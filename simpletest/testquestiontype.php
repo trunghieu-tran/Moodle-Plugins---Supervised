@@ -46,6 +46,7 @@ class reasc_test extends UnitTestCase {
 				$result->chars = null;
 				for($i=2; $prefixform[$i+1]!=')'; $i++){
 					$result->chars += $prefixform[i];
+				}
 				if($prefixform[$i]=='0'){
 					$result->direction=false;
 				} else {
@@ -114,43 +115,84 @@ class reasc_test extends UnitTestCase {
 	}
 	//Unit test for nullable function
 	function nullable_leaf_testing(){
-		$node = form_tree('(la1)');
-		$this->assertFalse(nullable($node));
+		$node = $this->form_tree('(la1)');
+		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_leaf_iteration_node_testing(){
-		$node=form_tree('(k* (la1))');
-		$this->assertTrue(nullable($node));
+		$node = $this->form_tree('(n* (la1))');
+		$this->assertTrue($this->qtype->nullable($node));
 	}
 	function nullable_leaf_concatenation_node_testing(){
-		$node = form_tree('(ko (la1)(lb1))');
-		$this->assertFalse(nullable($node));
+		$node = $this->form_tree('(no (la1)(lb1))');
+		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_leaf_alternative_node_testing(){
-		$node->form_tree('(k| (la1)(lb1))');
-		$this->assertFalse(nullable($node));
+		$node = $this->form_tree('(n| (la1)(lb1))');
+		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_node_concatenation_node_testing(){
-		$node = form_tree('(ko (k* (la1))(ko (lb1)(lc1)))');
-		$this->assertFalse(nullable($node));
+		$node = $this->form_tree('(no (n* (la1))(no (lb1)(lc1)))');
+		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_node_alternative_node_testing(){
-		$node = form_tree('(k| (k* (la1))(ko (lb1)(lc1)))');
-		$this->assertTrue(nullable($node));
+		$node = $this->form_tree('(n| (n* (la1))(no (lb1)(lc1)))');
+		$this->assertTrue($this->qtype->nullable($node));
 	}
 	function nullable_third_level_node_testing(){
-		$node = form_tree('(k| (k| (k| (la1)(lb1))(k* (lc1)))(k* (ld1)))');
-		$this->assertTrue(nullable($node));
+		$node = $this->form_tree('(n| (n| (n| (la1)(lb1))(n* (lc1)))(n* (ld1)))');
+		$this->assertTrue($this->qtype->nullable($node));
 	}
 	function nullable_question_quantificator_testing(){
-		$node = form_tree('(k? (la1))');
-		$this->assertTrue(nullable($node));
+		$node = $this->form_tree('(n? (la1))');
+		$this->assertTrue($this->qtype->nullable($node));
 	}
 	function nullable_negative_character_class_testing(){
-		$node = form_tree('(la0)');
-		$this->assertFalse(nullable($node));
+		$node = $this->form_tree('(la0)');
+		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_assert_testing(){
-		$node = form_tree('(ko (la1)(ko (kA (ko (k* (l\11))(lb1)))(k* (lxcvbnm1))))');
-		$this->assertTrue(nullable($node->secop->firop));
+		$node = $this->form_tree('(no (la1)(no (nA (no (n* (l\11))(lb1)))(n* (lxcvbnm1))))');
+		$this->assertTrue($this->qtype->nullable($node->secop->firop));
+	}
+	//Unit test for firstpos function
+	function firstpos_leaf_testing(){
+		$node = $this->form_tree('(la1)');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==1&&result[0]==1);
+	}
+	function firstpos_leaf_concatenation_node_testing(){
+		$node = $this->form_tree('(no (la1)(lb1))');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==1&&result[0]==1);
+	}
+	function firstpos_leaf_alternative_node_testing(){
+		$node = $this->form_tree('(n| (la1)(lb1))');
+		$result=$this->qtype->fistpos($node);
+		$this->assertTrue(count($result)==2&&$result[0]==1&&$result[1]==2);
+	}
+	function firstpos_three_leaf_alternative_testing(){
+		$node = $this->form_tree('(n| (la1)(n| (lb1)(lc1)))');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
+	}
+	function firstpos_leaf_iteration_node_testing(){
+		$node = $this->form_tree('(n* (la1))');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function firstpos_node_concatenation_node_testing(){
+		$node = $this->form_tree('(no (n* (lc1))(n| (la1)(lb1)))');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
+	}
+	function firstpos_node_alternative_node_testing(){
+		$node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
+		$result = $this->qtype->firstpos($node);
+		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
+	}
+	function firstpos_node_iteration_node_testing(){
+		$node = $this->form_tree('(n* (n* (la1)))');
+		$node = $this->form_tree('(no (n* (lc1))(n| (la1)(lb1)))');
+		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
 	?>
