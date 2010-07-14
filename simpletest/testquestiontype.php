@@ -37,9 +37,9 @@ class reasc_test extends UnitTestCase {
 	*@return root of formed tree
 	*/
 	function form_tree($prefixform){
-		$result = new node;
+		$result = & new node;
 		//forming the node or leaf
-		switch(prefixform[1]){ //analize first character, type of node/leaf
+		switch(prefixform[1]){ //analyze first character, type of node/leaf
 			case 'l': //simple leaf with char class
 				$result->type = LEAF;
 				$result->subtype = LEAF_CHARCLASS;
@@ -111,6 +111,46 @@ class reasc_test extends UnitTestCase {
 			break;
 		}
 		return $result;
-					
+	}
+	//Unit test for nullable function
+	function nullable_leaf_testing(){
+		$node = form_tree('(la1)');
+		$this->assertFalse(nullable($node));
+	}
+	function nullable_leaf_iteration_node_testing(){
+		$node=form_tree('(k* (la1))');
+		$this->assertTrue(nullable($node));
+	}
+	function nullable_leaf_concatenation_node_testing(){
+		$node = form_tree('(ko (la1)(lb1))');
+		$this->assertFalse(nullable($node));
+	}
+	function nullable_leaf_alternative_node_testing(){
+		$node->form_tree('(k| (la1)(lb1))');
+		$this->assertFalse(nullable($node));
+	}
+	function nullable_node_concatenation_node_testing(){
+		$node = form_tree('(ko (k* (la1))(ko (lb1)(lc1)))');
+		$this->assertFalse(nullable($node));
+	}
+	function nullable_node_alternative_node_testing(){
+		$node = form_tree('(k| (k* (la1))(ko (lb1)(lc1)))');
+		$this->assertTrue(nullable($node));
+	}
+	function nullable_third_level_node_testing(){
+		$node = form_tree('(k| (k| (k| (la1)(lb1))(k* (lc1)))(k* (ld1)))');
+		$this->assertTrue(nullable($node));
+	}
+	function nullable_question_quantificator_testing(){
+		$node = form_tree('(k? (la1))');
+		$this->assertTrue(nullable($node));
+	}
+	function nullable_negative_character_class_testing(){
+		$node = form_tree('(la0)');
+		$this->assertFalse(nullable($node));
+	}
+	function nullable_assert_testing(){
+		$node = form_tree('(ko (la1)(ko (kA (ko (k* (l\11))(lb1)))(k* (lxcvbnm1))))');
+		$this->assertTrue(nullable($node->secop->firop));
 	}
 	?>
