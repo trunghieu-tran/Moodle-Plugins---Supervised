@@ -247,4 +247,19 @@ class reasc_test extends UnitTestCase {
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
+	function lastpos_question_quantificator_testing(){
+		$node = $this->form->tree('(n? (la1))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function lastpos_negative_character_class_testing(){
+		$node = $this->form_tree('(n| (la0)(lb1))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==2&&$result[0]==-1&&$result[1]==2);
+	}
+	function lastpos_assert_testing(){
+		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
+		$this->qtype->lastpos($node);
+		$this->assertTrue(count($node->secop->firop->lastpos)&&$node->secop->firop->lastpos[0]>ASSERT);
+	}
 ?>
