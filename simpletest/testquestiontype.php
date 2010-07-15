@@ -151,7 +151,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($this->qtype->nullable($node));
 	}
 	function nullable_assert_testing(){
-		$node = $this->form_tree('(no (la1)(no (nA (no (n* (l\11))(lb1)))(n* (lxcvbnm1))))');
+		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
 		$this->assertTrue($this->qtype->nullable($node->secop->firop));
 	}
 	//Unit test for firstpos function
@@ -192,7 +192,23 @@ class reasc_test extends UnitTestCase {
 	}
 	function firstpos_node_iteration_node_testing(){
 		$node = $this->form_tree('(n* (n* (la1)))');
-		$node = $this->form_tree('(no (n* (lc1))(n| (la1)(lb1)))');
+		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function firstpos_question_quantificator_testing(){
+		$node = $this->form_tree('(n? (la1))');
+		$result = firstpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function firstpos_negative_character_class_testing(){
+		$node = $this->form_tree('(no (la0)(lb1))');
+		$this->qtype->firstpos($node);
+		$this->assertTrue(count($node->firstpos)==1&&$node->firstpos[0]==-1);
+		$this->assertTrue(count($node->firop->firstpos)==1&&$node->firop->firstpos==-1);
+	}
+	function firstpos_assert_testing(){
+		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
+		$this->qtype->firstpos($node);
+		$this->assertTrue(count($node->secop->firop->firstpos)&&$node->secop->firop->firstpos[0]>ASSERT);
 	}
 	?>

@@ -19,6 +19,9 @@ define('NODE_ASSERTTF','15');
 define('NODE_ASSERTTB','16');
 define('NODE_ASSERTFF','17');
 define('NODE_ASSERTFB','18');
+define('ASSERT','107741824');
+define('DOT','987654321');
+define('STREND','123456789');
 
 
 class node{
