@@ -30,6 +30,7 @@ class node{
 	enum subtype;
 	pointer firop,secop,thirdop;
 	bool nullable;
+	int number;
 	vector firstpos,lastpos,followpos;
 	bool direction;
 	bool greed;
@@ -45,6 +46,9 @@ class reasc{
 	function name(){
 		return 'reasc';
 	}
+	function numeration($node){
+		return -1;
+	}
 	function nullable($node){
 		return true;
 	}
@@ -54,6 +58,13 @@ class reasc{
 	}
 	function lastpos($node){
 		$result = array(0,0,0);
+		return $result;
+	}
+	function followpos($node, $fpmap){
+		$result=array(
+			array(0,0,0),
+			array(0,0,0),
+			array(0,0,0));
 		return $result;
 	}
 }
