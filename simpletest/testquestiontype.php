@@ -211,4 +211,40 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->firstpos($node);
 		$this->assertTrue(count($node->secop->firop->firstpos)&&$node->secop->firop->firstpos[0]>ASSERT);
 	}
-	?>
+	//Unit test for lastpos function
+	function lastpos_leaf_testing(){
+		$node = $this->form_tree('(la1)');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function lastpos_leaf_concatenation_node_testing(){
+		$node = $this->form_tree('(no (la1)(lb1))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==2);
+	}
+	function lastpos_leaf_alterbative_node_testing(){
+		$node = $this->form_tree('(n| (la1)(lb1))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==2&&$result[0]==1&&result[1]==2);
+	}
+	function lastpos_leaf_iteration_node_testing(){
+		$node = $this->form_tree('(n* (la1))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+	function lastpos_node_concatenation_node_testing(){
+		$node = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
+	}
+	function lastpos_node_alternative_node_testing(){
+		$node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
+	}
+	function lastpos_node_iteration_node_testing(){
+		$node = $this->form_tree('(n* (n* (la1)))');
+		$result = $this->qtype->lastpos($node);
+		$this->assertTrue(count($result)==1&&$result[0]==1);
+	}
+?>

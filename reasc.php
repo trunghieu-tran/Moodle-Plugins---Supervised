@@ -49,7 +49,12 @@ class reasc{
 		return true;
 	}
 	function firstpos($node){
-		$result=array(0,0,0);
+		$result = array(0,0,0);
+		return $result;
+	}
+	function lastpos($node){
+		$result = array(0,0,0);
+		return $result;
 	}
 }
 ?>
