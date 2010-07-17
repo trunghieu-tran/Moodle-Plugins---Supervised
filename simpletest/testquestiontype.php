@@ -36,18 +36,18 @@ class reasc_test extends UnitTestCase {
 	*@param prefixform string with regexp in prefix form
 	*@return croot of formed tree
 	*/
-	function form_tree($prefixform){
+	function form_tree($prefixform) {
 		$result = new node;
 		//forming the node or leaf
-		switch($prefixform[1]){ //analyze first character, type of node/leaf
+		switch($prefixform[1]) { //analyze first character, type of node/leaf
 			case 'l': //simple leaf with char class
 				$result->type = LEAF;
 				$result->subtype = LEAF_CHARCLASS;
 				$result->chars = null;
-				for($i=2; $prefixform[$i+1]!=')'; $i++){
+				for($i=2; $prefixform[$i+1]!=')'; $i++) {
 					$result->chars.=$prefixform[$i];
 				}
-				if($prefixform[$i]=='0'){
+				if($prefixform[$i]=='0') {
 					$result->direction=false;
 				} else {
 					$result->direction=true;
@@ -63,7 +63,7 @@ class reasc_test extends UnitTestCase {
 				break;
 			case 'n':
 				$result->type = NODE;
-				switch($prefixform[2]){
+				switch($prefixform[2]) {
 					case 'o': //concatenation node
 						$result->subtype = NODE_CONC;
 						break;
@@ -83,25 +83,25 @@ class reasc_test extends UnitTestCase {
 				//forming operand
 				$brackets=0;
 				$tmp=null;
-				for($i=4; $brackets!=0||$i==4; $i++){
+				for($i=4; $brackets!=0||$i==4; $i++) {
 					$tmp.=$prefixform[$i];
-					if($prefixform[$i]=='('){
+					if($prefixform[$i]=='(') {
 						$brackets++;
 					}
-					if($prefixform[$i]==')'){
+					if($prefixform[$i]==')') {
 						$brackets--;
 					}
 				}
 				//forming second operand
 	//			$result->firop = form_tree($tmp);
-				if($result->subtype==NODE_CONC||$result->subtype==NODE_ALT){
+				if($result->subtype==NODE_CONC||$result->subtype==NODE_ALT) {
 					$tmp = null;
 					do{
 						$tmp.=$prefixform[$i];
-						if($prefixform[$i]=='('){
+						if($prefixform[$i]=='(') {
 							$brackets++;
 						}
-						if($prefixform[$i]==')'){
+						if($prefixform[$i]==')') {
 							$brackets--;
 						}
 						$i++;
@@ -113,111 +113,111 @@ class reasc_test extends UnitTestCase {
 		return $result;
 	}
 	//Unit test for nullable function
-	function test_nullable_leaf(){
+	function test_nullable_leaf() {
 		$node = $this->form_tree('(la1)');
 		$this->assertFalse($this->qtype->nullable($node));
 	}
-	function test_nullable_leaf_iteration_node(){
+	function test_nullable_leaf_iteration_node() {
 		$node = $this->form_tree('(n* (la1))');
 		$this->assertTrue($this->qtype->nullable($node));
 	}
-	function test_nullable_leaf_concatenation_node(){
+	function test_nullable_leaf_concatenation_node() {
 		$node = $this->form_tree('(no (la1)(lb1))');
 		$this->assertFalse($this->qtype->nullable($node));
 	}
-	function test_nullable_leaf_alternative_node(){
+	function test_nullable_leaf_alternative_node() {
 		$node = $this->form_tree('(n| (la1)(lb1))');
 		$this->assertFalse($this->qtype->nullable($node));
 	}
-	function test_nullable_node_concatenation_node(){
+	function test_nullable_node_concatenation_node() {
 		$node = $this->form_tree('(no (n* (la1))(no (lb1)(lc1)))');
 		$this->assertFalse($this->qtype->nullable($node));
 	}
-	function test_nullable_node_alternative_node(){
+	function test_nullable_node_alternative_node() {
 		$node = $this->form_tree('(n| (n* (la1))(no (lb1)(lc1)))');
 		$this->assertTrue($this->qtype->nullable($node));
 	}
-	function test_nullable_third_level_node(){
+	function test_nullable_third_level_node() {
 		$node = $this->form_tree('(n| (n| (n| (la1)(lb1))(n* (lc1)))(n* (ld1)))');
 		$this->assertTrue($this->qtype->nullable($node));
 	}
-	function test_nullable_question_quantificator(){
+	function test_nullable_question_quantificator() {
 		$node = $this->form_tree('(n? (la1))');
 		$this->assertTrue($this->qtype->nullable($node));
 	}
-	function test_nullable_negative_character_class(){
+	function test_nullable_negative_character_class() {
 		$node = $this->form_tree('(la0)');
 		$this->assertFalse($this->qtype->nullable($node));
 	}
-	function test_nullable_assert(){
+	function test_nullable_assert() {
 		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
 		$this->assertTrue($this->qtype->nullable($node->secop->firop));
 	}
 	//Unit test for firstpos function
-	function test_firstpos_leaf(){
+	function test_firstpos_leaf() {
 		$node = $this->form_tree('(la1)');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_firstpos_leaf_concatenation_node(){
+	function test_firstpos_leaf_concatenation_node() {
 		$node = $this->form_tree('(no (la1)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_firstpos_leaf_alternative_node(){
+	function test_firstpos_leaf_alternative_node() {
 		$node = $this->form_tree('(n| (la1)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result=$this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==2&&$result[0]==1&&$result[1]==2);
 	}
-	function test_firstpos_three_leaf_alternative(){
+	function test_firstpos_three_leaf_alternative() {
 		$node = $this->form_tree('(n| (la1)(n| (lb1)(lc1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
 	}
-	function test_firstpos_leaf_iteration_node(){
+	function test_firstpos_leaf_iteration_node() {
 		$node = $this->form_tree('(n* (la1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_firstpos_node_concatenation_node(){
+	function test_firstpos_node_concatenation_node() {
 		$node = $this->form_tree('(no (n* (lc1))(n| (la1)(lb1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
 	}
-	function test_firstpos_node_alternative_node(){
+	function test_firstpos_node_alternative_node() {
 		$node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
 	}
-	function test_firstpos_node_iteration_node(){
+	function test_firstpos_node_iteration_node() {
 		$node = $this->form_tree('(n* (n* (la1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_firstpos_question_quantificator(){
+	function test_firstpos_question_quantificator() {
 		$node = $this->form_tree('(n? (la1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->firstpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_firstpos_negative_character_class(){
+	function test_firstpos_negative_character_class() {
 		$node = $this->form_tree('(no (la0)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
@@ -225,7 +225,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($node->firstpos)==1&&$node->firstpos[0]==-1);
 		$this->assertTrue(count($node->firop->firstpos)==1&&$node->firop->firstpos==-1);
 	}
-	function test_firstpos_assert(){
+	function test_firstpos_assert() {
 		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
@@ -233,70 +233,70 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($node->secop->firop->firstpos)&&$node->secop->firop->firstpos[0]>ASSERT);
 	}
 	//Unit test for lastpos function
-	function test_lastpos_leaf(){
+	function test_lastpos_leaf() {
 		$node = $this->form_tree('(la1)');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_lastpos_leaf_concatenation_node(){
+	function test_lastpos_leaf_concatenation_node() {
 		$node = $this->form_tree('(no (la1)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==2);
 	}
-	function test_lastpos_leaf_alterbative_node(){
+	function test_lastpos_leaf_alterbative_node() {
 		$node = $this->form_tree('(n| (la1)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==2&&$result[0]==1&&$result[1]==2);
 	}
-	function test_lastpos_leaf_iteration_node(){
+	function test_lastpos_leaf_iteration_node() {
 		$node = $this->form_tree('(n* (la1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_lastpos_node_concatenation_node(){
+	function test_lastpos_node_concatenation_node() {
 		$node = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
 	}
-	function test_lastpos_node_alternative_node(){
+	function test_lastpos_node_alternative_node() {
 		$node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==3&&$result[0]==1&&$result[1]==2&&$result[2]==3);
 	}
-	function test_lastpos_node_iteration_node(){
+	function test_lastpos_node_iteration_node() {
 		$node = $this->form_tree('(n* (n* (la1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_lastpos_question_quantificator(){
+	function test_lastpos_question_quantificator() {
 		$node = $this->form_tree('(n? (la1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==1&&$result[0]==1);
 	}
-	function test_lastpos_negative_character_class(){
+	function test_lastpos_negative_character_class() {
 		$node = $this->form_tree('(n| (la0)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$result = $this->qtype->lastpos($node);
 		$this->assertTrue(count($result)==2&&$result[0]==-1&&$result[1]==2);
 	}
-	function test_lastpos_assert(){
+	function test_lastpos_assert() {
 		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
@@ -304,7 +304,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($node->secop->firop->lastpos)&&$node->secop->firop->lastpos[0]>ASSERT);
 	}
 	//Unit tests for followpos function
-	function test_followpos_node_concatenation_node(){
+	function test_followpos_node_concatenation_node() {
 		$node = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (la1)(lb1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
@@ -317,7 +317,7 @@ class reasc_test extends UnitTestCase {
 		$res3 = (count($result[3])==1&&$result[3][0]==4);
 		$this->assertTrue($res1&&$res2&&$res3);
 	}
-	function test_followpos_three_node_alternative(){
+	function test_followpos_three_node_alternative() {
 		$node = $this->form_tree('((n| (n| (no (la1)(lb1))(no (lc1)(ld1)))(no (le1)(lf1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->firstpos($node);
@@ -329,7 +329,7 @@ class reasc_test extends UnitTestCase {
 		$res3 = (count($result[5])==1&&$result[5][0]==6);
 		$this->assertTrue($res1&&$res2&&$res3);
 	}
-	function test_followpos_question_quantificator(){
+	function test_followpos_question_quantificator() {
 		$node = $this->form_tree('(no (n? (la1))(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->firstpos($node);
@@ -338,7 +338,7 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->followpos($node, $result);
 		$this->assertTrue(count($result[1])==1&&$result[1][0]==2);
 	}
-	function test_followpos_negative_character_class(){
+	function test_followpos_negative_character_class() {
 		$node = $this->form_tree('(no (la0)(lb1))');
 		$this->qtype->numeration($node);
 		$this->qtype->firstpos($node);
@@ -348,7 +348,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($result[-1])==1&&$result[-1][0]==2);
 	}
 	//Unit test for buildfa function
-	function test_buildfa_easy(){//ab
+	function test_buildfa_easy() {//ab
 		$this->qtype->croot = $this->form_tree('(no (la1)(lb1))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -356,7 +356,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==1&&$this->qtype->finiteautomate[1]->passages[2]==2);
 		$this->assertTrue(count($this->qtype->finiteautomate[2]->passages)==1&&$this->qtype->finiteautomate[2]->passages[STREND]==-1);
 	}
-	function test_buildfa_iteration(){//ab*
+	function test_buildfa_iteration() {//ab*
 		$this->qtype->croot = $this->form_tree('(no (la1)(n* (lb1)))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -367,7 +367,7 @@ class reasc_test extends UnitTestCase {
 							$this->qtype->finiteautomate[$n1]->passages[1]==$n1);
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[STREND]==-1);
 	}
-	function test_buildfa_alternative(){//a|b
+	function test_buildfa_alternative() {//a|b
 		$this->qtype->croot = $this->form_tree('(n| (la1)(lb1))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -375,7 +375,7 @@ class reasc_test extends UnitTestCase {
 							$this->qtype->finiteautomate[0]->passages[2]==1);
 		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==1&&$this->qtype->finiteautomate[1]->passages[STREND]==-1);
 	}
-	function test_buildfa_alternative_and_iteration(){//(a|b)c*
+	function test_buildfa_alternative_and_iteration() {//(a|b)c*
 		$this->qtype->croot = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -386,7 +386,7 @@ class reasc_test extends UnitTestCase {
 							$this->qtype->finiteautomate[$n1]->passages[STREND]==-1);
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[STREND]==-1);
 	}
-	function test_buildfa_nesting_alternative_and_iteration(){//(ab|cd)*
+	function test_buildfa_nesting_alternative_and_iteration() {//(ab|cd)*
 		$this->qtype->croot = $this->form_tree('(n* (n| (no (la1)(lb1))(no (lc1)(ld1))))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -396,7 +396,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==1&&$this->qtype->finiteautomate[$n1]->passages[2]==0);
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[4]==0);
 	}
-	function test_buildfa_question_quantificator(){//a?b
+	function test_buildfa_question_quantificator() {//a?b
 		$this->qtype->croot = $this->form_tree('(no (n? (la1))(lb1))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -406,7 +406,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==1&&$this->qtype->finiteautomate[$n1]->passages[2]==$n2);
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[STREND]==-1);
 	}
-	function test_buildfa_negative_character_class(){//(a[^b]|c[^d])*
+	function test_buildfa_negative_character_class() {//(a[^b]|c[^d])*
 		$this->qtype->croot = $this->form_tree('(n* (n| (no (la1)(lb0))(no (lc1)(ld0))))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -416,7 +416,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==1&&$this->qtype->finiteautomate[$n1]->passages[-2]==0);
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[-4]==0);
 	}
-	function test_buildfa_assert(){//a(?=.*b)[xcvbnm]*
+	function test_buildfa_assert() {//a(?=.*b)[xcvbnm]*
 		$this->qtype->croot = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -433,7 +433,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[2]->passages)==1&&$this->qtype->finiteautomate[2]->passages[STREND]==-1);
 	}
 	//Unit tests for compare function
-	function test_compare_full_incorrect(){//ab
+	function test_compare_full_incorrect() {//ab
 		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[STREND] = -1;
 		$this->connection[0][1] = 'a';
@@ -442,7 +442,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($result->full);
 		$this->assertTrue($result->index==-1&&$result->next=='a');
 	}
-	function test_compare_first_character_incorrect(){//ab
+	function test_compare_first_character_incorrect() {//ab
 		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -453,7 +453,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($result->full);
 		$this->assertTrue($result->index==-1&&$result->next=='a');
 	}
-	function test_compare_particular_correct(){//ab
+	function test_compare_particular_correct() {//ab
 	$this->qtype->finiteautomates[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -464,7 +464,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($result->full);
 		$this->assertTrue($result->index==0&&$result->next=='b');
 	}
-	function test_compare_full_correct(){//ab
+	function test_compare_full_correct() {//ab
 		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -474,7 +474,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue($result->full);
 		$this->assertTrue($result->index==1&&$result->next==0);
 	}
-	function test_compare_question_quantificator(){//a?b
+	function test_compare_question_quantificator() {//a?b
 		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomates[0][0]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
@@ -491,7 +491,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($result->full);
 		$this->assertTrue($result->index==-1&&$result->next=='b');
 	}
-	function test_compare_negative_character_class(){//[^a][b]
+	function test_compare_negative_character_class() {//[^a][b]
 		$this->qtype->finiteautomates[0][0]->passages[-1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -504,7 +504,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue($result2->full);
 		$this->assertTrue($result2->index==1&&$result->next==0);
 	}
-	function test_compare_dot(){
+	function test_compare_dot() {
 		$this->qtype->finiteautomates[0][0]->passages[DOT+1] = 1;
 		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
 		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -519,7 +519,7 @@ class reasc_test extends UnitTestCase {
 		$this->assertFalse($result->full);
 		$this->assertTrue($result->index==0&&$result->next=='b');
 	}
-	function test_compare_assert(){//a(?=.*b)[xcvbnm]*
+	function test_compare_assert() {//a(?=.*b)[xcvbnm]*
 		$this->qtype->finiteautomate[0][0]->passages[1] = 1;
 		$this->qtype->finiteautomate[0][1]->passages[3] = 2;
 		$this->qtype->finiteautomate[0][2]->passages[STREND] = -1;
@@ -545,7 +545,7 @@ class reasc_test extends UnitTestCase {
 	}
 	//General tests, testing buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
 	//reasc without input and output data.
-	function test_general_repeat_characters(){//(a|b)*abb
+	function test_general_repeat_characters() {//(a|b)*abb
 		$this->qtype->croot = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (no (la1)(lb1))(lb1))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
@@ -569,12 +569,12 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue($result6->full);
 		$this->assertTrue($result6->index==33&&$result6->next==0);
 	}
-	function test_general_assert(){//a(?=.*b)[xcvbnm]*
+	function test_general_assert() {//a(?=.*b)[xcvbnm]*
 		$this->qtype->croot = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
 		$this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
-		foreach($this->qtype->roots as $key=>$value){
+		foreach($this->qtype->roots as $key=>$value) {
 			if($key) {
 				$this->qtype->croot = $value;
 				$this->qtype->append_end();
@@ -600,7 +600,7 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
 		$this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
-		foreach($this->qtype->roots as $key=>$value){
+		foreach($this->qtype->roots as $key=>$value) {
 			if($key) {
 				$this->qtype->croot = $value;
 				$this->qtype->append_end();

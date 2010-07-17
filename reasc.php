@@ -24,7 +24,7 @@ define('DOT','987654321');
 define('STREND','123456789');
 
 
-class node{
+class node {
 	var $type;
 	var $subtype;
 	var $firop;
@@ -39,60 +39,68 @@ class node{
 	var $greed;
 	var $chars;
 	
-	function name(){
+	function name() {
 		return 'node';
 	}
 }
 
-class fas{//finite automate state
+class fas {//finite automate state
 	var $asserts;
 	var $passages;//хранит номера состояний к которым перейти
+	
+	function name() {
+		return 'fas';
+	}
 }
 
-class compare_result{
+class compare_result {
 	var $index;
 	var $full;
 	var $next;
+	
+	function name() {
+		return 'compare_result';
+	}
 }
 
-class reasc{
+class reasc {
 	var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
 	var $cconn;//for current connection
-	var $roots;//array,[0] main root, [assert number] assert's root
+	var $roots;//array,[0] main root, [<assert number>] assert's root
 	var $croot;//for current root
 	var $maxnum;
 	var $finiteautomate;// for current finite  automate
 	var $finiteautomates;
 	
-	function name(){
+	function name() {
 		return 'reasc';
 	}
-	function append_end(){
+	function append_end() {
 	}
-	function numeration($node){
+	function numeration($node) {
 		return -1;
 	}
-	function nullable($node){
+	function nullable($node) {
 		return true;
 	}
-	function firstpos($node){
+	function firstpos($node) {
 		$result = array(0,0,0);
 		return $result;
 	}
-	function lastpos($node){
+	function lastpos($node) {
 		$result = array(0,0,0);
 		return $result;
 	}
-	function followpos($node, $fpmap){
+	function followpos($node, $fpmap) {
 		$fpmap=array(
 			array(0,0,0),
 			array(0,0,0),
 			array(0,0,0));
 	}
-	function buildfa(){//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0] остальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
+	function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0] остальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
 	
 	}
-	function compare($string, $assertnumber){//if main regex then assertnumber is 0
+	function compare($string, $assertnumber) {//if main regex then assertnumber is 0
 		$result = new compare_result;
 		return $result;
 	}
