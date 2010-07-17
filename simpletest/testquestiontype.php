@@ -543,5 +543,83 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue($result4->full);
 		$this->assertTrue($result4->index==3&&$result4->next==0);
 	}
+	//General tests, testing buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
+	//reasc without input and output data.
+	function test_general_repeat_characters(){//(a|b)*abb
+		$this->qtype->croot = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (no (la1)(lb1))(lb1))');
+		$this->qtype->append_end();
+		$this->qtype->buildfa();
+		$this->qtype->finiteautomates[0] = $this->qtype->finiteautomate;
+		$result1 = $this->qtype->compare('cd', 0);
+		$result2 = $this->qtype->compare('ca', 0);
+		$result3 = $this->qtype->compare('ac', 0);
+		$result4 = $this->qtype->compare('bb', 0);
+		$result5 = $this->qtype->compare('abb', 0);
+		$result6 = $this->qtype->compare('ababababababaabbabababababababaabb', 0);//34 characters
+		$this->assertFalse($result1->full);
+		$this->assertTrue($result1->index==-1&&$result1->next=='a');
+		$this->assertFalse($result2->full);
+		$this->assertTrue($result2->index==-1&&$result2->next=='a');
+		$this->assertFalse($result3->full);
+		$this->assertTrue($result3->index==0&&$result3->next=='b');
+		$this->assertFalse($result4->full);
+		$this->assertTrue($result4->index==1&&$result4->next=='a');
+		$this->assertTrue($result5->full);
+		$this->assertTrue($result5->index==2&&$result5->next==0);
+		$this->assertTrue($result6->full);
+		$this->assertTrue($result6->index==33&&$result6->next==0);
+	}
+	function test_general_assert(){//a(?=.*b)[xcvbnm]*
+		$this->qtype->croot = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
+		$this->qtype->append_end();
+		$this->qtype->buildfa();
+		$this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
+		foreach($this->qtype->roots as $key=>$value){
+			if($key) {
+				$this->qtype->croot = $value;
+				$this->qtype->append_end();
+				$this->qtype->buildfa();
+				$this->qtype->finiteautomates[$key] = $this->qtype->finiteautomate;
+			}
+		}
+		$result1 = $this->qtype->compare('an', 0);
+		$result2 = $this->qtype->compare('anvnvb', 0);
+		$result3 = $this->qtype->compare('avnvnv', 0);
+		$result4 = $this->qtype->compare('abnm', 0);
+		$this->assertFalse($result1->full);
+		$this->assertTrue($result1->index==1&&$result1->next=='b');
+		$this->assertTrue($result2->full);
+		$this->assertTrue($result2->index==5&&$result2->next==0);
+		$this->assertFalse($result3->full);
+		$this->assertTrue($result3->index==5&&$result3->next=='b');
+		$this->assertTrue($result4->full);
+		$this->assertTrue($result4->index==3&&$result4->next==0);
+	}
+	function test_general_two_asserts() {//a(?=b)(?=.*c)[xcvbnm]*
+		$this->qtype->croot = $this->form_tree('(no (no (la1)(nA lb1))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm))))');
+		$this->qtype->append_end();
+		$this->qtype->buildfa();
+		$this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
+		foreach($this->qtype->roots as $key=>$value){
+			if($key) {
+				$this->qtype->croot = $value;
+				$this->qtype->append_end();
+				$this->qtype->buildfa();
+				$this->qtype->finiteautomates[$key] = $this->qtype->finiteautomate;
+			}
+		}
+		$result1 = $this->qtype->compare('avnm', 0);
+		$result2 = $this->qtype->compare('acnm', 0);
+		$result3 = $this->qtype->compare('abnm', 0);
+		$result4 = $this->qtype->compare('abnc', 0);
+		$this->assertFalse($result1->full);
+		$this->assertTrue($result1->index==0&&$result1->next=='b');
+		$this->assertFalse($result2->full);
+		$this->assertTrue($result2->index==0&&$result2->next=='b');
+		$this->assertFalse($result3->full);
+		$this->assertTrue($result3->index==3&&$result3->next=='c');
+		$this->assertTrue($result4->full);
+		$this->assertTrue($result4->index==3&&$result4->next==0);
+	}
 }
 ?>
