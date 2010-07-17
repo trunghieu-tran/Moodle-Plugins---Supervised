@@ -25,26 +25,43 @@ define('STREND','123456789');
 
 
 class node{
-	/*
-	enum type;
-	enum subtype;
-	pointer firop,secop,thirdop;
-	bool nullable;
-	int number;
-	vector firstpos,lastpos,followpos;
-	bool direction;
-	bool greed;
-	string chars;
-	*/
+	var $type;
+	var $subtype;
+	var $firop;
+	var $secop;
+	var $thirdop;
+	var $nullable;
+	var $number;
+	var $firstpos;
+	var $lastpos;
+	var $followpos;
+	var $direction;
+	var $greed;
+	var $chars;
+	
 	function name(){
 		return 'node';
 	}
 }
 
-class reasc{
+class fas{//finite automate state
+	var $asserts;
+	var $passages;//хранит номера состояний к которым перейти
+}
 
+class reasc{
+	var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
+	var $cconn;//for current connection
+	var $roots;//array,[0] main root, [assert number] assert's root
+	var $croot;//for current root
+	var $maxnum;
+	var $finiteautomate;// for current finite  automate
+	var $assertautomates;
+	
 	function name(){
 		return 'reasc';
+	}
+	function append_end(){
 	}
 	function numeration($node){
 		return -1;
@@ -61,11 +78,12 @@ class reasc{
 		return $result;
 	}
 	function followpos($node, $fpmap){
-		$result=array(
+		$fpmap=array(
 			array(0,0,0),
 			array(0,0,0),
 			array(0,0,0));
-		return $result;
+	}
+	function buildfa(){//Начальное состояние ДКА сохраняется в поле finiteautomate[0] остальные состояния в прочих эл-тах этого массива
 	}
 }
 ?>
