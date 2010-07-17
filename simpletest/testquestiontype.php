@@ -432,5 +432,116 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==1&&$this->qtype->finiteautomate[1]->passages[2]==2);
 		$this->assertTrue(count($this->qtype->finiteautomate[2]->passages)==1&&$this->qtype->finiteautomate[2]->passages[STREND]==-1);
 	}
+	//Unit tests for compare function
+	function test_compare_full_incorrect(){//ab
+		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[STREND] = -1;
+		$this->connection[0][1] = 'a';
+		$this->connection[0][2] = 'b';
+		$result=$this->qtype->compare('b',0);
+		$this->assertFalse($result->full);
+		$this->assertTrue($result->index==-1&&$result->next=='a');
+	}
+	function test_compare_first_character_incorrect(){//ab
+		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][2] = 'b';
+		$this->qtype->connection[0][3] = 'c';
+		$result = $this->qtype->compare('cb',0);
+		$this->assertFalse($result->full);
+		$this->assertTrue($result->index==-1&&$result->next=='a');
+	}
+	function test_compare_particular_correct(){//ab
+	$this->qtype->finiteautomates[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][2] = 'b';
+		$this->qtype->connection[0][3] = 'c';
+		$result = $this->qtype->compare('ac',0);
+		$this->assertFalse($result->full);
+		$this->assertTrue($result->index==0&&$result->next=='b');
+	}
+	function test_compare_full_correct(){//ab
+		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][2] = 'b';
+		$result = $this->qtype->compare('ab',0);
+		$this->assertTrue($result->full);
+		$this->assertTrue($result->index==1&&$result->next==0);
+	}
+	function test_compare_question_quantificator(){//a?b
+		$this->qtype->finiteautomates[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomates[0][0]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][2] = 'b';
+		$result1 = $this->qtype->compare('ab',0);
+		$result2 = $this->qtype->compare('b',0);
+		$result3 = $this->qtype->compare('Incorrect string',0);
+		$this->assertTrue($result1->full);
+		$this->assertTrue($result1->index==1&&$result1->next==0);
+		$this->assertTrue($result2->full);
+		$this->assertTrue($result2->index==0&&$result->next==0);
+		$this->assertFalse($result->full);
+		$this->assertTrue($result->index==-1&&$result->next=='b');
+	}
+	function test_compare_negative_character_class(){//[^a][b]
+		$this->qtype->finiteautomates[0][0]->passages[-1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][2] = 'b';
+		$result1 = $this->qtype->compare('ab',0);
+		$result2 = $this->qtype->compare('bb',0);
+		$this->assertFalse($result1->full);
+		$this->assertTrue($result1->index==-1&&$result1->next!='a');
+		$this->assertTrue($result2->full);
+		$this->assertTrue($result2->index==1&&$result->next==0);
+	}
+	function test_compare_dot(){
+		$this->qtype->finiteautomates[0][0]->passages[DOT+1] = 1;
+		$this->qtype->finiteautomates[0][1]->passages[2] = 2;
+		$this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+		$this->qtype->connection[0][2] = 'b';
+		$result1 = $this->qtype->compare('ab',0);
+		$result2 = $this->qtype->compare('fbf',0);
+		$result3 = $this->qtype->compare('fff',0);
+		$this->assertTrue($result1->full);
+		$this->assertTrue($result1->index==1&&$result1->next==0);
+		$this->assertFalse($result2->full);
+		$this->assertTrue($result2->index==1&&$result->next==0);
+		$this->assertFalse($result->full);
+		$this->assertTrue($result->index==0&&$result->next=='b');
+	}
+	function test_compare_assert(){//a(?=.*b)[xcvbnm]*
+		$this->qtype->finiteautomate[0][0]->passages[1] = 1;
+		$this->qtype->finiteautomate[0][1]->passages[3] = 2;
+		$this->qtype->finiteautomate[0][2]->passages[STREND] = -1;
+		$this->qtype->finiteautomate[0][0]->asserts[0] = ASSERT+2;
+		$this->qtype->finiteautomate[ASSERT+2][0]->passages[DOT+1] = 0;
+		$this->qtype->finiteautomate[ASSERT+2][0]->passages[2] = 1;
+		$this->qtype->finiteautomate[ASSERT+2][1]->passages[STREND] = -1;
+		$this->qtype->connection[0][1] = 'a';
+		$this->qtype->connection[0][3] = 'xcvbnm';
+		$this->qtype->connection[ASSERT+2][2] = 'b';
+		$result1 = $this->qtype->compare('an',0);
+		$result2 = $this->qtype->compare('annvnvb',0);
+		$result3 = $this->qtype->compare('annvnvv',0);
+		$result4 = $this->qtype->compare('abnm',0);
+		$this->assertFalse($result1->full);
+		$this->assertTrue($result1->index==1&&$result1->next=='b');
+		$this->assertTrue($result2->full);
+		$this->assertTrue($result2->index==6&&$result2->next==0);
+		$this->assertFalse($result3->full);
+		$this->assertTrue($result3->index==6&&$result3->next=='b');
+		$this->assertTrue($result4->full);
+		$this->assertTrue($result4->index==3&&$result4->next==0);
+	}
 }
 ?>

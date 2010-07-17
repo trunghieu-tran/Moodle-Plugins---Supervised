@@ -49,6 +49,12 @@ class fas{//finite automate state
 	var $passages;//хранит номера состояний к которым перейти
 }
 
+class compare_result{
+	var $index;
+	var $full;
+	var $next;
+}
+
 class reasc{
 	var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
 	var $cconn;//for current connection
@@ -56,7 +62,7 @@ class reasc{
 	var $croot;//for current root
 	var $maxnum;
 	var $finiteautomate;// for current finite  automate
-	var $assertautomates;
+	var $finiteautomates;
 	
 	function name(){
 		return 'reasc';
@@ -83,7 +89,12 @@ class reasc{
 			array(0,0,0),
 			array(0,0,0));
 	}
-	function buildfa(){//Начальное состояние ДКА сохраняется в поле finiteautomate[0] остальные состояния в прочих эл-тах этого массива
+	function buildfa(){//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0] остальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
+	
+	}
+	function compare($string, $assertnumber){//if main regex then assertnumber is 0
+		$result = new compare_result;
+		return $result;
 	}
 }
 ?>
