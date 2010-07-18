@@ -223,14 +223,14 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->nullable($node);
 		$this->qtype->firstpos($node);
 		$this->assertTrue(count($node->firstpos)==1&&$node->firstpos[0]==-1);
-		$this->assertTrue(count($node->firop->firstpos)==1&&$node->firop->firstpos==-1);
+		$this->assertTrue(count($node->firop->firstpos)==1&&$node->firop->firstpos[0]==-1);
 	}
 	function test_firstpos_assert() {
 		$node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
 		$this->qtype->numeration($node);
 		$this->qtype->nullable($node);
 		$this->qtype->firstpos($node);
-		$this->assertTrue(count($node->secop->firop->firstpos)&&$node->secop->firop->firstpos[0]>ASSERT);
+		$this->assertTrue(count($node->secop->firop->firstpos)==1&&$node->secop->firop->firstpos[0]>ASSERT);
 	}
 	//Unit test for lastpos function
 	function test_lastpos_leaf() {

@@ -83,8 +83,8 @@ class reasc {
 	*@param $node current node (or leaf) for numerating.
 	*/
 	function numeration(&$node) {
-		if($node->type==NODE&&$node->subtype==ASSERTTF) {//assert node need number
-			$node->number = ++$this->$maxnum + ASSERTTF;
+		if($node->type==NODE&&$node->subtype==NODE_ASSERTTF) {//assert node need number
+			$node->number = ++$this->maxnum + ASSERT;
 		} else if($node->type==NODE) {//not need number for not assert node, numerate operands
 			$this->numeration($node->firop);
 			if ($node->subtype==NODE_CONC||$node->subtype==NODE_ALT) {//concatenation and alternative have second operand, numerate it.
@@ -135,8 +135,41 @@ class reasc {
 		$node->nullable = $result;//save result in node
 		return $result;
 	}
-	function firstpos($node) {
-		$result = array(0,0,0);
+	/**
+	*функция определяет какие символы могут стоять на 1-м месте в слове порождаемом поддеревом с вершиной в данном узле
+	*@param $node root of subtree giving word
+	*@return numbers of characters
+	*/
+	function firstpos(&$node) {
+		if($node->type==NODE) {
+			switch($node->subtype) {
+				case NODE_ALT:
+					$result = array_merge($this->firstpos($node->firop), $this->firstpos($node->secop));
+					break;
+				case NODE_CONC:
+					$result = $this->firstpos($node->firop);
+					if($node->firop->nullable) {
+						$result = array_merge($result, $this->firstpos($node->secop));
+					} else {
+						$this->firstpos($node->secop);
+					}
+					break;
+				case NODE_QUESTQUANT:
+				case NODE_ITER:
+					$result = $this->firstpos($node->firop);
+					break;
+				case NODE_ASSERTTF:
+					$result = array($node->number);
+					break;
+			}
+		} else {
+			if($node->direction) {
+				$result = array($node->number);
+			} else {
+				$result = array(-$node->number);
+			}
+		}
+		$node->firstpos = $result;
 		return $result;
 	}
 	function lastpos($node) {
