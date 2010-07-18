@@ -32,12 +32,12 @@ define('STREND','123456789');
 *	lastpos 						ãîòîâà, 	ïîäôóíêöèé íåò
 *	followpos 						ãîòîâà, 	ïîäôóíêöèè ãîòîâû
 *		fp_push 					ãîòîâà, 	ïîäôóíêöèé íåò
-*	find_asserts 					íåãîòîâà, 	ïîäôóíêöèé íåò								!!
+*	find_asserts 					ãîòîâà, 	ïîäôóíêöèé íåò								
 *	not_marked_state 				íåãîòîâà, 	ïîäôóíêöèé íåò								!!
 *	followposU 						íåãîòîâà, 	ïîäôóíêöèè íåãîòîâû							!!	!!
 *		is_include_characters 		íåãîòîâà, 	ïîäôóíêöèé íåò								!!
 *	state 							íåãîòîâà, 	ïîäôóíêöèé íåò								!!
-*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 6 (ØÅÑÒÜ ÔÓÍÊÖÈÉ).
+*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 5 (ÏßÒÜ ÔÓÍÊÖÈÉ).
 */
 
 class node {
@@ -261,6 +261,22 @@ class reasc {
 		foreach($arr2 as $value) {
 			if(!in_array($value, $arr1)) {
 				$arr1[] = $value;
+			}
+		}
+	}
+	function find_asserts($node) {
+		if($node->type==NODE) {
+			switch($node->subtype) {
+				case NODE_ASSERTTF:
+					$this->roots[$node->number] = $node;
+					break;
+				case NODE_ALT:
+				case NODE_CONC:
+					$this->find_asserts($node->secop);
+				case NODE_ITER:
+				case NODE_QUESTQUANT:
+					$this->find_asserts($node->firop);
+					break;
 			}
 		}
 	}
