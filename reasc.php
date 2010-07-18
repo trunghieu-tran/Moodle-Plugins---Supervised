@@ -25,7 +25,7 @@ define('STREND','123456789');
 
 /*
 *построение ДКА использует:
-*buildfa 							неготова, 	подфункции частично готовы					!!	!
+*buildfa 							неготова, 	подфункции готовы					!!
 *	numeration 						готова, 	подфункций нет
 *	nullable 						готова, 	подфункций нет
 *	firstpos 						готова, 	подфункций нет
@@ -36,8 +36,8 @@ define('STREND','123456789');
 *	not_marked_state 				готова, 	подфункций нет								
 *	followposU 						готова, 	подфункции готовы								
 *		is_include_characters 		готова, 	подфункций нет								
-*	state 							неготова, 	подфункций нет								!!
-*ДЛЯ ПОСТРОЕНИЯ ДКА НЕГОТОВО 2 (ДВЕ) ФУНКЦИИ.
+*	state 							готова, 	подфункций нет								
+*ДЛЯ ПОСТРОЕНИЯ ДКА НЕГОТОВО 1 (ОДНА) ФУНКЦИЯ.
 */
 
 class node {
@@ -314,5 +314,28 @@ class reasc {
 		}
 		return $followU;
 	}
+	function state($state) {
+		$passcount = count($state);
+		$result = false;
+		$fasize = count($this->finiteautomate);
+		for($i=0; $i<$fasize&&!$result; $i++) {
+			$flag = true;
+			if($passcount!=$this->count($this->finiteautomate[$i]->passages) {
+				$flag = false;
+			}
+			reset($state);
+			reset($this->finiteautomate[$i]->passages);
+			for($j=0; $flag&&$j<$passcount; $j++) {
+				if(key($state)!=key($this->finiteautomate[$i]->passages)) {
+					$flag = false;
+				}
+				next($state);
+				next($this->finiteautomate[$i]->passages);
+			}
+			if(flag) {
+				$result = $this->finiteautomte[$i];
+			}
+		}
+		return $result;
 }
 ?>
