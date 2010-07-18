@@ -33,11 +33,11 @@ define('STREND','123456789');
 *	followpos 						готова, 	подфункции готовы
 *		fp_push 					готова, 	подфункций нет
 *	find_asserts 					готова, 	подфункций нет								
-*	not_marked_state 				неготова, 	подфункций нет								!!
+*	not_marked_state 				готова, 	подфункций нет								
 *	followposU 						неготова, 	подфункции неготовы							!!	!!
 *		is_include_characters 		неготова, 	подфункций нет								!!
 *	state 							неготова, 	подфункций нет								!!
-*ДЛЯ ПОСТРОЕНИЯ ДКА НЕГОТОВО 5 (ПЯТЬ ФУНКЦИЙ).
+*ДЛЯ ПОСТРОЕНИЯ ДКА НЕГОТОВО 4 (ЧЕТЫРЕ ФУНКЦИЙ).
 */
 
 class node {
@@ -62,6 +62,7 @@ class node {
 class fas {//finite automate state
 	var $asserts;
 	var $passages;//хранит номера состояний к которым перейти
+	var $marked;//if mrked then true else false.
 	
 	function name() {
 		return 'fas';
@@ -277,6 +278,15 @@ class reasc {
 				case NODE_QUESTQUANT:
 					$this->find_asserts($node->firop);
 					break;
+			}
+		}
+	}
+	function not_marked_state($built) {
+		$notmarkedstate = false;
+		$size = count($built);
+		for($i = 0; $i<$size&&!isset($notmarkedstate); ++$i) {
+			if(!$built[$i]->marked) {
+				$notmarkedstate = $built[$i];
 			}
 		}
 	}
