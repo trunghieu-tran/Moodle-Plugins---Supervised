@@ -34,7 +34,6 @@ class node {
 	var $number;
 	var $firstpos;
 	var $lastpos;
-	var $followpos;
 	var $direction;
 	var $greed;
 	var $chars;
@@ -82,7 +81,7 @@ class reasc {
 	*Put pair of number=>character to $this->cconn.
 	*@param $node current node (or leaf) for numerating.
 	*/
-	function numeration(&$node) {
+	function numeration($node) {
 		if($node->type==NODE&&$node->subtype==NODE_ASSERTTF) {//assert node need number
 			$node->number = ++$this->maxnum + ASSERT;
 		} else if($node->type==NODE) {//not need number for not assert node, numerate operands
@@ -111,7 +110,7 @@ class reasc {
 	*@param node - node fo analyze
 	*@return true if can give empty word, else false
 	*/
-	function nullable(&$node) {
+	function nullable($node) {
 		$result = false;
 		if($node->type==NODE) {
 			switch($node->subtype) {
@@ -140,7 +139,7 @@ class reasc {
 	*@param $node root of subtree giving word
 	*@return numbers of characters (array)
 	*/
-	function firstpos(&$node) {
+	function firstpos($node) {
 		if($node->type==NODE) {
 			switch($node->subtype) {
 				case NODE_ALT:
@@ -210,18 +209,44 @@ class reasc {
 		$node->lastpos = $result;
 		return $result;
 	}
-	function followpos($node, $fpmap) {
-		$fpmap=array(
-			array(0,0,0),
-			array(0,0,0),
-			array(0,0,0));
+	function followpos($node, &$fpmap) {
+		if($node->type==NODE) {
+			switch($node->subtype) {
+				case NODE_CONC:
+					$this->followpos($node->firop, $fpmap);
+					$this->followpos($node->secop, $fpmap);
+					foreach($node->firop->lastpos as $key) {#need fix
+						$this->fp_push($fpmap[$key], $node->secop->firstpos);
+					}
+					break;
+				case NODE_ITER:
+					$this->followpos($node->firop, $fpmap);
+					foreach($node->firop->lastpos as $key) {#need fix
+						$this->fp_push($fpmap[$key], $node->firop->firstpos);
+					}
+					break;
+				case NODE_ALT:
+					$this->followpos($node->secop, $fpmap);
+				case NODE_QUESTQUANT:
+					$this->followpos($node->firop, $fpmap);
+					break;
+			}
+		}
 	}
-	function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0] остальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
+	function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
+						//oстальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
 	
 	}
 	function compare($string, $assertnumber) {//if main regex then assertnumber is 0
 		$result = new compare_result;
 		return $result;
+	}
+	function fp_push(&$arr1, $arr2) {
+		foreach($arr2 as $value) {
+			if(!in_array($value, $arr1)) {
+				$arr1[] = $value;
+			}
+		}
 	}
 }
 ?>

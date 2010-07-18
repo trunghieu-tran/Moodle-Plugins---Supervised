@@ -318,16 +318,15 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue($res1&&$res2&&$res3);
 	}
 	function test_followpos_three_node_alternative() {
-		$node = $this->form_tree('((n| (n| (no (la1)(lb1))(no (lc1)(ld1)))(no (le1)(lf1)))');
+		$node = $this->form_tree('(n| (n| (no (la1)(lb1))(no (lc1)(ld1)))(no (le1)(lf1)))');
 		$this->qtype->numeration($node);
 		$this->qtype->firstpos($node);
 		$this->qtype->lastpos($node);
 		$result=null;
 		$this->qtype->followpos($node, $result);
-		$res1 = (count($result[1])==1&&$result[1][0]==2);
-		$res2 = (count($result[3])==1&&$result[3][0]==4);
-		$res3 = (count($result[5])==1&&$result[5][0]==6);
-		$this->assertTrue($res1&&$res2&&$res3);
+		$this->assertTrue(count($result[1])==1&&$result[1][0]==2);
+		$this->assertTrue(count($result[3])==1&&$result[3][0]==4);
+		$this->assertTrue(count($result[5])==1&&$result[5][0]==6);
 	}
 	function test_followpos_question_quantificator() {
 		$node = $this->form_tree('(no (n? (la1))(lb1))');
