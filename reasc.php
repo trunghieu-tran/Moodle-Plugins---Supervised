@@ -34,10 +34,10 @@ define('STREND','123456789');
 *		fp_push 					ãîòîâà, 	ïîäôóíêöèé íåò
 *	find_asserts 					ãîòîâà, 	ïîäôóíêöèé íåò								
 *	not_marked_state 				ãîòîâà, 	ïîäôóíêöèé íåò								
-*	followposU 						íåãîòîâà, 	ïîäôóíêöèè íåãîòîâû							!!	!!
-*		is_include_characters 		íåãîòîâà, 	ïîäôóíêöèé íåò								!!
+*	followposU 						íåãîòîâà, 	ïîäôóíêöèè ãîòîâû							!!	
+*		is_include_characters 		ãîòîâà, 	ïîäôóíêöèé íåò								
 *	state 							íåãîòîâà, 	ïîäôóíêöèé íåò								!!
-*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 4 (×ÅÒÛÐÅ ÔÓÍÊÖÈÉ).
+*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 3 (ÒÐÈ) ÔÓÍÊÖÈÈ.
 */
 
 class node {
@@ -289,6 +289,16 @@ class reasc {
 				$notmarkedstate = $built[$i];
 			}
 		}
+		return $not_marked_state;
 	}
+	function is_include_characters($strin1, $string2) {
+		$result = true;
+		foreach($string2 as $char) {
+			if(strpos($string1, $char)===false) {
+				$result = false;
+			}
+		}
+	}
+	return $result;
 }
 ?>
