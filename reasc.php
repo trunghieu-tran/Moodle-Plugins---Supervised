@@ -284,7 +284,7 @@ class reasc {
 	function not_marked_state($built) {
 		$notmarkedstate = false;
 		$size = count($built);
-		for($i = 0; $i<$size&&!isset($notmarkedstate); ++$i) {
+		for($i = 0; $i<$size&&!$notmarkedstate; $i++) {
 			if(!$built[$i]->marked) {
 				$notmarkedstate = $built[$i];
 			}
@@ -293,12 +293,13 @@ class reasc {
 	}
 	function is_include_characters($strin1, $string2) {
 		$result = true;
-		foreach($string2 as $char) {
-			if(strpos($string1, $char)===false) {
+		$size = strlen($string2);
+		for($i = 0; $i<$size&&$result;$i++) {
+			if(strpos($string1, $string2[$i])===false) {
 				$result = false;
 			}
 		}
+		return $result;
 	}
-	return $result;
 }
 ?>
