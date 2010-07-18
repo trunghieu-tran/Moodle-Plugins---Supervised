@@ -34,10 +34,10 @@ define('STREND','123456789');
 *		fp_push 					ãîòîâà, 	ïîäôóíêöèé íåò
 *	find_asserts 					ãîòîâà, 	ïîäôóíêöèé íåò								
 *	not_marked_state 				ãîòîâà, 	ïîäôóíêöèé íåò								
-*	followposU 						íåãîòîâà, 	ïîäôóíêöèè ãîòîâû							!!	
+*	followposU 						ãîòîâà, 	ïîäôóíêöèè ãîòîâû								
 *		is_include_characters 		ãîòîâà, 	ïîäôóíêöèé íåò								
 *	state 							íåãîòîâà, 	ïîäôóíêöèé íåò								!!
-*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 3 (ÒÐÈ) ÔÓÍÊÖÈÈ.
+*ÄËß ÏÎÑÒÐÎÅÍÈß ÄÊÀ ÍÅÃÎÒÎÂÎ 2 (ÄÂÅ) ÔÓÍÊÖÈÈ.
 */
 
 class node {
@@ -300,6 +300,19 @@ class reasc {
 			}
 		}
 		return $result;
+	}
+	function followposU($number, $fpmap, $passages) {
+		$str1 = $this->cconn[$number];//for this charclass will found equivalent numbers
+		foreach($this->cconn as $num=>$cc) {//forming vector of equivalent numbers
+			$str2 = $cc;
+			if(is_include_characters($str1, $str2)&&array_key_exists($num)) {//if charclass 1 and 2 equivalenta and number exist in passages
+				array_push($equnum, $num);
+			}
+		}
+		foreach($equnum as $num) {//forming map of following numbers
+			$this->fp_push($followU, $fpmap);
+		}
+		return $followU;
 	}
 }
 ?>
