@@ -77,8 +77,34 @@ class reasc {
 	}
 	function append_end() {
 	}
-	function numeration($node) {
-		return -1;
+	/**
+	*Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
+	*Put pair of number=>character to $this->cconn.
+	*@param $node current node (or leaf) for numerating.
+	*/
+	function numeration(&$node) {
+		if($node->type==NODE&&$node->subtype==ASSERTTF) {//assert node need number
+			$node->number = ++$this->$maxnum + ASSERTTF;
+		} else if($node->type==NODE) {//not need number for not assert node, numerate operands
+			$this->numeration($node->firop);
+			if ($node->subtype==NODE_CONC||$node->subtype==NODE_ALT) {//concatenation and alternative have second operand, numerate it.
+				$this->numeration($node->secop);
+			}
+		}
+		if($node->type==LEAF) {//leaf need number
+			switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
+				case LEAF_CHARCLASS://normal number for charclass
+					$node->number = ++$this->maxnum;
+					$this->cconn[$this->maxnum] = $node->chars;
+					break;
+				case LEAF_END://STREND number for end leaf
+					$node->number = STREND;
+					break;
+				case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
+					$node->number = ++$this->maxnum + DOT;
+					break;
+			}
+		}
 	}
 	function nullable($node) {
 		return true;
