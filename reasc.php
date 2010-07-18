@@ -138,7 +138,7 @@ class reasc {
 	/**
 	*функция определяет какие символы могут стоять на 1-м месте в слове порождаемом поддеревом с вершиной в данном узле
 	*@param $node root of subtree giving word
-	*@return numbers of characters
+	*@return numbers of characters (array)
 	*/
 	function firstpos(&$node) {
 		if($node->type==NODE) {
@@ -172,8 +172,42 @@ class reasc {
 		$node->firstpos = $result;
 		return $result;
 	}
+	/**
+	*функция определяет символы которые могут стоять на последнем месте в слове порождаемом
+	*поддеревом с вершиной в данном узле
+	@param $node - root of subtree
+	@return numbers of characters (array)
+	*/
 	function lastpos($node) {
-		$result = array(0,0,0);
+		if($node->type==NODE) {
+			switch($node->subtype) {
+				case NODE_ALT:
+					$result = array_merge($this->lastpos($node->firop), $this->lastpos($node->secop));
+					break;
+				case NODE_CONC:
+					$result = $this->lastpos($node->secop);
+					if($node->secop->nullable) {
+						$result = array_merge($this->lastpos($node->firop), $result);
+					} else {
+						$this->lastpos($node->firop);
+					}
+					break;
+				case NODE_ITER:
+				case NODE_QUESTQUANT:
+					$result = $this->lastpos($node->firop);
+					break;
+				case NODE_ASSERTTF:
+					$result = array($node->number);
+					break;
+			}
+		} else {
+			if($node->direction) {
+				$result = array($node->number);
+			} else {
+				$result = array(-$node->number);
+			}
+		}
+		$node->lastpos = $result;
 		return $result;
 	}
 	function followpos($node, $fpmap) {
