@@ -106,8 +106,34 @@ class reasc {
 			}
 		}
 	}
-	function nullable($node) {
-		return true;
+	/**
+	*Function determine: subtree with root in this node can give empty word or not.
+	*@param node - node fo analyze
+	*@return true if can give empty word, else false
+	*/
+	function nullable(&$node) {
+		$result = false;
+		if($node->type==NODE) {
+			switch($node->subtype) {
+				case NODE_ALT://alternative can give empty word if one operand can.
+					$result = ($this->nullable($node->firop)||$this->nullable($node->secop));
+					break;
+				case NODE_CONC://concatenation can give empty word if both operands can.
+					$result = ($this->nullable($node->firop)&&$this->nullable($node->secop));
+					$this->nullable($node->secop);
+					break;
+				case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
+				case NODE_QUESTQUANT:
+					$result = true;
+					$this->nullable($node->firop);
+					break;
+				case NODE_ASSERTTF://assert can give empty word.
+					$result = true;
+					break;//operand of assert not need for main finite automate. It form other finite automate.
+			}
+		}
+		$node->nullable = $result;//save result in node
+		return $result;
 	}
 	function firstpos($node) {
 		$result = array(0,0,0);

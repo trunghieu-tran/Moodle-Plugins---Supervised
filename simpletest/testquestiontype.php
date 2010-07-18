@@ -37,7 +37,7 @@ class reasc_test extends UnitTestCase {
 	*@return croot of formed tree
 	*/
 	function form_tree($prefixform) {
-		$result = new node;
+		$result = &new node;
 		//forming the node or leaf
 		switch($prefixform[1]) { //analyze first character, type of node/leaf
 			case 'l': //simple leaf with char class
@@ -93,7 +93,7 @@ class reasc_test extends UnitTestCase {
 					}
 				}
 				//forming second operand
-	//			$result->firop = form_tree($tmp);
+				$result->firop = $this->form_tree($tmp);
 				if($result->subtype==NODE_CONC||$result->subtype==NODE_ALT) {
 					$tmp = null;
 					do{
@@ -106,7 +106,7 @@ class reasc_test extends UnitTestCase {
 						}
 						$i++;
 					}while($brackets!=0);
-		//			$result->secop = form_tree($tmp);
+					$result->secop = $this->form_tree($tmp);
 				}
 				break;
 		}
