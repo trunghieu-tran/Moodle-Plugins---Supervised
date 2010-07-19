@@ -60,6 +60,8 @@ class reasc_test extends UnitTestCase {
 			case 'd': //metasymbol dot
 				$result->type = LEAF;
 				$result->subtype = LEAF_METASYMBOLDOT;
+				$result->direction=true;
+				$result->chars = 'METASYBOL_DOT';
 				break;
 			case 'n':
 				$result->type = NODE;
@@ -359,12 +361,10 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->croot = $this->form_tree('(no (la1)(n* (lb1)))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
-		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==2);
+		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==1);
 		$n1 = $this->qtype->finiteautomate[0]->passages[1];
-		$n2 = $this->qtype->finiteautomate[0]->passages[2];
-		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==2&&$this->qtype->finiteautomate[$n1]->passages[2]==$n2&&
-							$this->qtype->finiteautomate[$n1]->passages[1]==$n1);
-		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[STREND]==-1);
+		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==2);
+		$this->assertTrue($this->qtype->finiteautomate[$n1]->passages[STREND]==-1&&$this->qtype->finiteautomate[$n1]->passages[2]==$n1);
 	}
 	function test_buildfa_alternative() {//a|b
 		$this->qtype->croot = $this->form_tree('(n| (la1)(lb1))');
@@ -372,7 +372,7 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->buildfa();
 		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==2&&$this->qtype->finiteautomate[0]->passages[1]==1&&
 							$this->qtype->finiteautomate[0]->passages[2]==1);
-		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==1&&$this->qtype->finiteautomate[1]->passages[STREND]==-1);
+		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==1&&$this->qtype->finiteautomate[1]->passages[STREND]==-1);
 	}
 	function test_buildfa_alternative_and_iteration() {//(a|b)c*
 		$this->qtype->croot = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
@@ -380,10 +380,8 @@ class reasc_test extends UnitTestCase {
 		$this->qtype->buildfa();
 		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==2);
 		$n1 = $this->qtype->finiteautomate[0]->passages[1];
-		$n2 = $this->qtype->finiteautomate[0]->passages[2];
-		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==2&&$this->qtype->finiteautomate[$n1]->passages[3]==2&&
+		$this->assertTrue(count($this->qtype->finiteautomate[$n1]->passages)==2&&$this->qtype->finiteautomate[$n1]->passages[3]==$n1&&
 							$this->qtype->finiteautomate[$n1]->passages[STREND]==-1);
-		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[STREND]==-1);
 	}
 	function test_buildfa_nesting_alternative_and_iteration() {//(ab|cd)*
 		$this->qtype->croot = $this->form_tree('(n* (n| (no (la1)(lb1))(no (lc1)(ld1))))');
@@ -416,20 +414,21 @@ class reasc_test extends UnitTestCase {
 		$this->assertTrue(count($this->qtype->finiteautomate[$n2]->passages)==1&&$this->qtype->finiteautomate[$n2]->passages[-4]==0);
 	}
 	function test_buildfa_assert() {//a(?=.*b)[xcvbnm]*
-		$this->qtype->croot = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
+		$this->qtype->roots[0] = $this->qtype->croot = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
 		$this->qtype->append_end();
 		$this->qtype->buildfa();
 		$this->assertTrue(count($this->qtype->finiteautomate[0]->asserts)==1&&count($this->qtype->finiteautomate[0]->passages)==1);
 		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==2&&$this->qtype->finiteautomate[1]->passages[3]==1&&
 							$this->qtype->finiteautomate[1]->passages[STREND]==-1);
 		$this->assertTrue(count($this->qtype->roots)==2&&next($this->qtype->roots)->subtype==NODE_ASSERTTF);
-		$this->qtype->croot = current($this->qtype->roots);
+		$this->qtype->croot = current($this->qtype->roots)->firop;
 		$this->qtype->append_end();
+		$this->qtype->cconn = null;
+		$this->qtype->finiteautomate = null;
 		$this->qtype->buildfa();
 		$this->assertTrue(count($this->qtype->finiteautomate[0]->passages)==2&&$this->qtype->finiteautomate[0]->passages[DOT+1]==0&&
-							$this->qtype->finiteautomate[0]->passages[2]==2);
-		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==1&&$this->qtype->finiteautomate[1]->passages[2]==2);
-		$this->assertTrue(count($this->qtype->finiteautomate[2]->passages)==1&&$this->qtype->finiteautomate[2]->passages[STREND]==-1);
+							$this->qtype->finiteautomate[0]->passages[2]==1);
+		$this->assertTrue(count($this->qtype->finiteautomate[1]->passages)==1&&$this->qtype->finiteautomate[1]->passages[STREND]==-1);
 	}
 	//Unit tests for compare function
 	function test_compare_full_incorrect() {//ab

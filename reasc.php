@@ -19,26 +19,9 @@ define('NODE_ASSERTTF','15');
 define('NODE_ASSERTTB','16');
 define('NODE_ASSERTFF','17');
 define('NODE_ASSERTFB','18');
-define('ASSERT','107741824');
+define('ASSERT','1073741824');
 define('DOT','987654321');
 define('STREND','123456789');
-
-/*
-*построение ДКА использует:
-*buildfa 							неготова, 	подфункции готовы					!!
-*	numeration 						готова, 	подфункций нет
-*	nullable 						готова, 	подфункций нет
-*	firstpos 						готова, 	подфункций нет
-*	lastpos 						готова, 	подфункций нет
-*	followpos 						готова, 	подфункции готовы
-*		fp_push 					готова, 	подфункций нет
-*	find_asserts 					готова, 	подфункций нет								
-*	not_marked_state 				готова, 	подфункций нет								
-*	followposU 						готова, 	подфункции готовы								
-*		is_include_characters 		готова, 	подфункций нет								
-*	state 							готова, 	подфункций нет								
-*ДЛЯ ПОСТРОЕНИЯ ДКА НЕГОТОВО 1 (ОДНА) ФУНКЦИЯ.
-*/
 
 class node {
 	var $type;
@@ -92,6 +75,15 @@ class reasc {
 		return 'reasc';
 	}
 	function append_end() {
+		$root = $this->croot;
+		$this->croot = &new node;
+		$this->croot->type = NODE;
+		$this->croot->subtype = NODE_CONC;
+		$this->croot->firop = $root;
+		$this->croot->secop = &new node;
+		$this->croot->secop->type = LEAF;
+		$this->croot->secop->subtype = LEAF_END;
+		$this->croot->secop->direction = true;
 	}
 	/**
 	*Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
@@ -118,6 +110,7 @@ class reasc {
 					break;
 				case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
 					$node->number = ++$this->maxnum + DOT;
+					$this->cconn[$this->maxnum+DOT] = $node->chars;
 					break;
 			}
 		}
@@ -252,7 +245,44 @@ class reasc {
 	}
 	function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
 						//oстальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
-	
+		$this->maxnum = 0;
+		$this->finiteautomate[0] = new fas;
+		$this->numeration($this->croot);
+		$this->nullable($this->croot);
+		$this->firstpos($this->croot);
+		$this->lastpos($this->croot);
+		$this->followpos($this->croot, $map);
+		$this->find_asserts($this->croot);
+		foreach($this->croot->firstpos as $value) {
+			$this->finiteautomate[0]->passages[$value] = -2;
+		}
+		$this->finiteautomate[0]->marked = false;
+		while($this->not_marked_state($this->finiteautomate)!==false) {
+			$currentstate = $this->not_marked_state($this->finiteautomate);
+			$this->finiteautomate[$currentstate]->marked = true;
+			foreach($this->finiteautomate[$currentstate]->passages as $num=>$passage) {
+				$newstate = new fas;
+				$fpU = $this->followposU($num, $map, $this->finiteautomate[$currentstate]->passages);
+				foreach($fpU as $follow) {
+					if($follow<ASSERT) {
+						$newstate->passages[$follow] = -2;
+					} else {
+						$this->finiteautomate[$currentstate]->asserts[] = $follow;
+					}
+				}
+				if($num!=STREND) {
+					if($this->state($newstate->passages)===false&&count($newstate->passages)!=0) {
+						array_push($this->finiteautomate, $newstate);
+						end($this->finiteautomate);
+						$this->finiteautomate[$currentstate]->passages[$num] = key($this->finiteautomate);
+					} else {
+						$this->finiteautomate[$currentstate]->passages[$num] = $this->state($newstate->passages);
+					}
+				} else {
+					$this->finiteautomate[$currentstate]->passages[$num] = -1;
+				}
+			}
+		}
 	}
 	function compare($string, $assertnumber) {//if main regex then assertnumber is 0
 		$result = new compare_result;
@@ -284,14 +314,14 @@ class reasc {
 	function not_marked_state($built) {
 		$notmarkedstate = false;
 		$size = count($built);
-		for($i = 0; $i<$size&&!$notmarkedstate; $i++) {
+		for($i = 0; $i<$size&&$notmarkedstate===false; $i++) {
 			if(!$built[$i]->marked) {
-				$notmarkedstate = $built[$i];
+				$notmarkedstate = $i;
 			}
 		}
-		return $not_marked_state;
+		return $notmarkedstate;
 	}
-	function is_include_characters($strin1, $string2) {
+	function is_include_characters($string1, $string2) {
 		$result = true;
 		$size = strlen($string2);
 		for($i = 0; $i<$size&&$result;$i++) {
@@ -303,14 +333,16 @@ class reasc {
 	}
 	function followposU($number, $fpmap, $passages) {
 		$str1 = $this->cconn[$number];//for this charclass will found equivalent numbers
+		$equnum = array();
 		foreach($this->cconn as $num=>$cc) {//forming vector of equivalent numbers
 			$str2 = $cc;
-			if(is_include_characters($str1, $str2)&&array_key_exists($num)) {//if charclass 1 and 2 equivalenta and number exist in passages
+			if($this->is_include_characters($str1, $str2)&&array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
 				array_push($equnum, $num);
 			}
 		}
+		$followU = array();
 		foreach($equnum as $num) {//forming map of following numbers
-			$this->fp_push($followU, $fpmap);
+			$this->fp_push($followU, $fpmap[$num]);
 		}
 		return $followU;
 	}
@@ -318,9 +350,9 @@ class reasc {
 		$passcount = count($state);
 		$result = false;
 		$fasize = count($this->finiteautomate);
-		for($i=0; $i<$fasize&&!$result; $i++) {
+		for($i=0; $i<$fasize&&$result===false; $i++) {
 			$flag = true;
-			if($passcount!=$this->count($this->finiteautomate[$i]->passages) {
+			if($passcount!=count($this->finiteautomate[$i]->passages)) {
 				$flag = false;
 			}
 			reset($state);
@@ -332,10 +364,11 @@ class reasc {
 				next($state);
 				next($this->finiteautomate[$i]->passages);
 			}
-			if(flag) {
-				$result = $this->finiteautomte[$i];
+			if($flag) {
+				$result =$i;
 			}
 		}
 		return $result;
+	}
 }
 ?>
