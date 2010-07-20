@@ -61,7 +61,7 @@ class reasc_test extends UnitTestCase {
 				$result->type = LEAF;
 				$result->subtype = LEAF_METASYMBOLDOT;
 				$result->direction=true;
-				$result->chars = 'METASYBOL_DOT';
+				$result->chars = 'METASYMBOL_DOT';
 				break;
 			case 'n':
 				$result->type = NODE;

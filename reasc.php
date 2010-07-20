@@ -1,4 +1,41 @@
 <?php //$Id: reasc.php,put version put time dvkolesov Exp $
+//создать кнопку хинт, демонстрирующюю что-нибудь.
+//разобраться с делением на классы
+//заменить табы пробелами
+//расставить пробелы в усовиях и между ифом и скобками
+//закоментировать по английски
+//написать парсер
+//6 function need convert to static
+
+/*ПЛАН:
+*Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
+*класс reasc сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
+*класс reasc снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
+*
+*Убрать $croot, $cconn, $finiteautomate, вместо них передавать в buildfa и другие функции использующие $this->c.*
+*номер ассерта(нуль для основного выражения) по которому строится автомат
+*и использовать сразу $finiteautomates[<полученный номер>] аналогично для $roots и $connection
+*
+*сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
+*is_include_characters, fp_push(переименовать в push_unique), followpos, lastpos, firstpos, nullable
+*
+*добавить объект класса парсера как свойство класса reasc
+*/
+
+/*PUBLIC МЕТОДЫ КЛАССА REASC:
+*reasc::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
+*                            если регекс содержал неподдерживаемую операцию возвращает её номер,
+*                            если регекс содержал синтаксическую ошибку возвращает -1.
+*reasc::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
+*                        если регекс небыл введен возвращает ложь, если сравнение было проведено истину.
+*reasc::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
+*                       если сравнение небыло проведено возвращает false.
+*reasc::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
+*reasc::next()          возвращает символ допустимый на следующей позиции, может быть 0.
+*                       если сравнение небыло проведено возвращает false
+*
+*если будет время, то сделать функции чтения из файла/записи в файл ДКА
+*/
 
 define('LEAF','0');
 define('NODE','1');
@@ -45,7 +82,7 @@ class node {
 class fas {//finite automate state
 	var $asserts;
 	var $passages;//хранит номера состояний к которым перейти
-	var $marked;//if mrked then true else false.
+	var $marked;//if marked then true else false.
 	
 	function name() {
 		return 'fas';
@@ -120,7 +157,7 @@ class reasc {
 	*@param node - node fo analyze
 	*@return true if can give empty word, else false
 	*/
-	function nullable($node) {
+	function nullable($node) {//to static
 		$result = false;
 		if($node->type==NODE) {
 			switch($node->subtype) {
@@ -149,7 +186,7 @@ class reasc {
 	*@param $node root of subtree giving word
 	*@return numbers of characters (array)
 	*/
-	function firstpos($node) {
+	function firstpos($node) {//to static
 		if($node->type==NODE) {
 			switch($node->subtype) {
 				case NODE_ALT:
@@ -187,7 +224,7 @@ class reasc {
 	@param $node - root of subtree
 	@return numbers of characters (array)
 	*/
-	function lastpos($node) {
+	function lastpos($node) {//to static
 		if($node->type==NODE) {
 			switch($node->subtype) {
 				case NODE_ALT:
@@ -219,19 +256,19 @@ class reasc {
 		$node->lastpos = $result;
 		return $result;
 	}
-	function followpos($node, &$fpmap) {
+	function followpos($node, &$fpmap) {//to static
 		if($node->type==NODE) {
 			switch($node->subtype) {
 				case NODE_CONC:
 					$this->followpos($node->firop, $fpmap);
 					$this->followpos($node->secop, $fpmap);
-					foreach($node->firop->lastpos as $key) {#need fix
+					foreach($node->firop->lastpos as $key) {
 						$this->fp_push($fpmap[$key], $node->secop->firstpos);
 					}
 					break;
 				case NODE_ITER:
 					$this->followpos($node->firop, $fpmap);
-					foreach($node->firop->lastpos as $key) {#need fix
+					foreach($node->firop->lastpos as $key) {
 						$this->fp_push($fpmap[$key], $node->firop->firstpos);
 					}
 					break;
@@ -288,7 +325,7 @@ class reasc {
 		$result = new compare_result;
 		return $result;
 	}
-	function fp_push(&$arr1, $arr2) {
+	function fp_push(&$arr1, $arr2) {// to static
 		foreach($arr2 as $value) {
 			if(!in_array($value, $arr1)) {
 				$arr1[] = $value;
@@ -311,7 +348,7 @@ class reasc {
 			}
 		}
 	}
-	function not_marked_state($built) {
+	function not_marked_state($built) {//передавать номер автомата, вместо массива с автоматом,  оставить динамической
 		$notmarkedstate = false;
 		$size = count($built);
 		for($i = 0; $i<$size&&$notmarkedstate===false; $i++) {
@@ -321,7 +358,7 @@ class reasc {
 		}
 		return $notmarkedstate;
 	}
-	function is_include_characters($string1, $string2) {
+	function is_include_characters($string1, $string2) {// to static
 		$result = true;
 		$size = strlen($string2);
 		for($i = 0; $i<$size&&$result;$i++) {
