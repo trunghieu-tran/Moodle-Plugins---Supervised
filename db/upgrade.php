@@ -22,13 +22,23 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
     global $CFG, $THEME, $db;
 
     $result=true;
-    if ($result && $oldversion < 2008111100) {
+    if ($result && $oldversion < 2010072201) {
 
     /// Define field exactmatch to be added to question_preg
         $table = new XMLDBTable('question_preg');
         $field = new XMLDBField('exactmatch');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'rightanswer');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'rightanswer','usehint');
         /// Launch add field exactmatch
+        $result = $result && add_field($table, $field);
+        /// Define field usehint to be added to question_preg
+        $field = new XMLDBField('usehint');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'exactmatch', 'hintpenalty');
+        /// Launch add field usehint
+        $result = $result && add_field($table, $field);
+        /// Define field hintpenalty to be added to question_preg
+        $field = new XMLDBField('hintpenalty');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
+        /// Launch add field hintpenalty
         $result = $result && add_field($table, $field);
     }
 

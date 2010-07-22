@@ -4,7 +4,7 @@ $string['addingpreg'] = 'Adding regular expression question';
 $string['addmoreanswerblanks'] = 'Adding regular expression options';
 $string['correctanswer'] =' Correct answer';
 $string['editingpreg'] = 'Editing regular expression question';
-$string['exactmatch'] = 'Exact matching';
+$string['exactmatch'] = 'Exact matching';$string['usehint'] = 'Use hint';$string['hintbutton'] = 'Hint';$string['hintpenalty'] = 'Penalty for hint';
 $string['norightanswermatch'] = 'No maximum grade regular expression matches correct answer.';
 $string['preg'] = 'Regular expression';
 ?>

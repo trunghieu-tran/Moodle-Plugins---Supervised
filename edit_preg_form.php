@@ -19,10 +19,14 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
      */
     function definition_inner(&$mform) {
 
+        $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
+        $mform->setDefault('usehint',0);
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
         $mform->setHelpButton('exactmatch', array('exactmatch',get_string('exactmatch','qtype_preg'),'qtype_preg'));
         $mform->setDefault('exactmatch',1);
         $mform->addElement('text', 'rightanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
+        $mform->addElement('text', 'hintpenalty', get_string('hintpenalty','qtype_preg'), array('size' => 3));
+        $mform->setDefault('hintpenalty','0.1');
 
         parent::definition_inner($mform);
 

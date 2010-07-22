@@ -9,7 +9,14 @@
 ///
 ///
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
-
+//+++extra_question_fields и definition_inner(edit_preg_form.php) нужны для выбора да/нет в окне редактирования вопроса.
+//+++$question->options хранит значения опций, можно будет получить оттуда данные о выборе да/нет.
+//+++print_question_submit_buttons печатает кнопку Submit, использовать её для кнопки Hint
+//+++В файле preg\lang\en_utf8 хранятся имена кнопок и т.д. и т.п.
+        //regex: questiontype.php: строчки 266-273, зачеркивание неправильного ответа. опциально.
+//+++$state->responses[''] = текст и этот текст появится в окошке ввода.
+//++default::grade_responses в переменной $state->event получает данные о событии, использовать для обработки нажатий кнопки hint(пенальти)
+    
 class question_preg_qtype extends question_shortanswer_qtype {
 
     function name() {
@@ -19,7 +26,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'question_preg');
-        array_push($extraquestionfields, 'rightanswer', 'exactmatch');
+        array_push($extraquestionfields, 'rightanswer', 'exactmatch','usehint','hintpenalty');
         return $extraquestionfields;
     }
 
@@ -55,7 +62,28 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function get_correct_responses(&$question, &$state) {
         return array(''=>addslashes($question->options->rightanswer));
     }
-
+    
+    function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
+        parent::print_question_submit_buttons(&$question, &$state, $cmoptions, $options);
+        if (($cmoptions->optionflags & QUESTION_ADAPTIVE) and !$options->readonly and $question->options->usehint) {
+            echo '<input type="submit" name="', $question->name_prefix, 'hint" value="',
+                    get_string('hintbutton','qtype_preg'), '" class=" btn" onclick="',
+                    "form.action = form.action + '#q", $question->id, "'; return true;", '" />';
+        }
+    }
+    function grade_responses(&$question, &$state, $cmoptions) {
+        default_questiontype::grade_responses(&$question, &$state, $cmoptions);
+        if(isset($state->responses['hint'])) {
+            $state->penalty = $question->options->hintpenalty * $question->maxgrade;
+        }
+        return true;
+    }
+    function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
+        if(isset($state->responses['hint'])) {
+            $state->responses[''] = 'Something';
+        }
+        parent::print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options);
+    }
 }
 //// END OF CLASS ////
 
