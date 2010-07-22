@@ -17,7 +17,7 @@
 *и использовать сразу $finiteautomates[<полученный номер>] аналогично для $roots и $connection
 *
 *сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
-*is_include_characters, fp_push(переименовать в push_unique), followpos, lastpos, firstpos, nullable
+*is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
 *
 *добавить объект класса парсера как свойство класса reasc
 */
@@ -61,351 +61,351 @@ define('DOT','987654321');
 define('STREND','123456789');
 
 class node {
-	var $type;
-	var $subtype;
-	var $firop;
-	var $secop;
-	var $thirdop;
-	var $nullable;
-	var $number;
-	var $firstpos;
-	var $lastpos;
-	var $direction;
-	var $greed;
-	var $chars;
-	
-	function name() {
-		return 'node';
-	}
+    var $type;
+    var $subtype;
+    var $firop;
+    var $secop;
+    var $thirdop;
+    var $nullable;
+    var $number;
+    var $firstpos;
+    var $lastpos;
+    var $direction;
+    var $greed;
+    var $chars;
+    
+    function name() {
+        return 'node';
+    }
 }
 
 class fas {//finite automate state
-	var $asserts;
-	var $passages;//хранит номера состояний к которым перейти
-	var $marked;//if marked then true else false.
-	
-	function name() {
-		return 'fas';
-	}
+    var $asserts;
+    var $passages;//хранит номера состояний к которым перейти
+    var $marked;//if marked then true else false.
+    
+    function name() {
+        return 'fas';
+    }
 }
 
 class compare_result {
-	var $index;
-	var $full;
-	var $next;
-	
-	function name() {
-		return 'compare_result';
-	}
+    var $index;
+    var $full;
+    var $next;
+    
+    function name() {
+        return 'compare_result';
+    }
 }
 
 class reasc {
-	var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
-	var $cconn;//for current connection
-	var $roots;//array,[0] main root, [<assert number>] assert's root
-	var $croot;//for current root
-	var $maxnum;
-	var $finiteautomate;// for current finite  automate
-	var $finiteautomates;
-	
-	function name() {
-		return 'reasc';
-	}
-	function append_end() {
-		$root = $this->croot;
-		$this->croot = &new node;
-		$this->croot->type = NODE;
-		$this->croot->subtype = NODE_CONC;
-		$this->croot->firop = $root;
-		$this->croot->secop = &new node;
-		$this->croot->secop->type = LEAF;
-		$this->croot->secop->subtype = LEAF_END;
-		$this->croot->secop->direction = true;
-	}
-	/**
-	*Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
-	*Put pair of number=>character to $this->cconn.
-	*@param $node current node (or leaf) for numerating.
-	*/
-	function numeration($node) {
-		if($node->type==NODE&&$node->subtype==NODE_ASSERTTF) {//assert node need number
-			$node->number = ++$this->maxnum + ASSERT;
-		} else if($node->type==NODE) {//not need number for not assert node, numerate operands
-			$this->numeration($node->firop);
-			if ($node->subtype==NODE_CONC||$node->subtype==NODE_ALT) {//concatenation and alternative have second operand, numerate it.
-				$this->numeration($node->secop);
-			}
-		}
-		if($node->type==LEAF) {//leaf need number
-			switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
-				case LEAF_CHARCLASS://normal number for charclass
-					$node->number = ++$this->maxnum;
-					$this->cconn[$this->maxnum] = $node->chars;
-					break;
-				case LEAF_END://STREND number for end leaf
-					$node->number = STREND;
-					break;
-				case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
-					$node->number = ++$this->maxnum + DOT;
-					$this->cconn[$this->maxnum+DOT] = $node->chars;
-					break;
-			}
-		}
-	}
-	/**
-	*Function determine: subtree with root in this node can give empty word or not.
-	*@param node - node fo analyze
-	*@return true if can give empty word, else false
-	*/
-	function nullable($node) {//to static
-		$result = false;
-		if($node->type==NODE) {
-			switch($node->subtype) {
-				case NODE_ALT://alternative can give empty word if one operand can.
-					$result = ($this->nullable($node->firop)||$this->nullable($node->secop));
-					break;
-				case NODE_CONC://concatenation can give empty word if both operands can.
-					$result = ($this->nullable($node->firop)&&$this->nullable($node->secop));
-					$this->nullable($node->secop);
-					break;
-				case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
-				case NODE_QUESTQUANT:
-					$result = true;
-					$this->nullable($node->firop);
-					break;
-				case NODE_ASSERTTF://assert can give empty word.
-					$result = true;
-					break;//operand of assert not need for main finite automate. It form other finite automate.
-			}
-		}
-		$node->nullable = $result;//save result in node
-		return $result;
-	}
-	/**
-	*функция определяет какие символы могут стоять на 1-м месте в слове порождаемом поддеревом с вершиной в данном узле
-	*@param $node root of subtree giving word
-	*@return numbers of characters (array)
-	*/
-	function firstpos($node) {//to static
-		if($node->type==NODE) {
-			switch($node->subtype) {
-				case NODE_ALT:
-					$result = array_merge($this->firstpos($node->firop), $this->firstpos($node->secop));
-					break;
-				case NODE_CONC:
-					$result = $this->firstpos($node->firop);
-					if($node->firop->nullable) {
-						$result = array_merge($result, $this->firstpos($node->secop));
-					} else {
-						$this->firstpos($node->secop);
-					}
-					break;
-				case NODE_QUESTQUANT:
-				case NODE_ITER:
-					$result = $this->firstpos($node->firop);
-					break;
-				case NODE_ASSERTTF:
-					$result = array($node->number);
-					break;
-			}
-		} else {
-			if($node->direction) {
-				$result = array($node->number);
-			} else {
-				$result = array(-$node->number);
-			}
-		}
-		$node->firstpos = $result;
-		return $result;
-	}
-	/**
-	*функция определяет символы которые могут стоять на последнем месте в слове порождаемом
-	*поддеревом с вершиной в данном узле
-	@param $node - root of subtree
-	@return numbers of characters (array)
-	*/
-	function lastpos($node) {//to static
-		if($node->type==NODE) {
-			switch($node->subtype) {
-				case NODE_ALT:
-					$result = array_merge($this->lastpos($node->firop), $this->lastpos($node->secop));
-					break;
-				case NODE_CONC:
-					$result = $this->lastpos($node->secop);
-					if($node->secop->nullable) {
-						$result = array_merge($this->lastpos($node->firop), $result);
-					} else {
-						$this->lastpos($node->firop);
-					}
-					break;
-				case NODE_ITER:
-				case NODE_QUESTQUANT:
-					$result = $this->lastpos($node->firop);
-					break;
-				case NODE_ASSERTTF:
-					$result = array($node->number);
-					break;
-			}
-		} else {
-			if($node->direction) {
-				$result = array($node->number);
-			} else {
-				$result = array(-$node->number);
-			}
-		}
-		$node->lastpos = $result;
-		return $result;
-	}
-	function followpos($node, &$fpmap) {//to static
-		if($node->type==NODE) {
-			switch($node->subtype) {
-				case NODE_CONC:
-					$this->followpos($node->firop, $fpmap);
-					$this->followpos($node->secop, $fpmap);
-					foreach($node->firop->lastpos as $key) {
-						$this->fp_push($fpmap[$key], $node->secop->firstpos);
-					}
-					break;
-				case NODE_ITER:
-					$this->followpos($node->firop, $fpmap);
-					foreach($node->firop->lastpos as $key) {
-						$this->fp_push($fpmap[$key], $node->firop->firstpos);
-					}
-					break;
-				case NODE_ALT:
-					$this->followpos($node->secop, $fpmap);
-				case NODE_QUESTQUANT:
-					$this->followpos($node->firop, $fpmap);
-					break;
-			}
-		}
-	}
-	function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
-						//oстальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
-		$this->maxnum = 0;
-		$this->finiteautomate[0] = new fas;
-		$this->numeration($this->croot);
-		$this->nullable($this->croot);
-		$this->firstpos($this->croot);
-		$this->lastpos($this->croot);
-		$this->followpos($this->croot, $map);
-		$this->find_asserts($this->croot);
-		foreach($this->croot->firstpos as $value) {
-			$this->finiteautomate[0]->passages[$value] = -2;
-		}
-		$this->finiteautomate[0]->marked = false;
-		while($this->not_marked_state($this->finiteautomate)!==false) {
-			$currentstate = $this->not_marked_state($this->finiteautomate);
-			$this->finiteautomate[$currentstate]->marked = true;
-			foreach($this->finiteautomate[$currentstate]->passages as $num=>$passage) {
-				$newstate = new fas;
-				$fpU = $this->followposU($num, $map, $this->finiteautomate[$currentstate]->passages);
-				foreach($fpU as $follow) {
-					if($follow<ASSERT) {
-						$newstate->passages[$follow] = -2;
-					} else {
-						$this->finiteautomate[$currentstate]->asserts[] = $follow;
-					}
-				}
-				if($num!=STREND) {
-					if($this->state($newstate->passages)===false&&count($newstate->passages)!=0) {
-						array_push($this->finiteautomate, $newstate);
-						end($this->finiteautomate);
-						$this->finiteautomate[$currentstate]->passages[$num] = key($this->finiteautomate);
-					} else {
-						$this->finiteautomate[$currentstate]->passages[$num] = $this->state($newstate->passages);
-					}
-				} else {
-					$this->finiteautomate[$currentstate]->passages[$num] = -1;
-				}
-			}
-		}
-	}
-	function compare($string, $assertnumber) {//if main regex then assertnumber is 0
-		$result = new compare_result;
-		return $result;
-	}
-	function fp_push(&$arr1, $arr2) {// to static
-		foreach($arr2 as $value) {
-			if(!in_array($value, $arr1)) {
-				$arr1[] = $value;
-			}
-		}
-	}
-	function find_asserts($node) {
-		if($node->type==NODE) {
-			switch($node->subtype) {
-				case NODE_ASSERTTF:
-					$this->roots[$node->number] = $node;
-					break;
-				case NODE_ALT:
-				case NODE_CONC:
-					$this->find_asserts($node->secop);
-				case NODE_ITER:
-				case NODE_QUESTQUANT:
-					$this->find_asserts($node->firop);
-					break;
-			}
-		}
-	}
-	function not_marked_state($built) {//передавать номер автомата, вместо массива с автоматом,  оставить динамической
-		$notmarkedstate = false;
-		$size = count($built);
-		for($i = 0; $i<$size&&$notmarkedstate===false; $i++) {
-			if(!$built[$i]->marked) {
-				$notmarkedstate = $i;
-			}
-		}
-		return $notmarkedstate;
-	}
-	function is_include_characters($string1, $string2) {// to static
-		$result = true;
-		$size = strlen($string2);
-		for($i = 0; $i<$size&&$result;$i++) {
-			if(strpos($string1, $string2[$i])===false) {
-				$result = false;
-			}
-		}
-		return $result;
-	}
-	function followposU($number, $fpmap, $passages) {
-		$str1 = $this->cconn[$number];//for this charclass will found equivalent numbers
-		$equnum = array();
-		foreach($this->cconn as $num=>$cc) {//forming vector of equivalent numbers
-			$str2 = $cc;
-			if($this->is_include_characters($str1, $str2)&&array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
-				array_push($equnum, $num);
-			}
-		}
-		$followU = array();
-		foreach($equnum as $num) {//forming map of following numbers
-			$this->fp_push($followU, $fpmap[$num]);
-		}
-		return $followU;
-	}
-	function state($state) {
-		$passcount = count($state);
-		$result = false;
-		$fasize = count($this->finiteautomate);
-		for($i=0; $i<$fasize&&$result===false; $i++) {
-			$flag = true;
-			if($passcount!=count($this->finiteautomate[$i]->passages)) {
-				$flag = false;
-			}
-			reset($state);
-			reset($this->finiteautomate[$i]->passages);
-			for($j=0; $flag&&$j<$passcount; $j++) {
-				if(key($state)!=key($this->finiteautomate[$i]->passages)) {
-					$flag = false;
-				}
-				next($state);
-				next($this->finiteautomate[$i]->passages);
-			}
-			if($flag) {
-				$result =$i;
-			}
-		}
-		return $result;
-	}
+    var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
+    var $cconn;//for current connection
+    var $roots;//array,[0] main root, [<assert number>] assert's root
+    var $croot;//for current root
+    var $maxnum;
+    var $finiteautomate;// for current finite  automate
+    var $finiteautomates;
+    
+    function name() {
+        return 'reasc';
+    }
+    function append_end() {
+        $root = $this->croot;
+        $this->croot = &new node;
+        $this->croot->type = NODE;
+        $this->croot->subtype = NODE_CONC;
+        $this->croot->firop = $root;
+        $this->croot->secop = &new node;
+        $this->croot->secop->type = LEAF;
+        $this->croot->secop->subtype = LEAF_END;
+        $this->croot->secop->direction = true;
+    }
+    /**
+    *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
+    *Put pair of number=>character to $this->cconn.
+    *@param $node current node (or leaf) for numerating.
+    */
+    function numeration($node) {
+        if ($node->type==NODE&&$node->subtype==NODE_ASSERTTF) {//assert node need number
+            $node->number = ++$this->maxnum + ASSERT;
+        } else if ($node->type==NODE) {//not need number for not assert node, numerate operands
+            $this->numeration($node->firop);
+            if ($node->subtype==NODE_CONC||$node->subtype==NODE_ALT) {//concatenation and alternative have second operand, numerate it.
+                $this->numeration($node->secop);
+            }
+        }
+        if ($node->type==LEAF) {//leaf need number
+            switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
+                case LEAF_CHARCLASS://normal number for charclass
+                    $node->number = ++$this->maxnum;
+                    $this->cconn[$this->maxnum] = $node->chars;
+                    break;
+                case LEAF_END://STREND number for end leaf
+                    $node->number = STREND;
+                    break;
+                case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
+                    $node->number = ++$this->maxnum + DOT;
+                    $this->cconn[$this->maxnum+DOT] = $node->chars;
+                    break;
+            }
+        }
+    }
+    /**
+    *Function determine: subtree with root in this node can give empty word or not.
+    *@param node - node fo analyze
+    *@return true if can give empty word, else false
+    */
+    function nullable($node) {//to static
+        $result = false;
+        if ($node->type == NODE) {
+            switch($node->subtype) {
+                case NODE_ALT://alternative can give empty word if one operand can.
+                    $result = ($this->nullable($node->firop) || $this->nullable($node->secop));
+                    break;
+                case NODE_CONC://concatenation can give empty word if both operands can.
+                    $result = ($this->nullable($node->firop) && $this->nullable($node->secop));
+                    $this->nullable($node->secop);
+                    break;
+                case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
+                case NODE_QUESTQUANT:
+                    $result = true;
+                    $this->nullable($node->firop);
+                    break;
+                case NODE_ASSERTTF://assert can give empty word.
+                    $result = true;
+                    break;//operand of assert not need for main finite automate. It form other finite automate.
+            }
+        }
+        $node->nullable = $result;//save result in node
+        return $result;
+    }
+    /**
+    *функция определяет какие символы могут стоять на 1-м месте в слове порождаемом поддеревом с вершиной в данном узле
+    *@param $node root of subtree giving word
+    *@return numbers of characters (array)
+    */
+    function firstpos($node) {//to static
+        if ($node->type == NODE) {
+            switch($node->subtype) {
+                case NODE_ALT:
+                    $result = array_merge($this->firstpos($node->firop), $this->firstpos($node->secop));
+                    break;
+                case NODE_CONC:
+                    $result = $this->firstpos($node->firop);
+                    if ($node->firop->nullable) {
+                        $result = array_merge($result, $this->firstpos($node->secop));
+                    } else {
+                        $this->firstpos($node->secop);
+                    }
+                    break;
+                case NODE_QUESTQUANT:
+                case NODE_ITER:
+                    $result = $this->firstpos($node->firop);
+                    break;
+                case NODE_ASSERTTF:
+                    $result = array($node->number);
+                    break;
+            }
+        } else {
+            if ($node->direction) {
+                $result = array($node->number);
+            } else {
+                $result = array(-$node->number);
+            }
+        }
+        $node->firstpos = $result;
+        return $result;
+    }
+    /**
+    *функция определяет символы которые могут стоять на последнем месте в слове порождаемом
+    *поддеревом с вершиной в данном узле
+    @param $node - root of subtree
+    @return numbers of characters (array)
+    */
+    function lastpos($node) {//to static
+        if ($node->type == NODE) {
+            switch($node->subtype) {
+                case NODE_ALT:
+                    $result = array_merge($this->lastpos($node->firop), $this->lastpos($node->secop));
+                    break;
+                case NODE_CONC:
+                    $result = $this->lastpos($node->secop);
+                    if ($node->secop->nullable) {
+                        $result = array_merge($this->lastpos($node->firop), $result);
+                    } else {
+                        $this->lastpos($node->firop);
+                    }
+                    break;
+                case NODE_ITER:
+                case NODE_QUESTQUANT:
+                    $result = $this->lastpos($node->firop);
+                    break;
+                case NODE_ASSERTTF:
+                    $result = array($node->number);
+                    break;
+            }
+        } else {
+            if ($node->direction) {
+                $result = array($node->number);
+            } else {
+                $result = array(-$node->number);
+            }
+        }
+        $node->lastpos = $result;
+        return $result;
+    }
+    function followpos($node, &$fpmap) {//to static
+        if ($node->type == NODE) {
+            switch($node->subtype) {
+                case NODE_CONC:
+                    $this->followpos($node->firop, $fpmap);
+                    $this->followpos($node->secop, $fpmap);
+                    foreach ($node->firop->lastpos as $key) {
+                        $this->push_unique($fpmap[$key], $node->secop->firstpos);
+                    }
+                    break;
+                case NODE_ITER:
+                    $this->followpos($node->firop, $fpmap);
+                    foreach ($node->firop->lastpos as $key) {
+                        $this->push_unique($fpmap[$key], $node->firop->firstpos);
+                    }
+                    break;
+                case NODE_ALT:
+                    $this->followpos($node->secop, $fpmap);
+                case NODE_QUESTQUANT:
+                    $this->followpos($node->firop, $fpmap);
+                    break;
+            }
+        }
+    }
+    function buildfa() {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
+                        //oстальные состояния в прочих эл-тах этого массива,finiteautomate[!=0] - asserts' fa
+        $this->maxnum = 0;
+        $this->finiteautomate[0] = new fas;
+        $this->numeration($this->croot);
+        $this->nullable($this->croot);
+        $this->firstpos($this->croot);
+        $this->lastpos($this->croot);
+        $this->followpos($this->croot, $map);
+        $this->find_asserts($this->croot);
+        foreach ($this->croot->firstpos as $value) {
+            $this->finiteautomate[0]->passages[$value] = -2;
+        }
+        $this->finiteautomate[0]->marked = false;
+        while ($this->not_marked_state($this->finiteautomate) !== false) {
+            $currentstate = $this->not_marked_state($this->finiteautomate);
+            $this->finiteautomate[$currentstate]->marked = true;
+            foreach ($this->finiteautomate[$currentstate]->passages as $num => $passage) {
+                $newstate = new fas;
+                $fpU = $this->followposU($num, $map, $this->finiteautomate[$currentstate]->passages);
+                foreach ($fpU as $follow) {
+                    if ($follow<ASSERT) {
+                        $newstate->passages[$follow] = -2;
+                    } else {
+                        $this->finiteautomate[$currentstate]->asserts[] = $follow;
+                    }
+                }
+                if ($num!=STREND) {
+                    if ($this->state($newstate->passages) === false && count($newstate->passages) != 0) {
+                        array_push($this->finiteautomate, $newstate);
+                        end($this->finiteautomate);
+                        $this->finiteautomate[$currentstate]->passages[$num] = key($this->finiteautomate);
+                    } else {
+                        $this->finiteautomate[$currentstate]->passages[$num] = $this->state($newstate->passages);
+                    }
+                } else {
+                    $this->finiteautomate[$currentstate]->passages[$num] = -1;
+                }
+            }
+        }
+    }
+    function compare($string, $assertnumber) {//if main regex then assertnumber is 0
+        $result = new compare_result;
+        return $result;
+    }
+    function push_unique(&$arr1, $arr2) {// to static
+        foreach ($arr2 as $value) {
+            if (!in_array($value, $arr1)) {
+                $arr1[] = $value;
+            }
+        }
+    }
+    function find_asserts($node) {
+        if ($node->type == NODE) {
+            switch($node->subtype) {
+                case NODE_ASSERTTF:
+                    $this->roots[$node->number] = $node;
+                    break;
+                case NODE_ALT:
+                case NODE_CONC:
+                    $this->find_asserts($node->secop);
+                case NODE_ITER:
+                case NODE_QUESTQUANT:
+                    $this->find_asserts($node->firop);
+                    break;
+            }
+        }
+    }
+    function not_marked_state($built) {//передавать номер автомата, вместо массива с автоматом,  оставить динамической
+        $notmarkedstate = false;
+        $size = count($built);
+        for ($i = 0; $i < $size && $notmarkedstate === false; $i++) {
+            if (!$built[$i]->marked) {
+                $notmarkedstate = $i;
+            }
+        }
+        return $notmarkedstate;
+    }
+    function is_include_characters($string1, $string2) {// to static
+        $result = true;
+        $size = strlen($string2);
+        for ($i = 0; $i < $size && $result; $i++) {
+            if (strpos($string1, $string2[$i]) === false) {
+                $result = false;
+            }
+        }
+        return $result;
+    }
+    function followposU($number, $fpmap, $passages) {
+        $str1 = $this->cconn[$number];//for this charclass will found equivalent numbers
+        $equnum = array();
+        foreach ($this->cconn as $num => $cc) {//forming vector of equivalent numbers
+            $str2 = $cc;
+            if ($this->is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
+                array_push($equnum, $num);
+            }
+        }
+        $followU = array();
+        foreach ($equnum as $num) {//forming map of following numbers
+            $this->push_unique($followU, $fpmap[$num]);
+        }
+        return $followU;
+    }
+    function state($state) {
+        $passcount = count($state);
+        $result = false;
+        $fasize = count($this->finiteautomate);
+        for ($i=0; $i < $fasize && $result === false; $i++) {
+            $flag = true;
+            if ($passcount != count($this->finiteautomate[$i]->passages)) {
+                $flag = false;
+            }
+            reset($state);
+            reset($this->finiteautomate[$i]->passages);
+            for ($j=0; $flag && $j < $passcount; $j++) {
+                if (key($state) != key($this->finiteautomate[$i]->passages)) {
+                    $flag = false;
+                }
+                next($state);
+                next($this->finiteautomate[$i]->passages);
+            }
+            if ($flag) {
+                $result =$i;
+            }
+        }
+        return $result;
+    }
 }
 ?>
