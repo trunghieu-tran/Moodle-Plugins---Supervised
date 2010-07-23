@@ -100,11 +100,12 @@ class compare_result {
 }
 
 class reasc {
-	
-	
+
+
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
     var $roots;//array,[0] main root, [<assert number>] assert's root
     var $finiteautomates;
+	var $maxnum;
     
     function name() {
         return 'reasc';
@@ -125,27 +126,27 @@ class reasc {
     *Put pair of number=>character to $this->connection[$index][].
     *@param $node current node (or leaf) for numerating.
     */
-    function numeration($node ,$index, &$maxid) {
-        if ($node->type==NODE&&$node->subtype==NODE_ASSERTTF) {//assert node need number
-            $node->number = ++$maxid + ASSERT;
-        } else if ($node->type==NODE) {//not need number for not assert node, numerate operands
-            $this->numeration($node->firop);
-            if ($node->subtype==NODE_CONC||$node->subtype==NODE_ALT) {//concatenation and alternative have second operand, numerate it.
-                $this->numeration($node->secop);
+    function numeration($node, $index) {
+        if ($node->type==NODE && $node->subtype == NODE_ASSERTTF) {//assert node need number
+            $node->number = ++$this->maxnum + ASSERT;
+        } else if ($node->type == NODE) {//not need number for not assert node, numerate operands
+            $this->numeration($node->firop, $index);
+            if ($node->subtype == NODE_CONC || $node->subtype == NODE_ALT) {//concatenation and alternative have second operand, numerate it.
+                $this->numeration($node->secop, $index);
             }
         }
         if ($node->type==LEAF) {//leaf need number
             switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
                 case LEAF_CHARCLASS://normal number for charclass
-                    $node->number = ++$maxid;
-                    $this->connection[$index][$maxid] = $node->chars;
+                    $node->number = ++$this->maxnum;
+                    $this->connection[$index][$this->maxnum] = $node->chars;
                     break;
                 case LEAF_END://STREND number for end leaf
                     $node->number = STREND;
                     break;
                 case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
-                    $node->number = ++$maxid + DOT;
-                    $this->connection[$index][$maxid + DOT] = $node->chars;
+                    $node->number = ++$this->maxnum + DOT;
+                    $this->connection[$index][$this->maxnum + DOT] = $node->chars;
                     break;
             }
         }
@@ -193,7 +194,7 @@ class reasc {
                 case NODE_CONC:
                     $result = reasc::firstpos($node->firop);
                     if ($node->firop->nullable) {
-                        $result = array_merge($result, $this->firstpos($node->secop));
+                        $result = array_merge($result, reasc::firstpos($node->secop));
                     } else {
                         reasc::firstpos($node->secop);
                     }
@@ -279,42 +280,43 @@ class reasc {
         }
     }
     function buildfa($index) {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
-                        //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
-        $maxnum = 0;
+        $old = $this->connection;                     //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
+        $this->maxnum = 0;
         $this->finiteautomates[$index][0] = new fas;
-        $this->numeration($this->roots[$index], $index, $maxnum);
+        $this->numeration($this->roots[$index], $index);
+        if($old == $this->connection) { }
         reasc::nullable($this->roots[$index]);
         reasc::firstpos($this->roots[$index]);
         reasc::lastpos($this->roots[$index]);
         reasc::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
         foreach ($this->roots[$index]->firstpos as $value) {
-            $this->finiteautomates[$index][0]->passages[$value] = -2;
+            $this->finiteautomates[$index][0]->passages[$value] = -2;//BUG!!! эта строка зависает!
         }
         $this->finiteautomates[$index][0]->marked = false;
         while ($this->not_marked_state($this->finiteautomates[$index]) !== false) {
-            $currentstate = $this->not_marked_state($this->finiteautomates[$index]);
-            $this->finiteautomates[$index][$currentstate]->marked = true;
-            foreach ($this->finiteautomates[$index][$currentstate]->passages as $num => $passage) {
+            $currentstateindex = $this->not_marked_state($this->finiteautomates[$index]);
+            $this->finiteautomates[$index][$currentstateindex]->marked = true;
+            foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new fas;
-                $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstate]->passages);
+                $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow<ASSERT) {
                         $newstate->passages[$follow] = -2;
                     } else {
-                        $this->finiteautomates[$index][$currentstate]->asserts[] = $follow;
+                        $this->finiteautomates[$index][$currentstateindex]->asserts[] = $follow;
                     }
                 }
                 if ($num!=STREND) {
-                    if ($this->state($newstate->passages) === false && count($newstate->passages) != 0) {
+                    if ($this->state($newstate->passages, $index) === false && count($newstate->passages) != 0) {
                         array_push($this->finiteautomates[$index], $newstate);
                         end($this->finiteautomates[$index]);
-                        $this->finiteautomates[$index][$currentstate]->passages[$num] = key($this->finiteautomates[$index]);
+                        $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
                     } else {
-                        $this->finiteautomates[$index][$currentstate]->passages[$num] = $this->state($newstate->passages);
+                        $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 } else {
-                    $this->finiteautomates[$index][$currentstate]->passages[$num] = -1;
+                    $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
                 }
             }
         }
@@ -334,8 +336,7 @@ class reasc {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ASSERTTF:
-                    $this->roots[$node->number] = $node;
-                    break;
+                    $this->roots[$node->number] = $node->firop;
                 case NODE_ALT:
                 case NODE_CONC:
                     $this->find_asserts($node->secop);
@@ -369,7 +370,7 @@ class reasc {
     function followposU($number, $fpmap, $passages, $index) {
         $str1 = $this->connection[$index][$number];//for this charclass will found equivalent numbers
         $equnum = array();
-        foreach (connection[$index] as $num => $cc) {//forming vector of equivalent numbers
+        foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
             $str2 = $cc;
             if (reasc::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
                 array_push($equnum, $num);
@@ -381,7 +382,7 @@ class reasc {
         }
         return $followU;
     }
-    function state($state) {
+    function state($state, $index) {
         $passcount = count($state);
         $result = false;
         $fasize = count($this->finiteautomates[$index]);
