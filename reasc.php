@@ -5,7 +5,7 @@
 //+++расставить пробелы в усовиях и между ифом и скобками
 //закоментировать по английски
 //написать парсер
-//6 function need convert to static
+//+++6 function need convert to static
 
 /*ПЛАН:
 *Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
@@ -16,8 +16,8 @@
 *   номер ассерта(нуль для основного выражения) по которому строится автомат
 *   и использовать сразу $finiteautomates[<полученный номер>] аналогично для $roots и $connection
 *
-*сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
-*is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
+*+++сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
+*   is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
 *
 *добавить объект класса парсера как свойство класса reasc
 */
@@ -100,6 +100,8 @@ class compare_result {
 }
 
 class reasc {
+	
+	
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
     var $roots;//array,[0] main root, [<assert number>] assert's root
     var $finiteautomates;
@@ -153,21 +155,21 @@ class reasc {
     *@param node - node fo analyze
     *@return true if can give empty word, else false
     */
-    function nullable($node) {//to static
+    static function nullable($node) {//to static
         $result = false;
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT://alternative can give empty word if one operand can.
-                    $result = ($this->nullable($node->firop) || $this->nullable($node->secop));
+                    $result = (reasc::nullable($node->firop) || reasc::nullable($node->secop));
                     break;
                 case NODE_CONC://concatenation can give empty word if both operands can.
-                    $result = ($this->nullable($node->firop) && $this->nullable($node->secop));
-                    $this->nullable($node->secop);
+                    $result = (reasc::nullable($node->firop) && reasc::nullable($node->secop));
+                    reasc::nullable($node->secop);
                     break;
                 case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
                 case NODE_QUESTQUANT:
                     $result = true;
-                    $this->nullable($node->firop);
+                    reasc::nullable($node->firop);
                     break;
                 case NODE_ASSERTTF://assert can give empty word.
                     $result = true;
@@ -182,23 +184,23 @@ class reasc {
     *@param $node root of subtree giving word
     *@return numbers of characters (array)
     */
-    function firstpos($node) {//to static
+    static function firstpos($node) {//to static
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge($this->firstpos($node->firop), $this->firstpos($node->secop));
+                    $result = array_merge(reasc::firstpos($node->firop), reasc::firstpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = $this->firstpos($node->firop);
+                    $result = reasc::firstpos($node->firop);
                     if ($node->firop->nullable) {
                         $result = array_merge($result, $this->firstpos($node->secop));
                     } else {
-                        $this->firstpos($node->secop);
+                        reasc::firstpos($node->secop);
                     }
                     break;
                 case NODE_QUESTQUANT:
                 case NODE_ITER:
-                    $result = $this->firstpos($node->firop);
+                    $result = reasc::firstpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -220,23 +222,23 @@ class reasc {
     @param $node - root of subtree
     @return numbers of characters (array)
     */
-    function lastpos($node) {//to static
+    static function lastpos($node) {//to static
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge($this->lastpos($node->firop), $this->lastpos($node->secop));
+                    $result = array_merge(reasc::lastpos($node->firop), reasc::lastpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = $this->lastpos($node->secop);
+                    $result = reasc::lastpos($node->secop);
                     if ($node->secop->nullable) {
-                        $result = array_merge($this->lastpos($node->firop), $result);
+                        $result = array_merge(reasc::lastpos($node->firop), $result);
                     } else {
-                        $this->lastpos($node->firop);
+                        reasc::lastpos($node->firop);
                     }
                     break;
                 case NODE_ITER:
                 case NODE_QUESTQUANT:
-                    $result = $this->lastpos($node->firop);
+                    $result = reasc::lastpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -252,26 +254,26 @@ class reasc {
         $node->lastpos = $result;
         return $result;
     }
-    function followpos($node, &$fpmap) {//to static
+    static function followpos($node, &$fpmap) {//to static
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_CONC:
-                    $this->followpos($node->firop, $fpmap);
-                    $this->followpos($node->secop, $fpmap);
+                    reasc::followpos($node->firop, $fpmap);
+                    reasc::followpos($node->secop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        $this->push_unique($fpmap[$key], $node->secop->firstpos);
+                        reasc::push_unique($fpmap[$key], $node->secop->firstpos);
                     }
                     break;
                 case NODE_ITER:
-                    $this->followpos($node->firop, $fpmap);
+                    reasc::followpos($node->firop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        $this->push_unique($fpmap[$key], $node->firop->firstpos);
+                        reasc::push_unique($fpmap[$key], $node->firop->firstpos);
                     }
                     break;
                 case NODE_ALT:
-                    $this->followpos($node->secop, $fpmap);
+                    reasc::followpos($node->secop, $fpmap);
                 case NODE_QUESTQUANT:
-                    $this->followpos($node->firop, $fpmap);
+                    reasc::followpos($node->firop, $fpmap);
                     break;
             }
         }
@@ -281,10 +283,10 @@ class reasc {
         $maxnum = 0;
         $this->finiteautomates[$index][0] = new fas;
         $this->numeration($this->roots[$index], $index, $maxnum);
-        $this->nullable($this->roots[$index]);
-        $this->firstpos($this->roots[$index]);
-        $this->lastpos($this->roots[$index]);
-        $this->followpos($this->roots[$index], $map);
+        reasc::nullable($this->roots[$index]);
+        reasc::firstpos($this->roots[$index]);
+        reasc::lastpos($this->roots[$index]);
+        reasc::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
         foreach ($this->roots[$index]->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;
@@ -321,7 +323,7 @@ class reasc {
         $result = new compare_result;
         return $result;
     }
-    function push_unique(&$arr1, $arr2) {// to static
+    static function push_unique(&$arr1, $arr2) {// to static
         foreach ($arr2 as $value) {
             if (!in_array($value, $arr1)) {
                 $arr1[] = $value;
@@ -354,7 +356,7 @@ class reasc {
         }
         return $notmarkedstate;
     }
-    function is_include_characters($string1, $string2) {// to static
+    static function is_include_characters($string1, $string2) {// to static
         $result = true;
         $size = strlen($string2);
         for ($i = 0; $i < $size && $result; $i++) {
@@ -369,13 +371,13 @@ class reasc {
         $equnum = array();
         foreach (connection[$index] as $num => $cc) {//forming vector of equivalent numbers
             $str2 = $cc;
-            if ($this->is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
+            if (reasc::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
                 array_push($equnum, $num);
             }
         }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
-            $this->push_unique($followU, $fpmap[$num]);
+            reasc::push_unique($followU, $fpmap[$num]);
         }
         return $followU;
     }
