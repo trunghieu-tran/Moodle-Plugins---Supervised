@@ -79,13 +79,13 @@ class node {
     }
 }
 
-class fas {//finite automate state
+class finite_automate_state {//finite automate state
     var $asserts;
     var $passages;//хранит номера состояний к которым перейти
     var $marked;//if marked then true else false.
     
     function name() {
-        return 'fas';
+        return 'finite_automate_state';
     }
 }
 
@@ -282,7 +282,7 @@ class reasc {
     function buildfa($index) {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
         $old = $this->connection;                     //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
         $this->maxnum = 0;
-        $this->finiteautomates[$index][0] = new fas;
+        $this->finiteautomates[$index][0] = new finite_automate_state;
         $this->numeration($this->roots[$index], $index);
         if($old == $this->connection) { }
         reasc::nullable($this->roots[$index]);
@@ -298,7 +298,7 @@ class reasc {
             $currentstateindex = $this->not_marked_state($this->finiteautomates[$index]);
             $this->finiteautomates[$index][$currentstateindex]->marked = true;
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
-                $newstate = new fas;
+                $newstate = new finite_automate_state;
                 $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow<ASSERT) {
@@ -385,8 +385,8 @@ class reasc {
     function state($state, $index) {
         $passcount = count($state);
         $result = false;
-        $fasize = count($this->finiteautomates[$index]);
-        for ($i=0; $i < $fasize && $result === false; $i++) {
+        $finite_automate_stateize = count($this->finiteautomates[$index]);
+        for ($i=0; $i < $finite_automate_stateize && $result === false; $i++) {
             $flag = true;
             if ($passcount != count($this->finiteautomates[$index][$i]->passages)) {
                 $flag = false;
