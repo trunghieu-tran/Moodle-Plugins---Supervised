@@ -570,7 +570,7 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result6->index == 33 && $result6->next == 0);
     }
     function test_general_assert() {//a(?=.*b)[xcvbnm]*
-        $this->qtype->roots[0] = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
+        $this->qtype->roots[0] = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         foreach ($this->qtype->roots as $key => $value) {
