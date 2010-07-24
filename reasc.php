@@ -324,7 +324,6 @@ class reasc {
         }
     }
     function compare($string, $assertnumber) {//if main regex then assertnumber is 0
-        $at4 = ($assertnumber>ASSERT && $string == 'bnm');
         $index = 0;//char index in string, comparing begin of first char in string
         $end = false;//current state is end state, not yet
         $full = true;//if string match with asserts
@@ -396,6 +395,7 @@ class reasc {
                         $full = false;
                         if ($maxindex > $tmpres->index + $index) {
                             $next = $tmpres->next;
+                            $maxindex = $tmpres->index + $index;
                         }
                     }
                 }

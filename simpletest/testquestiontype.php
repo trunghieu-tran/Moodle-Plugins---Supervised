@@ -593,7 +593,7 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result4->index == 3 && $result4->next == 0);
     }
     function test_general_two_asserts() {//a(?=b)(?=.*c)[xcvbnm]*
-        $this->qtype->roots[0] = $this->form_tree('(no (no (la1)(nA lb1))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm))))');
+        $this->qtype->roots[0] = $this->form_tree('(no (no (la1)(nA (lb1)))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm1))))');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         foreach ($this->qtype->roots as $key => $value) {
@@ -607,9 +607,9 @@ class reasc_test extends UnitTestCase {
         $result3 = $this->qtype->compare('abnm', 0);
         $result4 = $this->qtype->compare('abnc', 0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == 0 && $result1->next == 'b');
+        $this->assertTrue($result1->index == 0 && $result1->next == 'b');print_r($result1);
         $this->assertFalse($result2->full);
-        $this->assertTrue($result2->index == 0 && $result2->next == 'b');
+        $this->assertTrue($result2->index == 0 && $result2->next == 'b');print_r($result2);
         $this->assertFalse($result3->full);
         $this->assertTrue($result3->index == 3 && $result3->next == 'c');
         $this->assertTrue($result4->full);
