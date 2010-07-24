@@ -344,7 +344,7 @@ class reasc {
             $key = false;
             while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
                 //if character class number is positive (it's mean what character class is positive) and
-                //[$assertnumber][$currentstate]->passages);              //current character is contain in character class
+                //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
                 if (!$found) {
@@ -353,8 +353,7 @@ class reasc {
             }
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
-                //if character class number is positive (it's mean what character class is positive) and
-                //[$assertnumber][$currentstate]->passages);              //current character is contain in character class
+                //finding metasymbol dot's passages, it accept any character.
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 $found = ($key > DOT && $index < strlen($string));
                 if (!$found) {
@@ -378,10 +377,10 @@ class reasc {
                 if ($index == strlen($string)) { //must be end   
                     $found = true;
                     $foundkey = STREND;
-                } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {
+                } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {//must be end
                     $foundkey = STREND;
                 }
-                $maybeend = true;
+                $maybeend = true;//may be end.
             }
             $index++;
             if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
@@ -415,19 +414,20 @@ class reasc {
         } while($correct && !$end && $index <= strlen($string));//index - 1, becase index was incrimented
         //form result comparing string with regex
         $result = new compare_result;$len = strlen($string);
-        if ($index - 2 < $maxindex) {
+        if ($index - 2 < $maxindex) {//if asserts not give border to lenght of matching substring
             $result->index = $index - 2;
         } else {
             $result->index = $maxindex;
         }
-       if (strlen($string) == $result->index + 1 && $end && $full && $correct) {
+       if (strlen($string) == $result->index + 1 && $end && $full && $correct) {//if all string match with regex.
             $result->full = true;
         } else {
             $result->full = false;
         }
-        if ($result->full || $maybeend || $end) {
+        if ($result->full || $maybeend || $end) {//if string must be end on end of matching substring.
             $result->next = 0;
-        } elseif ($full) {
+        //determine next character, which will be correct and increment lenght of matching substring.
+        } elseif ($full && $index-2 < $maxindex) {//if assert not border next character
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
             if ($key > 0) {//if positive character class
