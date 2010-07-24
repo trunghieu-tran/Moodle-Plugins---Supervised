@@ -37,7 +37,7 @@ class reasc_test extends UnitTestCase {
     *@return croot of formed tree
     */
     function form_tree($prefixform) {
-        $result = &new node;
+        $result = new node;
         //forming the node or leaf
         switch($prefixform[1]) { //analyze first character, type of node/leaf
             case 'l': //simple leaf with char class
@@ -429,8 +429,14 @@ class reasc_test extends UnitTestCase {
     }
     //Unit tests for compare function
     function test_compare_full_incorrect() {//ab
+        $this->qtype->connection[0][1] = 'a';
+        $this->qtype->connection[0][2] = 'b';
+        $this->qtype->finiteautomates[0][0] = new finite_automate_state;
+        $this->qtype->finiteautomates[0][1] = new finite_automate_state;
+        $this->qtype->finiteautomates[0][2] = new finite_automate_state;
         $this->qtype->finiteautomates[0][0]->passages[1] = 1;
-        $this->qtype->finiteautomates[0][1]->passages[STREND] = -1;
+        $this->qtype->finiteautomates[0][1]->passages[2] = 2;
+        $this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
         $this->connection[0][1] = 'a';
         $this->connection[0][2] = 'b';
         $result=$this->qtype->compare('b',0);
@@ -449,7 +455,7 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result->index == -1 && $result->next == 'a');
     }
     function test_compare_particular_correct() {//ab
-    $this->qtype->finiteautomates[0][0]->passages[1] = 1;
+        $this->qtype->finiteautomates[0][0]->passages[1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
         $this->qtype->connection[0][1] = 'a';
@@ -483,8 +489,8 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result1->index == 1 && $result1->next == 0);
         $this->assertTrue($result2->full);
         $this->assertTrue($result2->index == 0 && $result->next == 0);
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == -1 && $result->next == 'b');
+        $this->assertFalse($result3->full);
+        $this->assertTrue($result3->index == -1 && $result3->next == 'b' || $result3->next == 'a');
     }
     function test_compare_negative_character_class() {//[^a][b]
         $this->qtype->finiteautomates[0][0]->passages[-1] = 1;
@@ -495,11 +501,11 @@ class reasc_test extends UnitTestCase {
         $result1 = $this->qtype->compare('ab',0);
         $result2 = $this->qtype->compare('bb',0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == -1 && $result1->next != 'a');
+        $this->assertTrue($result1->index == -1 && isset($result1->next) && $result1->next != 'a');
         $this->assertTrue($result2->full);
-        $this->assertTrue($result2->index == 1 && $result->next == 0);
+        $this->assertTrue($result2->index == 1 && $result2->next == 0);
     }
-    function test_compare_dot() {
+    function test_compare_dot() {//.b
         $this->qtype->finiteautomates[0][0]->passages[DOT+1] = 1;
         $this->qtype->finiteautomates[0][1]->passages[2] = 2;
         $this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
@@ -510,18 +516,18 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result1->full);
         $this->assertTrue($result1->index == 1 && $result1->next == 0);
         $this->assertFalse($result2->full);
-        $this->assertTrue($result2->index == 1 && $result->next == 0);
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 0 && $result->next == 'b');
+        $this->assertTrue($result2->index == 1 && $result2->next == 0);
+        $this->assertFalse($result3->full);
+        $this->assertTrue($result3->index == 0 && $result3->next == 'b');
     }
     function test_compare_assert() {//a(?=.*b)[xcvbnm]*
-        $this->qtype->finiteautomate[0][0]->passages[1] = 1;
-        $this->qtype->finiteautomate[0][1]->passages[3] = 2;
-        $this->qtype->finiteautomate[0][2]->passages[STREND] = -1;
-        $this->qtype->finiteautomate[0][0]->asserts[0] = ASSERT+2;
-        $this->qtype->finiteautomate[ASSERT+2][0]->passages[DOT+1] = 0;
-        $this->qtype->finiteautomate[ASSERT+2][0]->passages[2] = 1;
-        $this->qtype->finiteautomate[ASSERT+2][1]->passages[STREND] = -1;
+        $this->qtype->finiteautomates[0][0]->passages[1] = 1;
+        $this->qtype->finiteautomates[0][1]->passages[3] = 1;
+        $this->qtype->finiteautomates[0][1]->passages[STREND] = -1;
+        $this->qtype->finiteautomates[0][0]->asserts[0] = ASSERT+2;
+        $this->qtype->finiteautomates[ASSERT+2][0]->passages[DOT+1] = 0;
+        $this->qtype->finiteautomates[ASSERT+2][0]->passages[2] = 1;
+        $this->qtype->finiteautomates[ASSERT+2][1]->passages[STREND] = -1;
         $this->qtype->connection[0][1] = 'a';
         $this->qtype->connection[0][3] = 'xcvbnm';
         $this->qtype->connection[ASSERT+2][2] = 'b';
@@ -544,7 +550,6 @@ class reasc_test extends UnitTestCase {
         $this->qtype->roots[0] = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (no (la1)(lb1))(lb1))');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
-        $this->qtype->finiteautomates[0] = $this->qtype->finiteautomate;
         $result1 = $this->qtype->compare('cd', 0);
         $result2 = $this->qtype->compare('ca', 0);
         $result3 = $this->qtype->compare('ac', 0);
@@ -556,7 +561,7 @@ class reasc_test extends UnitTestCase {
         $this->assertFalse($result2->full);
         $this->assertTrue($result2->index == -1 && $result2->next == 'a');
         $this->assertFalse($result3->full);
-        $this->assertTrue($result3->index == 0 && $result3->next == 'b');
+        $this->assertTrue($result3->index == 0 && ($result3->next == 'b') || $result3->next == 'a');
         $this->assertFalse($result4->full);
         $this->assertTrue($result4->index == 1 && $result4->next == 'a');
         $this->assertTrue($result5->full);
@@ -568,7 +573,6 @@ class reasc_test extends UnitTestCase {
         $this->qtype->roots[0] = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
-        $this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
         foreach ($this->qtype->roots as $key => $value) {
             if ($key) {
                 $this->qtype->append_end($key);
@@ -592,7 +596,6 @@ class reasc_test extends UnitTestCase {
         $this->qtype->roots[0] = $this->form_tree('(no (no (la1)(nA lb1))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm))))');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
-        $this->qtype->finiteautomates[0]=$this->qtype->finiteautomate;
         foreach ($this->qtype->roots as $key => $value) {
             if ($key) {
                 $this->qtype->append_end($key);

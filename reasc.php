@@ -1,4 +1,6 @@
 <?php //$Id: reasc.php,put version put time dvkolesov Exp $
+//fa - finite automate
+
 //+++создать кнопку хинт, демонстрирующюю что-нибудь.
 //+++разобраться с делением на классы
 //+++заменить табы пробелами
@@ -112,11 +114,11 @@ class reasc {
     }
     function append_end($index) {
         $root = $this->roots[$index];
-        $this->roots[$index] = &new node;
+        $this->roots[$index] = new node;
         $this->roots[$index]->type = NODE;
         $this->roots[$index]->subtype = NODE_CONC;
         $this->roots[$index]->firop = $root;
-        $this->roots[$index]->secop = &new node;
+        $this->roots[$index]->secop = new node;
         $this->roots[$index]->secop->type = LEAF;
         $this->roots[$index]->secop->subtype = LEAF_END;
         $this->roots[$index]->secop->direction = true;
@@ -322,9 +324,130 @@ class reasc {
         }
     }
     function compare($string, $assertnumber) {//if main regex then assertnumber is 0
-        $result = new compare_result;
+        $at4 = ($assertnumber>ASSERT && $string == 'bnm');
+        $index = 0;//char index in string, comparing begin of first char in string
+        $end = false;//current state is end state, not yet
+        $full = true;//if string match with asserts
+        $next = 0;// character can put on next position, 0 for full matching with regex string
+        $maxindex = strlen($string);//string cannot match with regex after end, if mismatch with assert - index of last matching with assert character
+        $currentstate = 0;//finite automate begin work at start state, zero index in array
+        do {
+        /*check current character while: 1)checked substring match with regex
+                                         2)current character isn't end of string
+                                         3)finite automate not be in end state
+        */
+            $maybeend = false;
+            $found = false;//current character no accepted to fa yet
+            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //finding positive character class with this character
+            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            $key = false;
+            while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
+                //if character class number is positive (it's mean what character class is positive) and
+                //[$assertnumber][$currentstate]->passages);              //current character is contain in character class
+                $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
+                if (!$found) {
+                    next($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                }
+            }
+            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
+                //if character class number is positive (it's mean what character class is positive) and
+                //[$assertnumber][$currentstate]->passages);              //current character is contain in character class
+                $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                $found = ($key > DOT && $index < strlen($string));
+                if (!$found) {
+                    next($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                }
+            }
+            $foundkey = $key;
+            //finding negative character class without this character
+            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
+                $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                $found = ($key < 0 && strpos($this->connection[$assertnumber][abs($key)], $string[$index]) === false);
+                if ($found) {
+                    $foundkey = $key;
+                } else {
+                    next($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                }
+            }
+            if (array_key_exists(STREND, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
+            //if current character is end of string and fa can go to end state.
+                if ($index == strlen($string)) { //must be end   
+                    $found = true;
+                    $foundkey = STREND;
+                } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {
+                    $foundkey = STREND;
+                }
+                $maybeend = true;
+            }
+            $index++;
+            if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
+                foreach ($this->finiteautomates[$assertnumber][$currentstate]->asserts as $assert) {
+                    $tmpres = $this->compare(substr($string, $index), $assert);//result of compare substring starting at next character with current assert
+                    if ($tmpres->next !== 0) {
+                    /* if string not match with assert then assert give borders
+                       match string with regex can't be after mismatch with assert
+                       p.s. string can match if it not end when assert end
+                    */
+                        $full = false;
+                        if ($maxindex > $tmpres->index + $index) {
+                            $next = $tmpres->next;
+                        }
+                    }
+                }
+            }
+            //form results of check this character
+            if ($found) { //if finite automate did accept this character
+                $correct = true;
+                if ($foundkey != STREND) {// if finite automate go to not end state
+                    $currentstate = $this->finiteautomates[$assertnumber][$currentstate]->passages[$key];
+                    $end = false;
+                } else { 
+                    $end = true;
+                }
+            } else {
+                $correct = false;
+            }
+        } while($correct && !$end && $index <= strlen($string));//index - 1, becase index was incrimented
+        //form result comparing string with regex
+        $result = new compare_result;$len = strlen($string);
+        if ($index - 2 < $maxindex) {
+            $result->index = $index - 2;
+        } else {
+            $result->index = $maxindex;
+        }
+       if (strlen($string) == $result->index + 1 && $end && $full && $correct) {
+            $result->full = true;
+        } else {
+            $result->full = false;
+        }
+        if ($result->full || $maybeend || $end) {
+            $result->next = 0;
+        } elseif ($full) {
+            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
+            if ($key > 0) {//if positive character class
+                $result->next = $this->connection[$assertnumber][$key][0];
+                if($key > DOT && next($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) {
+                    $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
+                    $result->next = $this->connection[$assertnumber][$key][0];
+                }
+            } else {
+                for($c = ' '; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);
+                $result->next = $c;
+            }
+        } else {
+            $result->next = $next;
+        }
         return $result;
     }
+    
+    
+    
     static function push_unique(&$arr1, $arr2) {// to static
         foreach ($arr2 as $value) {
             if (!in_array($value, $arr1)) {
@@ -385,8 +508,8 @@ class reasc {
     function state($state, $index) {
         $passcount = count($state);
         $result = false;
-        $finite_automate_stateize = count($this->finiteautomates[$index]);
-        for ($i=0; $i < $finite_automate_stateize && $result === false; $i++) {
+        $fas = count($this->finiteautomates[$index]);
+        for ($i=0; $i < $fas && $result === false; $i++) {
             $flag = true;
             if ($passcount != count($this->finiteautomates[$index][$i]->passages)) {
                 $flag = false;
