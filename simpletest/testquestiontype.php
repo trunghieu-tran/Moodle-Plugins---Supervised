@@ -607,9 +607,9 @@ class reasc_test extends UnitTestCase {
         $result3 = $this->qtype->compare('abnm', 0);
         $result4 = $this->qtype->compare('abnc', 0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == 0 && $result1->next == 'b');print_r($result1);
+        $this->assertTrue($result1->index == 0 && $result1->next == 'b');
         $this->assertFalse($result2->full);
-        $this->assertTrue($result2->index == 0 && $result2->next == 'b');print_r($result2);
+        $this->assertTrue($result2->index == 0 && $result2->next == 'b');
         $this->assertFalse($result3->full);
         $this->assertTrue($result3->index == 3 && $result3->next == 'c');
         $this->assertTrue($result4->full);
