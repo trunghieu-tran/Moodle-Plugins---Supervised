@@ -615,5 +615,18 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next == 0);
     }
+    //Unit test for __clone()
+    function test_copy_subtree() {
+        $this->qtype->roots[0] = $this->form_tree('(no (no (loriginal1)(loriginal1))(no (loriginal1)(loriginal1)))');
+        $this->qtype->roots[1] = reasc::copy_subtree($this->qtype->roots[0]);
+        $this->assertTrue($this->qtype->roots[1]->firop->firop->chars == 'original' && $this->qtype->roots[1]->firop->secop->chars == 'original' &&
+                          $this->qtype->roots[1]->secop->firop->chars == 'original' && $this->qtype->roots[1]->secop->secop->chars == 'original');
+        $this->qtype->roots[1]->firop->firop->chars = 'cloned';
+        $this->qtype->roots[1]->firop->secop->chars = 'cloned';
+        $this->qtype->roots[1]->secop->firop->chars = 'cloned';
+        $this->qtype->roots[1]->secop->secop->chars = 'cloned';
+        $this->assertTrue($this->qtype->roots[0]->firop->firop->chars == 'original' && $this->qtype->roots[0]->firop->secop->chars == 'original' &&
+                          $this->qtype->roots[0]->secop->firop->chars == 'original' && $this->qtype->roots[0]->secop->secop->chars == 'original');
+    }
 }
 ?>

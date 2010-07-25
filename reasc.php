@@ -529,5 +529,20 @@ class reasc {
         }
         return $result;
     }
+    static function copy_subtree($node) {
+        $result = new node;
+        $result->type = $node->type;
+        $result->subtype = $node->subtype;
+        $result->greed = $node->greed;
+        $result->direction = $node->direction;
+        $result->chars = $node->chars;
+        if ($node->type == NODE) {
+            $result->firop = reasc::copy_subtree($node->firop);
+            if ($node->subtype == NODE_ALT || $node->subtype == NODE_CONC) {
+                $result->secop = reasc::copy_subtree($node->secop);
+            }
+        }
+        return $result;
+    }
 }
 ?>
