@@ -615,7 +615,7 @@ class reasc_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next == 0);
     }
-    //Unit test for __clone()
+    //Unit test for copy_subtree()
     function test_copy_subtree() {
         $this->qtype->roots[0] = $this->form_tree('(no (no (loriginal1)(loriginal1))(no (loriginal1)(loriginal1)))');
         $this->qtype->roots[1] = reasc::copy_subtree($this->qtype->roots[0]);
@@ -627,6 +627,73 @@ class reasc_test extends UnitTestCase {
         $this->qtype->roots[1]->secop->secop->chars = 'cloned';
         $this->assertTrue($this->qtype->roots[0]->firop->firop->chars == 'original' && $this->qtype->roots[0]->firop->secop->chars == 'original' &&
                           $this->qtype->roots[0]->secop->firop->chars == 'original' && $this->qtype->roots[0]->secop->secop->chars == 'original');
+    }
+    //Unit tests for convert_tree()
+    function test_convert_tree_quantificator_plus() {
+        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->roots[0]->firop->subtype = NODE_PLUSQUANT;
+        reasc::convert_tree($this->qtype->roots[0]);
+        $this->assertTrue($this->qtype->roots[0]->firop->subtype == NODE_CONC && $this->qtype->roots[0]->firop->firop->type == LEAF &&
+                          $this->qtype->roots[0]->firop->secop->type == NODE && $this->qtype->roots[0]->firop->secop->subtype == NODE_ITER);
+    }
+    function test_convert_tree_quantificator_l2r4() {//a{2,4}b
+        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
+        $this->qtype->roots[0]->firop->leftborder = 2;
+        $this->qtype->roots[0]->firop->rightborder = 4;
+        reasc::convert_tree($this->qtype->roots[0]);
+        $this->qtype->append_end(0);
+        $this->qtype->buildfa(0);
+        $result1 = $this->qtype->compare('ab', 0);
+        $result2 = $this->qtype->compare('aab', 0);
+        $result3 = $this->qtype->compare('aaab', 0);
+        $result4 = $this->qtype->compare('aaaab', 0);
+        $result5 = $this->qtype->compare('aaaaab', 0);
+        $this->assertFalse($result1->full);
+        $this->assertTrue($result2->full);
+        $this->assertTrue($result3->full);
+        $this->assertTrue($result4->full);
+        $this->assertFalse($result5->full);
+    }
+    function test_convert_tree_quantificator_l0r4() {//a{,4}b
+        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
+        $this->qtype->roots[0]->firop->leftborder = 0;
+        $this->qtype->roots[0]->firop->rightborder = 4;
+        reasc::convert_tree($this->qtype->roots[0]);
+        $this->qtype->append_end(0);
+        $this->qtype->buildfa(0);
+        $result0 = $this->qtype->compare('b', 0);
+        $result1 = $this->qtype->compare('ab', 0);
+        $result2 = $this->qtype->compare('aab', 0);
+        $result3 = $this->qtype->compare('aaab', 0);
+        $result4 = $this->qtype->compare('aaaab', 0);
+        $result5 = $this->qtype->compare('aaaaab', 0);
+        $this->assertTrue($result0->full);
+        $this->assertTrue($result1->full);
+        $this->assertTrue($result2->full);
+        $this->assertTrue($result3->full);
+        $this->assertTrue($result4->full);
+        $this->assertFalse($result5->full);
+    }
+    function test_convert_tree_quantificator_l2rinf() {//a{2,}b
+        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
+        $this->qtype->roots[0]->firop->leftborder = 2;
+        $this->qtype->roots[0]->firop->rightborder = -1;
+        reasc::convert_tree($this->qtype->roots[0]);
+        $this->qtype->append_end(0);
+        $this->qtype->buildfa(0);
+        $result1 = $this->qtype->compare('ab', 0);
+        $result2 = $this->qtype->compare('aab', 0);
+        $result3 = $this->qtype->compare('aaab', 0);
+        $result4 = $this->qtype->compare('aaaab', 0);
+        $result5 = $this->qtype->compare('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab', 0);
+        $this->assertFalse($result1->full);
+        $this->assertTrue($result2->full);
+        $this->assertTrue($result3->full);
+        $this->assertTrue($result4->full);
+        $this->assertTrue($result5->full);
     }
 }
 ?>

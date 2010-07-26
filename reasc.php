@@ -75,6 +75,8 @@ class node {
     var $direction;
     var $greed;
     var $chars;
+    var $leftborder;
+    var $rightborder;
     
     function name() {
         return 'node';
@@ -543,6 +545,8 @@ class reasc {
             }
         }
         return $result;
+    }
+    static function convert_tree($node) {
     }
 }
 ?>
