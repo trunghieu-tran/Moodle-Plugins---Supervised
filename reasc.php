@@ -1,13 +1,14 @@
 <?php //$Id: reasc.php,put version put time dvkolesov Exp $
 //fa - finite automate
 
-//+++создать кнопку хинт, демонстрирующюю что-нибудь.
-//+++разобраться с делением на классы
-//+++заменить табы пробелами
-//+++расставить пробелы в усовиях и между ифом и скобками
-//закоментировать по английски
-//написать парсер
-//+++6 function need convert to static
+/*СДЕЛАТЬ:
+*Преобразование дерева избавляюющее от + {} и пустых листьев.
+*проверку на неподдерживаемые операции
+*парсер
+*избавиться от свитчей, с помощью наследования от базового класса и отличающаяся по сабтипу
+*соединить этот класс с вопросом
+*сделать возможность для регистронезависимости
+*/
 
 /*ПЛАН:
 *Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
@@ -547,6 +548,105 @@ class reasc {
         return $result;
     }
     static function convert_tree($node) {
+        if ($node->type == NODE) {
+            switch ($node->subtype) {
+                case NODE_PLUSQUANT:
+                    reasc::convert_tree($node->firop);
+                    if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
+                        $node->type = LEAF;
+                        $node->subtype = LEAF_EMPTY;
+                    } else {
+                        $node->subtype = NODE_CONC;
+                        $node->secop = new node;
+                        $node->secop->type = NODE;
+                        $node->secop->subtype = NODE_ITER;
+                        $node->secop->firop = reasc::copy_subtree($node->firop);
+                    }
+                    break;
+                case NODE_QUANT:
+                    reasc::convert_tree($node->firop);
+                    if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
+                        $node->type = LEAF;
+                        $node->subtype = LEAF_EMPTY;
+                    } else {
+                        $operand = reasc::copy_subtree($node->firop);
+                        if ($node->leftborder != 0) {
+                            $count = $node->leftborder;
+                            $currsubroot = $node->firop;
+                            for ($i=1; $i<$count; $i++) {
+                                $tmp = new node;
+                                $tmp->type = NODE;
+                                $tmp->subtype = NODE_CONC;
+                                $tmp->firop = $currsubroot;
+                                $tmp->secop = reasc::copy_subtree($operand);
+                                $currsubroot = $tmp;
+                                
+                            }
+                            if ($node->leftborder < $node->rightborder) {
+                                $tmp = new node;
+                                $tmp->type = NODE;
+                                $tmp->subtype = NODE_CONC;
+                                $tmp->firop = $currsubroot;
+                                $currsubroot = $tmp;
+                                $tmp = new node;
+                                $tmp->type = NODE;
+                                $tmp->subtype = NODE_QUESTQUANT;
+                                $tmp->firop = reasc::copy_subtree($operand);
+                                $operand = $tmp;
+                                $currsubroot->secop = $tmp;
+                            }
+                        } else {
+                            $currsubroot = new node;
+                            $currsubroot->type = NODE;
+                            $currsubroot->subtype = NODE_QUESTQUANT;
+                            $currsubroot->firop = $operand;
+                            $operand = $currsubroot;
+                        }
+                        if ($node->rightborder != -1) {
+                            $count = $node->rightborder - $node->leftborder;
+                            for ($i=1; $i<$count; $i++) {
+                                $tmp = new node;
+                                $tmp->type = NODE;
+                                $tmp->subtype = NODE_CONC;
+                                $tmp->firop = $currsubroot;
+                                $tmp->secop = reasc::copy_subtree($operand);
+                                $currsubroot = $tmp;
+                            }
+                        } else {
+                            $tmp = new node;
+                            $tmp->type = NODE;
+                            $tmp->subtype = NODE_CONC;
+                            $tmp->firop = $currsubroot;
+                            $tmp->secop = new node;
+                            $tmp->secop->type = NODE;
+                            $tmp->secop->subtype = NODE_ITER;
+                            $tmp->secop->firop = reasc::copy_subtree($operand);
+                            $currsubroot = $tmp;
+                        }
+                        $node->subtype = $currsubroot->subtype;
+                        $node->firop = $currsubroot->firop;
+                        $node->secop = $currsubroot->secop;
+                    }
+                    break;
+                case NODE_ALT:
+                    if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
+                        $node->subtype = NODE_QUESTQUANT;
+                        $node->firop = $node->secop;
+                        reasc::convert_tree($node->firop);
+                    } elseif ($node->secop->type == LEAF &&$node->secop->subtype == LEAF_EMPTY) {
+                        $node->subtype = NODE_QUESTQUANT;
+                        reasc::convert_tree($node->firop);
+                    }
+                    reasc::convert_tree($node->firop);
+                    reasc::convert_tree($node->secop);
+                    break;
+                case NODE_CONC:
+                    reasc::convert_tree($node->secop);
+                default:
+                    reasc::convert_tree($node->firop);
+                    break;
+            }
+        }
     }
 }
 ?>

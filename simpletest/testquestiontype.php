@@ -629,7 +629,7 @@ class reasc_test extends UnitTestCase {
                           $this->qtype->roots[0]->secop->firop->chars == 'original' && $this->qtype->roots[0]->secop->secop->chars == 'original');
     }
     //Unit tests for convert_tree()
-    function test_convert_tree_quantificator_plus() {
+    function test_convert_tree_quantificator_plus() {//a+b
         $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
         $this->qtype->roots[0]->firop->subtype = NODE_PLUSQUANT;
         reasc::convert_tree($this->qtype->roots[0]);
