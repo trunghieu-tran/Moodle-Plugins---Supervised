@@ -2,12 +2,12 @@
 //fa - finite automate
 
 /*СДЕЛАТЬ:
-*Преобразование дерева избавляюющее от + {} и пустых листьев.
-*проверку на неподдерживаемые операции
-*парсер
-*избавиться от свитчей, с помощью наследования от базового класса и отличающаяся по сабтипу
-*соединить этот класс с вопросом
-*сделать возможность для регистронезависимости
+*+++Преобразование дерева избавляюющее от + {} и пустых листьев.
+*отложено - проверку на неподдерживаемые операции
+*отложено - парсер
+*сильно отложено - избавиться от свитчей, с помощью наследования от базового класса и отличающаяся по сабтипу
+*!!!соединить этот класс с вопросом
+*отложено - сделать возможность для регистронезависимости
 */
 
 /*ПЛАН:
@@ -103,7 +103,10 @@ class compare_result {
         return 'compare_result';
     }
 }
-
+//Этот класс соединяется с вопросом до написания парсера.
+//времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
+//её код копи-пастом переносится из класса тестировщика, т.к.
+//эта функция временная и после написания парсера будет удалена.
 class reasc {
 
 
@@ -111,6 +114,8 @@ class reasc {
     var $roots;//array,[0] main root, [<assert number>] assert's root
     var $finiteautomates;
 	var $maxnum;
+    var $built;
+    var $result;
     
     function name() {
         return 'reasc';
@@ -647,6 +652,126 @@ class reasc {
                     break;
             }
         }
+    }
+    /**
+    *form the tree of the regexp from prefix form, for unit tests only!
+    *this function is unsafe, input data must be correct!
+    *
+    *@param prefixform string with regexp in prefix form
+    *@return croot of formed tree
+    */
+    function form_tree($prefixform) {
+        $result = new node;
+        //forming the node or leaf
+        switch($prefixform[1]) { //analyze first character, type of node/leaf
+            case 'l': //simple leaf with char class
+                $result->type = LEAF;
+                $result->subtype = LEAF_CHARCLASS;
+                $result->chars = null;
+                for ($i=2; $prefixform[$i+1] != ')'; $i++) {
+                    $result->chars.=$prefixform[$i];
+                }
+                if ($prefixform[$i] == '0') {
+                    $result->direction=false;
+                } else {
+                    $result->direction=true;
+                }
+                break;
+            case 'e': //empty leaf
+                $result->type = LEAF;
+                $result->subtype = LEAF_EMPTY;
+                break;
+            case 'd': //metasymbol dot
+                $result->type = LEAF;
+                $result->subtype = LEAF_METASYMBOLDOT;
+                $result->direction=true;
+                $result->chars = 'METASYMBOL_DOT';
+                break;
+            case 'n':
+                $result->type = NODE;
+                switch($prefixform[2]) {
+                    case 'o': //concatenation node
+                        $result->subtype = NODE_CONC;
+                        break;
+                    case '|': //alternative node
+                        $result->subtype = NODE_ALT;
+                        break;
+                    case '*': //iteration node
+                        $result->subtype = NODE_ITER;
+                        break;
+                    case '?': //quantificator ? node
+                        $result->subtype = NODE_QUESTQUANT;
+                        break;
+                    case 'A': //true forward assert node
+                        $result->subtype = NODE_ASSERTTF;
+                        break;
+                }
+                //forming operand
+                $brackets=0;
+                $tmp=null;
+                for ($i=4; $brackets != 0 || $i == 4; $i++) {
+                    $tmp.=$prefixform[$i];
+                    if ($prefixform[$i] == '(') {
+                        $brackets++;
+                    }
+                    if ($prefixform[$i] == ')') {
+                        $brackets--;
+                    }
+                }
+                //forming second operand
+                $result->firop = $this->form_tree($tmp);
+                if ($result->subtype == NODE_CONC || $result->subtype == NODE_ALT) {
+                    $tmp = null;
+                    do{
+                        $tmp.=$prefixform[$i];
+                        if ($prefixform[$i] == '(') {
+                            $brackets++;
+                        }
+                        if ($prefixform[$i] == ')') {
+                            $brackets--;
+                        }
+                        $i++;
+                    }while ($brackets != 0);
+                    $result->secop = $this->form_tree($tmp);
+                }
+                break;
+        }
+        return $result;
+    }
+    function preprocess($regex) {
+        //getting tree
+        
+        $this->roots[0] = $this->form_tree($regex);//TEMP, change on parser
+       
+        //building finite automates
+        $this->append_end(0);
+        $this->buildfa(0);
+        foreach ($this->roots as $key => $value) {
+            if ($key) {
+                $this->append_end($key);
+                $this->buildfa($key);
+            }
+        }
+        $this->built = true;
+        return;
+    }
+    function get_result($response) {
+        if ($this->built) {
+            $result = $this->compare($response, 0);
+        } else {
+            $result = false;
+        }
+        $this->result = $result;
+        return $result;           
+    }
+    function get_index() {
+        return $this->result->index;
+    }
+    function get_full() {
+        return $this->result->full;
+    }
+    function get_next_char() {
+        return $this->result->next;
     }
 }
 ?>

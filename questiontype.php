@@ -9,6 +9,7 @@
 ///
 ///
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/question/type/preg/reasc.php');
 //+++extra_question_fields и definition_inner(edit_preg_form.php) нужны для выбора да/нет в окне редактирования вопроса.
 //+++$question->options хранит значения опций, можно будет получить оттуда данные о выборе да/нет.
 //+++print_question_submit_buttons печатает кнопку Submit, использовать её для кнопки Hint
@@ -18,7 +19,11 @@ require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 //++default::grade_responses в переменной $state->event получает данные о событии, использовать для обработки нажатий кнопки hint(пенальти)
     
 class question_preg_qtype extends question_shortanswer_qtype {
-
+    
+    var $automates;
+    var $hintedresponse;
+    var $result;
+    
     function name() {
         return 'preg';
     }
@@ -51,9 +56,24 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
 
     function test_response(&$question, $state, $answer) {
-        // Trim the response before it is saved in the database. See MDL-10709
-        $state->responses[''] = trim($state->responses['']);
-        return $this->match_regex($answer->answer, trim(stripslashes_safe($state->responses[''])), $question->options->exactmatch, $question->options->usecase);
+        if ($question->options->usehint) {
+            $this->automates[$answer->id]->get_result($state->responses['']);
+            if (isset($state->responses['hint'])) {
+                $this->hintedresponse = substr($state->responses[''],0,$this->automates[$answer->id]->get_index()+1);
+                if ($this->automates[$answer->id]->get_next_char() !== 0) {  
+                    $this->hintedresponse .= $this->automates[$answer->id]->get_next_char();
+                }
+                $this->automates[$answer->id]->get_result($this->hintedresponse);
+                $this->result[$answer->id] = $this->automates[$answer->id]->get_full();
+                return $this->automates[$answer->id]->get_full();
+            } else {
+                return $this->automates[$answer->id]->get_full();
+            }
+        } else {
+            // Trim the response before it is saved in the database. See MDL-10709
+            $state->responses[''] = trim($state->responses['']);
+            return $this->match_regex($answer->answer, trim(stripslashes_safe($state->responses[''])), $question->options->exactmatch, $question->options->usecase);
+        }
     }
 
   /*
@@ -75,14 +95,76 @@ class question_preg_qtype extends question_shortanswer_qtype {
         default_questiontype::grade_responses(&$question, &$state, $cmoptions);
         if(isset($state->responses['hint'])) {
             $state->penalty = $question->options->hintpenalty * $question->maxgrade;
+            $state->raw_grade -= $question->options->hintpenalty * $question->maxgrade;
+            if ($state->raw_grade < 0 ) {
+                $state->raw_grade = 0;
+            }
         }
         return true;
     }
-    function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
-        if(isset($state->responses['hint'])) {
-            $state->responses[''] = 'Something';
+    function get_question_options(&$question) {
+        $result = parent::get_question_options(&$question);
+        foreach ($question->options->answers as $answer) {
+            $this->automates[$answer->id] = new reasc;
+            $this->automates[$answer->id]->preprocess($answer->answer);
         }
-        parent::print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options);
+        return $result;
+    }
+    function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
+        if (isset($state->responses['hint']) && isset($this->hintedresponse)) {
+            $state->responses[''] = $this->hintedresponse;
+        }
+            global $CFG;
+    /// This implementation is also used by question type 'numerical'
+        $readonly = empty($options->readonly) ? '' : 'readonly="readonly"';
+        $formatoptions = new stdClass;
+        $formatoptions->noclean = true;
+        $formatoptions->para = false;
+        $nameprefix = $question->name_prefix;
+
+        /// Print question text and media
+
+        $questiontext = format_text($question->questiontext,
+                $question->questiontextformat,
+                $formatoptions, $cmoptions->course);
+        $image = get_question_image($question);
+
+        /// Print input controls
+
+        if (isset($state->responses['']) && $state->responses[''] != '') {
+            $value = ' value="'.s($state->responses[''], true).'" ';
+        } else {
+            $value = ' value="" ';
+        }
+        $inputname = ' name="'.$nameprefix.'" ';
+
+        $feedback = '';
+        $class = '';
+        $feedbackimg = '';
+
+        if ($options->feedback) {
+            $class = question_get_feedback_class(0);
+            $feedbackimg = question_get_feedback_image(0);
+            foreach($question->options->answers as $answer) {
+                if(isset($state->responses['hint'])) {
+                    $flag = $this->result[$answer->id];
+                } else {
+                    $flag = $this->test_response($question, $state, $answer);
+                }
+                if ($flag) {
+                    // Answer was correct or partially correct.
+                    $class = question_get_feedback_class($answer->fraction);
+                    $feedbackimg = question_get_feedback_image($answer->fraction);
+                    if ($answer->feedback) {
+                        $feedback = format_text($answer->feedback, true, $formatoptions, $cmoptions->course);
+                    }
+                    break;
+                }
+            }
+        }
+
+        /// Removed correct answer, to be displayed later MDL-7496
+        include("$CFG->dirroot/question/type/shortanswer/display.html");
     }
 }
 //// END OF CLASS ////

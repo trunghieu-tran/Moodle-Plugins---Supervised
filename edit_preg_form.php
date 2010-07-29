@@ -53,6 +53,9 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         if ($rightanswermatch == false) {
             $errors['rightanswer']=get_string('norightanswermatch','qtype_preg');
         }
+        if ($data['usehint']) {
+            return $noerror;
+        }
         return $errors;
     }
 
