@@ -94,11 +94,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function grade_responses(&$question, &$state, $cmoptions) {
         default_questiontype::grade_responses(&$question, &$state, $cmoptions);
         if(isset($state->responses['hint'])) {
-            $state->penalty = $question->options->hintpenalty * $question->maxgrade;
-            $state->raw_grade -= $question->options->hintpenalty * $question->maxgrade;
-            if ($state->raw_grade < 0 ) {
-                $state->raw_grade = 0;
-            }
+            $state->sumpenalty += $question->options->hintpenalty * $question->maxgrade;
         }
         return true;
     }
