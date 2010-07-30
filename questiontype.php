@@ -105,7 +105,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function get_question_options(&$question) {
         $result = parent::get_question_options(&$question);
         foreach ($question->options->answers as $answer) {
-            $this->automates[$answer->id] = new reasc;
+            $this->automates[$answer->id] = new preg_matcher_dfa;
             $this->automates[$answer->id]->preprocess($answer->answer);
         }
         return $result;

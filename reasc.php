@@ -1,4 +1,4 @@
-<?php //$Id: reasc.php,put version put time dvkolesov Exp $
+<?php //$Id: preg_matcher_dfa.php,put version put time dvkolesov Exp $
 //fa - finite automate
 
 /*СДЕЛАТЬ:
@@ -12,8 +12,8 @@
 
 /*ПЛАН:
 *Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
-*класс reasc сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
-*класс reasc снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
+*класс preg_matcher_dfa сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
+*класс preg_matcher_dfa снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
 *
 *+++Убрать $croot, $cconn, $finiteautomate, вместо них передавать в buildfa и другие функции использующие $this->c.*
 *   номер ассерта(нуль для основного выражения) по которому строится автомат
@@ -22,19 +22,19 @@
 *+++сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
 *   is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
 *
-*добавить объект класса парсера как свойство класса reasc
+*добавить объект класса парсера как свойство класса preg_matcher_dfa
 */
 
-/*PUBLIC МЕТОДЫ КЛАССА REASC:
-*reasc::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
+/*PUBLIC МЕТОДЫ КЛАССА preg_matcher_dfa:
+*preg_matcher_dfa::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
 *                            если регекс содержал неподдерживаемую операцию возвращает её номер,
 *                            если регекс содержал синтаксическую ошибку возвращает -1.
-*reasc::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
+*preg_matcher_dfa::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
 *                        если регекс небыл введен возвращает ложь, если сравнение было проведено истину.
-*reasc::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
+*preg_matcher_dfa::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
 *                       если сравнение небыло проведено возвращает false.
-*reasc::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
-*reasc::next()          возвращает символ допустимый на следующей позиции, может быть 0.
+*preg_matcher_dfa::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
+*preg_matcher_dfa::next()          возвращает символ допустимый на следующей позиции, может быть 0.
 *                       если сравнение небыло проведено возвращает false
 *
 *если будет время, то сделать функции чтения из файла/записи в файл ДКА
@@ -103,11 +103,12 @@ class compare_result {
         return 'compare_result';
     }
 }
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 //Этот класс соединяется с вопросом до написания парсера.
 //времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
 //её код копи-пастом переносится из класса тестировщика, т.к.
 //эта функция временная и после написания парсера будет удалена.
-class reasc {
+class preg_matcher_dfa {//extends preg_matcher {
 
 
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
@@ -118,7 +119,7 @@ class reasc {
     var $result;
     
     function name() {
-        return 'reasc';
+        return 'preg_matcher_dfa';
     }
     function append_end($index) {
         $root = $this->roots[$index];
@@ -171,16 +172,16 @@ class reasc {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT://alternative can give empty word if one operand can.
-                    $result = (reasc::nullable($node->firop) || reasc::nullable($node->secop));
+                    $result = (preg_matcher_dfa::nullable($node->firop) || preg_matcher_dfa::nullable($node->secop));
                     break;
                 case NODE_CONC://concatenation can give empty word if both operands can.
-                    $result = (reasc::nullable($node->firop) && reasc::nullable($node->secop));
-                    reasc::nullable($node->secop);
+                    $result = (preg_matcher_dfa::nullable($node->firop) && preg_matcher_dfa::nullable($node->secop));
+                    preg_matcher_dfa::nullable($node->secop);
                     break;
                 case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
                 case NODE_QUESTQUANT:
                     $result = true;
-                    reasc::nullable($node->firop);
+                    preg_matcher_dfa::nullable($node->firop);
                     break;
                 case NODE_ASSERTTF://assert can give empty word.
                     $result = true;
@@ -199,19 +200,19 @@ class reasc {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge(reasc::firstpos($node->firop), reasc::firstpos($node->secop));
+                    $result = array_merge(preg_matcher_dfa::firstpos($node->firop), preg_matcher_dfa::firstpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = reasc::firstpos($node->firop);
+                    $result = preg_matcher_dfa::firstpos($node->firop);
                     if ($node->firop->nullable) {
-                        $result = array_merge($result, reasc::firstpos($node->secop));
+                        $result = array_merge($result, preg_matcher_dfa::firstpos($node->secop));
                     } else {
-                        reasc::firstpos($node->secop);
+                        preg_matcher_dfa::firstpos($node->secop);
                     }
                     break;
                 case NODE_QUESTQUANT:
                 case NODE_ITER:
-                    $result = reasc::firstpos($node->firop);
+                    $result = preg_matcher_dfa::firstpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -237,19 +238,19 @@ class reasc {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge(reasc::lastpos($node->firop), reasc::lastpos($node->secop));
+                    $result = array_merge(preg_matcher_dfa::lastpos($node->firop), preg_matcher_dfa::lastpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = reasc::lastpos($node->secop);
+                    $result = preg_matcher_dfa::lastpos($node->secop);
                     if ($node->secop->nullable) {
-                        $result = array_merge(reasc::lastpos($node->firop), $result);
+                        $result = array_merge(preg_matcher_dfa::lastpos($node->firop), $result);
                     } else {
-                        reasc::lastpos($node->firop);
+                        preg_matcher_dfa::lastpos($node->firop);
                     }
                     break;
                 case NODE_ITER:
                 case NODE_QUESTQUANT:
-                    $result = reasc::lastpos($node->firop);
+                    $result = preg_matcher_dfa::lastpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -269,22 +270,22 @@ class reasc {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_CONC:
-                    reasc::followpos($node->firop, $fpmap);
-                    reasc::followpos($node->secop, $fpmap);
+                    preg_matcher_dfa::followpos($node->firop, $fpmap);
+                    preg_matcher_dfa::followpos($node->secop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        reasc::push_unique($fpmap[$key], $node->secop->firstpos);
+                        preg_matcher_dfa::push_unique($fpmap[$key], $node->secop->firstpos);
                     }
                     break;
                 case NODE_ITER:
-                    reasc::followpos($node->firop, $fpmap);
+                    preg_matcher_dfa::followpos($node->firop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        reasc::push_unique($fpmap[$key], $node->firop->firstpos);
+                        preg_matcher_dfa::push_unique($fpmap[$key], $node->firop->firstpos);
                     }
                     break;
                 case NODE_ALT:
-                    reasc::followpos($node->secop, $fpmap);
+                    preg_matcher_dfa::followpos($node->secop, $fpmap);
                 case NODE_QUESTQUANT:
-                    reasc::followpos($node->firop, $fpmap);
+                    preg_matcher_dfa::followpos($node->firop, $fpmap);
                     break;
             }
         }
@@ -295,10 +296,10 @@ class reasc {
         $this->finiteautomates[$index][0] = new finite_automate_state;
         $this->numeration($this->roots[$index], $index);
         if($old == $this->connection) { }
-        reasc::nullable($this->roots[$index]);
-        reasc::firstpos($this->roots[$index]);
-        reasc::lastpos($this->roots[$index]);
-        reasc::followpos($this->roots[$index], $map);
+        preg_matcher_dfa::nullable($this->roots[$index]);
+        preg_matcher_dfa::firstpos($this->roots[$index]);
+        preg_matcher_dfa::lastpos($this->roots[$index]);
+        preg_matcher_dfa::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
         foreach ($this->roots[$index]->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;//BUG!!! эта строка зависает!
@@ -503,13 +504,13 @@ class reasc {
         $equnum = array();
         foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
             $str2 = $cc;
-            if (reasc::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
+            if (preg_matcher_dfa::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
                 array_push($equnum, $num);
             }
         }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
-            reasc::push_unique($followU, $fpmap[$num]);
+            preg_matcher_dfa::push_unique($followU, $fpmap[$num]);
         }
         return $followU;
     }
@@ -545,9 +546,9 @@ class reasc {
         $result->direction = $node->direction;
         $result->chars = $node->chars;
         if ($node->type == NODE) {
-            $result->firop = reasc::copy_subtree($node->firop);
+            $result->firop = preg_matcher_dfa::copy_subtree($node->firop);
             if ($node->subtype == NODE_ALT || $node->subtype == NODE_CONC) {
-                $result->secop = reasc::copy_subtree($node->secop);
+                $result->secop = preg_matcher_dfa::copy_subtree($node->secop);
             }
         }
         return $result;
@@ -556,7 +557,7 @@ class reasc {
         if ($node->type == NODE) {
             switch ($node->subtype) {
                 case NODE_PLUSQUANT:
-                    reasc::convert_tree($node->firop);
+                    preg_matcher_dfa::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->type = LEAF;
                         $node->subtype = LEAF_EMPTY;
@@ -565,16 +566,16 @@ class reasc {
                         $node->secop = new node;
                         $node->secop->type = NODE;
                         $node->secop->subtype = NODE_ITER;
-                        $node->secop->firop = reasc::copy_subtree($node->firop);
+                        $node->secop->firop = preg_matcher_dfa::copy_subtree($node->firop);
                     }
                     break;
                 case NODE_QUANT:
-                    reasc::convert_tree($node->firop);
+                    preg_matcher_dfa::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->type = LEAF;
                         $node->subtype = LEAF_EMPTY;
                     } else {
-                        $operand = reasc::copy_subtree($node->firop);
+                        $operand = preg_matcher_dfa::copy_subtree($node->firop);
                         if ($node->leftborder != 0) {
                             $count = $node->leftborder;
                             $currsubroot = $node->firop;
@@ -583,7 +584,7 @@ class reasc {
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_CONC;
                                 $tmp->firop = $currsubroot;
-                                $tmp->secop = reasc::copy_subtree($operand);
+                                $tmp->secop = preg_matcher_dfa::copy_subtree($operand);
                                 $currsubroot = $tmp;
                                 
                             }
@@ -596,7 +597,7 @@ class reasc {
                                 $tmp = new node;
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_QUESTQUANT;
-                                $tmp->firop = reasc::copy_subtree($operand);
+                                $tmp->firop = preg_matcher_dfa::copy_subtree($operand);
                                 $operand = $tmp;
                                 $currsubroot->secop = $tmp;
                             }
@@ -614,7 +615,7 @@ class reasc {
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_CONC;
                                 $tmp->firop = $currsubroot;
-                                $tmp->secop = reasc::copy_subtree($operand);
+                                $tmp->secop = preg_matcher_dfa::copy_subtree($operand);
                                 $currsubroot = $tmp;
                             }
                         } else {
@@ -625,7 +626,7 @@ class reasc {
                             $tmp->secop = new node;
                             $tmp->secop->type = NODE;
                             $tmp->secop->subtype = NODE_ITER;
-                            $tmp->secop->firop = reasc::copy_subtree($operand);
+                            $tmp->secop->firop = preg_matcher_dfa::copy_subtree($operand);
                             $currsubroot = $tmp;
                         }
                         $node->subtype = $currsubroot->subtype;
@@ -637,18 +638,18 @@ class reasc {
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->subtype = NODE_QUESTQUANT;
                         $node->firop = $node->secop;
-                        reasc::convert_tree($node->firop);
+                        preg_matcher_dfa::convert_tree($node->firop);
                     } elseif ($node->secop->type == LEAF &&$node->secop->subtype == LEAF_EMPTY) {
                         $node->subtype = NODE_QUESTQUANT;
-                        reasc::convert_tree($node->firop);
+                        preg_matcher_dfa::convert_tree($node->firop);
                     }
-                    reasc::convert_tree($node->firop);
-                    reasc::convert_tree($node->secop);
+                    preg_matcher_dfa::convert_tree($node->firop);
+                    preg_matcher_dfa::convert_tree($node->secop);
                     break;
                 case NODE_CONC:
-                    reasc::convert_tree($node->secop);
+                    preg_matcher_dfa::convert_tree($node->secop);
                 default:
-                    reasc::convert_tree($node->firop);
+                    preg_matcher_dfa::convert_tree($node->firop);
                     break;
             }
         }
