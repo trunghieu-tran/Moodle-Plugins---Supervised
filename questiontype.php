@@ -6,8 +6,9 @@
 
 /// QUESTION TYPE CLASS //////////////////
 
-///
-///
+//так выводится зачеркнутый красный.
+//$f = '<span style="color:#0000FF;">'.$response.'</span><span style="text-decoration:line-through; color:#FF0000;">'.
+//                $s."</span><br />";
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/reasc.php');
 //+++extra_question_fields и definition_inner(edit_preg_form.php) нужны для выбора да/нет в окне редактирования вопроса.
@@ -95,6 +96,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         default_questiontype::grade_responses(&$question, &$state, $cmoptions);
         if(isset($state->responses['hint'])) {
             $state->sumpenalty += $question->options->hintpenalty * $question->maxgrade;
+            $state->penalty = 0;
         }
         return true;
     }
@@ -107,6 +109,9 @@ class question_preg_qtype extends question_shortanswer_qtype {
         return $result;
     }
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
+            $lenght = strlen($this->hintedresponse) - 1;
+            $hintmessage = '<span style="color:#0000FF;">'.substr($this->hintedresponse, 0, $lenght).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
+                    substr($state->responses[''], $lenght)."</span><br />";
         if (isset($state->responses['hint']) && isset($this->hintedresponse)) {
             $state->responses[''] = $this->hintedresponse;
         }
@@ -158,6 +163,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
                 }
             }
         }
+            $feedback = $hintmessage . $feedback;
 
         /// Removed correct answer, to be displayed later MDL-7496
         include("$CFG->dirroot/question/type/shortanswer/display.html");
