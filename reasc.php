@@ -40,49 +40,7 @@
 *если будет время, то сделать функции чтения из файла/записи в файл ДКА
 */
 
-define('LEAF','0');
-define('NODE','1');
-define('LEAF_CHARCLASS','2');
-define('LEAF_EMPTY','3');
-define('LEAF_END','4');
-define('LEAF_LINK','5');
-define('LEAF_METASYMBOLDOT','6');
-define('NODE_CONC','7');
-define('NODE_ALT','8');
-define('NODE_ITER','9');
-define('NODE_SUBPATT','10');
-define('NODE_CONDSUBPATT','11');
-define('NODE_QUESTQUANT','12');
-define('NODE_PLUSQUANT','13');
-define('NODE_QUANT','14');
-define('NODE_ASSERTTF','15');
-define('NODE_ASSERTTB','16');
-define('NODE_ASSERTFF','17');
-define('NODE_ASSERTFB','18');
-define('ASSERT','1073741824');
-define('DOT','987654321');
-define('STREND','123456789');
-
-class node {
-    var $type;
-    var $subtype;
-    var $firop;
-    var $secop;
-    var $thirdop;
-    var $nullable;
-    var $number;
-    var $firstpos;
-    var $lastpos;
-    var $direction;
-    var $greed;
-    var $chars;
-    var $leftborder;
-    var $rightborder;
-    
-    function name() {
-        return 'node';
-    }
-}
+require_once($CFG->dirroot . '/question/type/preg/node.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -108,7 +66,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 //времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
 //её код копи-пастом переносится из класса тестировщика, т.к.
 //эта функция временная и после написания парсера будет удалена.
-class preg_matcher_dfa {//extends preg_matcher {
+class preg_matcher_dfa extends preg_matcher {
 
 
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
@@ -295,7 +253,8 @@ class preg_matcher_dfa {//extends preg_matcher {
         $this->maxnum = 0;
         $this->finiteautomates[$index][0] = new finite_automate_state;
         $this->numeration($this->roots[$index], $index);
-        if($old == $this->connection) { }
+        if($old == $this->connection) { 
+        }
         preg_matcher_dfa::nullable($this->roots[$index]);
         preg_matcher_dfa::firstpos($this->roots[$index]);
         preg_matcher_dfa::lastpos($this->roots[$index]);
