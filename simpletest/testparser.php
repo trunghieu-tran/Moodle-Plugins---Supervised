@@ -1,10 +1,11 @@
 <?php
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
+require_once($CFG->dirroot . '/question/type/preg/reasc.php');
 
 class parser_test extends UnitTestCase {
     var $qtype;
@@ -112,6 +113,93 @@ class parser_test extends UnitTestCase {
         $token = $lexer->nextToken();//[3-6]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == '3456');
+    }
+    //Unit tests for parser
+    function test_parser_easy_regex() {//a|b
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\easyre.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
+        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
+        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+    }
+    function test_parser_quantification() {//ab+
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\quantification.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
+        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
+        $this->assertTrue($root->secop->type == NODE && $root->secop->subtype == NODE_PLUSQUANT);
+        $this->assertTrue($root->secop->firop->type == LEAF && $root->secop->firop->subtype == LEAF_CHARCLASS && $root->secop->firop->chars == 'b');
+    }
+    function test_parser_alt_and_quantif() {//a*|b
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_quantif.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
+        $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_ITER);
+        $this->assertTrue($root->firop->firop->type == LEAF && $root->firop->firop->subtype == LEAF_CHARCLASS && $root->firop->firop->chars == 'a');
+        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+    }
+    function test_parser_concatenation() {//ab
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\concatenation.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
+        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
+        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+    }
+    function test_parser_alt_and_conc() {//ab|cd
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_conc.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
+        $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_CONC);
+        $this->assertTrue($root->firop->firop->type == LEAF && $root->firop->firop->subtype == LEAF_CHARCLASS && $root->firop->firop->chars == 'a');
+        $this->assertTrue($root->firop->secop->type == LEAF && $root->firop->secop->subtype == LEAF_CHARCLASS && $root->firop->secop->chars == 'b');
+        $this->assertTrue($root->secop->type == NODE && $root->secop->subtype == NODE_CONC);
+        $this->assertTrue($root->secop->firop->type == LEAF && $root->secop->firop->subtype == LEAF_CHARCLASS && $root->secop->firop->chars == 'c');
+        $this->assertTrue($root->secop->secop->type == LEAF && $root->secop->secop->subtype == LEAF_CHARCLASS && $root->secop->secop->chars == 'd');
+    }
+    function test_parser_long_regex() {//(?:a|b)*abb
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\longre.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $parser->doParse($token->type, $token->value);
+        }
+        $parser->doParse(0, 0);
+        $matcher = new preg_matcher_dfa;
+        $matcher->roots[0] = $parser->get_root();
+        $matcher->append_end(0);
+        $matcher->buildfa(0);
+        $res = $matcher->compare('ab', 0);
+        $this->assertTrue(!$res->full && $res->index == 1 && ($res->next == 'a' || $res->next == 'b'));
+        $res = $matcher->compare('abb', 0);
+        $this->assertTrue($res->full && $res->index == 2 && $res->next == 0);
+        $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbab', 0);
+        $this->assertTrue(!$res->full && $res->index == 57 && ($res->next == 'a' || $res->next == 'b'));
+        $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
+        $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
     }
 }
 ?>
