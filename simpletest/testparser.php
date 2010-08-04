@@ -7,6 +7,20 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/reasc.php');
 
+function is_conc($prevtoken, $currtoken) {
+    $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
+              $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
+              $prevtoken == preg_parser_yyParser::ITER || $prevtoken == preg_parser_yyParser::LAZY_ITER ||
+              $prevtoken == preg_parser_yyParser::PLUS || $prevtoken == preg_parser_yyParser::LAZY_PLUS ||
+              $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT);
+    $flag2 = ($currtoken == preg_parser_yyParser::PARSLEAF || $currtoken == preg_parser_yyParser::OPENBRACK ||
+              $currtoken == preg_parser_yyParser::GROUPING || $currtoken == preg_parser_yyParser::CONDSUBPATT ||
+              $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF ||
+              $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB);
+    $flag = ($flag1 && $flag2 && isset($prevtoken));
+    return $flag;
+}
+
 class parser_test extends UnitTestCase {
     var $qtype;
     
@@ -119,7 +133,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\easyre.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
@@ -131,7 +152,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\quantification.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
@@ -144,7 +172,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_quantif.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
@@ -157,7 +192,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\concatenation.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
@@ -169,7 +211,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_conc.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
@@ -185,7 +234,14 @@ class parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\longre.txt', 'r'));
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            $prev = $curr;
+            $curr = $token->type;
+            if (is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
         }
         $parser->doParse(0, 0);
         $matcher = new preg_matcher_dfa;
