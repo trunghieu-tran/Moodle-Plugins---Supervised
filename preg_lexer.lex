@@ -17,6 +17,7 @@ function form_node($type, $subtype, $charclass = null, $leftborder = null, $righ
     if (isset($rightborder)) {
         $result->rightborder = $rightborder;
     }
+    $result->direction = true;
     return $result;
 }
 function form_res($type, $value) {
