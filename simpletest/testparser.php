@@ -115,10 +115,19 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == '3456');
     }
     function test_lexer_few_number_in_quant() {
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\few_number_in_quant.txt', 'r'));//{135,12755239}
-        $token = $lexer->nextToken();//[a]
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\few_number_in_quant.txt', 'r'));//{135,12755139}{135,}{,12755139}{135}
+        $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 12755239);
+        $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 12755139);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == -1);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 12755139);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 135);
     }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
