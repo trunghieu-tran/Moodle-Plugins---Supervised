@@ -4,9 +4,9 @@
 /*СДЕЛАТЬ:
 *+++Преобразование дерева избавляюющее от + {} и пустых листьев.
 *отложено - проверку на неподдерживаемые операции
-*отложено - парсер
+*+++парсер
 *сильно отложено - избавиться от свитчей, с помощью наследования от базового класса и отличающаяся по сабтипу
-*!!!соединить этот класс с вопросом
+*+++соединить этот класс с вопросом
 *отложено - сделать возможность для регистронезависимости
 */
 
@@ -22,7 +22,8 @@
 *+++сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
 *   is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
 *
-*добавить объект класса парсера как свойство класса preg_matcher_dfa
+*---добавить объект класса парсера как свойство класса preg_matcher_dfa
+*локальная переменная в функции парсинга.
 */
 
 /*PUBLIC МЕТОДЫ КЛАССА preg_matcher_dfa:
@@ -39,8 +40,8 @@
 *
 *если будет время, то сделать функции чтения из файла/записи в файл ДКА
 */
-
-require_once($CFG->dirroot . '/question/type/preg/node.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
+//require_once($CFG->dirroot . '/question/type/preg/node.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -701,9 +702,27 @@ class preg_matcher_dfa extends preg_matcher {
     function preprocess($regex) {
         //getting tree
         
-        $this->roots[0] = $this->form_tree($regex);//TEMP, change on parser
-       
+        $file = fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'w');
+        $res = fwrite($file, $regex);
+        fclose($file);
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $this->roots[0] = $parser->get_root();
+        fclose($file);
+        
         //building finite automates
+        preg_matcher_dfa::convert_tree($this->roots[0]);
         $this->append_end(0);
         $this->buildfa(0);
         foreach ($this->roots as $key => $value) {

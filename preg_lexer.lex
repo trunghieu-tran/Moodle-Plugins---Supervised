@@ -37,7 +37,10 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     }
 }
 %%
-
+%init{
+    //$this->yy_buffer = $stream;
+    //$this->yyfilename = 'Input from string';
+%init}
 %function nextToken
 %line
 %char
