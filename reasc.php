@@ -80,6 +80,107 @@ class preg_matcher_dfa extends preg_matcher {
     function name() {
         return 'preg_matcher_dfa';
     }
+    /**
+    *Function validate regex, before built tree, it need for validation
+    *@param $regex - regular expirience for validation
+    *@return array of errors, if no error - return true.
+    */
+    static function validate($regex) {
+        $matcher = new preg_matcher_dfa;
+        $errors = array();
+        //building tree
+        $matcher->build_tree($regex);
+        //validation tree
+        $for_regexp=$regex;
+        if (strpos($for_regexp,'/')!==false) {//escape any slashes
+            $for_regexp=implode('\/',explode('/',$for_regexp));
+        }
+        $for_regexp='/'.$for_regexp.'/u';
+        if (preg_match($for_regexp, 'something unimpotarnt') !== false) {
+            preg_matcher_dfa::find_unsupported_operation($matcher->roots[0], $errors);
+        } else {
+            $errors[0] = 'incorrectregex';
+        }
+        if (!count($errors)) {
+            return true;
+        } else {
+            return $errors;
+        }
+    }
+    /**
+    *function search for unsupported operation in tree
+    *@param $node - current node for search
+    *@param $errors - array of errors
+    */
+    static function find_unsupported_operation($node, &$errors) {
+        switch ($node->subtype) {
+            case LEAF_LINK:
+                $errors[1] = 'link';
+                break;
+            case NODE_ITER:
+            case NODE_PLUSQUANT:
+            case NODE_QUANT:
+            case NODE_QUESTQUANT:
+                if (!$node->greed) {
+                    $errors[2] = 'lazyquant';
+                }
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+            case  NODE_SUBPATT:
+                $errors[3] = 'subpattern';
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+            case NODE_CONDSUBPATT:
+                $errors[4] = 'condsubpatt';
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                preg_matcher_dfa::find_unsupported_operation($node->secop, $errors);
+                preg_matcher_dfa::find_unsupported_operation($node->thirdop, $errors);
+                break;
+            case NODE_ASSERTFF:
+                $errors[5] = 'assertff';
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+            case NODE_ASSERTFB:
+                $errors[6] = 'assertfb';
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+            case NODE_ASSERTTB:
+                $errors[7] = 'asserttb';
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+            case NODE_ALT:
+            case NODE_CONC:
+                preg_matcher_dfa::find_unsupported_operation($node->secop, $errors);
+            case NODE_ASSERTTF:
+                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                break;
+        }
+    }
+    /**
+    *function do lexical and syntaxical analyze of regex and build tree, root saving in $this->roots[0]
+    @param $regex - regular expirience for building tree
+    */
+    function build_tree($regex) {
+        $file = fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'w');
+        //$res = fwrite($file, $regex);
+        $res = fwrite($file, $regex);
+        fclose($file);
+        $parser = new preg_parser_yyParser;
+        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'r'));
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $this->roots[0] = $parser->get_root();
+        fclose($file);
+    }
     function append_end($index) {
         $root = $this->roots[$index];
         $this->roots[$index] = new node;
@@ -701,26 +802,7 @@ class preg_matcher_dfa extends preg_matcher {
     }
     function preprocess($regex) {
         //getting tree
-        
-        $file = fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'w');
-        $res = fwrite($file, $regex);
-        fclose($file);
-        $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'r'));
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
-        $this->roots[0] = $parser->get_root();
-        fclose($file);
-        
+        $this->build_tree($regex);
         //building finite automates
         preg_matcher_dfa::convert_tree($this->roots[0]);
         $this->append_end(0);

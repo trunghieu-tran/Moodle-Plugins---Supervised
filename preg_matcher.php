@@ -18,7 +18,7 @@ class preg_matcher {
     function get_next_char() {
         echo 'Error: getting next character has not been implemented for', $this->name(), 'class';
     }
-    function validate() {
+    static function validate($regex) {
         echo 'Error: validation has not been implemented for', $this->name(), 'class';
     }
     static function list_of_supported_operation() {

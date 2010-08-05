@@ -47,9 +47,20 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 if ($QTYPES[$this->qtype()]->match_regex(stripslashes_safe($trimmedanswer), $trimmedrightanswer, $data['exactmatch'], $data['usecase'])) {
                     $rightanswermatch=true;
                 }
+                if ($data['usehint']) {
+                    $currentunsupp = preg_matcher_dfa::validate($trimmedanswer);
+                    foreach ($currentunsupp as $operation) {
+                        $i = 0;
+                        if ($i<4) {
+                            $errors['answersinstruct'] .= (get_string($operation, 'qtype_preg') . '<br/>');
+                        } elseif ($i == 4) {
+                            $errors['answersinstruct'] .= (get_string('andother', 'qtype_preg') . '<br/>');
+                        }
+                    }
+                }
             }
         }
-
+        
         if ($rightanswermatch == false) {
             $errors['rightanswer']=get_string('norightanswermatch','qtype_preg');
         }
