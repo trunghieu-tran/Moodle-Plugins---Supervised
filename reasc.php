@@ -1,4 +1,4 @@
-<?php //$Id: preg_matcher_dfa.php,put version put time dvkolesov Exp $
+<?php //$Id: dfa_preg_matcher.php,put version put time dvkolesov Exp $
 //fa - finite automate
 
 /*СДЕЛАТЬ:
@@ -12,8 +12,8 @@
 
 /*ПЛАН:
 *Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
-*класс preg_matcher_dfa сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
-*класс preg_matcher_dfa снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
+*класс dfa_preg_matcher сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
+*класс dfa_preg_matcher снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
 *
 *+++Убрать $croot, $cconn, $finiteautomate, вместо них передавать в buildfa и другие функции использующие $this->c.*
 *   номер ассерта(нуль для основного выражения) по которому строится автомат
@@ -22,20 +22,20 @@
 *+++сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
 *   is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
 *
-*---добавить объект класса парсера как свойство класса preg_matcher_dfa
+*---добавить объект класса парсера как свойство класса dfa_preg_matcher
 *локальная переменная в функции парсинга.
 */
 
-/*PUBLIC МЕТОДЫ КЛАССА preg_matcher_dfa:
-*preg_matcher_dfa::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
+/*PUBLIC МЕТОДЫ КЛАССА dfa_preg_matcher:
+*dfa_preg_matcher::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
 *                            если регекс содержал неподдерживаемую операцию возвращает её номер,
 *                            если регекс содержал синтаксическую ошибку возвращает -1.
-*preg_matcher_dfa::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
+*dfa_preg_matcher::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
 *                        если регекс небыл введен возвращает ложь, если сравнение было проведено истину.
-*preg_matcher_dfa::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
+*dfa_preg_matcher::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
 *                       если сравнение небыло проведено возвращает false.
-*preg_matcher_dfa::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
-*preg_matcher_dfa::next()          возвращает символ допустимый на следующей позиции, может быть 0.
+*dfa_preg_matcher::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
+*dfa_preg_matcher::next()          возвращает символ допустимый на следующей позиции, может быть 0.
 *                       если сравнение небыло проведено возвращает false
 *
 *если будет время, то сделать функции чтения из файла/записи в файл ДКА
@@ -58,7 +58,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 //времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
 //её код копи-пастом переносится из класса тестировщика, т.к.
 //эта функция временная и после написания парсера будет удалена.
-class preg_matcher_dfa extends preg_matcher {
+class dfa_preg_matcher extends preg_matcher {
 
 
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
@@ -69,7 +69,7 @@ class preg_matcher_dfa extends preg_matcher {
     var $result;
     
     function name() {
-        return 'preg_matcher_dfa';
+        return 'dfa_preg_matcher';
     }
     /**
     *Function validate regex, before built tree, it need for validation
@@ -77,7 +77,7 @@ class preg_matcher_dfa extends preg_matcher {
     *@return array of errors, if no error - return true.
     */
     static function validate($regex) {
-        $matcher = new preg_matcher_dfa;
+        $matcher = new dfa_preg_matcher;
         $errors = array();
         //building tree
         $matcher->build_tree($regex);
@@ -88,7 +88,7 @@ class preg_matcher_dfa extends preg_matcher {
         }
         $for_regexp='/'.$for_regexp.'/u';
         if (preg_match($for_regexp, 'something unimpotarnt') !== false) {
-            preg_matcher_dfa::find_unsupported_operation($matcher->roots[0], $errors);
+            dfa_preg_matcher::find_unsupported_operation($matcher->roots[0], $errors);
         } else {
             $errors[0] = 'incorrectregex';
         }
@@ -115,35 +115,35 @@ class preg_matcher_dfa extends preg_matcher {
                 if (!$node->greed) {
                     $errors[2] = 'lazyquant';
                 }
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case  NODE_SUBPATT:
                 $errors[3] = 'subpattern';
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_CONDSUBPATT:
                 $errors[4] = 'condsubpatt';
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
-                preg_matcher_dfa::find_unsupported_operation($node->secop, $errors);
-                preg_matcher_dfa::find_unsupported_operation($node->thirdop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->thirdop, $errors);
                 break;
             case NODE_ASSERTFF:
                 $errors[5] = 'assertff';
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ASSERTFB:
                 $errors[6] = 'assertfb';
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ASSERTTB:
                 $errors[7] = 'asserttb';
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ALT:
             case NODE_CONC:
-                preg_matcher_dfa::find_unsupported_operation($node->secop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
             case NODE_ASSERTTF:
-                preg_matcher_dfa::find_unsupported_operation($node->firop, $errors);
+                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
         }
     }
@@ -223,16 +223,16 @@ class preg_matcher_dfa extends preg_matcher {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT://alternative can give empty word if one operand can.
-                    $result = (preg_matcher_dfa::nullable($node->firop) || preg_matcher_dfa::nullable($node->secop));
+                    $result = (dfa_preg_matcher::nullable($node->firop) || dfa_preg_matcher::nullable($node->secop));
                     break;
                 case NODE_CONC://concatenation can give empty word if both operands can.
-                    $result = (preg_matcher_dfa::nullable($node->firop) && preg_matcher_dfa::nullable($node->secop));
-                    preg_matcher_dfa::nullable($node->secop);
+                    $result = (dfa_preg_matcher::nullable($node->firop) && dfa_preg_matcher::nullable($node->secop));
+                    dfa_preg_matcher::nullable($node->secop);
                     break;
                 case NODE_ITER://iteration and question quantificator can give empty word without dependence from operand.
                 case NODE_QUESTQUANT:
                     $result = true;
-                    preg_matcher_dfa::nullable($node->firop);
+                    dfa_preg_matcher::nullable($node->firop);
                     break;
                 case NODE_ASSERTTF://assert can give empty word.
                     $result = true;
@@ -251,19 +251,19 @@ class preg_matcher_dfa extends preg_matcher {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge(preg_matcher_dfa::firstpos($node->firop), preg_matcher_dfa::firstpos($node->secop));
+                    $result = array_merge(dfa_preg_matcher::firstpos($node->firop), dfa_preg_matcher::firstpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = preg_matcher_dfa::firstpos($node->firop);
+                    $result = dfa_preg_matcher::firstpos($node->firop);
                     if ($node->firop->nullable) {
-                        $result = array_merge($result, preg_matcher_dfa::firstpos($node->secop));
+                        $result = array_merge($result, dfa_preg_matcher::firstpos($node->secop));
                     } else {
-                        preg_matcher_dfa::firstpos($node->secop);
+                        dfa_preg_matcher::firstpos($node->secop);
                     }
                     break;
                 case NODE_QUESTQUANT:
                 case NODE_ITER:
-                    $result = preg_matcher_dfa::firstpos($node->firop);
+                    $result = dfa_preg_matcher::firstpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -289,19 +289,19 @@ class preg_matcher_dfa extends preg_matcher {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
-                    $result = array_merge(preg_matcher_dfa::lastpos($node->firop), preg_matcher_dfa::lastpos($node->secop));
+                    $result = array_merge(dfa_preg_matcher::lastpos($node->firop), dfa_preg_matcher::lastpos($node->secop));
                     break;
                 case NODE_CONC:
-                    $result = preg_matcher_dfa::lastpos($node->secop);
+                    $result = dfa_preg_matcher::lastpos($node->secop);
                     if ($node->secop->nullable) {
-                        $result = array_merge(preg_matcher_dfa::lastpos($node->firop), $result);
+                        $result = array_merge(dfa_preg_matcher::lastpos($node->firop), $result);
                     } else {
-                        preg_matcher_dfa::lastpos($node->firop);
+                        dfa_preg_matcher::lastpos($node->firop);
                     }
                     break;
                 case NODE_ITER:
                 case NODE_QUESTQUANT:
-                    $result = preg_matcher_dfa::lastpos($node->firop);
+                    $result = dfa_preg_matcher::lastpos($node->firop);
                     break;
                 case NODE_ASSERTTF:
                     $result = array($node->number);
@@ -321,22 +321,22 @@ class preg_matcher_dfa extends preg_matcher {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_CONC:
-                    preg_matcher_dfa::followpos($node->firop, $fpmap);
-                    preg_matcher_dfa::followpos($node->secop, $fpmap);
+                    dfa_preg_matcher::followpos($node->firop, $fpmap);
+                    dfa_preg_matcher::followpos($node->secop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        preg_matcher_dfa::push_unique($fpmap[$key], $node->secop->firstpos);
+                        dfa_preg_matcher::push_unique($fpmap[$key], $node->secop->firstpos);
                     }
                     break;
                 case NODE_ITER:
-                    preg_matcher_dfa::followpos($node->firop, $fpmap);
+                    dfa_preg_matcher::followpos($node->firop, $fpmap);
                     foreach ($node->firop->lastpos as $key) {
-                        preg_matcher_dfa::push_unique($fpmap[$key], $node->firop->firstpos);
+                        dfa_preg_matcher::push_unique($fpmap[$key], $node->firop->firstpos);
                     }
                     break;
                 case NODE_ALT:
-                    preg_matcher_dfa::followpos($node->secop, $fpmap);
+                    dfa_preg_matcher::followpos($node->secop, $fpmap);
                 case NODE_QUESTQUANT:
-                    preg_matcher_dfa::followpos($node->firop, $fpmap);
+                    dfa_preg_matcher::followpos($node->firop, $fpmap);
                     break;
             }
         }
@@ -346,10 +346,10 @@ class preg_matcher_dfa extends preg_matcher {
         $this->maxnum = 0;
         $this->finiteautomates[$index][0] = new finite_automate_state;
         $this->numeration($this->roots[$index], $index);
-        preg_matcher_dfa::nullable($this->roots[$index]);
-        preg_matcher_dfa::firstpos($this->roots[$index]);
-        preg_matcher_dfa::lastpos($this->roots[$index]);
-        preg_matcher_dfa::followpos($this->roots[$index], $map);
+        dfa_preg_matcher::nullable($this->roots[$index]);
+        dfa_preg_matcher::firstpos($this->roots[$index]);
+        dfa_preg_matcher::lastpos($this->roots[$index]);
+        dfa_preg_matcher::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
         foreach ($this->roots[$index]->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;
@@ -554,13 +554,13 @@ class preg_matcher_dfa extends preg_matcher {
         $equnum = array();
         foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
             $str2 = $cc;
-            if (preg_matcher_dfa::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
+            if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
                 array_push($equnum, $num);
             }
         }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
-            preg_matcher_dfa::push_unique($followU, $fpmap[$num]);
+            dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
         }
         return $followU;
     }
@@ -596,9 +596,9 @@ class preg_matcher_dfa extends preg_matcher {
         $result->direction = $node->direction;
         $result->chars = $node->chars;
         if ($node->type == NODE) {
-            $result->firop = preg_matcher_dfa::copy_subtree($node->firop);
+            $result->firop = dfa_preg_matcher::copy_subtree($node->firop);
             if ($node->subtype == NODE_ALT || $node->subtype == NODE_CONC) {
-                $result->secop = preg_matcher_dfa::copy_subtree($node->secop);
+                $result->secop = dfa_preg_matcher::copy_subtree($node->secop);
             }
         }
         return $result;
@@ -607,7 +607,7 @@ class preg_matcher_dfa extends preg_matcher {
         if ($node->type == NODE) {
             switch ($node->subtype) {
                 case NODE_PLUSQUANT:
-                    preg_matcher_dfa::convert_tree($node->firop);
+                    dfa_preg_matcher::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->type = LEAF;
                         $node->subtype = LEAF_EMPTY;
@@ -616,16 +616,16 @@ class preg_matcher_dfa extends preg_matcher {
                         $node->secop = new node;
                         $node->secop->type = NODE;
                         $node->secop->subtype = NODE_ITER;
-                        $node->secop->firop = preg_matcher_dfa::copy_subtree($node->firop);
+                        $node->secop->firop = dfa_preg_matcher::copy_subtree($node->firop);
                     }
                     break;
                 case NODE_QUANT:
-                    preg_matcher_dfa::convert_tree($node->firop);
+                    dfa_preg_matcher::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->type = LEAF;
                         $node->subtype = LEAF_EMPTY;
                     } else {
-                        $operand = preg_matcher_dfa::copy_subtree($node->firop);
+                        $operand = dfa_preg_matcher::copy_subtree($node->firop);
                         if ($node->leftborder != 0) {
                             $count = $node->leftborder;
                             $currsubroot = $node->firop;
@@ -634,7 +634,7 @@ class preg_matcher_dfa extends preg_matcher {
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_CONC;
                                 $tmp->firop = $currsubroot;
-                                $tmp->secop = preg_matcher_dfa::copy_subtree($operand);
+                                $tmp->secop = dfa_preg_matcher::copy_subtree($operand);
                                 $currsubroot = $tmp;
                                 
                             }
@@ -647,7 +647,7 @@ class preg_matcher_dfa extends preg_matcher {
                                 $tmp = new node;
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_QUESTQUANT;
-                                $tmp->firop = preg_matcher_dfa::copy_subtree($operand);
+                                $tmp->firop = dfa_preg_matcher::copy_subtree($operand);
                                 $operand = $tmp;
                                 $currsubroot->secop = $tmp;
                             }
@@ -665,7 +665,7 @@ class preg_matcher_dfa extends preg_matcher {
                                 $tmp->type = NODE;
                                 $tmp->subtype = NODE_CONC;
                                 $tmp->firop = $currsubroot;
-                                $tmp->secop = preg_matcher_dfa::copy_subtree($operand);
+                                $tmp->secop = dfa_preg_matcher::copy_subtree($operand);
                                 $currsubroot = $tmp;
                             }
                         } else {
@@ -676,7 +676,7 @@ class preg_matcher_dfa extends preg_matcher {
                             $tmp->secop = new node;
                             $tmp->secop->type = NODE;
                             $tmp->secop->subtype = NODE_ITER;
-                            $tmp->secop->firop = preg_matcher_dfa::copy_subtree($operand);
+                            $tmp->secop->firop = dfa_preg_matcher::copy_subtree($operand);
                             $currsubroot = $tmp;
                         }
                         $node->subtype = $currsubroot->subtype;
@@ -688,18 +688,18 @@ class preg_matcher_dfa extends preg_matcher {
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
                         $node->subtype = NODE_QUESTQUANT;
                         $node->firop = $node->secop;
-                        preg_matcher_dfa::convert_tree($node->firop);
+                        dfa_preg_matcher::convert_tree($node->firop);
                     } elseif ($node->secop->type == LEAF &&$node->secop->subtype == LEAF_EMPTY) {
                         $node->subtype = NODE_QUESTQUANT;
-                        preg_matcher_dfa::convert_tree($node->firop);
+                        dfa_preg_matcher::convert_tree($node->firop);
                     }
-                    preg_matcher_dfa::convert_tree($node->firop);
-                    preg_matcher_dfa::convert_tree($node->secop);
+                    dfa_preg_matcher::convert_tree($node->firop);
+                    dfa_preg_matcher::convert_tree($node->secop);
                     break;
                 case NODE_CONC:
-                    preg_matcher_dfa::convert_tree($node->secop);
+                    dfa_preg_matcher::convert_tree($node->secop);
                 default:
-                    preg_matcher_dfa::convert_tree($node->firop);
+                    dfa_preg_matcher::convert_tree($node->firop);
                     break;
             }
         }
@@ -793,7 +793,7 @@ class preg_matcher_dfa extends preg_matcher {
         //getting tree
         $this->build_tree($regex);
         //building finite automates
-        preg_matcher_dfa::convert_tree($this->roots[0]);
+        dfa_preg_matcher::convert_tree($this->roots[0]);
         $this->append_end(0);
         $this->buildfa(0);
         foreach ($this->roots as $key => $value) {

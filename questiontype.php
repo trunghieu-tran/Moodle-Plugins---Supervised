@@ -76,7 +76,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function grade_responses(&$question, &$state, $cmoptions) {
         if (!$this->built && $question->options->usehint) {
             foreach ($question->options->answers as $answer) {
-                $this->automates[$answer->id] = new preg_matcher_dfa($answer->answer);
+                $this->automates[$answer->id] = new dfa_preg_matcher($answer->answer);
             }
             $this->built = true;
         }

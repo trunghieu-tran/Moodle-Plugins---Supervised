@@ -245,7 +245,7 @@ class parser_test extends UnitTestCase {
             }
         }
         $parser->doParse(0, 0);
-        $matcher = new preg_matcher_dfa;
+        $matcher = new dfa_preg_matcher;
         $matcher->roots[0] = $parser->get_root();
         $matcher->append_end(0);
         $matcher->buildfa(0);
