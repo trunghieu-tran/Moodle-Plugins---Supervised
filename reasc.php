@@ -789,7 +789,7 @@ class preg_matcher_dfa extends preg_matcher {
         }
         return $result;
     }
-    function preprocess($regex) {
+    function __construct($regex) {
         //getting tree
         $this->build_tree($regex);
         //building finite automates
