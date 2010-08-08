@@ -71,7 +71,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result->full);
         $this->assertTrue($result->index == 2 && $result->next == 0);
     }
-    function test_negative_character_class() {//NEED DEBUG!!!!
+    function test_negative_character_class() {
         $matcher = new dfa_preg_matcher('a[^b]cd');
         $result = $matcher->get_result('abcd');
         $this->assertFalse($result->full);
