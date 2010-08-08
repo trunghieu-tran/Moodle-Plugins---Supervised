@@ -558,13 +558,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $result3 = $this->qtype->compare('annvnvv',0);
         $result4 = $this->qtype->compare('abnm',0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == 1 && $result1->next == 'b');
+        $this->assertTrue($result1->index == 1 && $result1->next === 'b');
         $this->assertTrue($result2->full);
-        $this->assertTrue($result2->index == 6 && $result2->next == 0);
+        $this->assertTrue($result2->index == 6 && $result2->next === 0);
         $this->assertFalse($result3->full);
-        $this->assertTrue($result3->index == 6 && $result3->next == 'b');
+        $this->assertTrue($result3->index == 6 && $result3->next === 'b');
         $this->assertTrue($result4->full);
-        $this->assertTrue($result4->index == 3 && $result4->next == 0);
+        $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
     //General tests, testing buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
     //dfa_preg_matcher without input and output data.
@@ -606,13 +606,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $result3 = $this->qtype->compare('avnvnv', 0);
         $result4 = $this->qtype->compare('abnm', 0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == 1 && $result1->next == 'b');
+        $this->assertTrue($result1->index == 1 && $result1->next === 'b');
         $this->assertTrue($result2->full);
-        $this->assertTrue($result2->index == 5 && $result2->next == 0);
+        $this->assertTrue($result2->index == 5 && $result2->next === 0);
         $this->assertFalse($result3->full);
-        $this->assertTrue($result3->index == 5 && $result3->next == 'b');
+        $this->assertTrue($result3->index == 5 && $result3->next === 'b');
         $this->assertTrue($result4->full);
-        $this->assertTrue($result4->index == 3 && $result4->next == 0);
+        $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
     function test_general_two_asserts() {//a(?=b)(?=.*c)[xcvbnm]*
         $this->qtype->roots[0] = $this->form_tree('(no (no (la1)(nA (lb1)))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm1))))');
@@ -629,13 +629,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $result3 = $this->qtype->compare('abnm', 0);
         $result4 = $this->qtype->compare('abnc', 0);
         $this->assertFalse($result1->full);
-        $this->assertTrue($result1->index == 0 && $result1->next == 'b');
+        $this->assertTrue($result1->index == 0 && $result1->next === 'b');
         $this->assertFalse($result2->full);
-        $this->assertTrue($result2->index == 0 && $result2->next == 'b');
+        $this->assertTrue($result2->index == 0 && $result2->next === 'b');
         $this->assertFalse($result3->full);
-        $this->assertTrue($result3->index == 3 && $result3->next == 'c');
+        $this->assertTrue($result3->index == 3 && $result3->next === 'c');
         $this->assertTrue($result4->full);
-        $this->assertTrue($result4->index == 3 && $result4->next == 0);
+        $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
     //Unit test for copy_subtree()
     function test_copy_subtree() {

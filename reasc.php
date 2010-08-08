@@ -207,6 +207,7 @@ class dfa_preg_matcher extends preg_matcher {
                     $node->number = STREND;
                     break;
                 case LEAF_METASYMBOLDOT://normal + DOT for dot leaf
+                    $node->chars = 'METASYMBOL_DOT';
                     $node->number = ++$this->maxnum + DOT;
                     $this->connection[$index][$this->maxnum + DOT] = $node->chars;
                     break;
@@ -475,15 +476,17 @@ class dfa_preg_matcher extends preg_matcher {
         $result = new stdClass;
         if ($index - 2 < $maxindex) {//if asserts not give border to lenght of matching substring
             $result->index = $index - 2;
+            $assertrequirenext = false;
         } else {
             $result->index = $maxindex;
+            $assertrequirenext = true;
         }
        if (strlen($string) == $result->index + 1 && $end && $full && $correct) {//if all string match with regex.
             $result->full = true;
         } else {
             $result->full = false;
         }
-        if ($result->full || $maybeend || $end) {//if string must be end on end of matching substring.
+        if (($result->full || $maybeend || $end) && !$assertrequirenext) {//if string must be end on end of matching substring.
             $result->next = 0;
         //determine next character, which will be correct and increment lenght of matching substring.
         } elseif ($full && $index-2 < $maxindex) {//if assert not border next character
@@ -704,7 +707,9 @@ class dfa_preg_matcher extends preg_matcher {
                     dfa_preg_matcher::convert_tree($node->firop);
                     break;
             }
-        }
+        } elseif ($node->subtype == LEAF_CHARCLASS && $node->chars == 'METASYMBOL_DOT') {
+            $node->chars = 'METASYBOLD_';//METASYMBOL_DOT is service word, METASYBOLD_ is equivalent character class.
+        }  
     }
     /**
     *form the tree of the regexp from prefix form, for unit tests only!

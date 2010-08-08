@@ -134,17 +134,17 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result->full);
         $this->assertTrue($result->index == 100 && $result->next == 0);
     }
-    function test_assert() {//NEED DEBUG!!!!!!!
+    function test_assert() {
         $matcher = new dfa_preg_matcher('a(?=.*b)[xcvbnm]*');
         $result = $matcher->get_result('ax');
         $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 'b');
+        $this->assertTrue($result->index == 1 && $result->next === 'b');
         $result = $matcher->get_result('abxcv');
         $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 4 && $result->next == 0);
+        $this->assertTrue($result->index == 4 && $result->next === 0);
         $result = $matcher->get_result('avbv');
         $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 3 && $result->next == 0);
+        $this->assertTrue($result->index == 3 && $result->next === 0);
     }
 }
 ?>
