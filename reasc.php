@@ -53,15 +53,6 @@ class finite_automate_state {//finite automate state
     }
 }
 
-class compare_result {
-    var $index;
-    var $full;
-    var $next;
-    
-    function name() {
-        return 'compare_result';
-    }
-}
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 //Этот класс соединяется с вопросом до написания парсера.
 //времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
@@ -351,19 +342,17 @@ class preg_matcher_dfa extends preg_matcher {
         }
     }
     function buildfa($index) {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
-        $old = $this->connection;                     //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
+                              //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
         $this->maxnum = 0;
         $this->finiteautomates[$index][0] = new finite_automate_state;
         $this->numeration($this->roots[$index], $index);
-        if($old == $this->connection) { 
-        }
         preg_matcher_dfa::nullable($this->roots[$index]);
         preg_matcher_dfa::firstpos($this->roots[$index]);
         preg_matcher_dfa::lastpos($this->roots[$index]);
         preg_matcher_dfa::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
         foreach ($this->roots[$index]->firstpos as $value) {
-            $this->finiteautomates[$index][0]->passages[$value] = -2;//BUG!!! эта строка зависает!
+            $this->finiteautomates[$index][0]->passages[$value] = -2;
         }
         $this->finiteautomates[$index][0]->marked = false;
         while ($this->not_marked_state($this->finiteautomates[$index]) !== false) {
@@ -483,7 +472,7 @@ class preg_matcher_dfa extends preg_matcher {
             }
         } while($correct && !$end && $index <= strlen($string));//index - 1, becase index was incrimented
         //form result comparing string with regex
-        $result = new compare_result;$len = strlen($string);
+        $result = new stdClass;
         if ($index - 2 < $maxindex) {//if asserts not give border to lenght of matching substring
             $result->index = $index - 2;
         } else {
