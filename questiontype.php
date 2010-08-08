@@ -136,8 +136,8 @@ class question_preg_qtype extends question_shortanswer_qtype {
         //form hint messages
         $hintedresponse = substr($state->responses[''], 0 , $this->result->index + 1) . $this->result->next;
         $lenght = strlen($hintedresponse) - 1;
-        $hintmessage = '<span style="color:#0000FF;">'.substr($hintedresponse, 0, $lenght).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
-                    substr($state->responses[''], $lenght)."</span><br />";
+        $hintmessage = '<span style="color:#0000FF;">'.htmlentities(substr($hintedresponse, 0, $lenght)).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
+                    htmlentities(substr($state->responses[''], $lenght))."</span><br />";
         if (isset($state->responses['hint'])) {
             $state->responses[''] = $hintedresponse;
         }
