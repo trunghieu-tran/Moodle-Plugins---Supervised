@@ -1,4 +1,12 @@
 <?php
+/**
+ * Defines abstract class of matcher, extend it for get matcher
+ *
+ * @copyright &copy; 2010  Kolesov Dmitriy 
+ * @author Kolesov Dmitriy, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 class preg_matcher {
     function name() {
         return 'preg_matcher';

@@ -1,5 +1,14 @@
-<?php
-//error_reporting(E_ALL);
+<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+
+/**
+ * Unit tests for (some of) question/type/preg/preg_parser.php.
+ *
+ * @copyright &copy; 2010 Dmitriy Kolesov
+ * @author Dmitriy Kolesov
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package question
+ */
+ 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -8,15 +17,7 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class parser_test extends UnitTestCase {
-    var $qtype;
-    
-    #function setUp() {
-    #    $this->qtype = new preg_lexer();
-    #}
-    
-    #function tearDown() {
-    #    $this->qtype = null;   
-    #}
+
     //Unit test for lexer
     function test_lexer_quantificators() {
         $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\mainlexems.txt', 'r'));//?*+{1,5}{,5}{1,}{5}??*?+?{1,5}?{,5}?{1,}?{5}?

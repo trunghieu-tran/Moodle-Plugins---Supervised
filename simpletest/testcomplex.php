@@ -1,4 +1,4 @@
-<?php  // $Id: testquestiontype.php,put version put time dvkolesov Exp $
+<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
 /**
 * Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
 *

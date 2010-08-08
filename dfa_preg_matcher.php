@@ -1,4 +1,14 @@
-<?php //$Id: dfa_preg_matcher.php,put version put time dvkolesov Exp $
+<?php //$Id: dfa_preg_matcher.php, v 0.1 beta 2010/08/08 23:47:35 dvkolesov Exp $
+
+/**
+ * Defines class dfa_preg_matcher
+ *
+ * @copyright &copy; 2010  Kolesov Dmitriy 
+ * @author Kolesov Dmitriy, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
+
 //fa - finite automate
 //marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
 

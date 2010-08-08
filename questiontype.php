@@ -1,4 +1,4 @@
-<?php  // $Id: questiontype.php,v 1.3.2.3 2009/10/04 19:49:58 oasychev Exp $
+<?php  // $Id: questiontype.php,v 1.4 beta 2010/08/08 16:47:26 oasychev & dvkolesov Exp $
 
 ///////////////////
 /// preg ///

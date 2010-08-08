@@ -1,4 +1,12 @@
 <?php
+/**
+ * Defines class of node, uses in dfa_preg_matcher class
+ *
+ * @copyright &copy; 2010  Kolesov Dmitriy 
+ * @author Kolesov Dmitriy, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 if (!defined('NODE')) {
     define('LEAF','0');
     define('NODE','1');
