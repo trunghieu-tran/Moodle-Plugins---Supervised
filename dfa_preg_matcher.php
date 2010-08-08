@@ -1,51 +1,12 @@
 <?php //$Id: dfa_preg_matcher.php,put version put time dvkolesov Exp $
 //fa - finite automate
+//marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
 
-/*СДЕЛАТЬ:
-*+++Преобразование дерева избавляюющее от + {} и пустых листьев.
-*отложено - проверку на неподдерживаемые операции
-*+++парсер
-*сильно отложено - избавиться от свитчей, с помощью наследования от базового класса и отличающаяся по сабтипу
-*+++соединить этот класс с вопросом
-*отложено - сделать возможность для регистронезависимости
-*/
-
-/*ПЛАН:
-*Все свойства всех классов сделать private, класс тестировщик сделать для всех дружественным,
-*класс dfa_preg_matcher сделать дружественным для класса узла (node) и класса результата сравнения (compare_result)
-*класс dfa_preg_matcher снабдить методами для взаимодействия с внешней програмой, все остальные методы сделать private.
-*
-*+++Убрать $croot, $cconn, $finiteautomate, вместо них передавать в buildfa и другие функции использующие $this->c.*
-*   номер ассерта(нуль для основного выражения) по которому строится автомат
-*   и использовать сразу $finiteautomates[<полученный номер>] аналогично для $roots и $connection
-*
-*+++сделать статическими(т.к. они не используют ни свойства, ни динамические методы) следующии методы:
-*   is_include_characters, push_unique(переименовать в push_unique), followpos, lastpos, firstpos, nullable
-*
-*---добавить объект класса парсера как свойство класса dfa_preg_matcher
-*локальная переменная в функции парсинга.
-*/
-
-/*PUBLIC МЕТОДЫ КЛАССА dfa_preg_matcher:
-*dfa_preg_matcher::input_regex($regex); получает регулярное выражение и строит по нему ДКА, возвращает 0 если автомат был  построен,
-*                            если регекс содержал неподдерживаемую операцию возвращает её номер,
-*                            если регекс содержал синтаксическую ошибку возвращает -1.
-*dfa_preg_matcher::result($string); выполняет сравнение регекса, полученого в пердыдущем методе, со строкой, 
-*                        если регекс небыл введен возвращает ложь, если сравнение было проведено истину.
-*dfa_preg_matcher::index()         если сравнение было проведено, возвращает индекс последнего верного символа (от -1 до strlen -1)
-*                       если сравнение небыло проведено возвращает false.
-*dfa_preg_matcher::full()          если сравнение небыло проведено возвращает -1, 0 если соответствие неполное, 1 если полное.
-*dfa_preg_matcher::next()          возвращает символ допустимый на следующей позиции, может быть 0.
-*                       если сравнение небыло проведено возвращает false
-*
-*если будет время, то сделать функции чтения из файла/записи в файл ДКА
-*/
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
-//require_once($CFG->dirroot . '/question/type/preg/node.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
-    var $passages;//хранит номера состояний к которым перейти
+    var $passages;//contain numbers of state which can go from this
     var $marked;//if marked then true else false.
     
     function name() {
@@ -54,10 +15,6 @@ class finite_automate_state {//finite automate state
 }
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-//Этот класс соединяется с вопросом до написания парсера.
-//времена он будет заменен функцией form_tree предназначеной для модульного тестирования,
-//её код копи-пастом переносится из класса тестировщика, т.к.
-//эта функция временная и после написания парсера будет удалена.
 class dfa_preg_matcher extends preg_matcher {
 
 
@@ -172,6 +129,10 @@ class dfa_preg_matcher extends preg_matcher {
         $this->roots[0] = $parser->get_root();
         fclose($file);
     }
+    /**
+    *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
+    *@param index - number of tree for adding end's leaf.
+    */
     function append_end($index) {
         $root = $this->roots[$index];
         $this->roots[$index] = new node;
@@ -219,7 +180,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param node - node fo analyze
     *@return true if can give empty word, else false
     */
-    static function nullable($node) {//to static
+    static function nullable($node) {
         $result = false;
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -244,11 +205,11 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     /**
-    *функция определяет какие символы могут стоять на 1-м месте в слове порождаемом поддеревом с вершиной в данном узле
+    *function determine characters which can be on first position in word, which given subtree with root in this node
     *@param $node root of subtree giving word
     *@return numbers of characters (array)
     */
-    static function firstpos($node) {//to static
+    static function firstpos($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
@@ -281,12 +242,11 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     /**
-    *функция определяет символы которые могут стоять на последнем месте в слове порождаемом
-    *поддеревом с вершиной в данном узле
-    @param $node - root of subtree
-    @return numbers of characters (array)
+    *function determine characters which can be on last position in word, which given subtree with root in this node
+    *@param $node - root of subtree
+    *@return numbers of characters (array)
     */
-    static function lastpos($node) {//to static
+    static function lastpos($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_ALT:
@@ -318,7 +278,12 @@ class dfa_preg_matcher extends preg_matcher {
         $node->lastpos = $result;
         return $result;
     }
-    static function followpos($node, &$fpmap) {//to static
+    /**
+    *function determine characters which can follow characters from this node
+    *@param node - current node
+    *@param fpmap - map of following of characters
+    */
+    static function followpos($node, &$fpmap) {
         if ($node->type == NODE) {
             switch($node->subtype) {
                 case NODE_CONC:
@@ -342,47 +307,72 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
-    function buildfa($index) {//Начальное состояние ДКА сохраняется в поле finiteautomates[0][0]
-                              //oстальные состояния в прочих эл-тах этого массива,finiteautomates[!=0] - asserts' fa
-        $this->maxnum = 0;
+    /**
+    *function build determined finite automate, fa saving in $this->finiteautomates[$index], in $this->finiteautomates[$index][0] start state.
+    *@param index number of assert (0 for main regex) for which building fa
+    */
+    function buildfa($index) {
+        $this->maxnum = 0;//no one leaf numerated, yet.
         $this->finiteautomates[$index][0] = new finite_automate_state;
+        //form the map of following
         $this->numeration($this->roots[$index], $index);
         dfa_preg_matcher::nullable($this->roots[$index]);
         dfa_preg_matcher::firstpos($this->roots[$index]);
         dfa_preg_matcher::lastpos($this->roots[$index]);
         dfa_preg_matcher::followpos($this->roots[$index], $map);
         $this->find_asserts($this->roots[$index]);
+        //create start state.
         foreach ($this->roots[$index]->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;
         }
-        $this->finiteautomates[$index][0]->marked = false;
-        while ($this->not_marked_state($this->finiteautomates[$index]) !== false) {
-            $currentstateindex = $this->not_marked_state($this->finiteautomates[$index]);
-            $this->finiteautomates[$index][$currentstateindex]->marked = true;
+        $this->finiteautomates[$index][0]->marked = false;//start state not marked, because not readey, yet
+        //form the determined finite automate
+        while ($this->not_marked_state($index) !== false) {
+            //while has one or more not ready state.
+            $currentstateindex = $this->not_marked_state($index);
+            $this->finiteautomates[$index][$currentstateindex]->marked = true;//mark current state, because it will be ready on this step of loop
+            //form not marked state for each passage of current state
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new finite_automate_state;
                 $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow<ASSERT) {
+                        //if number less then ASSERT constant than this is character class, to passages it.
                         $newstate->passages[$follow] = -2;
                     } else {
+                        //else this is number of assert
                         $this->finiteautomates[$index][$currentstateindex]->asserts[] = $follow;
                     }
                 }
                 if ($num!=STREND) {
+                    //if this passage not point to end state
                     if ($this->state($newstate->passages, $index) === false && count($newstate->passages) != 0) {
-                        array_push($this->finiteautomates[$index], $newstate);
+                        //if fa hasn't other state matching with this and this state not empty
+                        array_push($this->finiteautomates[$index], $newstate);//add it to fa's array
                         end($this->finiteautomates[$index]);
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
                     } else {
+                        //else do passage point to state, which has in fa already
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 } else {
+                    //if this passage point to end state
                     $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
                 }
+                //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
             }
         }
     }
+    /**
+    *function compare regex and string, with using of finite automate builded of buildfa function
+    *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
+    *@param string - string for compare with regex
+    *@param assertnumber - number of assert with which string will compare, 0 for main regex
+    *@return object with three property:
+    *   1)index - index of last matching character (integer)
+    *   2)full  - fullnes of matching (boolean)
+    *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
+    */
     function compare($string, $assertnumber) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
         $end = false;//current state is end state, not yet
@@ -509,7 +499,11 @@ class dfa_preg_matcher extends preg_matcher {
     }
     
     
-    
+    /**
+    *function append array2 to array1, non unique values not add
+    *@param arr1 - first array
+    *@param arr2 - second array, which will appended to arr1
+    */
     static function push_unique(&$arr1, $arr2) {// to static
         foreach ($arr2 as $value) {
             if (!in_array($value, $arr1)) {
@@ -517,6 +511,10 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
+    /**
+    *function find asserts' nodes in tree and put link to root of it to $this->roots[<number of assert>]
+    *@param node - current nod for recursive search
+    */
     function find_asserts($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -532,16 +530,27 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
-    function not_marked_state($built) {//передавать номер автомата, вместо массива с автоматом,  оставить динамической
+    /**
+    *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
+    *@param index - number of automate
+    *@return link to not marked state
+    */
+    function not_marked_state($index) {
         $notmarkedstate = false;
-        $size = count($built);
+        $size = count($this->finiteautomates[$index]);
         for ($i = 0; $i < $size && $notmarkedstate === false; $i++) {
-            if (!$built[$i]->marked) {
+            if (!$this->finiteautomates[$index][$i]->marked) {
                 $notmarkedstate = $i;
             }
         }
         return $notmarkedstate;
     }
+    /**
+    *function check: string1 include string2, or not include, without stock of sequence character
+    *@param string1 - string which may contain string2 
+    *@param string2 - string which may be included in string1
+    *@return true if string1 include string2
+    */
     static function is_include_characters($string1, $string2) {// to static
         $result = true;
         $size = strlen($string2);
@@ -552,6 +561,14 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $result;
     }
+    /**
+    *function concatenate list of follow character for this number of character and other number match with character which mean this number
+    *@param number - for this number will concatenate list of follow chars
+    *@param fpmap - map of following characters
+    *@param passages - passges of current state fa
+    *@param index - number of assert (number of connection map if $this->connection array)
+    *@return concatenated list of follow chars
+    */
     function followposU($number, $fpmap, $passages, $index) {
         $str1 = $this->connection[$index][abs($number)];//for this charclass will found equivalent numbers
         $equnum = array();
@@ -569,6 +586,12 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $followU;
     }
+    /**
+    *function search state in fa
+    *@param state - state which be finding
+    *@param index - assert number (index in $this->finiteautomates array on which will be search)
+    *@return false if state not found, else number of found state
+    */
     function state($state, $index) {
         $passcount = count($state);
         $result = false;
@@ -593,6 +616,11 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $result;
     }
+    /**
+    *function copying subtree with root in this node
+    *@param node - root of copying subtree
+    *@return link to copy of subtree
+    */
     static function copy_subtree($node) {
         $result = new node;
         $result->type = $node->type;
@@ -608,6 +636,11 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $result;
     }
+    /**
+    *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and x-y times of operand?
+    *(operand|) replace on operand?, character class METASYMBOL_DOT replace on METASYBOLD_, because METASYMBOL_DOT is service word
+    *param node - current node of converting tree
+    */
     static function convert_tree($node) {
         if ($node->type == NODE) {
             switch ($node->subtype) {
@@ -712,90 +745,9 @@ class dfa_preg_matcher extends preg_matcher {
         }  
     }
     /**
-    *form the tree of the regexp from prefix form, for unit tests only!
-    *this function is unsafe, input data must be correct!
-    *
-    *@param prefixform string with regexp in prefix form
-    *@return croot of formed tree
+    *get regex and build finite automates
+    @param regex - regular expirience for which will be build finite automate
     */
-    function form_tree($prefixform) {
-        $result = new node;
-        //forming the node or leaf
-        switch($prefixform[1]) { //analyze first character, type of node/leaf
-            case 'l': //simple leaf with char class
-                $result->type = LEAF;
-                $result->subtype = LEAF_CHARCLASS;
-                $result->chars = null;
-                for ($i=2; $prefixform[$i+1] != ')'; $i++) {
-                    $result->chars.=$prefixform[$i];
-                }
-                if ($prefixform[$i] == '0') {
-                    $result->direction=false;
-                } else {
-                    $result->direction=true;
-                }
-                break;
-            case 'e': //empty leaf
-                $result->type = LEAF;
-                $result->subtype = LEAF_EMPTY;
-                break;
-            case 'd': //metasymbol dot
-                $result->type = LEAF;
-                $result->subtype = LEAF_METASYMBOLDOT;
-                $result->direction=true;
-                $result->chars = 'METASYMBOL_DOT';
-                break;
-            case 'n':
-                $result->type = NODE;
-                switch($prefixform[2]) {
-                    case 'o': //concatenation node
-                        $result->subtype = NODE_CONC;
-                        break;
-                    case '|': //alternative node
-                        $result->subtype = NODE_ALT;
-                        break;
-                    case '*': //iteration node
-                        $result->subtype = NODE_ITER;
-                        break;
-                    case '?': //quantificator ? node
-                        $result->subtype = NODE_QUESTQUANT;
-                        break;
-                    case 'A': //true forward assert node
-                        $result->subtype = NODE_ASSERTTF;
-                        break;
-                }
-                //forming operand
-                $brackets=0;
-                $tmp=null;
-                for ($i=4; $brackets != 0 || $i == 4; $i++) {
-                    $tmp.=$prefixform[$i];
-                    if ($prefixform[$i] == '(') {
-                        $brackets++;
-                    }
-                    if ($prefixform[$i] == ')') {
-                        $brackets--;
-                    }
-                }
-                //forming second operand
-                $result->firop = $this->form_tree($tmp);
-                if ($result->subtype == NODE_CONC || $result->subtype == NODE_ALT) {
-                    $tmp = null;
-                    do{
-                        $tmp.=$prefixform[$i];
-                        if ($prefixform[$i] == '(') {
-                            $brackets++;
-                        }
-                        if ($prefixform[$i] == ')') {
-                            $brackets--;
-                        }
-                        $i++;
-                    }while ($brackets != 0);
-                    $result->secop = $this->form_tree($tmp);
-                }
-                break;
-        }
-        return $result;
-    }
     function __construct($regex) {
         //getting tree
         $this->build_tree($regex);
@@ -812,6 +764,11 @@ class dfa_preg_matcher extends preg_matcher {
         $this->built = true;
         return;
     }
+    /**
+    *function get string and compare it with regex
+    *@param response - string which will be compared with regex
+    *@return result of compring, see compare function for format of result
+    */
     function get_result($response) {
         if ($this->built) {
             $result = $this->compare($response, 0);
@@ -821,14 +778,45 @@ class dfa_preg_matcher extends preg_matcher {
         $this->result = $result;
         return $result;           
     }
+    /**
+    *@return index of last matching character
+    */
     function get_index() {
         return $this->result->index;
     }
+    /**
+    *@return fullness of match
+    */
     function get_full() {
         return $this->result->full;
     }
+    /**
+    *@return character which can be on next position in correct string
+    */
     function get_next_char() {
         return $this->result->next;
+    }
+    /**
+    *@return list of supported operation as array of string
+    */
+    static function list_of_supported_operations_and_operands() {
+        $result = array(
+                        'character                                  - a',
+                        'character class                            - [abc][a-c] and other formats of CC',
+                        'negative character class                   - [^abc] ...',
+                        'character class in \w\W\d\D\s\S\t format',
+                        'empty                                      - something|',
+                        'metasymbol dot                             - .',
+                        'concatenation',
+                        'alternative                                - ab|cd',
+                        'greed iteration                            - a*',
+                        'greed quantificator plus                   - a+',
+                        'greed quantificator in curly               - a{15,137}',
+                        'greed question quantificator               - a?',
+                        'true forward assert                        - (?=...)',
+                        'grouping                                   - (?:...)'
+                       );
+        return $result;               
     }
 }
 ?>

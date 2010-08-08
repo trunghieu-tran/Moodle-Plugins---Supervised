@@ -21,7 +21,7 @@ class preg_matcher {
     static function validate($regex) {
         echo 'Error: validation has not been implemented for', $this->name(), 'class';
     }
-    static function list_of_supported_operation() {
+    static function list_of_supported_operations_and_operands() {
         echo 'Error: list of supported operation has not been implemented for', $this->name(), 'class';
     }
 }
