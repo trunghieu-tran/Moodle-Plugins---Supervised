@@ -550,12 +550,14 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     function followposU($number, $fpmap, $passages, $index) {
-        $str1 = $this->connection[$index][$number];//for this charclass will found equivalent numbers
+        $str1 = $this->connection[$index][abs($number)];//for this charclass will found equivalent numbers
         $equnum = array();
         foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
             $str2 = $cc;
-            if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages)) {//if charclass 1 and 2 equivalenta and number exist in passages
+            if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $number>0) {//if charclass 1 and 2 equivalenta and number exist in passages
                 array_push($equnum, $num);
+            } else if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists(-$num, $passages) && $number<0) {
+                array_push($equnum, -$num);
             }
         }
         $followU = array();
