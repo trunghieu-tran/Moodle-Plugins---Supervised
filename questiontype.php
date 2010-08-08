@@ -8,7 +8,7 @@
 
 define('HINT_GRADE_BORDER', 1);//if $answer->fraction >= HINT_GRADE_BORDER that hint will use this variant of answer.
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
-require_once($CFG->dirroot . '/question/type/preg/reasc.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
     

@@ -5,7 +5,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 //require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
-require_once($CFG->dirroot . '/question/type/preg/reasc.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class parser_test extends UnitTestCase {
     var $qtype;

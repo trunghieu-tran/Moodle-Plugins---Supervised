@@ -12,7 +12,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/reasc.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class dfa_preg_matcher_test extends UnitTestCase {
     var $qtype;

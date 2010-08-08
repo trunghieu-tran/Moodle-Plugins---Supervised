@@ -1,22 +1,21 @@
 <?php  // $Id: testquestiontype.php,put version put time dvkolesov Exp $
 /**
- * Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
- *
- * @copyright &copy; 2010 Dmitriy Kolesov
- * @author Dmitriy Kolesov
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package question
- */
+* Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
+*
+* @copyright &copy; 2010 Dmitriy Kolesov
+* @author Dmitriy Kolesov
+* @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+* @package question
+*/
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/reasc.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
-class dfa_preg_matcher_test extends UnitTestCase {
-    var $qtype;
-
+class dfa_preg_matcher_complex_test extends UnitTestCase {
+    
     function test_easy() {
         $matcher = new dfa_preg_matcher('abcd');
         $result = $matcher->get_result('fgh');
