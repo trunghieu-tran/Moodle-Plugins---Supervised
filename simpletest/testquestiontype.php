@@ -1,4 +1,4 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/09 15:22:54 dvkolesov Exp $
 /**
  * Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
  *
@@ -13,7 +13,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
-
+//see carefully commented example of test on lines 617-644
 class dfa_preg_matcher_test extends UnitTestCase {
     var $qtype;
     
@@ -566,18 +566,16 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
-    //General tests, testing buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
+    //General tests, testing parser + buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
     //dfa_preg_matcher without input and output data.
-    function test_general_repeat_characters() {//(a|b)*abb
-        $this->qtype->roots[0] = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (no (la1)(lb1))(lb1))');
-        $this->qtype->append_end(0);
-        $this->qtype->buildfa(0);
-        $result1 = $this->qtype->compare('cd', 0);
-        $result2 = $this->qtype->compare('ca', 0);
-        $result3 = $this->qtype->compare('ac', 0);
-        $result4 = $this->qtype->compare('bb', 0);
-        $result5 = $this->qtype->compare('abb', 0);
-        $result6 = $this->qtype->compare('ababababababaabbabababababababaabb', 0);//34 characters
+    function test_general_repeat_characters() {
+        $this->qtype = new dfa_preg_matcher('(?:a|b)*abb');
+        $result1 = $this->qtype->get_result('cd');
+        $result2 = $this->qtype->get_result('ca');
+        $result3 = $this->qtype->get_result('ac');
+        $result4 = $this->qtype->get_result('bb');
+        $result5 = $this->qtype->get_result('abb');
+        $result6 = $this->qtype->get_result('ababababababaabbabababababababaabb');//34 characters
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == -1 && $result1->next == 'a');
         $this->assertFalse($result2->full);
@@ -591,20 +589,12 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result6->full);
         $this->assertTrue($result6->index == 33 && $result6->next == 0);
     }
-    function test_general_assert() {//a(?=.*b)[xcvbnm]*
-        $this->qtype->roots[0] = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
-        $this->qtype->append_end(0);
-        $this->qtype->buildfa(0);
-        foreach ($this->qtype->roots as $key => $value) {
-            if ($key) {
-                $this->qtype->append_end($key);
-                $this->qtype->buildfa($key);
-            }
-        }
-        $result1 = $this->qtype->compare('an', 0);
-        $result2 = $this->qtype->compare('anvnvb', 0);
-        $result3 = $this->qtype->compare('avnvnv', 0);
-        $result4 = $this->qtype->compare('abnm', 0);
+    function test_general_assert() {
+        $this->qtype = new dfa_preg_matcher('a(?=.*b)[xcvbnm]*');
+        $result1 = $this->qtype->get_result('an');
+        $result2 = $this->qtype->get_result('anvnvb');
+        $result3 = $this->qtype->get_result('avnvnv');
+        $result4 = $this->qtype->get_result('abnm');
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == 1 && $result1->next === 'b');
         $this->assertTrue($result2->full);
@@ -614,20 +604,25 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
-    function test_general_two_asserts() {//a(?=b)(?=.*c)[xcvbnm]*
-        $this->qtype->roots[0] = $this->form_tree('(no (no (la1)(nA (lb1)))(no (nA (no (n* (d))(lc1)))(n* (lxcvbnm1))))');
-        $this->qtype->append_end(0);
-        $this->qtype->buildfa(0);
-        foreach ($this->qtype->roots as $key => $value) {
-            if ($key) {
-                $this->qtype->append_end($key);
-                $this->qtype->buildfa($key);
-            }
-        }
-        $result1 = $this->qtype->compare('avnm', 0);
-        $result2 = $this->qtype->compare('acnm', 0);
-        $result3 = $this->qtype->compare('abnm', 0);
-        $result4 = $this->qtype->compare('abnc', 0);
+    /*
+    *   this is overall test for dfa_preg_matcher class
+    *   you may use it as example of test
+    */
+    function test_general_two_asserts() {
+        $this->qtype = new dfa_preg_matcher('a(?=b)(?=.*c)[xcvbnm]*');//put regular expirience in constructor for building dfa.
+        /*  
+        *   call get_result method for matching string with regex, string is argument, regex was got in constructor,
+        *   this method return result of matching - object with three property:
+        *   1)index - index of last matching character in string
+        *   2)full  - fullness of matching
+        *   3)next  - character which can be on next position in correct string, int(0) for end of string
+        */
+        $result1 = $this->qtype->get_result('avnm');
+        $result2 = $this->qtype->get_result('acnm');
+        $result3 = $this->qtype->get_result('abnm');
+        $result4 = $this->qtype->get_result('abnc');
+        //validate results got from get_result method, use $result->next === something, but no ==
+        //because 0 == 'b' (or other alpha) is true.
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == 0 && $result1->next === 'b');
         $this->assertFalse($result2->full);
