@@ -12,9 +12,7 @@
 //fa - finite automate
 //marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
 
-require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -114,29 +112,6 @@ class dfa_preg_matcher extends preg_matcher {
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
         }
-    }
-    /**
-    *function do lexical and syntaxical analyze of regex and build tree, root saving in $this->roots[0]
-    @param $regex - regular expirience for building tree
-    */
-    function build_tree($regex) {
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $parser = new preg_parser_yyParser;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;//var_dump($token); echo '<br/>';
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
-        $this->roots[0] = $parser->get_root();
-        fclose($file);
     }
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
