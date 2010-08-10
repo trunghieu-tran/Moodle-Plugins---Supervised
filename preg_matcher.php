@@ -14,7 +14,7 @@ class preg_matcher {
     function preprocess($regex) {
         echo 'Error: preprocess has not been implemented for', $this->name(), 'class';
     }
-    function get_result($response) {
+    function match($response) {
         echo 'Error: geting result has not been implemented for', $this->name(), 'class';
     }
     function get_index() {

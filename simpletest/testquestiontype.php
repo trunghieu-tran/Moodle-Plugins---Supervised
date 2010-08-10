@@ -570,12 +570,12 @@ class dfa_preg_matcher_test extends UnitTestCase {
     //dfa_preg_matcher without input and output data.
     function test_general_repeat_characters() {
         $this->qtype = new dfa_preg_matcher('(?:a|b)*abb');
-        $result1 = $this->qtype->get_result('cd');
-        $result2 = $this->qtype->get_result('ca');
-        $result3 = $this->qtype->get_result('ac');
-        $result4 = $this->qtype->get_result('bb');
-        $result5 = $this->qtype->get_result('abb');
-        $result6 = $this->qtype->get_result('ababababababaabbabababababababaabb');//34 characters
+        $result1 = $this->qtype->match('cd');
+        $result2 = $this->qtype->match('ca');
+        $result3 = $this->qtype->match('ac');
+        $result4 = $this->qtype->match('bb');
+        $result5 = $this->qtype->match('abb');
+        $result6 = $this->qtype->match('ababababababaabbabababababababaabb');//34 characters
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == -1 && $result1->next == 'a');
         $this->assertFalse($result2->full);
@@ -591,10 +591,10 @@ class dfa_preg_matcher_test extends UnitTestCase {
     }
     function test_general_assert() {
         $this->qtype = new dfa_preg_matcher('a(?=.*b)[xcvbnm]*');
-        $result1 = $this->qtype->get_result('an');
-        $result2 = $this->qtype->get_result('anvnvb');
-        $result3 = $this->qtype->get_result('avnvnv');
-        $result4 = $this->qtype->get_result('abnm');
+        $result1 = $this->qtype->match('an');
+        $result2 = $this->qtype->match('anvnvb');
+        $result3 = $this->qtype->match('avnvnv');
+        $result4 = $this->qtype->match('abnm');
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == 1 && $result1->next === 'b');
         $this->assertTrue($result2->full);
@@ -611,17 +611,17 @@ class dfa_preg_matcher_test extends UnitTestCase {
     function test_general_two_asserts() {
         $this->qtype = new dfa_preg_matcher('a(?=b)(?=.*c)[xcvbnm]*');//put regular expirience in constructor for building dfa.
         /*  
-        *   call get_result method for matching string with regex, string is argument, regex was got in constructor,
+        *   call match method for matching string with regex, string is argument, regex was got in constructor,
         *   this method return result of matching - object with three property:
         *   1)index - index of last matching character in string
         *   2)full  - fullness of matching
         *   3)next  - character which can be on next position in correct string, int(0) for end of string
         */
-        $result1 = $this->qtype->get_result('avnm');
-        $result2 = $this->qtype->get_result('acnm');
-        $result3 = $this->qtype->get_result('abnm');
-        $result4 = $this->qtype->get_result('abnc');
-        //validate results got from get_result method, use $result->next === something, but no ==
+        $result1 = $this->qtype->match('avnm');
+        $result2 = $this->qtype->match('acnm');
+        $result3 = $this->qtype->match('abnm');
+        $result4 = $this->qtype->match('abnc');
+        //validate results got from match method, use $result->next === something, but no ==
         //because 0 == 'b' (or other alpha) is true.
         $this->assertFalse($result1->full);
         $this->assertTrue($result1->index == 0 && $result1->next === 'b');

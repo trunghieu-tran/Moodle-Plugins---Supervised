@@ -778,7 +778,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param response - string which will be compared with regex
     *@return result of compring, see compare function for format of result
     */
-    function get_result($response) {
+    function match($response) {
         if ($this->built) {
             $result = $this->compare($response, 0);
         } else {

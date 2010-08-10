@@ -51,7 +51,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
         if ($question->options->usehint) {
-            $this->tempresult = $this->automates[$answer->id]->get_result($state->responses['']);
+            $this->tempresult = $this->automates[$answer->id]->match($state->responses['']);
             return $this->automates[$answer->id]->get_full();
         } else {
             return $this->match_regex($answer->answer, trim(stripslashes_safe($state->responses[''])), $question->options->exactmatch, $question->options->usecase);
