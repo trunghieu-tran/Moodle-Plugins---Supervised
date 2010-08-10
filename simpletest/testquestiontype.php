@@ -1,4 +1,4 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/09 15:22:54 dvkolesov Exp $
+<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/10 21:40:20 dvkolesov Exp $
 /**
  * Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
  *
@@ -28,329 +28,243 @@ class dfa_preg_matcher_test extends UnitTestCase {
     function test_name() {
         $this->assertEqual($this->qtype->name(), 'dfa_preg_matcher');
     }
-    //service function for testing
-    /**
-    *form the tree of the regexp from prefix form, for unit tests only!
-    *this function is unsafe, input data must be correct!
-    *
-    *@param prefixform string with regexp in prefix form
-    *@return croot of formed tree
-    */
-    function form_tree($prefixform) {
-        $result = new node;
-        //forming the node or leaf
-        switch($prefixform[1]) { //analyze first character, type of node/leaf
-            case 'l': //simple leaf with char class
-                $result->type = LEAF;
-                $result->subtype = LEAF_CHARCLASS;
-                $result->chars = null;
-                for ($i=2; $prefixform[$i+1] != ')'; $i++) {
-                    $result->chars.=$prefixform[$i];
-                }
-                if ($prefixform[$i] == '0') {
-                    $result->direction=false;
-                } else {
-                    $result->direction=true;
-                }
-                break;
-            case 'e': //empty leaf
-                $result->type = LEAF;
-                $result->subtype = LEAF_EMPTY;
-                break;
-            case 'd': //metasymbol dot
-                $result->type = LEAF;
-                $result->subtype = LEAF_METASYMBOLDOT;
-                $result->direction=true;
-                $result->chars = 'METASYMBOL_DOT';
-                break;
-            case 'n':
-                $result->type = NODE;
-                switch($prefixform[2]) {
-                    case 'o': //concatenation node
-                        $result->subtype = NODE_CONC;
-                        break;
-                    case '|': //alternative node
-                        $result->subtype = NODE_ALT;
-                        break;
-                    case '*': //iteration node
-                        $result->subtype = NODE_ITER;
-                        break;
-                    case '?': //quantificator ? node
-                        $result->subtype = NODE_QUESTQUANT;
-                        break;
-                    case 'A': //true forward assert node
-                        $result->subtype = NODE_ASSERTTF;
-                        break;
-                }
-                //forming operand
-                $brackets=0;
-                $tmp=null;
-                for ($i=4; $brackets != 0 || $i == 4; $i++) {
-                    $tmp.=$prefixform[$i];
-                    if ($prefixform[$i] == '(') {
-                        $brackets++;
-                    }
-                    if ($prefixform[$i] == ')') {
-                        $brackets--;
-                    }
-                }
-                //forming second operand
-                $result->firop = $this->form_tree($tmp);
-                if ($result->subtype == NODE_CONC || $result->subtype == NODE_ALT) {
-                    $tmp = null;
-                    do{
-                        $tmp.=$prefixform[$i];
-                        if ($prefixform[$i] == '(') {
-                            $brackets++;
-                        }
-                        if ($prefixform[$i] == ')') {
-                            $brackets--;
-                        }
-                        $i++;
-                    }while ($brackets != 0);
-                    $result->secop = $this->form_tree($tmp);
-                }
-                break;
-        }
-        return $result;
-    }
     //Unit test for nullable function
     function test_nullable_leaf() {
-        $node = $this->form_tree('(la1)');
-        $this->assertFalse(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a');
+        $this->assertFalse(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_leaf_iteration_node() {
-        $node = $this->form_tree('(n* (la1))');
-        $this->assertTrue(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a*');
+        $this->assertTrue(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_leaf_concatenation_node() {
-        $node = $this->form_tree('(no (la1)(lb1))');
-        $this->assertFalse(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('ab');
+        $this->assertFalse(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_leaf_alternative_node() {
-        $node = $this->form_tree('(n| (la1)(lb1))');
-        $this->assertFalse(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a|b');
+        $this->assertFalse(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_node_concatenation_node() {
-        $node = $this->form_tree('(no (n* (la1))(no (lb1)(lc1)))');
-        $this->assertFalse(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a*bc');
+        $this->assertFalse(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_node_alternative_node() {
-        $node = $this->form_tree('(n| (n* (la1))(no (lb1)(lc1)))');
-        $this->assertTrue(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a*|bc');
+        $this->assertTrue(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_third_level_node() {
-        $node = $this->form_tree('(n| (n| (n| (la1)(lb1))(n* (lc1)))(n* (ld1)))');
-        $this->assertTrue(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('(?:(?:a|b)|c*)|d*');
+        $this->assertTrue(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_question_quantificator() {
-        $node = $this->form_tree('(n? (la1))');
-        $this->assertTrue(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('a?');
+        $this->assertTrue(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_negative_character_class() {
-        $node = $this->form_tree('(la0)');
-        $this->assertFalse(dfa_preg_matcher::nullable($node));
+        $this->qtype->build_tree('[^a]');
+        $this->assertFalse(dfa_preg_matcher::nullable($this->qtype->roots[0]));
     }
     function test_nullable_assert() {
-        $node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
-        $this->assertTrue(dfa_preg_matcher::nullable($node->secop->firop));
+        $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
+        $this->assertTrue(dfa_preg_matcher::nullable($this->qtype->roots[0]->firop->secop));
     }
     //Unit test for firstpos function
     function test_firstpos_leaf() {
-        $node = $this->form_tree('(la1)');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_leaf_concatenation_node() {
-        $node = $this->form_tree('(no (la1)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('ab');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_leaf_alternative_node() {
-        $node = $this->form_tree('(n| (la1)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result=dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a|b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result=dfa_preg_matcher::firstpos($this->qtype->roots[0]);
 		$this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
     function test_firstpos_three_leaf_alternative() {
-        $node = $this->form_tree('(n| (la1)(n| (lb1)(lc1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a|b|c');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_firstpos_leaf_iteration_node() {
-        $node = $this->form_tree('(n* (la1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_node_concatenation_node() {
-        $node = $this->form_tree('(no (n* (lc1))(n| (la1)(lb1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('c*(?:a|b)');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_firstpos_node_alternative_node() {
-        $node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a|b|c*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_firstpos_node_iteration_node() {
-        $node = $this->form_tree('(n* (n* (la1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('(?:a*)*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_question_quantificator() {
-        $node = $this->form_tree('(n? (la1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::firstpos($node);
+        $this->qtype->build_tree('a?');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::firstpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_firstpos_negative_character_class() {
-        $node = $this->form_tree('(no (la0)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        dfa_preg_matcher::firstpos($node);
-        $this->assertTrue(count($node->firstpos) == 1 && $node->firstpos[0] == -1);
-        $this->assertTrue(count($node->firop->firstpos) == 1 && $node->firop->firstpos[0] == -1);
+        $this->qtype->build_tree('[^a]b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        $this->assertTrue(count($this->qtype->roots[0]->firstpos) == 1 && $this->qtype->roots[0]->firstpos[0] == -1);
+        $this->assertTrue(count($this->qtype->roots[0]->firop->firstpos) == 1 && $this->qtype->roots[0]->firop->firstpos[0] == -1);
     }
     function test_firstpos_assert() {
-        $node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
-        $this->qtype->numeration($node, ASSERT + 2);
-        dfa_preg_matcher::nullable($node);
-        dfa_preg_matcher::firstpos($node);
-        $this->assertTrue(count($node->secop->firop->firstpos) == 1 && $node->secop->firop->firstpos[0]>ASSERT);
+        $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
+        $this->qtype->numeration($this->qtype->roots[0], ASSERT + 2);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        $this->assertTrue(count($this->qtype->roots[0]->firop->secop->firstpos) == 1 && $this->qtype->roots[0]->firop->secop->firstpos[0]>ASSERT);
     }
     //Unit test for lastpos function
     function test_lastpos_leaf() {
-        $node = $this->form_tree('(la1)');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_leaf_concatenation_node() {
-        $node = $this->form_tree('(no (la1)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('ab');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 2);
     }
     function test_lastpos_leaf_alterbative_node() {
-        $node = $this->form_tree('(n| (la1)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a|b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
     function test_lastpos_leaf_iteration_node() {
-        $node = $this->form_tree('(n* (la1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_node_concatenation_node() {
-        $node = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('(?:a|b)c*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_lastpos_node_alternative_node() {
-        $node = $this->form_tree('(n| (n| (la1)(lb1))(n* (lc1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a|b|c*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 3 && $result[0] == 1 && $result[1] == 2 && $result[2] == 3);
     }
     function test_lastpos_node_iteration_node() {
-        $node = $this->form_tree('(n* (n* (la1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('(?:a*)*');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_question_quantificator() {
-        $node = $this->form_tree('(n? (la1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a?');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 1 && $result[0] == 1);
     }
     function test_lastpos_negative_character_class() {
-        $node = $this->form_tree('(n| (la0)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        $result = dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('[^a]|b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        $result = dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $this->assertTrue(count($result) == 2 && $result[0] == -1 && $result[1] == 2);
     }
     function test_lastpos_assert() {
-        $node = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm1))))');
-        $this->qtype->numeration($node, ASSERT + 2);
-        dfa_preg_matcher::nullable($node);
-        dfa_preg_matcher::lastpos($node);
-        $this->assertTrue(count($node->secop->firop->lastpos) && $node->secop->firop->lastpos[0]>ASSERT);
+        $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
+        $this->qtype->numeration($this->qtype->roots[0], ASSERT + 2);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        dfa_preg_matcher::lastpos($this->qtype->roots[0]);
+        $this->assertTrue(count($this->qtype->roots[0]->firop->secop->lastpos) && $this->qtype->roots[0]->firop->secop->lastpos[0]>ASSERT);
     }
     //Unit tests for followpos function
     function test_followpos_node_concatenation_node() {
-        $node = $this->form_tree('(no (n* (n| (la1)(lb1)))(no (la1)(lb1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::nullable($node);
-        dfa_preg_matcher::firstpos($node);
-        dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('(?:a|b)*ab');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::nullable($this->qtype->roots[0]);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $result=null;
-        dfa_preg_matcher::followpos($node, $result);
+        dfa_preg_matcher::followpos($this->qtype->roots[0], $result);
         $res1 = (count($result[1]) == 3 && $result[1][0] == 1 && $result[1][1] == 2 && $result[1][2] == 3);
         $res2 = (count($result[2]) == 3 && $result[2][0] == 1 && $result[2][1] == 2 && $result[2][2] == 3);
         $res3 = (count($result[3]) == 1 && $result[3][0] == 4);
         $this->assertTrue($res1 && $res2 && $res3);
     }
     function test_followpos_three_node_alternative() {
-        $node = $this->form_tree('(n| (n| (no (la1)(lb1))(no (lc1)(ld1)))(no (le1)(lf1)))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::firstpos($node);
-        dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('ab|cd|ef');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $result=null;
-        dfa_preg_matcher::followpos($node, $result);
+        dfa_preg_matcher::followpos($this->qtype->roots[0], $result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
         $this->assertTrue(count($result[3]) == 1 && $result[3][0] == 4);
         $this->assertTrue(count($result[5]) == 1 && $result[5][0] == 6);
     }
     function test_followpos_question_quantificator() {
-        $node = $this->form_tree('(no (n? (la1))(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::firstpos($node);
-        dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('a?b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $result=null;
-        dfa_preg_matcher::followpos($node, $result);
+        dfa_preg_matcher::followpos($this->qtype->roots[0], $result);
         $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
     function test_followpos_negative_character_class() {
-        $node = $this->form_tree('(no (la0)(lb1))');
-        $this->qtype->numeration($node, 0);
-        dfa_preg_matcher::firstpos($node);
-        dfa_preg_matcher::lastpos($node);
+        $this->qtype->build_tree('[^a]b');
+        $this->qtype->numeration($this->qtype->roots[0], 0);
+        dfa_preg_matcher::firstpos($this->qtype->roots[0]);
+        dfa_preg_matcher::lastpos($this->qtype->roots[0]);
         $result=null;
-        dfa_preg_matcher::followpos($node, $result);
+        dfa_preg_matcher::followpos($this->qtype->roots[0], $result);
         $this->assertTrue(count($result[-1]) == 1 && $result[-1][0] == 2);
     }
     //Unit test for buildfa function
     function test_buildfa_easy() {//ab
-        $this->qtype->roots[0] = $this->form_tree('(no (la1)(lb1))');
+        $this->qtype->build_tree('ab');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 1 && $this->qtype->finiteautomates[0][0]->passages[1] == 1);
@@ -358,7 +272,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][2]->passages) == 1 && $this->qtype->finiteautomates[0][2]->passages[STREND] == -1);
     }
     function test_buildfa_iteration() {//ab*
-        $this->qtype->roots[0] = $this->form_tree('(no (la1)(n* (lb1)))');
+        $this->qtype->build_tree('ab*');
 		$this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 1);
@@ -367,7 +281,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($this->qtype->finiteautomates[0][$n1]->passages[STREND] == -1 && $this->qtype->finiteautomates[0][$n1]->passages[2] == $n1);
     }
     function test_buildfa_alternative() {//a|b
-        $this->qtype->roots[0] = $this->form_tree('(n| (la1)(lb1))');
+        $this->qtype->build_tree('a|b');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2 && $this->qtype->finiteautomates[0][0]->passages[1] == 1 && 
@@ -375,7 +289,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 1 && $this->qtype->finiteautomates[0][1]->passages[STREND] == -1);
     }
     function test_buildfa_alternative_and_iteration() {//(a|b)c*
-        $this->qtype->roots[0] = $this->form_tree('(no (n| (la1)(lb1))(n* (lc1)))');
+        $this->qtype->build_tree('(?:a|b)c*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2);
@@ -384,7 +298,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
                             $this->qtype->finiteautomates[0][$n1]->passages[STREND] == -1);
     }
     function test_buildfa_nesting_alternative_and_iteration() {//(ab|cd)*
-        $this->qtype->roots[0] = $this->form_tree('(n* (n| (no (la1)(lb1))(no (lc1)(ld1))))');
+        $this->qtype->build_tree('(?:ab|cd)*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 3 && $this->qtype->finiteautomates[0][0]->passages[STREND] == -1);
@@ -394,7 +308,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n2]->passages) == 1 && $this->qtype->finiteautomates[0][$n2]->passages[4] == 0);
     }
     function test_buildfa_question_quantificator() {//a?b
-        $this->qtype->roots[0] = $this->form_tree('(no (n? (la1))(lb1))');
+        $this->qtype->build_tree('a?b');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2);
@@ -404,7 +318,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n2]->passages) == 1 && $this->qtype->finiteautomates[0][$n2]->passages[STREND] == -1);
     }
     function test_buildfa_negative_character_class() {//(a[^b]|c[^d])*
-        $this->qtype->roots[0] = $this->form_tree('(n* (n| (no (la1)(lb0))(no (lc1)(ld0))))');
+        $this->qtype->build_tree('(?:a[^b]|c[^d])*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 3);
@@ -414,13 +328,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n2]->passages) == 1 && $this->qtype->finiteautomates[0][$n2]->passages[-4] == 0);
     }
     function test_buildfa_assert() {//a(?=.*b)[xcvbnm]*
-        $this->qtype->roots[0] = $this->form_tree('(no (la1)(no (nA (no (n* (d))(lb1)))(n* (lxcvbnm))))');
+        $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->asserts) == 1 && count($this->qtype->finiteautomates[0][0]->passages) == 1);
         $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 2 && $this->qtype->finiteautomates[0][1]->passages[3] == 1 && 
                             $this->qtype->finiteautomates[0][1]->passages[STREND] == -1);
-        $this->assertTrue(count($this->qtype->roots) == 2 && $this->qtype->roots[ASSERT + 2] == $this->qtype->roots[0]->firop->secop->firop->firop);
+        $this->assertTrue(count($this->qtype->roots) == 2 && $this->qtype->roots[ASSERT + 2] == $this->qtype->roots[0]->firop->firop->secop->firop);
         $this->qtype->append_end(ASSERT+2);
         $this->qtype->buildfa(ASSERT+2);
         $this->assertTrue(count($this->qtype->finiteautomates[ASSERT+2][0]->passages) == 2 && $this->qtype->finiteautomates[ASSERT+2][0]->passages[DOT+1] == 0 && 
@@ -634,7 +548,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
     }
     //Unit test for copy_subtree()
     function test_copy_subtree() {
-        $this->qtype->roots[0] = $this->form_tree('(no (no (loriginal1)(loriginal1))(no (loriginal1)(loriginal1)))');
+        $this->qtype->build_tree('(?:[original][original])(?:[original][original])');
         $this->qtype->roots[1] = dfa_preg_matcher::copy_subtree($this->qtype->roots[0]);
         $this->assertTrue($this->qtype->roots[1]->firop->firop->chars == 'original' && $this->qtype->roots[1]->firop->secop->chars == 'original' &&
                           $this->qtype->roots[1]->secop->firop->chars == 'original' && $this->qtype->roots[1]->secop->secop->chars == 'original');
@@ -647,14 +561,14 @@ class dfa_preg_matcher_test extends UnitTestCase {
     }
     //Unit tests for convert_tree()
     function test_convert_tree_quantificator_plus() {//a+b
-        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->build_tree('a+b');
         $this->qtype->roots[0]->firop->subtype = NODE_PLUSQUANT;
         dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
         $this->assertTrue($this->qtype->roots[0]->firop->subtype == NODE_CONC && $this->qtype->roots[0]->firop->firop->type == LEAF &&
                           $this->qtype->roots[0]->firop->secop->type == NODE && $this->qtype->roots[0]->firop->secop->subtype == NODE_ITER);
     }
     function test_convert_tree_quantificator_l2r4() {//a{2,4}b
-        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->build_tree('a{2,4}b');
         $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
         $this->qtype->roots[0]->firop->leftborder = 2;
         $this->qtype->roots[0]->firop->rightborder = 4;
@@ -673,7 +587,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result5->full);
     }
     function test_convert_tree_quantificator_l0r4() {//a{,4}b
-        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->build_tree('a{,4}b');
         $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
         $this->qtype->roots[0]->firop->leftborder = 0;
         $this->qtype->roots[0]->firop->rightborder = 4;
@@ -694,7 +608,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result5->full);
     }
     function test_convert_tree_quantificator_l2rinf() {//a{2,}b
-        $this->qtype->roots[0] = $this->form_tree('(no (n* (la1))(lb1))');
+        $this->qtype->build_tree('a{2,}b');
         $this->qtype->roots[0]->firop->subtype = NODE_QUANT;
         $this->qtype->roots[0]->firop->leftborder = 2;
         $this->qtype->roots[0]->firop->rightborder = -1;
