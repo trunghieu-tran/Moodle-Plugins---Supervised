@@ -13,14 +13,16 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-//require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class parser_test extends UnitTestCase {
 
     //Unit test for lexer
     function test_lexer_quantificators() {
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\mainlexems.txt', 'r'));//?*+{1,5}{,5}{1,}{5}??*?+?{1,5}?{,5}?{1,}?{5}?
+        $regex = '?*+{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}?';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();//?
         $this->assertTrue($token->type === preg_parser_yyParser::QUEST);
         $token = $lexer->nextToken();//*
@@ -59,7 +61,10 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 5 && $token->value->rightborder == 5 && !$token->value->greed);
     }
     function test_lexer_backslach() {
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\backslash.txt', 'r'));//\\\*\[\23\023\x23\d\s\t
+        $regex = '\\\\\\*\\[\\23\\023\\x23\\d\\s\\t';//\\\*\[\23\023\x23\d\s\t
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();//\\
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == '\\');
@@ -89,7 +94,11 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == chr(9));
     }
     function test_lexer_charclass() {
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\charclass.txt', 'r'));//[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
+        //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
+        $regex = '[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d][3-6]';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();//[a]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == 'a');
@@ -116,7 +125,11 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->value->type == LEAF && $token->value->subtype == LEAF_CHARCLASS && $token->value->chars == '3456');
     }
     function test_lexer_few_number_in_quant() {
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\few_number_in_quant.txt', 'r'));//{135,12755139}{135,}{,12755139}{135}
+        //{135,12755139}{135,}{,12755139}{135}
+        $regex = '{135,12755139}{135,}{,12755139}{135}';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 12755139);
@@ -133,7 +146,10 @@ class parser_test extends UnitTestCase {
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\easyre.txt', 'r'));
+        $regex = 'a|b';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -152,7 +168,10 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_quantification() {//ab+
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\quantification.txt', 'r'));
+        $regex = 'ab+';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -172,7 +191,10 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_alt_and_quantif() {//a*|b
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_quantif.txt', 'r'));
+        $regex = 'a*|b';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -192,7 +214,10 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_concatenation() {//ab
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\concatenation.txt', 'r'));
+        $regex = 'ab';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -211,7 +236,10 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_alt_and_conc() {//ab|cd
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\alt_and_conc.txt', 'r'));
+        $regex = 'ab|cd';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -234,7 +262,10 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_long_regex() {//(?:a|b)*abb
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\simpletest\\longre.txt', 'r'));
+        $regex = '(?:a|b)*abb';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;

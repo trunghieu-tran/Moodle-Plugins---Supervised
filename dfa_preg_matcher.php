@@ -13,6 +13,8 @@
 //marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
 
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -24,7 +26,6 @@ class finite_automate_state {//finite automate state
     }
 }
 
-require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 class dfa_preg_matcher extends preg_matcher {
 
 
@@ -119,15 +120,13 @@ class dfa_preg_matcher extends preg_matcher {
     @param $regex - regular expirience for building tree
     */
     function build_tree($regex) {
-        $file = fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'w');
-        //$res = fwrite($file, $regex);
-        $res = fwrite($file, $regex);
-        fclose($file);
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
-        $lexer = new Yylex(fopen('C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\regex.txt', 'r'));
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
-            $curr = $token->type;
+            $curr = $token->type;//var_dump($token); echo '<br/>';
             if (preg_parser_yyParser::is_conc($prev, $curr)) {
                 $parser->doParse(preg_parser_yyParser::CONC, 0);
                 $parser->doParse($token->type, $token->value);
