@@ -57,7 +57,7 @@ class preg_matcher {
         }
         $parser->doParse(0, 0);
         $this->roots[0] = $parser->get_root();
-        fclose($file);
+        fclose($pseudofile);
     }
 }
 ?>
