@@ -504,6 +504,7 @@ class dfa_preg_matcher extends preg_matcher {
             switch($node->subtype) {
                 case NODE_ASSERTTF:
                     $this->roots[$node->number] = $node->firop;
+                    break;
                 case NODE_ALT:
                 case NODE_CONC:
                     $this->find_asserts($node->secop);
@@ -733,20 +734,22 @@ class dfa_preg_matcher extends preg_matcher {
     @param regex - regular expirience for which will be build finite automate
     */
     function __construct($regex) {
-        //getting tree
-        $this->build_tree($regex);
-        //building finite automates
-        dfa_preg_matcher::convert_tree($this->roots[0]);
-        $this->append_end(0);
-        $this->buildfa(0);
-        foreach ($this->roots as $key => $value) {
-            if ($key) {
-                $this->append_end($key);
-                $this->buildfa($key);
+        if (isset($regex)) {
+            //getting tree
+            $this->build_tree($regex);
+            //building finite automates
+            dfa_preg_matcher::convert_tree($this->roots[0]);
+            $this->append_end(0);
+            $this->buildfa(0);
+            foreach ($this->roots as $key => $value) {
+                if ($key) {
+                    $this->append_end($key);
+                    $this->buildfa($key);
+                }
             }
+            $this->built = true;
+            return;
         }
-        $this->built = true;
-        return;
     }
     /**
     *function get string and compare it with regex

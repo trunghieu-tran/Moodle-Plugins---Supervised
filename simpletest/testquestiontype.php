@@ -408,13 +408,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
         $this->qtype->connection[0][1] = 'a';
         $this->qtype->connection[0][2] = 'b';
-        $result1 = $this->qtype->compare('ab',0);
-        $result2 = $this->qtype->compare('b',0);
-        $result3 = $this->qtype->compare('Incorrect string',0);
+        $result1 = $this->qtype->compare('ab', 0);
+        $result2 = $this->qtype->compare('b', 0);
+        $result3 = $this->qtype->compare('Incorrect string', 0);
         $this->assertTrue($result1->full);
         $this->assertTrue($result1->index == 1 && $result1->next == 0);
         $this->assertTrue($result2->full);
-        $this->assertTrue($result2->index == 0 && $result->next == 0);
+        $this->assertTrue($result2->index == 0 && $result2->next == 0);
         $this->assertFalse($result3->full);
         $this->assertTrue($result3->index == -1 && $result3->next == 'b' || $result3->next == 'a');
     }
