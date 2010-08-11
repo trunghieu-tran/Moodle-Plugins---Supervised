@@ -37,6 +37,26 @@ class dfa_preg_matcher extends preg_matcher {
     function name() {
         return 'dfa_preg_matcher';
     }
+
+
+    /**
+    *returns true for supported capabilities
+    @param capability the capability in question
+    @return bool is capanility supported
+    */
+    function is_supporting($capability) {
+        switch($capability) {
+        case preg_matcher::PARTIAL_MATCHING :
+        case preg_matcher::NEXT_CHARACTER :
+            return true;
+            break;
+        case preg_matcher::CHARACTERS_LEFT :
+            return false;//We hope it'll be true some day
+            break;
+        }
+        return false;
+    }
+    
     /**
     *Function validate regex, before built tree, it need for validation
     *@param $regex - regular expirience for validation
@@ -728,13 +748,15 @@ class dfa_preg_matcher extends preg_matcher {
             $node->chars = 'METASYBOLD_';//METASYMBOL_DOT is service word, METASYBOLD_ is equivalent character class.
         }  
     }
+
     /**
     *get regex and build finite automates
     @param regex - regular expirience for which will be build finite automate
+    @param modifiers - modifiers of regular expression
     */
-    function __construct($regex) {
-        //getting tree
-        $this->build_tree($regex);
+    function __construct($regex, $modifiers = null) {
+        parent::__construct($regex, $modifiers);
+        $this->roots[0] = $this->ast_root;
         //building finite automates
         dfa_preg_matcher::convert_tree($this->roots[0]);
         $this->append_end(0);
