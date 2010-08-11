@@ -133,13 +133,15 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
             global $CFG;
-        //form hint messages
-        $hintedresponse = substr($state->responses[''], 0 , $this->result->index + 1) . $this->result->next;
-        $lenght = strlen($hintedresponse) - 1;
-        $hintmessage = '<span style="color:#0000FF;">'.htmlentities(substr($hintedresponse, 0, $lenght)).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
-                    htmlentities(substr($state->responses[''], $lenght))."</span><br />";
-        if (isset($state->responses['hint'])) {
-            $state->responses[''] = $hintedresponse;
+        if (isset($state->responses['hint']) && is_object($this->result)) {// if hint need and there is result of matching
+            //form hint messages
+            $hintedresponse = substr($state->responses[''], 0 , $this->result->index + 1) . $this->result->next;
+            $lenght = strlen($hintedresponse) - 1;
+            $hintmessage = '<span style="color:#0000FF;">'.htmlentities(substr($hintedresponse, 0, $lenght)).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
+                        htmlentities(substr($state->responses[''], $lenght))."</span><br />";
+            if (isset($state->responses['hint'])) {
+                $state->responses[''] = $hintedresponse;
+            }
         }
     /// This implementation is also used by question type 'numerical'
         $readonly = empty($options->readonly) ? '' : 'readonly="readonly"';
