@@ -30,18 +30,21 @@ start ::= expr(B). {
     $this->root = B;
 }
 expr(A) ::= expr(B) CONC expr(C). {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_CONC;
     A->firop = B;
     A->secop = C;
 }
 expr(A) ::= expr(B) ALT expr(C). {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ALT;
     A->firop = B;
     A->secop = C;
 }
 expr(A) ::= expr(B) ALT. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ALT;
     A->firop = B;
@@ -50,42 +53,49 @@ expr(A) ::= expr(B) ALT. {
     A->secop->subtype = LEAF_EMPTY;
 }
 expr(A) ::= expr(B) QUEST. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_QUESTQUANT;
     A->greed = true;
     A->firop = B;
 }
 expr(A) ::= expr(B) ITER. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ITER;
     A->greed = true;
     A->firop = B;
 }
 expr(A) ::= expr(B) PLUS. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_PLUSQUANT;
     A->greed = true;
     A->firop = B;
 }
 expr(A) ::= expr(B) LAZY_QUEST. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_QUESTQUANT;
     A->greed = false;
     A->firop = B;
 }
 expr(A) ::= expr(B) LAZY_ITER. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ITER;
     A->greed = false;
     A->firop = B;
 }
 expr(A) ::= expr(B) LAZY_PLUS. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_PLUSQUANT;
     A->greed = false;
     A->firop = B;
 }
 expr(A) ::= expr(B) QUANT(C). {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_QUANT;
     A->greed = true;
@@ -94,6 +104,7 @@ expr(A) ::= expr(B) QUANT(C). {
     A->firop = B;
 }
 expr(A) ::= expr(B) LAZY_QUANT(C). {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_QUANT;
     A->greed = false;
@@ -102,6 +113,7 @@ expr(A) ::= expr(B) LAZY_QUANT(C). {
     A->firop = B;
 }
 expr(A) ::= OPENBRACK expr(B) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_SUBPATT;
     A->firop = B;
@@ -110,26 +122,31 @@ expr(A) ::= GROUPING expr(B) CLOSEBRACK. {
     A = B;
 }
 expr(A) ::= ASSERT_TF expr(B) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ASSERTTF;
     A->firop = B;
 }
 expr(A) ::= ASSERT_TB expr(B) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ASSERTTB;
     A->firop = B;
 }
 expr(A) ::= ASSERT_FF expr(B) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ASSERTFF;
     A->firop = B;
 }
 expr(A) ::= ASSERT_FB expr(B) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_ASSERTFB;
     A->firop = B;
 }
 expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
     A->firop = C;
@@ -139,6 +156,7 @@ expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A->thirdop->firop = B;
 }
 expr(A) ::= CONDSUBPATT ASSERT_TB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
     A->firop = C;
@@ -148,6 +166,7 @@ expr(A) ::= CONDSUBPATT ASSERT_TB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A->thirdop->firop = B;
 }
 expr(A) ::= CONDSUBPATT ASSERT_FF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
     A->firop = C;
@@ -157,6 +176,7 @@ expr(A) ::= CONDSUBPATT ASSERT_FF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A->thirdop->firop = B;
 }
 expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBRACK. {
+    A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
     A->firop = C;
@@ -166,5 +186,6 @@ expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A->thirdop->firop = B;
 }
 expr(A) ::= PARSLEAF(B). {
+    A = new node;
     A = B;
 }
