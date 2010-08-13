@@ -170,6 +170,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -192,6 +193,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -215,6 +217,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -238,6 +241,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -260,6 +264,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
@@ -286,6 +291,7 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;

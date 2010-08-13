@@ -232,6 +232,7 @@ class preg_matcher {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
             $curr = $token->type;
