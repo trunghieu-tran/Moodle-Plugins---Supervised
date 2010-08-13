@@ -14,6 +14,12 @@
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
+define('MAX_STATE_COUNT', 64);/* if you put large constant here, than big dfa will be
+                                  correct, but big dfa will be build slow, if you small
+                                  constant here dfa will must small, but complexy regex
+                                  will be get error on validation.
+                               */
+
 class finite_automate_state {//finite automate state
     var $asserts;
     var $passages;//contain numbers of state which can go from this
@@ -25,6 +31,8 @@ class finite_automate_state {//finite automate state
 }
 
 class dfa_preg_matcher extends preg_matcher {
+
+    
 
 
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
@@ -63,10 +71,9 @@ class dfa_preg_matcher extends preg_matcher {
     *@return array of errors, if no error - return true.
     */
     static function validate($regex) {
-        $matcher = new dfa_preg_matcher;
         $errors = array();
-        //building tree
-        $matcher->build_tree($regex);
+        //building tree and dfa
+        $matcher = new dfa_preg_matcher($regex);
         //validation tree
         $for_regexp=$regex;
         if (strpos($for_regexp,'/')!==false) {//escape any slashes
@@ -77,6 +84,9 @@ class dfa_preg_matcher extends preg_matcher {
             dfa_preg_matcher::find_unsupported_operation($matcher->roots[0], $errors);
         } else {
             $errors[0] = 'incorrectregex';
+        }
+        if (count($matcher->finiteautomates, COUNT_RECURSIVE) > MAX_STATE_COUNT) {
+            $errors[1] = 'largedfa';
         }
         if (!count($errors)) {
             return true;
@@ -92,37 +102,37 @@ class dfa_preg_matcher extends preg_matcher {
     static function find_unsupported_operation($node, &$errors) {
         switch ($node->subtype) {
             case LEAF_LINK:
-                $errors[1] = 'link';
+                $errors[2] = 'link';
                 break;
             case NODE_ITER:
             case NODE_PLUSQUANT:
             case NODE_QUANT:
             case NODE_QUESTQUANT:
                 if (!$node->greed) {
-                    $errors[2] = 'lazyquant';
+                    $errors[3] = 'lazyquant';
                 }
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case  NODE_SUBPATT:
-                $errors[3] = 'subpattern';
+                $errors[4] = 'subpattern';
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_CONDSUBPATT:
-                $errors[4] = 'condsubpatt';
+                $errors[5] = 'condsubpatt';
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
                 dfa_preg_matcher::find_unsupported_operation($node->thirdop, $errors);
                 break;
             case NODE_ASSERTFF:
-                $errors[5] = 'assertff';
+                $errors[6] = 'assertff';
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ASSERTFB:
-                $errors[6] = 'assertfb';
+                $errors[7] = 'assertfb';
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ASSERTTB:
-                $errors[7] = 'asserttb';
+                $errors[8] = 'asserttb';
                 dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
                 break;
             case NODE_ALT:
@@ -524,6 +534,7 @@ class dfa_preg_matcher extends preg_matcher {
             switch($node->subtype) {
                 case NODE_ASSERTTF:
                     $this->roots[$node->number] = $node->firop;
+                    break;
                 case NODE_ALT:
                 case NODE_CONC:
                     $this->find_asserts($node->secop);

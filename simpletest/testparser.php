@@ -15,6 +15,26 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
+//$err = find_illegal_isnt_object($matcher->roots[0], 'root');if($err !== false){ echo '<br/> NON OBJECT!!!' . $err . '<br/>';}
+
+function find_illegal_isnt_object($node, $path) {
+    if(!is_object($node)) {
+        return $path;
+    } elseif ($node->type == NODE) {
+        if ($node->subtype == NODE_CONC || $node->subtype == NODE_ALT) {
+            $result = find_illegal_isnt_object($node->secop, $path . '->secop');
+            if ($result !== false) {
+                return $result;
+            }
+        }
+        $result = find_illegal_isnt_object($node->firop, $path . '->firop');
+        if ($result !== false) {
+            return $result;
+        }
+    }
+    return false;
+}
+
 class parser_test extends UnitTestCase {
 
     //Unit test for lexer
