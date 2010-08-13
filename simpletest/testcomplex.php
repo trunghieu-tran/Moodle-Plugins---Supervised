@@ -74,7 +74,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('a[^b]cd');
         $result = $matcher->match('abcd');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() !== 'b');var_dump($matcher->next_char());
+        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() !== 'b');
         $result = $matcher->match('axcd');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
