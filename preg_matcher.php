@@ -37,7 +37,7 @@ class preg_matcher {
     protected $regex;
     protected $modifiers;
 
-    //The root of abstract sytax tree of the regular expression
+    //The root of abstract syntax tree of the regular expression
     protected $ast_root;
     //The error messages array
     protected $errors;
@@ -75,8 +75,8 @@ class preg_matcher {
         if (is_string($modifiers)) {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
-                if (strpos($supportedmodifiers,$modifiers[i]) === false) {
-                    $errors[] = 'Error: modifier '.$modifiers[i].' isn\'t supported by engine '.$this->name.'.';
+                if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
+                    $errors[] = 'Error: modifier '.$modifiers[$i].' isn\'t supported by engine '.$this->name.'.';
                 }
             }
         }
@@ -211,7 +211,7 @@ class preg_matcher {
     * Are errors in regex?
     @return bool  errors exists
     */
-    public function get_errors() {
+    public function is_error_exists() {
         return (!empty($this->errors));
     }
 
@@ -227,14 +227,14 @@ class preg_matcher {
     *function do lexical and syntaxical analyze of regex and build tree, root saving in $this->roots[0]
     @param $regex - regular expirience for building tree
     */
-    protected function build_tree($regex) {
+    /*protected*/public function build_tree($regex) {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
-            $curr = $token->type;//var_dump($token); echo '<br/>';
+            $curr = $token->type;
             if (preg_parser_yyParser::is_conc($prev, $curr)) {
                 $parser->doParse(preg_parser_yyParser::CONC, 0);
                 $parser->doParse($token->type, $token->value);
