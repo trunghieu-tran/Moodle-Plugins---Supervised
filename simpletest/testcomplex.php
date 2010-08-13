@@ -18,132 +18,132 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
     
     function test_easy() {
         $matcher = new dfa_preg_matcher('abcd');
-        $result = $matcher->match('fgh');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == -1 && $result->next == 'a');
+        $matcher->match('fgh');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a');
         $result = $matcher->match('abce');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 'd');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 'd');
         $result = $matcher->match('abcd');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 3 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
     }
     function test_alternative() {
         $matcher = new dfa_preg_matcher('ab|cd');
         $result = $matcher->match('ad');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 0 && $result->next == 'b');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b');
         $result = $matcher->match('ab');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 0);
         $result = $matcher->match('cd');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 0);
     }
     function test_iteration() {
         $matcher = new dfa_preg_matcher('ab*c');
         $result = $matcher->match('ac');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 0);
         $result = $matcher->match('abc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 46 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 46 && $matcher->next_char() === 0);
     }
     function test_questquant() {
         $matcher = new dfa_preg_matcher('ab?c');
         $result = $matcher->match('ac');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 0);
         $result = $matcher->match('abc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('abbc');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 1 && $result->next == 'c');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'c');
     }
     function test_metasymbol_dot() {
         $matcher = new dfa_preg_matcher('a.c');
         $result = $matcher->match('afc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
     }
     function test_negative_character_class() {
         $matcher = new dfa_preg_matcher('a[^b]cd');
         $result = $matcher->match('abcd');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 0 && $result->next != 'b');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() !== 'b');var_dump($matcher->next_char());
         $result = $matcher->match('axcd');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 3 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
     }
     function test_many_alternatives() {
         $matcher = new dfa_preg_matcher('(?:ab|cd|ef|gh)i');
         $result = $matcher->match('abi');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('cdi');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('efi');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('ghi');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('yzi');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == -1 && ($result->next == 'a' || $result->next == 'c' || $result->next == 'e' || $result->next == 'g'));
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == -1 && ($matcher->next_char() === 'a' || $matcher->next_char() === 'c' || $matcher->next_char() === 'e' || $matcher->next_char() === 'g'));
     }
     function test_repeat_chars() {
         $matcher = new dfa_preg_matcher('(?:a|b)*abb');
         $result = $matcher->match('ab');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 1 && ($result->next == 'a'|| $result->next == 'b'));
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'a'|| $matcher->next_char() === 'b'));
         $result = $matcher->match('abb');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 75 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === 0);
     }
     function test_quantificator() {
         $matcher = new dfa_preg_matcher('ab{15,35}c');
         $result = $matcher->match('abbbbbc');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 5 && $result->next == 'b');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 5 && $matcher->next_char() === 'b');
         $result = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 26 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 26 && $matcher->next_char() === 0);
         $result = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 35 && $result->next == 'c');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 35 && $matcher->next_char() === 'c');
     }
     function test_plusquant() {
         $matcher = new dfa_preg_matcher('ab+c');
         $result = $matcher->match('ac');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 0 && $result->next == 'b');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b');
         $result = $matcher->match('abc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
         $result = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 100 && $result->next == 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 100 && $matcher->next_char() === 0);
     }
     function test_assert() {
         $matcher = new dfa_preg_matcher('a(?=.*b)[xcvbnm]*');
         $result = $matcher->match('ax');
-        $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 1 && $result->next === 'b');
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'b');
         $result = $matcher->match('abxcv');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 4 && $result->next === 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 4 && $matcher->next_char() === 0);
         $result = $matcher->match('avbv');
-        $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 3 && $result->next === 0);
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
     }
 }
 ?>
