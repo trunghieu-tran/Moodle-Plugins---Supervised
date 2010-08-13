@@ -51,8 +51,8 @@ class question_preg_qtype extends question_shortanswer_qtype {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
         if ($question->options->usehint) {
-            $this->tempresult = $this->automates[$answer->id]->match($state->responses['']);
-            return $this->automates[$answer->id]->get_full();
+            $this->automates[$answer->id]->match($state->responses['']);
+            return $this->automates[$answer->id]->is_matching_complete();
         } else {
             return $this->match_regex($answer->answer, trim(stripslashes_safe($state->responses[''])), $question->options->exactmatch, $question->options->usecase);
         }
@@ -81,50 +81,64 @@ class question_preg_qtype extends question_shortanswer_qtype {
             $this->built = true;
         }
         if(isset($state->responses['hint'])) {
-            $this->result->index = -2;
-            $this->result->full = false;
+            $this->index = -2;
+            $this->full = false;
             $state->raw_grade = 0;
             foreach($question->options->answers as $answer) {
                 if($answer->fraction >= HINT_GRADE_BORDER) {
                     if($this->test_response($question, $state, $answer)) {
                         $state->raw_grade = $answer->fraction;
-                        $this->result = $this->tempresult;
+                        $this->index = $this->automates[$answer->id]->last_correct_character_index();
+                        $this->full = $this->automates[$answer->id]->is_matching_complete();
+                        $this->next = $this->automates[$answer->id]->next_char();
                         break;
                     }
                     //determine hint
                     $old = $state->responses[''];
-                    $state->responses[''] = substr($state->responses[''], 0, $this->tempresult->index + 1);
-                    if ($this->result->next !== 0) {
-                        $state->responses[''] .= $this->result->next;
+                    $state->responses[''] = substr($state->responses[''], 0, $this->automates[$answer->id]->last_correct_character_index() + 1);
+                    if ($this->automates[$answer->id]->next_char() !== 0) {
+                        $state->responses[''] .= $this->automates[$answer->id]->next_char();
                     }
-                    $prevtemp = $this->tempresult;
+                    $prevtempindex = $this->automates[$answer->id]->last_correct_character_index();
+                    $prevtempnext = $this->automates[$answer->id]->next_char();
                     if ($this->test_response($question, $state, $answer)) {
                         $state->raw_grade = $answer->fraction;
-                        $this->result = $prevtemp;
+                        $this->index = $prevtempindex;
+                        $this->full = true;
+                        $this->next = $prevtempnext;
                         $state->responses[''] = $old;
                         break;
-                    } elseif ($this->tempresult->index > $this->result->index || !isset($this->result)) {
-                        $this->result = $this->tempresult;
+                    } elseif ($this->automates[$answer->id]->last_correct_character_index() > $this->index) {
+                        $this->index = $this->automates[$answer->id]->last_correct_character_index();
+                        $this->full = $this->automates[$answer->id]->is_matching_complete();
+                        if ($this->full) {
+                            $state->raw_grade = $answer->fraction;
+                        }
+                        $this->next = $this->automates[$answer->id]->next_char();
                         $state->responses[''] = $old;
                     } else {
                         $state->responses[''] = $old;
                     }
                 }
+                if ($this->full) {
+                    $state->raw_grade = $answer->fraction;
+                }
             }
-            if ($this->result->next === 0) {
-                $this->result->next = '';
+            if ($this->next === 0) {
+                $this->next = '';
             }
-            
-            // Make sure we don't assign negative or too high marks.
-            $state->raw_grade = min(max((float) $state->raw_grade,
-                                0.0), 1.0) * $question->maxgrade;
-    
+
             // Update the penalty.
-            if ($this->result->full) {
+            if ($this->full) {
                 $state->sumpenalty += $question->options->hintpenalty * $question->maxgrade;
             } else {
                 $state->penalty = $question->options->hintpenalty * $question->maxgrade;
             }
+    
+            // Make sure we don't assign negative or too high marks.
+            $state->raw_grade = min(max((float) $state->raw_grade,
+                                0.0), 1.0) * $question->maxgrade;
+    
             $state->event = QUESTION_EVENTGRADE;
         } else {
             default_questiontype::grade_responses(&$question, &$state, $cmoptions);//use parent function, because hint's functional not using at this call.
@@ -133,15 +147,16 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
             global $CFG;
-        if (isset($state->responses['hint']) && is_object($this->result)) {// if hint need and there is result of matching
+        if (isset($state->responses['hint']) && isset($this->next) && isset($this->index) && isset($this->full)) {// if hint need and there is result of matching
             //form hint messages
-            $hintedresponse = substr($state->responses[''], 0 , $this->result->index + 1) . $this->result->next;
+            $hintmessage = 'This message not formed yet!';
+            $hintedresponse = substr($state->responses[''], 0 , $this->index + 1) . $this->next;
             $lenght = strlen($hintedresponse) - 1;
             $hintmessage = '<span style="color:#0000FF;">'.htmlentities(substr($hintedresponse, 0, $lenght)).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
                         htmlentities(substr($state->responses[''], $lenght))."</span><br />";
             if (isset($state->responses['hint'])) {
                 $state->responses[''] = $hintedresponse;
-            }
+            } else {$hint = 'error in line 151-153';}
         }
     /// This implementation is also used by question type 'numerical'
         $readonly = empty($options->readonly) ? '' : 'readonly="readonly"';
@@ -175,7 +190,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
             $feedbackimg = question_get_feedback_image(0);
             foreach($question->options->answers as $answer) {
 
-                if ($this->test_response($question, $state, $answer) || $this->result->full) {
+                if ($this->test_response($question, $state, $answer) || $this->full) {
                     // Answer was correct or partially correct.
                     $class = question_get_feedback_class($answer->fraction);
                     $feedbackimg = question_get_feedback_image($answer->fraction);
@@ -187,7 +202,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
             }
         }
         if ($question->options->usehint && isset($state->responses['hint'])) {
-            if (!$this->result->full) {
+            if (!$this->full) {
                 //for display hint message, concatenate it with feedback
                 $feedback = $hintmessage . $feedback;
             }
