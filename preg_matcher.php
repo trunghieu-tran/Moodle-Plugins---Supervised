@@ -59,6 +59,19 @@ class preg_matcher {
     }
 
     /**
+    * creates an empty object, used mainly to query engine capabilities
+    */
+    public function __construct() {
+        $this->errors = array('Empty matcher');
+        $this->full = false;
+        $this->index = -1;
+        $this->next = '';
+        $this->left = -1;
+        $this->result_cache = array();
+        $this->regex = null;
+    }
+
+    /**
     *parse regex and do all necessary preprocessing
     @param regex - regular expression for which will be build finite automate
     @param modifiers - modifiers of regular expression
@@ -76,7 +89,7 @@ class preg_matcher {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[i]) === false) {
-                    $errors[] = 'Error: modifier '.$modifiers[i].' isn\'t supported by engine '.$this->name.'.';
+                    $this->errors[] = 'Error: modifier '.$modifiers[i].' isn\'t supported by engine '.$this->name.'.';
                 }
             }
         }
@@ -92,6 +105,7 @@ class preg_matcher {
 
         //check regular expression for validity
         $this->accept_tree($this->ast_root);
+        }
     }
 
     /**
@@ -127,7 +141,7 @@ class preg_matcher {
     @return bool is node accepted
     */
     protected function accept_node($node) {
-        $errors[] = 'Abstract matcher don\'t support anything! Please use real matcher class.';
+        $this->errors[] = 'Abstract matcher don\'t support anything! Please use real matcher class.';
         return false;
     }
 
