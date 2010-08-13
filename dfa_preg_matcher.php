@@ -766,6 +766,9 @@ class dfa_preg_matcher extends preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex, $modifiers = null) {
+        if (!is_string($regex)) {//not build tree and dfa, if regex not given
+            return;
+        }
         parent::__construct($regex, $modifiers);
         $this->roots[0] = $this->ast_root;
         //building finite automates
@@ -780,6 +783,10 @@ class dfa_preg_matcher extends preg_matcher {
         }
         $this->built = true;
         return;
+    }
+    function build_tree($regex) {
+        parent::build_tree($regex);
+        $this->roots[0] = $this->ast_root;
     }
     /**
     *function get string and compare it with regex
