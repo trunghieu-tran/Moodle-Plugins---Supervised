@@ -192,7 +192,7 @@ class preg_matcher {
     */
     public function next_char() {
         if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-            return $this->index;
+            return $this->next;
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports hinting');
     }

@@ -503,7 +503,7 @@ class dfa_preg_matcher extends preg_matcher {
                     $result->next = $this->connection[$assertnumber][$key][0];
                 }
             } else {
-                for($c = ' '; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);
+                for($c = 'a'; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);//TODO: need better algorithm for determine next character in negative CC
                 $result->next = $c;
             }
         } else {
@@ -793,32 +793,12 @@ class dfa_preg_matcher extends preg_matcher {
     *@param response - string which will be compared with regex
     *@return result of compring, see compare function for format of result
     */
-    function match($response) {
-        if ($this->built) {
-            $result = $this->compare($response, 0);
-        } else {
-            $result = false;
-        }
-        $this->result = $result;
-        return $result;           
-    }
-    /**
-    *@return index of last matching character
-    */
-    function get_index() {
-        return $this->result->index;
-    }
-    /**
-    *@return fullness of match
-    */
-    function get_full() {
-        return $this->result->full;
-    }
-    /**
-    *@return character which can be on next position in correct string
-    */
-    function get_next_char() {
-        return $this->result->next;
+    function match_inner($response) {
+        $result = $this->compare($response, 0);
+        $this->full = $result->full;
+        $this->index = $result->index;
+        $this->next = $result->next;
+        return;
     }
     /**
     *@return list of supported operation as array of string
