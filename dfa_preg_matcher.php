@@ -410,7 +410,9 @@ class dfa_preg_matcher extends preg_matcher {
                 //if character class number is positive (it's mean what character class is positive) and
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
+                if ($key != STREND && $key < DOT && $index < strlen($string)) {
+                    $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
+                }
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 }
@@ -496,12 +498,14 @@ class dfa_preg_matcher extends preg_matcher {
         } elseif ($full && $index-2 < $maxindex) {//if assert not border next character
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            if ($key > 0) {//if positive character class
+            if ($key > 0 && $key < DOT) {//if positive character class
                 $result->next = $this->connection[$assertnumber][$key][0];
                 if($key > DOT && next($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) {
                     $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                     $result->next = $this->connection[$assertnumber][$key][0];
                 }
+            }elseif ($key > DOT) {
+                $result->next = 'D';
             } else {
                 for($c = 'a'; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);//TODO: need better algorithm for determine next character in negative CC
                 $result->next = $c;
@@ -519,6 +523,9 @@ class dfa_preg_matcher extends preg_matcher {
     *@param arr2 - second array, which will appended to arr1
     */
     static function push_unique(&$arr1, $arr2) {// to static
+        if (!is_array($arr1)) {
+            $arr1 = array();
+        }
         foreach ($arr2 as $value) {
             if (!in_array($value, $arr1)) {
                 $arr1[] = $value;
@@ -585,6 +592,10 @@ class dfa_preg_matcher extends preg_matcher {
     *@return concatenated list of follow chars
     */
     function followposU($number, $fpmap, $passages, $index) {
+        if ($number == STREND) {
+            $res = array();
+            return $res;
+        }
         $str1 = $this->connection[$index][abs($number)];//for this charclass will found equivalent numbers
         $equnum = array();
         foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
@@ -765,8 +776,8 @@ class dfa_preg_matcher extends preg_matcher {
     @param regex - regular expirience for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    function __construct($regex, $modifiers = null) {
-        if (!is_string($regex)) {//not build tree and dfa, if regex not given
+    function __construct($regex = null, $modifiers = null) {
+        if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
         parent::__construct($regex, $modifiers);
