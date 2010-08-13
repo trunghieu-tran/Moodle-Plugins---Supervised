@@ -8,13 +8,24 @@
 
 define('HINT_GRADE_BORDER', 1);//if $answer->fraction >= HINT_GRADE_BORDER that hint will use this variant of answer.
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
+//require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
     
-    var $automates;
+    /*var $automates;
     var $result;
-    var $tempresult;
+    var $tempresult;*/
+    //key is answer id, value is matcher object
+    //keys will be unique across many questions since answer id's are unique
+    protected $matchers_cache = array();
+
+    /**
+    * returns an array of engine names
+    */
+    public function available_engines() {
+        return array(1 => 'preg_php_matcher', 2 => 'dfa_preg_matcher');
+    }
+    
     
     function name() {
         return 'preg';
@@ -27,34 +38,49 @@ class question_preg_qtype extends question_shortanswer_qtype {
         return $extraquestionfields;
     }
 
-    function match_regex($regex, $str, $exact, $usecase) {
-        $for_regexp=$regex;
-        if (strpos($for_regexp,'/')!==false) {//escape any slashes
-            $for_regexp=implode('\/',explode('/',$for_regexp));
-        }
-        if ($exact){
-            if ($for_regexp[0]!='^'){
-                $for_regexp='^'.$for_regexp;
+    /**
+    * create or get suitable matcher object for given engine, regex and options
+    @param engine string engine name
+    @param regex string regular expression to match
+    @param $exact bool exact macthing mode
+    @param $usecase bool case sensitive mode
+    @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
+    @return matcher object
+    */
+    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null) {
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'php');
+
+        if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
+            $matcher =& $this->matchers_cache[$answerid];
+        } else {//create and store matcher object
+            $for_regexp=$regex;
+            if ($exact) {
+                if ($for_regexp[0]!='^') {
+                    $for_regexp='^'.$for_regexp;
+                }
+                if ($for_regexp[strlen($for_regexp)-1]!='$' || 
+                        ($for_regexp[strlen($for_regexp)-1]=='$' && $for_regexp[strlen($for_regexp)-2]=='\\')) {
+                    $for_regexp=$for_regexp.'$';
+                }
             }
-            if ($for_regexp[strlen($for_regexp)-1]!='$' && $for_regexp[strlen($for_regexp)-2]!='\\') {
-                $for_regexp=$for_regexp.'$';
+            $modifiers = null;
+            if (!$usecase) {
+                $modifiers = 'i';
+            }
+            $matcher = new $engine($for_regexp, $modifiers);
+            if ($answerid !== null) {
+                $this->matchers_cache[$answerid] =& $matcher;
             }
         }
-        $for_regexp='/'.$for_regexp.'/u';
-        if (!$usecase) {
-            $for_regexp .= 'i';
-        }
-        return preg_match($for_regexp, $str);
+
+        return $matcher;
     }
 
     function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
-        if ($question->options->usehint) {
-            $this->tempresult = $this->automates[$answer->id]->match($state->responses['']);
-            return $this->automates[$answer->id]->get_full();
-        } else {
-            return $this->match_regex($answer->answer, trim(stripslashes_safe($state->responses[''])), $question->options->exactmatch, $question->options->usecase);
+        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        return $matcher->match(trim(stripslashes_safe($state->responses['']));
         }
     }
 
@@ -73,64 +99,86 @@ class question_preg_qtype extends question_shortanswer_qtype {
                     "form.action = form.action + '#q", $question->id, "'; return true;", '" />';
         }
     }
+
+    /**
+    * function additionaly fill $state->responses['__answer'] with best fit answer for further hinting
+    */
     function grade_responses(&$question, &$state, $cmoptions) {
-        if (!$this->built && $question->options->usehint) {
+        require_once($CFG->dirroot . '/question/type/preg/'.$question->options->engine.'php');
+        $querymatcher = new $question->options->engine;//this matcher will be used to query engine capabilities
+        $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
+        $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
+        
+        //Set an initial value for best fit. This is tricky, since when using hint we need first element within hint grade border
+        reset($question->options->answers);
+        $bestfitanswer = current($question->options->answers);
+        if (isset($state->responses['hint'])) {
             foreach ($question->options->answers as $answer) {
-                $this->automates[$answer->id] = new dfa_preg_matcher($answer->answer);
-            }
-            $this->built = true;
-        }
-        if(isset($state->responses['hint'])) {
-            $this->result->index = -2;
-            $this->result->full = false;
-            $state->raw_grade = 0;
-            foreach($question->options->answers as $answer) {
-                if($answer->fraction >= HINT_GRADE_BORDER) {
-                    if($this->test_response($question, $state, $answer)) {
-                        $state->raw_grade = $answer->fraction;
-                        $this->result = $this->tempresult;
-                        break;
-                    }
-                    //determine hint
-                    $old = $state->responses[''];
-                    $state->responses[''] = substr($state->responses[''], 0, $this->tempresult->index + 1);
-                    if ($this->result->next !== 0) {
-                        $state->responses[''] .= $this->result->next;
-                    }
-                    $prevtemp = $this->tempresult;
-                    if ($this->test_response($question, $state, $answer)) {
-                        $state->raw_grade = $answer->fraction;
-                        $this->result = $prevtemp;
-                        $state->responses[''] = $old;
-                        break;
-                    } elseif ($this->tempresult->index > $this->result->index || !isset($this->result)) {
-                        $this->result = $this->tempresult;
-                        $state->responses[''] = $old;
-                    } else {
-                        $state->responses[''] = $old;
-                    }
+                if ($answer->fraction >= HINT_GRADE_BORDER) {
+                    $bestfitanswer = $answer;
+                    break;//anyone that fits border helps
                 }
             }
-            if ($this->result->next === 0) {
-                $this->result->next = '';
-            }
-            
-            // Make sure we don't assign negative or too high marks.
-            $state->raw_grade = min(max((float) $state->raw_grade,
-                                0.0), 1.0) * $question->maxgrade;
-    
-            // Update the penalty.
-            if ($this->result->full) {
-                $state->sumpenalty += $question->options->hintpenalty * $question->maxgrade;
-            } else {
-                $state->penalty = $question->options->hintpenalty * $question->maxgrade;
-            }
-            $state->event = QUESTION_EVENTGRADE;
-        } else {
-            default_questiontype::grade_responses(&$question, &$state, $cmoptions);//use parent function, because hint's functional not using at this call.
         }
+        //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
+        $maxfitness = (-1)*(strlen($state->responses[''])+1);
+        $full = false;
+        foreach ($question->options->answers as $answer) {
+            $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+            $full = $matcher->match(stripslashes_safe($state->responses['']));
+
+            //check full match
+            if ($full) {//don't need to look more if we find full match
+                $bestfitanswer = $answer;
+                $fitness = strlen($state->responses['']);
+                break;
+            }
+
+            //when hinting we should use only answers within hint border except full matching case
+            //if engine doesn't support hinting we shoudn't bother with fitness too
+            if (!$ispartialmatching || $answer->fraction < HINT_GRADE_BORDER) {
+                continue;
+            }
+
+            //calculate fitness now
+            if ($knowleftcharacters) {//engine could tell us how many characters left to complete response, this is the best fitness possible
+                $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
+            } else {//we should rely on the length of correct response part
+                $fitness = $matcher->last_correct_character_index()+1;
+            }
+
+            if ($fitness > $maxfitness) {
+                $maxfitness = $fitness;
+                $bestfitanswer = $answer;
+            }
+        }
+
+        //save best fitted answer for further uses
+        $state->responses['__answer'] = $bestfitanswer;
+
+        if ($full) {
+            $state->raw_grade = $bestfitanswer->fraction;
+        } else {
+            $state->raw_grade = 0;//TODO - implement partial grades for partially correct answers
+        }
+
+        // Make sure we don't assign negative or too high marks.
+        $state->raw_grade = min(max((float) $state->raw_grade,
+                            0.0), 1.0) * $question->maxgrade;
+
+        // Update the penalty
+        if (isset($state->responses['hint'])) {
+            $state->penalty = $question->hintpenalty * $question->maxgrade;
+        } else {
+            $state->penalty = $question->penalty * $question->maxgrade;
+        }
+
+        // mark the state as graded
+        $state->event = ($state->event ==  QUESTION_EVENTCLOSE) ? QUESTION_EVENTCLOSEANDGRADE : QUESTION_EVENTGRADE;
+
         return true;
     }
+
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
             global $CFG;
         //form hint messages
