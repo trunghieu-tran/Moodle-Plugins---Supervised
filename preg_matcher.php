@@ -116,9 +116,21 @@ class preg_matcher {
     @return bool is tree accepted
     */
     protected function accept_tree($node) {
-        //TODO - Dmitriy please place there code  from dfa_preg_matcher::find_unsupported_operation, which is walking the tree
-        //for validation of individual nodes use function below (accept_node), that should be defined in dfa_preg_matcher class overriding default code (by you too).
-        //Идея в том, чтобы каждый конкретный класс описывал только функцию, определяющую подходит ему узел или нет, а общий обход дерева осуществлял бы абстрактный класс
+        $this->accept_node($node);
+        if ($node->type == NODE) {
+            if ($node->subtype == NODE_CONDSUBPATT) {
+                $this->accept_tree($node->thirdop);
+            }
+            if($node->subtype == NODE_CONC || $node->subtype == NODE_ALT || $node->subtype == NODE_CONDSUBPATT) {
+                $this->accept_tree($node->secop);
+            }
+            $this->accept_tree($node->firop);
+        }
+        if (empty($this->errors)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -127,7 +139,7 @@ class preg_matcher {
     @return bool is node accepted
     */
     protected function accept_node($node) {
-        $errors[] = 'Abstract matcher don\'t support anything! Please use real matcher class.';
+        $this->errors[] = 'Abstract matcher don\'t support anything! Please use real matcher class.';
         return false;
     }
 
