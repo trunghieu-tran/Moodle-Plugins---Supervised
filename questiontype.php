@@ -21,8 +21,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     public function available_engines() {
         return array(1 => 'preg_php_matcher', 2 => 'dfa_preg_matcher');
     }
-    
-    
+
     function name() {
         return 'preg';
     }

@@ -14,6 +14,12 @@
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
+define('MAX_STATE_COUNT', 64);/* if you put large constant here, than big dfa will be
+                                  correct, but big dfa will be build slow, if you small
+                                  constant here dfa will must small, but complexy regex
+                                  will be get error on validation.
+                               */
+
 class finite_automate_state {//finite automate state
     var $asserts;
     var $passages;//contain numbers of state which can go from this
@@ -25,6 +31,8 @@ class finite_automate_state {//finite automate state
 }
 
 class dfa_preg_matcher extends preg_matcher {
+
+    
 
 
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
@@ -63,10 +71,9 @@ class dfa_preg_matcher extends preg_matcher {
     *@return array of errors, if no error - return true.
     */
     static function validate($regex) {
-        $matcher = new dfa_preg_matcher;
         $errors = array();
-        //building tree
-        $matcher->build_tree($regex);
+        //building tree and dfa
+        $matcher = new dfa_preg_matcher($regex);
         //validation tree
         $for_regexp=$regex;
         if (strpos($for_regexp,'/')!==false) {//escape any slashes
@@ -74,64 +81,49 @@ class dfa_preg_matcher extends preg_matcher {
         }
         $for_regexp='/'.$for_regexp.'/u';
         if (preg_match($for_regexp, 'something unimpotarnt') !== false) {
-            dfa_preg_matcher::find_unsupported_operation($matcher->roots[0], $errors);
+            $matcher->accept_tree($matcher->roots[0]);
         } else {
             $errors[0] = 'incorrectregex';
         }
-        if (!count($errors)) {
+        if (count($matcher->finiteautomates, COUNT_RECURSIVE) > MAX_STATE_COUNT) {
+            $errors[1] = 'largedfa';
+        }
+        if (!$matcher->is_error_exists()) {
             return true;
         } else {
-            return $errors;
+            return $matcher->get_errors();
         }
     }
-    /**
-    *function search for unsupported operation in tree
-    *@param $node - current node for search
-    *@param $errors - array of errors
-    */
-    static function find_unsupported_operation($node, &$errors) {
+    protected function accept_node($node) {
         switch ($node->subtype) {
             case LEAF_LINK:
-                $errors[1] = 'link';
-                break;
+                $this->errors[2] = 'link';
+                return false;
+            case NODE_SUBPATT:
+                $this->errors[3] = 'subpattern';
+                return false;
+            case NODE_CONDSUBPATT:
+                $this->errors[4] = 'condsubpatt';
+                return false;
+            case NODE_ASSERTTB:
+                $this->errors[5] = 'asserttb';
+                return false;
+            case NODE_ASSERTFB:
+                $this->errors[6] = 'assertfb';
+                return false;
+            case NODE_ASSERTFF:
+                $this->errors[7] = 'assertff';
+                return false;
+            case NODE_QUESTQUANT:
             case NODE_ITER:
             case NODE_PLUSQUANT:
             case NODE_QUANT:
-            case NODE_QUESTQUANT:
-                if (!$node->greed) {
-                    $errors[2] = 'lazyquant';
+                if ($node->greed === false) {
+                    $this->errors[8] = 'lazyquant';
                 }
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case  NODE_SUBPATT:
-                $errors[3] = 'subpattern';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_CONDSUBPATT:
-                $errors[4] = 'condsubpatt';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
-                dfa_preg_matcher::find_unsupported_operation($node->thirdop, $errors);
-                break;
-            case NODE_ASSERTFF:
-                $errors[5] = 'assertff';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ASSERTFB:
-                $errors[6] = 'assertfb';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ASSERTTB:
-                $errors[7] = 'asserttb';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ALT:
-            case NODE_CONC:
-                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
-            case NODE_ASSERTTF:
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
+                return false;
         }
+        return true;
     }
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
@@ -400,7 +392,9 @@ class dfa_preg_matcher extends preg_matcher {
                 //if character class number is positive (it's mean what character class is positive) and
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
+                if ($key != STREND && $key < DOT && $index < strlen($string)) {
+                    $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$index]) !== false);
+                }
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 }
@@ -486,14 +480,16 @@ class dfa_preg_matcher extends preg_matcher {
         } elseif ($full && $index-2 < $maxindex) {//if assert not border next character
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            if ($key > 0) {//if positive character class
+            if ($key > 0 && $key < DOT) {//if positive character class
                 $result->next = $this->connection[$assertnumber][$key][0];
                 if($key > DOT && next($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) {
                     $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                     $result->next = $this->connection[$assertnumber][$key][0];
                 }
+            }elseif ($key > DOT) {
+                $result->next = 'D';
             } else {
-                for($c = ' '; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);
+                for($c = 'a'; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);//TODO: need better algorithm for determine next character in negative CC
                 $result->next = $c;
             }
         } else {
@@ -509,6 +505,9 @@ class dfa_preg_matcher extends preg_matcher {
     *@param arr2 - second array, which will appended to arr1
     */
     static function push_unique(&$arr1, $arr2) {// to static
+        if (!is_array($arr1)) {
+            $arr1 = array();
+        }
         foreach ($arr2 as $value) {
             if (!in_array($value, $arr1)) {
                 $arr1[] = $value;
@@ -524,6 +523,7 @@ class dfa_preg_matcher extends preg_matcher {
             switch($node->subtype) {
                 case NODE_ASSERTTF:
                     $this->roots[$node->number] = $node->firop;
+                    break;
                 case NODE_ALT:
                 case NODE_CONC:
                     $this->find_asserts($node->secop);
@@ -574,6 +574,10 @@ class dfa_preg_matcher extends preg_matcher {
     *@return concatenated list of follow chars
     */
     function followposU($number, $fpmap, $passages, $index) {
+        if ($number == STREND) {
+            $res = array();
+            return $res;
+        }
         $str1 = $this->connection[$index][abs($number)];//for this charclass will found equivalent numbers
         $equnum = array();
         foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
@@ -754,7 +758,10 @@ class dfa_preg_matcher extends preg_matcher {
     @param regex - regular expirience for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    function __construct($regex, $modifiers = null) {
+    function __construct($regex = null, $modifiers = null) {
+        if (!isset($regex)) {//not build tree and dfa, if regex not given
+            return;
+        }
         parent::__construct($regex, $modifiers);
         $this->roots[0] = $this->ast_root;
         //building finite automates
@@ -770,37 +777,21 @@ class dfa_preg_matcher extends preg_matcher {
         $this->built = true;
         return;
     }
+    function build_tree($regex) {
+        parent::build_tree($regex);
+        $this->roots[0] = $this->ast_root;
+    }
     /**
     *function get string and compare it with regex
     *@param response - string which will be compared with regex
     *@return result of compring, see compare function for format of result
     */
-    function match($response) {
-        if ($this->built) {
-            $result = $this->compare($response, 0);
-        } else {
-            $result = false;
-        }
-        $this->result = $result;
-        return $result;           
-    }
-    /**
-    *@return index of last matching character
-    */
-    function get_index() {
-        return $this->result->index;
-    }
-    /**
-    *@return fullness of match
-    */
-    function get_full() {
-        return $this->result->full;
-    }
-    /**
-    *@return character which can be on next position in correct string
-    */
-    function get_next_char() {
-        return $this->result->next;
+    function match_inner($response) {
+        $result = $this->compare($response, 0);
+        $this->full = $result->full;
+        $this->index = $result->index;
+        $this->next = $result->next;
+        return;
     }
     /**
     *@return list of supported operation as array of string

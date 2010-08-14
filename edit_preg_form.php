@@ -49,6 +49,9 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 }
                 if ($data['usehint']) {
                     $currentunsupp = dfa_preg_matcher::validate($trimmedanswer);
+                    if (!isset($errors['answersinstruct'])) {
+                        $errors['answersinstruct'] = '';
+                    }
                     foreach ($currentunsupp as $operation) {
                         $i = 0;
                         if ($i<4) {
