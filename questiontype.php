@@ -8,13 +8,9 @@
 
 define('HINT_GRADE_BORDER', 1);//if $answer->fraction >= HINT_GRADE_BORDER that hint will use this variant of answer.
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
-//require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
     
-    /*var $automates;
-    var $result;
-    var $tempresult;*/
     //key is answer id, value is matcher object
     //keys will be unique across many questions since answer id's are unique
     protected $matchers_cache = array();
@@ -109,10 +105,10 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
         $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
         
-        //Set an initial value for best fit. This is tricky, since when using hint we need first element within hint grade border
+        //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border
         reset($question->options->answers);
         $bestfitanswer = current($question->options->answers);
-        if (isset($state->responses['hint'])) {
+        if ($ispartialmatching) {
             foreach ($question->options->answers as $answer) {
                 if ($answer->fraction >= HINT_GRADE_BORDER) {
                     $bestfitanswer = $answer;
