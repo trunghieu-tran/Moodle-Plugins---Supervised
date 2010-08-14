@@ -81,67 +81,49 @@ class dfa_preg_matcher extends preg_matcher {
         }
         $for_regexp='/'.$for_regexp.'/u';
         if (preg_match($for_regexp, 'something unimpotarnt') !== false) {
-            dfa_preg_matcher::find_unsupported_operation($matcher->roots[0], $errors);
+            $matcher->accept_tree($matcher->roots[0]);
         } else {
             $errors[0] = 'incorrectregex';
         }
         if (count($matcher->finiteautomates, COUNT_RECURSIVE) > MAX_STATE_COUNT) {
             $errors[1] = 'largedfa';
         }
-        if (!count($errors)) {
+        if (!$matcher->is_error_exists()) {
             return true;
         } else {
-            return $errors;
+            return $matcher->get_errors();
         }
     }
-    /**
-    *function search for unsupported operation in tree
-    *@param $node - current node for search
-    *@param $errors - array of errors
-    */
-    static function find_unsupported_operation($node, &$errors) {
+    protected function accept_node($node) {
         switch ($node->subtype) {
             case LEAF_LINK:
-                $errors[2] = 'link';
-                break;
+                $this->errors[2] = 'link';
+                return false;
+            case NODE_SUBPATT:
+                $this->errors[3] = 'subpattern';
+                return false;
+            case NODE_CONDSUBPATT:
+                $this->errors[4] = 'condsubpatt';
+                return false;
+            case NODE_ASSERTTB:
+                $this->errors[5] = 'asserttb';
+                return false;
+            case NODE_ASSERTFB:
+                $this->errors[6] = 'assertfb';
+                return false;
+            case NODE_ASSERTFF:
+                $this->errors[7] = 'assertff';
+                return false;
+            case NODE_QUESTQUANT:
             case NODE_ITER:
             case NODE_PLUSQUANT:
             case NODE_QUANT:
-            case NODE_QUESTQUANT:
-                if (!$node->greed) {
-                    $errors[3] = 'lazyquant';
+                if ($node->greed === false) {
+                    $this->errors[8] = 'lazyquant';
                 }
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case  NODE_SUBPATT:
-                $errors[4] = 'subpattern';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_CONDSUBPATT:
-                $errors[5] = 'condsubpatt';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
-                dfa_preg_matcher::find_unsupported_operation($node->thirdop, $errors);
-                break;
-            case NODE_ASSERTFF:
-                $errors[6] = 'assertff';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ASSERTFB:
-                $errors[7] = 'assertfb';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ASSERTTB:
-                $errors[8] = 'asserttb';
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
-            case NODE_ALT:
-            case NODE_CONC:
-                dfa_preg_matcher::find_unsupported_operation($node->secop, $errors);
-            case NODE_ASSERTTF:
-                dfa_preg_matcher::find_unsupported_operation($node->firop, $errors);
-                break;
+                return false;
         }
+        return true;
     }
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
