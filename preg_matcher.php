@@ -37,7 +37,7 @@ class preg_matcher {
     protected $regex;
     protected $modifiers;
 
-    //The root of abstract sytax tree of the regular expression
+    //The root of abstract syntax tree of the regular expression
     protected $ast_root;
     //The error messages array
     protected $errors;
@@ -88,7 +88,7 @@ class preg_matcher {
         if (is_string($modifiers)) {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
-                if (strpos($supportedmodifiers,$modifiers[i]) === false) {
+                if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
                     $this->errors[] = 'Error: modifier '.$modifiers[i].' isn\'t supported by engine '.$this->name.'.';
                 }
             }
@@ -130,9 +130,24 @@ class preg_matcher {
     @return bool is tree accepted
     */
     protected function accept_tree($node) {
-        //TODO - Dmitriy please place there code  from dfa_preg_matcher::find_unsupported_operation, which is walking the tree
-        //for validation of individual nodes use function below (accept_node), that should be defined in dfa_preg_matcher class overriding default code (by you too).
-        //Идея в том, чтобы каждый конкретный класс описывал только функцию, определяющую подходит ему узел или нет, а общий обход дерева осуществлял бы абстрактный класс
+        $this->accept_node($node);
+        if ($node->type == NODE) {
+            if ($node->subtype == NODE_CONDSUBPATT) {
+                $this->accept_tree($node->thirdop);
+            }
+            if($node->subtype == NODE_CONC || $node->subtype == NODE_ALT || $node->subtype == NODE_CONDSUBPATT) {
+                $this->accept_tree($node->secop);
+            }
+            $this->accept_tree($node->firop);
+        }
+        if (empty($this->errors)) {
+            return true;
+        } else {
+            return false;
+        }
+
+
+
     }
 
     /**
@@ -206,7 +221,8 @@ class preg_matcher {
     */
     public function next_char() {
         if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-            return $this->index;
+            return $this->next;
+
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports hinting');
     }
@@ -216,7 +232,7 @@ class preg_matcher {
     */
     public function characters_left() {
         if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-            return $this->index;
+            return $this->left;
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports counting of the remaining characters');
     }
@@ -225,7 +241,7 @@ class preg_matcher {
     * Are errors in regex?
     @return bool  errors exists
     */
-    public function get_errors() {
+    public function is_error_exists() {
         return (!empty($this->errors));
     }
 
@@ -241,14 +257,17 @@ class preg_matcher {
     *function do lexical and syntaxical analyze of regex and build tree, root saving in $this->roots[0]
     @param $regex - regular expirience for building tree
     */
-    protected function build_tree($regex) {
+    /*protected*/public function build_tree($regex) {
+
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
+        $curr = -1;
         while ($token = $lexer->nextToken()) {
             $prev = $curr;
-            $curr = $token->type;//var_dump($token); echo '<br/>';
+            $curr = $token->type;
+
             if (preg_parser_yyParser::is_conc($prev, $curr)) {
                 $parser->doParse(preg_parser_yyParser::CONC, 0);
                 $parser->doParse($token->type, $token->value);
