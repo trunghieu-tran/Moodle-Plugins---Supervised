@@ -17,7 +17,7 @@
   </div>
   <?php if ($feedback) { ?>
     <div class="feedback">
-      <?php echo $feedback ?>
+      <?php echo $this->hintmessage.$feedback ?>
     </div>
   <?php } ?>
   <?php $this->print_question_submit_buttons($question, $state, $cmoptions, $options); ?>

@@ -44,8 +44,10 @@ class preg_matcher {
 
     //Matching results
     protected $full;
-    //Index of the last correct character
-    protected $index;
+    //Index of first matched character
+    protected $index_first;
+    //Index of the last matched character
+    protected $index_last;
     //Possible next character
     protected $next;
     //The number of characters left for matching
@@ -64,7 +66,8 @@ class preg_matcher {
     public function __construct() {
         $this->errors = array('Empty matcher');
         $this->full = false;
-        $this->index = -1;
+        $this->index_last = -1;
+        $this->index_first = -1;
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
@@ -79,7 +82,8 @@ class preg_matcher {
     public function __construct($regex, $modifiers = null) {
         $this->errors = array();
         $this->full = false;
-        $this->index = -1;
+        $this->index_last = -1;
+        $this->index_first = 0;
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
@@ -177,7 +181,8 @@ class preg_matcher {
         if (array_key_exists($str,$this->result_cache)) {
             $result = $this->result_cache[$str];
             $this->full = $result['full'];
-            $this->index = $result['index'];
+            $this->index_last = $result['index_last'];
+            $this->index_first = $result['index_first'];
             $this->next = $result['next'];
             $this->left = $result['left'];
             return $this->full;
@@ -186,7 +191,7 @@ class preg_matcher {
         $this->match_inner($str);
 
         //Save results to the cache
-        $this->result_cache[$str] = array('full' => $this->full, 'index' => $this->index, 'next' => $this->next, 'left' => $this->left);
+        $this->result_cache[$str] = array('full' => $this->full, 'index_last' => $this->index_last, 'index_first' => $this->index_first, 'next' => $this->next, 'left' => $this->left);
         return $this->full;
     }
 
@@ -206,14 +211,18 @@ class preg_matcher {
     }
 
     /**
-    returns the index of last correct character if engine supports partial matching
+    *returns first correct character index
+    */
+    public function first_correct_character_index() {
+        return $this->index_first;
+    }
+
+    /**
+    *returns the index of last correct character if engine supports partial matching
     @return the index of last correct character
     */
     public function last_correct_character_index() {
-        if ($this->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
-            return $this->index;
-        }
-        throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports partial matching');
+        return $this->index_last;
     }
 
     /**

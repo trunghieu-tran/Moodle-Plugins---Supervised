@@ -15,6 +15,9 @@ class question_preg_qtype extends question_shortanswer_qtype {
     //keys will be unique across many questions since answer id's are unique
     protected $matchers_cache = array();
 
+    //Neded to pass hinted message to the question form, should be deleted when moving for renderers
+    protected $hintmessage;
+
     /**
     * returns an array of engine names
     */
@@ -43,6 +46,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     @return matcher object
     */
     public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null) {
+        global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
@@ -99,6 +103,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     * function additionaly fill $state->responses['__answer'] with best fit answer for further hinting
     */
     function grade_responses(&$question, &$state, $cmoptions) {
+        global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$question->options->engine.'php');
         $querymatcher = new $question->options->engine;//this matcher will be used to query engine capabilities
         $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
@@ -139,7 +144,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
             if ($knowleftcharacters) {//engine could tell us how many characters left to complete response, this is the best fitness possible
                 $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
             } else {//we should rely on the length of correct response part
-                $fitness = $matcher->last_correct_character_index()+1;
+                $fitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
             }
 
             if ($fitness > $maxfitness) {
@@ -175,16 +180,38 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
 
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
-            global $CFG;
         //form hint messages
-        $hintedresponse = substr($state->responses[''], 0 , $this->result->index + 1) . $this->result->next;
-        $lenght = strlen($hintedresponse) - 1;
-        $hintmessage = '<span style="color:#0000FF;">'.htmlentities(substr($hintedresponse, 0, $lenght)).'</span><span style="text-decoration:line-through; color:#FF0000;">'.
-                    htmlentities(substr($state->responses[''], $lenght))."</span><br />";
-        if (isset($state->responses['hint'])) {
-            $state->responses[''] = $hintedresponse;
+        $answer = $state->responses['__answer'];//TODO - check this is working, or it is in $state->last_graded->responses
+        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $reponse = stripslashes_safe($state->responses['']);
+        $matcher->match($response);
+
+        //Calculate strings for response coloring
+        //TODO - change actual style definition to the classes to work with themes correctly, requires investigation how add a new class for plugin...
+        $firstindex = $matcher->first_correct_character_index();
+        $lastindex = $matcher->last_correct_character_index();
+        $wronghead = '';
+        if ($firstindex > 0) {//if there is wrong heading
+            $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
         }
-    /// This implementation is also used by question type 'numerical'
+        $correctpart = '';
+        if ($firstindex != -1) {//there were any match
+            $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex)).'</span>';
+        }
+        $hintedcharacter = '';
+        if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
+            $hintedcharacter = '<span style="background-color:#FFFF00">'.htmlspecialchars($matcher->next_char()).'</span>';
+        }
+        $wrongtail = '';
+        if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
+            $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
+        }
+        
+        $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail.'<br />';
+
+        parent::print_question_formulation_and_controls($question, $state, $cmoptions, $options);
+        /*
+        //Code from shortanswer question - doesn't see any way to avoid duplicating it now!!! - possibly could be avoided using $this->hintedmessage
         $readonly = empty($options->readonly) ? '' : 'readonly="readonly"';
         $formatoptions = new stdClass;
         $formatoptions->noclean = true;
@@ -192,7 +219,6 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $nameprefix = $question->name_prefix;
 
         /// Print question text and media
-
         $questiontext = format_text($question->questiontext,
                 $question->questiontextformat,
                 $formatoptions, $cmoptions->course);
@@ -236,6 +262,12 @@ class question_preg_qtype extends question_shortanswer_qtype {
 
         /// Removed correct answer, to be displayed later MDL-7496
         include("$CFG->dirroot/question/type/preg/display.html");
+        */
+    }
+
+    function get_display_html_path() {
+         global $CFG;
+         return $CFG->dirroot.'/question/type/preg/display.html';
     }
 }
 //// END OF CLASS ////
