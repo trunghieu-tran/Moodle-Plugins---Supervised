@@ -18,15 +18,37 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
      * @param MoodleQuickForm $mform the form being built.
      */
     function definition_inner(&$mform) {
+        global $CFG;
+        global $QTYPES;
 
+        $engines = $QTYPES[$this->qtype()]->available_engines();
+        $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
+        $mform->setDefault('engine','preg_php_matcher');
         $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
         $mform->setDefault('usehint',0);
         $mform->addElement('text', 'hintpenalty', get_string('hintpenalty','qtype_preg'), array('size' => 3));
         $mform->setDefault('hintpenalty','0.1');
+        $mform->setType('hintpenalty', PARAM_NUMBER);
+        $creategrades = get_grade_options();
+        $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
+        $mform->setDefault('hintgradeborder',1);
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
         $mform->setHelpButton('exactmatch', array('exactmatch',get_string('exactmatch','qtype_preg'),'qtype_preg'));
         $mform->setDefault('exactmatch',1);
-        $mform->addElement('text', 'rightanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
+        $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
+
+        //Set hint availability determined by engine capabilities
+        foreach ($engines as $engine => $enginename) {
+            require_once($CFG->dirroot . '/question/type/preg/'.$engine.'php');
+            $querymatcher = new $engine;
+            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+                $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
+            }
+            if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $mform->disabledIf('usehint','engine', 'eq', $engine);
+                $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
+            }
+        }
 
         parent::definition_inner($mform);
 
@@ -39,37 +61,26 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         global $QTYPES;
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
-        $trimmedrightanswer=trim(stripslashes_safe($data['rightanswer']));
-        $rightanswermatch=($trimmedrightanswer=='');
+        $trimmedcorrectanswer = trim(stripslashes_safe($data['correctanswer']));
+        $correctanswermatch = ($trimmedcorrectanswer=='');
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
-            if ($trimmedanswer !== '' && $data['fraction'][$key] == 1 && $trimmedrightanswer != '') {
-                if ($QTYPES[$this->qtype()]->match_regex(stripslashes_safe($trimmedanswer), $trimmedrightanswer, $data['exactmatch'], $data['usecase'])) {
-                    $rightanswermatch=true;
-                }
-                if ($data['usehint']) {
-                    $currentunsupp = dfa_preg_matcher::validate($trimmedanswer);
-                    if (!isset($errors['answersinstruct'])) {
-                        $errors['answersinstruct'] = '';
+            if ($trimmedanswer !== '') {
+                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],stripslashes_safe($trimmedanswer), $data['exactmatch'], $data['usecase'], (-1)*$i);
+                if($matcher->is_error_exists()) {//there are errors in the matching process
+                    $regexerrors = $matcher->get_errors();
+                    foreach ($regexerrors as $regexerror) {
+                        $errors['answer['.$key.']'] .= $regexerror.'<br/>';
                     }
-                    foreach ($currentunsupp as $operation) {
-                        $i = 0;
-                        if ($i<4) {
-                            $errors['answersinstruct'] .= (get_string($operation, 'qtype_preg') . '<br/>');
-                        } elseif ($i == 4) {
-                            $errors['answersinstruct'] .= (get_string('andother', 'qtype_preg') . '<br/>');
-                        }
-                    }
+                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)) {
+                    $correctanswermatch=true;
                 }
             }
         }
         
-        if ($rightanswermatch == false) {
-            $errors['rightanswer']=get_string('norightanswermatch','qtype_preg');
+        if ($correctanswermatch == false) {
+            $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
         }
-        //if ($data['usehint']) {
-        //    return $noerror;
-        //}
         return $errors;
     }
 

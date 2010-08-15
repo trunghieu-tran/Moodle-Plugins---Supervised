@@ -39,13 +39,13 @@ class preg_php_matcher extends preg_matcher {
     }
 
     /**
-    *check abstract syntax tree for nodes unsupported by matching engine
+    *check regular expression for errors
     @param node root of the tree
     @return bool is tree accepted
     */
-    protected function accept_tree($node) {
+    protected function accept_regex($node) {
         if (preg_match($this->regex,'test') === false) {
-            $this->errors[] = 'Regular expression incorrect';
+            $this->errors[] = get_string('incorrectregex','qtype_preg');
             return false;
         }
 

@@ -6,7 +6,6 @@
 
 /// QUESTION TYPE CLASS //////////////////
 
-define('HINT_GRADE_BORDER', 1);//if $answer->fraction >= HINT_GRADE_BORDER that hint will use this variant of answer.
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
@@ -19,10 +18,11 @@ class question_preg_qtype extends question_shortanswer_qtype {
     protected $hintmessage;
 
     /**
-    * returns an array of engine names
+    * returns an array of engines
     */
     public function available_engines() {
-        return array(1 => 'preg_php_matcher', 2 => 'dfa_preg_matcher');
+        return array('preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
+                        'dfa_preg_matcher' => get_string('dfa_preg_matcher','qtype_preg'));
     }
 
     function name() {
@@ -32,7 +32,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'question_preg');
-        array_push($extraquestionfields, 'rightanswer', 'exactmatch','usehint','hintpenalty');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch','usehint','hintpenalty','hintgradeborder','engine');
         return $extraquestionfields;
     }
 
@@ -87,7 +87,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
      * Override the parent class method, to show right answer.
      */
     function get_correct_responses(&$question, &$state) {
-        return array(''=>addslashes($question->options->rightanswer));
+        return array(''=>addslashes($question->options->correctanswer));
     }
     
     function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
@@ -114,7 +114,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $bestfitanswer = current($question->options->answers);
         if ($ispartialmatching) {
             foreach ($question->options->answers as $answer) {
-                if ($answer->fraction >= HINT_GRADE_BORDER) {
+                if ($answer->fraction >= $question->options->hintgradeborder) {
                     $bestfitanswer = $answer;
                     break;//anyone that fits border helps
                 }
@@ -136,7 +136,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
 
             //when hinting we should use only answers within hint border except full matching case
             //if engine doesn't support hinting we shoudn't bother with fitness too
-            if (!$ispartialmatching || $answer->fraction < HINT_GRADE_BORDER) {
+            if (!$ispartialmatching || $answer->fraction < $question->options->hintgradeborder) {
                 continue;
             }
 
@@ -207,7 +207,10 @@ class question_preg_qtype extends question_shortanswer_qtype {
             $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
         }
         
-        $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail.'<br />';
+        $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail
+        if (!empty($this->hintmessage)) {
+            $this->hintmessage .= '<br />';
+        {
 
         parent::print_question_formulation_and_controls($question, $state, $cmoptions, $options);
         /*
