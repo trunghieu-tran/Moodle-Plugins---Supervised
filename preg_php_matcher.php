@@ -57,14 +57,21 @@ class preg_php_matcher extends preg_matcher {
     @param str a string to match
     */
     protected function match_inner($str) {
+        //Preparing regexp
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes
             $for_regexp = implode('\/',explode('/',$for_regexp));
         }
         $for_regexp = '/'.$for_regexp.'/u';
         $for_regexp .= $this->modifiers;
-        $this->full = preg_match($for_regexp, $str);
 
+        //Do matching
+        $matches = array();
+        $this->full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
+        if ($this->full) {
+            $this->index_first = $matches[0][1];//$matches[0] - match with the whole regexp, array(0=> match, 1 => offset of this match)
+            $this->index_last = $this->index_first + strlen($matches[0][0]);
+        }
     }
 
 
