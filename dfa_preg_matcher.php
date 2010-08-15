@@ -42,7 +42,7 @@ class dfa_preg_matcher extends preg_matcher {
     var $built;
     var $result;
     
-    function name() {
+    public function name() {
         return 'dfa_preg_matcher';
     }
 
@@ -52,7 +52,7 @@ class dfa_preg_matcher extends preg_matcher {
     @param capability the capability in question
     @return bool is capanility supported
     */
-    function is_supporting($capability) {
+    public function is_supporting($capability) {
         switch($capability) {
         case preg_matcher::PARTIAL_MATCHING :
         case preg_matcher::NEXT_CHARACTER :
@@ -65,66 +65,38 @@ class dfa_preg_matcher extends preg_matcher {
         return false;
     }
     
-    /**
-    *Function validate regex, before built tree, it need for validation
-    *@param $regex - regular expirience for validation
-    *@return array of errors, if no error - return true.
-    */
-    static function validate($regex) {
-        $errors = array();
-        //building tree and dfa
-        $matcher = new dfa_preg_matcher($regex);
-        //validation tree
-        $for_regexp=$regex;
-        if (strpos($for_regexp,'/')!==false) {//escape any slashes
-            $for_regexp=implode('\/',explode('/',$for_regexp));
-        }
-        $for_regexp='/'.$for_regexp.'/u';
-        if (preg_match($for_regexp, 'something unimpotarnt') !== false) {
-            $matcher->accept_tree($matcher->roots[0]);
-        } else {
-            $errors[0] = 'incorrectregex';
-        }
-        if (count($matcher->finiteautomates, COUNT_RECURSIVE) > MAX_STATE_COUNT) {
-            $errors[1] = 'largedfa';
-        }
-        if (!$matcher->is_error_exists()) {
-            return true;
-        } else {
-            return $matcher->get_errors();
-        }
-    }
     protected function accept_node($node) {
         switch ($node->subtype) {
             case LEAF_LINK:
-                $this->errors[2] = 'link';
+                $this->flags['link'] = true;
                 return false;
             case NODE_SUBPATT:
-                $this->errors[3] = 'subpattern';
+                $this->flags['subpattern'] = true;
                 return false;
             case NODE_CONDSUBPATT:
-                $this->errors[4] = 'condsubpatt';
+                $this->flags['condsubpatt'] = true;
                 return false;
             case NODE_ASSERTTB:
-                $this->errors[5] = 'asserttb';
+                $this->flags['asserttb'] = true;
                 return false;
             case NODE_ASSERTFB:
-                $this->errors[6] = 'assertfb';
+                $this->flags['assertfb'] = true;
                 return false;
             case NODE_ASSERTFF:
-                $this->errors[7] = 'assertff';
+                $this->flags['assertff'] = true;
                 return false;
             case NODE_QUESTQUANT:
             case NODE_ITER:
             case NODE_PLUSQUANT:
             case NODE_QUANT:
                 if ($node->greed === false) {
-                    $this->errors[8] = 'lazyquant';
+                    $this->flags['lazyquant'] = true;
                 }
                 return false;
         }
         return true;
     }
+
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
     *@param index - number of tree for adding end's leaf.
@@ -789,7 +761,8 @@ class dfa_preg_matcher extends preg_matcher {
     function match_inner($response) {
         $result = $this->compare($response, 0);
         $this->full = $result->full;
-        $this->index = $result->index;
+        $this->index_first = 0;
+        $this->index_last = $result->index;
         $this->next = $result->next;
         return;
     }

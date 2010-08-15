@@ -41,6 +41,8 @@ class preg_matcher {
     protected $ast_root;
     //The error messages array
     protected $errors;
+    //Array with flags for unsupported node types
+    protected $flags;
 
     //Matching results
     protected $full;
@@ -64,7 +66,7 @@ class preg_matcher {
     * creates an empty object, used mainly to query engine capabilities
     */
     public function __construct() {
-        $this->errors = array('Empty matcher');
+        $this->errors = array(get_string('noregex','qtype_preg'));
         $this->full = false;
         $this->index_last = -1;
         $this->index_first = -1;
@@ -93,7 +95,10 @@ class preg_matcher {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = 'Error: modifier '.$modifiers[i].' isn\'t supported by engine '.$this->name.'.';
+                    $a = new stdClass;
+                    $a->modifier = $modifiers[i];
+                    $a->classname = $this->name;
+                    $this->errors[] = get_string('unsupportedmodifier','qtype_preg',$a);
                 }
             }
         }
@@ -108,7 +113,7 @@ class preg_matcher {
         }
 
         //check regular expression for validity
-        $this->accept_tree($this->ast_root);
+        $this->accept_regex($this->ast_root);
         }
     }
 
@@ -129,38 +134,43 @@ class preg_matcher {
     }
 
     /**
-    *check abstract syntax tree for nodes unsupported by matching engine
+    *check regular expression for errors using absract syntax tree
     @param node root of the tree
     @return bool is tree accepted
     */
-    protected function accept_tree($node) {
+    protected function accept_regex($node) {
         $this->accept_node($node);
         if ($node->type == NODE) {
             if ($node->subtype == NODE_CONDSUBPATT) {
-                $this->accept_tree($node->thirdop);
+                $this->accept_regex($node->thirdop);
             }
             if($node->subtype == NODE_CONC || $node->subtype == NODE_ALT || $node->subtype == NODE_CONDSUBPATT) {
-                $this->accept_tree($node->secop);
+                $this->accept_regex($node->secop);
             }
-            $this->accept_tree($node->firop);
+            $this->accept_regex($node->firop);
         }
+
+        //Add error messages for unsupported nodes
+        foreach ($this->flags as $key => $value) {
+            $this->errors[] = get_string($key, 'qtype_preg').' '.get_string('unsupported','qtype_preg');
+        }
+
         if (empty($this->errors)) {
             return true;
         } else {
             return false;
         }
 
-
-
     }
 
     /**
     *checks if this abstract sytax tree node supported by this matching engine, adding error messages for unsupported nodes
+    *This function should add names of strings for unsupported operations to $this->flags
     @param node - node to check
     @return bool is node accepted
     */
     protected function accept_node($node) {
-        $this->errors[] = 'Abstract matcher don\'t support anything! Please use real matcher class.';
+        $this->flags['noabstractaccept'] = true;
         return false;
     }
 

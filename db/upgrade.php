@@ -27,21 +27,38 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
     /// Define field exactmatch to be added to question_preg
         $table = new XMLDBTable('question_preg');
         $field = new XMLDBField('exactmatch');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'rightanswer','usehint');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'rightanswer');
         /// Launch add field exactmatch
         $result = $result && add_field($table, $field);
+    }
+
+    if ($result && $oldversion < 2010080800) {
+        $table = new XMLDBTable('question_preg');
         /// Define field usehint to be added to question_preg
         $field = new XMLDBField('usehint');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'exactmatch', 'hintpenalty');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'exactmatch');
         /// Launch add field usehint
         $result = $result && add_field($table, $field);
         /// Define field hintpenalty to be added to question_preg
         $field = new XMLDBField('hintpenalty');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '3', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
+        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
         /// Launch add field hintpenalty
         $result = $result && add_field($table, $field);
     }
 
+    if ($result && $oldversion < 2010081600) {
+        $table = new XMLDBTable('question_preg');
+        //Adding two new fields
+        $field = new XMLDBField('hintgradeborder');
+        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '1', 'hintpenalty');
+        $result = $result && add_field($table, $field);
+        $field = new XMLDBField('engine');
+        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, 'preg_php_matcher', 'hintgradeborder');
+        $result = $result && add_field($table, $field);
+        //Renaming rightanswer field to correctanswer
+        $field =& $table->getField('rightanswer');
+        $result = $result && rename_field($table, $field, 'correctanswer');
+    }
 
     return $result;
 
