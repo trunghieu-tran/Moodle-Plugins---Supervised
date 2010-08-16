@@ -39,7 +39,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
 
         //Set hint availability determined by engine capabilities
         foreach ($engines as $engine => $enginename) {
-            require_once($CFG->dirroot . '/question/type/preg/'.$engine.'php');
+            require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
             $querymatcher = new $engine;
             if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
@@ -61,14 +61,16 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         global $QTYPES;
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
-        $trimmedcorrectanswer = trim(stripslashes_safe($data['correctanswer']));
+        $trimmedcorrectanswer = trim($data['correctanswer']);
         $correctanswermatch = ($trimmedcorrectanswer=='');
+        $i = 0;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],stripslashes_safe($trimmedanswer), $data['exactmatch'], $data['usecase'], (-1)*$i);
+                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],$trimmedanswer, $data['exactmatch'], $data['usecase'], (-1)*$i);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
+                    $errors['answer['.$key.']'] = '';
                     foreach ($regexerrors as $regexerror) {
                         $errors['answer['.$key.']'] .= $regexerror.'<br/>';
                     }
@@ -76,6 +78,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                     $correctanswermatch=true;
                 }
             }
+            $i++;
         }
         
         if ($correctanswermatch == false) {

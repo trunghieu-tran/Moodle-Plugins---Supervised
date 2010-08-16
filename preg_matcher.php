@@ -63,25 +63,11 @@ class preg_matcher {
     }
 
     /**
-    * creates an empty object, used mainly to query engine capabilities
-    */
-    public function __construct() {
-        $this->errors = array(get_string('noregex','qtype_preg'));
-        $this->full = false;
-        $this->index_last = -1;
-        $this->index_first = -1;
-        $this->next = '';
-        $this->left = -1;
-        $this->result_cache = array();
-        $this->regex = null;
-    }
-
-    /**
     *parse regex and do all necessary preprocessing
     @param regex - regular expression for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    public function __construct($regex, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
         $this->full = false;
         $this->index_last = -1;
@@ -89,6 +75,11 @@ class preg_matcher {
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
+        $this->flags = array();
+
+        if ($regex === null) {
+            return;
+        }
 
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
@@ -96,8 +87,8 @@ class preg_matcher {
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
                     $a = new stdClass;
-                    $a->modifier = $modifiers[i];
-                    $a->classname = $this->name;
+                    $a->modifier = $modifiers[$i];
+                    $a->classname = $this->name();
                     $this->errors[] = get_string('unsupportedmodifier','qtype_preg',$a);
                 }
             }
@@ -114,7 +105,6 @@ class preg_matcher {
 
         //check regular expression for validity
         $this->accept_regex($this->ast_root);
-        }
     }
 
     /**

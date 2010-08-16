@@ -15,7 +15,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     protected $matchers_cache = array();
 
     //Neded to pass hinted message to the question form, should be deleted when moving for renderers
-    protected $hintmessage;
+    protected $hintmessage = '';
 
     /**
     * returns an array of engines
@@ -47,7 +47,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     */
     public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null) {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
             $matcher =& $this->matchers_cache[$answerid];
@@ -79,8 +79,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
         $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-        return $matcher->match(trim(stripslashes_safe($state->responses['']));
-        }
+        return $matcher->match($state->responses['']);
     }
 
   /*
@@ -104,7 +103,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     */
     function grade_responses(&$question, &$state, $cmoptions) {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$question->options->engine.'php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$question->options->engine.'.php');
         $querymatcher = new $question->options->engine;//this matcher will be used to query engine capabilities
         $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
         $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
@@ -125,7 +124,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $full = false;
         foreach ($question->options->answers as $answer) {
             $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-            $full = $matcher->match(stripslashes_safe($state->responses['']));
+            $full = $matcher->match($state->responses['']);
 
             //check full match
             if ($full) {//don't need to look more if we find full match
@@ -180,37 +179,40 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
 
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
-        //form hint messages
-        $answer = $state->responses['__answer'];//TODO - check this is working, or it is in $state->last_graded->responses
-        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-        $reponse = stripslashes_safe($state->responses['']);
-        $matcher->match($response);
+        if (array_key_exists('__answer',$state->responses)) {//for the first time - no hint message
+            //form hint messages
+            $answer = $state->responses['__answer'];//TODO - check this is working, or it is in $state->last_graded->responses
+            $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+            $response = $state->responses[''];
+            $matcher->match($response);
 
-        //Calculate strings for response coloring
-        //TODO - change actual style definition to the classes to work with themes correctly, requires investigation how add a new class for plugin...
-        $firstindex = $matcher->first_correct_character_index();
-        $lastindex = $matcher->last_correct_character_index();
-        $wronghead = '';
-        if ($firstindex > 0) {//if there is wrong heading
-            $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
-        }
-        $correctpart = '';
-        if ($firstindex != -1) {//there were any match
-            $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
-        }
-        $hintedcharacter = '';
-        if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
-            $hintedcharacter = '<span style="background-color:#FFFF00">'.htmlspecialchars($matcher->next_char()).'</span>';
-        }
-        $wrongtail = '';
-        if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
-            $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
-        }
+            //Calculate strings for response coloring
+            //TODO - change actual style definition to the classes to work with themes correctly, requires investigation how add a new class for plugin...
+            $firstindex = $matcher->first_correct_character_index();
+            $lastindex = $matcher->last_correct_character_index();
+            $wronghead = '';
+            if ($firstindex > 0) {//if there is wrong heading
+                $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
+            }
+            $correctpart = '';
+            if ($firstindex != -1) {//there were any match
+                $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
+            }
+            $hintedcharacter = '';
+            if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
+                $hintedcharacter = '<span style="background-color:#FFFF00">'.htmlspecialchars($matcher->next_char()).'</span>';
+            }
+            $wrongtail = '';
+            if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
+                $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
+            }
         
-        $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail
-        if (!empty($this->hintmessage)) {
-            $this->hintmessage .= '<br />';
-        {
+            $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
+            if (!empty($this->hintmessage)) {
+                $this->hintmessage .= '<br />';
+            }
+        }
+
 
         parent::print_question_formulation_and_controls($question, $state, $cmoptions, $options);
         /*

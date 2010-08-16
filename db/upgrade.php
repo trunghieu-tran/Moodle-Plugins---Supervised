@@ -19,52 +19,62 @@
 
 function xmldb_qtype_preg_upgrade($oldversion=0) {
 
-    global $CFG, $THEME, $db;
+    global $CFG, $DB;
+    $dbman = $DB->get_manager();
 
-    $result=true;
-    if ($result && $oldversion < 2010072201) {
+    if ($oldversion < 2010072201) {
 
-    /// Define field exactmatch to be added to question_preg
-        $table = new XMLDBTable('question_preg');
-        $field = new XMLDBField('exactmatch');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'rightanswer');
+        /// Define field exactmatch to be added to question_preg
+        $table = new xmldb_table('question_preg');
+        $field = new xmldb_field('exactmatch', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'rightanswer');
         /// Launch add field exactmatch
-        $result = $result && add_field($table, $field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2010072201, 'qtype', 'preg');
     }
 
-    if ($result && $oldversion < 2010080800) {
-        $table = new XMLDBTable('question_preg');
+    if ($oldversion < 2010080800) {
+        $table = new xmldb_table('question_preg');
         /// Define field usehint to be added to question_preg
-        $field = new XMLDBField('usehint');
-        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, null, '0', 'exactmatch');
-        /// Launch add field usehint
-        $result = $result && add_field($table, $field);
+        $field = new xmldb_field('usehint', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'exactmatch');
+        // Conditionally launch add field usehint
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
         /// Define field hintpenalty to be added to question_preg
-        $field = new XMLDBField('hintpenalty');
-        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
+        $field = new xmldb_field('hintpenalty', XMLDB_TYPE_FLOAT, '4, 2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'usehint');
         /// Launch add field hintpenalty
-        $result = $result && add_field($table, $field);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2010080800, 'qtype', 'preg');
     }
 
-    if ($result && $oldversion < 2010081600) {
-        $table = new XMLDBTable('question_preg');
-        //Adding two new fields
-        $field = new XMLDBField('hintgradeborder');
-        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '1', 'hintpenalty');
-        $result = $result && add_field($table, $field);
-        $field = new XMLDBField('engine');
-        $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, 'preg_php_matcher', 'hintgradeborder');
-        $result = $result && add_field($table, $field);
-        //Renaming rightanswer field to correctanswer
-        $field =& $table->getField('rightanswer');
-        $result = $result && rename_field($table, $field, 'correctanswer');
+    if ($oldversion < 2010081600) {
+        $table = new xmldb_table('question_preg');
+        // Define field hintgradeborder to be added to question_preg
+        $field = new xmldb_field('hintgradeborder', XMLDB_TYPE_FLOAT, '4, 2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '1', 'hintpenalty');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field engine to be added to question_preg
+         $field = new xmldb_field('engine', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'preg_php_matcher', 'hintgradeborder');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Rename field rightanswer on table question_preg to correctanswer
+        $table = new xmldb_table('question_preg');
+        $field = new xmldb_field('rightanswer', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'usecase');
+        // Launch rename field rightanswer
+        $dbman->rename_field($table, $field, 'correctanswer');
+
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2010081600, 'qtype', 'preg');
     }
 
-    return $result;
+    return true;
 
-/// if ($result && $oldversion < YYYYMMDD00) { //New version in version.php
-///     $result = result of "/lib/ddllib.php" function calls
-/// }
 }
 
 ?>
