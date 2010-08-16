@@ -41,7 +41,7 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         $result = $result && add_field($table, $field);
         /// Define field hintpenalty to be added to question_preg
         $field = new XMLDBField('hintpenalty');
-        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
+        $field->setAttributes(XMLDB_TYPE_FLOAT, '4,2', null, XMLDB_NOTNULL, null, null, null, '0', 'usehint');
         /// Launch add field hintpenalty
         $result = $result && add_field($table, $field);
     }
@@ -50,7 +50,7 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         $table = new XMLDBTable('question_preg');
         //Adding two new fields
         $field = new XMLDBField('hintgradeborder');
-        $field->setAttributes(XMLDB_TYPE_FLOAT, '3', null, XMLDB_NOTNULL, null, null, null, '1', 'hintpenalty');
+        $field->setAttributes(XMLDB_TYPE_FLOAT, '4,2', null, XMLDB_NOTNULL, null, null, null, '1', 'hintpenalty');
         $result = $result && add_field($table, $field);
         $field = new XMLDBField('engine');
         $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, 'preg_php_matcher', 'hintgradeborder');

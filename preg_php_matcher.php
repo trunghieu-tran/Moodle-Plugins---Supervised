@@ -44,7 +44,13 @@ class preg_php_matcher extends preg_matcher {
     @return bool is tree accepted
     */
     protected function accept_regex($node) {
-        if (preg_match($this->regex,'test') === false) {
+        $for_regexp = $this->regex;
+        if (strpos($for_regexp,'/') !== false) {//escape any slashes
+            $for_regexp = implode('\/',explode('/',$for_regexp));
+        }
+        $for_regexp = '/'.$for_regexp.'/u';
+
+        if (preg_match($for_regexp,'test') === false) {
             $this->errors[] = get_string('incorrectregex','qtype_preg');
             return false;
         }
@@ -70,7 +76,7 @@ class preg_php_matcher extends preg_matcher {
         $this->full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
         if ($this->full) {
             $this->index_first = $matches[0][1];//$matches[0] - match with the whole regexp, array(0=> match, 1 => offset of this match)
-            $this->index_last = $this->index_first + strlen($matches[0][0]);
+            $this->index_last = $this->index_first + strlen($matches[0][0]) - 1;
         }
     }
 
