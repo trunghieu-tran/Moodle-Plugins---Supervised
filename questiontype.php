@@ -196,7 +196,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         }
         $correctpart = '';
         if ($firstindex != -1) {//there were any match
-            $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex)).'</span>';
+            $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
         }
         $hintedcharacter = '';
         if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
