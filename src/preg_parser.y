@@ -5,16 +5,21 @@
 %include_class {
     private $root;
     private $lock;
+    private $error;
     function __construct() {
         $this->lock = new stdClass;
         $this->lock->start = false;
         $this->lock->end = false;
-}
+        $this->error = false;
+    }
     function get_root() {
         return $this->root;
     }
     function get_lock() {
         return $this->lock;
+    }
+    function get_error() {
+        return $this->error;
     }
     static function is_conc($prevtoken, $currtoken) {
         $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
@@ -29,6 +34,9 @@
         $flag = ($flag1 && $flag2 && isset($prevtoken));
         return $flag;
     }
+}
+%parse_failure {
+    $this->error = true;
 }
 %left ALT.
 %left CONC.

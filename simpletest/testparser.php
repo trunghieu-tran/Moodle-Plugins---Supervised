@@ -422,5 +422,45 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($lock->start === false && $lock->end === false);
     }
+    function test_parser_error() {
+        $parser = new preg_parser_yyParser;
+        $regex = '((ab|cd)ef';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $this->assertTrue($parser->get_error());
+    }
+    function test_parser_no_error() {
+        $parser = new preg_parser_yyParser;
+        $regex = '((ab|cd)ef)';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $this->assertFalse($parser->get_error());
+    }
 }
 ?>
