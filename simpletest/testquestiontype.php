@@ -480,6 +480,28 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
+    function test_compare_unclock() {//ab
+        $this->qtype->finiteautomates[0][0] = new finite_automate_state;
+        $this->qtype->finiteautomates[0][1] = new finite_automate_state;
+        $this->qtype->finiteautomates[0][2] = new finite_automate_state;
+        $this->qtype->finiteautomates[0][0]->passages[1] = 1;
+        $this->qtype->finiteautomates[0][1]->passages[2] = 2;
+        $this->qtype->finiteautomates[0][2]->passages[STREND] = -1;
+        $this->qtype->connection[0][1] = 'a';
+        $this->qtype->connection[0][2] = 'b';
+        $result = $this->qtype->compare('OabO', 0, 0, false);
+        $this->assertFalse($result->full);
+        $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 0);
+        $result = $this->qtype->compare('OabO', 0, 1, false);
+        $this->assertTrue($result->full);
+        $this->assertTrue($result->index == 2 && $result->next === 0 && $result->offset == 1);
+        $result = $this->qtype->compare('OabO', 0, 1, true);
+        $this->assertFalse($result->full);
+        $this->assertTrue($result->index == 2 && $result->next === 0 && $result->offset == 1);
+        $result = $this->qtype->compare('OabO', 0, 2, false);
+        $this->assertFalse($result->full);
+        $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 2);
+    }
     //General tests, testing parser + buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
     //dfa_preg_matcher without input and output data.
     function test_general_repeat_characters() {
