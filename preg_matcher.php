@@ -36,6 +36,7 @@ class preg_matcher {
     //Initial data
     protected $regex;
     protected $modifiers;
+    protected $lock;
 
     //The root of abstract syntax tree of the regular expression
     protected $ast_root;
@@ -286,6 +287,7 @@ class preg_matcher {
         }
         $parser->doParse(0, 0);
         $this->ast_root = $parser->get_root();
+        $this->lock = $parser->get_lock();
         fclose($pseudofile);
     }
 }
