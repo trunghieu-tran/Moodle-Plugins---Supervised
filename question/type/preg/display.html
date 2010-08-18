@@ -1,0 +1,20 @@
+<div class="qtext">
+  <?php echo $questiontext; ?>
+</div>
+
+<div class="ablock clearfix">
+  <div class="prompt">
+    <?php echo get_string("answer", "quiz").': '; ?>
+  </div>
+  <div class="answer">
+    <input type="text" class="<?php echo $class; ?>" <?php echo "$readonly $inputname $value"; ?> size="80"/>
+    <?php echo $feedbackimg; ?>
+  </div>
+  <?php $feedback = $this->hintmessage.$feedback;/*ugly hack to add hint message*/
+  if ($feedback) { ?>
+    <div class="feedback">
+      <?php echo $feedback ?>
+    </div>
+  <?php } ?>
+  <?php $this->print_question_submit_buttons($question, $state, $cmoptions, $options); ?>
+</div>
