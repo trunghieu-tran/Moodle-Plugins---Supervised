@@ -14,11 +14,10 @@
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-define('MAX_STATE_COUNT', 64);/* if you put large constant here, than big dfa will be
-                                  correct, but big dfa will be build slow, if you small
-                                  constant here dfa will must small, but complexy regex
-                                  will be get error on validation.
-                               */
+define('MAX_STATE_COUNT', 250);     //    if you put large constant here, than big dfa will be
+define('MAX_PASSAGE_COUNT', 250);    //    correct, but big dfa will be build slow, if you small
+                                     //    constant here dfa will must small, but complexy regex
+                                     //    will be get error on validation
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -280,6 +279,8 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index number of assert (0 for main regex) for which building fa
     */
     function buildfa($index) {
+        $statecount = 0;
+        $passcount = 0;
         $this->maxnum = 0;//no one leaf numerated, yet.
         $this->finiteautomates[$index][0] = new finite_automate_state;
         //form the map of following
@@ -319,15 +320,21 @@ class dfa_preg_matcher extends preg_matcher {
                         array_push($this->finiteautomates[$index], $newstate);//add it to fa's array
                         end($this->finiteautomates[$index]);
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
+                        $statecount++;
                     } else {
                         //else do passage point to state, which has in fa already
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 } else {
                     //if this passage point to end state
+                    //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
                     $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
                 }
-                //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
+                $passcount++;
+                if (($passcount > MAX_PASSAGE_COUNT || $statecount > MAX_STATE_COUNT) && MAX_STATE_COUNT != 0 && MAX_PASSAGE_COUNT != 0) {
+                    $this->errors[] = get_string('toolargedfa', 'qtype_preg');
+                    return;
+                }
             }
         }
     }
