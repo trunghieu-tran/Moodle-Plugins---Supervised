@@ -336,6 +336,8 @@ class dfa_preg_matcher extends preg_matcher {
     *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
     *@param string - string for compare with regex
     *@param assertnumber - number of assert with which string will compare, 0 for main regex
+    *@param offset - index of character in string which must be beginning for match
+    *@param endlock - if endlock == false than string can continue after end of matching, else string must end on end of matching
     *@return object with three property:
     *   1)index - index of last matching character (integer)
     *   2)full  - fullnes of matching (boolean)
