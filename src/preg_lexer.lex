@@ -151,7 +151,7 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_METASYMBOLDOT));
     return $res;
 }
-<YYINITIAL> [^\[\]\\*+?{}()|.] {
+<YYINITIAL> [^\[\]\\*+?{}()|.^$] {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, $this->yytext()));
     return $res;
 }
@@ -212,6 +212,14 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 }
 <YYINITIAL> \\t {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, chr(9)));
+    return $res;
+}
+<YYINITIAL> "^" {
+    $res = form_res(preg_parser_yyParser::STARTLOCK, 0);
+    return $res;
+}
+<YYINITIAL> "$" {
+    $res = form_res(preg_parser_yyPARSER::ENDLOCK, 0);
     return $res;
 }
 <CHARCLASS> \\\\ {
