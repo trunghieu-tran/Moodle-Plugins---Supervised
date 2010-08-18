@@ -3,10 +3,19 @@
     require_once($CFG->dirroot . '/question/type/preg/node.php');
 }
 %include_class {
+    private $root;
+    private $lock;
+    function __construct() {
+        $this->lock = new stdClass;
+        $this->lock->start = false;
+        $this->lock->end = false;
+}
     function get_root() {
         return $this->root;
     }
-    private $root;
+    function get_lock() {
+        return $this->lock;
+    }
     static function is_conc($prevtoken, $currtoken) {
         $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
                   $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
@@ -186,6 +195,16 @@ expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A->thirdop->firop = B;
 }
 expr(A) ::= PARSLEAF(B). {
+    A = new node;
+    A = B;
+}
+expr(A) ::= STARTLOCK(B) expr(C). {
+    $this->lock->start = true;
+    A = new node;
+    A = C;
+}
+expr(A) ::= expr(B) ENDLOCK(C). {
+    $this->lock->end = true;
     A = new node;
     A = B;
 }
