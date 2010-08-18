@@ -163,6 +163,20 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 135);
     }
+    function test_lexer_locks() {
+        //^a|b$
+        $regex = '^a|b$';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::STARTLOCK);
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::ENDLOCK);
+    }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
         $parser = new preg_parser_yyParser;
@@ -315,6 +329,98 @@ class parser_test extends UnitTestCase {
         $this->assertTrue(!$res->full && $res->index == 57 && ($res->next == 'a' || $res->next == 'b'));
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
         $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
+    }
+    function test_parser_two_locks() {
+        $parser = new preg_parser_yyParser;
+        $regex = '^a$';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $lock = $parser->get_lock();
+        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($lock->start === true && $lock->end === true);
+    }
+    function test_parser_start_lock() {
+        $parser = new preg_parser_yyParser;
+        $regex = '^a';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $lock = $parser->get_lock();
+        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($lock->start === true && $lock->end === false);
+    }
+    function test_parser_end_lock() {
+        $parser = new preg_parser_yyParser;
+        $regex = 'a$';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $lock = $parser->get_lock();
+        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($lock->start === false && $lock->end === true);
+    }
+    function test_parser_no_locks() {
+        $parser = new preg_parser_yyParser;
+        $regex = 'a';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $curr = -1;
+        while ($token = $lexer->nextToken()) {
+            $prev = $curr;
+            $curr = $token->type;
+            if (preg_parser_yyParser::is_conc($prev, $curr)) {
+                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                $parser->doParse($token->type, $token->value);
+            } else {
+                $parser->doParse($token->type, $token->value);
+            }
+        }
+        $parser->doParse(0, 0);
+        $root = $parser->get_root();
+        $lock = $parser->get_lock();
+        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($lock->start === false && $lock->end === false);
     }
 }
 ?>
