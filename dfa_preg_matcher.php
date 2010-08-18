@@ -350,6 +350,9 @@ class dfa_preg_matcher extends preg_matcher {
         $next = 0;// character can put on next position, 0 for full matching with regex string
         $maxindex = strlen($string);//string cannot match with regex after end, if mismatch with assert - index of last matching with assert character
         $currentstate = 0;//finite automate begin work at start state, zero index in array
+        $substringmatch = new stdClass;
+        $substringmatch->full = false;
+        $substringmatch->index = -1;
         do {
         /*check current character while: 1)checked substring match with regex
                                          2)current character isn't end of string
@@ -403,6 +406,8 @@ class dfa_preg_matcher extends preg_matcher {
                     $foundkey = STREND;
                 }
                 $maybeend = true;//may be end.
+                $substringmatch->full = true;
+                $substringmatch->index = $index;
             }
             $index++;
             if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
@@ -442,14 +447,17 @@ class dfa_preg_matcher extends preg_matcher {
                 $result->index = -1;
             } else {
                 $result->index = $offset + $index - 2;
-                $assertrequirenext = false;
             }
+            $assertrequirenext = false;
         } else {
             $result->index = $maxindex;
             $assertrequirenext = true;
         }
-       if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endlock) {//if all string match with regex.
+        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endlock) {//if all string match with regex.
             $result->full = true;
+        } elseif ($substringmatch->full && !$endlock) {
+            $result->full = true;
+            $result->index = $substringmatch->index -1;
         } else {
             $result->full = false;
         }
