@@ -769,7 +769,6 @@ class dfa_preg_matcher extends preg_matcher {
             return;
         }
         parent::__construct($regex, $modifiers);
-        $this->roots[0] = $this->ast_root;
         //building finite automates
         if (strpos($modifiers, 'i') !== false) {
             dfa_preg_matcher::for_case_insensitive($this->roots[0]);
