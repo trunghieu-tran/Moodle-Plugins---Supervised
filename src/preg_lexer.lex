@@ -1,6 +1,6 @@
 <?php # vim:ft=php
 require_once($CFG->dirroot . '/question/type/preg/jlex.php');
-require_once($CFG->dirroot . '/question/type/preg/parser_preg.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/node.php');
 
 function form_node($type, $subtype, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
