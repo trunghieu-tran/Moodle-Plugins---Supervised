@@ -766,7 +766,19 @@ class dfa_preg_matcher extends preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        $result = $this->compare($response, 0);
+        if ($this->lock->start) {
+            $result = $this->compare($response, 0);
+        } else {
+            $result = new stdClass;
+            $result->full = false;
+            $result->index = -1;
+            for ($i=0; $i<strlen($response) && !$result->full; $i++) {
+                $tmpres = $this->compare($response, 0, $i, $this->lock->end);
+                if ($tmpres->full || $tmpres->index > $result->index) {
+                    $result = $tmpres;
+                }
+            }
+        }
         $this->full = $result->full;
         $this->index_first = 0;
         $this->index_last = $result->index;

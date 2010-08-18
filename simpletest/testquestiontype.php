@@ -505,7 +505,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
     //General tests, testing parser + buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
     //dfa_preg_matcher without input and output data.
     function test_general_repeat_characters() {
-        $matcher = new dfa_preg_matcher('(?:a|b)*abb');
+        $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('cd');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a');
@@ -526,7 +526,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 33 && $matcher->next_char() ===0);
     }
     function test_general_assert() {
-        $matcher = new dfa_preg_matcher('a(?=.*b)[xcvbnm]*');
+        $matcher = new dfa_preg_matcher('^a(?=.*b)[xcvbnm]*$');
         $result1 = $matcher->match('an');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
@@ -545,7 +545,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
     *   you may use it as example of test
     */
     function test_general_two_asserts() {
-        $matcher = new dfa_preg_matcher('a(?=b)(?=.*c)[xcvbnm]*');//put regular expirience in constructor for building dfa.
+        $matcher = new dfa_preg_matcher('^a(?=b)(?=.*c)[xcvbnm]*$');//put regular expirience in constructor for building dfa.
         /*  
         *   call match method for matching string with regex, string is argument, regex was got in constructor,
         *   results of matching get with method
