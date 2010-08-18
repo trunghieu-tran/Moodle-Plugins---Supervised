@@ -739,7 +739,19 @@ class dfa_preg_matcher extends preg_matcher {
             $node->chars = 'METASYBOLD_';//METASYMBOL_DOT is service word, METASYBOLD_ is equivalent character class.
         }  
     }
-
+    
+    static function for_case_insensitive($node) {
+        if ($node->type == LEAF) {
+            if ($node->subtype == LEAF_CHARCLASS) {
+                $node->chars = strtolower($node->chars);
+            }
+        } else {//if node
+            dfa_preg_matcher::for_case_insensitive($node->firop);
+            if ($node->subtype == NODE_ALT || $node->subtype == NODE_CONC) {
+                dfa_preg_matcher::for_case_insensitive($node->secop);
+            }
+        }
+    }
     /**
     *get regex and build finite automates
     @param regex - regular expirience for which will be build finite automate
@@ -752,6 +764,9 @@ class dfa_preg_matcher extends preg_matcher {
         parent::__construct($regex, $modifiers);
         $this->roots[0] = $this->ast_root;
         //building finite automates
+        if (strpos($modifiers, 'i') !== false) {
+            dfa_preg_matcher::for_case_insensitive($this->roots[0]);
+        }
         dfa_preg_matcher::convert_tree($this->roots[0]);
         $this->append_end(0);
         $this->buildfa(0);
@@ -767,6 +782,13 @@ class dfa_preg_matcher extends preg_matcher {
     function build_tree($regex) {
         parent::build_tree($regex);
         $this->roots[0] = $this->ast_root;
+    }
+    public function match($str) {
+        if (strpos($this->modifiers, 'i') !== false) {
+            $str = strtolower($str);
+        }
+        $res = parent::match($str);
+        return $res;
     }
     /**
     *function get string and compare it with regex

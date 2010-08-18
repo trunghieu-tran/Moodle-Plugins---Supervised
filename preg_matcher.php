@@ -68,7 +68,7 @@ class preg_matcher {
     @param regex - regular expression for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    public function __construct($regex, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
         $this->full = false;
         $this->index_last = -1;
@@ -112,7 +112,7 @@ class preg_matcher {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return '';//no modifiers support by default
+        return 'i';//no modifiers support by default
     }
 
     /**
