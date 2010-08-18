@@ -145,5 +145,11 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
     }
+    function test_lock() {
+        $matcher = new dfa_preg_matcher('ab');
+        $matcher->match('OabO');
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0 && $matcher->first_correct_character_index() == 1);
+    }
 }
 ?>
