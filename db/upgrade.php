@@ -56,8 +56,13 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         $field->setAttributes(XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, null, 'preg_php_matcher', 'hintgradeborder');
         $result = $result && add_field($table, $field);
         //Renaming rightanswer field to correctanswer
-        $field =& $table->getField('rightanswer');
-        $result = $result && rename_field($table, $field, 'correctanswer');
+        //$field = $table->getField('rightanswer'); it not work, field === null
+        $field = new XMLDBField('rightanswer');
+        $oldfield = new XMLDBField('correctanswer');
+        if (field_exists($table, $field) && !field_exists($table, $oldfield)) {
+            $field->setAttributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, 'usecase', 'exactmatch');
+            $result = $result && rename_field($table, $field, 'correctanswer');
+        }
     }
 
     return $result;
