@@ -472,19 +472,15 @@ class dfa_preg_matcher extends preg_matcher {
             $result->next = 0;
         //determine next character, which will be correct and increment lenght of matching substring.
         } elseif ($full && $offset + $index-2 < $maxindex) {//if assert not border next character
-            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            if ($key > 0 && $key < DOT) {//if positive character class
+            $key = $this->wave($currentstate, $assertnumber);
+            if ($key>0) {
                 $result->next = $this->connection[$assertnumber][$key][0];
-                if($key > DOT && next($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) {
-                    $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                    $result->next = $this->connection[$assertnumber][$key][0];
+            } else {//TODO: need better algoritm for search next character in negative CC
+                $char = 'a';
+                while (ord($char) < 255 && strpos($this->connection[$assertnumber][-$key], $char) !== false) {
+                    $char = chr(ord($char)+1);
                 }
-            }elseif ($key > DOT) {
-                $result->next = 'D';
-            } else {
-                for($c = 'a'; strpos($this->connection[$assertnumber][abs($key)], $c) !== false; $c++);//TODO: need better algorithm for determine next character in negative CC
-                $result->next = $c;
+                $result->next = $char;
             }
         } else {
             $result->next = $next;
@@ -492,6 +488,41 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     
+    /**
+    *Function search for shortest way from current state to end state
+    @param current - number of current state dfa
+    @param assertnum - number of dfa for which do search
+    @return number of state, which is first step on shortest way to end state
+    */
+    function wave($current, $assertnum) {
+        //form start state of waves: start chars, current states of dfa and states of next step
+        $i = 0;
+        foreach ($this->finiteautomates[$assertnum][$current]->passages as $key => $passage) {
+            $front[$i] = new stdClass;
+            $front[$i]->charnum = $key;
+            $front[$i]->currentstep[] = $passage;
+            $i++;
+        }
+        $found = false;
+        while (!$found) {//while not found way to end state
+            foreach ($front as $i => $curr) {//for each start char and it's subfront
+                foreach ($curr->currentstep as $step) {//for all state if current subfront
+                    foreach ($this->finiteautomates[$assertnum][$step]->passages as $passage) {//for all passage in this state
+                        if ($passage != $step) {//if passage not to self
+                            if ($passage == -1) {//if passage to end state
+                                $found = true;
+                                return $front[$i]->charnum;
+                            } else {
+                                $front[$i]->nextstep[] = $passage;
+                            }
+                        }
+                    }
+                }
+                $front[$i]->currentstep = $front[$i]->nextstep;
+                $front[$i]->nextstep = array();
+            }
+        }
+    }
     
     /**
     *function append array2 to array1, non unique values not add
