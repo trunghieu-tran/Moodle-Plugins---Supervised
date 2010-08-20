@@ -662,5 +662,31 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
     }
+    //Unit test for wave
+    function test_wave_easy() {
+        $matcher = new dfa_preg_matcher('abcd');
+        $matcher->match('abce');
+        $this->assertTrue($matcher->next_char() === 'd');
+    }
+    function test_wave_iteration() {
+        $matcher = new dfa_preg_matcher('abc*d');
+        $matcher->match('abB');
+        $this->assertTrue($matcher->next_char() === 'd');
+    }
+    function test_wave_alternative() {
+        $matcher = new dfa_preg_matcher('a(?:cdgfhghghgdhgfhdgfydgfdhgfdhgfdhgfhdgfhdgfhdgfydgfy|b)');
+        $matcher->match('a_incorrect');
+        $this->assertTrue($matcher->next_char() === 'b');
+    }
+    function test_wave_repeat_chars() {
+        $matcher = new dfa_preg_matcher('(?:a|b)*abb');
+        $matcher->match('ababababbbbaaaabbbabbbab');
+        $this->assertTrue($matcher->next_char() === 'b');
+    }
+    function test_wave_complex() {
+        $matcher = new dfa_preg_matcher('(?:fgh|ab?c)+');
+        $matcher->match('something');
+        $this->assertTrue($matcher->next_char() === 'a');
+    }
 }
 ?>
