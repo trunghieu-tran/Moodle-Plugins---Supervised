@@ -148,6 +148,7 @@ class preg_matcher {
         foreach ($this->flags as $key => $value) {
             $this->errors[] = get_string($key, 'qtype_preg').' '.get_string('unsupported','qtype_preg');
         }
+        $this->errors = array_unique($this->errors);//Fix, for one message about one unsuppoerted operation.
 
         if (empty($this->errors)) {
             return true;
