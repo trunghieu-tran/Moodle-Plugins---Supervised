@@ -679,7 +679,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->next_char() === 'b');
     }
     function test_wave_repeat_chars() {
-        $matcher = new dfa_preg_matcher('(?:a|b)*abb');
+        $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('ababababbbbaaaabbbabbbab');
         $this->assertTrue($matcher->next_char() === 'b');
     }
