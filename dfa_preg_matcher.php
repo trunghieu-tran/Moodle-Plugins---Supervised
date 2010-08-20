@@ -813,7 +813,7 @@ class dfa_preg_matcher extends preg_matcher {
             $result->index = -1;
             for ($i=0; $i<strlen($response) && !$result->full; $i++) {
                 $tmpres = $this->compare($response, 0, $i, $this->lock->end);
-                if ($tmpres->full || $tmpres->index > $result->index) {
+                if ($tmpres->full || $tmpres->index > $result->index || !isset($result->next)) {
                     $result = $tmpres;
                 }
             }
