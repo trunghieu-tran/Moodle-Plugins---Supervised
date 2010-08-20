@@ -43,7 +43,7 @@
 %nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
 %nonassoc CLOSEBRACK.
 
-start ::= expr(B). {
+start ::= lastexpr(B). {
     $this->root = B;
 }
 expr(A) ::= expr(B) CONC expr(C). {
@@ -211,8 +211,12 @@ expr(A) ::= STARTLOCK(B) expr(C). {
     A = new node;
     A = C;
 }
-expr(A) ::= expr(B) ENDLOCK(C). {
+lastexpr(A) ::= lastexpr(B) ENDLOCK(C). {
     $this->lock->end = true;
+    A = new node;
+    A = B;
+}
+lastexpr(A) ::= expr(B). {
     A = new node;
     A = B;
 }

@@ -424,7 +424,7 @@ class parser_test extends UnitTestCase {
     }
     function test_parser_error() {
         $parser = new preg_parser_yyParser;
-        $regex = '((ab|cd)ef';
+        $regex = '^((ab|cd)ef$';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
