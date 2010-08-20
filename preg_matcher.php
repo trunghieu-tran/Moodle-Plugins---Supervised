@@ -103,7 +103,10 @@ class preg_matcher {
         } else {
             $this->ast_root = null;
         }
-
+        if ($this->is_error_exists()) {
+            //if parsing error then no tree, nothing accept.
+            return;
+        }
         //check regular expression for validity
         $this->accept_regex($this->ast_root);
     }
