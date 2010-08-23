@@ -688,5 +688,21 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $matcher->match('something');
         $this->assertTrue($matcher->next_char() === 'a');
     }
+    //Unit tests for left character count determined by wave function
+    function test_wave_left_full_true() {
+        $matcher = new dfa_preg_matcher('abcd');
+        $matcher->match('abcd');
+        $this->assertTrue($matcher->characters_left() == 0);
+    }
+    function test_wave_left_easy_regex() {
+        $matcher = new dfa_preg_matcher('abcdefghi');
+        $matcher->match('abcd');
+        $this->assertTrue($matcher->characters_left() == 5);
+    }
+    function test_wave_left_complex_regex() {
+        $matcher = new dfa_preg_matcher('ab+c{5,9}(?:ab?c|dfg)|averylongword');
+        $matcher->match('a');
+        $this->assertTrue($matcher->characters_left() == 8);
+    }
 }
 ?>
