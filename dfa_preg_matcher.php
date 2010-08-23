@@ -55,10 +55,8 @@ class dfa_preg_matcher extends preg_matcher {
         switch($capability) {
         case preg_matcher::PARTIAL_MATCHING :
         case preg_matcher::NEXT_CHARACTER :
-            return true;
-            break;
         case preg_matcher::CHARACTERS_LEFT :
-            return false;//We hope it'll be true some day
+            return true;
             break;
         }
         return false;
@@ -470,9 +468,12 @@ class dfa_preg_matcher extends preg_matcher {
         }
         if (($result->full || $maybeend || $end) && !$assertrequirenext) {//if string must be end on end of matching substring.
             $result->next = 0;
+            $result->left = 0;
         //determine next character, which will be correct and increment lenght of matching substring.
         } elseif ($full && $offset + $index-2 < $maxindex) {//if assert not border next character
-            $key = $this->wave($currentstate, $assertnumber);
+            $wres = $this->wave($currentstate, $assertnumber);
+            $key = $wres->nextkey;
+            $result->left = $wres->left;
             if ($key>0) {
                 $result->next = $this->connection[$assertnumber][$key][0];
             } else {//TODO: need better algoritm for search next character in negative CC
@@ -484,6 +485,8 @@ class dfa_preg_matcher extends preg_matcher {
             }
         } else {
             $result->next = $next;
+            $wres = $this->wave($currentstate, $assertnumber);
+            $result->left = $wres->left;
         }
         return $result;
     }
@@ -492,12 +495,19 @@ class dfa_preg_matcher extends preg_matcher {
     *Function search for shortest way from current state to end state
     @param current - number of current state dfa
     @param assertnum - number of dfa for which do search
-    @return number of state, which is first step on shortest way to end state
+    @return number of state, which is first step on shortest way to end state and count of left character, as class
     */
     function wave($current, $assertnum) {
         //form start state of waves: start chars, current states of dfa and states of next step
         $i = 0;
+        $left = 1;
         foreach ($this->finiteautomates[$assertnum][$current]->passages as $key => $passage) {
+            if ($passage == -1) {
+                $res = new stdClass;
+                $res->nextkey = $key;
+                $res->left = 0;
+                return $res;
+            }
             $front[$i] = new stdClass;
             $front[$i]->charnum = $key;
             $front[$i]->currentstep[] = $passage;
@@ -511,7 +521,10 @@ class dfa_preg_matcher extends preg_matcher {
                         if ($passage != $step) {//if passage not to self
                             if ($passage == -1) {//if passage to end state
                                 $found = true;
-                                return $front[$i]->charnum;
+                                $result = new stdClass;
+                                $result->left = $left;
+                                $result->nextkey = $front[$i]->charnum;
+                                return $result;
                             } else {
                                 $front[$i]->nextstep[] = $passage;
                             }
@@ -521,6 +534,7 @@ class dfa_preg_matcher extends preg_matcher {
                 $front[$i]->currentstep = $front[$i]->nextstep;
                 $front[$i]->nextstep = array();
             }
+            $left++;
         }
     }
     
@@ -854,6 +868,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->index_last = $result->index;
         $this->next = $result->next;
         $this->index_first = $result->offset;
+        $this->left = $result->left;
         return;
     }
     /**
