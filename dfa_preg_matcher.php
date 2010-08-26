@@ -866,7 +866,11 @@ class dfa_preg_matcher extends preg_matcher {
         $this->full = $result->full;
         $this->index_first = 0;
         $this->index_last = $result->index;
-        $this->next = $result->next;
+        if ($result->next === 0) {
+            $this->next = '';
+        } else {
+            $this->next = $result->next;
+        }
         $this->index_first = $result->offset;
         $this->left = $result->left;
         return;
