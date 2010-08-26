@@ -22,16 +22,34 @@
         return $this->error;
     }
     static function is_conc($prevtoken, $currtoken) {
+        static $condsubpatt = false;
+        static $close = 0;
+        if ($currtoken == preg_parser_yyParser::CONDSUBPATT) {
+            $condsubpatt = true;
+            $close = -1;
+        }
+        if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
+            $close++;
+        }
+        if ($condsubpatt && $currtoken == preg_parser_yyParser::OPENBRACK) {
+            $close--;
+        }
+        if ($close == 0) {
+            $condsubpatt = false;
+        }
         $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
                   $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
                   $prevtoken == preg_parser_yyParser::ITER || $prevtoken == preg_parser_yyParser::LAZY_ITER ||
                   $prevtoken == preg_parser_yyParser::PLUS || $prevtoken == preg_parser_yyParser::LAZY_PLUS ||
-                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT);
+                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT ||
+                  $prevtoken == preg_parser_yyParser::WORDBREAK || $prevtoken == preg_parser_yyParser::WORDNOTBREAK);
         $flag2 = ($currtoken == preg_parser_yyParser::PARSLEAF || $currtoken == preg_parser_yyParser::OPENBRACK ||
                   $currtoken == preg_parser_yyParser::GROUPING || $currtoken == preg_parser_yyParser::CONDSUBPATT ||
                   $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB);
-        $flag = ($flag1 && $flag2 && isset($prevtoken));
+                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB||
+                  $currtoken == preg_parser_yyParser::WORDBREAK || $currtoken == preg_parser_yyParser::WORDNOTBREAK ||
+                  $currtoken == preg_parser_yyParser::ONETIMESUBPATT);
+        $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
         return $flag;
     }
 }
@@ -219,4 +237,20 @@ lastexpr(A) ::= lastexpr(B) ENDLOCK(C). {
 lastexpr(A) ::= expr(B). {
     A = new node;
     A = B;
+}
+expr(A) ::= ONETIMESUBPATT expr(B) CLOSEBRACK. {
+    A = new node;
+    A->type = NODE;
+    A->subtype = NODE_ONETIMESUBPATT;
+    A->firop = B;
+}
+expr(A) ::= WORDBREAK . {
+    A = new node;
+    A->type = LEAF;
+    A->subtype = LEAF_WORDBREAK;
+}
+expr(A) ::= WORDNOTBREAK . {
+    A = new node;
+    A->type = LEAF;
+    A->subtype = LEAF_WORDNOTBREAK;
 }

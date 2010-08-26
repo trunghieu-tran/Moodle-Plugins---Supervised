@@ -25,434 +25,27 @@ State 0:
           expr ::= * STARTLOCK expr
           lastexpr ::= * lastexpr ENDLOCK
           lastexpr ::= * expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
                          start accept
-                      lastexpr shift  45
-                          expr shift  34
+                      lastexpr shift  47
+                          expr shift  35
 
 State 1:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= ASSERT_TB * expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  31
-
-State 2:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= ASSERT_FF * expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  22
-
-State 3:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= expr ALT * expr
-          expr ::= * expr ALT
-      (3) expr ::= expr ALT *
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  32
-                     {default} reduce 3
-
-State 4:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= ASSERT_TF * expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  30
-
-State 5:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= expr ALT * expr
-          expr ::= * expr ALT
-      (3) expr ::= expr ALT *
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  36
-                     {default} reduce 3
-
-State 6:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= GROUPING * expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  28
-
-State 7:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_FF * expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  25
-
-State 8:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= ASSERT_FB * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  27
-
-State 9:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_TB * expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  24
-
-State 10:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK * expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  37
-
-State 11:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-          expr ::= STARTLOCK * expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  33
-
-State 12:
           expr ::= * expr CONC expr
           expr ::= * expr ALT expr
           expr ::= expr ALT * expr
@@ -479,20 +72,26 @@ State 12:
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  35
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  34
                      {default} reduce 3
 
-State 13:
+State 2:
           expr ::= * expr CONC expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -511,25 +110,74 @@ State 13:
           expr ::= * ASSERT_FF expr CLOSEBRACK
           expr ::= * ASSERT_FB expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_TF * expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= STARTLOCK * expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  23
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  38
 
-State 14:
+State 3:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= ONETIMESUBPATT * expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  27
+
+State 4:
           expr ::= * expr CONC expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -554,130 +202,283 @@ State 14:
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  38
-
-State 15:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= OPENBRACK * expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  26
-
-State 16:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK * expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  40
-
-State 17:
-          expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK * expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
                           expr shift  41
 
-State 18:
+State 5:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= ASSERT_FB * expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  23
+
+State 6:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= ASSERT_TF * expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  30
+
+State 7:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= ASSERT_TB * expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  31
+
+State 8:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= ASSERT_FF * expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  33
+
+State 9:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TB * expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  25
+
+State 10:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK * expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  42
+
+State 11:
           expr ::= * expr CONC expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
@@ -702,60 +503,26 @@ State 18:
           expr ::= CONDSUBPATT ASSERT_FB * expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  29
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  28
 
-State 19:
+State 12:
           expr ::= * expr CONC expr
-          expr ::= * expr ALT expr
-          expr ::= expr ALT * expr
-          expr ::= * expr ALT
-      (3) expr ::= expr ALT *
-          expr ::= * expr QUEST
-          expr ::= * expr ITER
-          expr ::= * expr PLUS
-          expr ::= * expr LAZY_QUEST
-          expr ::= * expr LAZY_ITER
-          expr ::= * expr LAZY_PLUS
-          expr ::= * expr QUANT
-          expr ::= * expr LAZY_QUANT
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * GROUPING expr CLOSEBRACK
-          expr ::= * ASSERT_TF expr CLOSEBRACK
-          expr ::= * ASSERT_TB expr CLOSEBRACK
-          expr ::= * ASSERT_FF expr CLOSEBRACK
-          expr ::= * ASSERT_FB expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
-          expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
-                          expr shift  42
-                     {default} reduce 3
-
-State 20:
-          expr ::= * expr CONC expr
-          expr ::= expr CONC * expr
           expr ::= * expr ALT expr
           expr ::= * expr ALT
           expr ::= * expr QUEST
@@ -776,21 +543,28 @@ State 20:
           expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK * expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
                           expr shift  43
 
-State 21:
+State 13:
           expr ::= * expr CONC expr
           expr ::= * expr ALT expr
           expr ::= expr ALT * expr
@@ -817,44 +591,419 @@ State 21:
           expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT * expr CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                     OPENBRACK shift  15
-                      GROUPING shift  6
-                     ASSERT_TF shift  4
-                     ASSERT_TB shift  1
-                     ASSERT_FF shift  2
-                     ASSERT_FB shift  8
-                   CONDSUBPATT shift  44
-                      PARSLEAF shift  65
-                     STARTLOCK shift  11
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
                           expr shift  39
                      {default} reduce 3
 
-State 22:
-          expr ::= expr * CONC expr
-          expr ::= expr * ALT expr
-          expr ::= expr * ALT
-          expr ::= expr * QUEST
-          expr ::= expr * ITER
-          expr ::= expr * PLUS
-          expr ::= expr * LAZY_QUEST
-          expr ::= expr * LAZY_ITER
-          expr ::= expr * LAZY_PLUS
-          expr ::= expr * QUANT
-          expr ::= expr * LAZY_QUANT
-          expr ::= ASSERT_FF expr * CLOSEBRACK
+State 14:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= expr ALT * expr
+          expr ::= * expr ALT
+      (3) expr ::= expr ALT *
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT * expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
 
-                           ALT shift  19
-                          CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  59
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  37
+                     {default} reduce 3
+
+State 15:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK * expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  36
+
+State 16:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= expr ALT * expr
+          expr ::= * expr ALT
+      (3) expr ::= expr ALT *
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT * expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  40
+                     {default} reduce 3
+
+State 17:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FF * expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  26
+
+State 18:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= GROUPING * expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  24
+
+State 19:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TF * expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  29
+
+State 20:
+          expr ::= * expr CONC expr
+          expr ::= expr CONC * expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  45
+
+State 21:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= OPENBRACK * expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  32
+
+State 22:
+          expr ::= * expr CONC expr
+          expr ::= * expr ALT expr
+          expr ::= expr ALT * expr
+          expr ::= * expr ALT
+      (3) expr ::= expr ALT *
+          expr ::= * expr QUEST
+          expr ::= * expr ITER
+          expr ::= * expr PLUS
+          expr ::= * expr LAZY_QUEST
+          expr ::= * expr LAZY_ITER
+          expr ::= * expr LAZY_PLUS
+          expr ::= * expr QUANT
+          expr ::= * expr LAZY_QUANT
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * GROUPING expr CLOSEBRACK
+          expr ::= * ASSERT_TF expr CLOSEBRACK
+          expr ::= * ASSERT_TB expr CLOSEBRACK
+          expr ::= * ASSERT_FF expr CLOSEBRACK
+          expr ::= * ASSERT_FB expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= * PARSLEAF
+          expr ::= * STARTLOCK expr
+          expr ::= * ONETIMESUBPATT expr CLOSEBRACK
+          expr ::= * WORDBREAK
+          expr ::= * WORDNOTBREAK
+
+                     OPENBRACK shift  21
+                      GROUPING shift  18
+                     ASSERT_TF shift  6
+                     ASSERT_TB shift  7
+                     ASSERT_FF shift  8
+                     ASSERT_FB shift  5
+                   CONDSUBPATT shift  46
+                      PARSLEAF shift  69
+                     STARTLOCK shift  2
+                ONETIMESUBPATT shift  3
+                     WORDBREAK shift  63
+                  WORDNOTBREAK shift  64
+                          expr shift  44
+                     {default} reduce 3
 
 State 23:
           expr ::= expr * CONC expr
@@ -868,19 +1017,19 @@ State 23:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_TF expr * CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= ASSERT_FB expr * CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  14
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  56
 
 State 24:
           expr ::= expr * CONC expr
@@ -894,19 +1043,19 @@ State 24:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_TB expr * CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= GROUPING expr * CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  10
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  59
 
 State 25:
           expr ::= expr * CONC expr
@@ -920,19 +1069,19 @@ State 25:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_FF expr * CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TB expr * CLOSEBRACK expr ALT expr CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  16
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  10
 
 State 26:
           expr ::= expr * CONC expr
@@ -946,19 +1095,19 @@ State 26:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= OPENBRACK expr * CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FF expr * CLOSEBRACK expr ALT expr CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  63
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  15
 
 State 27:
           expr ::= expr * CONC expr
@@ -972,19 +1121,19 @@ State 27:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= ASSERT_FB expr * CLOSEBRACK
+          expr ::= ONETIMESUBPATT expr * CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  49
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  66
 
 State 28:
           expr ::= expr * CONC expr
@@ -998,19 +1147,19 @@ State 28:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= GROUPING expr * CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_FB expr * CLOSEBRACK expr ALT expr CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  64
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  12
 
 State 29:
           expr ::= expr * CONC expr
@@ -1024,19 +1173,19 @@ State 29:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_FB expr * CLOSEBRACK expr ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TF expr * CLOSEBRACK expr ALT expr CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  17
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  4
 
 State 30:
           expr ::= expr * CONC expr
@@ -1052,17 +1201,17 @@ State 30:
           expr ::= expr * LAZY_QUANT
           expr ::= ASSERT_TF expr * CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  62
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  58
 
 State 31:
           expr ::= expr * CONC expr
@@ -1078,22 +1227,21 @@ State 31:
           expr ::= expr * LAZY_QUANT
           expr ::= ASSERT_TB expr * CLOSEBRACK
 
-                           ALT shift  19
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  61
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  57
 
 State 32:
           expr ::= expr * CONC expr
           expr ::= expr * ALT expr
-      (2) expr ::= expr ALT expr *
           expr ::= expr * ALT
           expr ::= expr * QUEST
           expr ::= expr * ITER
@@ -1103,19 +1251,19 @@ State 32:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr * CLOSEBRACK
+          expr ::= OPENBRACK expr * CLOSEBRACK
 
+                           ALT shift  22
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  48
-                     {default} reduce 2
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  60
 
 State 33:
           expr ::= expr * CONC expr
@@ -1129,57 +1277,21 @@ State 33:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-     (23) expr ::= STARTLOCK expr *
+          expr ::= ASSERT_FF expr * CLOSEBRACK
 
-                           ALT shift  19
-                           ALT reduce 23  ** Parsing conflict **
+                           ALT shift  22
                           CONC shift  20
-                          CONC reduce 23  ** Parsing conflict **
-                         QUEST shift  56
-                         QUEST reduce 23  ** Parsing conflict **
-                          PLUS shift  53
-                          PLUS reduce 23  ** Parsing conflict **
-                          ITER shift  54
-                          ITER reduce 23  ** Parsing conflict **
-                         QUANT shift  57
-                         QUANT reduce 23  ** Parsing conflict **
-                     LAZY_ITER shift  51
-                     LAZY_ITER reduce 23  ** Parsing conflict **
-                    LAZY_QUEST shift  50
-                    LAZY_QUEST reduce 23  ** Parsing conflict **
-                     LAZY_PLUS shift  52
-                     LAZY_PLUS reduce 23  ** Parsing conflict **
-                    LAZY_QUANT shift  58
-                    LAZY_QUANT reduce 23  ** Parsing conflict **
-                     {default} reduce 23
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  54
 
 State 34:
-          expr ::= expr * CONC expr
-          expr ::= expr * ALT expr
-          expr ::= expr * ALT
-          expr ::= expr * QUEST
-          expr ::= expr * ITER
-          expr ::= expr * PLUS
-          expr ::= expr * LAZY_QUEST
-          expr ::= expr * LAZY_ITER
-          expr ::= expr * LAZY_PLUS
-          expr ::= expr * QUANT
-          expr ::= expr * LAZY_QUANT
-     (25) lastexpr ::= expr *
-
-                           ALT shift  19
-                          CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                     {default} reduce 25
-
-State 35:
           expr ::= expr * CONC expr
           expr ::= expr * ALT expr
       (2) expr ::= expr ALT expr *
@@ -1195,18 +1307,69 @@ State 35:
           expr ::= CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr * CLOSEBRACK
 
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  60
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  68
                      {default} reduce 2
 
+State 35:
+          expr ::= expr * CONC expr
+          expr ::= expr * ALT expr
+          expr ::= expr * ALT
+          expr ::= expr * QUEST
+          expr ::= expr * ITER
+          expr ::= expr * PLUS
+          expr ::= expr * LAZY_QUEST
+          expr ::= expr * LAZY_ITER
+          expr ::= expr * LAZY_PLUS
+          expr ::= expr * QUANT
+          expr ::= expr * LAZY_QUANT
+     (25) lastexpr ::= expr *
+
+                           ALT shift  22
+                          CONC shift  20
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                     {default} reduce 25
+
 State 36:
+          expr ::= expr * CONC expr
+          expr ::= expr * ALT expr
+          expr ::= expr * ALT
+          expr ::= expr * QUEST
+          expr ::= expr * ITER
+          expr ::= expr * PLUS
+          expr ::= expr * LAZY_QUEST
+          expr ::= expr * LAZY_ITER
+          expr ::= expr * LAZY_PLUS
+          expr ::= expr * QUANT
+          expr ::= expr * LAZY_QUANT
+          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+
+                           ALT shift  14
+                          CONC shift  20
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+
+State 37:
           expr ::= expr * CONC expr
           expr ::= expr * ALT expr
       (2) expr ::= expr ALT expr *
@@ -1222,41 +1385,16 @@ State 36:
           expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr * CLOSEBRACK
 
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  47
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  51
                      {default} reduce 2
-
-State 37:
-          expr ::= expr * CONC expr
-          expr ::= expr * ALT expr
-          expr ::= expr * ALT
-          expr ::= expr * QUEST
-          expr ::= expr * ITER
-          expr ::= expr * PLUS
-          expr ::= expr * LAZY_QUEST
-          expr ::= expr * LAZY_ITER
-          expr ::= expr * LAZY_PLUS
-          expr ::= expr * QUANT
-          expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr * ALT expr CLOSEBRACK
-
-                           ALT shift  3
-                          CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
 
 State 38:
           expr ::= expr * CONC expr
@@ -1270,18 +1408,29 @@ State 38:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+     (23) expr ::= STARTLOCK expr *
 
-                           ALT shift  12
+                           ALT shift  22
+                           ALT reduce 23  ** Parsing conflict **
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
+                          CONC reduce 23  ** Parsing conflict **
+                         QUEST shift  49
+                         QUEST reduce 23  ** Parsing conflict **
+                          PLUS shift  65
+                          PLUS reduce 23  ** Parsing conflict **
+                          ITER shift  70
+                          ITER reduce 23  ** Parsing conflict **
+                         QUANT shift  61
+                         QUANT reduce 23  ** Parsing conflict **
+                     LAZY_ITER shift  67
+                     LAZY_ITER reduce 23  ** Parsing conflict **
+                    LAZY_QUEST shift  53
+                    LAZY_QUEST reduce 23  ** Parsing conflict **
+                     LAZY_PLUS shift  62
+                     LAZY_PLUS reduce 23  ** Parsing conflict **
+                    LAZY_QUANT shift  55
+                    LAZY_QUANT reduce 23  ** Parsing conflict **
+                     {default} reduce 23
 
 State 39:
           expr ::= expr * CONC expr
@@ -1299,20 +1448,21 @@ State 39:
           expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr * CLOSEBRACK
 
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
-                    CLOSEBRACK shift  46
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  48
                      {default} reduce 2
 
 State 40:
           expr ::= expr * CONC expr
           expr ::= expr * ALT expr
+      (2) expr ::= expr ALT expr *
           expr ::= expr * ALT
           expr ::= expr * QUEST
           expr ::= expr * ITER
@@ -1322,18 +1472,19 @@ State 40:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr * CLOSEBRACK
 
-                           ALT shift  5
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+                    CLOSEBRACK shift  50
+                     {default} reduce 2
 
 State 41:
           expr ::= expr * CONC expr
@@ -1347,20 +1498,70 @@ State 41:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-          expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+          expr ::= CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr * ALT expr CLOSEBRACK
 
-                           ALT shift  21
+                           ALT shift  1
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
 
 State 42:
+          expr ::= expr * CONC expr
+          expr ::= expr * ALT expr
+          expr ::= expr * ALT
+          expr ::= expr * QUEST
+          expr ::= expr * ITER
+          expr ::= expr * PLUS
+          expr ::= expr * LAZY_QUEST
+          expr ::= expr * LAZY_ITER
+          expr ::= expr * LAZY_PLUS
+          expr ::= expr * QUANT
+          expr ::= expr * LAZY_QUANT
+          expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+
+                           ALT shift  16
+                          CONC shift  20
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+
+State 43:
+          expr ::= expr * CONC expr
+          expr ::= expr * ALT expr
+          expr ::= expr * ALT
+          expr ::= expr * QUEST
+          expr ::= expr * ITER
+          expr ::= expr * PLUS
+          expr ::= expr * LAZY_QUEST
+          expr ::= expr * LAZY_ITER
+          expr ::= expr * LAZY_PLUS
+          expr ::= expr * QUANT
+          expr ::= expr * LAZY_QUANT
+          expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr * ALT expr CLOSEBRACK
+
+                           ALT shift  13
+                          CONC shift  20
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
+
+State 44:
           expr ::= expr * CONC expr
           expr ::= expr * ALT expr
       (2) expr ::= expr ALT expr *
@@ -1375,17 +1576,17 @@ State 42:
           expr ::= expr * LAZY_QUANT
 
                           CONC shift  20
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
                      {default} reduce 2
 
-State 43:
+State 45:
           expr ::= expr * CONC expr
       (1) expr ::= expr CONC expr *
           expr ::= expr * ALT expr
@@ -1399,131 +1600,146 @@ State 43:
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
 
-                         QUEST shift  56
-                          PLUS shift  53
-                          ITER shift  54
-                         QUANT shift  57
-                     LAZY_ITER shift  51
-                    LAZY_QUEST shift  50
-                     LAZY_PLUS shift  52
-                    LAZY_QUANT shift  58
+                         QUEST shift  49
+                          PLUS shift  65
+                          ITER shift  70
+                         QUANT shift  61
+                     LAZY_ITER shift  67
+                    LAZY_QUEST shift  53
+                     LAZY_PLUS shift  62
+                    LAZY_QUANT shift  55
                      {default} reduce 1
 
-State 44:
+State 46:
           expr ::= CONDSUBPATT * ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT * ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT * ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT * ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
 
-                     ASSERT_TF shift  13
+                     ASSERT_TF shift  19
                      ASSERT_TB shift  9
-                     ASSERT_FF shift  7
-                     ASSERT_FB shift  18
+                     ASSERT_FF shift  17
+                     ASSERT_FB shift  11
 
-State 45:
+State 47:
       (0) start ::= lastexpr *
           lastexpr ::= lastexpr * ENDLOCK
 
-                       ENDLOCK shift  55
+                       ENDLOCK shift  52
                      {default} reduce 0
 
-State 46:
+State 48:
      (21) expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK *
 
                      {default} reduce 21
 
-State 47:
-     (20) expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK *
-
-                     {default} reduce 20
-
-State 48:
-     (19) expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK *
-
-                     {default} reduce 19
-
 State 49:
-     (17) expr ::= ASSERT_FB expr CLOSEBRACK *
-
-                     {default} reduce 17
-
-State 50:
-      (7) expr ::= expr LAZY_QUEST *
-
-                     {default} reduce 7
-
-State 51:
-      (8) expr ::= expr LAZY_ITER *
-
-                     {default} reduce 8
-
-State 52:
-      (9) expr ::= expr LAZY_PLUS *
-
-                     {default} reduce 9
-
-State 53:
-      (6) expr ::= expr PLUS *
-
-                     {default} reduce 6
-
-State 54:
-      (5) expr ::= expr ITER *
-
-                     {default} reduce 5
-
-State 55:
-     (24) lastexpr ::= lastexpr ENDLOCK *
-
-                     {default} reduce 24
-
-State 56:
       (4) expr ::= expr QUEST *
 
                      {default} reduce 4
 
-State 57:
-     (10) expr ::= expr QUANT *
+State 50:
+     (19) expr ::= CONDSUBPATT ASSERT_TB expr CLOSEBRACK expr ALT expr CLOSEBRACK *
 
-                     {default} reduce 10
+                     {default} reduce 19
 
-State 58:
-     (11) expr ::= expr LAZY_QUANT *
+State 51:
+     (20) expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK *
 
-                     {default} reduce 11
+                     {default} reduce 20
 
-State 59:
+State 52:
+     (24) lastexpr ::= lastexpr ENDLOCK *
+
+                     {default} reduce 24
+
+State 53:
+      (7) expr ::= expr LAZY_QUEST *
+
+                     {default} reduce 7
+
+State 54:
      (16) expr ::= ASSERT_FF expr CLOSEBRACK *
 
                      {default} reduce 16
 
-State 60:
-     (18) expr ::= CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK *
+State 55:
+     (11) expr ::= expr LAZY_QUANT *
 
-                     {default} reduce 18
+                     {default} reduce 11
 
-State 61:
+State 56:
+     (17) expr ::= ASSERT_FB expr CLOSEBRACK *
+
+                     {default} reduce 17
+
+State 57:
      (15) expr ::= ASSERT_TB expr CLOSEBRACK *
 
                      {default} reduce 15
 
-State 62:
+State 58:
      (14) expr ::= ASSERT_TF expr CLOSEBRACK *
 
                      {default} reduce 14
 
-State 63:
-     (12) expr ::= OPENBRACK expr CLOSEBRACK *
-
-                     {default} reduce 12
-
-State 64:
+State 59:
      (13) expr ::= GROUPING expr CLOSEBRACK *
 
                      {default} reduce 13
 
+State 60:
+     (12) expr ::= OPENBRACK expr CLOSEBRACK *
+
+                     {default} reduce 12
+
+State 61:
+     (10) expr ::= expr QUANT *
+
+                     {default} reduce 10
+
+State 62:
+      (9) expr ::= expr LAZY_PLUS *
+
+                     {default} reduce 9
+
+State 63:
+     (27) expr ::= WORDBREAK *
+
+                     {default} reduce 27
+
+State 64:
+     (28) expr ::= WORDNOTBREAK *
+
+                     {default} reduce 28
+
 State 65:
+      (6) expr ::= expr PLUS *
+
+                     {default} reduce 6
+
+State 66:
+     (26) expr ::= ONETIMESUBPATT expr CLOSEBRACK *
+
+                     {default} reduce 26
+
+State 67:
+      (8) expr ::= expr LAZY_ITER *
+
+                     {default} reduce 8
+
+State 68:
+     (18) expr ::= CONDSUBPATT ASSERT_TF expr CLOSEBRACK expr ALT expr CLOSEBRACK *
+
+                     {default} reduce 18
+
+State 69:
      (22) expr ::= PARSLEAF *
 
                      {default} reduce 22
+
+State 70:
+      (5) expr ::= expr ITER *
+
+                     {default} reduce 5
 
