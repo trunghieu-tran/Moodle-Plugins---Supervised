@@ -123,6 +123,10 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::CLOSEBRACK, 0);
     return $res;
 }
+<YYINITIAL> \(\?> {
+    $res = form_res(preg_parser_yyParser::ONETIMESUBPATT, 0);
+    return $res;
+}
 <YYINITIAL> \(\?: {
     $res = form_res(preg_parser_yyParser::GROUPING, 0);
     return $res;
@@ -135,15 +139,15 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::ASSERT_TF, 0);
     return $res;
 }
-<YYINITIAL> \(!= {
+<YYINITIAL> \(\?! {
     $res = form_res(preg_parser_yyParser::ASSERT_FF, 0);
     return $res;
 }
-<YYINITIAL> \(\?~ {
+<YYINITIAL> \(\?<= {
     $res = form_res(preg_parser_yyParser::ASSERT_TB, 0);
     return $res;
 }
-<YYINITIAL> \(!~ {
+<YYINITIAL> \(\?<! {
     $res = form_res(preg_parser_yyParser::ASSERT_FB, 0);
     return $res;
 }
@@ -178,6 +182,14 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 }
 <YYINITIAL> \\\\ {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, '\\'));
+    return $res;
+}
+<YYINITIAL> \\b {
+    $res = form_res(preg_parser_yyParser::WORDBREAK, 0);
+    return $res;
+}
+<YYINITIAL> \\B {
+    $res = form_res(preg_parser_yyParser::WORDNOTBREAK, 0);
     return $res;
 }
 <YYINITIAL> \\d {
