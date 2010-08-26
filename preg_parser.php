@@ -137,7 +137,9 @@ class preg_parser_yyParser
         if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
             $close++;
         }
-        if ($condsubpatt && $currtoken == preg_parser_yyParser::OPENBRACK) {
+        if ($condsubpatt && ($currtoken == preg_parser_yyParser::OPENBRACK || $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF  ||
+            $currtoken == preg_parser_yyParser::ASSERT_FB || $currtoken == preg_parser_yyParser::ASSERT_TB || $currtoken == preg_parser_yyParser::GROUPING ||
+            $currtoken == preg_parser_yyParser::ONETIMESUBPATT)) {
             $close--;
         }
         if ($close == 0) {
@@ -158,7 +160,7 @@ class preg_parser_yyParser
         $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
         return $flag;
     }
-#line 164 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 166 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
 
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
@@ -967,12 +969,12 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 64 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 66 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r0(){
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 979 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 67 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 981 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 69 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r1(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -980,8 +982,8 @@ static public $yy_action = array(
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -2]->minor;
     $this->_retvalue->secop = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 988 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 74 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 990 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 76 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r2(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -989,8 +991,8 @@ static public $yy_action = array(
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -2]->minor;
     $this->_retvalue->secop = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 997 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 81 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 999 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 83 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r3(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1000,8 +1002,8 @@ static public $yy_action = array(
     $this->_retvalue->secop->type = LEAF;
     $this->_retvalue->secop->subtype = LEAF_EMPTY;
     }
-#line 1008 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 90 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1010 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 92 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r4(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1009,8 +1011,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = true;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1017 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 97 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1019 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 99 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r5(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1018,8 +1020,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = true;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1026 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 104 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1028 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 106 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r6(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1027,8 +1029,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = true;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1035 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 111 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1037 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 113 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r7(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1036,8 +1038,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = false;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1044 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 118 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1046 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 120 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r8(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1045,8 +1047,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = false;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1053 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 125 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1055 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 127 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r9(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1054,8 +1056,8 @@ static public $yy_action = array(
     $this->_retvalue->greed = false;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1062 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 132 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1064 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 134 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r10(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1065,8 +1067,8 @@ static public $yy_action = array(
     $this->_retvalue->rightborder = $this->yystack[$this->yyidx + 0]->minor->rightborder;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1073 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 141 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1075 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 143 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r11(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1076,53 +1078,53 @@ static public $yy_action = array(
     $this->_retvalue->rightborder = $this->yystack[$this->yyidx + 0]->minor->rightborder;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1084 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 150 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1086 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 152 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r12(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_SUBPATT;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1092 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 156 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1094 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 158 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r13(){
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1097 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 159 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1099 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 161 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r14(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_ASSERTTF;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1105 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 165 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1107 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 167 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r15(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_ASSERTTB;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1113 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 171 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1115 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 173 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r16(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_ASSERTFF;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1121 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 177 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1123 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 179 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r17(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_ASSERTFB;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1129 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 183 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1131 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 185 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r18(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1133,8 +1135,8 @@ static public $yy_action = array(
     $this->_retvalue->thirdop->subtype = NODE_ASSERTTF;
     $this->_retvalue->thirdop->firop = $this->yystack[$this->yyidx + -5]->minor;
     }
-#line 1141 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 193 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1143 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 195 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r19(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1145,8 +1147,8 @@ static public $yy_action = array(
     $this->_retvalue->thirdop->subtype = NODE_ASSERTTB;
     $this->_retvalue->thirdop->firop = $this->yystack[$this->yyidx + -5]->minor;
     }
-#line 1153 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 203 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1155 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 205 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r20(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1157,8 +1159,8 @@ static public $yy_action = array(
     $this->_retvalue->thirdop->subtype = NODE_ASSERTFF;
     $this->_retvalue->thirdop->firop = $this->yystack[$this->yyidx + -5]->minor;
     }
-#line 1165 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 213 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1167 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 215 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r21(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
@@ -1169,49 +1171,49 @@ static public $yy_action = array(
     $this->_retvalue->thirdop->subtype = NODE_ASSERTFB;
     $this->_retvalue->thirdop->firop = $this->yystack[$this->yyidx + -5]->minor;
     }
-#line 1177 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 223 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1179 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 225 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r22(){
     $this->_retvalue = new node;
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 1183 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 227 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1185 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 229 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r23(){
     $this->lock->start = true;
     $this->_retvalue = new node;
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 1190 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 232 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1192 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 234 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r24(){
     $this->lock->end = true;
     $this->_retvalue = new node;
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1197 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 241 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1199 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 243 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r26(){
     $this->_retvalue = new node;
     $this->_retvalue->type = NODE;
     $this->_retvalue->subtype = NODE_ONETIMESUBPATT;
     $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1205 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 247 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1207 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 249 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r27(){
     $this->_retvalue = new node;
     $this->_retvalue->type = LEAF;
     $this->_retvalue->subtype = LEAF_WORDBREAK;
     }
-#line 1212 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
-#line 252 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 1214 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 254 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r28(){
     $this->_retvalue = new node;
     $this->_retvalue->type = LEAF;
     $this->_retvalue->subtype = LEAF_WORDNOTBREAK;
     }
-#line 1219 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 1221 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1310,10 +1312,10 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 56 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
+#line 58 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
 
     $this->error = true;
-#line 1322 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
+#line 1324 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
     }
 
     /**

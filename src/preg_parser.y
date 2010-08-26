@@ -31,7 +31,9 @@
         if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
             $close++;
         }
-        if ($condsubpatt && $currtoken == preg_parser_yyParser::OPENBRACK) {
+        if ($condsubpatt && ($currtoken == preg_parser_yyParser::OPENBRACK || $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF  ||
+            $currtoken == preg_parser_yyParser::ASSERT_FB || $currtoken == preg_parser_yyParser::ASSERT_TB || $currtoken == preg_parser_yyParser::GROUPING ||
+            $currtoken == preg_parser_yyParser::ONETIMESUBPATT)) {
             $close--;
         }
         if ($close == 0) {
