@@ -575,7 +575,7 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $this->assertTrue($root->secop->type == LEAF && $root->subtype == LEAF_WORDBREAK);
+        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDBREAK);
     }
     function test_parser_word_not_break() {
         $parser = new preg_parser_yyParser;
@@ -596,7 +596,7 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $this->assertTrue($root->secop->type == LEAF && $root->subtype == LEAF_WORDNOTBREAK);
+        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDNOTBREAK);
     }
     function test_parser_subpatterns() {
         $parser = new preg_parser_yyParser;
