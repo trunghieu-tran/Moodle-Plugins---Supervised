@@ -22,8 +22,8 @@ State 0:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-          lastexpr ::= * lastexpr ENDLOCK
+          expr ::= * STARTUNCHOR expr
+          lastexpr ::= * lastexpr ENDUNCHOR
           lastexpr ::= * expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
@@ -37,7 +37,7 @@ State 0:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -71,7 +71,7 @@ State 1:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -84,7 +84,7 @@ State 1:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -114,8 +114,8 @@ State 2:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
-          expr ::= STARTLOCK * expr
+          expr ::= * STARTUNCHOR expr
+          expr ::= STARTUNCHOR * expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -128,7 +128,7 @@ State 2:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -157,7 +157,7 @@ State 3:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= ONETIMESUBPATT * expr CLOSEBRACK
           expr ::= * WORDBREAK
@@ -171,7 +171,7 @@ State 3:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -201,7 +201,7 @@ State 4:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -214,7 +214,7 @@ State 4:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -244,7 +244,7 @@ State 5:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -257,7 +257,7 @@ State 5:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -287,7 +287,7 @@ State 6:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -300,7 +300,7 @@ State 6:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -330,7 +330,7 @@ State 7:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -343,7 +343,7 @@ State 7:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -373,7 +373,7 @@ State 8:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -386,7 +386,7 @@ State 8:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -416,7 +416,7 @@ State 9:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -429,7 +429,7 @@ State 9:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -459,7 +459,7 @@ State 10:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -472,7 +472,7 @@ State 10:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -502,7 +502,7 @@ State 11:
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT ASSERT_FB * expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -515,7 +515,7 @@ State 11:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -545,7 +545,7 @@ State 12:
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK * expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -558,7 +558,7 @@ State 12:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -590,7 +590,7 @@ State 13:
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT * expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -603,7 +603,7 @@ State 13:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -636,7 +636,7 @@ State 14:
           expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT * expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -649,7 +649,7 @@ State 14:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -680,7 +680,7 @@ State 15:
           expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK * expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -693,7 +693,7 @@ State 15:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -725,7 +725,7 @@ State 16:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -738,7 +738,7 @@ State 16:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -769,7 +769,7 @@ State 17:
           expr ::= CONDSUBPATT ASSERT_FF * expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -782,7 +782,7 @@ State 17:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -812,7 +812,7 @@ State 18:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -825,7 +825,7 @@ State 18:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -855,7 +855,7 @@ State 19:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -868,7 +868,7 @@ State 19:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -898,7 +898,7 @@ State 20:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -911,7 +911,7 @@ State 20:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -941,7 +941,7 @@ State 21:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -954,7 +954,7 @@ State 21:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -985,7 +985,7 @@ State 22:
           expr ::= * CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK
           expr ::= * PARSLEAF
-          expr ::= * STARTLOCK expr
+          expr ::= * STARTUNCHOR expr
           expr ::= * ONETIMESUBPATT expr CLOSEBRACK
           expr ::= * WORDBREAK
           expr ::= * WORDNOTBREAK
@@ -998,7 +998,7 @@ State 22:
                      ASSERT_FB shift  5
                    CONDSUBPATT shift  46
                       PARSLEAF shift  69
-                     STARTLOCK shift  2
+                   STARTUNCHOR shift  2
                 ONETIMESUBPATT shift  3
                      WORDBREAK shift  63
                   WORDNOTBREAK shift  64
@@ -1408,7 +1408,7 @@ State 38:
           expr ::= expr * LAZY_PLUS
           expr ::= expr * QUANT
           expr ::= expr * LAZY_QUANT
-     (23) expr ::= STARTLOCK expr *
+     (23) expr ::= STARTUNCHOR expr *
 
                            ALT shift  22
                            ALT reduce 23  ** Parsing conflict **
@@ -1623,9 +1623,9 @@ State 46:
 
 State 47:
       (0) start ::= lastexpr *
-          lastexpr ::= lastexpr * ENDLOCK
+          lastexpr ::= lastexpr * ENDUNCHOR
 
-                       ENDLOCK shift  52
+                     ENDUNCHOR shift  52
                      {default} reduce 0
 
 State 48:
@@ -1649,7 +1649,7 @@ State 51:
                      {default} reduce 20
 
 State 52:
-     (24) lastexpr ::= lastexpr ENDLOCK *
+     (24) lastexpr ::= lastexpr ENDUNCHOR *
 
                      {default} reduce 24
 

@@ -36,7 +36,7 @@ class preg_matcher {
     //Initial data
     protected $regex;
     protected $modifiers;
-    protected $lock;
+    protected $unchor;
 
     //The root of abstract syntax tree of the regular expression
     protected $ast_root;
@@ -294,7 +294,7 @@ class preg_matcher {
             $this->errors[] = get_string('incorrectregex', 'qtype_preg');
         } else {
             $this->ast_root = $parser->get_root();
-            $this->lock = $parser->get_lock();
+            $this->unchor = $parser->get_unchor();
         }
         fclose($pseudofile);
     }
