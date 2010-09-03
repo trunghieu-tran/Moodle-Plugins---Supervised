@@ -79,7 +79,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
         $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-        return $matcher->match(trim(stripslashes_safe($state->responses[''])));
+        return $matcher->match($state->responses['']);
     }
 
   /*
@@ -124,7 +124,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $full = false;
         foreach ($question->options->answers as $answer) {
             $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-            $full = $matcher->match(stripslashes_safe($state->responses['']));
+            $full = $matcher->match($state->responses['']);
 
             //check full match
             if ($full) {//don't need to look more if we find full match
@@ -183,7 +183,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
             //form hint messages
             $answer = $state->responses['__answer'];//TODO - check this is working, or it is in $state->last_graded->responses
             $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
-            $response = stripslashes_safe($state->responses['']);
+            $response = $state->responses[''];
             $matcher->match($response);
 
             //Calculate strings for response coloring

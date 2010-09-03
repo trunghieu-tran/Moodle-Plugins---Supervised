@@ -61,13 +61,13 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         global $QTYPES;
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
-        $trimmedcorrectanswer = trim(stripslashes_safe($data['correctanswer']));
+        $trimmedcorrectanswer = trim($data['correctanswer']);
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $i = 0;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],stripslashes_safe($trimmedanswer), $data['exactmatch'], $data['usecase'], (-1)*$i);
+                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],$trimmedanswer, $data['exactmatch'], $data['usecase'], (-1)*$i);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';
