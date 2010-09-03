@@ -283,6 +283,9 @@ class dfa_preg_matcher extends preg_matcher {
         $this->finiteautomates[$index][0] = new finite_automate_state;
         //form the map of following
         $this->numeration($this->roots[$index], $index);
+        if (strpos($this->modifiers, 'i') !== false) {
+            $this->for_case_insensitive();
+        }
         dfa_preg_matcher::nullable($this->roots[$index]);
         dfa_preg_matcher::firstpos($this->roots[$index]);
         dfa_preg_matcher::lastpos($this->roots[$index]);
@@ -792,15 +795,10 @@ class dfa_preg_matcher extends preg_matcher {
         }  
     }
     
-    static function for_case_insensitive($node) {
-        if ($node->type == LEAF) {
-            if ($node->subtype == LEAF_CHARCLASS) {
-                $node->chars = strtolower($node->chars);
-            }
-        } else {//if node
-            dfa_preg_matcher::for_case_insensitive($node->firop);
-            if ($node->subtype == NODE_ALT || $node->subtype == NODE_CONC) {
-                dfa_preg_matcher::for_case_insensitive($node->secop);
+    function for_case_insensitive() {
+        foreach ($this->connection as $key1 => $val1) {
+            foreach ($val1 as $key2 => $val2) {
+                $this->connection[$key1][$key2] = strtolower($val2) . strtoupper($val2);
             }
         }
     }
@@ -818,9 +816,6 @@ class dfa_preg_matcher extends preg_matcher {
         if ($this->is_error_exists()) {
             return;
         }
-        if (strpos($modifiers, 'i') !== false) {
-            dfa_preg_matcher::for_case_insensitive($this->roots[0]);
-        }
         dfa_preg_matcher::convert_tree($this->roots[0]);
         $this->append_end(0);
         $this->buildfa(0);
@@ -836,13 +831,6 @@ class dfa_preg_matcher extends preg_matcher {
     function build_tree($regex) {
         parent::build_tree($regex);
         $this->roots[0] = $this->ast_root;
-    }
-    public function match($str) {
-        if (strpos($this->modifiers, 'i') !== false) {
-            $str = strtolower($str);
-        }
-        $res = parent::match($str);
-        return $res;
     }
     /**
     *function get string and compare it with regex
