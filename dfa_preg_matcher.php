@@ -839,7 +839,7 @@ class dfa_preg_matcher extends preg_matcher {
     */
     function match_inner($response) {
         if ($this->unchor->start) {
-            $result = $this->compare($response, 0);
+            $result = $this->compare($response, 0, 0, $this->unchor->end);
         } else {
             $result = new stdClass;
             $result->full = false;
