@@ -36,6 +36,7 @@ class preg_matcher {
     //Initial data
     protected $regex;
     protected $modifiers;
+    protected $unchor;
 
     //The root of abstract syntax tree of the regular expression
     protected $ast_root;
@@ -102,7 +103,10 @@ class preg_matcher {
         } else {
             $this->ast_root = null;
         }
-
+        if ($this->is_error_exists()) {
+            //if parsing error then no tree, nothing accept.
+            return;
+        }
         //check regular expression for validity
         $this->accept_regex($this->ast_root);
     }
@@ -111,7 +115,7 @@ class preg_matcher {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return '';//no modifiers support by default
+        return 'i';//no modifiers support by default
     }
 
     /**
@@ -144,6 +148,7 @@ class preg_matcher {
         foreach ($this->flags as $key => $value) {
             $this->errors[] = get_string($key, 'qtype_preg').' '.get_string('unsupported','qtype_preg');
         }
+        $this->errors = array_unique($this->errors);//Fix, for one message about one unsuppoerted operation.
 
         if (empty($this->errors)) {
             return true;
@@ -285,7 +290,12 @@ class preg_matcher {
             }
         }
         $parser->doParse(0, 0);
-        $this->ast_root = $parser->get_root();
+        if ($parser->get_error()) {
+            $this->errors[] = get_string('incorrectregex', 'qtype_preg');
+        } else {
+            $this->ast_root = $parser->get_root();
+            $this->unchor = $parser->get_unchor();
+        }
         fclose($pseudofile);
     }
 }

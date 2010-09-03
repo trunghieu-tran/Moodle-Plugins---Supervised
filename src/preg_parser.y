@@ -3,30 +3,67 @@
     require_once($CFG->dirroot . '/question/type/preg/node.php');
 }
 %include_class {
+    private $root;
+    private $unchor;
+    private $error;
+    function __construct() {
+        $this->unchor = new stdClass;
+        $this->unchor->start = false;
+        $this->unchor->end = false;
+        $this->error = false;
+    }
     function get_root() {
         return $this->root;
     }
-    private $root;
+    function get_unchor() {
+        return $this->unchor;
+    }
+    function get_error() {
+        return $this->error;
+    }
     static function is_conc($prevtoken, $currtoken) {
+        static $condsubpatt = false;
+        static $close = 0;
+        if ($currtoken == preg_parser_yyParser::CONDSUBPATT) {
+            $condsubpatt = true;
+            $close = -1;
+        }
+        if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
+            $close++;
+        }
+        if ($condsubpatt && ($currtoken == preg_parser_yyParser::OPENBRACK || $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF  ||
+            $currtoken == preg_parser_yyParser::ASSERT_FB || $currtoken == preg_parser_yyParser::ASSERT_TB || $currtoken == preg_parser_yyParser::GROUPING ||
+            $currtoken == preg_parser_yyParser::ONETIMESUBPATT)) {
+            $close--;
+        }
+        if ($close == 0) {
+            $condsubpatt = false;
+        }
         $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
                   $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
                   $prevtoken == preg_parser_yyParser::ITER || $prevtoken == preg_parser_yyParser::LAZY_ITER ||
                   $prevtoken == preg_parser_yyParser::PLUS || $prevtoken == preg_parser_yyParser::LAZY_PLUS ||
-                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT);
+                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT ||
+                  $prevtoken == preg_parser_yyParser::WORDBREAK || $prevtoken == preg_parser_yyParser::WORDNOTBREAK);
         $flag2 = ($currtoken == preg_parser_yyParser::PARSLEAF || $currtoken == preg_parser_yyParser::OPENBRACK ||
                   $currtoken == preg_parser_yyParser::GROUPING || $currtoken == preg_parser_yyParser::CONDSUBPATT ||
                   $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB);
-        $flag = ($flag1 && $flag2 && isset($prevtoken));
+                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB||
+                  $currtoken == preg_parser_yyParser::WORDBREAK || $currtoken == preg_parser_yyParser::WORDNOTBREAK ||
+                  $currtoken == preg_parser_yyParser::ONETIMESUBPATT);
+        $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
         return $flag;
     }
+}
+%parse_failure {
+    $this->error = true;
 }
 %left ALT.
 %left CONC.
 %nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
 %nonassoc CLOSEBRACK.
 
-start ::= expr(B). {
+start ::= lastexpr(B). {
     $this->root = B;
 }
 expr(A) ::= expr(B) CONC expr(C). {
@@ -188,4 +225,34 @@ expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
 expr(A) ::= PARSLEAF(B). {
     A = new node;
     A = B;
+}
+expr(A) ::= STARTUNCHOR(B) expr(C). {
+    $this->unchor->start = true;
+    A = new node;
+    A = C;
+}
+lastexpr(A) ::= lastexpr(B) ENDUNCHOR(C). {
+    $this->unchor->end = true;
+    A = new node;
+    A = B;
+}
+lastexpr(A) ::= expr(B). {
+    A = new node;
+    A = B;
+}
+expr(A) ::= ONETIMESUBPATT expr(B) CLOSEBRACK. {
+    A = new node;
+    A->type = NODE;
+    A->subtype = NODE_ONETIMESUBPATT;
+    A->firop = B;
+}
+expr(A) ::= WORDBREAK . {
+    A = new node;
+    A->type = LEAF;
+    A->subtype = LEAF_WORDBREAK;
+}
+expr(A) ::= WORDNOTBREAK . {
+    A = new node;
+    A->type = LEAF;
+    A->subtype = LEAF_WORDNOTBREAK;
 }

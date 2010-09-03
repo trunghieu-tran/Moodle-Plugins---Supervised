@@ -213,7 +213,6 @@ class question_preg_qtype extends question_shortanswer_qtype {
             }
         }
 
-
         parent::print_question_formulation_and_controls($question, $state, $cmoptions, $options);
         /*
         //Code from shortanswer question - doesn't see any way to avoid duplicating it now!!! - possibly could be avoided using $this->hintedmessage

@@ -51,7 +51,6 @@ class preg_php_matcher extends preg_matcher {
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp,'test') === false) {
-
             $this->errors[] = get_string('incorrectregex','qtype_preg');
             return false;
         }

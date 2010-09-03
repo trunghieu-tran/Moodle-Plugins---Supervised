@@ -1,6 +1,6 @@
 <?php # vim:ft=php
 require_once($CFG->dirroot . '/question/type/preg/jlex.php');
-require_once($CFG->dirroot . '/question/type/preg/parser_preg.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/node.php');
 
 function form_node($type, $subtype, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
@@ -123,6 +123,10 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::CLOSEBRACK, 0);
     return $res;
 }
+<YYINITIAL> \(\?> {
+    $res = form_res(preg_parser_yyParser::ONETIMESUBPATT, 0);
+    return $res;
+}
 <YYINITIAL> \(\?: {
     $res = form_res(preg_parser_yyParser::GROUPING, 0);
     return $res;
@@ -135,15 +139,15 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::ASSERT_TF, 0);
     return $res;
 }
-<YYINITIAL> \(!= {
+<YYINITIAL> \(\?! {
     $res = form_res(preg_parser_yyParser::ASSERT_FF, 0);
     return $res;
 }
-<YYINITIAL> \(\?~ {
+<YYINITIAL> \(\?<= {
     $res = form_res(preg_parser_yyParser::ASSERT_TB, 0);
     return $res;
 }
-<YYINITIAL> \(!~ {
+<YYINITIAL> \(\?<! {
     $res = form_res(preg_parser_yyParser::ASSERT_FB, 0);
     return $res;
 }
@@ -151,7 +155,7 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_METASYMBOLDOT));
     return $res;
 }
-<YYINITIAL> [^\[\]\\*+?{}()|.] {
+<YYINITIAL> [^\[\]\\*+?{}()|.^$] {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, $this->yytext()));
     return $res;
 }
@@ -178,6 +182,14 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 }
 <YYINITIAL> \\\\ {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, '\\'));
+    return $res;
+}
+<YYINITIAL> \\b {
+    $res = form_res(preg_parser_yyParser::WORDBREAK, 0);
+    return $res;
+}
+<YYINITIAL> \\B {
+    $res = form_res(preg_parser_yyParser::WORDNOTBREAK, 0);
     return $res;
 }
 <YYINITIAL> \\d {
@@ -212,6 +224,14 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 }
 <YYINITIAL> \\t {
     $res = form_res(preg_parser_yyParser::PARSLEAF, form_node(LEAF, LEAF_CHARCLASS, chr(9)));
+    return $res;
+}
+<YYINITIAL> "^" {
+    $res = form_res(preg_parser_yyParser::STARTUNCHOR, 0);
+    return $res;
+}
+<YYINITIAL> "$" {
+    $res = form_res(preg_parser_yyPARSER::ENDUNCHOR, 0);
     return $res;
 }
 <CHARCLASS> \\\\ {
