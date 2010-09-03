@@ -345,13 +345,13 @@ class dfa_preg_matcher extends preg_matcher {
     *@param string - string for compare with regex
     *@param assertnumber - number of assert with which string will compare, 0 for main regex
     *@param offset - index of character in string which must be beginning for match
-    *@param endlock - if endlock == false than string can continue after end of matching, else string must end on end of matching
+    *@param endunchor - if endunchor == false than string can continue after end of matching, else string must end on end of matching
     *@return object with three property:
     *   1)index - index of last matching character (integer)
     *   2)full  - fullnes of matching (boolean)
     *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
     */
-    function compare($string, $assertnumber, $offset = 0, $endlock = true) {//if main regex then assertnumber is 0
+    function compare($string, $assertnumber, $offset = 0, $endunchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
         $end = false;//current state is end state, not yet
         $full = true;//if string match with asserts
@@ -461,9 +461,9 @@ class dfa_preg_matcher extends preg_matcher {
             $result->index = $maxindex;
             $assertrequirenext = true;
         }
-        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endlock) {//if all string match with regex.
+        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endunchor) {//if all string match with regex.
             $result->full = true;
-        } elseif ($substringmatch->full && !$endlock) {
+        } elseif ($substringmatch->full && !$endunchor) {
             $result->full = true;
             $result->index = $substringmatch->index -1;
         } else {
@@ -838,14 +838,14 @@ class dfa_preg_matcher extends preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        if ($this->lock->start) {
+        if ($this->unchor->start) {
             $result = $this->compare($response, 0);
         } else {
             $result = new stdClass;
             $result->full = false;
             $result->index = -1;
             for ($i=0; $i<strlen($response) && !$result->full; $i++) {
-                $tmpres = $this->compare($response, 0, $i, $this->lock->end);
+                $tmpres = $this->compare($response, 0, $i, $this->unchor->end);
                 if ($tmpres->full || $tmpres->index > $result->index || !isset($result->next)) {
                     $result = $tmpres;
                 }

@@ -436,14 +436,14 @@ array(
 							break;
 						case 11:
 							{
-    $res = form_res(preg_parser_yyParser::STARTLOCK, 0);
+    $res = form_res(preg_parser_yyParser::STARTUNCHOR, 0);
     return $res;
 }
 						case -12:
 							break;
 						case 12:
 							{
-    $res = form_res(preg_parser_yyPARSER::ENDLOCK, 0);
+    $res = form_res(preg_parser_yyPARSER::ENDUNCHOR, 0);
     return $res;
 }
 						case -13:

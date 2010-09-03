@@ -4,19 +4,19 @@
 }
 %include_class {
     private $root;
-    private $lock;
+    private $unchor;
     private $error;
     function __construct() {
-        $this->lock = new stdClass;
-        $this->lock->start = false;
-        $this->lock->end = false;
+        $this->unchor = new stdClass;
+        $this->unchor->start = false;
+        $this->unchor->end = false;
         $this->error = false;
     }
     function get_root() {
         return $this->root;
     }
-    function get_lock() {
-        return $this->lock;
+    function get_unchor() {
+        return $this->unchor;
     }
     function get_error() {
         return $this->error;
@@ -226,13 +226,13 @@ expr(A) ::= PARSLEAF(B). {
     A = new node;
     A = B;
 }
-expr(A) ::= STARTLOCK(B) expr(C). {
-    $this->lock->start = true;
+expr(A) ::= STARTUNCHOR(B) expr(C). {
+    $this->unchor->start = true;
     A = new node;
     A = C;
 }
-lastexpr(A) ::= lastexpr(B) ENDLOCK(C). {
-    $this->lock->end = true;
+lastexpr(A) ::= lastexpr(B) ENDUNCHOR(C). {
+    $this->unchor->end = true;
     A = new node;
     A = B;
 }

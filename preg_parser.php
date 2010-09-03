@@ -110,19 +110,19 @@ class preg_parser_yyParser
 #line 5 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
 
     private $root;
-    private $lock;
+    private $unchor;
     private $error;
     function __construct() {
-        $this->lock = new stdClass;
-        $this->lock->start = false;
-        $this->lock->end = false;
+        $this->unchor = new stdClass;
+        $this->unchor->start = false;
+        $this->unchor->end = false;
         $this->error = false;
     }
     function get_root() {
         return $this->root;
     }
-    function get_lock() {
-        return $this->lock;
+    function get_unchor() {
+        return $this->unchor;
     }
     function get_error() {
         return $this->error;
@@ -191,8 +191,8 @@ class preg_parser_yyParser
     const ASSERT_FB                      = 17;
     const CONDSUBPATT                    = 18;
     const PARSLEAF                       = 19;
-    const STARTLOCK                      = 20;
-    const ENDLOCK                        = 21;
+    const STARTUNCHOR                    = 20;
+    const ENDUNCHOR                      = 21;
     const ONETIMESUBPATT                 = 22;
     const WORDBREAK                      = 23;
     const WORDNOTBREAK                   = 24;
@@ -520,7 +520,7 @@ static public $yy_action = array(
   'LAZY_QUEST',    'LAZY_PLUS',     'LAZY_QUANT',    'CLOSEBRACK',  
   'OPENBRACK',     'GROUPING',      'ASSERT_TF',     'ASSERT_TB',   
   'ASSERT_FF',     'ASSERT_FB',     'CONDSUBPATT',   'PARSLEAF',    
-  'STARTLOCK',     'ENDLOCK',       'ONETIMESUBPATT',  'WORDBREAK',   
+  'STARTUNCHOR',   'ENDUNCHOR',     'ONETIMESUBPATT',  'WORDBREAK',   
   'WORDNOTBREAK',  'error',         'start',         'lastexpr',    
   'expr',        
     );
@@ -553,8 +553,8 @@ static public $yy_action = array(
  /*  20 */ "expr ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr ALT expr CLOSEBRACK",
  /*  21 */ "expr ::= CONDSUBPATT ASSERT_FB expr CLOSEBRACK expr ALT expr CLOSEBRACK",
  /*  22 */ "expr ::= PARSLEAF",
- /*  23 */ "expr ::= STARTLOCK expr",
- /*  24 */ "lastexpr ::= lastexpr ENDLOCK",
+ /*  23 */ "expr ::= STARTUNCHOR expr",
+ /*  24 */ "lastexpr ::= lastexpr ENDUNCHOR",
  /*  25 */ "lastexpr ::= expr",
  /*  26 */ "expr ::= ONETIMESUBPATT expr CLOSEBRACK",
  /*  27 */ "expr ::= WORDBREAK",
@@ -1180,14 +1180,14 @@ static public $yy_action = array(
 #line 1185 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
 #line 229 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r23(){
-    $this->lock->start = true;
+    $this->unchor->start = true;
     $this->_retvalue = new node;
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 1192 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.php"
 #line 234 "C:\denwer\installed\home\moodle19\www\question\type\preg\src\preg_parser.y"
     function yy_r24(){
-    $this->lock->end = true;
+    $this->unchor->end = true;
     $this->_retvalue = new node;
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
