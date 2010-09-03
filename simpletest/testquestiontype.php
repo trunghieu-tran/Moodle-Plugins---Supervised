@@ -535,10 +535,10 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'a');
         $matcher->match('abb');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 0);
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '');
         $matcher->match('ababababababaabbabababababababaabb');//34 characters
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 33 && $matcher->next_char() ===0);
+        $this->assertTrue($matcher->last_correct_character_index() == 33 && $matcher->next_char() ==='');
     }
     function test_general_assert() {
         $matcher = new dfa_preg_matcher('^a(?=.*b)[xcvbnm]*$');
@@ -547,13 +547,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
         $matcher->match('anvnvb');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 5 && $matcher->next_char() === 0);
+        $this->assertTrue($matcher->last_correct_character_index() == 5 && $matcher->next_char() === '');
         $matcher->match('avnvnv');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 5 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
         $matcher->match('abnm');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
+        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
     /*
     *   this is overall test for dfa_preg_matcher class
@@ -568,7 +568,6 @@ class dfa_preg_matcher_test extends UnitTestCase {
         *   2)full  - is_matching_complete()
         *   3)next  - next_char()
         */
-        //use === but not == for next_char, because 'b' == 0 is true
         $matcher->match('avnm');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b');
@@ -580,7 +579,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 3 && ($matcher->next_char() === 'c' || $matcher->next_char() ===  'D'));
         $matcher->match('abnc');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === 0);
+        $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
     //Unit test for copy_subtree()
     function test_copy_subtree() {
