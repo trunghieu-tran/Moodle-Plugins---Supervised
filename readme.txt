@@ -28,7 +28,7 @@ Native PHP preg matching engine works using preg_match() function from PHP langu
 library, which uses backtracking method). It supports full regular expression syntax, but don't allow
 partial matches - so no hinting. Also, due to backtracking algorithm problems it could give wrong answers
 on some regular expression like a?NaN (see http://swtch.com/~rsc/regexp/regexp1.html) - DFA engine are
-best for this type of regexes.
+best for this type of regexes. It's almost 100% debugged.
 
 DFA matching algorithm support partial matching and could tell us shortest path to complete a match. However, it 
 by nature can't support backreferences in regular expressions. It also doesn't handle well quantificators with
