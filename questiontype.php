@@ -1,9 +1,17 @@
 <?php  // $Id: questiontype.php,v 1.4 beta 2010/08/08 16:47:26 oasychev & dvkolesov Exp $
 
+/**
+ * Defines the question type class for the preg question type.
+ *
+ * @copyright &copy; 2008  Sychev Oleg 
+ * @author Sychev Oleg, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 ///////////////////
 /// preg ///
 ///////////////////
-
+ 
 /// QUESTION TYPE CLASS //////////////////
 
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
@@ -214,59 +222,6 @@ class question_preg_qtype extends question_shortanswer_qtype {
         }
 
         parent::print_question_formulation_and_controls($question, $state, $cmoptions, $options);
-        /*
-        //Code from shortanswer question - doesn't see any way to avoid duplicating it now!!! - possibly could be avoided using $this->hintedmessage
-        $readonly = empty($options->readonly) ? '' : 'readonly="readonly"';
-        $formatoptions = new stdClass;
-        $formatoptions->noclean = true;
-        $formatoptions->para = false;
-        $nameprefix = $question->name_prefix;
-
-        /// Print question text and media
-        $questiontext = format_text($question->questiontext,
-                $question->questiontextformat,
-                $formatoptions, $cmoptions->course);
-        $image = get_question_image($question);
-
-        /// Print input controls
-
-        if (isset($state->responses['']) && $state->responses[''] != '') {
-            $value = ' value="'.s($state->responses[''], true).'" ';
-        } else {
-            $value = ' value="" ';
-        }
-        $inputname = ' name="'.$nameprefix.'" ';
-
-        $feedback = '';
-        $class = '';
-        $feedbackimg = '';
-
-        if ($options->feedback) {
-            $class = question_get_feedback_class(0);
-            $feedbackimg = question_get_feedback_image(0);
-            foreach($question->options->answers as $answer) {
-
-                if ($this->test_response($question, $state, $answer) || $this->result->full) {
-                    // Answer was correct or partially correct.
-                    $class = question_get_feedback_class($answer->fraction);
-                    $feedbackimg = question_get_feedback_image($answer->fraction);
-                    if ($answer->feedback) {
-                        $feedback = format_text($answer->feedback, true, $formatoptions, $cmoptions->course);
-                    }
-                    break;
-                }
-            }
-        }
-        if ($question->options->usehint && isset($state->responses['hint'])) {
-            if (!$this->result->full) {
-                //for display hint message, concatenate it with feedback
-                $feedback = $hintmessage . $feedback;
-            }
-        }
-
-        /// Removed correct answer, to be displayed later MDL-7496
-        include("$CFG->dirroot/question/type/preg/display.html");
-        */
     }
 
     function get_display_html_path() {

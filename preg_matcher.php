@@ -2,8 +2,8 @@
 /**
  * Defines abstract class of matcher, extend it to create a new mathcing engine
  *
- * @copyright &copy; 2010  Oleg Sychev & Kolesov Dmitriy 
- * @author Oleg Sychev & Kolesov Dmitriy, Volgograd State Technical University
+ * @copyright &copy; 2010  Oleg Sychev
+ * @author Oleg Sychev, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
