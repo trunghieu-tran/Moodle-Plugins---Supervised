@@ -480,7 +480,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
-    function test_compare_uncunchor() {//ab
+    function test_compare_uncanchor() {//ab
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[0][2] = new finite_automate_state;
@@ -502,7 +502,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 2);
     }
-    function test_compare_ununchor_iteration() {//(?:abc)*
+    function test_compare_unanchor_iteration() {//(?:abc)*
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[0][2] = new finite_automate_state;

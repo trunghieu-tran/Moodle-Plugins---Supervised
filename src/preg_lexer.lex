@@ -227,11 +227,11 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     return $res;
 }
 <YYINITIAL> "^" {
-    $res = form_res(preg_parser_yyParser::STARTUNCHOR, 0);
+    $res = form_res(preg_parser_yyParser::STARTANCHOR, 0);
     return $res;
 }
 <YYINITIAL> "$" {
-    $res = form_res(preg_parser_yyPARSER::ENDUNCHOR, 0);
+    $res = form_res(preg_parser_yyPARSER::ENDANCHOR, 0);
     return $res;
 }
 <CHARCLASS> \\\\ {
