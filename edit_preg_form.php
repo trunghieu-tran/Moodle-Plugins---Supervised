@@ -38,6 +38,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
 
         //Set hint availability determined by engine capabilities
+        /* TODO - commented out before MDL-23825 will be resolved
         foreach ($engines as $engine => $enginename) {
             require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
             $querymatcher = new $engine;
@@ -48,7 +49,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 $mform->disabledIf('usehint','engine', 'eq', $engine);
                 $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
             }
-        }
+        }*/
 
         parent::definition_inner($mform);
 
@@ -84,6 +85,13 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         if ($correctanswermatch == false) {
             $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
         }
+
+        //Check engine capabilities - TODO replace with disabledIf calls when MDL-23825 will be resolved
+        $querymatcher = new $data['engine'];
+        if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER) && $data['usehint']) {
+            $errors['usehint'] = get_string('nohintsupport','qtype_preg',get_string($data['engine'],'qtype_preg'));
+        }
+
         return $errors;
     }
 
