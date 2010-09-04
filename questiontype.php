@@ -17,7 +17,7 @@
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
-    
+
     //key is answer id, value is matcher object
     //keys will be unique across many questions since answer id's are unique
     protected $matchers_cache = array();
@@ -32,6 +32,12 @@ class question_preg_qtype extends question_shortanswer_qtype {
         return array('preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
                         'dfa_preg_matcher' => get_string('dfa_preg_matcher','qtype_preg'));
     }
+
+    //We are a child of shortanswer question
+    function requires_qtypes() {
+        return array('shortanswer');
+    }
+
 
     function name() {
         return 'preg';
