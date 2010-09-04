@@ -127,7 +127,7 @@ class dfa_preg_matcher extends preg_matcher {
             switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
                 case LEAF_CHARCLASS://normal number for charclass
                     $node->number = ++$this->maxnum;
-                    $this->connection[$index][$this->maxnum] = $node->chars;
+                    $this->connection[$index][$this->maxnum] = &$node->chars;
                     break;
                 case LEAF_END://STREND number for end leaf
                     $node->number = STREND;
