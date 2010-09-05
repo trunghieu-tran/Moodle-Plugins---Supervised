@@ -180,7 +180,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
 
         // Update the penalty
         if (isset($state->responses['hint'])) {
-            $state->penalty = $question->hintpenalty * $question->maxgrade;
+            $state->penalty = $question->options->hintpenalty * $question->maxgrade;
         } else {
             $state->penalty = $question->penalty * $question->maxgrade;
         }
@@ -213,7 +213,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
             }
             $hintedcharacter = '';
             if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
-                $hintedcharacter = '<span style="background-color:#FFFF00">'.htmlspecialchars($matcher->next_char()).'</span>';
+                $hintedcharacter = '<span style="background-color:#00FF00">'.htmlspecialchars($matcher->next_char()).'</span>';
             }
             $wrongtail = '';
             if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
