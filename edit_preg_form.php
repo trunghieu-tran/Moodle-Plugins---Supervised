@@ -24,18 +24,23 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $engines = $QTYPES[$this->qtype()]->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine','preg_php_matcher');
+        $mform->addHelpButton('engine','engine','qtype_preg');
         $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
         $mform->setDefault('usehint',0);
+        $mform->addHelpButton('usehint','usehint','qtype_preg');
         $mform->addElement('text', 'hintpenalty', get_string('hintpenalty','qtype_preg'), array('size' => 3));
         $mform->setDefault('hintpenalty','0.2');
         $mform->setType('hintpenalty', PARAM_NUMBER);
+        $mform->addHelpButton('hintpenalty','hintpenalty','qtype_preg');
         $creategrades = get_grade_options();
         $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
         $mform->setDefault('hintgradeborder',1);
+        $mform->addHelpButton('hintgradeborder','hintgradeborder','qtype_preg');
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
-        $mform->setHelpButton('exactmatch', array('exactmatch',get_string('exactmatch','qtype_preg'),'qtype_preg'));
+        $mform->addHelpButton('exactmatch','exactmatch','qtype_preg');
         $mform->setDefault('exactmatch',1);
         $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
+        $mform->addHelpButton('correctanswer','correctanswer','qtype_preg');
 
         //Set hint availability determined by engine capabilities
         /* TODO - commented out before MDL-23825 will be resolved
