@@ -22,7 +22,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     //keys will be unique across many questions since answer id's are unique
     protected $matchers_cache = array();
 
-    //Neded to pass hinted message to the question form, should be deleted when moving for renderers
+    //Needed to pass hinted message to the question form, should be deleted when moving for renderers
     protected $hintmessage = '';
 
     /**
@@ -37,7 +37,6 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function requires_qtypes() {
         return array('shortanswer');
     }
-
 
     function name() {
         return 'preg';
@@ -72,7 +71,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
                     $for_regexp='^'.$for_regexp;
                 }
                 if ($for_regexp[strlen($for_regexp)-1]!='$' || 
-                        ($for_regexp[strlen($for_regexp)-1]=='$' && $for_regexp[strlen($for_regexp)-2]=='\\')) {
+                        (strlen($for_regexp)>1 && $for_regexp[strlen($for_regexp)-1]=='$' && $for_regexp[strlen($for_regexp)-2]=='\\')) {
                     $for_regexp=$for_regexp.'$';
                 }
             }
@@ -195,7 +194,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
         if (array_key_exists('__answer',$state->responses)) {//for the first time - no hint message
             //form hint messages
-            $answer = $state->responses['__answer'];//TODO - check this is working, or it is in $state->last_graded->responses
+            $answer = $state->responses['__answer'];
             $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
             $response = $state->responses[''];
             $matcher->match($response);
