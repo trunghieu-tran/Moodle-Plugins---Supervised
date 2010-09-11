@@ -146,9 +146,9 @@ class preg_matcher {
 
         //Add error messages for unsupported nodes
         foreach ($this->flags as $key => $value) {
-            $this->errors[] = get_string($key, 'qtype_preg').' '.get_string('unsupported','qtype_preg');
+            $this->errors[] = get_string('unsupported','qtype_preg',get_string($key, 'qtype_preg'));
         }
-        $this->errors = array_unique($this->errors);//Fix, for one message about one unsuppoerted operation.
+        $this->errors = array_unique($this->errors);//Fix, for one message about one unsupported operation.
 
         if (empty($this->errors)) {
             return true;
