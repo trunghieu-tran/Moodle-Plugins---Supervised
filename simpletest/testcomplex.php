@@ -184,5 +184,14 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 0);
     }
+    function test_subpattern() {
+        $matcher = new dfa_preg_matcher('(a|b)');
+        $matcher->match('a');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('b');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('Incorrect!!!');
+        $this->assertFalse($matcher->is_matching_complete());
+    }
 }
 ?>
