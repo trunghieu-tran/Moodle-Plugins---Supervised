@@ -661,6 +661,18 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
     }
+    function test_convert_tree_subpattern() {//('a|b')
+        $this->qtype->build_tree('(a|b)');
+        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
+        $this->qtype->append_end(0);
+        $this->qtype->buildfa(0);
+        $result1 = $this->qtype->compare('b', 0);
+        $result2 = $this->qtype->compare('a', 0);
+        $result3 = $this->qtype->compare('Incorrect', 0);
+        $this->assertTrue($result1->full);
+        $this->assertTrue($result2->full);
+        $this->assertFalse($result3->full);
+    }
     //Unit test for wave
     function test_wave_easy() {
         $matcher = new dfa_preg_matcher('abcd');
