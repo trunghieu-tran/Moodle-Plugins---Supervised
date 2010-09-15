@@ -67,9 +67,6 @@ class dfa_preg_matcher extends preg_matcher {
             case LEAF_LINK:
                 $this->flags['link'] = true;
                 return false;
-            case NODE_SUBPATT:
-                $this->flags['subpattern'] = true;
-                return false;
             case NODE_CONDSUBPATT:
                 $this->flags['condsubpatt'] = true;
                 return false;
@@ -687,13 +684,19 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     /**
-    *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and x-y times of operand?
+    *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and y-x times of operand?
+    *and replace subpattern on it's operand (operand) on operand, because subbpattern is unsupported, 
+    *but it can use as grouping () == (?:) if link isn't exist (for this matcher).
     *(operand|) replace on operand?, character class METASYMBOL_DOT replace on METASYBOLD_, because METASYMBOL_DOT is service word
     *param node - current node of converting tree
     */
-    static function convert_tree($node) {
+    static function convert_tree(&$node) {
         if ($node->type == NODE) {
             switch ($node->subtype) {
+                case NODE_SUBPATT:
+                    $node = $node->firop;
+                    dfa_preg_matcher::convert_tree($node);//because $node is old $node->firop and it is recursive call for operand of current node
+                    break;
                 case NODE_PLUSQUANT:
                     dfa_preg_matcher::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
