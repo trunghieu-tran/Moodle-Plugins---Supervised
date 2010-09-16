@@ -67,9 +67,6 @@ class dfa_preg_matcher extends preg_matcher {
             case LEAF_LINK:
                 $this->flags['link'] = true;
                 return false;
-            case NODE_SUBPATT:
-                $this->flags['subpattern'] = true;
-                return false;
             case NODE_CONDSUBPATT:
                 $this->flags['condsubpatt'] = true;
                 return false;
@@ -127,7 +124,7 @@ class dfa_preg_matcher extends preg_matcher {
             switch($node->subtype) {//number depend from subtype (charclass, metasymbol dot or end symbol)
                 case LEAF_CHARCLASS://normal number for charclass
                     $node->number = ++$this->maxnum;
-                    $this->connection[$index][$this->maxnum] = $node->chars;
+                    $this->connection[$index][$this->maxnum] = &$node->chars;
                     break;
                 case LEAF_END://STREND number for end leaf
                     $node->number = STREND;
@@ -345,13 +342,13 @@ class dfa_preg_matcher extends preg_matcher {
     *@param string - string for compare with regex
     *@param assertnumber - number of assert with which string will compare, 0 for main regex
     *@param offset - index of character in string which must be beginning for match
-    *@param endunchor - if endunchor == false than string can continue after end of matching, else string must end on end of matching
+    *@param endanchor - if endanchor == false than string can continue after end of matching, else string must end on end of matching
     *@return object with three property:
     *   1)index - index of last matching character (integer)
     *   2)full  - fullnes of matching (boolean)
     *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
     */
-    function compare($string, $assertnumber, $offset = 0, $endunchor = true) {//if main regex then assertnumber is 0
+    function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
         $end = false;//current state is end state, not yet
         $full = true;//if string match with asserts
@@ -461,9 +458,9 @@ class dfa_preg_matcher extends preg_matcher {
             $result->index = $maxindex;
             $assertrequirenext = true;
         }
-        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endunchor) {//if all string match with regex.
+        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endanchor) {//if all string match with regex.
             $result->full = true;
-        } elseif ($substringmatch->full && !$endunchor) {
+        } elseif ($substringmatch->full && !$endanchor) {
             $result->full = true;
             $result->index = $substringmatch->index -1;
         } else {
@@ -687,13 +684,19 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
     /**
-    *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and x-y times of operand?
+    *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and y-x times of operand?
+    *and replace subpattern on it's operand (operand) on operand, because subbpattern is unsupported, 
+    *but it can use as grouping () == (?:) if link isn't exist (for this matcher).
     *(operand|) replace on operand?, character class METASYMBOL_DOT replace on METASYBOLD_, because METASYMBOL_DOT is service word
     *param node - current node of converting tree
     */
-    static function convert_tree($node) {
+    static function convert_tree(&$node) {
         if ($node->type == NODE) {
             switch ($node->subtype) {
+                case NODE_SUBPATT:
+                    $node = $node->firop;
+                    dfa_preg_matcher::convert_tree($node);//because $node is old $node->firop and it is recursive call for operand of current node
+                    break;
                 case NODE_PLUSQUANT:
                     dfa_preg_matcher::convert_tree($node->firop);
                     if ($node->firop->type == LEAF &&$node->firop->subtype == LEAF_EMPTY) {
@@ -838,14 +841,14 @@ class dfa_preg_matcher extends preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        if ($this->unchor->start) {
-            $result = $this->compare($response, 0, 0, $this->unchor->end);
+        if ($this->anchor->start) {
+            $result = $this->compare($response, 0, 0, $this->anchor->end);
         } else {
             $result = new stdClass;
             $result->full = false;
             $result->index = -1;
             for ($i=0; $i<strlen($response) && !$result->full; $i++) {
-                $tmpres = $this->compare($response, 0, $i, $this->unchor->end);
+                $tmpres = $this->compare($response, 0, $i, $this->anchor->end);
                 if ($tmpres->full || $tmpres->index > $result->index || !isset($result->next)) {
                     $result = $tmpres;
                 }

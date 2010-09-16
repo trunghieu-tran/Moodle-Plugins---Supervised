@@ -172,19 +172,19 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 135);
     }
-    function test_lexer_unchors() {
+    function test_lexer_anchors() {
         //^a|b$
         $regex = '^a|b$';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::STARTUNCHOR);
+        $this->assertTrue($token->type === preg_parser_yyParser::STARTANCHOR);
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ENDUNCHOR);
+        $this->assertTrue($token->type === preg_parser_yyParser::ENDANCHOR);
     }
     function test_lexer_asserts() {
         $regex = '(?=(?!(?<=(?<!';
@@ -375,7 +375,7 @@ class parser_test extends UnitTestCase {
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
         $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
     }
-    function test_parser_two_unchors() {
+    function test_parser_two_anchors() {
         $parser = new preg_parser_yyParser;
         $regex = '^a$';
         StringStreamController::createRef('regex', $regex);
@@ -394,11 +394,11 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $unchor = $parser->get_unchor();
+        $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
-        $this->assertTrue($unchor->start === true && $unchor->end === true);
+        $this->assertTrue($anchor->start === true && $anchor->end === true);
     }
-    function test_parser_start_unchor() {
+    function test_parser_start_anchor() {
         $parser = new preg_parser_yyParser;
         $regex = '^a';
         StringStreamController::createRef('regex', $regex);
@@ -417,11 +417,11 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $unchor = $parser->get_unchor();
+        $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
-        $this->assertTrue($unchor->start === true && $unchor->end === false);
+        $this->assertTrue($anchor->start === true && $anchor->end === false);
     }
-    function test_parser_end_unchor() {
+    function test_parser_end_anchor() {
         $parser = new preg_parser_yyParser;
         $regex = 'a$';
         StringStreamController::createRef('regex', $regex);
@@ -440,11 +440,11 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $unchor = $parser->get_unchor();
+        $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
-        $this->assertTrue($unchor->start === false && $unchor->end === true);
+        $this->assertTrue($anchor->start === false && $anchor->end === true);
     }
-    function test_parser_no_unchors() {
+    function test_parser_no_anchors() {
         $parser = new preg_parser_yyParser;
         $regex = 'a';
         StringStreamController::createRef('regex', $regex);
@@ -463,9 +463,9 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
-        $unchor = $parser->get_unchor();
+        $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
-        $this->assertTrue($unchor->start === false && $unchor->end === false);
+        $this->assertTrue($anchor->start === false && $anchor->end === false);
     }
     function test_parser_error() {
         $parser = new preg_parser_yyParser;

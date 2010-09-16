@@ -480,7 +480,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
-    function test_compare_uncunchor() {//ab
+    function test_compare_uncanchor() {//ab
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[0][2] = new finite_automate_state;
@@ -502,7 +502,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 2);
     }
-    function test_compare_ununchor_iteration() {//(?:abc)*
+    function test_compare_unanchor_iteration() {//(?:abc)*
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[0][2] = new finite_automate_state;
@@ -660,6 +660,18 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result3->full);
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
+    }
+    function test_convert_tree_subpattern() {//('a|b')
+        $this->qtype->build_tree('(a|b)');
+        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
+        $this->qtype->append_end(0);
+        $this->qtype->buildfa(0);
+        $result1 = $this->qtype->compare('b', 0);
+        $result2 = $this->qtype->compare('a', 0);
+        $result3 = $this->qtype->compare('Incorrect', 0);
+        $this->assertTrue($result1->full);
+        $this->assertTrue($result2->full);
+        $this->assertFalse($result3->full);
     }
     //Unit test for wave
     function test_wave_easy() {
