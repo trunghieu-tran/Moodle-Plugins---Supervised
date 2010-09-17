@@ -193,6 +193,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     }
 
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {
+        $this->hintmessage = '';
         if (array_key_exists('__answer',$state->responses)) {//for the first time - no hint message
             //form hint messages
             $answer = $state->responses['__answer'];
@@ -220,8 +221,11 @@ class question_preg_qtype extends question_shortanswer_qtype {
             if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
                 $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
             }
-        
-            $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
+
+            //We shouldn't show colored message if there is no match and partial matching is unavailable, because we could mislead student striking throught all reponse, even the correct parts that may be there
+            if($matcher->match_found() || $matcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+                $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
+            }
             if (!empty($this->hintmessage)) {
                 $this->hintmessage .= '<br />';
             }
