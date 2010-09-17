@@ -847,9 +847,10 @@ class dfa_preg_matcher extends preg_matcher {
             $result = new stdClass;
             $result->full = false;
             $result->index = -1;
+            $result->left = 999999;
             for ($i=0; $i<strlen($response) && !$result->full; $i++) {
                 $tmpres = $this->compare($response, 0, $i, $this->anchor->end);
-                if ($tmpres->full || $tmpres->index > $result->index || !isset($result->next)) {
+                if ($tmpres->full || $tmpres->left < $result->left || !isset($result->next)) {
                     $result = $tmpres;
                 }
             }
