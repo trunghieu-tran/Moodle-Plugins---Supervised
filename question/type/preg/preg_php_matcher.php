@@ -15,7 +15,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 class preg_php_matcher extends preg_matcher {
 
     public function is_supporting($capability) {
-        return false; //Native matching doesn't support any special capabilities
+        switch ($capability) {
+        case preg_matcher::SUBPATTERN_CAPTURING :
+            return true;
+            break;
+        }
+        return false; //Native matching doesn't support any partial matching capabilities
     }
 
     public function name() {
@@ -73,11 +78,18 @@ class preg_php_matcher extends preg_matcher {
 
         //Do matching
         $matches = array();
+        //No need to find all matches since preg_match don't return partial matches, any full match is sufficient
         $this->full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
+        //$matches[0] - match with the whole regexp, $matches[1] - first subpattern etc
+        //$matches[$i] format is array(0=> match, 1 => offset of this match)
         if ($this->full) {
-            $this->index_first = $matches[0][1];//$matches[0] - match with the whole regexp, array(0=> match, 1 => offset of this match)
-            $this->index_last = $this->index_first + strlen($matches[0][0]) - 1;
+            $this->is_match = true;
+            foreach ($matches as $i => $match) {
+                $this->index_first[$i] = $match[1];
+                $this->index_last[$i] = $this->index_first[$i] + strlen($match[0]) - 1;
+            }
         }
+
     }
 
 
