@@ -854,15 +854,16 @@ class dfa_preg_matcher extends preg_matcher {
                 }
             }
         }
+
+        $this->is_match =  ($result->index > -1);
         $this->full = $result->full;
-        $this->index_first = 0;
-        $this->index_last = $result->index;
+        $this->index_first[0] = $result->offset;
+        $this->index_last[0] = $result->index;
         if ($result->next === 0) {
             $this->next = '';
         } else {
             $this->next = $result->next;
         }
-        $this->index_first = $result->offset;
         $this->left = $result->left;
         return;
     }

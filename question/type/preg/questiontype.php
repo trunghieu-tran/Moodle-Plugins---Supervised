@@ -168,6 +168,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
         //save best fitted answer for further uses
         $state->responses['__answer'] = $bestfitanswer;
 
+
         if ($full) {
             $state->raw_grade = $bestfitanswer->fraction;
         } else {
