@@ -23,7 +23,7 @@ class preg_matcher {
     const NEXT_CHARACTER = 1;
     //Returning the smallest number of characters that needed to complete partial match
     const CHARACTERS_LEFT = 2;
-    //Subpattern matching
+    //Subpattern capturing during matching
     const SUBPATTERN_CAPTURING = 3;
 
     /**
@@ -48,7 +48,7 @@ class preg_matcher {
     protected $errors;
     //Array with flags for unsupported node types
     protected $flags;
-    //Anchoring - TODO -  Dmitriy please add comment about what is stored there
+    //Anchoring - object,  with 'start' and 'end' logical fields, which are true if ancho
     protected $anchor;
 
     //Matching results
