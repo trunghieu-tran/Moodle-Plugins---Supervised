@@ -97,6 +97,19 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
             $errors['usehint'] = get_string('nohintsupport','qtype_preg',get_string($data['engine'],'qtype_preg'));
         }
 
+        //If engine doesn't support subpattern capturing, than no placeholders should be in feedback
+        if (!$querymatcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
+            $feedbacks = $data['feedback'];
+            foreach ($feedbacks as $key => $feedback) {
+                if (is_array($feedback)) {//On some servers feedback is HTMLEditor, on another it is simple text area
+                    $feedback = $feedback['text'];
+                }
+                if (!empty($feedback) && preg_match('/\{\$[1-9][0-9]*\}/', $feedback) == 1) {
+                    $errors['feedback['.$key.']'] = get_string('nosubpatterncapturing','qtype_preg',$querymatcher->name());
+                }
+            }
+        }
+
         return $errors;
     }
 

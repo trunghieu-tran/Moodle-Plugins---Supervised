@@ -17,7 +17,7 @@
     </div>
   <?php } ?>
   <?php 
-  $feedback = $feedback;
+  $feedback = $this->insert_subpatterns($feedback, $question, $state);
   if ($feedback) { ?>
     <div class="feedback">
       <?php echo $feedback ?>
