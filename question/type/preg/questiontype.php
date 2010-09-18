@@ -238,6 +238,39 @@ class question_preg_qtype extends question_shortanswer_qtype {
          global $CFG;
          return $CFG->dirroot.'/question/type/preg/display.html';
     }
+
+    /*
+    * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
+    @param subject string to insert subpatterns
+    @param question question object to create matcher
+    @param state state of the question attempt to get response
+    @return changed string
+    */
+    function insert_subpatterns($subject, $question, $state) {
+        //Sanity check 
+        if (strpos($subject,'{$') === false || strpos($subject,'}') === false 
+            || !array_key_exists('__answer',$state->responses)) {
+            //there are no placeholders for sure or no match found 
+            return $subject;
+        }
+
+        $answer = $state->responses['__answer'];
+        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $response = $state->responses[''];
+        $matcher->match($response);
+
+        $subpatterncount = $matcher->count_subpatterns();
+
+        for ($i=0;$i <= $subpatterncount;$i++) {//<= because full match counts too
+            $search = '{$'.$i.'}';
+            $startindex = $matcher->first_correct_character_index($i);
+            $endindex = $matcher->last_correct_character_index($i);
+            $replace = substr($response, $startindex, $endindex - $startindex + 1);
+            $subject = str_replace($search, $replace, $subject);
+        }
+
+        return $subject;
+    }
 }
 //// END OF CLASS ////
 
