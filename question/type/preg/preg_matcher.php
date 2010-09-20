@@ -337,7 +337,7 @@ class preg_matcher {
         }
         $parser->doParse(0, 0);
         if ($parser->get_error()) {
-            $this->errors[] = get_string('incorrectregex', 'qtype_preg');
+            $this->errors = array_merge($this->errors, $parser->get_error_messages());
         } else {
             $this->ast_root = $parser->get_root();
             $this->anchor = $parser->get_anchor();
