@@ -57,7 +57,7 @@
     }
 
     static function is_conc($prevtoken, $currtoken) {
-        static $condsubpatt = false;
+        /*static $condsubpatt = false;
         static $close = 0;
         if ($currtoken == preg_parser_yyParser::CONDSUBPATT) {
             $condsubpatt = true;
@@ -87,7 +87,8 @@
                   $currtoken == preg_parser_yyParser::WORDBREAK || $currtoken == preg_parser_yyParser::WORDNOTBREAK ||
                   $currtoken == preg_parser_yyParser::ONETIMESUBPATT);
         $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
-        return $flag;
+        return $flag;*/
+        return false;
     }
 }
 %parse_failure {

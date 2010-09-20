@@ -526,10 +526,16 @@ class parser_test extends UnitTestCase {
         }
         $parser->doParse(0, 0);
         $root = $parser->get_root();
+        /* Old-style concatenation layout (strictly left-associative)
         $ff = $root->secop;
         $tf = $root->firop->secop;
         $fb = $root->firop->firop->firop->secop;
-        $tb = $root->firop->firop->firop->firop;
+        $tb = $root->firop->firop->firop->firop;*/
+        /*New-style concatenation layout (with no associativity defined) - more balanced tree*/
+        $tb = $root->firop->firop;
+        $fb = $root->firop->secop;
+        $tf = $root->secop->secop->firop;
+        $ff = $root->secop->secop->secop;
         $this->assertTrue($tf->type == NODE && $tf->subtype == NODE_ASSERTTF);
         $this->assertTrue($ff->type == NODE && $ff->subtype == NODE_ASSERTFF);
         $this->assertTrue($fb->type == NODE && $fb->subtype == NODE_ASSERTFB);
