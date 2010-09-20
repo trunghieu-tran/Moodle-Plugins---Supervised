@@ -523,10 +523,10 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('cd');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a');
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('cd')-1 && $matcher->next_char() === 'a');
         $matcher->match('ca');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a');
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('ca')-1 && $matcher->next_char() === 'a');
         $matcher->match('ac');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 0 && ($matcher->next_char() === 'b') || $matcher->next_char() === 'a');
