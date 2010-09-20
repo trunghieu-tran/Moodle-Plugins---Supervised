@@ -4110,5 +4110,5 @@ class LemonParser
 $a = new Lemon;
 //$_SERVER['argv'] = array('lemon', '-s', '/development/lemon/PHP_Parser.y');
 //$_SERVER['argv'] = array('lemon', '-s', '/development/File_ChessPGN/ChessPGN/Parser.y');
-$_SERVER['argv'] = array('lemon', '-s', 'C:\\denwer\\installed\\home\\moodle19\\www\\question\\type\\preg\\src\\preg_parser.y');
+$_SERVER['argv'] = array('lemon', '-s', '../preg_parser.y');
 $a->main();
