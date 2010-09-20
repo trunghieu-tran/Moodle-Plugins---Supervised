@@ -13,6 +13,8 @@
     private $errormessages;
     //Count of reduces made
     private $reducecount;
+    //Assert characters
+    private $assertchars;
 
     function __construct() {
         $this->anchor = new stdClass;
@@ -21,6 +23,7 @@
         $this->error = false;
         $this->errormessages = array();
         $this->reducecount = 0;
+        $this->assertchars = array(NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
     }
 
     function get_root() {
@@ -221,36 +224,27 @@ expr(A) ::= GROUPING expr(B) CLOSEBRACK. {
     A = B;
     $this->reducecount++;
 }
-expr(A) ::= ASSERT_TF expr(B) CLOSEBRACK. {
+assertstart(A) ::= ASSERT_TF. {
+    A = NODE_ASSERTTF;
+}
+assertstart(A) ::= ASSERT_TB. {
+    A = NODE_ASSERTTB;
+}
+assertstart(A) ::= ASSERT_FF. {
+    A = NODE_ASSERTFF;
+}
+assertstart(A) ::= ASSERT_FB. {
+    A = NODE_ASSERTFB;
+}
+expr(A) ::= assertstart(C) expr(B) CLOSEBRACK. {
     ECHO  'ASSERT TF <br/>';
     A = new node;
     A->type = NODE;
-    A->subtype = NODE_ASSERTTF;
+    A->subtype = C;
     A->firop = B;
     $this->reducecount++;
 }
-expr(A) ::= ASSERT_TB expr(B) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ASSERTTB;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= ASSERT_FF expr(B) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ASSERTFF;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= ASSERT_FB expr(B) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ASSERTFB;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
+expr(A) ::= CONDSUBPATT assertstart(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     ECHO  'CONDSUB TF <br/>';
     A = new node;
     A->type = NODE;
@@ -263,55 +257,7 @@ expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
         A->secop = C->secop;
     }
     A->thirdop->type = NODE;
-    A->thirdop->subtype = NODE_ASSERTTF;
-    A->thirdop->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= CONDSUBPATT ASSERT_TB expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONDSUBPATT;
-    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
-    if (C->subtype != NODE_ALT) {
-        A->firop = C;
-    } else {
-        A->firop = C->firop;
-        A->secop = C->secop;
-    }
-    A->thirdop->type = NODE;
-    A->thirdop->subtype = NODE_ASSERTTB;
-    A->thirdop->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= CONDSUBPATT ASSERT_FF expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONDSUBPATT;
-    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
-    if (C->subtype != NODE_ALT) {
-        A->firop = C;
-    } else {
-        A->firop = C->firop;
-        A->secop = C->secop;
-    }
-    A->thirdop->type = NODE;
-    A->thirdop->subtype = NODE_ASSERTFF;
-    A->thirdop->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONDSUBPATT;
-    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
-    if (C->subtype != NODE_ALT) {
-        A->firop = C;
-    } else {
-        A->firop = C->firop;
-        A->secop = C->secop;
-    }
-    A->thirdop->type = NODE;
-    A->thirdop->subtype = NODE_ASSERTFB;
+    A->thirdop->subtype = D;
     A->thirdop->firop = B;
     $this->reducecount++;
 }
@@ -412,83 +358,26 @@ expr(A) ::= GROUPING. [ERROR_PREC_SHORT] {
     $this->reducecount++;
 }
 
-expr(A) ::= ASSERT_TF expr. [ERROR_PREC] {
+expr(A) ::= assertstart(B) expr. [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?=');
+        A = $this->create_error_node('emptyparens',$this->assertchars(B));
     } else {//normal unclosed bracket
         if ($lasterrormsg != null) {
             $this->errormessages[] = $lasterrormsg;
         }
-        A = $this->create_error_node('unclosedparen','(?=');
+        A = $this->create_error_node('unclosedparen',$this->assertchars(B));
     }
     $this->reducecount++;
 }
 
-expr(A) ::= ASSERT_TF. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?=');
-    $this->reducecount++;
+expr(A) ::= assertstart(B). [ERROR_PREC_SHORT] {
+    A = $this->create_error_node('openparenatend',$this->assertchars(B));
+    $this->reducecount++; /*TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
 }
 
-expr(A) ::= ASSERT_TB expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?<=');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen','(?<=');
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT_TB. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?<=');
-    $this->reducecount++;
-}
- 
-expr(A) ::= ASSERT_FF expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?!');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen','(?!');
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT_FF. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?!');
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT_FB expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?<!');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen','(?<!');
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT_FB. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?<!');
-    $this->reducecount++;/* TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
-}
-
-expr(A) ::= CONDSUBPATT ASSERT_FF expr CLOSEBRACK expr. [ERROR_PREC] {
+expr(A) ::= CONDSUBPATT assertstart expr CLOSEBRACK expr. [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
@@ -563,5 +452,10 @@ expr(A) ::= LAZY_PLUS. [ERROR_PREC] {
 
 expr(A) ::= LAZY_QUANT. [ERROR_PREC] {
     A = $this->create_error_node('quantifieratstart','{...}?');
+    $this->reducecount++;
+}
+
+lastexpr(A) ::= LEXERROR(A). {
+    A = $this->create_error_node(A);
     $this->reducecount++;
 }
