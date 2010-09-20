@@ -20,7 +20,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('^abcd$');
         $matcher->match('fgh');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a');
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('fgh')-1 && $matcher->next_char() === 'a');
         $result = $matcher->match('abce');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === 'd');
@@ -95,7 +95,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '');
         $result = $matcher->match('yzi');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && ($matcher->next_char() === 'a' || $matcher->next_char() === 'c' || $matcher->next_char() === 'e' || $matcher->next_char() === 'g'));
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('yzi')-1 && ($matcher->next_char() === 'a' || $matcher->next_char() === 'c' || $matcher->next_char() === 'e' || $matcher->next_char() === 'g'));
     }
     function test_repeat_chars() {
         $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
@@ -161,7 +161,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 0);
         $matcher->match('OabO');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a' && $matcher->first_correct_character_index() == 0);
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('OabO')-1 && $matcher->next_char() === 'a' && $matcher->first_correct_character_index() == strlen('OabO'));
     }
     function test_right_anchor() {
         $matcher = new dfa_preg_matcher('ab$');
@@ -179,7 +179,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 0);
         $matcher->match('Oab');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == -1 && $matcher->next_char() === 'a' && $matcher->first_correct_character_index() == 0);
+        $this->assertTrue($matcher->last_correct_character_index() == strlen('Oab')-1 && $matcher->next_char() === 'a' && $matcher->first_correct_character_index() == strlen('Oab'));
         $matcher->match('abO');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 0);
