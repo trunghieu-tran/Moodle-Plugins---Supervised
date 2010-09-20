@@ -329,13 +329,14 @@ class preg_matcher {
             $curr = $token->type;
 
             if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                //$parser->doParse(preg_parser_yyParser::CONC, 0);
                 $parser->doParse($token->type, $token->value);
             } else {
                 $parser->doParse($token->type, $token->value);
             }
 
             if ($token->type === preg_parser_yyParser::LEXERROR) {//Stop processing on lexical errors
+                //TODO - add detecting unclosed square bracket errror...
                 //Right now there is only one lexical error - unclosed square bracket and it is detected at the end of the file, so it's OK to stop processing there
                 break;
             }
