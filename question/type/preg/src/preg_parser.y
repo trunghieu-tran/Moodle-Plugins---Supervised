@@ -6,21 +6,32 @@
     private $root;
     private $anchor;
     private $error;
+    private $errormessages;
+
     function __construct() {
         $this->anchor = new stdClass;
         $this->anchor->start = false;
         $this->anchor->end = false;
         $this->error = false;
+        $this->errormessages = array();
     }
+
     function get_root() {
         return $this->root;
     }
+
     function get_anchor() {
         return $this->anchor;
     }
+
     function get_error() {
         return $this->error;
     }
+
+    function get_error_messages() {
+        return $this->errormessages;
+    }
+
     static function is_conc($prevtoken, $currtoken) {
         static $condsubpatt = false;
         static $close = 0;
@@ -56,17 +67,32 @@
     }
 }
 %parse_failure {
-    $this->error = true;
+    if (!$this->error) {
+        $this->errormessages[] = get_string('incorrectregex', 'qtype_preg');
+        $this->error = true;
+    }
 }
-%left ALT.
-%left CONC.
-%nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
+%nonassoc ERROR_PREC_SHORT.
+%nonassoc ERROR_PREC.
 %nonassoc CLOSEBRACK.
+%left ALT.
+%left CONC PARSLEAF WORDBREAK WORDNOTBREAK STARTANCHOR.
+%nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
+%nonassoc OPENBRACK GROUPING ASSERT_TF ASSERT_TB ASSERT_FF ASSERT_FB CONDSUBPATT ONETIMESUBPATT.
 
 start ::= lastexpr(B). {
     $this->root = B;
 }
 expr(A) ::= expr(B) CONC expr(C). {
+    ECHO 'CONC <br/>';
+    A = new node;
+    A->type = NODE;
+    A->subtype = NODE_CONC;
+    A->firop = B;
+    A->secop = C;
+}
+expr(A) ::= expr(B) expr(C). [CONC] {
+    ECHO 'CONC1 <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONC;
@@ -74,6 +100,7 @@ expr(A) ::= expr(B) CONC expr(C). {
     A->secop = C;
 }
 expr(A) ::= expr(B) ALT expr(C). {
+    ECHO 'ALT <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_ALT;
@@ -150,6 +177,7 @@ expr(A) ::= expr(B) LAZY_QUANT(C). {
     A->firop = B;
 }
 expr(A) ::= OPENBRACK expr(B) CLOSEBRACK. {
+    ECHO 'SUBPATT <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_SUBPATT;
@@ -159,6 +187,7 @@ expr(A) ::= GROUPING expr(B) CLOSEBRACK. {
     A = B;
 }
 expr(A) ::= ASSERT_TF expr(B) CLOSEBRACK. {
+    ECHO  'ASSERT TF <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_ASSERTTF;
@@ -182,12 +211,18 @@ expr(A) ::= ASSERT_FB expr(B) CLOSEBRACK. {
     A->subtype = NODE_ASSERTFB;
     A->firop = B;
 }
-expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBRACK. {
+expr(A) ::= CONDSUBPATT ASSERT_TF expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
+    ECHO  'CONDSUB TF <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
-    A->firop = C;
-    A->secop = D;
+    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
+    if (C->subtype != NODE_ALT) {
+        A->firop = C;
+    } else {
+        A->firop = C->firop;
+        A->secop = C->secop;
+    }
     A->thirdop->type = NODE;
     A->thirdop->subtype = NODE_ASSERTTF;
     A->thirdop->firop = B;
@@ -196,8 +231,13 @@ expr(A) ::= CONDSUBPATT ASSERT_TB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
-    A->firop = C;
-    A->secop = D;
+    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
+    if (C->subtype != NODE_ALT) {
+        A->firop = C;
+    } else {
+        A->firop = C->firop;
+        A->secop = C->secop;
+    }
     A->thirdop->type = NODE;
     A->thirdop->subtype = NODE_ASSERTTB;
     A->thirdop->firop = B;
@@ -206,8 +246,13 @@ expr(A) ::= CONDSUBPATT ASSERT_FF expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
-    A->firop = C;
-    A->secop = D;
+    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
+    if (C->subtype != NODE_ALT) {
+        A->firop = C;
+    } else {
+        A->firop = C->firop;
+        A->secop = C->secop;
+    }
     A->thirdop->type = NODE;
     A->thirdop->subtype = NODE_ASSERTFF;
     A->thirdop->firop = B;
@@ -216,13 +261,19 @@ expr(A) ::= CONDSUBPATT ASSERT_FB expr(B) CLOSEBRACK expr(C) ALT expr(D) CLOSEBR
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
-    A->firop = C;
-    A->secop = D;
+    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
+    if (C->subtype != NODE_ALT) {
+        A->firop = C;
+    } else {
+        A->firop = C->firop;
+        A->secop = C->secop;
+    }
     A->thirdop->type = NODE;
     A->thirdop->subtype = NODE_ASSERTFB;
     A->thirdop->firop = B;
 }
 expr(A) ::= PARSLEAF(B). {
+    ECHO 'LEAF <br/>';
     A = new node;
     A = B;
 }
@@ -255,4 +306,90 @@ expr(A) ::= WORDNOTBREAK . {
     A = new node;
     A->type = LEAF;
     A->subtype = LEAF_WORDNOTBREAK;
+}
+
+expr(A) ::= expr CLOSEBRACK. [ERROR_PREC] {
+    ECHO 'UNOPENPARENS <br/>';
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('unopenedparen','qtype_preg');
+    $this->error = true;
+}
+
+expr(A) ::= CLOSEBRACK. [ERROR_PREC_SHORT] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('closeparenatstart','qtype_preg');
+    $this->error = true;
+}
+
+expr(A) ::= OPENBRACK expr. [ERROR_PREC] {
+    ECHO 'UNCLOSEDPARENS <br/>';
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('unclosedparen','qtype_preg');
+    $this->error = true; 
+}
+
+expr(A) ::= OPENBRACK. [ERROR_PREC_SHORT] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('openparenatend','qtype_preg');
+    $this->error = true; 
+}
+
+expr(A) ::= QUEST. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','?');
+    $this->error = true; 
+}
+
+expr(A) ::= PLUS. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','+');
+    $this->error = true; 
+}
+
+expr(A) ::= ITER. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','*');
+    $this->error = true; 
+}
+
+expr(A) ::= QUANT. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','{..}');
+    $this->error = true; 
+}
+
+expr(A) ::= LAZY_ITER. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','*?');
+    $this->error = true; 
+}
+
+expr(A) ::= LAZY_QUEST. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','??');
+    $this->error = true; 
+}
+
+expr(A) ::= LAZY_PLUS. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','+?');
+    $this->error = true; 
+}
+
+expr(A) ::= LAZY_QUANT. [ERROR_PREC] {
+    A = new node;
+    A->type = ERROR;
+    $this->errormessages[] = get_string('quantifieratstart','qtype_preg','{..}?');
+    $this->error = true; 
 }

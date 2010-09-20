@@ -33,6 +33,7 @@ if (!defined('NODE')) {
     define('ASSERT','1073741824');
     define('DOT','987654321');
     define('STREND','123456789');
+    define('ERROR',999999);
 
     class node {
         var $type;
