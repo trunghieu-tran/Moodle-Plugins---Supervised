@@ -209,19 +209,25 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->subtype === LEAF_METASYMBOLDOT);
     }
     function test_lexer_subpatterns() {
-        $regex = '((?(?:(?>';
+        $regex = '((?:(?>(?(?=(?(?!(?(?<=(?(?<!';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::GROUPING);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::ONETIMESUBPATT);
-    }
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === NODE_ASSERTTF);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === NODE_ASSERTFF);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === NODE_ASSERTTB);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === NODE_ASSERTFB);
+        }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
         $parser = new preg_parser_yyParser;
