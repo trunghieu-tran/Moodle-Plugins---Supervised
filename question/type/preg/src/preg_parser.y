@@ -233,7 +233,7 @@ expr(A) ::= ASSERT(B) expr(C) CLOSEBRACK. {
     A->firop = C;
     $this->reducecount++;
 }
-expr(A) ::= CONDSUBPATT ASSERT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
+expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     ECHO  'CONDSUB TF <br/>';
     A = new node;
     A->type = NODE;
@@ -366,7 +366,7 @@ expr(A) ::= ASSERT(B). [ERROR_PREC_SHORT] {
     $this->reducecount++; /*TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
 }
 
-expr(A) ::= CONDSUBPATT assertstart expr CLOSEBRACK expr. [ERROR_PREC] {
+expr(A) ::= CONDSUBPATT expr CLOSEBRACK expr. [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
