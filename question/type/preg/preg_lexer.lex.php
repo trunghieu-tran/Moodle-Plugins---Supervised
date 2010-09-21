@@ -47,6 +47,11 @@ class Yylex extends JLexBase  {
 	const YY_NO_ANCHOR = 4;
 	const YY_BOL = 128;
 	var $YY_EOF = 129;
+
+    protected $errors = array();
+    public function get_errors() {
+        return $this->errors;
+    }
 	protected $yy_count_chars = true;
 	protected $yy_count_lines = true;
 
@@ -55,6 +60,16 @@ class Yylex extends JLexBase  {
 		$this->yy_lexical_state = self::YYINITIAL;
 	}
 
+	private function yy_do_eof () {
+		if (false === $this->yy_eof_done) {
+
+        if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
+            $this->errors[] = 'unclosedsqbrackets';
+            $this->cc = null;
+        }
+		}
+		$this->yy_eof_done = true;
+	}
 	const YYINITIAL = 0;
 	const CHARCLASS = 1;
 	static $yy_state_dtrans = array(
@@ -360,6 +375,7 @@ array(
 			else $yy_lookahead = $this->yy_advance();
 			$yy_next_state = self::$yy_nxt[self::$yy_rmap[$yy_state]][self::$yy_cmap[$yy_lookahead]];
 			if ($this->YY_EOF == $yy_lookahead && true == $yy_initial) {
+				$this->yy_do_eof();
 				return null;
 			}
 			if (self::YY_F != $yy_next_state) {
@@ -736,8 +752,9 @@ array(
 							break;
 						case 49:
 							{
-    $res= form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
+    $res = form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     $this->yybegin(self::YYINITIAL);
+    $this->cc = null;
     return $res;
 }
 						case -50:

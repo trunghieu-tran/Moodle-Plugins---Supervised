@@ -459,7 +459,7 @@ expr(A) ::= LAZY_QUANT. [ERROR_PREC] {
     $this->reducecount++;
 }
 
-lastexpr(A) ::= LEXERROR(A). {
-    A = $this->create_error_node(A);
+lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
+    A = $this->create_error_node(C);
     $this->reducecount++;
 }

@@ -611,8 +611,27 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDNOTBREAK);
     }
     function test_parser_subpatterns() {
+        $parser =& $this->run_parser('((?:(?(?=a)a|(?>b))))');
+        $root = $parser->get_root();
+        $this->assertTrue($root->subtype == NODE_SUBPATT);
+        $this->assertTrue($root->firop->subtype == NODE_CONDSUBPATT);
+        $this->assertTrue($root->firop->secop->subtype == NODE_ONETIMESUBPATT);
+    }
+    function test_syntax_errors() {//Test error reporting
+        //Unclosed square brackets
+        $parser =& $this->run_parser('ab(c|d)[fg\\]');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(in_array(get_string('unclosedsqbrackets', 'qtype_preg'), $errormsgs));
+    }
+
+    /** 
+    *Service function to run parser on regex
+    *@param regex Regular expression to parse
+    *@return parser object
+    */
+    protected function &run_parser($regex) {
         $parser = new preg_parser_yyParser;
-        $regex = '((?:(?(?=a)a|(?>b))))';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
@@ -621,17 +640,18 @@ class parser_test extends UnitTestCase {
             $prev = $curr;
             $curr = $token->type;
             if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
+                //$parser->doParse(preg_parser_yyParser::CONC, 0);
                 $parser->doParse($token->type, $token->value);
             } else {
                 $parser->doParse($token->type, $token->value);
             }
         }
+        $lexerrors = $lexer->get_errors();
+        foreach ($lexerrors as $errstring) {
+            $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
+        }
         $parser->doParse(0, 0);
-        $root = $parser->get_root();
-        $this->assertTrue($root->subtype == NODE_SUBPATT);
-        $this->assertTrue($root->firop->subtype == NODE_CONDSUBPATT);
-        $this->assertTrue($root->firop->secop->subtype == NODE_ONETIMESUBPATT);
+        return $parser;
     }
 }
 ?>
