@@ -192,13 +192,13 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT_TF);
+        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTTF);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT_FF);
+        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTFF);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT_TB);
+        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTTB);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT_FB);
+        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTFB);
     }
     function test_lexer_metasymbol_dot() {
         $regex = '.';
