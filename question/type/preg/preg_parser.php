@@ -1277,7 +1277,7 @@ static public $yy_action = array(
 #line 310 "../preg_parser.y"
     function yy_r26(){
     ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
+    /*$lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
         $this->_retvalue = $this->create_error_node('emptyparens','(');
     } else {//normal unclosed bracket
@@ -1285,17 +1285,32 @@ static public $yy_action = array(
             $this->errormessages[] = $lasterrormsg;
         }
         $this->_retvalue = $this->create_error_node('unclosedparen','(');
+    }*/
+    end($this->errormessages);
+    $unopenstr = get_string('unopenedparen','qtype_preg');
+    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
+    $i = count($this->errormessages) - 1;
+    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
+        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
+        $i--;
+    }
+    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
+        //empty brackets, avoiding two error messages
+        array_splice($this->errormessages, $i, 1);
+        $this->_retvalue = $this->create_error_node('emptyparens','(');
+    } else {
+        $this->_retvalue = $this->create_error_node('unclosedparen','(');
     }
     $this->reducecount++;
     }
-#line 1296 "../preg_parser.php"
-#line 324 "../preg_parser.y"
+#line 1311 "../preg_parser.php"
+#line 338 "../preg_parser.y"
     function yy_r27(){
     $this->_retvalue = $this->create_error_node('openparenatend','(');
     $this->reducecount++;
     }
-#line 1302 "../preg_parser.php"
-#line 329 "../preg_parser.y"
+#line 1317 "../preg_parser.php"
+#line 343 "../preg_parser.y"
     function yy_r28(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
@@ -1309,14 +1324,14 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1317 "../preg_parser.php"
-#line 343 "../preg_parser.y"
+#line 1332 "../preg_parser.php"
+#line 357 "../preg_parser.y"
     function yy_r29(){
     $this->_retvalue = $this->create_error_node('openparenatend','(?:');
     $this->reducecount++;
     }
-#line 1323 "../preg_parser.php"
-#line 348 "../preg_parser.y"
+#line 1338 "../preg_parser.php"
+#line 362 "../preg_parser.y"
     function yy_r30(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
@@ -1330,14 +1345,14 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1338 "../preg_parser.php"
-#line 362 "../preg_parser.y"
+#line 1353 "../preg_parser.php"
+#line 376 "../preg_parser.y"
     function yy_r31(){
     $this->_retvalue = $this->create_error_node('openparenatend',$this->assertchars[$this->yystack[$this->yyidx + 0]->minor]);
     $this->reducecount++; //TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
     }
-#line 1344 "../preg_parser.php"
-#line 367 "../preg_parser.y"
+#line 1359 "../preg_parser.php"
+#line 381 "../preg_parser.y"
     function yy_r32(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
@@ -1351,8 +1366,8 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1359 "../preg_parser.php"
-#line 381 "../preg_parser.y"
+#line 1374 "../preg_parser.php"
+#line 395 "../preg_parser.y"
     function yy_r33(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
@@ -1366,14 +1381,14 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1374 "../preg_parser.php"
-#line 395 "../preg_parser.y"
+#line 1389 "../preg_parser.php"
+#line 409 "../preg_parser.y"
     function yy_r34(){
     $this->_retvalue = $this->create_error_node('openparenatend','(?'.$this->assertchars[$this->yystack[$this->yyidx + 0]->minor]);
     $this->reducecount++;
     }
-#line 1380 "../preg_parser.php"
-#line 400 "../preg_parser.y"
+#line 1395 "../preg_parser.php"
+#line 414 "../preg_parser.y"
     function yy_r35(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
@@ -1387,67 +1402,67 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1395 "../preg_parser.php"
-#line 414 "../preg_parser.y"
+#line 1410 "../preg_parser.php"
+#line 428 "../preg_parser.y"
     function yy_r36(){
     $this->_retvalue = $this->create_error_node('openparenatend','(?>');
     $this->reducecount++;
     }
-#line 1401 "../preg_parser.php"
-#line 419 "../preg_parser.y"
+#line 1416 "../preg_parser.php"
+#line 433 "../preg_parser.y"
     function yy_r37(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','?');
     $this->reducecount++;
     }
-#line 1407 "../preg_parser.php"
-#line 424 "../preg_parser.y"
+#line 1422 "../preg_parser.php"
+#line 438 "../preg_parser.y"
     function yy_r38(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','+');
     $this->reducecount++;
     }
-#line 1413 "../preg_parser.php"
-#line 429 "../preg_parser.y"
+#line 1428 "../preg_parser.php"
+#line 443 "../preg_parser.y"
     function yy_r39(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','*');
     $this->reducecount++;
     }
-#line 1419 "../preg_parser.php"
-#line 434 "../preg_parser.y"
+#line 1434 "../preg_parser.php"
+#line 448 "../preg_parser.y"
     function yy_r40(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','{...}');
     $this->reducecount++;
     }
-#line 1425 "../preg_parser.php"
-#line 439 "../preg_parser.y"
+#line 1440 "../preg_parser.php"
+#line 453 "../preg_parser.y"
     function yy_r41(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','*?');
     $this->reducecount++;
     }
-#line 1431 "../preg_parser.php"
-#line 444 "../preg_parser.y"
+#line 1446 "../preg_parser.php"
+#line 458 "../preg_parser.y"
     function yy_r42(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','??');
     $this->reducecount++;
     }
-#line 1437 "../preg_parser.php"
-#line 449 "../preg_parser.y"
+#line 1452 "../preg_parser.php"
+#line 463 "../preg_parser.y"
     function yy_r43(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','+?');
     $this->reducecount++;
     }
-#line 1443 "../preg_parser.php"
-#line 454 "../preg_parser.y"
+#line 1458 "../preg_parser.php"
+#line 468 "../preg_parser.y"
     function yy_r44(){
     $this->_retvalue = $this->create_error_node('quantifieratstart','{...}?');
     $this->reducecount++;
     }
-#line 1449 "../preg_parser.php"
-#line 459 "../preg_parser.y"
+#line 1464 "../preg_parser.php"
+#line 473 "../preg_parser.y"
     function yy_r45(){
     $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor);
     $this->reducecount++;
     }
-#line 1455 "../preg_parser.php"
+#line 1470 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1552,7 +1567,7 @@ static public $yy_action = array(
         $this->errormessages[] = get_string('incorrectregex', 'qtype_preg');
         $this->error = true;
     }
-#line 1561 "../preg_parser.php"
+#line 1576 "../preg_parser.php"
     }
 
     /**

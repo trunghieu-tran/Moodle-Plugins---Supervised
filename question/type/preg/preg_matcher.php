@@ -334,12 +334,10 @@ class preg_matcher {
             } else {
                 $parser->doParse($token->type, $token->value);
             }
-
-            if ($token->type === preg_parser_yyParser::LEXERROR) {//Stop processing on lexical errors
-                //TODO - add detecting unclosed square bracket errror...
-                //Right now there is only one lexical error - unclosed square bracket and it is detected at the end of the file, so it's OK to stop processing there
-                break;
-            }
+        }
+        $lexerrors = $lexer->get_errors();
+        foreach ($lexerrors as $errstring) {
+            $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
         }
         $parser->doParse(0, 0);
         if ($parser->get_error()) {

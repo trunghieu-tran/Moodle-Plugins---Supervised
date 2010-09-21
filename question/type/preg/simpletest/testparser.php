@@ -623,6 +623,40 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
         $this->assertTrue(in_array(get_string('unclosedsqbrackets', 'qtype_preg'), $errormsgs));
+        //Unclosed parenthesis
+        $parser =& $this->run_parser('a(b(?:c(?=d(?!e(?<=f(?<!g(?>h');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 7);
+        //Unopened parenthesis
+        $parser =& $this->run_parser(')ab(c|d)eg)');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 2);
+        $this->assertTrue(in_array(get_string('unopenedparen', 'qtype_preg'), $errormsgs));
+        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
+        //Several unopened and unclosed parenthesis
+        $parser =& $this->run_parser(')a)b)e(((g(');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 7);
+        //Empty parenthesis
+        $parser =& $this->run_parser(')abeg(?!)f');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 2);
+        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
+        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?!'), $errormsgs));
+        //Several empty parenthesis
+        $parser =& $this->run_parser(')ab()eg(?!)f');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        print_r($errormsgs);
+        $this->assertTrue(count($errormsgs) >= 3);
+        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
+        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?!'), $errormsgs));
+        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '('), $errormsgs));
+
     }
 
     /** 
