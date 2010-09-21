@@ -57,27 +57,27 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 %%
 
 <YYINITIAL> \? {
-    $res = form_res(preg_parser_yyParser::QUEST, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUESTQUANT));
     return $res;
 }
 <YYINITIAL> \* {
-    $res = form_res(preg_parser_yyParser::ITER, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_ITER));
     return $res;
 }
 <YYINITIAL> \+ {
-    $res = form_res(preg_parser_yyParser::PLUS, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_PLUSQUANT));
     return $res;
 }
 <YYINITIAL> \?\? {
-    $res = form_res(preg_parser_yyParser::LAZY_QUEST, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUESTQUANT, null, null, null, false));
     return $res;
 }
 <YYINITIAL> \*\? {
-    $res = form_res(preg_parser_yyParser::LAZY_ITER, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_ITER, null, null, null, false));
     return $res;
 }
 <YYINITIAL> \+\? {
-    $res = form_res(preg_parser_yyParser::LAZY_PLUS, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_PLUSQUANT, null, null, null, false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\} {
@@ -102,22 +102,22 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\}\? {
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,\}\? {
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1, false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1, false));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\}\? {
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3), false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+\}\? {
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
     return $res;
 }
 <YYINITIAL> \[ {
