@@ -412,13 +412,47 @@ class parser_test extends UnitTestCase {
 
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
-        $parser =& $this->run_parser('(?(?=bc)d|e|f)');
+        $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 1);
+        //Correct situation: alternatives are nested within two alternatives for conditional subpattern
+        $parser =& $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))');
+        $this->assertFalse($parser->get_error());
+        //Unclosed second parenthesis
+        $parser =& $this->run_parser('a(?(?=bc)dd|e*f|hhh');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 1);
+        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        //Two parethesis unclosed
+        $parser =& $this->run_parser('(?(?=bce*f|hhh');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 2);
+        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        //Empty assert in conditional subpattern
+        $parser =& $this->run_parser('a(?(?=)');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 2);
+        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?(?='), $errormsgs));
+        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        //Empty yes-expr in conditional subpattern
+        $parser =& $this->run_parser('(?(?=ab))');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        $this->assertTrue(count($errormsgs) == 1);
+        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?(?='), $errormsgs));
+        //Conditional subpattern starts at the end of expression
+        $parser =& $this->run_parser('ab(?(?=');
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
         print_r($errormsgs);
         $this->assertTrue(count($errormsgs) == 1);
-        $this->assertTrue(in_array(get_string('threealtincondsubpatt', 'qtype_preg'), $errormsgs));
-    }
+        $this->assertTrue(in_array(get_string('openparenatend', 'qtype_preg', '(?(?='), $errormsgs));
+
+        }
     /** 
     *Service function to run parser on regex
     *@param regex Regular expression to parse
