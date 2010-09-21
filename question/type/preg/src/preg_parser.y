@@ -14,7 +14,7 @@
     //Count of reduces made
     private $reducecount;
     //Assert characters
-    private $assertchars;
+    private $parens;
 
     function __construct() {
         $this->anchor = new stdClass;
@@ -23,7 +23,8 @@
         $this->error = false;
         $this->errormessages = array();
         $this->reducecount = 0;
-        $this->assertchars = array(NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
+        $this->parens = array(NODE_SUBPATT => '(', NODE => '(?:', NODE_ONETIMESUBPATT => '(?>', 
+                                NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
     }
 
     function get_root() {
@@ -104,7 +105,7 @@
 %left ALT.
 %left CONC PARSLEAF WORDBREAK WORDNOTBREAK STARTANCHOR.
 %nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
-%nonassoc OPENBRACK GROUPING ASSERT CONDSUBPATT ONETIMESUBPATT.
+%nonassoc OPENBRACK CONDSUBPATT.
 
 start ::= lastexpr(B). {
     $this->root = B;
@@ -214,24 +215,16 @@ expr(A) ::= expr(B) LAZY_QUANT(C). {
     A->firop = B;
     $this->reducecount++;
 }
-expr(A) ::= OPENBRACK expr(B) CLOSEBRACK. {
-    ECHO 'SUBPATT <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_SUBPATT;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= GROUPING expr(B) CLOSEBRACK. {
-    A = B;
-    $this->reducecount++;
-}
-expr(A) ::= ASSERT(B) expr(C) CLOSEBRACK. {
-    ECHO  'ASSERT TF <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = B;
-    A->firop = C;
+expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
+    ECHO 'SUBPATT '.$this->parens[B].'<br/>';
+    if (B != NODE) {
+        A = new node;
+        A->type = NODE;
+        A->subtype = B;
+        A->firop = C;
+    } else {//grouping node
+        A = C;
+    }
     $this->reducecount++;
 }
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
@@ -274,13 +267,6 @@ lastexpr(A) ::= expr(B). {
     A = B;
     $this->reducecount++;
 }
-expr(A) ::= ONETIMESUBPATT expr(B) CLOSEBRACK. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ONETIMESUBPATT;
-    A->firop = B;
-    $this->reducecount++;
-}
 expr(A) ::= WORDBREAK . {
     A = new node;
     A->type = LEAF;
@@ -310,7 +296,7 @@ expr(A) ::= CLOSEBRACK. [ERROR_PREC_SHORT] {
     $this->reducecount++;
 }
 
-expr(A) ::= OPENBRACK expr. [ERROR_PREC] {
+expr(A) ::= OPENBRACK(B) expr. [ERROR_PREC] {
     ECHO 'UNCLOSEDPARENS <br/>';
     end($this->errormessages);
     $unopenstr = get_string('unopenedparen','qtype_preg');
@@ -323,66 +309,28 @@ expr(A) ::= OPENBRACK expr. [ERROR_PREC] {
     if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
         //empty brackets, avoiding two error messages
         array_splice($this->errormessages, $i, 1);
-        A = $this->create_error_node('emptyparens','(');
+        A = $this->create_error_node('emptyparens',$this->parens[B]);
     } else {
-        A = $this->create_error_node('unclosedparen','(');
+        A = $this->create_error_node('unclosedparen',$this->parens[B]);
     }
     $this->reducecount++;
 }
 
-expr(A) ::= OPENBRACK. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(');
+expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
+    A = $this->create_error_node('openparenatend',$this->parens[B]);
     $this->reducecount++;
-}
-
-expr(A) ::= GROUPING expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?:');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen','(?:');
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= GROUPING. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?:');
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT(B) expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens',$this->assertchars[B]);
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen',$this->assertchars[B]);
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= ASSERT(B). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend',$this->assertchars[B]);
-    $this->reducecount++; //TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
 }
 
 expr(A) ::= CONDSUBPATT(B) expr CLOSEBRACK expr. [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?'.$this->assertchars[B]);
+        A = $this->create_error_node('emptyparens','(?'.$this->parens[B]);
     } else {//normal unclosed bracket
         if ($lasterrormsg != null) {
             $this->errormessages[] = $lasterrormsg;
         }
-        A = $this->create_error_node('unclosedparen','(?'.$this->assertchars[B]);
+        A = $this->create_error_node('unclosedparen','(?'.$this->parens[B]);
     }
     $this->reducecount++;
 }
@@ -391,37 +339,18 @@ expr(A) ::= CONDSUBPATT(B) expr. [ERROR_PREC_SHORT] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?'.$this->assertchars[B]);
+        A = $this->create_error_node('emptyparens','(?'.$this->parens[B]);
     } else {//normal unclosed bracket
         if ($lasterrormsg != null) {
             $this->errormessages[] = $lasterrormsg;
         }
-        A = $this->create_error_node('unclosedparen','(?'.$this->assertchars[B]);
+        A = $this->create_error_node('unclosedparen','(?'.$this->parens[B]);
     }
     $this->reducecount++;
 }
 
 expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
-    A = $this->create_error_node('openparenatend','(?'.$this->assertchars[B]);
-    $this->reducecount++;
-}
-
-expr(A) ::= ONETIMESUBPATT expr. [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
-        A = $this->create_error_node('emptyparens','(?>');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
-        A = $this->create_error_node('unclosedparen','(?>');
-    }
-    $this->reducecount++;
-}
-
-expr(A) ::= ONETIMESUBPATT. [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend','(?>');
+    A = $this->create_error_node('openparenatend','(?'.$this->parens[B]);
     $this->reducecount++;
 }
 

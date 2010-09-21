@@ -192,13 +192,13 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTTF);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === NODE_ASSERTTF);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTFF);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === NODE_ASSERTFF);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTTB);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === NODE_ASSERTTB);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ASSERT && $token->value === NODE_ASSERTFB);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === NODE_ASSERTFB);
     }
     function test_lexer_metasymbol_dot() {
         $regex = '.';
@@ -214,11 +214,11 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === NODE_SUBPATT);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::GROUPING);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === NODE);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::ONETIMESUBPATT);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === NODE_ONETIMESUBPATT);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === NODE_ASSERTTF);
         $token = $lexer->nextToken();
