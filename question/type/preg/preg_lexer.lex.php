@@ -404,21 +404,21 @@ array(
 							break;
 						case 2:
 							{
-    $res = form_res(preg_parser_yyParser::QUEST, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUESTQUANT));
     return $res;
 }
 						case -3:
 							break;
 						case 3:
 							{
-    $res = form_res(preg_parser_yyParser::ITER, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_ITER));
     return $res;
 }
 						case -4:
 							break;
 						case 4:
 							{
-    $res = form_res(preg_parser_yyParser::PLUS, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_PLUSQUANT));
     return $res;
 }
 						case -5:
@@ -485,21 +485,21 @@ array(
 							break;
 						case 13:
 							{
-    $res = form_res(preg_parser_yyParser::LAZY_QUEST, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUESTQUANT, null, null, null, false));
     return $res;
 }
 						case -14:
 							break;
 						case 14:
 							{
-    $res = form_res(preg_parser_yyParser::LAZY_ITER, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_ITER, null, null, null, false));
     return $res;
 }
 						case -15:
 							break;
 						case 15:
 							{
-    $res = form_res(preg_parser_yyParser::LAZY_PLUS, 0);
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_PLUSQUANT, null, null, null, false));
     return $res;
 }
 						case -16:
@@ -649,7 +649,7 @@ array(
 						case 35:
 							{
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
     return $res;
 }
 						case -36:
@@ -694,7 +694,7 @@ array(
 						case 41:
 							{
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1, false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1, false));
     return $res;
 }
 						case -42:
@@ -702,7 +702,7 @@ array(
 						case 42:
 							{
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3), false));
     return $res;
 }
 						case -43:
@@ -724,7 +724,7 @@ array(
 						case 45:
 							{
     $text = $this->yytext();
-    $res = form_res(preg_parser_yyParser::LAZY_QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
+    $res = form_res(preg_parser_yyParser::QUANT, form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
     return $res;
 }
 						case -46:

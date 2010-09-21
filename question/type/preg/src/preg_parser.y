@@ -13,8 +13,10 @@
     private $errormessages;
     //Count of reduces made
     private $reducecount;
-    //Assert characters
+    //Open-parenthesis strings
     private $parens;
+    //Quantifier strings
+    private $quants;
 
     function __construct() {
         $this->anchor = new stdClass;
@@ -25,6 +27,7 @@
         $this->reducecount = 0;
         $this->parens = array(NODE_SUBPATT => '(', NODE => '(?:', NODE_ONETIMESUBPATT => '(?>', 
                                 NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
+        $this->quants = array (NODE_QUESTQUANT => '?', NODE_ITER => '*', NODE_PLUSQUANT => '+', NODE_QUANT => '{...}');
     }
 
     function get_root() {
@@ -104,7 +107,7 @@
 %nonassoc CLOSEBRACK.
 %left ALT.
 %left CONC PARSLEAF WORDBREAK WORDNOTBREAK STARTANCHOR.
-%nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
+%nonassoc QUANT.
 %nonassoc OPENBRACK CONDSUBPATT.
 
 start ::= lastexpr(B). {
@@ -147,74 +150,13 @@ expr(A) ::= expr(B) ALT. {
     A->secop->subtype = LEAF_EMPTY;
     $this->reducecount++;
 }
-expr(A) ::= expr(B) QUEST. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_QUESTQUANT;
-    A->greed = true;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= expr(B) ITER. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ITER;
-    A->greed = true;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= expr(B) PLUS. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_PLUSQUANT;
-    A->greed = true;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= expr(B) LAZY_QUEST. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_QUESTQUANT;
-    A->greed = false;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= expr(B) LAZY_ITER. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ITER;
-    A->greed = false;
-    A->firop = B;
-    $this->reducecount++;
-}
-expr(A) ::= expr(B) LAZY_PLUS. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_PLUSQUANT;
-    A->greed = false;
-    A->firop = B;
-    $this->reducecount++;
-}
+
 expr(A) ::= expr(B) QUANT(C). {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_QUANT;
-    A->greed = true;
-    A->leftborder = C->leftborder;
-    A->rightborder = C->rightborder;
+    A = C;
     A->firop = B;
     $this->reducecount++;
 }
-expr(A) ::= expr(B) LAZY_QUANT(C). {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_QUANT;
-    A->greed = false;
-    A->leftborder = C->leftborder;
-    A->rightborder = C->rightborder;
-    A->firop = B;
-    $this->reducecount++;
-}
+
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     ECHO 'SUBPATT '.$this->parens[B].'<br/>';
     if (B != NODE) {
@@ -366,43 +308,13 @@ expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
     $this->reducecount++;
 }
 
-expr(A) ::= QUEST. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','?');
-    $this->reducecount++;
-}
 
-expr(A) ::= PLUS. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','+');
-    $this->reducecount++;
-}
-
-expr(A) ::= ITER. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','*');
-    $this->reducecount++;
-}
-
-expr(A) ::= QUANT. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','{...}');
-    $this->reducecount++;
-}
-
-expr(A) ::= LAZY_ITER. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','*?');
-    $this->reducecount++;
-}
-
-expr(A) ::= LAZY_QUEST. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','??');
-    $this->reducecount++;
-}
-
-expr(A) ::= LAZY_PLUS. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','+?');
-    $this->reducecount++;
-}
-
-expr(A) ::= LAZY_QUANT. [ERROR_PREC] {
-    A = $this->create_error_node('quantifieratstart','{...}?');
+expr(A) ::= QUANT(B). [ERROR_PREC] {
+    $quantstr = $this->quants[B->subtype];
+    if (!B->greed) {
+        $quantstr .= '?';
+    }
+    A = $this->create_error_node('quantifieratstart',$quantstr);
     $this->reducecount++;
 }
 

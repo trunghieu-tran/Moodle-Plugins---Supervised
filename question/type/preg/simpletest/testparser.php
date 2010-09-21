@@ -49,11 +49,11 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();//?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUEST);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->subtype == NODE_QUESTQUANT && $token->value->greed);
         $token = $lexer->nextToken();//*
-        $this->assertTrue($token->type === preg_parser_yyParser::ITER);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->subtype == NODE_ITER && $token->value->greed);
         $token = $lexer->nextToken();//+
-        $this->assertTrue($token->type === preg_parser_yyParser::PLUS);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->subtype == NODE_PLUSQUANT && $token->value->greed);
         $token = $lexer->nextToken();//{1,5}
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 1 && $token->value->rightborder == 5 && $token->value->greed);
@@ -67,22 +67,22 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 5 && $token->value->rightborder == 5 && $token->value->greed);
         $token = $lexer->nextToken();//*?
-        $this->assertTrue($token->type == preg_parser_yyParser::LAZY_ITER);
+        $this->assertTrue($token->type == preg_parser_yyParser::QUANT && $token->value->subtype == NODE_ITER && !$token->value->greed);
         $token = $lexer->nextToken();//??
-        $this->assertTrue($token->type == preg_parser_yyParser::LAZY_QUEST);
+        $this->assertTrue($token->type == preg_parser_yyParser::QUANT && $token->value->subtype == NODE_QUESTQUANT && !$token->value->greed);
         $token = $lexer->nextToken();//+?
-        $this->assertTrue($token->type == preg_parser_yyParser::LAZY_PLUS);
+        $this->assertTrue($token->type == preg_parser_yyParser::QUANT && $token->value->subtype == NODE_PLUSQUANT && !$token->value->greed);
         $token = $lexer->nextToken();//{1,5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::LAZY_QUANT);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 1 && $token->value->rightborder == 5 && !$token->value->greed);
         $token = $lexer->nextToken();//{,5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::LAZY_QUANT);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 5 && !$token->value->greed);
         $token = $lexer->nextToken();//{1,}?
-        $this->assertTrue($token->type === preg_parser_yyParser::LAZY_QUANT);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 1 && $token->value->rightborder == -1 && !$token->value->greed);
         $token = $lexer->nextToken();//{5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::LAZY_QUANT);
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == NODE && $token->value->subtype == NODE_QUANT && $token->value->leftborder == 5 && $token->value->rightborder == 5 && !$token->value->greed);
     }
     function test_lexer_backslach() {
