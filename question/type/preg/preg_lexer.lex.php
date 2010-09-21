@@ -598,14 +598,14 @@ array(
 							break;
 						case 33:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT_TF, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTF);
     return $res;
 }
 						case -34:
 							break;
 						case 34:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT_FF, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFF);
     return $res;
 }
 						case -35:
@@ -636,14 +636,14 @@ array(
 							break;
 						case 38:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT_TB, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTB);
     return $res;
 }
 						case -39:
 							break;
 						case 39:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT_FB, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFB);
     return $res;
 }
 						case -40:

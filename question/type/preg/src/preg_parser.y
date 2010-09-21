@@ -103,7 +103,7 @@
 %left ALT.
 %left CONC PARSLEAF WORDBREAK WORDNOTBREAK STARTANCHOR.
 %nonassoc QUEST PLUS ITER QUANT LAZY_ITER LAZY_QUEST LAZY_PLUS LAZY_QUANT.
-%nonassoc OPENBRACK GROUPING ASSERT_TF ASSERT_TB ASSERT_FF ASSERT_FB CONDSUBPATT ONETIMESUBPATT.
+%nonassoc OPENBRACK GROUPING ASSERT CONDSUBPATT ONETIMESUBPATT.
 
 start ::= lastexpr(B). {
     $this->root = B;
@@ -225,27 +225,15 @@ expr(A) ::= GROUPING expr(B) CLOSEBRACK. {
     A = B;
     $this->reducecount++;
 }
-assertstart(A) ::= ASSERT_TF. {
-    A = NODE_ASSERTTF;
-}
-assertstart(A) ::= ASSERT_TB. {
-    A = NODE_ASSERTTB;
-}
-assertstart(A) ::= ASSERT_FF. {
-    A = NODE_ASSERTFF;
-}
-assertstart(A) ::= ASSERT_FB. {
-    A = NODE_ASSERTFB;
-}
-expr(A) ::= assertstart(C) expr(B) CLOSEBRACK. {
+expr(A) ::= ASSERT(B) expr(C) CLOSEBRACK. {
     ECHO  'ASSERT TF <br/>';
     A = new node;
     A->type = NODE;
-    A->subtype = C;
-    A->firop = B;
+    A->subtype = B;
+    A->firop = C;
     $this->reducecount++;
 }
-expr(A) ::= CONDSUBPATT assertstart(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
+expr(A) ::= CONDSUBPATT ASSERT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     ECHO  'CONDSUB TF <br/>';
     A = new node;
     A->type = NODE;
@@ -359,7 +347,7 @@ expr(A) ::= GROUPING. [ERROR_PREC_SHORT] {
     $this->reducecount++;
 }
 
-expr(A) ::= assertstart(B) expr. [ERROR_PREC] {
+expr(A) ::= ASSERT(B) expr. [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
     $lasterrormsg = array_pop($this->errormessages);
     if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
@@ -373,7 +361,7 @@ expr(A) ::= assertstart(B) expr. [ERROR_PREC] {
     $this->reducecount++;
 }
 
-expr(A) ::= assertstart(B). [ERROR_PREC_SHORT] {
+expr(A) ::= ASSERT(B). [ERROR_PREC_SHORT] {
     A = $this->create_error_node('openparenatend',$this->assertchars(B));
     $this->reducecount++; /*TODO - get the next rule working and uncomment it. For now we still don't supporting conditional subpatterns anyway
 }
@@ -389,12 +377,12 @@ expr(A) ::= CONDSUBPATT assertstart expr CLOSEBRACK expr. [ERROR_PREC] {
         }
         A = $this->create_error_node('unclosedparen','(?');
     }
-    $this->reducecount++;*/
+    $this->reducecount++;
 }
 
 expr(A) ::= CONDSUBPATT. [ERROR_PREC_SHORT] {
     A = $this->create_error_node('openparenatend','(?');
-    $this->reducecount++;
+    $this->reducecount++;*/
 }
 
 expr(A) ::= ONETIMESUBPATT expr. [ERROR_PREC] {
