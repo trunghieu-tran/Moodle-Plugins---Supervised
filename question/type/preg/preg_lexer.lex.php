@@ -443,7 +443,7 @@ array(
 							break;
 						case 7:
 							{
-    $res = form_res(preg_parser_yyParser::OPENBRACK, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_SUBPATT);
     return $res;
 }
 						case -8:
@@ -612,28 +612,28 @@ array(
 							break;
 						case 30:
 							{
-    $res = form_res(preg_parser_yyParser::ONETIMESUBPATT, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ONETIMESUBPATT);
     return $res;
 }
 						case -31:
 							break;
 						case 31:
 							{
-    $res = form_res(preg_parser_yyParser::GROUPING, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE);
     return $res;
 }
 						case -32:
 							break;
 						case 32:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTF);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTF);
     return $res;
 }
 						case -33:
 							break;
 						case 33:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFF);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFF);
     return $res;
 }
 						case -34:
@@ -664,14 +664,14 @@ array(
 							break;
 						case 37:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTB);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTB);
     return $res;
 }
 						case -38:
 							break;
 						case 38:
 							{
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFB);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFB);
     return $res;
 }
 						case -39:

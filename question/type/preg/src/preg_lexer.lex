@@ -129,7 +129,7 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
-    $res = form_res(preg_parser_yyParser::OPENBRACK, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_SUBPATT);
     return $res;
 }
 <YYINITIAL> \) {
@@ -137,11 +137,11 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     return $res;
 }
 <YYINITIAL> \(\?> {
-    $res = form_res(preg_parser_yyParser::ONETIMESUBPATT, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ONETIMESUBPATT);
     return $res;
 }
 <YYINITIAL> \(\?: {
-    $res = form_res(preg_parser_yyParser::GROUPING, 0);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE);
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
@@ -161,19 +161,19 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     return $res;
 }
 <YYINITIAL> \(\?= {
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTF);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTF);
     return $res;
 }
 <YYINITIAL> \(\?! {
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFF);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFF);
     return $res;
 }
 <YYINITIAL> \(\?<= {
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTB);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTB);
     return $res;
 }
 <YYINITIAL> \(\?<! {
-    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFB);
+    $res = form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFB);
     return $res;
 }
 <YYINITIAL> \. {
