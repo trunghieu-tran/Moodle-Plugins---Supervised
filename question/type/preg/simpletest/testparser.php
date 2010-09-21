@@ -403,7 +403,6 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('?a({2,3})c(*)e(+)f');
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
-        print_r($errormsgs);
         $this->assertTrue(count($errormsgs) == 4);
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '?'), $errormsgs));
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '+'), $errormsgs));
@@ -411,6 +410,15 @@ class parser_test extends UnitTestCase {
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '{...}'), $errormsgs));
     }
 
+    function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
+        //Three or more alternatives in conditional subpattern
+        $parser =& $this->run_parser('(?(?=bc)d|e|f)');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        print_r($errormsgs);
+        $this->assertTrue(count($errormsgs) == 1);
+        $this->assertTrue(in_array(get_string('threealtincondsubpatt', 'qtype_preg'), $errormsgs));
+    }
     /** 
     *Service function to run parser on regex
     *@param regex Regular expression to parse

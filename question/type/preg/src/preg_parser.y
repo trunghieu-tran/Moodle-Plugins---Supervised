@@ -174,12 +174,17 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
-    /*TODO - add check that there is no ALT operators in C (or C->firop/C->secop)*/
     if (C->subtype != NODE_ALT) {
         A->firop = C;
     } else {
-        A->firop = C->firop;
-        A->secop = C->secop;
+        if (C->firop->subtype == NODE_ALT || C->secop->subtype == NODE_ALT) {
+            A = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
+            $this->reducecount++;
+            return;
+        } else {
+            A->firop = C->firop;
+            A->secop = C->secop;
+        }
     }
     A->thirdop->type = NODE;
     A->thirdop->subtype = D;
