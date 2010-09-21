@@ -114,7 +114,7 @@ start ::= lastexpr(B). {
     $this->root = B;
 }
 expr(A) ::= expr(B) CONC expr(C). {
-    ECHO 'CONC <br/>';
+    //ECHO 'CONC <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONC;
@@ -123,7 +123,7 @@ expr(A) ::= expr(B) CONC expr(C). {
     $this->reducecount++;
 }
 expr(A) ::= expr(B) expr(C). [CONC] {
-    ECHO 'CONC1 <br/>';
+    //ECHO 'CONC1 <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONC;
@@ -132,7 +132,7 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     $this->reducecount++;
 }
 expr(A) ::= expr(B) ALT expr(C). {
-    ECHO 'ALT <br/>';
+    //ECHO 'ALT <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_ALT;
@@ -158,7 +158,7 @@ expr(A) ::= expr(B) QUANT(C). {
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
-    ECHO 'SUBPATT '.$this->parens[B].'<br/>';
+    //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
     if (B != NODE) {
         A = new node;
         A->type = NODE;
@@ -170,7 +170,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     $this->reducecount++;
 }
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    ECHO  'CONDSUB TF <br/>';
+    //ECHO  'CONDSUB TF <br/>';
     A = new node;
     A->type = NODE;
     A->subtype = NODE_CONDSUBPATT;
@@ -192,7 +192,7 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     $this->reducecount++;
 }
 expr(A) ::= PARSLEAF(B). {
-    ECHO 'LEAF <br/>';
+    //ECHO 'LEAF <br/>';
     A = new node;
     A = B;
     $this->reducecount++;
@@ -244,7 +244,7 @@ expr(A) ::= CLOSEBRACK. [ERROR_PREC_SHORT] {
 }
 
 expr(A) ::= OPENBRACK(B) expr. [ERROR_PREC] {
-    ECHO 'UNCLOSEDPARENS <br/>';
+    //ECHO 'UNCLOSEDPARENS <br/>';
     end($this->errormessages);
     $unopenstr = get_string('unopenedparen','qtype_preg');
     $closeatstartstr = get_string('closeparenatstart','qtype_preg');
@@ -302,8 +302,12 @@ expr(A) ::= CONDSUBPATT(B) expr. [ERROR_PREC_SHORT] {
         //empty brackets, avoiding two error messages
         array_splice($this->errormessages, $i, 1);
         A = $this->create_error_node('emptyparens','(?'.$this->parens[B]);
+        //Two unclosed brackets, firts are empty
+        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[B]);
     } else {
+        //Two unclosed brackets, so two messages
         A = $this->create_error_node('unclosedparen','(?'.$this->parens[B]);
+        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[B]);
     }
     $this->reducecount++;
 }
