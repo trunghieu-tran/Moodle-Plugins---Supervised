@@ -312,13 +312,19 @@ expr(A) ::= CLOSEBRACK. [ERROR_PREC_SHORT] {
 
 expr(A) ::= OPENBRACK expr. [ERROR_PREC] {
     ECHO 'UNCLOSEDPARENS <br/>';
-    $lasterrormsg = array_pop($this->errormessages);
-    if ($lasterrormsg == get_string('closeparenatstart','qtype_preg')) {//empty brackets, avoiding two error messages
+    end($this->errormessages);
+    $unopenstr = get_string('unopenedparen','qtype_preg');
+    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
+    $i = count($this->errormessages) - 1;
+    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
+        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
+        $i--;
+    }
+    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
+        //empty brackets, avoiding two error messages
+        array_splice($this->errormessages, $i, 1);
         A = $this->create_error_node('emptyparens','(');
-    } else {//normal unclosed bracket
-        if ($lasterrormsg != null) {
-            $this->errormessages[] = $lasterrormsg;
-        }
+    } else {
         A = $this->create_error_node('unclosedparen','(');
     }
     $this->reducecount++;
