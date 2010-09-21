@@ -55,6 +55,7 @@ class JLexBase {
   protected $yy_count_lines = false;
   protected $yy_count_chars = false;
   protected $yyfilename = null;
+  protected $yy_eof_done = false;
 
   function __construct($stream) {
     $this->yy_reader = $stream;
