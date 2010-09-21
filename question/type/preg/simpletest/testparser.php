@@ -230,46 +230,14 @@ class parser_test extends UnitTestCase {
         }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
-        $parser = new preg_parser_yyParser;
-        $regex = 'a|b';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
         $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
     }
     function test_parser_quantification() {//ab+
-        $parser = new preg_parser_yyParser;
-        $regex = 'ab+';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('ab+');
         $root = $parser->get_root();
         $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
         $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
@@ -277,23 +245,7 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->secop->firop->type == LEAF && $root->secop->firop->subtype == LEAF_CHARCLASS && $root->secop->firop->chars == 'b');
     }
     function test_parser_alt_and_quantif() {//a*|b
-        $parser = new preg_parser_yyParser;
-        $regex = 'a*|b';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
         $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_ITER);
@@ -301,46 +253,14 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
     }
     function test_parser_concatenation() {//ab
-        $parser = new preg_parser_yyParser;
-        $regex = 'ab';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('ab');
         $root = $parser->get_root();
         $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
         $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
     }
     function test_parser_alt_and_conc() {//ab|cd
-        $parser = new preg_parser_yyParser;
-        $regex = 'ab|cd';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('ab|cd');
         $root = $parser->get_root();
         $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
         $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_CONC);
@@ -351,23 +271,7 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->secop->secop->type == LEAF && $root->secop->secop->subtype == LEAF_CHARCLASS && $root->secop->secop->chars == 'd');
     }
     function test_parser_long_regex() {//(?:a|b)*abb
-        $parser = new preg_parser_yyParser;
-        $regex = '(?:a|b)*abb';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('(?:a|b)*abb');
         $matcher = new dfa_preg_matcher;
         $matcher->roots[0] = $parser->get_root();
         $matcher->append_end(0);
@@ -382,155 +286,43 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
     }
     function test_parser_two_anchors() {
-        $parser = new preg_parser_yyParser;
-        $regex = '^a$';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($anchor->start === true && $anchor->end === true);
     }
     function test_parser_start_anchor() {
-        $parser = new preg_parser_yyParser;
-        $regex = '^a';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('^a');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($anchor->start === true && $anchor->end === false);
     }
     function test_parser_end_anchor() {
-        $parser = new preg_parser_yyParser;
-        $regex = 'a$';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a$');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($anchor->start === false && $anchor->end === true);
     }
     function test_parser_no_anchors() {
-        $parser = new preg_parser_yyParser;
-        $regex = 'a';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($anchor->start === false && $anchor->end === false);
     }
     function test_parser_error() {
-        $parser = new preg_parser_yyParser;
-        $regex = '^((ab|cd)ef$';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('^((ab|cd)ef$');
         $this->assertTrue($parser->get_error());
     }
     function test_parser_no_error() {
-        $parser = new preg_parser_yyParser;
-        $regex = '((ab|cd)ef)';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('((ab|cd)ef)');
         $this->assertFalse($parser->get_error());
     }
     function test_parser_asserts() {
-        $parser = new preg_parser_yyParser;
-        $regex = '(?<=\w)(?<!_)a*(?=\w)(?!_)';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)');
         $root = $parser->get_root();
         /* Old-style concatenation layout (strictly left-associative)
         $ff = $root->secop;
@@ -548,65 +340,17 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($tb->type == NODE && $tb->subtype == NODE_ASSERTTB);
     }
     function test_parser_metasymbol_dot() {
-        $parser = new preg_parser_yyParser;
-        $regex = '.';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('.');
         $root = $parser->get_root();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_METASYMBOLDOT);
     }
     function test_parser_word_break() {
-        $parser = new preg_parser_yyParser;
-        $regex = 'a\b';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a\b');
         $root = $parser->get_root();
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDBREAK);
     }
     function test_parser_word_not_break() {
-        $parser = new preg_parser_yyParser;
-        $regex = 'a\B';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $curr = -1;
-        while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                $parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
-        }
-        $parser->doParse(0, 0);
+        $parser =& $this->run_parser('a\B');
         $root = $parser->get_root();
         $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDNOTBREAK);
     }
