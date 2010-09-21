@@ -41,6 +41,13 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 %line
 %char
 %state CHARCLASS
+%eof{
+    if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
+        $res = form_res(preg_parser_yyParser::LEXERROR, 'unclosedsqbrackets');
+        $this->cc = null;
+        return $res;
+    }
+%eof}
 %%
 
 <YYINITIAL> \? {
@@ -131,24 +138,36 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $res = form_res(preg_parser_yyParser::GROUPING, 0);
     return $res;
 }
-<YYINITIAL> \(\? {
-    $res = form_res(preg_parser_yyParser::CONDSUBPATT, 0);
+<YYINITIAL> \(\?\(\?= {
+    $res = form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTTF);
+    return $res;
+}
+<YYINITIAL> \(\?\(\?! {
+    $res = form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTFF);
+    return $res;
+}
+<YYINITIAL> \(\?\(\?<= {
+    $res = form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTTB);
+    return $res;
+}
+<YYINITIAL> \(\?\(\?<! {
+    $res = form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTFB);
     return $res;
 }
 <YYINITIAL> \(\?= {
-    $res = form_res(preg_parser_yyParser::ASSERT_TF, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTF);
     return $res;
 }
 <YYINITIAL> \(\?! {
-    $res = form_res(preg_parser_yyParser::ASSERT_FF, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFF);
     return $res;
 }
 <YYINITIAL> \(\?<= {
-    $res = form_res(preg_parser_yyParser::ASSERT_TB, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTTB);
     return $res;
 }
 <YYINITIAL> \(\?<! {
-    $res = form_res(preg_parser_yyParser::ASSERT_FB, 0);
+    $res = form_res(preg_parser_yyParser::ASSERT, NODE_ASSERTFB);
     return $res;
 }
 <YYINITIAL> \. {
@@ -304,7 +323,8 @@ function form_num_interval(&$cc, $startchar, $endchar) {
     $this->cccharnumber++;
 }
 <CHARCLASS> \] {
-    $res= form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
+    $res = form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     $this->yybegin(self::YYINITIAL);
+    $this->cc = null;
     return $res;
 }
