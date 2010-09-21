@@ -41,12 +41,18 @@ function form_num_interval(&$cc, $startchar, $endchar) {
 %line
 %char
 %state CHARCLASS
-%eof{
-    if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
-        $res = form_res(preg_parser_yyParser::LEXERROR, 'unclosedsqbrackets');
-        $this->cc = null;
-        return $res;
+%{
+    protected $errors = array();
+
+    public function get_errors() {
+        return $this->errors;
     }
+%}
+%eof{
+        if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
+            $this->errors[] = 'unclosedsqbrackets';
+            $this->cc = null;
+        }
 %eof}
 %%
 
