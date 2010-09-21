@@ -651,12 +651,20 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser(')ab()eg(?!)f');
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
-        print_r($errormsgs);
         $this->assertTrue(count($errormsgs) >= 3);
         $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
         $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?!'), $errormsgs));
         $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '('), $errormsgs));
-
+        //Quantifiers without argument inside parenthesis
+        $parser =& $this->run_parser('?a({2,3})c(*)e(+)f');
+        $this->assertTrue($parser->get_error());
+        $errormsgs = $parser->get_error_messages();
+        print_r($errormsgs);
+        $this->assertTrue(count($errormsgs) == 4);
+        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '?'), $errormsgs));
+        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '+'), $errormsgs));
+        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '*'), $errormsgs));
+        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '{...}'), $errormsgs));
     }
 
     /** 
