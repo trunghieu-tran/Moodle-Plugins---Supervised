@@ -64,13 +64,27 @@ abstract class preg_node {
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
     }
-}
+
+    /**
+    * Return class name without 'preg_' prefix
+    */
+    abstract public function name();
+
+    /*
+    //Returns interface name string for the node
+    abstract public function nodename();//TODO - implement if will be useful
+
+    //May be overloaded by childs to change name using data from $this->pregnode
+    public function ui_nodename() {
+        return get_string($this->nodename(), 'qtype_preg');
+    }
+}*/
 
 /**
 * Generic leaf node class
 * 
 */
-class preg_leaf extends preg_node {
+abstract class preg_leaf extends preg_node {
 
     //Is matching case insensitive?
     public $caseinsensitive = false;
@@ -116,6 +130,10 @@ class preg_leaf_chars extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_CHAR;
     }
 
+    public function name() {
+        return 'leaf_chars';
+    }
+
 }
 
 /**
@@ -133,6 +151,10 @@ class preg_leaf_meta extends preg_leaf {
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_META;
+    }
+
+    public function name() {
+        return 'leaf_meta';
     }
 
 }
@@ -164,6 +186,11 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     //TODO - implement match function
+
+    public function name() {
+        return 'leaf_assert';
+    }
+
 }
 
 
@@ -200,6 +227,10 @@ class preg_node_finite_quant extends preg_operator {
         $this->type = preg_node::TYPE_NODE_FINITE_QUANT;
     }
 
+    public function name() {
+        return 'node_finite_quant';
+    }
+
 }
 
 /**
@@ -218,7 +249,11 @@ class preg_node_infinite_quant extends preg_operator {
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_INFINITE_QUANT;
     }
-  
+
+    public function name() {
+        return 'node_infinite_quant';
+    }
+
 }
 
 /**
@@ -228,6 +263,10 @@ class preg_node_infinite_quant extends preg_operator {
 class preg_node_concat extends preg_operator {
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_CONCAT;
+    }
+
+    public function name() {
+        return 'node_concat';
     }
 
 }
@@ -240,6 +279,10 @@ class preg_node_alt extends preg_operator {
 
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_ALT;
+    }
+
+    public function name() {
+        return 'node_alt';
     }
 
 }
@@ -263,6 +306,10 @@ class preg_node_assert extends preg_operator {
         $this->type = preg_node::TYPE_NODE_ASSERT;
     }
 
+    public function name() {
+        return 'node_assert';
+    }
+
 }
 
 /**
@@ -283,6 +330,10 @@ class preg_node_subpatt extends preg_operator {
 
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_SUBPATT;
+    }
+
+    public function name() {
+        return 'node_subpatt';
     }
 
 }
@@ -319,6 +370,10 @@ class preg_node_cond_subpatt extends preg_operator {
 
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_COND_SUBPATT;
+    }
+
+    public function name() {
+        return 'node_cond_subpatt';
     }
 
 }
