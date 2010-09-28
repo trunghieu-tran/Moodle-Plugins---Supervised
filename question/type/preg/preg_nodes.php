@@ -112,6 +112,8 @@ abstract class preg_leaf extends preg_node {
 /**
 * Character or character class
 * Escape-sequence scanning will lead to this class only if characters it represents could be enumerated
+* I.e. \n, \s, \v, \h and \d and their negative counterparts since they are not support unicode by default and so can be enumerated 
+* \w is too large to be handled by full character set
 */
 class preg_leaf_charset extends preg_leaf {
 
@@ -153,13 +155,13 @@ class preg_leaf_charset extends preg_leaf {
 */
 class preg_leaf_meta extends preg_leaf {
 
-    //.
+    //. - any character except \n
     const SUBTYPE_DOT = 1;
-    //\p{L}
+    //\p{L} or \pL
     const SUBTYPE_UNICODE_PROP = 2;
-    // \w
+    // \w 
+    //Should be locale-aware, but not Unicode for PCRE-compatibility
     const SUBTYPE_WORD_CHAR = 3;
-    //TODO - see if other escape-sequences could be converted to \p{L}, since we are always unicode in Moodle
 
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
@@ -172,6 +174,7 @@ class preg_leaf_meta extends preg_leaf {
         return 'leaf_meta';
     }
 
+    //TODO - implement match function
 }
 
 /**
@@ -200,12 +203,11 @@ class preg_leaf_assert extends preg_leaf {
         return false;
     }
 
-    //TODO - implement match function
-
     public function name() {
         return 'leaf_assert';
     }
 
+    //TODO - implement match function
 }
 
 
