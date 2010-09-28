@@ -44,7 +44,11 @@ abstract class dfa_preg_node {
     */
     public function &from_preg_node($pregnode) {
         $dfanodename = 'dfa_'.$pregnode->name();
-        $dfanode = new $dfanodename($pregnode);
+        if (class_exists($dfanodename)) {
+            $dfanode = new $dfanodename($pregnode);
+        } else {
+            $dfanode = $pregnode;
+        }
         return $dfanode;
     }
 
