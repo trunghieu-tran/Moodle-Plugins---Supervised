@@ -22,7 +22,9 @@ abstract class dfa_preg_node {
     protected $nullable;
     protected $firstpos;
     protected $lastpos;
+    protected $number;
 
+    //TODO decide, if it could also do convert_tree job...
     public function __construct($node) {
         $this->pregnode = $node;
         //Convert operands to dfa nodes
@@ -48,13 +50,12 @@ abstract class dfa_preg_node {
 
 
     /**
-    * Return true if the node is supported by engine, interface string name to report as unsupported if not
-    * TODO decide, if it could also do convert_tree job...
+    * Return false if the node is supported by engine, interface string name to report as unsupported if not
     */
-    abstract public function accept();
+    abstract public function not_supported();
 
     //DFA functions
-    abstract public function numeration();
+    abstract public function number();//replacement of old 'numeration'
     abstract public function nullable();
     abstract public function firstpos();
     abstract public function lastpos();
@@ -62,4 +63,5 @@ abstract class dfa_preg_node {
     abstract public function find_asserts();    
 }
 
+//TODO -  - implement child nodes
 ?>
