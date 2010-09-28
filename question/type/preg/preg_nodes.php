@@ -60,6 +60,9 @@ abstract class preg_node {
     public $subtype;
     //Error data for the subtype
     public $error = false;
+    //Indexes of first and last characters for the node, they are equal if it's one-character node
+    public $indfirst = -1;
+    public $indlast = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
