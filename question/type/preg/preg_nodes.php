@@ -10,8 +10,6 @@
  * @package questions
  */
 
-//We need preg_character_set class in order for leafs to work
-require_once($CFG->dirroot . '/question/type/preg/preg_character_set.php');
 
 /**
 * Generic node class
@@ -22,7 +20,7 @@ abstract class preg_node {
     //Abstract node class, not representing real things
     const TYPE_ABSTRACT = 0;
     //Character or character class
-    const TYPE_LEAF_CHAR = 1;
+    const TYPE_LEAF_CHARSET = 1;
     //Meta-character or escape sequence matching with a set of characters that couldn't be enumerated
     const TYPE_LEAF_META = 2;
     //Simple assert: ^ $ or escape-sequence
@@ -91,8 +89,6 @@ abstract class preg_leaf extends preg_node {
 
     //Is matching case insensitive?
     public $caseinsensitive = false;
-    //Instance of preg_character_set class describing which characters could match this leaf
-    public $charset = null;
     //Is leaf negative?
     public $negative = false;
 
@@ -108,34 +104,47 @@ abstract class preg_leaf extends preg_node {
     * Default implementation is good for simple consuming classes
     * @param str string with which matching is supporting
     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
-    * @param length the length of match (for backreference or recursion)
+    * @param length the length of match (for backreference or recursion), can be 0 for asserts
     */
-    public function match($str, $pos, &$length) {
-        $result = $this->charset->match($str,$pos);
-        if ($this->negative) {
-            $result = ! $result;
-        }
-        $length = 1;
-        return $result;
-    }
+    abstract public function match($str, $pos, &$length);
 }
 
 /**
 * Character or character class
 * Escape-sequence scanning will lead to this class only if characters it represents could be enumerated
 */
-class preg_leaf_chars extends preg_leaf {
+class preg_leaf_charset extends preg_leaf {
 
-    public function type() {
-        return 
-    }
+    //Character set, any of which could (not) match with this node
+    public $charset = '';
+
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_CHAR;
+        $this->type = preg_node::TYPE_LEAF_CHARSET;
     }
 
     public function name() {
-        return 'leaf_chars';
+        return 'leaf_charset';
     }
+
+    public function match($str, $pos, &$length) {
+        $charsetcopy = $this->charset;
+        $strcopy = $str;
+        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
+
+        if ($this->caseinsensitive) {
+            $charsetcopy = $textlib->strtolower($charsetcopy);
+            $strcopy = $textlib->strtolower($strcopy);
+        }
+
+        $result = ($textlib->strpos($charsetcopy, $strcopy[$pos]) !== false);
+
+        if ($this->negative) {
+            $result = ! $result;
+        }
+        $length = 1;
+        return $result;
+    }
+
 
 }
 
@@ -151,6 +160,9 @@ class preg_leaf_meta extends preg_leaf {
     // \w
     const SUBTYPE_WORD_CHAR = 3;
     //TODO - see if other escape-sequences could be converted to \p{L}, since we are always unicode in Moodle
+
+    //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
+    public $propname = '';
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_META;
