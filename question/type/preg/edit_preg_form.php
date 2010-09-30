@@ -69,6 +69,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
         $correctanswermatch = ($trimmedcorrectanswer=='');
+        $passhintgradeborder = false;
         $i = 0;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
@@ -83,12 +84,19 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)) {
                     $correctanswermatch=true;
                 }
+                if ($answer->fraction >= $data['hintgradeborder']) {
+                    $passhintgradeborder = true;
+                }
             }
             $i++;
         }
         
         if ($correctanswermatch == false) {
             $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
+        }
+
+        if ($passhintgradeborder == false && $data['usehint']) {//no asnwer pass hint grade border
+            $errors['hintgradeborder']=get_string('nohintgradeborderpass','qtype_preg');
         }
 
         //Check engine capabilities - TODO replace with disabledIf calls when MDL-23825 will be resolved
