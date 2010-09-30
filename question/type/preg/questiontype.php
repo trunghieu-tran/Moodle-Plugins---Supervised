@@ -95,8 +95,22 @@ class question_preg_qtype extends question_shortanswer_qtype {
         return $matcher->match($state->responses['']);
     }
 
+    /*
+    * Override compare responses for Hint button to work right after Submit without changing response
+    * This may not be needed if the best fit answer would be saved in DB in reponses - TODO - probably could wait before new question engine
+    */
+    function compare_responses($question, $state, $teststate) {
+        $result = parent::compare_responses($question, $state, $teststate);
+        //if hint requiested grade and apply penalty anyway, because if $teststate isn't direct predecessor of $state, than Hint won't work if the student entered exactly same response before
+        //Hinting needs grading to work for now
+        if ($result && isset($state->responses['hint'])) {
+            $result = false;
+        }
+        return $result;
+    }
+
   /*
-     * Override the parent class method, to show right answer.
+     * Override the parent class method, to show correct answer.
      */
     function get_correct_responses(&$question, &$state) {
         return array(''=>addslashes($question->options->correctanswer));
