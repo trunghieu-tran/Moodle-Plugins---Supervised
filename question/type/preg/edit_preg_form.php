@@ -70,6 +70,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $trimmedcorrectanswer = trim($data['correctanswer']);
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $passhintgradeborder = false;
+        $fractions = $data['fraction'];
         $i = 0;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
@@ -84,7 +85,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)) {
                     $correctanswermatch=true;
                 }
-                if ($answer->fraction >= $data['hintgradeborder']) {
+                if ($fractions[$key] >= $data['hintgradeborder']) {
                     $passhintgradeborder = true;
                 }
             }
