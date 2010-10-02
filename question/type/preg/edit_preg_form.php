@@ -43,7 +43,6 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $mform->addHelpButton('correctanswer','correctanswer','qtype_preg');
 
         //Set hint availability determined by engine capabilities
-        /* TODO - commented out before MDL-23825 will be resolved
         foreach ($engines as $engine => $enginename) {
             require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
             $querymatcher = new $engine;
@@ -54,7 +53,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
                 $mform->disabledIf('usehint','engine', 'eq', $engine);
                 $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
             }
-        }*/
+        }
 
         parent::definition_inner($mform);
 
@@ -71,6 +70,16 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $passhintgradeborder = false;
         $fractions = $data['fraction'];
+
+        //Fill in some default data that could be absent due to disabling relevant form controls
+        if (!array_key_exists('hintgradeborder', $data)) {
+            $data['hintgradeborder'] = 1;
+        }
+
+        if (!array_key_exists('usehint', $data)) {
+            $data['usehint'] = false;
+        }
+
         $i = 0;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
@@ -100,12 +109,7 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
             $errors['hintgradeborder']=get_string('nohintgradeborderpass','qtype_preg');
         }
 
-        //Check engine capabilities - TODO replace with disabledIf calls when MDL-23825 will be resolved
         $querymatcher = new $data['engine'];
-        if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER) && $data['usehint']) {
-            $errors['usehint'] = get_string('nohintsupport','qtype_preg',get_string($data['engine'],'qtype_preg'));
-        }
-
         //If engine doesn't support subpattern capturing, than no placeholders should be in feedback
         if (!$querymatcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
             $feedbacks = $data['feedback'];
