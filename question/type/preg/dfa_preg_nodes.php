@@ -31,7 +31,7 @@ abstract class dfa_preg_node {
         if (is_a($node, 'preg_operator')) {
             foreach ($node->operands as &$operand) {
                 if (is_a($operand, 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $operand =& $this->from_preg_node($operand);
+                    $operand =& self::from_preg_node($operand);
                 }
             }
         }
@@ -42,7 +42,7 @@ abstract class dfa_preg_node {
     * @param pregnode preg_node child class instance
     * @return corresponding dfa_preg_node child class instance
     */
-    public function &from_preg_node($pregnode) {
+    static public function &from_preg_node($pregnode) {
         $dfanodename = 'dfa_'.$pregnode->name();
         if (class_exists($dfanodename)) {
             $dfanode = new $dfanodename($pregnode);
