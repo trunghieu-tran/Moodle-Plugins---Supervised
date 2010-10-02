@@ -88,6 +88,21 @@ class question_preg_qtype extends question_shortanswer_qtype {
         return $matcher;
     }
 
+    function save_question_options($question) {
+        //Fill in some data that could be absent due to disabling form controls
+        if (!isset($question->usehint)) {
+            $question->usehint = false;
+        }
+        if (!isset($question->hintpenalty)) {
+            $question->hintpenalty = 0;
+        }
+        if (!isset($question->hintgradeborder)) {
+            $question->hintgradeborder = 1;
+        }
+
+        parent::save_question_options($question);
+    }
+
     function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
