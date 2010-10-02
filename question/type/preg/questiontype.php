@@ -113,7 +113,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
      * Override the parent class method, to show correct answer.
      */
     function get_correct_responses(&$question, &$state) {
-        return array(''=>addslashes($question->options->correctanswer));
+        return array(''=>$question->options->correctanswer);
     }
     
     function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
