@@ -448,7 +448,6 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('ab(?(?=');
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
-        print_r($errormsgs);
         $this->assertTrue(count($errormsgs) == 1);
         $this->assertTrue(in_array(get_string('openparenatend', 'qtype_preg', '(?(?='), $errormsgs));
 
