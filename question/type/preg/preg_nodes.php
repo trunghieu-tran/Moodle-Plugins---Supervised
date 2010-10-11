@@ -4,7 +4,7 @@
  * The will be usually aggregated in engine-specific classes.
  * These classes are used primarily to store data, so their variable memebers are public
  *
- * @copyright &copy; 2010 Sychev Oleg
+ * @copyright &copy; 2010 Sychev Oleg, Kolesov Dmitriy
  * @author Sychev Oleg, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -79,7 +79,8 @@ abstract class preg_node {
     public function ui_nodename() {
         return get_string($this->nodename(), 'qtype_preg');
     }
-}*/
+    */
+}
 
 /**
 * Generic leaf node class
@@ -173,8 +174,28 @@ class preg_leaf_meta extends preg_leaf {
     public function name() {
         return 'leaf_meta';
     }
-
-    //TODO - implement match function
+    public function match($str, $pos, &$length) {
+        switch ($this->subtype) {
+            case preg_leaf_meta::SUBTYPE_DOT:
+                $lenght = 1;
+                return true;
+                break;
+            //TODO: unicode property
+            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+                if (ctype_alnum($str[$pos]) || $str[$pos] === '_') {
+                    $lenght = 1;
+                    $result =  true;
+                } else {
+                    $lenght = -1;
+                    $result =  false;
+                }
+                break;
+        }
+        if ($this->negative) {
+            $result = !$result;
+        }
+        return $result;
+    }
 }
 
 /**
@@ -207,7 +228,42 @@ class preg_leaf_assert extends preg_leaf {
         return 'leaf_assert';
     }
 
-    //TODO - implement match function
+    public function match($str, $pos, &$length) {
+        $lenght = 0;
+        switch ($this->subtype) {
+            case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                if($pos == 0) {
+                    $result = true;
+                } else {
+                    $result = false;
+                }
+                break;
+            case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_DOLLAR:
+                if ($pos == strlen($str)) {
+                    $result = true;
+                } else {
+                    $result = false;
+                }
+                break;
+            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+                if ($pos == 0 || $pos == strlen($str) || $str[$pos] !== '_' && !ctype_alnum($str[$pos]) || $str[$pos] !== '_' && !ctype_alnum($str[$pos])) {
+                    $result = true;
+                } else {
+                    $result = false;
+                }
+                break;
+            /*case preg_leaf_assert::SUBTYPE_ESC_G:
+                TODO: matching with SUBTYPE_ESC_G
+                trouble, because this function has not information about offset!
+                break;*/
+        }
+        if ($this->negative) {
+            $result = !$result;
+        }
+        return $result;
+    }
 }
 
 
