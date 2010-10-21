@@ -1,7 +1,7 @@
 <?php # vim:ft=php
 require_once($CFG->dirroot . '/question/type/preg/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
-require_once($CFG->dirroot . '/question/type/preg/node.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 
 class Yylex extends JLexBase  {
@@ -19,21 +19,22 @@ class Yylex extends JLexBase  {
     public function get_errors() {
         return $this->errors;
     }
-    protected function form_node($type, $subtype, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
-        $result = new node;
-        $result->type = $type;
-        $result->subtype = $subtype;
-        $result->greed = $greed;
-        if (isset($charclass)) {
-            $result->chars = $charclass;
+    protected function form_node($name, $subtype = null, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
+        $result = new $name;
+        if (isset($subtype)) {
+            $result->subtype = $subtype;
         }
-        if (isset($leftborder)) {
+        if ($name == 'preg_leaf_charset') {
+            $result->charset = $charclass;
+        } elseif ($name == 'preg_leaf_backref') {
+            $result->number = $charclass;//TODO: rename $charclass argument, because it may be number of backref
+        } elseif ($name == 'preg_node_finite_quant' || $name == 'preg_node_infinite_quant') {
+            $result->greed = $greed;
             $result->leftborder = $leftborder;
+            if ($name == 'preg_node_finite_quant') {
+                $result->rightborder = $rightborder;
+            }
         }
-        if (isset($rightborder)) {
-            $result->rightborder = $rightborder;
-        }
-        $result->direction = true;
         return $result;
     }
     protected function form_res($type, $value) {
@@ -45,7 +46,7 @@ class Yylex extends JLexBase  {
         if(ord($startchar) < ord($endchar)) {
             $char = ord($startchar);
             while($char <= ord($endchar)) {
-                $cc->chars .= chr($char);
+                $cc->charset .= chr($char);
                 $char++;
             }
         } else {
@@ -74,7 +75,7 @@ class Yylex extends JLexBase  {
 	const CHARCLASS = 1;
 	static $yy_state_dtrans = array(
 		0,
-		83
+		84
 	);
 	static $yy_acpt = array(
 		/* 0 */ self::YY_NOT_ACCEPT,
@@ -141,14 +142,14 @@ class Yylex extends JLexBase  {
 		/* 61 */ self::YY_NO_ANCHOR,
 		/* 62 */ self::YY_NO_ANCHOR,
 		/* 63 */ self::YY_NO_ANCHOR,
-		/* 64 */ self::YY_NOT_ACCEPT,
-		/* 65 */ self::YY_NO_ANCHOR,
+		/* 64 */ self::YY_NO_ANCHOR,
+		/* 65 */ self::YY_NOT_ACCEPT,
 		/* 66 */ self::YY_NO_ANCHOR,
 		/* 67 */ self::YY_NO_ANCHOR,
-		/* 68 */ self::YY_NOT_ACCEPT,
-		/* 69 */ self::YY_NO_ANCHOR,
+		/* 68 */ self::YY_NO_ANCHOR,
+		/* 69 */ self::YY_NOT_ACCEPT,
 		/* 70 */ self::YY_NO_ANCHOR,
-		/* 71 */ self::YY_NOT_ACCEPT,
+		/* 71 */ self::YY_NO_ANCHOR,
 		/* 72 */ self::YY_NOT_ACCEPT,
 		/* 73 */ self::YY_NOT_ACCEPT,
 		/* 74 */ self::YY_NOT_ACCEPT,
@@ -169,9 +170,10 @@ class Yylex extends JLexBase  {
 		/* 89 */ self::YY_NOT_ACCEPT,
 		/* 90 */ self::YY_NOT_ACCEPT,
 		/* 91 */ self::YY_NOT_ACCEPT,
-		/* 92 */ self::YY_NO_ANCHOR,
+		/* 92 */ self::YY_NOT_ACCEPT,
 		/* 93 */ self::YY_NO_ANCHOR,
-		/* 94 */ self::YY_NOT_ACCEPT
+		/* 94 */ self::YY_NO_ANCHOR,
+		/* 95 */ self::YY_NOT_ACCEPT
 	);
 		static $yy_cmap = array(
  17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
@@ -186,13 +188,13 @@ class Yylex extends JLexBase  {
  0, 1, 2, 3, 4, 5, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7, 1, 1,
  1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 9, 1, 10, 1, 1, 1,
  11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 1, 13, 1, 1, 14, 15, 16, 17, 18, 19, 16, 20, 21, 22, 23, 24, 25,
- 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,);
+ 1, 1, 1, 1, 1, 13, 1, 1, 14, 15, 16, 17, 18, 19, 16, 20, 21, 22, 23, 24,
+ 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,);
 
 		static $yy_nxt = array(
 array(
- 1, 2, 3, 4, 64, 5, 65, -1, 6, 7, 8, 65, 65, 65, 65, 65, 9, 65, 10, 68,
- -1, 5, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 11, 12, 65, 65, 65,
+ 1, 2, 3, 4, 65, 5, 66, -1, 6, 7, 8, 66, 66, 66, 66, 66, 9, 66, 10, 69,
+ -1, 5, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 11, 12, 66, 66, 66,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -211,16 +213,16 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 73, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 73, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 74, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 74, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 74, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 75, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 66, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 66, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 67, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 67, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
  -1, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -240,19 +242,19 @@ array(
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 60, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 61, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 71, 72, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 71, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 72, 73, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 72, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 86, -1, -1,
+ -1, -1, -1, -1, -1, 86, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 86, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 87, -1, -1,
 ),
 array(
  -1, 16, 16, 16, 16, 17, -1, 16, 16, 16, 16, -1, -1, -1, -1, -1, 16, -1, 16, 18,
- 16, 92, 94, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1,
+ 16, 93, 95, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1,
 ),
 array(
  -1, -1, -1, -1, -1, 29, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -260,30 +262,30 @@ array(
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 89, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 90, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 71, 75, 28, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 71, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 72, 76, 28, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 72, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 77, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 77, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, 77, -1, 30, 31, 32, 33, 78, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 78, -1, 30, 31, 32, 33, 79, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 80, -1, 34, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 80, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 81, -1, 34, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 81, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 76, -1, 36, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 77, -1, 36, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 77, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 81, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 82, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
@@ -295,11 +297,11 @@ array(
  -1, 39, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 80, -1, 40, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 80, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 81, -1, 40, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 81, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 43, 44, 82, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 43, 44, 83, -1, -1, -1, -1,
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
@@ -307,52 +309,52 @@ array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- 1, 48, 48, 48, 48, 67, 48, 48, -1, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 84,
- 49, 67, 70, 70, 93, 70, 93, 70, 93, 70, 93, 70, 50, 48, 51, 70, 93,
+ 1, 48, 48, 48, 48, 68, 48, 48, -1, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 85,
+ 49, 68, 71, 71, 94, 71, 94, 71, 94, 71, 94, 71, 50, 48, 51, 71, 94,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, 52, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 53,
- 54, 87, 88, -1, -1, 55, -1, 56, -1, 57, -1, 58, -1, -1, 59, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, 61, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 61, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ 54, 88, 89, -1, -1, 55, -1, 56, 57, 58, -1, 59, -1, -1, 60, -1, -1,
 ),
 array(
  -1, -1, -1, -1, -1, 62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, 62, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, 91, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 91, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, 62, 62, -1, 62, -1, 62, -1, 62, -1, 62, -1, -1, -1, 62, -1,
-),
-array(
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, 62, -1, 62, -1, 62, -1, 62, -1, -1, -1, -1, -1, 62,
-),
-array(
  -1, -1, -1, -1, -1, 63, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
  -1, 63, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, 86, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 86, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 90, -1, -1,
+ -1, -1, 63, 63, -1, 63, -1, 63, -1, 63, -1, 63, -1, -1, -1, 63, -1,
 ),
 array(
- -1, -1, -1, -1, -1, 79, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
- -1, 79, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, 63, -1, 63, -1, 63, -1, 63, -1, -1, -1, -1, -1, 63,
+),
+array(
+ -1, -1, -1, -1, -1, 64, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 64, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, 70, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 70, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 91, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, 80, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+ -1, 80, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 );
 
@@ -404,38 +406,36 @@ array(
 							break;
 						case 2:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUESTQUANT));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1));
     return $res;
 }
 						case -3:
 							break;
 						case 3:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_ITER));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0));
     return $res;
 }
 						case -4:
 							break;
 						case 4:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_PLUSQUANT));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1));
     return $res;
 }
 						case -5:
 							break;
 						case 5:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->yytext()));
     return $res;
 }
 						case -6:
 							break;
 						case 6:
 							{
-    $this->cc = new node;
-    $this->cc->direction = true;
-    $this->cc->type = LEAF;
-    $this->cc->subtype = LEAF_CHARCLASS;
+    $this->cc = new preg_leaf_charset;
+    $this->cc->negative = false;
     $this->cccharnumber = 0;
     $this->yybegin(self::CHARCLASS);
 }
@@ -443,7 +443,7 @@ array(
 							break;
 						case 7:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_SUBPATT);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node::TYPE_NODE_SUBPATT);
     return $res;
 }
 						case -8:
@@ -457,7 +457,7 @@ array(
 							break;
 						case 9:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_METASYMBOLDOT));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_meta', preg_leaf_meta::SUBTYPE_DOT));
     return $res;
 }
 						case -10:
@@ -471,35 +471,37 @@ array(
 							break;
 						case 11:
 							{
-    $res = $this->form_res(preg_parser_yyParser::STARTANCHOR, 0);
+    $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+    $res = $this->form_res(preg_parser_yyParser::STARTANCHOR, $leaf);
     return $res;
 }
 						case -12:
 							break;
 						case 12:
 							{
-    $res = $this->form_res(preg_parser_yyPARSER::ENDANCHOR, 0);
+    $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR);
+    $res = $this->form_res(preg_parser_yyPARSER::ENDANCHOR, $leaf);
     return $res;
 }
 						case -13:
 							break;
 						case 13:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUESTQUANT, null, null, null, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, false));
     return $res;
 }
 						case -14:
 							break;
 						case 14:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_ITER, null, null, null, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, false));
     return $res;
 }
 						case -15:
 							break;
 						case 15:
 							{
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_PLUSQUANT, null, null, null, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, false));
     return $res;
 }
 						case -16:
@@ -507,50 +509,51 @@ array(
 						case 16:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, $text[1]));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $text[1]));
     return $res;
 }
 						case -17:
 							break;
 						case 17:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_LINK, substr($this->yytext(), 1)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
     return $res;
 }
 						case -18:
 							break;
 						case 18:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, '\\'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, '\\'));
     return $res;
 }
 						case -19:
 							break;
 						case 19:
 							{
-    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, 0);
+    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     return $res;
 }
 						case -20:
 							break;
 						case 20:
 							{
-    $res = $this->form_res(preg_parser_yyParser::WORDNOTBREAK, 0);
+    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res->value->negative = true;
     return $res;
 }
 						case -21:
 							break;
 						case 21:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, '0123456789'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, '0123456789'));
     return $res;
 }
 						case -22:
 							break;
 						case 22:
 							{
-    $PARSLEAF = $this->form_node(LEAF, LEAF_CHARCLASS, '0123456789');
-    $PARSLEAF->direction = false;
+    $PARSLEAF = $this->form_node('preg_leaf_charset', null, '0123456789');
+    $PARSLEAF->negative = true;
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $PARSLEAF);
     return $res;
 }
@@ -558,15 +561,15 @@ array(
 							break;
 						case 23:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLMNBVCXZ_0123456789'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_meta', preg_leaf_meta::SUBTYPE_WORD_CHAR));
     return $res;
 }
 						case -24:
 							break;
 						case 24:
 							{
-    $PARSLEAF = $this->form_node(LEAF, LEAF_CHARCLASS, 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLMNBVCXZ_0123456789');
-    $PARSLEAF->direction = false;
+    $PARSLEAF = $this->form_node('preg_leaf_meta', preg_leaf_meta::SUBTYPE_WORD_CHAR);
+    $PARSLEAF->negative = true;
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $PARSLEAF);
     return $res;
 }
@@ -574,15 +577,15 @@ array(
 							break;
 						case 25:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, ' '));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, ' '));
     return $res;
 }
 						case -26:
 							break;
 						case 26:
 							{
-    $PARSLEAF = $this->form_node(LEAF, LEAF_CHARCLASS, ' ');
-    $PARSLEAF->direction = false;
+    $PARSLEAF = $this->form_node('preg_leaf_charset', null, ' ');
+    $PARSLEAF->negative = true;
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $PARSLEAF);
     return $res;
 }
@@ -590,7 +593,7 @@ array(
 							break;
 						case 27:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, chr(9)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(9)));
     return $res;
 }
 						case -28:
@@ -598,42 +601,42 @@ array(
 						case 28:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1)));
     return $res;
 }
 						case -29:
 							break;
 						case 29:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, chr(octdec(substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec(substr($this->yytext(), 1)))));
     return $res;
 }
 						case -30:
 							break;
 						case 30:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_ONETIMESUBPATT);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK,preg_node_subpatt::SUBTYPE_ONCEONLY);
     return $res;
 }
 						case -31:
 							break;
 						case 31:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_subpatt::SUBTYPE_GROUPING);
     return $res;
 }
 						case -32:
 							break;
 						case 32:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTF);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_PLA);
     return $res;
 }
 						case -33:
 							break;
 						case 33:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFF);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_NLA);
     return $res;
 }
 						case -34:
@@ -641,7 +644,7 @@ array(
 						case 34:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') -1)));
     return $res;
 }
 						case -35:
@@ -649,7 +652,7 @@ array(
 						case 35:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
     return $res;
 }
 						case -36:
@@ -657,28 +660,28 @@ array(
 						case 36:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, substr($text, 2, strlen($text) - 3)));
     return $res;
 }
 						case -37:
 							break;
 						case 37:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTTB);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_PLB);
     return $res;
 }
 						case -38:
 							break;
 						case 38:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, NODE_ASSERTFB);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_NLB);
     return $res;
 }
 						case -39:
 							break;
 						case 39:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, chr(hexdec(substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(hexdec(substr($this->yytext(), 1)))));
     return $res;
 }
 						case -40:
@@ -686,7 +689,7 @@ array(
 						case 40:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ','))));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ','))));
     return $res;
 }
 						case -41:
@@ -694,7 +697,7 @@ array(
 						case 41:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), -1, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') -1), null, false));
     return $res;
 }
 						case -42:
@@ -702,21 +705,21 @@ array(
 						case 42:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, 0, substr($text, 2, strlen($text) - 3), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, substr($text, 2, strlen($text) - 3), false));
     return $res;
 }
 						case -43:
 							break;
 						case 43:
 							{
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTTF);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_PLA);
     return $res;
 }
 						case -44:
 							break;
 						case 44:
 							{
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTFF);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_NLA);
     return $res;
 }
 						case -45:
@@ -724,28 +727,28 @@ array(
 						case 45:
 							{
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node(NODE, NODE_QUANT, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
     return $res;
 }
 						case -46:
 							break;
 						case 46:
 							{
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTTB);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_PLB);
     return $res;
 }
 						case -47:
 							break;
 						case 47:
 							{
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, NODE_ASSERTFB);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_NLB);
     return $res;
 }
 						case -48:
 							break;
 						case 48:
 							{
-    $this->cc->chars .= $this->yytext();
+    $this->cc->charset .= $this->yytext();
     $this->cccharnumber++;
 }
 						case -49:
@@ -762,9 +765,9 @@ array(
 						case 50:
 							{
     if ($this->cccharnumber) {
-        $this->cc .= '^';
+        $this->cc->charset .= '^';
     } else {
-        $this->cc->direction = false;
+        $this->cc->negative = true;
     }
     $this->cccharnumber++;
 }
@@ -773,7 +776,7 @@ array(
 						case 51:
 							{
     if (!$this->cccharnumber) {
-        $this->cc->chars .= '-';
+        $this->cc->charset .= '-';
     }
     $this->cccharnumber++;
 }
@@ -781,21 +784,21 @@ array(
 							break;
 						case 52:
 							{
-    $this->cc->chars .= '[';
+    $this->cc->charset .= '[';
     $this->cccharnumber++;
 }
 						case -53:
 							break;
 						case 53:
 							{
-    $this->cc->chars .= '\\';
+    $this->cc->charset .= '\\';
     $this->cccharnumber++;
 }
 						case -54:
 							break;
 						case 54:
 							{
-    $this->cc->chars .= ']';
+    $this->cc->charset .= ']';
     $this->cccharnumber++;
 }
 						case -55:
@@ -803,117 +806,122 @@ array(
 						case 55:
 							{
     $this->cccharnumber++;
-    $this->cc->chars .= '0123456789';
+    $this->cc->charset .= '0123456789';
 }
 						case -56:
 							break;
 						case 56:
 							{
-    $this->cccharnumber++;
-    $this->cc->chars .= 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLMNBVCXZ_0123456789';
+    $this->cc->w = true;
 }
 						case -57:
 							break;
 						case 57:
 							{
-    $this->cccharnumber++;
-    $this->cc->chars .= ' ';
+    $this->cc->W = true;
 }
 						case -58:
 							break;
 						case 58:
 							{
     $this->cccharnumber++;
-    $this->cc->chars .= chr(9);
+    $this->cc->charset .= ' ';
 }
 						case -59:
 							break;
 						case 59:
 							{
-    $this->cc->chars .= '-';
     $this->cccharnumber++;
+    $this->cc->charset .= chr(9);
 }
 						case -60:
 							break;
 						case 60:
 							{
-    if (!$this->cccharnumber) {
-        $this->cc->chars .= '-';
-        $this->cc->direction;
-        $this->cccharnumber++;
-    }
+    $this->cc->charset .= '-';
+    $this->cccharnumber++;
 }
 						case -61:
 							break;
 						case 61:
 							{
-    $this->cc->chars .= chr(octdec(substr($this->yytext(), 1)));
-    $this->cccharnumber++;
+    if (!$this->cccharnumber) {
+        $this->cc->charset .= '-';
+        $this->cc->negative = true;
+        $this->cccharnumber++;
+    }
 }
 						case -62:
 							break;
 						case 62:
 							{
-    $text = $this->yytext();
-    $this->form_num_interval($this->cc, $text[0], $text[2]);
+    $this->cc->charset .= chr(octdec(substr($this->yytext(), 1)));
+    $this->cccharnumber++;
 }
 						case -63:
 							break;
 						case 63:
 							{
-    $this->cccharnumber++;
-    $this->cc->chars .= chr(hexdec(substr($this->yytext(), 1)));
+    $text = $this->yytext();
+    $this->form_num_interval($this->cc, $text[0], $text[2]);
 }
 						case -64:
 							break;
-						case 65:
+						case 64:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_CHARCLASS, $this->yytext()));
-    return $res;
+    $this->cccharnumber++;
+    $this->cc->charset .= chr(hexdec(substr($this->yytext(), 1)));
 }
 						case -65:
 							break;
 						case 66:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_LINK, substr($this->yytext(), 1)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->yytext()));
     return $res;
 }
 						case -66:
 							break;
 						case 67:
 							{
-    $this->cc->chars .= $this->yytext();
-    $this->cccharnumber++;
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    return $res;
 }
 						case -67:
 							break;
-						case 69:
+						case 68:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_LINK, substr($this->yytext(), 1)));
-    return $res;
+    $this->cc->charset .= $this->yytext();
+    $this->cccharnumber++;
 }
 						case -68:
 							break;
 						case 70:
 							{
-    $this->cc->chars .= $this->yytext();
-    $this->cccharnumber++;
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    return $res;
 }
 						case -69:
 							break;
-						case 92:
+						case 71:
 							{
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(LEAF, LEAF_LINK, substr($this->yytext(), 1)));
-    return $res;
+    $this->cc->charset .= $this->yytext();
+    $this->cccharnumber++;
 }
 						case -70:
 							break;
 						case 93:
 							{
-    $this->cc->chars .= $this->yytext();
-    $this->cccharnumber++;
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    return $res;
 }
 						case -71:
+							break;
+						case 94:
+							{
+    $this->cc->charset .= $this->yytext();
+    $this->cccharnumber++;
+}
+						case -72:
 							break;
 						default:
 						$this->yy_error('INTERNAL',false);

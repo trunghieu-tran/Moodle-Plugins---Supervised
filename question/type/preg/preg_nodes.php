@@ -120,9 +120,15 @@ class preg_leaf_charset extends preg_leaf {
 
     //Character set, any of which could (not) match with this node
     public $charset = '';
+    
+    //Flags, if character class contain \w and \W which need to convert to other type of leaf
+    public $w;
+    public $W;
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_CHARSET;
+        $this->w = false;
+        $this->W = false;
     }
 
     public function name() {
@@ -266,7 +272,19 @@ class preg_leaf_assert extends preg_leaf {
     }
 }
 
-
+class preg_leaf_backref extends preg_leaf {
+    public $number;
+    
+    public function match($str, $pos, &$length) {
+        die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
+    }
+    public function name() {
+        return 'leaf_backref';
+    }
+    public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_BACKREF;
+    }
+}
 
 
 /**
@@ -395,6 +413,8 @@ class preg_node_subpatt extends preg_operator {
     const SUBTYPE_SUBPATT = 1;
     //Once-only subpattern
     const SUBTYPE_ONCEONLY = 2;
+    //Grouping without cathing
+    const SUBTYPE_GROUPING = 3;
 
     //Subpattern number
     public $number = 0;
