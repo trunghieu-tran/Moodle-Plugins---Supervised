@@ -27,12 +27,12 @@ function find_illegal_isnt_object($node, $path) {
         return $path;
     } elseif ($node->type == NODE) {
         if ($node->subtype == NODE_CONC || $node->subtype == NODE_ALT) {
-            $result = find_illegal_isnt_object($node->secop, $path . '->secop');
+            $result = find_illegal_isnt_object($node->operands[2], $path . '->operands[2]');
             if ($result !== false) {
                 return $result;
             }
         }
-        $result = find_illegal_isnt_object($node->firop, $path . '->firop');
+        $result = find_illegal_isnt_object($node->operands[1], $path . '->operands[1]');
         if ($result !== false) {
             return $result;
         }
@@ -229,46 +229,46 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_NLB);
         }
     //Unit tests for parser
-    function _test_parser_easy_regex() {//a|b
+    function test_parser_easy_regex() {//a|b
         $parser =& $this->run_parser('a|b');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
-        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
-        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
     }
-    function _test_parser_quantification() {//ab+
+    function test_parser_quantification() {//ab+
         $parser =& $this->run_parser('ab+');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
-        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
-        $this->assertTrue($root->secop->type == NODE && $root->secop->subtype == NODE_PLUSQUANT);
-        $this->assertTrue($root->secop->firop->type == LEAF && $root->secop->firop->subtype == LEAF_CHARCLASS && $root->secop->firop->chars == 'b');
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[2]->leftborder == 1);
+        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'b');
     }
-    function _test_parser_alt_and_quantif() {//a*|b
+    function test_parser_alt_and_quantif() {//a*|b
         $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
-        $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_ITER);
-        $this->assertTrue($root->firop->firop->type == LEAF && $root->firop->firop->subtype == LEAF_CHARCLASS && $root->firop->firop->chars == 'a');
-        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 1);
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
     }
-    function _test_parser_concatenation() {//ab
+    function test_parser_concatenation() {//ab
         $parser =& $this->run_parser('ab');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == NODE && $root->subtype == NODE_CONC);
-        $this->assertTrue($root->firop->type == LEAF && $root->firop->subtype == LEAF_CHARCLASS && $root->firop->chars == 'a');
-        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_CHARCLASS && $root->secop->chars == 'b');
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
     }
-    function _test_parser_alt_and_conc() {//ab|cd
+    function test_parser_alt_and_conc() {//ab|cd
         $parser =& $this->run_parser('ab|cd');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == NODE && $root->subtype == NODE_ALT);
-        $this->assertTrue($root->firop->type == NODE && $root->firop->subtype == NODE_CONC);
-        $this->assertTrue($root->firop->firop->type == LEAF && $root->firop->firop->subtype == LEAF_CHARCLASS && $root->firop->firop->chars == 'a');
-        $this->assertTrue($root->firop->secop->type == LEAF && $root->firop->secop->subtype == LEAF_CHARCLASS && $root->firop->secop->chars == 'b');
-        $this->assertTrue($root->secop->type == NODE && $root->secop->subtype == NODE_CONC);
-        $this->assertTrue($root->secop->firop->type == LEAF && $root->secop->firop->subtype == LEAF_CHARCLASS && $root->secop->firop->chars == 'c');
-        $this->assertTrue($root->secop->secop->type == LEAF && $root->secop->secop->subtype == LEAF_CHARCLASS && $root->secop->secop->chars == 'd');
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[2]->charset == 'b');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'c');
+        $this->assertTrue($root->operands[2]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[2]->charset == 'd');
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
         $parser =& $this->run_parser('(?:a|b)*abb');
@@ -285,83 +285,83 @@ class parser_test extends UnitTestCase {
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
         $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
     }
-    function _test_parser_two_anchors() {
+    function test_parser_two_anchors() {
         $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
         $this->assertTrue($anchor->start === true && $anchor->end === true);
     }
-    function _test_parser_start_anchor() {
+    function test_parser_start_anchor() {
         $parser =& $this->run_parser('^a');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
         $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
         $this->assertTrue($anchor->start === true && $anchor->end === false);
     }
-    function _test_parser_end_anchor() {
+    function test_parser_end_anchor() {
         $parser =& $this->run_parser('a$');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
         $this->assertTrue($anchor->start === false && $anchor->end === true);
     }
-    function _test_parser_no_anchors() {
+    function test_parser_no_anchors() {
         $parser =& $this->run_parser('a');
         $root = $parser->get_root();
         $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
+        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
         $this->assertTrue($anchor->start === false && $anchor->end === false);
     }
-    function _test_parser_error() {
+    function test_parser_error() {
         $parser =& $this->run_parser('^((ab|cd)ef$');
         $this->assertTrue($parser->get_error());
     }
-    function _test_parser_no_error() {
+    function test_parser_no_error() {
         $parser =& $this->run_parser('((ab|cd)ef)');
         $this->assertFalse($parser->get_error());
     }
-    function _test_parser_asserts() {
+    function test_parser_asserts() {
         $parser =& $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)');
         $root = $parser->get_root();
         /* Old-style concatenation layout (strictly left-associative)
-        $ff = $root->secop;
-        $tf = $root->firop->secop;
-        $fb = $root->firop->firop->firop->secop;
-        $tb = $root->firop->firop->firop->firop;*/
+        $ff = $root->operands[2];
+        $tf = $root->operands[1]->operands[2];
+        $fb = $root->operands[1]->operands[1]->operands[1]->operands[2];
+        $tb = $root->operands[1]->operands[1]->operands[1]->operands[1];*/
         /*New-style concatenation layout (with no associativity defined) - more balanced tree*/
-        $tb = $root->firop->firop;
-        $fb = $root->firop->secop;
-        $tf = $root->secop->secop->firop;
-        $ff = $root->secop->secop->secop;
-        $this->assertTrue($tf->type == NODE && $tf->subtype == NODE_ASSERTTF);
-        $this->assertTrue($ff->type == NODE && $ff->subtype == NODE_ASSERTFF);
-        $this->assertTrue($fb->type == NODE && $fb->subtype == NODE_ASSERTFB);
-        $this->assertTrue($tb->type == NODE && $tb->subtype == NODE_ASSERTTB);
+        $tb = $root->operands[1]->operands[1];
+        $fb = $root->operands[1]->operands[2];
+        $tf = $root->operands[2]->operands[2]->operands[1];
+        $ff = $root->operands[2]->operands[2]->operands[2];
+        $this->assertTrue($tf->type == TYPE_NODE_ASSERT && $tf->subtype == SUBTYPE_PLA);
+        $this->assertTrue($ff->type == TYPE_NODE_ASSERT && $ff->subtype == SUBTYPE_NLA);
+        $this->assertTrue($fb->type == TYPE_NODE_ASSERT && $fb->subtype == SUBTYPE_NLB);
+        $this->assertTrue($tb->type == TYPE_NODE_ASSERT && $tb->subtype == SUBTYPE_PLB);
     }
-    function _test_parser_metasymbol_dot() {
+    function test_parser_metasymbol_dot() {
         $parser =& $this->run_parser('.');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_METASYMBOLDOT);
+        $this->assertTrue($root->type == preg_node::TYPE_LEAF_META && $root->subtype == preg_leaf_meta::SUBTYPE_DOT);
     }
-    function _test_parser_word_break() {
+    function test_parser_word_break() {
         $parser =& $this->run_parser('a\b');
         $root = $parser->get_root();
-        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDBREAK);
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$root->operands[2]->negative);
     }
-    function _test_parser_word_not_break() {
+    function test_parser_word_not_break() {
         $parser =& $this->run_parser('a\B');
         $root = $parser->get_root();
-        $this->assertTrue($root->secop->type == LEAF && $root->secop->subtype == LEAF_WORDNOTBREAK);
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $root->operands[2]->negative);
     }
-    function _test_parser_subpatterns() {
-        $parser =& $this->run_parser('((?:(?(?=a)a|(?>b))))');
+    function test_parser_subpatterns() {
+        $parser =& $this->run_parser('((?:(?(?=a)(?>b)|a)))');
         $root = $parser->get_root();
-        $this->assertTrue($root->subtype == NODE_SUBPATT);
-        $this->assertTrue($root->firop->subtype == NODE_CONDSUBPATT);
-        $this->assertTrue($root->firop->secop->subtype == NODE_ONETIMESUBPATT);
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_COND_SUBPATT);
+        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[1]->operands[2]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
-    function _test_syntax_errors() {//Test error reporting
+    function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
         $parser =& $this->run_parser('ab(c|d)[fg\\]');
         $this->assertTrue($parser->get_error());
@@ -410,7 +410,7 @@ class parser_test extends UnitTestCase {
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '{...}'), $errormsgs));
     }
 
-    function _test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
+    function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
         $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
         $this->assertTrue($parser->get_error());
@@ -462,16 +462,8 @@ class parser_test extends UnitTestCase {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
-        $curr = -1;
         while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                //$parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
+            $parser->doParse($token->type, $token->value);
         }
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $errstring) {
