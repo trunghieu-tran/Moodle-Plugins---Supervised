@@ -622,7 +622,7 @@ array(
 							break;
 						case 31:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_subpatt::SUBTYPE_GROUPING);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, 'grouping');
     return $res;
 }
 						case -32:

@@ -143,7 +143,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \(\?: {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_subpatt::SUBTYPE_GROUPING);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, 'grouping');
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {

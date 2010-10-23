@@ -50,6 +50,8 @@ abstract class preg_node {
     const TYPE_NODE_SUBPATT = 106;
     //Conditional subpattern
     const TYPE_NODE_COND_SUBPATT = 107;
+    //error node
+    const TYPE_NODE_ERROR = 108;
 
     //Member variables, common to all subclasses
     //Type, one of the class  - must return constants defined in this class
@@ -169,7 +171,8 @@ class preg_leaf_meta extends preg_leaf {
     // \w 
     //Should be locale-aware, but not Unicode for PCRE-compatibility
     const SUBTYPE_WORD_CHAR = 3;
-
+    //Leaf with empty in alternative (something|)
+    const SUBTYPE_EMPTY = 4;
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
 
@@ -412,9 +415,7 @@ class preg_node_subpatt extends preg_operator {
     //Subpattern
     const SUBTYPE_SUBPATT = 1;
     //Once-only subpattern
-    const SUBTYPE_ONCEONLY = 2;
-    //Grouping without cathing
-    const SUBTYPE_GROUPING = 3;
+    const SUBTYPE_ONCEONLY = 22;//for mismatching with SUBTYPE_NLA in parser
 
     //Subpattern number
     public $number = 0;
@@ -469,6 +470,14 @@ class preg_node_cond_subpatt extends preg_operator {
         return 'node_cond_subpatt';
     }
 
+}
+class preg_node_error extends preg_node {
+    public function name() {
+        return 'node_error';
+    }
+    public function __construct() {
+        $this->type = preg_node::TYPE_NODE_ERROR;
+    }
 }
 
 

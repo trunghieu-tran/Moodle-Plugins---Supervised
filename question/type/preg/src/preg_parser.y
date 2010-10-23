@@ -1,6 +1,6 @@
 %name preg_parser_
 %include{
-    require_once($CFG->dirroot . '/question/type/preg/node.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 %include_class {
     //Root of the Abstract Syntax Tree (AST)
@@ -25,9 +25,10 @@
         $this->error = false;
         $this->errormessages = array();
         $this->reducecount = 0;
-        $this->parens = array(NODE_SUBPATT => '(', NODE => '(?:', NODE_ONETIMESUBPATT => '(?>', 
-                                NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
-        $this->quants = array (NODE_QUESTQUANT => '?', NODE_ITER => '*', NODE_PLUSQUANT => '+', NODE_QUANT => '{...}');
+        $this->parens = array(preg_node::TYPE_NODE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
+                                preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!',
+                                preg_node_assert::SUBTYPE_NLB => '(?<!');
+        //$this->quants = array (NODE_QUESTQUANT => '?', NODE_ITER => '*', NODE_PLUSQUANT => '+', NODE_QUANT => '{...}');
     }
 
     function get_root() {
@@ -53,8 +54,7 @@
     @return node
     */
     protected function create_error_node($errorstr, $a = null) {
-        $newnode = new node;
-        $newnode->type = ERROR;
+        $newnode = new preg_node_error;
         $newnode->subtype = $errorstr;
         $this->errormessages[] = get_string($errorstr,'qtype_preg',$a);
         $this->error = true;
@@ -115,55 +115,51 @@ start ::= lastexpr(B). {
 }
 expr(A) ::= expr(B) CONC expr(C). {
     //ECHO 'CONC <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONC;
-    A->firop = B;
-    A->secop = C;
+    A = new preg_node_concat;
+    A->operands[1] = B;
+    A->operands[2] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) expr(C). [CONC] {
     //ECHO 'CONC1 <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONC;
-    A->firop = B;
-    A->secop = C;
+    A = new preg_node_concat;
+    A->operands[1] = B;
+    A->operands[2] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) ALT expr(C). {
     //ECHO 'ALT <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ALT;
-    A->firop = B;
-    A->secop = C;
+    A = new preg_node_alt;
+    A->operands[1] = B;
+    A->operands[2] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) ALT. {
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_ALT;
-    A->firop = B;
-    A->secop = new node;
-    A->secop->type = LEAF;
-    A->secop->subtype = LEAF_EMPTY;
+    A = new preg_node_alt;
+    A->operands[1] = B;
+    A->operands[2] = new preg_leaf_meta;
+    A->operands[2]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     $this->reducecount++;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
-    A->firop = B;
+    A->operands[1] = B;
     $this->reducecount++;
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
-    if (B != NODE) {
-        A = new node;
-        A->type = NODE;
-        A->subtype = B;
-        A->firop = C;
+    if (B !== 'grouping') {
+        if (B === preg_node::TYPE_NODE_SUBPATT || B === preg_node_subpatt::SUBTYPE_ONCEONLY) {
+            A = new preg_node_subpatt;
+        } else {
+            A = new preg_node_assert;
+        }
+        if (B !== preg_node::TYPE_NODE_SUBPATT) {
+            A->subtype = B;
+        }
+        A->operands[1] = C;
     } else {//grouping node
         A = C;
     }
@@ -171,59 +167,47 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
 }
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     //ECHO  'CONDSUB TF <br/>';
-    A = new node;
-    A->type = NODE;
-    A->subtype = NODE_CONDSUBPATT;
-    if (C->subtype != NODE_ALT) {
-        A->firop = C;
+    A = new preg_node_cond_subpatt;
+    if (C->type != preg_node::TYPE_NODE_ALT) {
+        A->operands[1] = C;
     } else {
-        if (C->firop->subtype == NODE_ALT || C->secop->subtype == NODE_ALT) {
+        if (C->operands[1]->type == preg_node::TYPE_NODE_ALT || C->operands[2]->type == preg_node::TYPE_NODE_ALT) {
             A = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
             $this->reducecount++;
             return;
         } else {
-            A->firop = C->firop;
-            A->secop = C->secop;
+            A->operands[1] = C->operands[1];
+            A->operands[1] = C->operands[1];
         }
     }
-    A->thirdop->type = NODE;
-    A->thirdop->subtype = D;
-    A->thirdop->firop = B;
+    A->operands[3] = new preg_node_assert;
+    A->operands[3]->subtype = D;
+    A->operands[3]->operands[1] = B;
     $this->reducecount++;
 }
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
-    A = new node;
     A = B;
     $this->reducecount++;
 }
-expr(A) ::= STARTANCHOR(B) expr(C). {
-    $this->anchor->start = true;
-    A = new node;
-    A = C;
+expr(A) ::= STARTANCHOR(B). {
+    A = B;
     $this->reducecount++;
 }
-lastexpr(A) ::= lastexpr(B) ENDANCHOR(C). {
-    $this->anchor->end = true;
-    A = new node;
+expr(A) ::= ENDANCHOR(B). {
     A = B;
     $this->reducecount++;
 }
 lastexpr(A) ::= expr(B). {
-    A = new node;
     A = B;
     $this->reducecount++;
 }
-expr(A) ::= WORDBREAK . {
-    A = new node;
-    A->type = LEAF;
-    A->subtype = LEAF_WORDBREAK;
+expr(A) ::= WORDBREAK(B) . {
+    A = B;
     $this->reducecount++;
 }
-expr(A) ::= WORDNOTBREAK . {
-    A = new node;
-    A->type = LEAF;
-    A->subtype = LEAF_WORDNOTBREAK;
+expr(A) ::= WORDNOTBREAK(B) . {
+    A = B;
     $this->reducecount++;
 }
 
@@ -319,11 +303,12 @@ expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
 
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
+    /*Now cannot determine quntifier type.
     $quantstr = $this->quants[B->subtype];
     if (!B->greed) {
         $quantstr .= '?';
-    }
-    A = $this->create_error_node('quantifieratstart',$quantstr);
+    }*/
+    A = $this->create_error_node('quantifieratstart');
     $this->reducecount++;
 }
 
