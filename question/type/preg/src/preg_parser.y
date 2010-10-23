@@ -106,7 +106,7 @@
 %nonassoc ERROR_PREC.
 %nonassoc CLOSEBRACK.
 %left ALT.
-%left CONC PARSLEAF WORDBREAK WORDNOTBREAK STARTANCHOR.
+%left CONC PARSLEAF.
 %nonassoc QUANT.
 %nonassoc OPENBRACK CONDSUBPATT.
 
@@ -187,7 +187,7 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
 }
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
-    if (!B->w && !B->W) {
+    if (B->type != preg_node::TYPE_LEAF_CHARSET || !B->w && !B->W) {
         A = B;
     } else if (B->w) {
         A = new preg_node_alt;
@@ -203,23 +203,7 @@ expr(A) ::= PARSLEAF(B). {
     }
     $this->reducecount++;
 }
-expr(A) ::= STARTANCHOR(B). {
-    A = B;
-    $this->reducecount++;
-}
-expr(A) ::= ENDANCHOR(B). {
-    A = B;
-    $this->reducecount++;
-}
 lastexpr(A) ::= expr(B). {
-    A = B;
-    $this->reducecount++;
-}
-expr(A) ::= WORDBREAK(B) . {
-    A = B;
-    $this->reducecount++;
-}
-expr(A) ::= WORDNOTBREAK(B) . {
     A = B;
     $this->reducecount++;
 }

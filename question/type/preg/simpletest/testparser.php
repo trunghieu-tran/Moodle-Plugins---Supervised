@@ -118,9 +118,9 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == chr(9));
         $token = $lexer->nextToken();//\b
-        $this->assertTrue($token->type === preg_parser_yyParser::WORDBREAK && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$token->value->negative);
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$token->value->negative);
         $token = $lexer->nextToken();//\B
-        $this->assertTrue($token->type === preg_parser_yyParser::WORDBREAK && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $token->value->negative);
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $token->value->negative);
     }
     function test_lexer_charclass() {
         //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
@@ -179,12 +179,16 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::STARTANCHOR);
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($token->value->subtype === preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::ENDANCHOR);
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($token->value->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_lexer_asserts() {
         $regex = '(?=(?!(?<=(?<!';
@@ -289,9 +293,9 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[2]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_start_anchor() {
         $parser =& $this->run_parser('^a');
