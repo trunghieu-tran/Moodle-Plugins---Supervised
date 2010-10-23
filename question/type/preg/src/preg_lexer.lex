@@ -5,7 +5,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 %%
 %function nextToken
-%line
 %char
 %state CHARCLASS
 %{
@@ -31,6 +30,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
                 $result->rightborder = $rightborder;
             }
         }
+        $result->indfirst = $this->yychar;
+        $text = $this->yytext();
+        $result->indlast = $this->yychar + strlen($text) - 1;
         return $result;
     }
 
@@ -128,6 +130,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->cc = new preg_leaf_charset;
     $this->cc->negative = false;
     $this->cccharnumber = 0;
+    $this->cc->indfirst = $this->yychar;
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
@@ -336,6 +339,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->cccharnumber++;
 }
 <CHARCLASS> \] {
+    $this->cc->indlast = $this->yychar;
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     $this->yybegin(self::YYINITIAL);
     $this->cc = null;
