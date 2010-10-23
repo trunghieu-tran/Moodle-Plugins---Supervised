@@ -59,11 +59,37 @@ abstract class dfa_preg_node {
     abstract public function not_supported();
 
     //DFA functions
+    /**
+    *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
+    *Put pair of number=>linktoleaf to connection.
+    *@param $connection table for saving connection numbers and leafs.
+    *@param $maxnum maximum number of leaf, it's number of previous leaf
+    */
     abstract public function number(&$connection, &$maxnum);//replacement of old 'numeration'
+    /**
+    *Function determine: subtree with root in this node can give empty word or not.
+    *@return true if can give empty word, else false
+    */
     abstract public function nullable();
+    /**
+    *function determine characters which can be on first position in word, which given subtree with root in this node
+    *@return numbers of characters (array)
+    */
     abstract public function firstpos();
+    /**
+    *function determine characters which can be on last position in word, which given subtree with root in this node
+    *@return numbers of characters (array)
+    */
     abstract public function lastpos();
+    /**
+    *function determine characters which can follow characters from this node
+    *@param fpmap - map of following of characters
+    */
     abstract public function followpos(&$fpmap);
+    /**
+    *function find asserts' nodes in tree and put link to root of it to $this->roots[<number of assert>]
+    *@param node - current nod for recursive search
+    */
     abstract public function find_asserts(&$roots);
     
     //Service DFA function
