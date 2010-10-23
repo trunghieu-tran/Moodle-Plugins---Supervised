@@ -231,7 +231,25 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_PLB);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_NLB);
-        }
+    }
+    function test_lexer_index() {
+        $regex = 'ab{12,57}[abc]';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->indfirst == 0);
+        $this->assertTrue($token->value->indlast == 0);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->indfirst == 1);
+        $this->assertTrue($token->value->indlast == 1);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->indfirst == 2);
+        $this->assertTrue($token->value->indlast == 8);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->indfirst == 9);
+        $this->assertTrue($token->value->indlast == 13);
+    }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
         $parser =& $this->run_parser('a|b');
