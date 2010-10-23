@@ -116,35 +116,35 @@ start ::= lastexpr(B). {
 expr(A) ::= expr(B) CONC expr(C). {
     //ECHO 'CONC <br/>';
     A = new preg_node_concat;
-    A->operands[1] = B;
-    A->operands[2] = C;
+    A->operands[0] = B;
+    A->operands[1] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) expr(C). [CONC] {
     //ECHO 'CONC1 <br/>';
     A = new preg_node_concat;
-    A->operands[1] = B;
-    A->operands[2] = C;
+    A->operands[0] = B;
+    A->operands[1] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) ALT expr(C). {
     //ECHO 'ALT <br/>';
     A = new preg_node_alt;
-    A->operands[1] = B;
-    A->operands[2] = C;
+    A->operands[0] = B;
+    A->operands[1] = C;
     $this->reducecount++;
 }
 expr(A) ::= expr(B) ALT. {
     A = new preg_node_alt;
-    A->operands[1] = B;
-    A->operands[2] = new preg_leaf_meta;
-    A->operands[2]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+    A->operands[0] = B;
+    A->operands[1] = new preg_leaf_meta;
+    A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     $this->reducecount++;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
-    A->operands[1] = B;
+    A->operands[0] = B;
     $this->reducecount++;
 }
 
@@ -159,7 +159,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
         if (B !== preg_node::TYPE_NODE_SUBPATT) {
             A->subtype = B;
         }
-        A->operands[1] = C;
+        A->operands[0] = C;
     } else {//grouping node
         A = C;
     }
@@ -169,20 +169,20 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     //ECHO  'CONDSUB TF <br/>';
     A = new preg_node_cond_subpatt;
     if (C->type != preg_node::TYPE_NODE_ALT) {
-        A->operands[1] = C;
+        A->operands[0] = C;
     } else {
-        if (C->operands[1]->type == preg_node::TYPE_NODE_ALT || C->operands[2]->type == preg_node::TYPE_NODE_ALT) {
+        if (C->operands[0]->type == preg_node::TYPE_NODE_ALT || C->operands[1]->type == preg_node::TYPE_NODE_ALT) {
             A = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
             $this->reducecount++;
             return;
         } else {
-            A->operands[1] = C->operands[1];
-            A->operands[1] = C->operands[1];
+            A->operands[0] = C->operands[0];
+            A->operands[0] = C->operands[0];
         }
     }
-    A->operands[3] = new preg_node_assert;
-    A->operands[3]->subtype = D;
-    A->operands[3]->operands[1] = B;
+    A->operands[2] = new preg_node_assert;
+    A->operands[2]->subtype = D;
+    A->operands[2]->operands[0] = B;
     $this->reducecount++;
 }
 expr(A) ::= PARSLEAF(B). {
@@ -191,15 +191,15 @@ expr(A) ::= PARSLEAF(B). {
         A = B;
     } else if (B->w) {
         A = new preg_node_alt;
-        A->operands[1] = new preg_leaf_meta;
-        A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[2] = B;
+        A->operands[0] = new preg_leaf_meta;
+        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        A->operands[1] = B;
     } else if (B->W) {
         A = new preg_node_alt;
-        A->operands[1] = new preg_leaf_meta;
-        A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[1]->negative = true;
-        A->operands[2] = B;
+        A->operands[0] = new preg_leaf_meta;
+        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        A->operands[0]->negative = true;
+        A->operands[1] = B;
     }
     $this->reducecount++;
 }
