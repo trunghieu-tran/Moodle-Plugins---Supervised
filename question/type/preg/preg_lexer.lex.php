@@ -35,6 +35,9 @@ class Yylex extends JLexBase  {
                 $result->rightborder = $rightborder;
             }
         }
+        $result->indfirst = $this->yychar;
+        $text = $this->yytext();
+        $result->indlast = $this->yychar + strlen($text) - 1;
         return $result;
     }
     protected function form_res($type, $value) {
@@ -54,7 +57,6 @@ class Yylex extends JLexBase  {
         }
     }
 	protected $yy_count_chars = true;
-	protected $yy_count_lines = true;
 
 	function __construct($stream) {
 		parent::__construct($stream);
@@ -437,6 +439,7 @@ array(
     $this->cc = new preg_leaf_charset;
     $this->cc->negative = false;
     $this->cccharnumber = 0;
+    $this->cc->indfirst = $this->yychar;
     $this->yybegin(self::CHARCLASS);
 }
 						case -7:
@@ -755,6 +758,7 @@ array(
 							break;
 						case 49:
 							{
+    $this->cc->indlast = $this->yychar;
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     $this->yybegin(self::YYINITIAL);
     $this->cc = null;
