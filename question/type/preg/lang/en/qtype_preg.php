@@ -55,7 +55,7 @@ $string['preg'] = 'Regular expression';
 $string['preg_help'] = 'Regular expression is a form of writing a pattern to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match part of the answer (which can be used, for example, to catch common errors and give appropriate comments).<br/>This question use php perl-compatible regular expression syntax. There is many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression there: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.<br/>';
 $string['preg_php_matcher'] = 'PHP preg extension';
 $string['pregsummary'] = 'Enter a string response from student that can be matched against several regular expressions (non-anchored matching is possible). Shows to the student the correct part of his response. In adaptive mode could give to the student hint by telling next correct character.';
-$string['quantifieratstart'] = 'Regex syntax error: {$a} quantifier without operand';
+$string['quantifieratstart'] = 'Regex syntax error: quantifier without operand';
 $string['subpattern'] = 'Subpattern';
 $string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level alternative in conditional subpattern. Use parenthesis if you want include alternatives in yes-expr on no-expr';
 $string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missing for \'{$a}\'';
