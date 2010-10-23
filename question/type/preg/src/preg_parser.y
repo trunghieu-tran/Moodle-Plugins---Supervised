@@ -126,6 +126,10 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->operands[0] = B;
     A->operands[1] = C;
     $this->reducecount++;
+    if (is_object(B) && is_object(C)) {
+        A->indfirst = B->indfirst;
+        A->indlast = C->indlast;
+    }
 }
 expr(A) ::= expr(B) ALT expr(C). {
     //ECHO 'ALT <br/>';
@@ -133,6 +137,10 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->operands[0] = B;
     A->operands[1] = C;
     $this->reducecount++;
+    if (is_object(B) && is_object(C)) {
+        A->indfirst = B->indfirst;
+        A->indlast = C->indlast;
+    }
 }
 expr(A) ::= expr(B) ALT. {
     A = new preg_node_alt;
@@ -140,12 +148,19 @@ expr(A) ::= expr(B) ALT. {
     A->operands[1] = new preg_leaf_meta;
     A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     $this->reducecount++;
+    if (is_object(B)) {
+        A->indfirst = B->indfirst;
+        A->indlast = B->indlast + 1;
+    }
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->operands[0] = B;
     $this->reducecount++;
+    if (is_object(B)) {
+        A->indfirst = B->indfirst;
+    }
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
@@ -164,6 +179,10 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
         A = C;
     }
     $this->reducecount++;
+    if (is_object(C)) {
+        A->indfirst = C->indfirst - strlen($this->parens[B]);
+        A->indlast = C->indlast + 1;
+    }
 }
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     //ECHO  'CONDSUB TF <br/>';
@@ -184,6 +203,10 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A->operands[2]->subtype = D;
     A->operands[2]->operands[0] = B;
     $this->reducecount++;
+    if (is_object(B) && is_object(C)) {
+        A->indfirst = B->indfirst - strlen($this->parens[D]);
+        A->indlast = C->indlast + 1;
+    }
 }
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
