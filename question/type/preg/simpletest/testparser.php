@@ -384,6 +384,16 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_COND_SUBPATT);
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
+    function test_parser_index() {
+        $parser =& $this->run_parser('abcdefgh|(abcd)*');
+        $root = $parser->get_root();
+        $this->assertTrue($root->indfirst == 0);
+        $this->assertTrue($root->indlast == 15);
+        $this->assertTrue($root->operands[0]->indfirst == 0);
+        $this->assertTrue($root->operands[0]->indlast == 7);
+        $this->assertTrue($root->operands[1]->indfirst == 9);
+        $this->assertTrue($root->operands[1]->indlast == 15);
+    }
     function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
         $parser =& $this->run_parser('ab(c|d)[fg\\]');
