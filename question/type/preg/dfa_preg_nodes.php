@@ -43,7 +43,7 @@ abstract class dfa_preg_node {
     * @return corresponding dfa_preg_node child class instance
     */
     static public function &from_preg_node($pregnode) {
-        $dfanodename = 'dfa_'.$pregnode->name();
+        $dfanodename = 'dfa_preg_'.$pregnode->name();
         if (class_exists($dfanodename)) {
             $dfanode = new $dfanodename($pregnode);
         } else {
@@ -122,12 +122,24 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         return $this->pregnode->subtype != preg_leaf_assert::SUBTYPE_ESC_G;
     }
 }
-class dfa_preg_node_concat extends dfa_preg_node {
+abstract class dfa_preg_operator extends dfa_preg_node {
     public function number(&$connection, &$maxnum) {
         foreach ($this->pregnode->operands as $key => $operand) {
             $this->pregnode->operands[$key]->number($connection, $maxnum);
         }
     }
+    public function followpos(&$fpmap) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
+            $this->pregnode->operands[$key]->followpos($fpmap);
+        }
+    }
+    public function find_asserts(&$roots) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
+            $this->pregnode->operands[$key]->find_asserts(&$roots);
+        }
+    }
+}
+class dfa_preg_node_concat extends dfa_preg_operator {
     public function nullable() {
         $result = true;
         foreach ($this->pregnode->operands as $operand) {
@@ -139,44 +151,26 @@ class dfa_preg_node_concat extends dfa_preg_node {
         return $result;
     }
     public function firstpos() {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->firstpos = $this->pregnode->operands[$key]->firstpos();
+        $this->firstpos = $this->pregnode->operands[1]->firstpos();
         return $this->firstpos;
     }
     public function lastpos() {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->lastpos = $this->pregnode->operands[$key]->lastpos();
+        $this->lastpos = $this->pregnode->operands[2]->lastpos();
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         foreach ($this->pregnode->operands as $key=>$operand) {
             $this->pregnode->operands[$key]->followpos($fpmap);
         }
-        reset($this->pregnode->operands);
-        $key1 = key($this->pregnode->operands);//key for first operand
-        next($this->pregnode->operands);
-        $key2 = key($this->pregnode->operands);//key for second operand
-        foreach ($this->pregnode->operands[$key1]->lastpos as $key) {
-            dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[$key2]->firstpos);
+        foreach ($this->pregnode->operands[1]->lastpos as $key) {
+            dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[2]->firstpos);
         }        
-    }
-    public function find_asserts(&$roots) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->find_asserts(&$roots);
-        }
     }
     public function not_supported() {
         return false;
     }
 }
-class dfa_preg_node_alt extends dfa_preg_node {
-    public function number(&$connection, &$maxnum) {
-        foreach ($this->pregnode->operands as $key => $operand) {
-            $this->pregnode->operands[$key]->number($connection, $maxnum);
-        }
-    }
+class dfa_preg_node_alt extends dfa_preg_operator {
     public function nullable() {
         $result = false;
         foreach ($this->pregnode->operands as $operand) {
@@ -201,21 +195,11 @@ class dfa_preg_node_alt extends dfa_preg_node {
         }
         return $this->lastpos;
     }
-    public function followpos(&$fpmap) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->followpos($fpmap);
-        }
-    }
-    public function find_asserts(&$roots) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->find_asserts(&$roots);
-        }
-    }
     public function not_supported() {
         return false;
     }
 }
-class dfa_preg_node_assert extends dfa_preg_node {
+class dfa_preg_node_assert extends dfa_preg_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
     
     public function not_supported() {
@@ -248,62 +232,35 @@ class dfa_preg_node_assert extends dfa_preg_node {
         $roots[$this->number] = &$this;
     }
 }
-abstract class dfa_preg_node_quant extends dfa_preg_node {
-    public function number(&$connection, &$maxnum) {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->pregnode->operands[$key]->number($connection, $maxnum);
-    }
+abstract class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function nullable() {
         //{} quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
             $result = true;
-            reset($this->pregnode->operands);
-            $key = key($this->pregnode->operands);
-            $this->pregnode->operands[$key]->nullable();
+            $this->pregnode->operands[1]->nullable();
         } else {//+
-            $result = reset($this->pregnode->operands);
-            $key = key($this->pregnode->operands);
-            $this->pregnode->operands[$key]->number($connection, $maxnum);
+            $reulst = $this->pregnode->operands[1]->nullable();
         }
         $this->nullable = $result;
         return $result;
     }
     public function firstpos() {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->firstpos = $this->pregnode->operands[$key]->firstpos();
+        $this->firstpos = $this->pregnode->operands[1]->firstpos();
         return $this->firstpos;
     }
     public function lastpos() {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->lastpos = $this->pregnode->operands[$key]->lastpos();
+        $this->lastpos = $this->pregnode->operands[1]->lastpos();
         return $this->lastpos;
-    }
-    public function find_asserts(&$roots) {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->pregnode->operands[$key]->find_asserts($roots);
     }
     public function not_supported() {
         return false;
     }
 }
-class dfa_preg_node_finite_quant extends dfa_preg_node_quant {
+class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function followpos(&$fpmap) {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->pregnode->operands[$key]->followpos($fpmap);
-    }
-}
-class dfa_preg_node_infinite_quant extends dfa_preg_node_quant {
-    public function followpos(&$fpmap) {
-        reset($this->pregnode->operands);
-        $key = key($this->pregnode->operands);
-        $this->pregnode->operands[$key]->followpos($fpmap);
-        foreach ($this->pregnode->operands[$key]->lastpos as $lpkey) {
-            dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[$key]->firstpos);
+        $this->pregnode->operands[1]->followpos($fpmap);
+        foreach ($this->pregnode->operands[1]->lastpos as $lpkey) {
+            dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[1]->firstpos);
         }
     }
 }
