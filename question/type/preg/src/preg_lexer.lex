@@ -212,11 +212,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \\b {
-    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     return $res;
 }
 <YYINITIAL> \\B {
-    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     $res->value->negative = true;
     return $res;
 }
@@ -256,12 +256,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> "^" {
     $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-    $res = $this->form_res(preg_parser_yyParser::STARTANCHOR, $leaf);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $leaf);
     return $res;
 }
 <YYINITIAL> "$" {
     $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR);
-    $res = $this->form_res(preg_parser_yyPARSER::ENDANCHOR, $leaf);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
 <CHARCLASS> \\\\ {

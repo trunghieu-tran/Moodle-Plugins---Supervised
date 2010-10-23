@@ -472,7 +472,7 @@ array(
 						case 11:
 							{
     $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-    $res = $this->form_res(preg_parser_yyParser::STARTANCHOR, $leaf);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $leaf);
     return $res;
 }
 						case -12:
@@ -480,7 +480,7 @@ array(
 						case 12:
 							{
     $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR);
-    $res = $this->form_res(preg_parser_yyPARSER::ENDANCHOR, $leaf);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
 						case -13:
@@ -530,14 +530,14 @@ array(
 							break;
 						case 19:
 							{
-    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     return $res;
 }
 						case -20:
 							break;
 						case 20:
 							{
-    $res = $this->form_res(preg_parser_yyParser::WORDBREAK, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     $res->value->negative = true;
     return $res;
 }
