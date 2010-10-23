@@ -187,7 +187,20 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
 }
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
-    A = B;
+    if (!B->w && !B->W) {
+        A = B;
+    } else if (B->w) {
+        A = new preg_node_alt;
+        A->operands[1] = new preg_leaf_meta;
+        A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        A->operands[2] = B;
+    } else if (B->W) {
+        A = new preg_node_alt;
+        A->operands[1] = new preg_leaf_meta;
+        A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        A->operands[1]->negative = true;
+        A->operands[2] = B;
+    }
     $this->reducecount++;
 }
 expr(A) ::= STARTANCHOR(B). {
