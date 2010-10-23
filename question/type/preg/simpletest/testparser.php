@@ -216,7 +216,7 @@ class parser_test extends UnitTestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === preg_node::TYPE_NODE_SUBPATT);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === 'grouping');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === preg_node_subpatt::SUBTYPE_ONCEONLY);
         $token = $lexer->nextToken();
@@ -248,7 +248,7 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 1);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 0);
         $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'a');
         $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
     }
@@ -288,23 +288,24 @@ class parser_test extends UnitTestCase {
     function test_parser_two_anchors() {
         $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
-        $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
-        $this->assertTrue($anchor->start === true && $anchor->end === true);
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_start_anchor() {
         $parser =& $this->run_parser('^a');
         $root = $parser->get_root();
-        $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == LEAF && $root->subtype == LEAF_CHARCLASS && $root->chars === 'a');
-        $this->assertTrue($anchor->start === true && $anchor->end === false);
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'a');
     }
     function test_parser_end_anchor() {
         $parser =& $this->run_parser('a$');
         $root = $parser->get_root();
-        $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
-        $this->assertTrue($anchor->start === false && $anchor->end === true);
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_no_anchors() {
         $parser =& $this->run_parser('a');
@@ -334,10 +335,10 @@ class parser_test extends UnitTestCase {
         $fb = $root->operands[1]->operands[2];
         $tf = $root->operands[2]->operands[2]->operands[1];
         $ff = $root->operands[2]->operands[2]->operands[2];
-        $this->assertTrue($tf->type == TYPE_NODE_ASSERT && $tf->subtype == SUBTYPE_PLA);
-        $this->assertTrue($ff->type == TYPE_NODE_ASSERT && $ff->subtype == SUBTYPE_NLA);
-        $this->assertTrue($fb->type == TYPE_NODE_ASSERT && $fb->subtype == SUBTYPE_NLB);
-        $this->assertTrue($tb->type == TYPE_NODE_ASSERT && $tb->subtype == SUBTYPE_PLB);
+        $this->assertTrue($tf->type == preg_node::TYPE_NODE_ASSERT && $tf->subtype == preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($ff->type == preg_node::TYPE_NODE_ASSERT && $ff->subtype == preg_node_assert::SUBTYPE_NLA);
+        $this->assertTrue($fb->type == preg_node::TYPE_NODE_ASSERT && $fb->subtype == preg_node_assert::SUBTYPE_NLB);
+        $this->assertTrue($tb->type == preg_node::TYPE_NODE_ASSERT && $tb->subtype == preg_node_assert::SUBTYPE_PLB);
     }
     function test_parser_metasymbol_dot() {
         $parser =& $this->run_parser('.');
@@ -359,7 +360,7 @@ class parser_test extends UnitTestCase {
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_COND_SUBPATT);
-        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[1]->operands[2]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[1]->operands[1]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
     function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
@@ -404,10 +405,13 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($parser->get_error());
         $errormsgs = $parser->get_error_messages();
         $this->assertTrue(count($errormsgs) == 4);
+        /*Old style error reporting
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '?'), $errormsgs));
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '+'), $errormsgs));
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '*'), $errormsgs));
         $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '{...}'), $errormsgs));
+        */
+        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg'), $errormsgs));
     }
 
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
