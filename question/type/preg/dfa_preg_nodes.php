@@ -177,19 +177,19 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $result;
     }
     public function firstpos() {
-        $this->firstpos = $this->pregnode->operands[1]->firstpos();
+        $this->firstpos = $this->pregnode->operands[0]->firstpos();
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = $this->pregnode->operands[2]->lastpos();
+        $this->lastpos = $this->pregnode->operands[1]->lastpos();
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         foreach ($this->pregnode->operands as $key=>$operand) {
             $this->pregnode->operands[$key]->followpos($fpmap);
         }
-        foreach ($this->pregnode->operands[1]->lastpos as $key) {
-            dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[2]->firstpos);
+        foreach ($this->pregnode->operands[0]->lastpos as $key) {
+            dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
         }        
     }
     public function not_supported() {
@@ -263,19 +263,19 @@ abstract class dfa_preg_node_finite_quant extends dfa_preg_operator {
         //{} quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
             $result = true;
-            $this->pregnode->operands[1]->nullable();
+            $this->pregnode->operands[0]->nullable();
         } else {//+
-            $reulst = $this->pregnode->operands[1]->nullable();
+            $reulst = $this->pregnode->operands[0]->nullable();
         }
         $this->nullable = $result;
         return $result;
     }
     public function firstpos() {
-        $this->firstpos = $this->pregnode->operands[1]->firstpos();
+        $this->firstpos = $this->pregnode->operands[0]->firstpos();
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = $this->pregnode->operands[1]->lastpos();
+        $this->lastpos = $this->pregnode->operands[0]->lastpos();
         return $this->lastpos;
     }
     public function not_supported() {
@@ -284,9 +284,9 @@ abstract class dfa_preg_node_finite_quant extends dfa_preg_operator {
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function followpos(&$fpmap) {
-        $this->pregnode->operands[1]->followpos($fpmap);
-        foreach ($this->pregnode->operands[1]->lastpos as $lpkey) {
-            dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[1]->firstpos);
+        $this->pregnode->operands[0]->followpos($fpmap);
+        foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
+            dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
         }
     }
 }

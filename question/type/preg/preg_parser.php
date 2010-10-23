@@ -869,8 +869,8 @@ static public $yy_action = array(
     function yy_r1(){
     //ECHO 'CONC <br/>';
     $this->_retvalue = new preg_node_concat;
-    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -2]->minor;
-    $this->_retvalue->operands[2] = $this->yystack[$this->yyidx + 0]->minor;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -2]->minor;
+    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
 #line 881 "../preg_parser.php"
@@ -878,8 +878,8 @@ static public $yy_action = array(
     function yy_r2(){
     //ECHO 'CONC1 <br/>';
     $this->_retvalue = new preg_node_concat;
-    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor;
-    $this->_retvalue->operands[2] = $this->yystack[$this->yyidx + 0]->minor;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
 #line 890 "../preg_parser.php"
@@ -887,24 +887,24 @@ static public $yy_action = array(
     function yy_r3(){
     //ECHO 'ALT <br/>';
     $this->_retvalue = new preg_node_alt;
-    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -2]->minor;
-    $this->_retvalue->operands[2] = $this->yystack[$this->yyidx + 0]->minor;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -2]->minor;
+    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
 #line 899 "../preg_parser.php"
 #line 135 "../preg_parser.y"
     function yy_r4(){
     $this->_retvalue = new preg_node_alt;
-    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor;
-    $this->_retvalue->operands[2] = new preg_leaf_meta;
-    $this->_retvalue->operands[2]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[1] = new preg_leaf_meta;
+    $this->_retvalue->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     $this->reducecount++;
     }
 #line 908 "../preg_parser.php"
 #line 143 "../preg_parser.y"
     function yy_r5(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
-    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     $this->reducecount++;
     }
 #line 915 "../preg_parser.php"
@@ -920,7 +920,7 @@ static public $yy_action = array(
         if ($this->yystack[$this->yyidx + -2]->minor !== preg_node::TYPE_NODE_SUBPATT) {
             $this->_retvalue->subtype = $this->yystack[$this->yyidx + -2]->minor;
         }
-        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor;
+        $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {//grouping node
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
@@ -932,20 +932,20 @@ static public $yy_action = array(
     //ECHO  'CONDSUB TF <br/>';
     $this->_retvalue = new preg_node_cond_subpatt;
     if ($this->yystack[$this->yyidx + -1]->minor->type != preg_node::TYPE_NODE_ALT) {
-        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor;
+        $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {
-        if ($this->yystack[$this->yyidx + -1]->minor->operands[1]->type == preg_node::TYPE_NODE_ALT || $this->yystack[$this->yyidx + -1]->minor->operands[2]->type == preg_node::TYPE_NODE_ALT) {
+        if ($this->yystack[$this->yyidx + -1]->minor->operands[0]->type == preg_node::TYPE_NODE_ALT || $this->yystack[$this->yyidx + -1]->minor->operands[1]->type == preg_node::TYPE_NODE_ALT) {
             $this->_retvalue = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
             $this->reducecount++;
             return;
         } else {
-            $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor->operands[1];
-            $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor->operands[1];
+            $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor->operands[0];
+            $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor->operands[0];
         }
     }
-    $this->_retvalue->operands[3] = new preg_node_assert;
-    $this->_retvalue->operands[3]->subtype = $this->yystack[$this->yyidx + -4]->minor;
-    $this->_retvalue->operands[3]->operands[1] = $this->yystack[$this->yyidx + -3]->minor;
+    $this->_retvalue->operands[2] = new preg_node_assert;
+    $this->_retvalue->operands[2]->subtype = $this->yystack[$this->yyidx + -4]->minor;
+    $this->_retvalue->operands[2]->operands[0] = $this->yystack[$this->yyidx + -3]->minor;
     $this->reducecount++;
     }
 #line 956 "../preg_parser.php"
@@ -956,15 +956,15 @@ static public $yy_action = array(
         $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     } else if ($this->yystack[$this->yyidx + 0]->minor->w) {
         $this->_retvalue = new preg_node_alt;
-        $this->_retvalue->operands[1] = new preg_leaf_meta;
-        $this->_retvalue->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        $this->_retvalue->operands[2] = $this->yystack[$this->yyidx + 0]->minor;
+        $this->_retvalue->operands[0] = new preg_leaf_meta;
+        $this->_retvalue->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     } else if ($this->yystack[$this->yyidx + 0]->minor->W) {
         $this->_retvalue = new preg_node_alt;
-        $this->_retvalue->operands[1] = new preg_leaf_meta;
-        $this->_retvalue->operands[1]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        $this->_retvalue->operands[1]->negative = true;
-        $this->_retvalue->operands[2] = $this->yystack[$this->yyidx + 0]->minor;
+        $this->_retvalue->operands[0] = new preg_leaf_meta;
+        $this->_retvalue->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        $this->_retvalue->operands[0]->negative = true;
+        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     }
     $this->reducecount++;
     }

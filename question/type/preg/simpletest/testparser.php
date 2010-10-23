@@ -27,12 +27,12 @@ function find_illegal_isnt_object($node, $path) {
         return $path;
     } elseif ($node->type == NODE) {
         if ($node->subtype == NODE_CONC || $node->subtype == NODE_ALT) {
-            $result = find_illegal_isnt_object($node->operands[2], $path . '->operands[2]');
+            $result = find_illegal_isnt_object($node->operands[1], $path . '->operands[1]');
             if ($result !== false) {
                 return $result;
             }
         }
-        $result = find_illegal_isnt_object($node->operands[1], $path . '->operands[1]');
+        $result = find_illegal_isnt_object($node->operands[0], $path . '->operands[0]');
         if ($result !== false) {
             return $result;
         }
@@ -237,42 +237,42 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('a|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
     }
     function test_parser_quantification() {//ab+
         $parser =& $this->run_parser('ab+');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[2]->leftborder == 1);
-        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 1);
+        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[0]->charset == 'b');
     }
     function test_parser_alt_and_quantif() {//a*|b
         $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 0);
-        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[0]->leftborder == 0);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
     }
     function test_parser_concatenation() {//ab
         $parser =& $this->run_parser('ab');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
     }
     function test_parser_alt_and_conc() {//ab|cd
         $parser =& $this->run_parser('ab|cd');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[1]->charset == 'b');
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[2]->charset == 'b');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[2]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[1]->charset == 'c');
-        $this->assertTrue($root->operands[2]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->operands[2]->charset == 'd');
+        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[0]->charset == 'c');
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'd');
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
         $parser =& $this->run_parser('(?:a|b)*abb');
@@ -293,23 +293,23 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $this->assertTrue($root->operands[1]->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[2]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[0]->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_start_anchor() {
         $parser =& $this->run_parser('^a');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[2]->charset == 'a');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
     }
     function test_parser_end_anchor() {
         $parser =& $this->run_parser('a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_no_anchors() {
         $parser =& $this->run_parser('a');
@@ -330,15 +330,15 @@ class parser_test extends UnitTestCase {
         $parser =& $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)');
         $root = $parser->get_root();
         /* Old-style concatenation layout (strictly left-associative)
-        $ff = $root->operands[2];
-        $tf = $root->operands[1]->operands[2];
-        $fb = $root->operands[1]->operands[1]->operands[1]->operands[2];
-        $tb = $root->operands[1]->operands[1]->operands[1]->operands[1];*/
+        $ff = $root->operands[1];
+        $tf = $root->operands[0]->operands[1];
+        $fb = $root->operands[0]->operands[0]->operands[0]->operands[1];
+        $tb = $root->operands[0]->operands[0]->operands[0]->operands[0];*/
         /*New-style concatenation layout (with no associativity defined) - more balanced tree*/
-        $tb = $root->operands[1]->operands[1];
-        $fb = $root->operands[1]->operands[2];
-        $tf = $root->operands[2]->operands[2]->operands[1];
-        $ff = $root->operands[2]->operands[2]->operands[2];
+        $tb = $root->operands[0]->operands[0];
+        $fb = $root->operands[0]->operands[1];
+        $tf = $root->operands[1]->operands[1]->operands[0];
+        $ff = $root->operands[1]->operands[1]->operands[1];
         $this->assertTrue($tf->type == preg_node::TYPE_NODE_ASSERT && $tf->subtype == preg_node_assert::SUBTYPE_PLA);
         $this->assertTrue($ff->type == preg_node::TYPE_NODE_ASSERT && $ff->subtype == preg_node_assert::SUBTYPE_NLA);
         $this->assertTrue($fb->type == preg_node::TYPE_NODE_ASSERT && $fb->subtype == preg_node_assert::SUBTYPE_NLB);
@@ -352,19 +352,19 @@ class parser_test extends UnitTestCase {
     function test_parser_word_break() {
         $parser =& $this->run_parser('a\b');
         $root = $parser->get_root();
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$root->operands[2]->negative);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$root->operands[1]->negative);
     }
     function test_parser_word_not_break() {
         $parser =& $this->run_parser('a\B');
         $root = $parser->get_root();
-        $this->assertTrue($root->operands[2]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[2]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $root->operands[2]->negative);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $root->operands[1]->negative);
     }
     function test_parser_subpatterns() {
         $parser =& $this->run_parser('((?:(?(?=a)(?>b)|a)))');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_COND_SUBPATT);
-        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[1]->operands[1]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_COND_SUBPATT);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
     function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
