@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
     protected function form_node($name, $subtype = null, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
-        if (isset($subtype)) {
+        if ($subtype !== null) {
             $result->subtype = $subtype;
         }
         if ($name == 'preg_leaf_charset') {
