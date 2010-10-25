@@ -175,9 +175,9 @@ class question_preg_qtype extends question_shortanswer_qtype {
                 break;
             }
 
-            //when hinting we should use only answers within hint border except full matching case
+            //when hinting we should use only answers within hint border except full matching case and there is some match at all
             //if engine doesn't support hinting we shoudn't bother with fitness too
-            if (!$ispartialmatching || $answer->fraction < $question->options->hintgradeborder) {
+            if (!$ispartialmatching || !$matcher->match_found() || $answer->fraction < $question->options->hintgradeborder) {
                 continue;
             }
 
@@ -232,31 +232,33 @@ class question_preg_qtype extends question_shortanswer_qtype {
 
             //Calculate strings for response coloring
             //TODO - change actual style definition to the classes to work with themes correctly, requires investigation how add a new class for plugin...
-            $firstindex = $matcher->first_correct_character_index();
-            $lastindex = $matcher->last_correct_character_index();
-            $wronghead = '';
-            if ($firstindex > 0) {//if there is wrong heading
-                $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
-            }
-            $correctpart = '';
-            if ($firstindex != -1) {//there were any match
-                $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
-            }
-            $hintedcharacter = '';
-            if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
-                $hintedcharacter = '<span style="background-color:#00FF00">'.htmlspecialchars($matcher->next_char()).'</span>';
-            }
-            $wrongtail = '';
-            if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
-                $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
-            }
+            if ($matcher->match_found()) {
+                $firstindex = $matcher->first_correct_character_index();
+                $lastindex = $matcher->last_correct_character_index();
+                $wronghead = '';
+                if ($firstindex > 0) {//if there is wrong heading
+                    $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
+                }
+                $correctpart = '';
+                if ($firstindex != -1) {//there were any match
+                    $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
+                }
+                $hintedcharacter = '';
+                if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
+                    $hintedcharacter = '<span style="background-color:#00FF00">'.htmlspecialchars($matcher->next_char()).'</span>';
+                }
+                $wrongtail = '';
+                if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
+                    $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
+                }
 
-            //We shouldn't show colored message if there is no match and partial matching is unavailable, because we could mislead student striking throught all reponse, even the correct parts that may be there
-            if($matcher->match_found() || $matcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
-                $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
-            }
-            if (!empty($this->hintmessage)) {
-                $this->hintmessage .= '<br />';
+                //We shouldn't show colored message if there is no match and partial matching is unavailable, because we could mislead student striking throught all reponse, even the correct parts that may be there
+                if ($matcher->is_matching_complete() || $matcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+                    $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
+                }
+                if (!empty($this->hintmessage)) {
+                    $this->hintmessage .= '<br />';
+                }
             }
         }
 
