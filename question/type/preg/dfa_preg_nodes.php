@@ -29,9 +29,9 @@ abstract class dfa_preg_node {
         $this->pregnode = $node;
         //Convert operands to dfa nodes
         if (is_a($node, 'preg_operator')) {
-            foreach ($node->operands as &$operand) {
-                if (is_a($operand, 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $operand =& self::from_preg_node($operand);
+            foreach ($node->operands as $key=>$operand) {
+                if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
+                    $node->operands[$key] =& self::from_preg_node($operand);
                 }
             }
         }
@@ -168,7 +168,7 @@ abstract class dfa_preg_operator extends dfa_preg_node {
 class dfa_preg_node_concat extends dfa_preg_operator {
     public function nullable() {
         $result = true;
-        foreach ($this->pregnode->operands as $operand) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
             if(!$this->pregnode->operands[$key]->nullable()) {
                 $result = false;
             }
@@ -199,7 +199,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
 class dfa_preg_node_alt extends dfa_preg_operator {
     public function nullable() {
         $result = false;
-        foreach ($this->pregnode->operands as $operand) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
             if($this->pregnode->operands[$key]->nullable()) {
                 $result = true;
             }
@@ -258,7 +258,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         $roots[$this->number] = &$this;
     }
 }
-abstract class dfa_preg_node_finite_quant extends dfa_preg_operator {
+class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function nullable() {
         //{} quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
