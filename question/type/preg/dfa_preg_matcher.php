@@ -13,6 +13,7 @@
 //marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_nodes.php');
 
 define('MAX_STATE_COUNT', 250);     //    if you put large constant here, than big dfa will be
 define('MAX_PASSAGE_COUNT', 250);    //    correct, but big dfa will be build slow, if you small
@@ -833,7 +834,7 @@ class dfa_preg_matcher extends preg_matcher {
     }
     function build_tree($regex) {
         parent::build_tree($regex);
-        $this->roots[0] = $this->ast_root;
+        $this->roots[0] = dfa_preg_node::from_preg_node($this->ast_root);
     }
     /**
     *function get string and compare it with regex
