@@ -17,12 +17,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 abstract class dfa_preg_node {
 
     //Instance of preg_node child class
-    protected $pregnode;
+    public $pregnode;
     //Cashes for important data
-    protected $nullable;
-    protected $firstpos;
-    protected $lastpos;
-    protected $number;
+    public $nullable;
+    public $firstpos;
+    public $lastpos;
+    public $number;
 
     //TODO decide, if it could also do convert_tree job...
     public function __construct($node) {
@@ -314,14 +314,14 @@ class dfa_preg_node_alt extends dfa_preg_operator {
     }
     public function firstpos() {
         $this->firstpos = array();
-        foreach ($this->pregnode->operands as $operand) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
             $this->firstpos = array_push($this->firstpos, $this->pregnode->operands[$key]->firstpos());
         }
         return $this->firstpos;
     }
     public function lastpos() {
         $this->lastpos = array();
-        foreach ($this->pregnode->operands as $operand) {
+        foreach ($this->pregnode->operands as $key=>$operand) {
             $this->lastpos = array_push($this->lastpos, $this->pregnode->operands[$key]->lastpos());
         }
         return $this->lastpos;
