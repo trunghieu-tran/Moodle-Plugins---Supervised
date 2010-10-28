@@ -36,6 +36,28 @@ abstract class dfa_preg_node {
             }
         }
     }
+    
+    /**
+    *Function print indent before something
+    *@param indent size of indent in count of 5 dot
+    */
+    static public function print_indent($indent) {
+        for ($i=0; $i<$indent; $i++) {
+            echo '.....';
+        }
+    }
+    /**
+    *Function print the subtree with root in this node with indents
+    *@param indent indent for printing info about this node
+    */
+    public function print_tree($indent) {
+        $this->print_self($indent);
+    }
+    /**
+    *Function print info about this node
+    *@param indent indent for printing info about this node
+    */
+    abstract public function print_self($indent);
 
     /**
     * DFA node factory
@@ -137,15 +159,85 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
     public function not_supported() {
         return false;
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: leaf charset ';
+        if ($this->pregnode->negative) {
+            echo 'negative';
+        } else {
+            echo 'positive';
+        }
+        echo '<br/>';
+        dfa_preg_node::print_indent($indent);
+        echo 'charset: ', $this->pregnode->charset, '<br/>';
+        
+    }
 }
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
     public function not_supported() {
         return false;
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: leaf meta ';
+        if ($this->pregnode->negative) {
+            echo 'negative';
+        } else {
+            echo 'positive';
+        }
+        echo '<br/>';
+        switch ($this->pregnode->subtype) {
+            case preg_leaf_meta::SUBTYPE_DOT:
+                $subtype = 'dot';
+                break;
+            case preg_leaf_meta::SUBTYPE_UNICODE_PROP:
+                $subtype = 'unicode property';
+                break;
+            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+                $subtype = 'word char';
+                break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $subtype = 'empty';
+                break;
+        }
+        dfa_preg_node::print_indent($indent);
+        echo 'subtype: ', $subtype, '<br/>';
+        
+    }
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
     public function not_supported() {
         return $this->pregnode->subtype != preg_leaf_assert::SUBTYPE_ESC_G;
+    }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node assert ';
+        if ($this->pregnode->negative) {
+            echo 'negative';
+        } else {
+            echo 'positive';
+        }
+        echo '<br/>';
+        switch ($this->pregnode->subtype) {
+            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                $subtype = 'circumflex';
+                break;
+            case preg_leaf_assert::SUBTYPE_DOLLAR:
+                $subtype = 'dollar';
+                break;
+            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+                $subtype = 'word break';
+                break;
+            case preg_leaf_assert::SUBTYPE_ESC_A:
+                $subtype = '\\A';
+                break;
+            case preg_leaf_assert::SUBTYPE_ESC_Z:
+                $subtype = '\\Z';
+                break;
+        }
+        dfa_preg_node::print_indent($indent);
+        echo 'subtype: ', $subtype, '<br/>';
+        
     }
 }
 abstract class dfa_preg_operator extends dfa_preg_node {
@@ -162,6 +254,15 @@ abstract class dfa_preg_operator extends dfa_preg_node {
     public function find_asserts(&$roots) {
         foreach ($this->pregnode->operands as $key=>$operand) {
             $this->pregnode->operands[$key]->find_asserts(&$roots);
+        }
+    }
+    public function print_tree($indent) {
+        parent::print_tree($indent);
+        foreach ($this->pregnode->operands as $operand) {
+            echo '<br/>';
+            dfa_preg_node::print_indent($indent+1);
+            echo 'OPERAND:<br/>';
+            $operand->print_tree($indent+1);
         }
     }
 }
@@ -195,6 +296,10 @@ class dfa_preg_node_concat extends dfa_preg_operator {
     public function not_supported() {
         return false;
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node concatenation<br/>';
+    }
 }
 class dfa_preg_node_alt extends dfa_preg_operator {
     public function nullable() {
@@ -223,6 +328,10 @@ class dfa_preg_node_alt extends dfa_preg_operator {
     }
     public function not_supported() {
         return false;
+    }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node alternative<br/>';
     }
 }
 class dfa_preg_node_assert extends dfa_preg_operator {
@@ -257,6 +366,26 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     public function find_asserts(&$roots) {
         $roots[$this->number] = &$this;
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node assert<br/>';
+        switch ($this->pregnode->subtype) {
+            case preg_node_assert::SUBTYPE_PLA:
+                $subtype = 'PLA';
+                break;
+            case preg_node_assert::SUBTYPE_PLB:
+                $subtype = 'PLB';
+                break;
+            case preg_node_assert::SUBTYPE_NLA:
+                $subtype = 'NLA';
+                break;
+            case preg_node_assert::SUBTYPE_NLB:
+                $subtype = 'NLB';
+                break;
+        }
+        dfa_preg_node::print_indent($indent);
+        echo 'subtype: ', $subtype, '<br/>';
+    }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function nullable() {
@@ -281,6 +410,14 @@ class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function not_supported() {
         return false;
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node finite quant<br/>';
+        dfa_preg_node::print_indent($indent);
+        echo 'left border: ', $this->pregnode->leftborder, '<br/>';
+        dfa_preg_node::print_indent($indent);
+        echo 'right border: ', $this->pregnode->rightborder, '<br/>';
+    }
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function followpos(&$fpmap) {
@@ -288,6 +425,12 @@ class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
             dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
         }
+    }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'type: node infinite quant<br/>';
+        dfa_preg_node::print_indent($indent);
+        echo 'left border: ', $this->pregnode->leftborder, '<br/>';
     }
 }
 ?>
