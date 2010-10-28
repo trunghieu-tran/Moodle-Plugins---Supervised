@@ -199,6 +199,9 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
             case preg_leaf_meta::SUBTYPE_EMPTY:
                 $subtype = 'empty';
                 break;
+            case preg_leaf_meta::SUBTYPE_ENDREG:
+                $subtype = 'endreg';
+                break;
         }
         dfa_preg_node::print_indent($indent);
         echo 'subtype: ', $subtype, '<br/>';
