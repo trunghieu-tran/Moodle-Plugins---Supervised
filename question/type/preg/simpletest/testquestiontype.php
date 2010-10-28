@@ -307,7 +307,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->lastpos();
         $result=null;
         $this->qtype->roots[0]->followpos($result);
-        $this->assertTrue(count($result[-1]) == 1 && $result[-1][0] == 2);
+        $this->assertTrue(count($result[1]) == 1 && $result[1][0] == 2);
     }
     //Unit test for buildfa function
     function test_buildfa_easy() {//ab
