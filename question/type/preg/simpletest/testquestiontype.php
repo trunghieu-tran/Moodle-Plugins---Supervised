@@ -158,8 +158,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->number($connection, $maxnum);
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
-        $this->assertTrue(count($this->qtype->roots[0]->firstpos) == 1 && $this->qtype->roots[0]->firstpos[0] == -1);
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->operands[0]->firstpos[0] == -1);
+        $this->assertTrue(count($this->qtype->roots[0]->firstpos) == 1 && $this->qtype->roots[0]->firstpos[0] == 1);
+        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->firstpos) == 1 && $this->qtype->roots[0]->pregnode->operands[0]->firstpos[0] == 1);
     }
     function test_firstpos_assert() {
         $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
@@ -169,7 +169,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->firstpos();
         $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos) == 1 && 
-                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos[0]>ASSERT);
+                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }
     //Unit test for lastpos function
     function test_lastpos_leaf() {

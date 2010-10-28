@@ -154,6 +154,10 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     public function find_asserts(&$roots) {
         ;//do nothing, because not need for leaf
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        echo 'number: ', $this->number, '<br/>';
+    }
 }
 class dfa_preg_leaf_charset extends dfa_preg_leaf {
     public function not_supported() {
@@ -170,7 +174,7 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
         echo '<br/>';
         dfa_preg_node::print_indent($indent);
         echo 'charset: ', $this->pregnode->charset, '<br/>';
-        
+        parent::print_self($indent);
     }
 }
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
@@ -205,7 +209,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
         }
         dfa_preg_node::print_indent($indent);
         echo 'subtype: ', $subtype, '<br/>';
-        
+        parent::print_self($indent);
     }
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
@@ -240,7 +244,7 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         }
         dfa_preg_node::print_indent($indent);
         echo 'subtype: ', $subtype, '<br/>';
-        
+        parent::print_self($indent);
     }
 }
 abstract class dfa_preg_operator extends dfa_preg_node {
@@ -281,7 +285,15 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $result;
     }
     public function firstpos() {
-        $this->firstpos = $this->pregnode->operands[0]->firstpos();
+        $this->firstpos = array();
+        if ($this->pregnode->operands[0]->nullable) {
+            foreach ($this->pregnode->operands as $key=>$operand) {
+            $this->firstpos = array_merge($this->firstpos, $this->pregnode->operands[$key]->firstpos());
+        }
+        } else {
+            $this->firstpos = $this->pregnode->operands[0]->firstpos();
+            $this->pregnode->operands[1]->firstpos();
+        }
         return $this->firstpos;
     }
     public function lastpos() {
@@ -318,7 +330,7 @@ class dfa_preg_node_alt extends dfa_preg_operator {
     public function firstpos() {
         $this->firstpos = array();
         foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->firstpos = array_push($this->firstpos, $this->pregnode->operands[$key]->firstpos());
+            $this->firstpos = array_merge($this->firstpos, $this->pregnode->operands[$key]->firstpos());
         }
         return $this->firstpos;
     }
@@ -362,6 +374,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     }
     public function lastpos() {
         $this->lastpos = array($this->number);
+        return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         ;//do nothing, because not need for assert
@@ -388,6 +401,8 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         }
         dfa_preg_node::print_indent($indent);
         echo 'subtype: ', $subtype, '<br/>';
+        dfa_preg_node::print_indent($indent);
+        echo 'number: ', $this->number, '<br/>';
     }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_operator {
