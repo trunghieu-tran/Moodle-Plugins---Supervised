@@ -97,6 +97,8 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
+        /*
+        *Old style
         $root = $this->roots[$index];
         $this->roots[$index] = new node;
         $this->roots[$index]->type = NODE;
@@ -106,6 +108,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->roots[$index]->secop->type = LEAF;
         $this->roots[$index]->secop->subtype = LEAF_END;
         $this->roots[$index]->secop->direction = true;
+        */
     }
     /**
     *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
@@ -670,6 +673,8 @@ class dfa_preg_matcher extends preg_matcher {
     *@return link to copy of subtree
     */
     static function copy_subtree($node) {
+        /*
+        *Old style function, it don't work now
         $result = new node;
         $result->type = $node->type;
         $result->subtype = $node->subtype;
@@ -683,6 +688,7 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
         return $result;
+        */
     }
     /**
     *function convert the tree, replace operand+ on operandoperand*, operand{x,y} replace on x times of operand and y-x times of operand?
@@ -692,6 +698,8 @@ class dfa_preg_matcher extends preg_matcher {
     *param node - current node of converting tree
     */
     static function convert_tree(&$node) {
+        /*
+        *Old style function, it don't work now.
         if ($node->type == NODE) {
             switch ($node->subtype) {
                 case NODE_SUBPATT:
@@ -796,7 +804,8 @@ class dfa_preg_matcher extends preg_matcher {
             }
         } elseif ($node->subtype == LEAF_CHARCLASS && $node->chars == 'METASYMBOL_DOT') {
             $node->chars = 'METASYBOLD_';//METASYMBOL_DOT is service word, METASYBOLD_ is equivalent character class.
-        }  
+        } 
+        */
     }
     
     function for_case_insensitive() {
