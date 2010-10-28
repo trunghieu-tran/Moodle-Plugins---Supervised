@@ -190,7 +190,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $result = $this->qtype->roots[0]->lastpos();
         $this->assertTrue(count($result) == 1 && $result[0] == 2);
     }
-    function test_lastpos_leaf_alterbative_node() {
+    function test_lastpos_leaf_alternative_node() {
         $this->qtype->build_tree('a|b');
         $connection = array();
         $maxnum = 0;
@@ -251,7 +251,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->number($connection, $maxnum);
         $this->qtype->roots[0]->nullable();
         $result = $this->qtype->roots[0]->lastpos();
-        $this->assertTrue(count($result) == 2 && $result[0] == -1 && $result[1] == 2);
+        $this->assertTrue(count($result) == 2 && $result[0] == 1 && $result[1] == 2);
     }
     function test_lastpos_assert() {
         $this->qtype->build_tree('a(?=.*b)[xcvbnm]*');
@@ -261,7 +261,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->nullable();
         $this->qtype->roots[0]->lastpos();
         $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos) && 
-                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos[0]>ASSERT);
+                            $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }
     //Unit tests for followpos function
     function test_followpos_node_concatenation_node() {

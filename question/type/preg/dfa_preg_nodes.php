@@ -147,6 +147,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     }
     public function lastpos() {
         $this->lastpos = array($this->number);
+        return $this->lastpos;
     }
     public function followpos(&$fpmap) {
         ;//do nothing, because not need for leaf
@@ -297,7 +298,15 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = $this->pregnode->operands[1]->lastpos();
+        $this->lastpos = array();
+        if ($this->pregnode->operands[1]->nullable) {
+            foreach ($this->pregnode->operands as $key=>$operand) {
+            $this->lastpos = array_merge($this->lastpos, $this->pregnode->operands[$key]->lastpos());
+        }
+        } else {
+            $this->lastpos = $this->pregnode->operands[1]->lastpos();
+            $this->pregnode->operands[0]->lastpos();
+        }
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
@@ -337,7 +346,7 @@ class dfa_preg_node_alt extends dfa_preg_operator {
     public function lastpos() {
         $this->lastpos = array();
         foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->lastpos = array_push($this->lastpos, $this->pregnode->operands[$key]->lastpos());
+            $this->lastpos = array_merge($this->lastpos, $this->pregnode->operands[$key]->lastpos());
         }
         return $this->lastpos;
     }
