@@ -97,18 +97,12 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
-        /*
-        *Old style
         $root = $this->roots[$index];
-        $this->roots[$index] = new node;
-        $this->roots[$index]->type = NODE;
-        $this->roots[$index]->subtype = NODE_CONC;
-        $this->roots[$index]->firop = $root;
-        $this->roots[$index]->secop = new node;
-        $this->roots[$index]->secop->type = LEAF;
-        $this->roots[$index]->secop->subtype = LEAF_END;
-        $this->roots[$index]->secop->direction = true;
-        */
+        $this->roots[$index] = new preg_node_concat;
+        $this->roots[$index]->operands[0] = $root;
+        $this->roots[$index]->operands[1] = new preg_leaf_meta;
+        $this->roots[$index]->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
+        $this->roots[$index] = dfa_preg_node::from_preg_node($this->roots[$index]);
     }
     /**
     *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.

@@ -173,6 +173,8 @@ class preg_leaf_meta extends preg_leaf {
     const SUBTYPE_WORD_CHAR = 3;
     //Leaf with empty in alternative (something|)
     const SUBTYPE_EMPTY = 4;
+    //Service subtype - end of regex, but not end of string
+    const SUBTYPE_ENDREG = 5;
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
 
