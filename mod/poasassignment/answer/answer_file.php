@@ -19,7 +19,12 @@ class poasassignment_answer_file extends poasassignment_answer {
         if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
             $DB->insert_record('poasassignment_plugins',$record);
     }
-    function show_settings(&$mform,$poasassignmentid) {
+    
+    /** Display plugin settings 
+     *
+     *  Display separate fieldset with plugin settings
+     */
+    function show_settings($mform,$poasassignmentid) {
         global $CFG,$COURSE,$DB;
         $mform->addElement('header','answerfileheader',get_string('answerfile','poasassignment'));
         $mform->addElement('checkbox','answerfile', get_string('answerfile','poasassignment'));
@@ -37,20 +42,22 @@ class poasassignment_answer_file extends poasassignment_answer {
         if ($DB->record_exists('poasassignment_type_settings',$conditions)) {
             $rec=$DB->get_record('poasassignment_type_settings',$conditions);
             $mform->setDefault('fileamount',$rec->value);
-            }
+        }
         $mform->disabledIf('fileamount','answerfile');
+        $mform->addHelpButton('fileamount', 'submissionfilesamount', 'poasassignment');
         
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
-        $mform->addElement('select', 'maxfilesize', get_string('maximumsize', 'poasassignment'), $choices);
+        $mform->addElement('select', 'maxfilesize', get_string('submissionfilemaxsize', 'poasassignment'), $choices);
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid,
                 'name'=>'maxfilesize');
         if ($DB->record_exists('poasassignment_type_settings',$conditions)) {
             $rec=$DB->get_record('poasassignment_type_settings',$conditions);
             $mform->setDefault('maxfilesize',$rec->value);
-            }
+        }
         $mform->disabledIf('maxfilesize','answerfile');
+        $mform->addHelpButton('maxfilesize', 'submissionfilemaxsize', 'poasassignment');
         
         $mform->addElement('text', 'fileextensions', get_string('fileextensions', 'poasassignment'), array('size'=>'64'));
         $conditions = array('poasassignmentid'=>$poasassignmentid,
@@ -62,6 +69,10 @@ class poasassignment_answer_file extends poasassignment_answer {
             }
         $mform->addHelpButton('fileextensions', 'fileextensions', 'poasassignment');
         $mform->disabledIf('fileextensions','answerfile');
+    }
+    
+    static function validation($data, &$errors) {
+        // TODO check 'fileextensions' element, it must look like "ext,ext,ext"
     }
     function save_settings($poasassignment, $id) {
         global $DB;

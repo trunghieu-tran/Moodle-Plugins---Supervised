@@ -29,7 +29,8 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
     echo $OUTPUT->heading($poasassignment->name);
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     $attempts=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$assigneeid),'attemptnumber');
-    $plugins=$DB->get_records('poasassignment_plugins');
+    $plugins=$poasmodel->get_plugins();
+    //$plugins=$DB->get_records('poasassignment_plugins');
     foreach($attempts as $attempt) {
         echo $OUTPUT->box_start();
         echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');

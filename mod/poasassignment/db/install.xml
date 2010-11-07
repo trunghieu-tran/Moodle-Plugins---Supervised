@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/db" VERSION="20100802" COMMENT="XMLDB file for Moodle mod/poasassignment"
+<XMLDB PATH="mod/poasassignment/db" VERSION="20101029" COMMENT="XMLDB file for Moodle mod/poasassignment"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -180,7 +180,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assigneeid"/>
         <FIELD NAME="assigneeid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="attemptnumber"/>
         <FIELD NAME="attemptnumber" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="assigneeid" NEXT="rating"/>
-        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="attemptnumber" NEXT="attemptdate"/>
+        <FIELD NAME="rating" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" DECIMALS="2" PREVIOUS="attemptnumber" NEXT="attemptdate"/>
         <FIELD NAME="attemptdate" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rating" NEXT="ratingdate"/>
         <FIELD NAME="ratingdate" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="attemptdate" NEXT="disablepenalty"/>
         <FIELD NAME="disablepenalty" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ratingdate" NEXT="draft"/>

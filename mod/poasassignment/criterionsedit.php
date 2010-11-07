@@ -33,6 +33,7 @@ if($mode==DELETE_MODE) {
         error('Incorrect criterion id');
 }
 
+
 $mform = new criterionsedit_form(null,array('id'=>$cm->id,'criterionid'=>$criterionid,'mode'=>$mode,'poasassignmentid'=>$poasassignment->id));
 if($mform->is_cancelled()) {
     redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'criterions')),null,0);

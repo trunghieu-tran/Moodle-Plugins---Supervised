@@ -88,8 +88,8 @@ function poasassignment_add_instance($poasassignment) {
     $poasassignment->timecreated = time();
     
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $id=$poasassignmentmodelinstance->add_instance();
-    return $id;
+    $poasassignment->id=$poasassignmentmodelinstance->add_instance();
+    return $poasassignment->id;
 }
 
 /**
@@ -167,6 +167,33 @@ function poasassignment_print_recent_activity($course, $isteacher, $timestart) {
 }
 
 /**
+ * Return grade for given user or all users.
+ *
+ * @param int $assignmentid id of assignment
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function poasassignment_get_user_grades($poasassignment, $userid=0) {
+/*     global $CFG, $DB;
+
+    if ($userid) {
+        $user = "AND u.id = :userid";
+        $params = array('userid'=>$userid);
+    } else {
+        $user = "";
+    }
+    $params['aid'] = $assignment->id;
+
+    $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback, s.format AS feedbackformat,
+                   s.teacher AS usermodified, s.timemarked AS dategraded, s.timemodified AS datesubmitted
+              FROM {user} u, {assignment_submissions} s
+             WHERE u.id = s.userid AND s.assignment = :aid
+                   $user";
+
+    return $DB->get_records_sql($sql, $params); */
+}
+
+/**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
  * as sending out mail, toggling flags etc ...
@@ -190,6 +217,7 @@ function poasassignment_cron () {
 function poasassignment_get_participants($poasassignmentid) {
     return false;
 }
+
 
 /**
  * This function returns if a scale is being used by one poasassignment
@@ -249,7 +277,8 @@ function poasassignment_supports($feature) {
         case FEATURE_GROUPMEMBERSONLY:        return true;
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        
+        case FEATURE_GRADE_HAS_GRADE:         return true;
+        case FEATURE_GRADE_OUTCOMES:          return true;
 
         default: return null;
     }

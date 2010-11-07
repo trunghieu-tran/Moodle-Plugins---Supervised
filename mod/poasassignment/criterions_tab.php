@@ -57,7 +57,7 @@ class criterions_tab extends abstract_tab {
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         $mform = new criterionsedit_form(null,array('id'=>$id,'poasassignmentid'=>$this->poasassignment->id));
         if($mform->get_data()) {
-                $data=$mform->get_data();    
+                $data=$mform->get_data();
                 $poasmodel->save_criterion($data);
                 redirect(new moodle_url('view.php',array('id'=>$id,'tab'=>'criterions')),null,0);
         }

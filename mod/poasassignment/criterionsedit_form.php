@@ -30,7 +30,10 @@ class criterionsedit_form extends moodleform {
         $repeateloptions = array();
         $mform->setType('weight', PARAM_NUMBER);
 
-        //$repeateloptions['option']['helpbutton'] = array('choiceoptions', get_string('modulenameplural', 'choice'), 'choice');
+        $repeateloptions['name']['helpbutton'] = array('criterionname', 'poasassignment');
+        $repeateloptions['description']['helpbutton'] = array('criteriondescription', 'poasassignment');
+        $repeateloptions['weight']['helpbutton'] = array('criterionweight', 'poasassignment');
+        $repeateloptions['source']['helpbutton'] = array('criterionsource', 'poasassignment');
         //$mform->setType('option', PARAM_CLEAN);
 
         //$mform->setType('optionid', PARAM_INT);

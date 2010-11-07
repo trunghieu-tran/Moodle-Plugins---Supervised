@@ -2,8 +2,48 @@
 require_once('lib.php');
 require_once('answer/answer.php');
 require_once(dirname(dirname(dirname(__FILE__))).'/comment/lib.php');
+/**
+ * Main DB-work class. Singletone
+ */
 class poasassignment_model {
+
+    /** 
+     * Poasassignment instance
+     */
+    var $poasassignment;
+    
+    /**
+     * Types of fields of tasks
+     * @var array
+     */
+    var $ftypes;
+    
+    /**
+     * Context of poasassignment instance
+     */     
+    var $context;
+    
+     /**
+     * Context of poasassignment instance
+     */  
+    var $assignee;
+    
+    /** 
+     * Answer plugins array
+     * @var array
+     */
+    private $plugins=array();
+    
+    /**
+     * Saves object of poasassignment_model class
+     * @var poasassignment_model
+     */
     protected static $instance;
+    
+    /**
+     * Constructor. Cannot be called outside of the class
+     * @param $poasassignment module instance
+     */
     private function __construct($poasassignment=null) {
         global $DB,$USER;
         $this->poasassignment = $poasassignment;
@@ -19,26 +59,40 @@ class poasassignment_model {
             $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
         if(!$this->assignee)
             $this->assignee->id=0;
+        $this->plugins=$DB->get_records('poasassignment_plugins');
     }
-    
+    /** 
+     * Method is used instead of constructor. If poasassignment_model 
+     * object exists, returns it, otherwise creates object and returns it.
+     * @param $poasassignment module instance
+     * @return poasassignment_model
+     */
     static function &get_instance($poasassignment=null) {
         if(self::$instance==null) {
             self::$instance = new self($poasassignment);
         }
         return self::$instance;
     }
-    var $poasassignment;
-    var $ftypes;
-    var $context;
-    var $assignee;
+    /** 
+     * Returns poasassignment answer plugins
+     * @return array 
+     */
+    public function get_plugins() {
+        if(!$this->plugins)
+            $this->plugins=$DB->get_records('poasassignment_plugins');
+        return $this->plugins;
+    }
     
+    /** 
+     * Inserts poasassignment data into DB
+     * @return int poasassignment id
+     */
     function add_instance() {
         global $DB;
         $this->poasassignment->flags=$this->configure_flags();
         $this->poasassignment->timemodified=time();
         $this->poasassignment->id = $DB->insert_record('poasassignment', $this->poasassignment);
-        $plugins = $DB->get_records('poasassignment_plugins');
-        foreach($plugins as $plugin) {
+        foreach($this->plugins as $plugin) {
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
             $poasassignmentplugin->configure_flag($this->poasassignment);
@@ -46,14 +100,19 @@ class poasassignment_model {
         }
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles,'poasassignmentfiles',0);
+        $this->grade_item_update();
         return $this->poasassignment->id;
     }
+    
+    /** 
+     * Updates poasassignment data in DB
+     * @return int poasassignment id
+     */
     function update_instance() {
         global $DB;
         $this->poasassignment->flags=$this->configure_flags();
 
-        $plugins = $DB->get_records('poasassignment_plugins');
-        foreach($plugins as $plugin) {
+        foreach($this->plugins as $plugin) {
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
             $poasassignmentplugin->configure_flag($this->poasassignment);
@@ -69,34 +128,43 @@ class poasassignment_model {
         return $this->poasassignment->id;
     }
     
+    /** 
+     * Deletes poasassignment data from DB
+     * @param int $id id of poasassignment to be deleted
+     * @return bool
+     */
     function delete_instance($id) {
         global $DB;
-        if (! $this->poasassignment = $DB->get_record('poasassignment', array('id' => $id))) {
+        if (! $DB->record_exists('poasassignment', array('id' => $id))) {
             return false;
         }
         $cm = get_coursemodule_from_instance('poasassignment',$id);
         $this->poasassignment=$DB->get_record('poasassignment',array('id'=>$id));
         
         $poasassignment_answer= new poasassignment_answer();
-        $poasassignment_answer->delete_settings($this->poasassignment->id);
+        $poasassignment_answer->delete_settings($id);
         
         $this->delete_files($cm->id);
-        $DB->delete_records('poasassignment', array('id' => $this->poasassignment->id));
-        $DB->delete_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
-        $types=$DB->get_records('poasassignment_type_settings', array('poasassignmentid' => $this->poasassignment->id));
+        $DB->delete_records('poasassignment', array('id' => $id));
+        $DB->delete_records('poasassignment_tasks', array('poasassignmentid' => $id));
+        $types=$DB->get_records('poasassignment_type_settings', array('poasassignmentid' => $id));
         foreach( $types as $type) {
             $DB->delete_records('poasassignment_plugins', array('id' => $type->pluginid));
         }
-        $DB->delete_records('poasassignment_type_settings', array('poasassignmentid' => $this->poasassignment->id));
-        $DB->delete_records('poasassignment_criterions', array('poasassignmentid' => $this->poasassignment->id));
-        $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $this->poasassignment->id));
+        $DB->delete_records('poasassignment_type_settings', array('poasassignmentid' => $id));
+        $DB->delete_records('poasassignment_criterions', array('poasassignmentid' => $id));
+        $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $id));
         foreach( $fields as $field) {
             $DB->delete_records('poasassignment_task_values', array('fieldid' => $field->id));
         }
-        $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $this->poasassignment->id));
+        $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $id));
         return true;
     }
     
+    /** 
+     * Converts some poasassignments settings into one variable
+     * @return int
+     */
     function configure_flags() {
         $flags = 0;
         if (isset($this->poasassignment->preventlatechoice)) {
@@ -193,6 +261,11 @@ class poasassignment_model {
             return $file->fileurl.'<br>';
         }
     }
+    
+    /**
+     * Adds task into DB
+     * @param $data
+     */
     function add_task($data) {
         global $DB;
         $data->poasassignmentid=$this->poasassignment->id;
@@ -325,11 +398,14 @@ class poasassignment_model {
         global $DB;
         $DB->delete_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
         $assignees=$DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
+        
         foreach($assignees as $assignee) {
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
-            $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
-            $attempt->rating=null;
-            $DB->update_record('poasassignment_attempts',$attempt);
+            $attempt = new stdClass();
+            if($attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount))) {
+                $attempt->rating=null;
+                $DB->update_record('poasassignment_attempts',$attempt);
+            }
         }
         for($i=0;$i<count($data->name);$i++) {
             if(isset($data->name[$i]) && strlen($data->name[$i])>0) {
@@ -378,7 +454,11 @@ class poasassignment_model {
     }
    
     function save_grade($assigneeid,$data) {
-        echo 'save_grade';
+        $dfs=get_object_vars($data);
+        foreach($dfs as $dfk=>$dfv) {
+            //echo "$dfk=>$dfv<br>";
+            //echo $data->criterion1.'<br>';
+        }
         global $DB;
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
         $rating=0;
@@ -395,10 +475,8 @@ class poasassignment_model {
         foreach( $criterions as $criterion) {
             $elementname='criterion'.$criterion->id;
             $elementcommentname='criterion'.$criterion->id.'comment';
-            
-            //$elementweightname='criterion'.$criterion->id.'weight';
             if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id,'criterionid'=>$criterion->id))) {
-                echo 'new_rtask_value';
+                $rec = new stdClass();
                 $rec->attemptid=$attempt->id;
                 $rec->criterionid=$criterion->id;
                 $rec->assigneeid=$assigneeid;
@@ -413,7 +491,6 @@ class poasassignment_model {
                 
             }
             else {
-                echo 'updater_task value';
                 $ratingvalue=$DB->get_record('poasassignment_rating_values',array('attemptid'=>$attempt->id,'criterionid'=>$criterion->id));
                 if($attempt->draft==0)
                     $ratingvalue->value=$data->$elementname;
@@ -428,8 +505,8 @@ class poasassignment_model {
         }
         if($attempt->draft==0)
             $attempt->rating=$rating;
-            echo $attempt->draft;
-            echo $attempt->rating;
+            //echo $attempt->draft;
+            //echo $attempt->rating;
         $attempt->ratingdate=time();
         $DB->update_record('poasassignment_attempts',$attempt);
         $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$assigneeid));
@@ -706,8 +783,9 @@ class poasassignment_model {
         groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id.'&tab=view');
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         $notchecked=0;
+        $count=0;
         /// Get all ppl that are allowed to submit assignments
-        if ($usersid = get_enrolled_users($context, 'mod/assignment:submit', $currentgroup, 'u.id')) {
+        if ($usersid = get_enrolled_users($context, 'mod/assignment:view', $currentgroup, 'u.id')) {
             $usersid = array_keys($usersid);
             $count=count($usersid);
             foreach($usersid as $userid) {
@@ -720,7 +798,31 @@ class poasassignment_model {
                 }
             }
         }
-        $html = $notchecked.' '.get_string('of','poasassignment').' '.$count.' '.get_string('needgrade','poasassignment');
+        
+        /// If we know how much students are enrolled on this task show "$notchecked of $count need grade" message
+        if($count!=0) {
+            $html = $notchecked.' '.get_string('of','poasassignment').' '.$count.' '.get_string('needgrade','poasassignment');
+            $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
+            return "<align='right'>".html_writer::link($submissionsurl,$html);
+        }
+        else {
+            $notchecked=0;
+            $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
+            foreach($assignees as $assignee) {
+                $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
+                if($attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount))) {
+                    if($attempt->attemptdate>$attempt->ratingdate || !isset($attempt->rating))
+                    $notchecked++;
+                }
+            }
+            /// If there is no enrollment on this task but someone loaded anser show "$notchecked need grade" message
+            if($notchecked!=0) {
+                $html = $notchecked.' '.get_string('needgrade','poasassignment');
+                $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
+                return "<align='right'>".html_writer::link($submissionsurl,$html);
+            }
+        }
+        $html = get_string('noattempts','poasassignment');
         $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
         return "<align='right'>".html_writer::link($submissionsurl,$html);
     }
@@ -739,5 +841,26 @@ class poasassignment_model {
             return $this->poasassignment->penalty*($realnumber-1);
         else return 0;
         return ;
+    }
+    
+    function grade_item_update($grades=NULL) {
+        global $CFG;
+        require_once($CFG->libdir.'/gradelib.php');
+
+        if (!isset($this->poasassignment->courseid)) {
+            $this->poasassignment->courseid = $this->poasassignment->course;
+        }
+
+        $params = array('itemname'=>$this->poasassignment->name, 'idnumber'=>$this->poasassignment->cmidnumber);
+
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']  = 100;
+        $params['grademin']  = 0;
+
+        if ($grades  === 'reset') {
+            $params['reset'] = true;
+            $grades = NULL;
+        }
+        return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grades, $params);
     }
 }
