@@ -92,6 +92,8 @@ class tasksfields_tab extends abstract_tab {
 
         $table->print_html();
         $id = $this->cm->id;
+        echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/tasksfieldsedit.php?id='.$id.'?mode='.ADD_MODE), get_string('addbuttontext','poasassignment'));
+        echo '</div>';
     }
 }

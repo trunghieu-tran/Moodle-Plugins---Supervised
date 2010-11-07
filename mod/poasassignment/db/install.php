@@ -35,4 +35,15 @@ function xmldb_poasassignment_install() {
     update_log_display_entry('poasassignment', 'update', 'poasassignment', 'name');
     update_log_display_entry('poasassignment', 'view', 'poasassignment', 'name');
     update_log_display_entry('poasassignment', 'view all', 'poasassignment', 'name');
+    
+    // Add info about default plugins into table
+    $record->name='poasassignment_answer_file';
+    $record->path='answer/answer_file.php';
+    if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
+        $DB->insert_record('poasassignment_plugins',$record);
+        
+    $record->name='poasassignment_answer_text';
+    $record->path='answer/answer_text.php';
+    if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
+        $DB->insert_record('poasassignment_plugins',$record);
 }

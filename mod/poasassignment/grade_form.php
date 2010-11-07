@@ -24,7 +24,7 @@ class grade_form extends moodleform {
                                                 html_writer::link($attemptsurl,get_string('studentattempts','poasassignment')));
         
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
-        $plugins=$DB->get_records('poasassignment_plugins');
+        $plugins = $poasmodel->get_plugins();
         foreach($plugins as $plugin) {
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
@@ -46,7 +46,7 @@ class grade_form extends moodleform {
         foreach($criterions as $criterion) {
             $mform->addElement('html',$OUTPUT->box_start());
             if($attempt->draft==0 || has_capability('mod/poasassignment:manageanything',$context)) {
-                $mform->addElement('select','criterion'.$criterion->id,$criterion->name,$opt);
+                $mform->addElement('select','criterion'.$criterion->id,$criterion->name.' '.$poasmodel->help_icon($criterion->description),$opt);
             }
             $mform->addElement('static','criterion'.$criterion->id.'weight',get_string('normalizedcriterionweight','poasassignment'),round($criterion->weight/$weightsum,2));
             $ratingvalue=$DB->get_record('poasassignment_rating_values',array('criterionid'=>$criterion->id,

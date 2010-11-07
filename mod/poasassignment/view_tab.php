@@ -5,6 +5,9 @@ require_once('model.php');
 class view_tab extends abstract_tab {
     var $poasassignment;
     var $context;
+
+    /** Constructor, initializes variables $poasassignment, $cm, $context
+     */
     function view_tab($cm,$poasassignment) {
         
         $this->poasassignment = $poasassignment;
@@ -16,35 +19,50 @@ class view_tab extends abstract_tab {
         global $OUTPUT;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         
+        // Show submission statistics if user has capability
         if (has_capability('mod/poasassignment:grade', $this->context))
-            echo $poasmodel->get_statistics();
-        
+            echo '<div align="right">'.$poasmodel->get_statistics().'</div>';
+
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-        $this->view_intro();
-        echo $poasmodel->view_files($this->context->id,'poasassignmentfiles',0);
         
+        // Show poasassignment intro
+        $this->view_intro();
+
+        // Show poasassignment files
+        echo $poasmodel->view_files($this->context->id, 'poasassignmentfiles',0);
         echo $OUTPUT->box_end();
+
         $this->view_status();
         $this->view_dates();
         $this->view_feedback();
         $this->view_answer_block();
     }
     
+    /** Show task status
+     */
     function view_status() {
         global $DB,$USER,$OUTPUT;
-        if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
-            echo $OUTPUT->box_start('generalbox boxaligncenter','intro');
-            if($DB->record_exists('poasassignment_assignee',array('userid'=>$USER->id))) {
-                $assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
-                if($assignee && $assignee->taskid>0) {
-                    echo get_string('youhavetask','poasassignment');
+        // If individual tasks mode is active
+        if ($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
+            echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+            // If user have task
+            if ($DB->record_exists('poasassignment_assignee', array('userid'=>$USER->id))) {
+                $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$USER->id,
+                                                                            'poasassignmentid'=>$this->poasassignment->id));
+                if ($assignee && $assignee->taskid>0) {
+                    echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
-                    $taskurl = new moodle_url('taskview.php',array('taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get'); 
-                    $task=$DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
-                    echo html_writer::link($taskurl,$task->name);
-                    
-                    if(has_capability('mod/poasassignment:managetasks',$this->context)) {
-                        $deleteurl = new moodle_url('warning.php',array('action'=>'canceltask','assigneeid'=>$assignee->id,'id'=>$this->cm->id),'d','post');
+                    // Show link to the task
+                    $taskurl = new moodle_url('taskview.php', array('taskid'=>$assignee->taskid, 'id'=>$this->cm->id), 'v', 'get');
+                    $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
+                    echo html_writer::link($taskurl, $task->name);
+
+                    // TODO: second choice option must be checked too
+                    // If user have capability to cancel task - show cancel button
+                    if (has_capability('mod/poasassignment:managetasks', $this->context)) {
+                        $deleteurl = new moodle_url('warning.php', array('action'=>'canceltask',
+                                                                        'assigneeid'=>$assignee->id,
+                                                                        'id'=>$this->cm->id), 'd', 'post');
                         $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                                 '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                         echo ' '.$deleteicon;
@@ -52,21 +70,26 @@ class view_tab extends abstract_tab {
                 }
             }
             else {
-                echo get_string('youhavenotask','poasassignment');
-                $taskstaburl = new moodle_url('view.php',array('id'=>$this->cm->id,'tab'=>'tasks')); 
-                echo ' '.html_writer::link($taskstaburl,get_string('gototassktab','poasassignment'));
+                // If user have no task - show link to task tab
+                echo get_string('youhavenotask', 'poasassignment');
+                $taskstaburl = new moodle_url('view.php', array('id'=>$this->cm->id, 'tab'=>'tasks'));
+                echo ' '.html_writer::link($taskstaburl, get_string('gototassktab', 'poasassignment'));
             }
             echo $OUTPUT->box_end();
         }
     }
+
+    /** Show module intro
+     */
     function view_intro() {
         echo format_module_intro('poassignment', $this->poasassignment, $this->cm->id);
     }
-    
-    
+
+    /** Show dates (available date, choice date, deadline) if they exist
+     */
     function view_dates() {
         global $OUTPUT;
-        if(!empty($this->poasassignment->availabledate) && !empty($this->poasassignment->choicedate) && !empty($this->poasassignment->deadline)) {
+        if (!empty($this->poasassignment->availabledate) && !empty($this->poasassignment->choicedate) && !empty($this->poasassignment->deadline)) {
             echo $OUTPUT->box_start();
             echo '<table>';
             if (!empty($this->poasassignment->availabledate)) {
@@ -85,14 +108,17 @@ class view_tab extends abstract_tab {
             echo $OUTPUT->box_end();
         }
     }
-    
+
+    /** Show teacher comments and submissions
+     */
     function view_feedback() {
         global $OUTPUT,$DB,$USER;
-         if($DB->record_exists('poasassignment_assignee',
-                            array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
-            $assignee=$DB->get_record('poasassignment_assignee',
-                            array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id));
-            if($assignee /* && isset($assignee->rating) */) {
+        // If user registred in poasassignment database
+        if ($DB->record_exists('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
+                                                                'userid'=>$USER->id))) {
+            $assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
+                                                                        'userid'=>$USER->id));
+            if ($assignee /* && isset($assignee->rating) */) {
                 $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
                 $latestattempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
                 $attempt=false;
@@ -187,10 +213,12 @@ class view_tab extends abstract_tab {
     
     function view_answer_block() {
         global $OUTPUT,$DB,$USER;
-        $plugins=$DB->get_records('poasassignment_plugins');
+        //$plugins=$DB->get_records('poasassignment_plugins');
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
+        $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
         if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
+            // if individual tasks mode is activated
             if($DB->record_exists('poasassignment_assignee',
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
                 if($attempt=$DB->get_record('poasassignment_attempts',

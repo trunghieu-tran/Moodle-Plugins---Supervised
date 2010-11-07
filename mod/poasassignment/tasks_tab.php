@@ -269,8 +269,10 @@ class tasks_tab extends abstract_tab {
         }
         if($hascapmanage) {
             $id = $this->cm->id;
+            echo '<div align="center">';
             echo $OUTPUT->single_button(new moodle_url('taskedit.php?id='.$id.'?mode='.ADD_MODE), 
                                                         get_string('addbuttontext','poasassignment'));
+            echo '</div>';
         }
         if($this->poasassignment->howtochoosetask==FULLRANDOM) {
             if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {

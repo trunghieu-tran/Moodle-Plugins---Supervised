@@ -22,13 +22,13 @@ $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulen
 
 global $DB,$USER;
 $answer_form=new answer_form(null,array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id,'id'=>$cm->id));
-$plugins=$DB->get_records('poasassignment_plugins');
+//$plugins=$DB->get_records('poasassignment_plugins');
 
 $poasmodel = poasassignment_model::get_instance($poasassignment);
-$poasanswer = new poasassignment_answer();
+$plugins=$poasmodel->get_plugins();
 foreach($plugins as $plugin) {
     //load data from db
-    if($poasanswer->used_in_poasassignment($plugin->id,$poasassignment->id)) {
+    if(poasassignment_answer::used_in_poasassignment($plugin->id,$poasassignment->id)) {
         require_once($plugin->path);
         $poasassignmentplugin = new $plugin->name();
         $preloadeddata=$poasassignmentplugin->get_answer_values($poasassignment->id);
@@ -43,7 +43,7 @@ else {
         $data=$answer_form->get_data();
         //save data            
         foreach($plugins as $plugin) {
-            if($poasanswer->used_in_poasassignment($plugin->id,$poasassignment->id)) {
+            if(poasassignment_answer::used_in_poasassignment($plugin->id,$poasassignment->id)) {
                 require_once($plugin->path);
                 $poasassignmentplugin = new $plugin->name();
                 

@@ -18,7 +18,12 @@ class poasassignment_answer_text extends poasassignment_answer {
         if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
             $DB->insert_record('poasassignment_plugins',$record);
     }
-    function show_settings(&$mform,$poasassignmentid) {
+    
+    /** Display plugin settings 
+     *
+     *  Display separate fieldset with plugin settings
+     */
+    function show_settings($mform,$poasassignmentid) {
         global $DB;
         $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));
         $mform->addElement('checkbox','answertext', get_string('answertext','poasassignment'));

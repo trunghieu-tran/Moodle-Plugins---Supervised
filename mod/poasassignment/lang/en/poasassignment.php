@@ -44,35 +44,50 @@ $string['preventlatechoice']='Prevent late choice';
 $string['randomtasksafterchoicedate']='Set free random task to student after choice date';
 $string['answers']='Answers';
 $string['severalattempts']='Several attempts';
-$string['severalattempts_help']='severalattempts_help';
+$string['severalattempts_help']='Student can do several attempts';
 $string['notifyteachers']='Notify teachers';
-$string['notifyteachers_help']='notifyteachers_help';
+$string['notifyteachers_help']='Send e-mail to teacher when student makes attempt';
 $string['notifystudents']='Notify students';
-$string['notifystudents_help']='notifystudents_help';
+$string['notifystudents_help']='Send e-mail to students when some changes made with this module';
 $string['answerfile']='File upload';
-$string['answerfile_help']='answerfile_help';
+$string['answerfile_help']='If this setting is checked student will be able to load files on his submission screen';
 $string['answertext']='Online text';
-$string['answertext_help']='answertext_help';
-$string['maximumsize'] = 'Maximum file size';
+$string['answertext_help']='If this setting is checked student will be able to type text in his submission screen';
+$string['submissionfilemaxsize'] = 'Maximum file size';
+$string['submissionfilemaxsize_help'] = 'Maximum file size of file that can be uploaded as submission';
 $string['fileextensions']='File extensions';
-$string['fileextensions_help']='fileextensions_help';
+$string['fileextensions_help']='Extensions of submision files that are allowed for students';
 $string['activateindividualtasks']='Activate individual tasks';
-$string['howtochoosetask']='How students choose tasks?';
+$string['activateindividualtasks_help']='Check this if you need individual tasks mode. In other case module will work as standard assignment';
+$string['howtochoosetask']='Chose mode';
+$string['howtochoosetask_help']='This setting has three options:
+    
+* Random task - each student gets random task
+* Using the parameters - each student specifies desired parameters
+* Students choose their tasks - students can see all tasks and choose one of them';
 $string['randomtask']='Random task';
 $string['parameterchoice']='Using the parameters';
 $string['studentchoice']='Students choose their tasks';
 $string['secondchoice']='Second choice';
+$string['secondchoice_help']='Student can refuse task and make new choice';
 $string['uniqueness']='Task uniqueness';
+$string['uniqueness_help']='This setting has three options:
+
+* No uniqueness - each student can choose any task
+* Unique within group - student can choose task if only nobody in group choosed it
+* Unique within course - student can choose task if only nobody in course choosed it';
 $string['nouniqueness']='No uniqueness';
 $string['uniquewithingroup']='Unique within group';
 $string['uniquewithincourse']='Unique within course';
 $string['teacherapproval']='Teacher approval';
+$string['teacherapproval_help']='Student needs teacher approval to make submissions';
 $string['poasassignmentfiles']='Attach file(s) to the assignment';
 $string['attachedpoasassignmentfiles']='File(s) attached to the assignment';
 $string['choicebeforeopen']='Choice date before available date';
 $string['deadlinebeforeopen']='Deadline before available date';
 $string['deadlinebeforechoice']='Deadline before choice date';
-$string['submissionfilesamount']='How much files can be uploaded as an answer?';
+$string['submissionfilesamount']='Files amount';
+$string['submissionfilesamount_help']='How much files can be uploaded as a submission';
 $string['availablefrom']='Available from';
 $string['selectbefore']='Select before';
 $string['tasksfields']="Task's fields";
@@ -181,21 +196,33 @@ $string['gradedate']='Grade date';
 $string['attemptnumber']='Attempt number';
 $string['oldfeedback']='Outdated';
 $string['outdated']='Outdated';
-$string['view_help']='view_help';
-$string['submissions_help']='submissions_help';
-$string['tasks_help']='tasks_help';
-$string['criterions_help']='criterions_help';
-$string['tasksfields_help']='tasksfields_help';
+$string['view_help']='On this page you can see the most important information about your task. 
+You can see critical dates.';
+$string['submissions_help']='On this page you can grade student works';
+$string['tasks_help']='On this page you can manage assignment tasks';
+$string['criterions_help']='On this page you can manage assignment criterions';
+$string['tasksfields_help']='On this page you can manage fields of assignment tasks';
 $string['of']='of';
 $string['needgrade'] = 'need grade';
 $string['penalty']='Penalty for attempt';
-$string['penalty_help']='penalty_help';
+$string['penalty_help']='Penalty that will be deducted from final grade with each new attempt';
 $string['ago'] = 'ago';
 $string['newattemptbeforegrade']='Consider all attempts as one attempt if none were graded';
-$string['newattemptbeforegrade_help']='newattemptbeforegrade_help';
+$string['newattemptbeforegrade_help']='Student can do another attempt without having penalty';
 $string['draft']='Draft';
 $string['myattempts']='My attempts';
 $string['studentattempts']='Student attempts';
 $string['disablepenalty']='Turn off penalty for this attempt';
 $string['enablepenalty']='Turn on penalty for this attempt';
 $string['range']='Range';
+$string['pluginadministration']='Plugin administration';
+$string['errornoid'] = 'You must specify a course_module ID or an instance ID';
+$string['nostudents'] = 'Threre are no students on this task';
+$string['noattempts'] ='No attempts have been made on this assignment';
+$string['criterionname_help']='Name of the criterion';
+$string['criteriondescription_help']='Description of the criterion that will be available for students to look';
+$string['criterionweight_help']='Relative importance rating of criterion';
+$string['criterionsource_help']='This setting has two options:
+
+* manually - traditional grading
+* module - if you have special module that checks submission';
