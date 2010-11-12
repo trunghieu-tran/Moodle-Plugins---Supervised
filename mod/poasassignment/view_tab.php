@@ -109,18 +109,62 @@ class view_tab extends abstract_tab {
         }
     }
 
-    /** Show teacher comments and submissions
+    function view_feedback_optimized() {
+        global $OUTPUT,$DB,$USER;
+        if($assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
+                                                                        'userid'=>$USER->id))) {
+            if($lastattempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid))) {
+                
+            }
+        }
+    }
+    /** Show teacher comments and submissions for last graded attempt
      */
     function view_feedback() {
+        //$this->view_feedback_optimized();
+        //return;
+        
         global $OUTPUT,$DB,$USER;
-        // If user registred in poasassignment database
+        
+    $assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
+                                                                        'userid'=>$USER->id));
+                                                                        
+    $poasmodel = poasassignment_model::get_instance($this->poasassignment);
+    $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
+    $plugins=$poasmodel->get_plugins();
+    $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
+    $latestattempt=$DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+    $attemptscount=count($attempts);
+    // show latest graded feedback
+    foreach($attempts as $attempt) {
+        if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id)))
+            continue;
+        echo $OUTPUT->box_start();
+        echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
+        echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
+        // show attempt's submission
+        foreach($plugins as $plugin) {
+            require_once($plugin->path);
+            $poasassignmentplugin = new $plugin->name();
+            echo $poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,1,$attempt->id);
+        }
+        $poasmodel->show_feedback($attempt,$latestattempt,$criterions,$this->context);
+        echo $OUTPUT->box_end();
+        break;
+    }   
+    
+        /* // If user registred in poasassignment database
         if ($DB->record_exists('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
                                                                 'userid'=>$USER->id))) {
             $assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
                                                                         'userid'=>$USER->id));
-            if ($assignee /* && isset($assignee->rating) */) {
+            if ($assignee) {
+            
+                // Receive attempts count
                 $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
+                // Recieve latest attempt
                 $latestattempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
+                // Recieve last attempt with rating
                 $attempt=false;
                 for($i=$attemptscount;$i>0;$i--) {
                     $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$i));
@@ -178,7 +222,7 @@ class view_tab extends abstract_tab {
                             echo $OUTPUT->box_start();
                             $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
                             foreach($criterions as $criterion) {
-                            $ratingvalue=$DB->get_record('poasassignment_rating_values',
+                                $ratingvalue=$DB->get_record('poasassignment_rating_values',
                                     array('criterionid'=>$criterion->id,
                                             'attemptid'=>$attempt->id));
                                 if($ratingvalue) {                
@@ -208,7 +252,7 @@ class view_tab extends abstract_tab {
                     }
                 }
             }
-        }                            
+        } */                            
     }
     
     function view_answer_block() {
@@ -217,13 +261,14 @@ class view_tab extends abstract_tab {
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
+        // if individual tasks mode is active
         if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
-            // if individual tasks mode is activated
+
             if($DB->record_exists('poasassignment_assignee',
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
                 if($attempt=$DB->get_record('poasassignment_attempts',
                             array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount))) {
-                    echo $OUTPUT->heading(get_string('yoursubmissions','poasassignment'));
+                    echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
                     echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attemptscount.' ('.userdate($attempt->attemptdate).')');
                     $attemptsurl = new moodle_url('attempts.php',array('id'=>$this->cm->id,'assigneeid'=>$attempt->assigneeid)); 
                     echo '<br>'.html_writer::link($attemptsurl,get_string('myattempts','poasassignment'));

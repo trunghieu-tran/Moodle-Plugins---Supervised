@@ -389,7 +389,8 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
     if($userid) {
         // return user's last attempt rating
         $assignee = $DB->get_record('poasassignment_attempts',array('userid'=>$userid));
-        return $DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id));
+        $lastattempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+        return $lastattempt->rating;
     }
     
 }
