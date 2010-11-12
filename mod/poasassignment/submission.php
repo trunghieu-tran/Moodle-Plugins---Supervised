@@ -27,7 +27,6 @@ $answer_form=new answer_form(null,array('poasassignmentid'=>$poasassignment->id,
 $poasmodel = poasassignment_model::get_instance($poasassignment);
 $plugins=$poasmodel->get_plugins();
 foreach($plugins as $plugin) {
-    //load data from db
     if(poasassignment_answer::used_in_poasassignment($plugin->id,$poasassignment->id)) {
         require_once($plugin->path);
         $poasassignmentplugin = new $plugin->name();
@@ -48,12 +47,16 @@ else {
                 $poasassignmentplugin = new $plugin->name();
                 
                 if($poasmodel->assignee)
-                    $poasassignmentplugin->save_answer($poasmodel->assignee->id,$data);
+                    $attemptid = $poasassignmentplugin->save_answer($poasmodel->assignee->id,$data);
                 else
-                    $poasassignmentplugin->save_answer(0,$data);
+                    $attemptid = $poasassignmentplugin->save_answer(0,$data);
                 //noitify teacher if needed
             }
         }
+        // save attempt as last attempt of this assignee
+        $poasmodel->assignee->lastattemptid = $attemptid;
+        echo '...lastattemptid='.$attemptid;
+        $DB->update_record('poasassignment_assignee',$poasmodel->assignee);
         redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
     }
 }

@@ -26,19 +26,24 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
     
     
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($poasassignment->name);
+    echo $OUTPUT->heading($poasassignment->name." : ".get_string('attempts', 'poasassignment'));
     $poasmodel = poasassignment_model::get_instance($poasassignment);
-    $attempts=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$assigneeid),'attemptnumber');
+    $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assigneeid),'attemptnumber'));
     $plugins=$poasmodel->get_plugins();
-    //$plugins=$DB->get_records('poasassignment_plugins');
-    foreach($attempts as $attempt) {
+    $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$poasassignment->id));
+    $latestattempt=$DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+    $attemptscount=count($attempts);  
+    foreach($attempts as $attempt) {    
         echo $OUTPUT->box_start();
         echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
+        
+        // show attempt's submission
         foreach($plugins as $plugin) {
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
             echo $poasassignmentplugin->show_assignee_answer($assigneeid,$poasassignment->id,1,$attempt->id);
         }
+        // show disablepenalty/enablepenalty button
         if(has_capability('mod/poasassignment:grade',$context)) {
             if(isset($attempt->disablepenalty) && $attempt->disablepenalty==1) {
                 echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$id.'&action=enablepenalty&attemptid='.$attempt->id), 
@@ -49,13 +54,13 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
                                                         get_string('disablepenalty','poasassignment'));
             }
         }
-        $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
-        $latestattempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
-        if(isset($attempt->rating) && 
+        $poasmodel->show_feedback($attempt,$latestattempt,$criterions,$context);
+        /* if(isset($attempt->rating) && 
                             $DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
             echo $OUTPUT->heading(get_string('feedback','poasassignment'));
+            if($attempt->ratingdate < $latestattempt->attemptdate)
+                echo $OUTPUT->heading(get_string('oldfeedback','poasassignment'));
             echo $OUTPUT->box_start();
-            $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$poasassignment->id));
             foreach($criterions as $criterion) {
                 $ratingvalue=$DB->get_record('poasassignment_rating_values',
                         array('criterionid'=>$criterion->id,
@@ -69,8 +74,9 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
                             echo $criterion->description.'<br>';
                         echo $ratingvalue->value.'/100<br>';
                     }
-                    
+                    $options = new stdClass();
                     $options->area    = 'poasassignment_comment';
+                    $options->component    = 'mod_poasassignment';
                     $options->pluginname = 'poasassignment';
                     $options->context = $context;
                     $options->showcount = true;
@@ -80,7 +86,6 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
                     echo $OUTPUT->box_end();
                 }
             }
-            $poasmodel = poasassignment_model:: get_instance();
             echo $poasmodel->view_files($context->id,'commentfiles',$attempt->id);
             if($attempt->draft==0) {
                 echo get_string('penalty','poasassignment').'='.$poasmodel->get_penalty($attempt->id);
@@ -88,15 +93,15 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
                 echo '<br>'.get_string('totalratingis','poasassignment').' '.$ratingwithpenalty;
             }
             echo $OUTPUT->box_end();
-        }
-        else {
+        } */        
+        // if attempt isn't graded
+        /*else {
             if($attempt && $attempt->draft==1) {
                 if($DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
                     echo $OUTPUT->heading(get_string('feedback','poasassignment'));
-                    if($attempt->ratingdate<$latestattempt->attemptdate)
+                    if($attempt->ratingdate < $latestattempt->attemptdate)
                         echo $OUTPUT->heading(get_string('oldfeedback','poasassignment'));
                     echo $OUTPUT->box_start();
-                    $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$poasassignment->id));
                     foreach($criterions as $criterion) {
                     $ratingvalue=$DB->get_record('poasassignment_rating_values',
                             array('criterionid'=>$criterion->id,
@@ -122,11 +127,10 @@ if(has_capability('mod/poasassignment:grade',$context) || $assignee->userid==$US
                         }
                     }
                     echo $OUTPUT->box_end();
-                    $poasmodel = poasassignment_model:: get_instance();
                     echo $poasmodel->view_files($context->id,'commentfiles',$attempt->id);
                 }
             }
-        }
+        } */
         echo $OUTPUT->box_end();
     }
     echo $OUTPUT->footer();

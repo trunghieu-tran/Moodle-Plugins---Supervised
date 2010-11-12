@@ -185,6 +185,7 @@ class poasassignment_answer_file extends poasassignment_answer {
         $rec->value=$data->$name;
         $submissionid=$DB->insert_record('poasassignment_submissions',$rec);
         $poasmodel->save_files($data->$name,'submissionfiles',$submissionid);
+        return $rec->attemptid;
     }
     
     function show_assignee_answer($assigneeid,$poasassignmentid,$needbox=1) {

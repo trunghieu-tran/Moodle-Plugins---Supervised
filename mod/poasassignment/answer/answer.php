@@ -44,7 +44,7 @@ class poasassignment_answer {
     function bind_submission_to_attempt($assigneeid,$draft) {
         global $DB;
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
-        echo $draft;
+        //echo $draft;
         if($attemptscount==0) {
             $attempt->attemptnumber=1;
             $attempt->assigneeid=$assigneeid;

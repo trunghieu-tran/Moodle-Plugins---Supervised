@@ -103,6 +103,7 @@ class poasassignment_answer_text extends poasassignment_answer {
         $rec->pluginid=$this->pluginid;
         $rec->value=$data->text_editor;
         $DB->insert_record('poasassignment_submissions',$rec);
+        return $rec->attemptid;
     }
     
     function get_answer_values() {

@@ -194,7 +194,7 @@ $string['answerfiles']='Load submission files';
 $string['picture']="User's picture";
 $string['gradedate']='Grade date';
 $string['attemptnumber']='Attempt number';
-$string['oldfeedback']='Outdated';
+$string['oldfeedback']='Not actual';
 $string['outdated']='Outdated';
 $string['view_help']='On this page you can see the most important information about your task. 
 You can see critical dates.';
@@ -226,3 +226,6 @@ $string['criterionsource_help']='This setting has two options:
 
 * manually - traditional grading
 * module - if you have special module that checks submission';
+$string['attempts']='Attempts';
+$string['lastgraded']='Last graded attempt';
+$string['lastattempt']='Last attempt';
