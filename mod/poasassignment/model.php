@@ -100,7 +100,7 @@ class poasassignment_model {
         }
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles,'poasassignmentfiles',0);
-        $this->grade_item_update();
+        //$this->grade_item_update();
         return $this->poasassignment->id;
     }
     
@@ -863,4 +863,13 @@ class poasassignment_model {
         }
         return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grades, $params);
     }
+    function grade_item_delete() {
+        global $CFG;
+        require_once($CFG->libdir.'/gradelib.php');
+        if (!isset($this->poasassignment->courseid)) {
+            $this->poasassignment->courseid = $this->poasassignment->course;
+        }
+
+        return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, NULL, array('deleted'=>1));
+}
 }

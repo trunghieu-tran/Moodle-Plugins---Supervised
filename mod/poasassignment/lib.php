@@ -89,6 +89,7 @@ function poasassignment_add_instance($poasassignment) {
     
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
     $poasassignment->id=$poasassignmentmodelinstance->add_instance();
+    poasassignment_grade_item_update($poasassignment);
     return $poasassignment->id;
 }
 
@@ -108,7 +109,7 @@ function poasassignment_update_instance($poasassignment) {
     
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
     $id=$poasassignmentmodelinstance->update_instance();
-    
+    poasassignment_grade_item_update($poasassignment);
     return $id;
 }
 
@@ -121,8 +122,10 @@ function poasassignment_update_instance($poasassignment) {
  * @return boolean Success/Failure
  */
 function poasassignment_delete_instance($id) {
-  //  global $DB;
+    global $DB;
+    $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));    
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
+    poasassignment_grade_item_delete($poasassignment);
     return $poasassignmentmodelinstance->delete_instance($id);
 }
 
@@ -173,26 +176,6 @@ function poasassignment_print_recent_activity($course, $isteacher, $timestart) {
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
-function poasassignment_get_user_grades($poasassignment, $userid=0) {
-/*     global $CFG, $DB;
-
-    if ($userid) {
-        $user = "AND u.id = :userid";
-        $params = array('userid'=>$userid);
-    } else {
-        $user = "";
-    }
-    $params['aid'] = $assignment->id;
-
-    $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback, s.format AS feedbackformat,
-                   s.teacher AS usermodified, s.timemarked AS dategraded, s.timemodified AS datesubmitted
-              FROM {user} u, {assignment_submissions} s
-             WHERE u.id = s.userid AND s.assignment = :aid
-                   $user";
-
-    return $DB->get_records_sql($sql, $params); */
-}
-
 /**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
@@ -351,4 +334,62 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
 
     // finally send the file
     send_stored_file($file, 86400, $filter, $forcedownload);
+}
+
+/**
+ * Create grade item for given poasassignment
+ *
+ * @param object $poasassignment object with extra cmidnumber
+ * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return int 0 if ok, error code otherwise
+ */
+function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
+
+    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
+    return($poasassignmentmodelinstance->grade_item_update($grades));
+     
+}
+
+/**
+ * Delete grade item for given poasassignment
+ *
+ * @param object $poasassignment object
+ * @return object poasassignment
+ */
+function poasassignment_grade_item_delete($poasassignment) {
+    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
+    return($poasassignmentmodelinstance->grade_item_delete());
+}
+
+/**
+ * Return grade for given user or all users.
+ *
+ * @param int $poasassignmentid id of poasassignment
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function poasassignment_get_user_grades($poasassignment, $userid=0) {
+    global $CFG, $DB;
+
+    /* if ($userid) {
+        $user = "AND u.id = :userid";
+        $params = array('userid'=>$userid);
+    } else {
+        $user = "";
+    }
+    $params['aid'] = $poasassignment->id;
+
+    $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback, s.format AS feedbackformat,
+                   s.teacher AS usermodified, s.timemarked AS dategraded, s.timemodified AS datesubmitted
+              FROM {user} u, {assignment_submissions} s
+             WHERE u.id = s.userid AND s.assignment = :aid
+                   $user";
+
+    return $DB->get_records_sql($sql, $params); */
+    if($userid) {
+        // return user's last attempt rating
+        $assignee = $DB->get_record('poasassignment_attempts',array('userid'=>$userid));
+        return $DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id));
+    }
+    
 }
