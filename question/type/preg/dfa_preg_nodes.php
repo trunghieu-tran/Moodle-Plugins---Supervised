@@ -371,7 +371,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum + dfa_preg_node_assert::ASSERT_MIN_NUM;
-        $connection[$maxnum] = &$this;
+        $connection[$this->number] = &$this;
     }
     public function nullable() {
         $this->nullable = true;
