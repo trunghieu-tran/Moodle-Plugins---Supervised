@@ -97,12 +97,17 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
-        $root = $this->roots[$index];
-        $this->roots[$index] = new preg_node_concat;
-        $this->roots[$index]->operands[0] = $root;
-        $this->roots[$index]->operands[1] = new preg_leaf_meta;
-        $this->roots[$index]->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
-        $this->roots[$index] = dfa_preg_node::from_preg_node($this->roots[$index]);
+        if ($index==0) {
+            $root =& $this->roots[0];
+        } else {
+            $root =& $this->roots[$index]->pregnode->operands[0];
+        }
+        $oldroot = $root;
+        $root = new preg_node_concat;
+        $root->operands[0] = $oldroot;
+        $root->operands[1] = new preg_leaf_meta;
+        $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
+        $root = dfa_preg_node::from_preg_node($root);
     }
     /**
     *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
@@ -272,22 +277,27 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index number of assert (0 for main regex) for which building fa
     */
     function buildfa($index) {
+        if ($index==0) {
+            $root = $this->roots[0];
+        } else {
+            $root = $this->roots[$index]->pregnode->operands[0];
+        }
         $statecount = 0;
         $passcount = 0;
         $this->maxnum = 0;//no one leaf numerated, yet.
         $this->finiteautomates[$index][0] = new finite_automate_state;
         //form the map of following
-        $this->numeration($this->roots[$index], $index);
+        $root->number($this->connection[$index], $maxnum);
         if (strpos($this->modifiers, 'i') !== false) {
             $this->for_case_insensitive();
         }
-        dfa_preg_matcher::nullable($this->roots[$index]);
-        dfa_preg_matcher::firstpos($this->roots[$index]);
-        dfa_preg_matcher::lastpos($this->roots[$index]);
-        dfa_preg_matcher::followpos($this->roots[$index], $map);
-        $this->find_asserts($this->roots[$index]);
+        $root->nullable();
+        $root->firstpos();
+        $root->lastpos();
+        $root->followpos($map);
+        $root->find_asserts($this->roots);
         //create start state.
-        foreach ($this->roots[$index]->firstpos as $value) {
+        foreach ($root->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;
         }
         $this->finiteautomates[$index][0]->marked = false;//start state not marked, because not readey, yet
@@ -301,15 +311,20 @@ class dfa_preg_matcher extends preg_matcher {
                 $newstate = new finite_automate_state;
                 $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
-                    if ($follow<ASSERT) {
-                        //if number less then ASSERT constant than this is character class, to passages it.
+                    if ($follow<dfa_preg_node_assert::ASSERT_MIN_NUM) {
+                        //if number less then dfa_preg_node_assert::ASSERT_MIN_NUM constant than this is character class, to passages it.
                         $newstate->passages[$follow] = -2;
                     } else {
                         //else this is number of assert
                         $this->finiteautomates[$index][$currentstateindex]->asserts[] = $follow;
                     }
                 }
-                if ($num!=STREND) {
+                if ($this->connection[$index][$num]->pregnode->type == preg_node::TYPE_LEAF_META && 
+                    $this->connection[$index][$num]->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
+                    //if this passage point to end state
+                    //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
+                    $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
+                } else {
                     //if this passage not point to end state
                     if ($this->state($newstate->passages, $index) === false && count($newstate->passages) != 0) {
                         //if fa hasn't other state matching with this and this state not empty
@@ -321,10 +336,6 @@ class dfa_preg_matcher extends preg_matcher {
                         //else do passage point to state, which has in fa already
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
-                } else {
-                    //if this passage point to end state
-                    //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
-                    $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
                 }
                 $passcount++;
                 if (($passcount > MAX_PASSAGE_COUNT || $statecount > MAX_STATE_COUNT) && MAX_STATE_COUNT != 0 && MAX_PASSAGE_COUNT != 0) {
@@ -592,7 +603,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param string2 - string which may be included in string1
     *@return true if string1 include string2
     */
-    static function is_include_characters($string1, $string2) {// to static
+    static function is_include_characters($string1, $string2) {
         $result = true;
         $size = strlen($string2);
         for ($i = 0; $i < $size && $result; $i++) {
@@ -611,18 +622,28 @@ class dfa_preg_matcher extends preg_matcher {
     *@return concatenated list of follow chars
     */
     function followposU($number, $fpmap, $passages, $index) {
-        if ($number == STREND) {
+        if ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META && 
+            $this->connection[$index][$number]->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
             $res = array();
             return $res;
         }
-        $str1 = $this->connection[$index][abs($number)];//for this charclass will found equivalent numbers
         $equnum = array();
-        foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
-            $str2 = $cc;
-            if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $number>0) {//if charclass 1 and 2 equivalenta and number exist in passages
-                array_push($equnum, $num);
-            } else if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists(-$num, $passages) && $number<0) {
-                array_push($equnum, -$num);
+        if ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
+            $str1 = $this->connection[$index][$number]->pregnode->charset;//for this charclass will found equivalent numbers
+            foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+                    $str2 = $cc->pregnode->charset;
+                    $equdirection = $cc->pregnode->negative === $this->connection[$index][$number]->pregnode->negative; 
+                    if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
+                        array_push($equnum, $num);
+                    }
+                }
+            }
+        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
+            foreach ($this->connection[$index] as $num => $cc) {
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
+                    array_push($equnum, $num);
+                }
             }
         }
         $followU = array();
@@ -893,6 +914,13 @@ class dfa_preg_matcher extends preg_matcher {
                         'grouping                                   - (?:...)'
                        );
         return $result;               
+    }
+    public function print_connection($index) {
+        foreach ($this->connection[$index] as $num=>$leaf) {
+            echo 'number: ', $num, '</br>';
+            $leaf->print_self(0);
+            echo '</br>';
+        }
     }
 }
 ?>
