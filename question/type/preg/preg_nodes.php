@@ -110,6 +110,11 @@ abstract class preg_leaf extends preg_node {
     * @param length the length of match (for backreference or recursion), can be 0 for asserts
     */
     abstract public function match($str, $pos, &$length);
+    
+    /*
+    *Returns one of characters which contains in this leaf
+    */
+    abstract public function character();
 }
 
 /**
@@ -155,8 +160,19 @@ class preg_leaf_charset extends preg_leaf {
         $length = 1;
         return $result;
     }
-
-
+    
+    public function character() {
+        if ($this->negative) {
+            $i = ord(' ');
+            while (strchr(chr($i), $this->charset) !== false) {
+                $i++;
+            }
+            $res = chr($i);
+            return $res;
+        } else {
+            return $this->charset[0];
+        }
+    }
 }
 
 /**
@@ -181,12 +197,27 @@ class preg_leaf_meta extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_META;
     }
-
     public function name() {
         return 'leaf_meta';
     }
-    public function match($str, $pos, &$length) {
+    public function character() {
         switch ($this->subtype) {
+            case preg_leaf_meta::SUBTYPE_DOT:
+                $result = 'D';
+                break;
+            //TODO: unicode property
+            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+                if ($this->negative) {
+                    $result = '#';
+                } else {
+                    $result = 'W';
+                }
+                break;
+        }
+        return $result;
+    }
+    public function match($str, $pos, &$length) {
+    switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $lenght = 1;
                 return true;
@@ -194,10 +225,8 @@ class preg_leaf_meta extends preg_leaf {
             //TODO: unicode property
             case preg_leaf_meta::SUBTYPE_WORD_CHAR:
                 if (ctype_alnum($str[$pos]) || $str[$pos] === '_') {
-                    $lenght = 1;
                     $result =  true;
                 } else {
-                    $lenght = -1;
                     $result =  false;
                 }
                 break;
@@ -205,6 +234,7 @@ class preg_leaf_meta extends preg_leaf {
         if ($this->negative) {
             $result = !$result;
         }
+        $lenght = 1;
         return $result;
     }
 }
@@ -275,6 +305,9 @@ class preg_leaf_assert extends preg_leaf {
         }
         return $result;
     }
+    public function character() {
+        echo 'TODO: implements abstract function character for preg_leaf_backref class before use it!';
+    }
 }
 
 class preg_leaf_backref extends preg_leaf {
@@ -288,6 +321,9 @@ class preg_leaf_backref extends preg_leaf {
     }
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
+    }
+    public function character() {
+        die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
     }
 }
 
