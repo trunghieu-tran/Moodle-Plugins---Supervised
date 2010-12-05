@@ -384,7 +384,6 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->roots) == 2 && $this->qtype->roots[dfa_preg_node_assert::ASSERT_MIN_NUM + 2] == $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]);
         $this->qtype->append_end(dfa_preg_node_assert::ASSERT_MIN_NUM+2);
         $this->qtype->buildfa(dfa_preg_node_assert::ASSERT_MIN_NUM+2);
-        var_dump($this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2]);
         $this->assertTrue(count($this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages) == 2 && $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages[1] == 0 && 
                             $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages[2] == 1);
         $this->assertTrue(count($this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][1]->passages) == 1 && $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);

@@ -181,8 +181,12 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
     const ENDREG = 186759556;
     public function number(&$connection, &$maxnum) {
-        $this->number = dfa_preg_leaf_meta::ENDREG;
-        $connection[dfa_preg_leaf_meta::ENDREG] = &$this;
+        if ($this->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
+            $this->number = dfa_preg_leaf_meta::ENDREG;
+            $connection[dfa_preg_leaf_meta::ENDREG] = &$this;
+        } else {
+            parent::number($connection, $maxnum);
+        }
     }
     public function not_supported() {
         return false;
