@@ -179,6 +179,11 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
     }
 }
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
+    const ENDREG = 186759556;
+    public function number(&$connection, &$maxnum) {
+        $this->number = dfa_preg_leaf_meta::ENDREG;
+        $connection[dfa_preg_leaf_meta::ENDREG] = &$this;
+    }
     public function not_supported() {
         return false;
     }
@@ -416,12 +421,12 @@ class dfa_preg_node_assert extends dfa_preg_operator {
 }
 class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function nullable() {
-        //{} quantificators will be converted to ? and * combination
+        //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
             $result = true;
             $this->pregnode->operands[0]->nullable();
         } else {//+
-            $reulst = $this->pregnode->operands[0]->nullable();
+            $result = $this->pregnode->operands[0]->nullable();
         }
         $this->nullable = $result;
         return $result;

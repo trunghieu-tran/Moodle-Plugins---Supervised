@@ -64,6 +64,7 @@ class dfa_preg_matcher extends preg_matcher {
     }
     
     protected function accept_node($node) {
+        /* Old style function
         switch ($node->subtype) {
             case LEAF_LINK:
                 $this->flags['link'] = true;
@@ -88,8 +89,8 @@ class dfa_preg_matcher extends preg_matcher {
                     $this->flags['lazyquant'] = true;
                 }
                 return false;
-        }
-        return true;
+        }*/
+        return true;//заглушка
     }
 
     /**
@@ -319,8 +320,8 @@ class dfa_preg_matcher extends preg_matcher {
                         $this->finiteautomates[$index][$currentstateindex]->asserts[] = $follow;
                     }
                 }
-                if ($this->connection[$index][$num]->pregnode->type == preg_node::TYPE_LEAF_META && 
-                    $this->connection[$index][$num]->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
+                if ($this->connection[$index][$num]->pregnode->type === preg_node::TYPE_LEAF_META && 
+                    $this->connection[$index][$num]->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
                     //if this passage point to end state
                     //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
                     $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
@@ -359,6 +360,7 @@ class dfa_preg_matcher extends preg_matcher {
     */
     function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
+        $lenght = 0;//count of character matched with current leaf
         $end = false;//current state is end state, not yet
         $full = true;//if string match with asserts
         $next = 0;// character can put on next position, 0 for full matching with regex string
@@ -376,48 +378,29 @@ class dfa_preg_matcher extends preg_matcher {
             $found = false;//current character no accepted to fa yet
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //finding positive character class with this character
+            //finding leaf with this character
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             $key = false;
             while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
-                //if character class number is positive (it's mean what character class is positive) and
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                if ($key != STREND && $key < DOT && $offset + $index < strlen($string)) {
-                    $found = ($key > 0 && strpos($this->connection[$assertnumber][$key], $string[$offset + $index]) !== false);
+                if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index < strlen($string)) {
+                    $found = ($this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, $lenght));
                 }
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 }
             }
-            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
-                //finding metasymbol dot's passages, it accept any character.
-                $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                $found = ($key > DOT && $offset + $index < strlen($string));
-                if (!$found) {
-                    next($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                }
+            if ($found) {
+                $foundkey = $key;
             }
-            $foundkey = $key;
-            //finding negative character class without this character
-            reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
-            while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
-                $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                $found = ($key < 0 && strpos($this->connection[$assertnumber][abs($key)], $string[$offset + $index]) === false);
-                if ($found) {
-                    $foundkey = $key;
-                } else {
-                    next($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                }
-            }
-            if (array_key_exists(STREND, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
+            if (array_key_exists(dfa_preg_leaf_meta::ENDREG, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
             //if current character is end of string and fa can go to end state.
                 if ($offset + $index == strlen($string)) { //must be end   
                     $found = true;
-                    $foundkey = STREND;
+                    $foundkey = dfa_preg_leaf_meta::ENDREG;
                 } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {//must be end
-                    $foundkey = STREND;
+                    $foundkey = dfa_preg_leaf_meta::ENDREG;
                 }
                 $maybeend = true;//may be end.
                 $substringmatch->full = true;
@@ -443,7 +426,7 @@ class dfa_preg_matcher extends preg_matcher {
             //form results of check this character
             if ($found) { //if finite automate did accept this character
                 $correct = true;
-                if ($foundkey != STREND) {// if finite automate go to not end state
+                if ($foundkey != dfa_preg_leaf_meta::ENDREG) {// if finite automate go to not end state
                     $currentstate = $this->finiteautomates[$assertnumber][$currentstate]->passages[$key];
                     $end = false;
                 } else { 
@@ -452,7 +435,7 @@ class dfa_preg_matcher extends preg_matcher {
             } else {
                 $correct = false;
             }
-        } while($correct && !$end && $offset + $index <= strlen($string));//index - 1, becase index was incrimented
+        } while($correct && !$end && $offset + $index <= strlen($string));
         //form result comparing string with regex
         $result = new stdClass;
         $result->offset = $offset;
@@ -484,7 +467,7 @@ class dfa_preg_matcher extends preg_matcher {
             $key = $wres->nextkey;
             $result->left = $wres->left;
             if ($key>0) {
-                $result->next = $this->connection[$assertnumber][$key][0];
+                $result->next = $this->connection[$assertnumber][$key]->pregnode->character();
             } else {//TODO: need better algoritm for search next character in negative CC
                 $char = 'a';
                 while (ord($char) < 255 && strpos($this->connection[$assertnumber][-$key], $char) !== false) {
