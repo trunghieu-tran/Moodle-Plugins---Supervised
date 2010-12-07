@@ -486,7 +486,6 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result2->index == 1 && $result2->next == 0);
     }
     function test_compare_dot() {//.b
-        global $PREG_DEBUG;
         $this->qtype->build_tree('.b');
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
@@ -506,7 +505,13 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result3->full);
         $this->assertTrue($result3->index == 0 && $result3->next == 'b');
     }
-    function _test_compare_assert() {//a(?=.*b)[xcvbnm]*
+    function test_compare_assert() {//a(?=.*b)[xcvbnm]*
+        $this->qtype->build_tree('a[xcvbnm]*');
+        $this->qtype->connection[0][1] = $this->qtype->roots[0]->pregnode->operands[0];
+        $this->qtype->connection[0][3] = $this->qtype->roots[0]->pregnode->operands[1]->pregnode->operands[0];
+        $this->qtype->build_tree('.*b');
+        $this->qtype->connection[dfa_preg_node_assert::ASSERT_MIN_NUM+2][1] = $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0];
+        $this->qtype->connection[dfa_preg_node_assert::ASSERT_MIN_NUM+2][2] = $this->qtype->roots[0]->pregnode->operands[1];   
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
         $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0] = new finite_automate_state;
@@ -515,12 +520,9 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->finiteautomates[0][1]->passages[3] = 1;
         $this->qtype->finiteautomates[0][1]->passages[dfa_preg_leaf_meta::ENDREG] = -1;
         $this->qtype->finiteautomates[0][0]->asserts[0] = dfa_preg_node_assert::ASSERT_MIN_NUM+2;
-        $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages[DOT+1] = 0;
         $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages[2] = 1;
+        $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][0]->passages[1] = 0;
         $this->qtype->finiteautomates[dfa_preg_node_assert::ASSERT_MIN_NUM+2][1]->passages[dfa_preg_leaf_meta::ENDREG] = -1;
-        $this->qtype->connection[0][1] = 'a';
-        $this->qtype->connection[0][3] = 'xcvbnm';
-        $this->qtype->connection[dfa_preg_node_assert::ASSERT_MIN_NUM+2][2] = 'b';
         $result1 = $this->qtype->compare('an',0);
         $result2 = $this->qtype->compare('annvnvb',0);
         $result3 = $this->qtype->compare('annvnvv',0);
