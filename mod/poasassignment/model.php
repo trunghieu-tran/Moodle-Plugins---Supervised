@@ -915,4 +915,26 @@ class poasassignment_model {
             echo $OUTPUT->box_end();
         }
     }
+    /**
+     * 
+     */
+    function send_email() {
+        global $DB,$USER;
+        $eventdata= new stdClass();
+        
+        $eventdata->name = 'assignment_updates';
+        $eventdata->fullmessageformat = FORMAT_PLAIN;
+        //for($i=0;$i<1000000;$i++)
+        //    $eventdata->fullmessage +='j';
+        $eventdata->fullmessage= 'fullmessage';
+        $eventdata->fullmessagehtml   = '<b>fullmessage</b>'; 
+        $eventdata->smallmessage = '';
+        $eventdata->subject = 'Page visited'; 
+        $eventdata->component = 'mod_assignment';
+        $eventdata->userto = $DB->get_record('user', array('id'=>$USER->id)); 
+        $eventdata->userfrom = $eventdata->userto;
+        echo 'sending message';
+        message_send($eventdata);
+    }
 }
+    
