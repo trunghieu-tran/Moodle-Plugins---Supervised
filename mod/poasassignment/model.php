@@ -207,6 +207,10 @@ class poasassignment_model {
             $flags+=ALL_ATTEMPTS_AS_ONE;
             unset($this->poasassignment->newattemptbeforegrade);
         }
+        if (isset($this->poasassignment->finalattempts)) {
+            $flags+=MATCH_ATTEMPT_AS_FINAL;
+            unset($this->poasassignment->finalattempts);
+        }
         return $flags;
     }
     

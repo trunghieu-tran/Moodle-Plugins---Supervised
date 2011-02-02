@@ -165,6 +165,7 @@ class poasassignment_answer_file extends poasassignment_answer {
         $options['maxbytes'] = $plugin_settings_size->value;
         $options['maxfiles'] = ($plugin_settings_amount->value)+1;
         $mform->addElement('filemanager', 'answerfiles_filemanager', get_string('answerfiles','poasassignment'),$options);
+        $mform->closeHeaderBefore('answerfileheader');
     }
     function configure_flag($poasassignment) {
         if (isset($poasassignment->answerfile)) {
@@ -178,7 +179,7 @@ class poasassignment_answer_file extends poasassignment_answer {
         $poasmodel = poasassignment_model::get_instance();
         global $DB;
         
-        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft));
+        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft),isset($data->final));
         $rec->assigneeid=$assigneeid;
         $rec->pluginid=$this->pluginid;
         $name='answerfiles_filemanager';

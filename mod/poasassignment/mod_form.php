@@ -96,6 +96,10 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $mform->disabledIf('penalty', 'severalattempts', 'notchecked');
         $mform->addHelpButton('penalty', 'penalty', 'poasassignment');
         
+        $mform->addElement('checkbox','finalattempts',get_string('finalattempts','poasassignment'));
+        $mform->addHelpButton('finalattempts','finalattempts','poasassignment');
+        $mform->disabledIf('finalattempts', 'severalattempts', 'notchecked');
+        
         $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'poasassignment'));
         $mform->addHelpButton('notifyteachers', 'notifyteachers', 'poasassignment');
         
@@ -142,6 +146,11 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $mform->disabledIf('teacherapproval', 'activateindividualtasks');
         $mform->addHelpButton('teacherapproval', 'teacherapproval', 'poasassignment');
 
+        // Adding graders list
+        //----------------------------------------------------------------------
+        
+        $mform->addElement('header', 'poasassignmentgraderslist', get_string('poasassignmentgraderslist', 'poasassignment'));
+        // TODO show graders list with checkboxes
 
         // add standard elements, common to all modules
         //----------------------------------------------------------------------
@@ -168,6 +177,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
             $default_values['secondchoice']=$flags & SECOND_CHOICE;
             $default_values['teacherapproval']=$flags & TEACHER_APPROVAL;
             $default_values['newattemptbeforegrade']=$flags & ALL_ATTEMPTS_AS_ONE;
+            $default_values['finalattempts']=$flags & MATCH_ATTEMPT_AS_FINAL;
         }
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('poasassignmentfiles');
@@ -202,5 +212,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         } else {
             return $errors;
         }        
+        
+        // TODO validate graders
     }
 }
