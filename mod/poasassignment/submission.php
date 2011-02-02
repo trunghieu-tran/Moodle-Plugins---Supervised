@@ -50,13 +50,22 @@ else {
                     $attemptid = $poasassignmentplugin->save_answer($poasmodel->assignee->id,$data);
                 else
                     $attemptid = $poasassignmentplugin->save_answer(0,$data);
-                //noitify teacher if needed
+                
             }
         }
+        
+        
         // save attempt as last attempt of this assignee
         $poasmodel->assignee->lastattemptid = $attemptid;
-        echo '...lastattemptid='.$attemptid;
+        //echo '...lastattemptid='.$attemptid;
         $DB->update_record('poasassignment_assignee',$poasmodel->assignee);
+        
+        // trigger poasassignmentevent 
+        $poasmodel->trigger_poasassignment_event(ATTEMPT_DONE,$poasmodel->assignee->id);
+        
+        //noitify teacher if needed
+        $poasmodel->email_teachers($poasmodel->assignee);
+        
         redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
     }
 }

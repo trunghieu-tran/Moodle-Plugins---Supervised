@@ -44,20 +44,20 @@ class poasassignment_answer {
     function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
         global $DB;
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
+        
         //echo $draft;
+        $newattempt=new stdClass();
+        $newattempt->assigneeid=$assigneeid;
+        $newattempt->attemptdate=time();
+        $newattempt->disablepenalty=0;
+        $newattempt->draft=$draft;
+        $newattempt->final=$final;
+        if($draft)
+            $newattempt->disablepenalty=1;
+        
         if($attemptscount==0) {
-            $attempt=new stdClass();
-            $attempt->attemptnumber=1;
-            $attempt->assigneeid=$assigneeid;
-            $attempt->attemptdate=time();
-            $attempt->disablepenalty=0;
-            $attempt->draft=$draft;
-            $attempt->final=$final;
-            if($draft)
-                $attempt->disablepenalty=1;
-            
-            
-            $attemptid=$DB->insert_record('poasassignment_attempts',$attempt);
+            $newattempt->attemptnumber=1;
+            $attemptid=$DB->insert_record('poasassignment_attempts',$newattempt);
         }
         if($attemptscount>0) {
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
@@ -65,15 +65,8 @@ class poasassignment_answer {
                 $attemptid=$attempt->id;
             else {
                 $newattempt->attemptnumber=$attemptscount+1;
-                $newattempt->assigneeid=$assigneeid;
-                $newattempt->attemptdate=time();
                 $newattempt->ratingdate=$attempt->ratingdate;
                 $newattempt->rating=$attempt->rating;
-                $newattempt->disablepenalty=0;
-                $newattempt->draft=$draft;
-                $newattempt->final=$final;
-                if($draft)
-                    $newattempt->disablepenalty=1;
                 $attemptid=$DB->insert_record('poasassignment_attempts',$newattempt);
             }
         }
