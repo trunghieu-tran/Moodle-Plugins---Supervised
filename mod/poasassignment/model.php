@@ -922,7 +922,7 @@ class poasassignment_model {
     
     function trigger_poasassignment_event($mode,$assigneeid) {
         //global $DB,$USER;
-        echo 'triggering event';
+        //echo 'triggering event';
         // получение задания, отправка ответа, получение оценки
         $eventdata = new stdClass();
         $eventdata->student=$assigneeid;
@@ -939,10 +939,10 @@ class poasassignment_model {
     }
     function email_teachers($assignee) {
         global $DB;
-        echo 'e-mail ing?';
+        //echo 'e-mail ing?';
         if(!$this->poasassignment->flags & NOTIFY_TEACHERS)
             return;
-        echo 'need e-mail ing';
+        //echo 'need e-mail ing';
         $user = $DB->get_record('user', array('id'=>$assignee->userid));
         $eventdata= new stdClass();
         
