@@ -280,11 +280,13 @@ class view_tab extends abstract_tab {
                         echo $poasassignmentplugin->show_assignee_answer($poasmodel->assignee->id,$this->poasassignment->id);
                     }
                     
+                    /* If student has several attempts and hasn't final grade */
                     if($this->poasassignment->flags&SEVERAL_ATTEMPTS && $poasmodel->assignee->finalized!=1) {
-                        if($submission=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
-                            echo $OUTPUT->single_button(new moodle_url('submission.php',
-                                            array('id'=>$this->cm->id,'assigneeid'=>$poasmodel->assignee->id)),get_string('editsubmission','poasassignment'));
-                        }
+                        if(!$attempt->final || ($attempt->final  && $attempt->rating!=null ))
+                            if($submission=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
+                                echo $OUTPUT->single_button(new moodle_url('submission.php',
+                                                array('id'=>$this->cm->id,'assigneeid'=>$poasmodel->assignee->id)),get_string('editsubmission','poasassignment'));
+                            }
                     }
                 }
                 if(!$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
@@ -302,9 +304,10 @@ class view_tab extends abstract_tab {
                     echo $poasassignmentplugin->show_assignee_answer($poasmodel->assignee->id,$this->poasassignment->id);
                 }
                 if($this->poasassignment->flags&SEVERAL_ATTEMPTS) {
-                if($submission=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
-                    echo $OUTPUT->single_button(new moodle_url('submission.php',
-                                    array('id'=>$this->cm->id,'assigneeid'=>$poasmodel->assignee->id)),get_string('editsubmission','poasassignment'));
+                    if(!$attempt->final || ($attempt->final  && $attempt->rating>0 ))
+                        if($submission=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
+                            echo $OUTPUT->single_button(new moodle_url('submission.php',
+                                            array('id'=>$this->cm->id,'assigneeid'=>$poasmodel->assignee->id)),get_string('editsubmission','poasassignment'));
                 }
             }
             }
