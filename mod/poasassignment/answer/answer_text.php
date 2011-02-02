@@ -35,6 +35,7 @@ class poasassignment_answer_text extends poasassignment_answer {
     function show_answer_form($mform) {
         $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));
         $mform->addElement('htmleditor', 'text_editor', get_string('answertexteditor','poasassignment'));
+        $mform->closeHeaderBefore('answertextheader');
     }
     function show_assignee_answer($assigneeid,$poasassignmentid,$needbox=1,$attemptid=null) {
         global $DB,$OUTPUT;
@@ -98,7 +99,7 @@ class poasassignment_answer_text extends poasassignment_answer {
     function save_answer($assigneeid,$data) {
         global $DB,$USER;
 
-        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft));
+        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft),isset($data->final));
         $rec->assigneeid=$assigneeid;
         $rec->pluginid=$this->pluginid;
         $rec->value=$data->text_editor;

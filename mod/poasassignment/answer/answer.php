@@ -41,18 +41,21 @@ class poasassignment_answer {
                                                                 'pluginid'=>$pluginid));    
     }
     
-    function bind_submission_to_attempt($assigneeid,$draft) {
+    function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
         global $DB;
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
         //echo $draft;
         if($attemptscount==0) {
+            $attempt=new stdClass();
             $attempt->attemptnumber=1;
             $attempt->assigneeid=$assigneeid;
             $attempt->attemptdate=time();
             $attempt->disablepenalty=0;
             $attempt->draft=$draft;
+            $attempt->final=$final;
             if($draft)
                 $attempt->disablepenalty=1;
+            
             
             $attemptid=$DB->insert_record('poasassignment_attempts',$attempt);
         }
@@ -68,6 +71,7 @@ class poasassignment_answer {
                 $newattempt->rating=$attempt->rating;
                 $newattempt->disablepenalty=0;
                 $newattempt->draft=$draft;
+                $newattempt->final=$final;
                 if($draft)
                     $newattempt->disablepenalty=1;
                 $attemptid=$DB->insert_record('poasassignment_attempts',$newattempt);
@@ -92,9 +96,20 @@ class answer_form extends moodleform {
                 $poasassignmentplugin->show_answer_form($mform,$instance['poasassignmentid']);
             }
         }
+        
+        $mform->addElement('header');
         $mform->addElement('checkbox','draft',get_string('draft','poasassignment'));
+        
+        $poasassignment  = $DB->get_record('poasassignment', array('id' => $instance['poasassignmentid']), '*', MUST_EXIST);
+        $model = poasassignment_model::get_instance($poasassignment);
+        
+        if($model->poasassignment->flags & MATCH_ATTEMPT_AS_FINAL) {
+            $mform->addElement('checkbox','final',get_string('final','poasassignment'));
+        }        
+        
         $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
-        $mform->setType('poasassignmentid', PARAM_INT);
+        $mform->setType('poasassignmentid', PARAM_INT); 
+        
         
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);

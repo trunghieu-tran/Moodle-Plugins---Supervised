@@ -43,6 +43,7 @@ define('ACTIVATE_INDIVIDUAL_TASKS', 64);
 define('SECOND_CHOICE', 128);
 define('TEACHER_APPROVAL', 256);
 define('ALL_ATTEMPTS_AS_ONE', 512);
+define('MATCH_ATTEMPT_AS_FINAL', 1024);
 
 define('ADD_MODE', 0);
 define('EDIT_MODE',1);
