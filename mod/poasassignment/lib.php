@@ -32,7 +32,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/** example constant */
 define('PREVENT_LATE_CHOICE', 1);
 define('RANDOM_TASKS_AFTER_CHOICEDATE', 2);
 define('PREVENT_LATE', 4);
@@ -63,6 +62,10 @@ define('DATE',4);
 define('FILE',5);
 define('LISTOFELEMENTS',6);
 define('MULTILIST',7);
+
+define('TASK_RECIEVED',0);
+define('ATTEMPT_DONE',1);
+define('GRADE_DONE',2);
 /**
  * If you for some reason need to use global variables instead of constants, do not forget to make them
  * global as this file can be included inside a function scope. However, using the global variables

@@ -41,9 +41,16 @@ function xmldb_poasassignment_install() {
     $record->path='answer/answer_file.php';
     if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
         $DB->insert_record('poasassignment_plugins',$record);
+    
         
     $record->name='poasassignment_answer_text';
     $record->path='answer/answer_text.php';
     if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
         $DB->insert_record('poasassignment_plugins',$record);
+        
+    // Add message provider
+    $provider = new stdClass();
+    $provider->name = 'poasassignment_updates';
+    $provider->component='mod_poasassignment';
+    $DB->insert_record('message_providers',$provider);
 }

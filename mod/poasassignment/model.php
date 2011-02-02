@@ -919,26 +919,56 @@ class poasassignment_model {
             echo $OUTPUT->box_end();
         }
     }
-    /**
-     * 
-     */
-    function send_email() {
-        global $DB,$USER;
+    
+    function trigger_poasassignment_event($mode,$assigneeid) {
+        //global $DB,$USER;
+        echo 'triggering event';
+        // получение задания, отправка ответа, получение оценки
+        $eventdata = new stdClass();
+        $eventdata->student=$assigneeid;
+        $eventdate->poasassignmentid=$this->poasassignment->id;
+        if($mode==TASK_RECIEVED) {
+            events_trigger('poasassignment_task_recieved', $eventdata);
+        }
+        if($mode==ATTEMPT_DONE) {
+            events_trigger('poasassignment_attempt_done', $eventdata);
+        }
+        if($mode==GRADE_DONE) {
+            events_trigger('poasassignment_grade_done', $eventdata);
+        }
+    }
+    function email_teachers($assignee) {
+        global $DB;
+        echo 'e-mail ing?';
+        if(!$this->poasassignment->flags & NOTIFY_TEACHERS)
+            return;
+        echo 'need e-mail ing';
+        $user = $DB->get_record('user', array('id'=>$assignee->userid));
         $eventdata= new stdClass();
         
-        $eventdata->name = 'assignment_updates';
+        $teachers = $this->get_graders($user);
+        
+        
+        $eventdata->name = 'poasassignment_updates';
         $eventdata->fullmessageformat = FORMAT_PLAIN;
-        //for($i=0;$i<1000000;$i++)
-        //    $eventdata->fullmessage +='j';
-        $eventdata->fullmessage= 'fullmessage';
-        $eventdata->fullmessagehtml   = '<b>fullmessage</b>'; 
+        $eventdata->fullmessage= 'Student '.fullname($user,true).' uploaded his answer' ;
+        $eventdata->fullmessagehtml   = '<b>'.$eventdata->fullmessage.'</b>'; 
         $eventdata->smallmessage = '';
-        $eventdata->subject = 'Page visited'; 
-        $eventdata->component = 'mod_assignment';
-        $eventdata->userto = $DB->get_record('user', array('id'=>$USER->id)); 
-        $eventdata->userfrom = $eventdata->userto;
-        echo 'sending message';
-        message_send($eventdata);
+        $eventdata->subject = 'Attempt done'; 
+        $eventdata->component = 'mod_poasassignment';
+        $eventdata->userfrom = $user;
+        
+        foreach ($teachers as $teacher) {
+            $eventdata->userto = $teacher;
+            message_send($eventdata);
+        }
+        
+    }
+    function get_graders() {
+        $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
+        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
+        $potgraders = get_users_by_capability($context, 'mod/poasassignment:grade', '', '', '', '', '', '', false, false);
+        return $potgraders;
     }
 }
     
