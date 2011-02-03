@@ -457,16 +457,23 @@ class poasassignment_model {
         }
     }
    
-    function save_grade($assigneeid,$data) {
-        $dfs=get_object_vars($data);
-        foreach($dfs as $dfk=>$dfv) {
+    /**
+     * Saves student's grade in DB
+     *
+     * @param int $assigneeid
+     * @param object $data
+     */
+    function save_grade($assigneeid, $data) {
+        global $DB;
+        $dfs = get_object_vars($data);
+        foreach ($dfs as $dfk => $dfv) {
             //echo "$dfk=>$dfv<br>";
             //echo $data->criterion1.'<br>';
         }
-        global $DB;
-        $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
-        $rating=0;
-        $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
+        $criterions = $DB->get_records('poasassignment_criterions', 
+                                       array('poasassignmentid' => $this->poasassignment->id));
+        $rating = 0;
+        $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
         $context = get_context_instance(CONTEXT_MODULE, $cm->id);
         
         $options->area    = 'poasassignment_comment';
@@ -474,53 +481,56 @@ class poasassignment_model {
         $options->context = $context;
         $options->showcount = true;
         
-        $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
-        $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
-        foreach( $criterions as $criterion) {
-            $elementname='criterion'.$criterion->id;
-            $elementcommentname='criterion'.$criterion->id.'comment';
-            if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id,'criterionid'=>$criterion->id))) {
+        $attemptscount = $DB->count_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
+        $attempt = $DB->get_record('poasassignment_attempts', 
+                                   array('assigneeid' => $assigneeid, 'attemptnumber' => $attemptscount));
+        foreach ($criterions as $criterion) {
+            $elementname = 'criterion'.$criterion->id;
+            $elementcommentname = 'criterion'.$criterion->id.'comment';
+            if (!$DB->record_exists('poasassignment_rating_values', array('attemptid' => $attempt->id, 'criterionid' => $criterion->id))) {
                 $rec = new stdClass();
-                $rec->attemptid=$attempt->id;
-                $rec->criterionid=$criterion->id;
-                $rec->assigneeid=$assigneeid;
-                if($attempt->draft==0)
-                    $rec->value=$data->$elementname;
-                $ratingvalueid=$DB->insert_record('poasassignment_rating_values',$rec);
-                
+                $rec->attemptid = $attempt->id;
+                $rec->criterionid = $criterion->id;
+                $rec->assigneeid = $assigneeid;
+                if ($attempt->draft == 0)
+                    $rec->value = $data->$elementname;
+                $ratingvalueid = $DB->insert_record('poasassignment_rating_values', $rec);
                 
                 $options->itemid  = $ratingvalueid;
                 $comment = new comment($options);
                 $comment->add($data->$elementcommentname);
-                
             }
             else {
-                $ratingvalue=$DB->get_record('poasassignment_rating_values',array('attemptid'=>$attempt->id,'criterionid'=>$criterion->id));
-                if($attempt->draft==0)
-                    $ratingvalue->value=$data->$elementname;
-                $DB->update_record('poasassignment_rating_values',$ratingvalue);
+                $ratingvalue = $DB->get_record('poasassignment_rating_values', array('attemptid' => $attempt->id, 'criterionid' => $criterion->id));
+                if ($attempt->draft == 0)
+                    $ratingvalue->value = $data->$elementname;
+                $DB->update_record('poasassignment_rating_values', $ratingvalue);
                 
                 //$options->itemid  = $ratingvalue->id;
                 //$comment = new comment($options);
                 //$comment->add($data->$elementcommentname);
             }
-            if($attempt->draft==0)
-                $rating+=$data->$elementname*round($criterion->weight/$data->weightsum,2);
+            if ($attempt->draft == 0)
+                $rating += $data->$elementname * round($criterion->weight / $data->weightsum, 2);
         }
-        if($attempt->draft==0)
-            $attempt->rating=$rating;
+        if ($attempt->draft == 0)
+            $attempt->rating = $rating;
             //echo $attempt->draft;
             //echo $attempt->rating;
-        $attempt->ratingdate=time();
-        $DB->update_record('poasassignment_attempts',$attempt);
-        $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$assigneeid));
+        $attempt->ratingdate = time();
+        $DB->update_record('poasassignment_attempts', $attempt);
+        $assignee = $DB->get_record('poasassignment_assignee', array('id'=>$assigneeid));
 //        $assignee->rating=$rating;
         $assignee->finalized=isset($data->final);
-        $DB->update_record('poasassignment_assignee',$assignee);
-        if($this->poasassignment->flags&ALL_ATTEMPTS_AS_ONE) {
+        $DB->update_record('poasassignment_assignee', $assignee);
+        if ($this->poasassignment->flags & ALL_ATTEMPTS_AS_ONE) {
             $this->disable_previous_attempts($assignee->id);
         }
-        $this->save_files($data->commentfiles_filemanager,'commentfiles',$attempt->id);
+        $this->save_files($data->commentfiles_filemanager, 'commentfiles', $attempt->id);
+        
+        // Update grade in gradebook
+        $this->update_gradebook_grades($assigneeid);
+        
     }
     
     function disable_previous_attempts($attemptid) {
@@ -969,6 +979,19 @@ class poasassignment_model {
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         $potgraders = get_users_by_capability($context, 'mod/poasassignment:grade', '', '', '', '', '', '', false, false);
         return $potgraders;
+    }
+    
+    function update_gradebook_grades($assigneeid=0) {
+        global $CFG;
+        require_once($CFG->libdir.'/gradelib.php');
+        echo 'step 1<br>';
+        $grade = new stdClass();
+        
+        $grade->userid = 4; // TODO
+        $grade->rawgrade =80;
+        echo 'step 2<br>';
+        grade_update('mod/poasassignment', $this->poasassignment->course, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grade, null);
+        echo 'step 3<br>';
     }
 }
     

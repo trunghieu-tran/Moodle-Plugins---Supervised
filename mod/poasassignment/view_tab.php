@@ -16,7 +16,7 @@ class view_tab extends abstract_tab {
     }
 
     function view() {
-        global $OUTPUT;
+        global $OUTPUT,$USER;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         
         // Show submission statistics if user has capability
@@ -31,7 +31,7 @@ class view_tab extends abstract_tab {
         // Show poasassignment files
         echo $poasmodel->view_files($this->context->id, 'poasassignmentfiles',0);
         echo $OUTPUT->box_end();
-
+        $poasmodel->update_gradebook_grades();
         $this->view_status();
         $this->view_dates();
         $this->view_feedback();
