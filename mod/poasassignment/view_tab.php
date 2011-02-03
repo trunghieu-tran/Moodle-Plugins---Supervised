@@ -31,7 +31,6 @@ class view_tab extends abstract_tab {
         // Show poasassignment files
         echo $poasmodel->view_files($this->context->id, 'poasassignmentfiles',0);
         echo $OUTPUT->box_end();
-        $poasmodel->update_gradebook_grades();
         $this->view_status();
         $this->view_dates();
         $this->view_feedback();
