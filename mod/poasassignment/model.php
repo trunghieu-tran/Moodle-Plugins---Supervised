@@ -529,7 +529,7 @@ class poasassignment_model {
         $this->save_files($data->commentfiles_filemanager, 'commentfiles', $attempt->id);
         
         // Update grade in gradebook
-        $this->update_gradebook_grades($assigneeid);
+        $this->update_assignee_gradebook_grade($assignee);
         
     }
     
@@ -949,10 +949,10 @@ class poasassignment_model {
     }
     function email_teachers($assignee) {
         global $DB;
-        //echo 'e-mail ing?';
+        
         if(!$this->poasassignment->flags & NOTIFY_TEACHERS)
             return;
-        //echo 'need e-mail ing';
+            
         $user = $DB->get_record('user', array('id'=>$assignee->userid));
         $eventdata= new stdClass();
         
@@ -981,17 +981,24 @@ class poasassignment_model {
         return $potgraders;
     }
     
-    function update_gradebook_grades($assigneeid=0) {
-        global $CFG;
+    /**
+     * Saves assignee grade in gradebook
+     *
+     * @param object $assignee
+     */
+    function update_assignee_gradebook_grade($assignee) {
+        global $CFG, $DB;
         require_once($CFG->libdir.'/gradelib.php');
-        echo 'step 1<br>';
-        $grade = new stdClass();
         
-        $grade->userid = 4; // TODO
-        $grade->rawgrade =80;
-        echo 'step 2<br>';
+        $grade = new stdClass();
+        $grade->userid = $assignee->userid;
+        $attempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+        if ($attempt) {
+            $grade->rawgrade = $attempt->rating;
+            $grade->dategraded = $attempt->ratingdate;
+            $grade->datesubmitted = $attempt->attemptdate;
+        }
         grade_update('mod/poasassignment', $this->poasassignment->course, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grade, null);
-        echo 'step 3<br>';
     }
 }
     
