@@ -60,14 +60,14 @@ abstract class grader {
     
     // Отображает результаты тестирования ответа
     function show_result($resultmode) {
-        // В зависимости от параметра, функция отображает:
-        // * оценку
-        // * статистику успешных/неуспешных тестов
-        // * названия этих тестов
-        // * разницу между тестовыми данными и полученными из ответа
-        // * входные данные тестов
-        // * сообщения программы-тестера
-       
+        if(isset($resultmode["grade"]) && $resultmode["grade"]==true) {
+            // print student grade
+        }
+        if(isset($resultmode["statistics"]) && $resultmode["statistics"]==true) {
+            // print statistics (successfuly completed/unsuccessfuly completed)
+        }
+        if(isset($resultmode["testnames"]) && $resultmode["testnames"]==true) {
+            // print tests names
         }
         if(isset($resultmode["studentoutput"]) && $resultmode["studentoutput"]==true) {
             // print student's answer output data 
