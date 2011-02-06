@@ -158,6 +158,29 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
         echo 'number: ', $this->number, '<br/>';
+        dfa_preg_node::print_indent($indent);
+        if ($this->nullable) {    
+            echo 'nullable: true<br>';
+        } else {
+            echo 'nullable: false<br>';
+        }
+        dfa_preg_node::print_indent($indent);
+        if (is_array($this->firstpos)) {
+            dfa_preg_node::print_indent($indent);
+            echo 'firstpos: ';
+            foreach ($this->firstpos as $val) {
+                echo $val, ' ';
+            }
+            echo '<br>';
+        }
+        if (is_array($this->lastpos)) {
+            dfa_preg_node::print_indent($indent);
+            echo 'lastpos: ';
+            foreach ($this->lastpos as $val) {
+                echo $val, ' ';
+            }
+            echo '<br>';
+        }
     }
 }
 class dfa_preg_leaf_charset extends dfa_preg_leaf {
@@ -282,24 +305,40 @@ abstract class dfa_preg_operator extends dfa_preg_node {
             $operand->print_tree($indent+1);
         }
     }
+    public function print_self($indent) {
+        dfa_preg_node::print_indent($indent);
+        if ($this->nullable) {    
+            echo 'nullable: true<br>';
+        } else {
+            echo 'nullable: false<br>';
+        }
+        if (is_array($this->firstpos)) {
+            dfa_preg_node::print_indent($indent);
+            echo 'firstpos: ';
+            foreach ($this->firstpos as $val) {
+                echo $val, ' ';
+            }
+            echo '<br>';
+        }
+        if (is_array($this->lastpos)) {
+            dfa_preg_node::print_indent($indent);
+            echo 'lastpos: ';
+            foreach ($this->lastpos as $val) {
+                echo $val, ' ';
+            }
+            echo '<br>';
+        }
+    }
 }
 class dfa_preg_node_concat extends dfa_preg_operator {
     public function nullable() {
-        $result = true;
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            if(!$this->pregnode->operands[$key]->nullable()) {
-                $result = false;
-            }
-        }
-        $this->nullable = $result;
-        return $result;
+        $secnull = $this->pregnode->operands[1]->nullable();
+        $this->nullable = $this->pregnode->operands[0]->nullable() && $secnull;
+        return $this->nullable;
     }
     public function firstpos() {
-        $this->firstpos = array();
         if ($this->pregnode->operands[0]->nullable) {
-            foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->firstpos = array_merge($this->firstpos, $this->pregnode->operands[$key]->firstpos());
-        }
+            $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
         } else {
             $this->firstpos = $this->pregnode->operands[0]->firstpos();
             $this->pregnode->operands[1]->firstpos();
@@ -307,11 +346,8 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = array();
         if ($this->pregnode->operands[1]->nullable) {
-            foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->lastpos = array_merge($this->lastpos, $this->pregnode->operands[$key]->lastpos());
-        }
+            $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
         } else {
             $this->lastpos = $this->pregnode->operands[1]->lastpos();
             $this->pregnode->operands[0]->lastpos();
@@ -332,31 +368,21 @@ class dfa_preg_node_concat extends dfa_preg_operator {
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
         echo 'type: node concatenation<br/>';
+        parent::print_self($indent);
     }
 }
 class dfa_preg_node_alt extends dfa_preg_operator {
     public function nullable() {
-        $result = false;
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            if($this->pregnode->operands[$key]->nullable()) {
-                $result = true;
-            }
-        }
-        $this->nullable = $result;
-        return $result;
+        $firnull = $this->pregnode->operands[0]->nullable();
+        $this->nullable = $firnull || $this->pregnode->operands[1]->nullable();
+        return $this->nullable;
     }
     public function firstpos() {
-        $this->firstpos = array();
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->firstpos = array_merge($this->firstpos, $this->pregnode->operands[$key]->firstpos());
-        }
+        $this->firstpos = array_merge($this->pregnode->operands[0]->firstpos(), $this->pregnode->operands[1]->firstpos());
         return $this->firstpos;
     }
     public function lastpos() {
-        $this->lastpos = array();
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->lastpos = array_merge($this->lastpos, $this->pregnode->operands[$key]->lastpos());
-        }
+        $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
         return $this->lastpos;
     }
     public function not_supported() {
@@ -365,6 +391,7 @@ class dfa_preg_node_alt extends dfa_preg_operator {
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
         echo 'type: node alternative<br/>';
+        parent::print_self($indent);
     }
 }
 class dfa_preg_node_assert extends dfa_preg_operator {
@@ -421,6 +448,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         echo 'subtype: ', $subtype, '<br/>';
         dfa_preg_node::print_indent($indent);
         echo 'number: ', $this->number, '<br/>';
+        parent::print_self();
     }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_operator {
@@ -448,11 +476,14 @@ class dfa_preg_node_finite_quant extends dfa_preg_operator {
     }
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
-        echo 'type: node finite quant<br/>';
+        echo 'type: node quant<br/>';
         dfa_preg_node::print_indent($indent);
         echo 'left border: ', $this->pregnode->leftborder, '<br/>';
-        dfa_preg_node::print_indent($indent);
-        echo 'right border: ', $this->pregnode->rightborder, '<br/>';
+        if (!is_a($this, 'dfa_preg_node_infinite_quant')) {    
+            dfa_preg_node::print_indent($indent);
+            echo 'right border: ', $this->pregnode->rightborder, '<br/>';
+        }
+        parent::print_self($indent);
     }
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
@@ -465,8 +496,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
         echo 'type: node infinite quant<br/>';
-        dfa_preg_node::print_indent($indent);
-        echo 'left border: ', $this->pregnode->leftborder, '<br/>';
+        parent::print_self($indent);
     }
 }
 ?>
