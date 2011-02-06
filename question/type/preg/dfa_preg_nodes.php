@@ -355,9 +355,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
-        foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->followpos($fpmap);
-        }
+        parent::followpos(&$fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $key) {
             dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
         }        
@@ -488,7 +486,7 @@ class dfa_preg_node_finite_quant extends dfa_preg_operator {
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function followpos(&$fpmap) {
-        $this->pregnode->operands[0]->followpos($fpmap);
+        parent::followpos(&$fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
             dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
         }
