@@ -114,7 +114,7 @@ class dfa_preg_matcher extends preg_matcher {
     *Function numerate leafs, nodes use for find leafs. Start on root and move to leafs.
     *Put pair of number=>character to $this->connection[$index][].
     *@param $node current node (or leaf) for numerating.
-    */
+    
     function numeration($node, $index) {
         if ($node->type==NODE && $node->subtype == NODE_ASSERTTF) {//assert node need number
             $node->number = ++$this->maxnum + ASSERT;
@@ -141,11 +141,12 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
+    */
     /**
     *Function determine: subtree with root in this node can give empty word or not.
     *@param node - node fo analyze
     *@return true if can give empty word, else false
-    */
+    
     static function nullable($node) {
         $result = false;
         if ($node->type == NODE) {
@@ -170,11 +171,12 @@ class dfa_preg_matcher extends preg_matcher {
         $node->nullable = $result;//save result in node
         return $result;
     }
+    */
     /**
     *function determine characters which can be on first position in word, which given subtree with root in this node
     *@param $node root of subtree giving word
     *@return numbers of characters (array)
-    */
+    
     static function firstpos($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -207,11 +209,12 @@ class dfa_preg_matcher extends preg_matcher {
         $node->firstpos = $result;
         return $result;
     }
+    */
     /**
     *function determine characters which can be on last position in word, which given subtree with root in this node
     *@param $node - root of subtree
     *@return numbers of characters (array)
-    */
+    
     static function lastpos($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -244,11 +247,12 @@ class dfa_preg_matcher extends preg_matcher {
         $node->lastpos = $result;
         return $result;
     }
+    */
     /**
     *function determine characters which can follow characters from this node
     *@param node - current node
     *@param fpmap - map of following of characters
-    */
+    
     static function followpos($node, &$fpmap) {
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -273,6 +277,7 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
+    */
     /**
     *function build determined finite automate, fa saving in $this->finiteautomates[$index], in $this->finiteautomates[$index][0] start state.
     *@param index number of assert (0 for main regex) for which building fa
@@ -548,7 +553,7 @@ class dfa_preg_matcher extends preg_matcher {
     /**
     *function find asserts' nodes in tree and put link to root of it to $this->roots[<number of assert>]
     *@param node - current nod for recursive search
-    */
+    
     function find_asserts($node) {
         if ($node->type == NODE) {
             switch($node->subtype) {
@@ -565,6 +570,7 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
+    */
     /**
     *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
     *@param index - number of automate
