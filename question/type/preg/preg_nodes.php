@@ -220,7 +220,11 @@ class preg_leaf_meta extends preg_leaf {
     switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $lenght = 1;
-                return true;
+                if ($pos<strlen($str) && $str[$pos] != "\n") {
+                    return true;
+                } else {
+                    return false;
+                }
                 break;
             //TODO: unicode property
             case preg_leaf_meta::SUBTYPE_WORD_CHAR:
