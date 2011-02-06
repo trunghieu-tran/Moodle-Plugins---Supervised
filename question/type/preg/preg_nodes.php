@@ -293,7 +293,11 @@ class preg_leaf_assert extends preg_leaf {
                 }
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
-                if ($pos == 0 || $pos == strlen($str) || $str[$pos] !== '_' && !ctype_alnum($str[$pos]) || $str[$pos] !== '_' && !ctype_alnum($str[$pos])) {
+                $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
+                $end = $pos==strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
+                $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                if ($start||$end||$wW||$Ww) {
                     $result = true;
                 } else {
                     $result = false;
