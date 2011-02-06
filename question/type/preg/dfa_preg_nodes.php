@@ -109,7 +109,7 @@ abstract class dfa_preg_node {
     */
     abstract public function followpos(&$fpmap);
     /**
-    *function find asserts' nodes in tree and put link to root of it to $this->roots[<number of assert>]
+    *function find asserts' nodes in tree and put link to root of it to $roots[<number of assert>]
     *@param node - current nod for recursive search
     */
     abstract public function find_asserts(&$roots);
