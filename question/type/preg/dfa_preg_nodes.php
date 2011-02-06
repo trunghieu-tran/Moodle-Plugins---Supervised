@@ -247,7 +247,11 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
     public function not_supported() {
-        return $this->pregnode->subtype != preg_leaf_assert::SUBTYPE_ESC_G;
+        if ($this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
+            return 'escg';
+        } else {
+            return false;
+        }
     }
     public function print_self($indent) {
         dfa_preg_node::print_indent($indent);
@@ -396,10 +400,19 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
     
     public function not_supported() {
-        if ($this->pregnode->subtype != preg_node_assert::SUBTYPE_PLA) {
-            $res = false;
-        } else {
-            $res = true;
+        switch ($this->subtype) {
+            case preg_node_assert::SUBTYPE_PLA:
+                $res = false;
+                break;
+            case preg_node_assert::SUBTYPE_NLA:
+                $res = 'assertff';
+                break;
+            case preg_node_assert::SUBTYPE_PLB:
+                $res = 'asserttb';
+                break;
+            case preg_node_assert::SUBTYPE_NLB:
+                $res = 'assertfb';
+                break;
         }
         return $res;
     }

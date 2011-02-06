@@ -8,6 +8,7 @@ $string['asserttf'] = 'Positive lookahead assert';
 $string['assertff'] = 'Negative lookahead assert';
 $string['asserttb'] = 'Positive lookbehind assert';
 $string['assertfb'] = 'Negative lookbehind assert';
+$string['escg'] = 'Escape G';
 $string['closeparenatstart'] = 'Regex syntax error: closing parenthesis \')\' at the start of (sub)expression.';
 $string['closeparenatverystart'] = 'Regex syntax error: closing parenthesis \')\' at the start of expression.';
 $string['condsubpatt'] = 'Conditional subpattern';
