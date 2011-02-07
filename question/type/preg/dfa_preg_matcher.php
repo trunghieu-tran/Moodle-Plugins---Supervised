@@ -473,15 +473,7 @@ class dfa_preg_matcher extends preg_matcher {
             $wres = $this->wave($currentstate, $assertnumber);
             $key = $wres->nextkey;
             $result->left = $wres->left;
-            if ($key>0) {
-                $result->next = $this->connection[$assertnumber][$key]->pregnode->character();
-            } else {//TODO: need better algoritm for search next character in negative CC
-                $char = 'a';
-                while (ord($char) < 255 && strpos($this->connection[$assertnumber][-$key], $char) !== false) {
-                    $char = chr(ord($char)+1);
-                }
-                $result->next = $char;
-            }
+            $result->next = $this->connection[$assertnumber][$key]->pregnode->character();
         } else {
             $result->next = $next;
             $wres = $this->wave($currentstate, $assertnumber);
