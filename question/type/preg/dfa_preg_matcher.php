@@ -365,7 +365,7 @@ class dfa_preg_matcher extends preg_matcher {
     */
     function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
-        $lenght = 0;//count of character matched with current leaf
+        $length = 0;//count of character matched with current leaf
         $end = false;//current state is end state, not yet
         $full = true;//if string match with asserts
         $next = 0;// character can put on next position, 0 for full matching with regex string
@@ -390,7 +390,7 @@ class dfa_preg_matcher extends preg_matcher {
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index < strlen($string)) {
-                    $found = ($this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, $lenght));
+                    $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length);
                 }
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
@@ -404,26 +404,28 @@ class dfa_preg_matcher extends preg_matcher {
                 if ($offset + $index == strlen($string)) { //must be end   
                     $found = true;
                     $foundkey = dfa_preg_leaf_meta::ENDREG;
+                    $length = 0;
                 } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {//must be end
                     $foundkey = dfa_preg_leaf_meta::ENDREG;
+                    $length = 0;
                 }
                 $maybeend = true;//may be end.
                 $substringmatch->full = true;
                 $substringmatch->index = $index;
             }
-            $index++;
+            $index += $length;
             if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
                 foreach ($this->finiteautomates[$assertnumber][$currentstate]->asserts as $assert) {
-                    $tmpres = $this->compare(substr($string, $offset + $index), $assert);//result of compare substring starting at next character with current assert
-                    if ($tmpres->next !== 0) {
+                    $tmpres = $this->compare($string, $assert, $index+$offset, false);//result of compare substring starting at next character with current assert
+                    $full = $tmpres->full && $full;
+                    if (!$tmpres->full) {
                     /* if string not match with assert then assert give borders
                        match string with regex can't be after mismatch with assert
                        p.s. string can match if it not end when assert end
                     */
-                        $full = false;
-                        if ($maxindex > $tmpres->index + $offset + $index) {
+                        if ($maxindex >= $tmpres->index + $tmpres->offset-2) {
                             $next = $tmpres->next;
-                            $maxindex = $tmpres->index + $offset + $index;
+                            $maxindex = $tmpres->index + $tmpres->offset-2;
                         }
                     }
                 }
@@ -444,11 +446,11 @@ class dfa_preg_matcher extends preg_matcher {
         //form result comparing string with regex
         $result = new stdClass;
         $result->offset = $offset;
-        if ($offset + $index - 2 < $maxindex) {//if asserts not give border to lenght of matching substring
-            if ($index - 2 == -1) {
+        if ($full) {//if asserts not give border to lenght of matching substring
+            if ($index - 1 == -1) {
                 $result->index = -1;
             } else {
-                $result->index = $offset + $index - 2;
+                $result->index = $offset + $index - 1;
             }
             $assertrequirenext = false;
         } else {
@@ -467,7 +469,7 @@ class dfa_preg_matcher extends preg_matcher {
             $result->next = 0;
             $result->left = 0;
         //determine next character, which will be correct and increment lenght of matching substring.
-        } elseif ($full && $offset + $index-2 < $maxindex) {//if assert not border next character
+        } elseif (!$assertrequirenext) {//if assert not border next character //$full && $offset + $index-1 < $maxindex && 
             $wres = $this->wave($currentstate, $assertnumber);
             $key = $wres->nextkey;
             $result->left = $wres->left;

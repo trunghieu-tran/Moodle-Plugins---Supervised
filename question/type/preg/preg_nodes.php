@@ -157,7 +157,11 @@ class preg_leaf_charset extends preg_leaf {
         if ($this->negative) {
             $result = ! $result;
         }
-        $length = 1;
+        if ($result) {
+            $length = 1;
+        } else {
+            $length = 0;
+        }
         return $result;
     }
     
@@ -217,12 +221,13 @@ class preg_leaf_meta extends preg_leaf {
         return $result;
     }
     public function match($str, $pos, &$length) {
-    switch ($this->subtype) {
+        switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
-                $lenght = 1;
                 if ($pos<strlen($str) && $str[$pos] != "\n") {
+                    $length = 1;
                     return true;
                 } else {
+                    $length = 0;
                     return false;
                 }
                 break;
@@ -238,7 +243,11 @@ class preg_leaf_meta extends preg_leaf {
         if ($this->negative) {
             $result = !$result;
         }
-        $lenght = 1;
+        if ($result) {
+            $length = 1;
+        } else {
+            $length = 0;
+        }
         return $result;
     }
 }
