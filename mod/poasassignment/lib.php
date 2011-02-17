@@ -398,3 +398,28 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
     }
     
 }
+
+
+/**
+ * Adds module specific settings to the settings block
+ *
+ * @param settings_navigation $settings The settings navigation object
+ * @param navigation_node $poasassignmentnode The node to add module settings to
+ */
+function poasassignment_extend_settings_navigation(settings_navigation $settings, navigation_node $poasassignmentnode) {
+    //echo '123!!!!';
+}
+
+function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
+    global $PAGE;
+    $navigation->add(get_string('tasksfields', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'tasksfields')));
+    $navigation->add(get_string('tasks', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'tasks')));
+    $navigation->add(get_string('view', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'view')));
+    $navigation->add(get_string('criterions', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'criterions')));
+    $navigation->add(get_string('submissions', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'submissions')));
+
+    //navigation_node::override_active_url(new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'view')));
+    //echo $PAGE->url;
+    
+    //$navigation->get(get_string('submissions', 'poasassignment'))->make_active();
+}
