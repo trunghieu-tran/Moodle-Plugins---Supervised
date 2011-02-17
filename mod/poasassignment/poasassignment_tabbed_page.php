@@ -126,4 +126,8 @@ class poasassignment_tabbed_page {
         global $OUTPUT;
         echo $OUTPUT->footer();
     }
+
+    function view_navigation() {
+        
+    }
 }
