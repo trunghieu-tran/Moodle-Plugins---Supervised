@@ -68,7 +68,8 @@ class poasassignment_tabbed_page {
             echo get_string('thismoduleisntopenedyet', 'poasassignment');
         }
         else {
-            $this->view_tabs($this->cm);
+            // TODO: убрать метод view_tabs
+            //$this->view_tabs($this->cm);
             $this->view_body();
         }
         $this->view_footer();        

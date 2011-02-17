@@ -411,15 +411,18 @@ function poasassignment_extend_settings_navigation(settings_navigation $settings
 }
 
 function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
-    global $PAGE;
-    $navigation->add(get_string('tasksfields', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'tasksfields')));
-    $navigation->add(get_string('tasks', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'tasks')));
-    $navigation->add(get_string('view', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'view')));
-    $navigation->add(get_string('criterions', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'criterions')));
-    $navigation->add(get_string('submissions', 'poasassignment'),new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'submissions')));
+    global $PAGE,$DB;
+    $tabs = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions');
 
-    //navigation_node::override_active_url(new moodle_url('/mod/poasassignment/view.php', array('id' => $cm->id, 'tab' => 'view')));
-    //echo $PAGE->url;
-    
-    //$navigation->get(get_string('submissions', 'poasassignment'))->make_active();
+    foreach($tabs as $tab) {
+        $tabtype = $tab.'_tab';
+        require_once($tabtype.'.php');
+
+        // If user has ability to view <tabname>_tab - add tab on panel
+        $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
+        $tabinstance = new $tabtype($cm, $poasassignment);
+        if ($tabinstance->has_ability_to_view()) {
+            $navigation->add(get_string($tab,'poasassignment'),new moodle_url('/mod/poasassignment/view.php',array('id' => $cm->id, 'tab' => $tab)));
+        }
+    }
 }
