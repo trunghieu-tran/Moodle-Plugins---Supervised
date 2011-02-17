@@ -933,7 +933,7 @@ class poasassignment_model {
     function trigger_poasassignment_event($mode,$assigneeid) {
         //global $DB,$USER;
         //echo 'triggering event';
-        // ïîëó÷åíèå çàäàíèÿ, îòïğàâêà îòâåòà, ïîëó÷åíèå îöåíêè
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         $eventdata = new stdClass();
         $eventdata->student=$assigneeid;
         $eventdate->poasassignmentid=$this->poasassignment->id;
