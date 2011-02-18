@@ -38,7 +38,7 @@ class tasks_tab extends abstract_tab {
         if($this->poasassignment->howtochoosetask==PARAMETERRANDOM) {
             $mform=new parametersearch_form(null,array('poasassignmentid'=>$this->poasassignment->id,'id'=>$this->cm->id));
             if($data=$mform->get_data()) {
-                // подбор задания
+                // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 //$tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id,'hidden'=>0));
                 // if($tasks) {
                     // foreach($tasks as $task) {
