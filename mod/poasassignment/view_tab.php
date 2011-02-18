@@ -45,7 +45,8 @@ class view_tab extends abstract_tab {
         if ($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             // If user have task
-            if ($DB->record_exists('poasassignment_assignee', array('userid'=>$USER->id))) {
+            if ($DB->record_exists('poasassignment_assignee',
+                    array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) {
                 $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$USER->id,
                                                                             'poasassignmentid'=>$this->poasassignment->id));
                 if ($assignee && $assignee->taskid>0) {
@@ -296,6 +297,8 @@ class view_tab extends abstract_tab {
         else {
             if($DB->record_exists('poasassignment_assignee',
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
+                $attempt=$DB->get_record('poasassignment_attempts',
+                            array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount));
                 echo $OUTPUT->heading(get_string('yoursubmissions','poasassignment'));
                 foreach($plugins as $plugin) {
                     require_once($plugin->path);
@@ -303,7 +306,7 @@ class view_tab extends abstract_tab {
                     echo $poasassignmentplugin->show_assignee_answer($poasmodel->assignee->id,$this->poasassignment->id);
                 }
                 if($this->poasassignment->flags&SEVERAL_ATTEMPTS) {
-                    if(!$attempt->final || ($attempt->final  && $attempt->rating>0 ))
+                    if($attempt && (!$attempt->final || ($attempt->final  && $attempt->rating>0 )))
                         if($submission=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
                             echo $OUTPUT->single_button(new moodle_url('submission.php',
                                             array('id'=>$this->cm->id,'assigneeid'=>$poasmodel->assignee->id)),get_string('editsubmission','poasassignment'));
