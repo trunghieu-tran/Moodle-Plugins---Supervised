@@ -35,6 +35,7 @@ $string['poasassignmentfieldset'] = 'Individual tasks';
 $string['poasassignmentname'] = 'POAS assignment name';
 $string['poasassignment'] = 'POAS assignment';
 $string['poasassignmentintro']='POAS assignment intro';
+$string['taskdescription']='Task description';
 $string['poasassignmentadministration']='Administration';
 $string['availabledate']= 'Available from';
 $string['choicedate']= 'Make choice before';

@@ -22,13 +22,11 @@ class view_tab extends abstract_tab {
         // Show submission statistics if user has capability
         if (has_capability('mod/poasassignment:grade', $this->context))
             echo '<div align="right">'.$poasmodel->get_statistics().'</div>';
-
-        echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
         
         // Show poasassignment intro
         $this->view_intro();
 
-        // Show poasassignment files
+        // Show task files
         echo $poasmodel->view_files($this->context->id, 'poasassignmentfiles',0);
         echo $OUTPUT->box_end();
         $this->view_status();
@@ -38,12 +36,16 @@ class view_tab extends abstract_tab {
     }
     
     /** Show task status
+     *
+     *  Draws box with information about student task only if individual tasks
+     *  mode is activate.
      */
     function view_status() {
         global $DB,$USER,$OUTPUT;
         // If individual tasks mode is active
         if ($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+            echo $OUTPUT->heading(get_string('status','poasassignment'));
             // If user have task
             if ($DB->record_exists('poasassignment_assignee',
                     array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) {
@@ -82,6 +84,9 @@ class view_tab extends abstract_tab {
     /** Show module intro
      */
     function view_intro() {
+        global $OUTPUT;
+        echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+        echo $OUTPUT->heading(get_string('taskdescription','poasassignment'));
         echo format_module_intro('poassignment', $this->poasassignment, $this->cm->id);
     }
 

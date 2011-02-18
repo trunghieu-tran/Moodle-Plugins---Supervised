@@ -35,6 +35,7 @@ $string['poasassignmentfieldset'] = 'Индивидуальные задания
 $string['poasassignmentname'] = 'Название задания';
 $string['poasassignment'] = 'poasassignment';
 $string['poasassignmentintro']='Краткое описание задания';
+$string['taskdescription']='Описание задания';
 $string['poasassignmentadministration']='Администрирование';
 $string['availabledate']= 'Доступно с';
 $string['choicedate']= 'Последний срок выбора задания';
