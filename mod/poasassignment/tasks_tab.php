@@ -123,9 +123,23 @@ class tasks_tab extends abstract_tab {
     }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
+        $taskgiver;
+        
         $hascapmanage=has_capability('mod/poasassignment:managetasks',
                             get_context_instance(CONTEXT_MODULE,$this->cm->id));
         $mform=$this->parameter_search();
+
+        if($this->poasassignment->howtochoosetask==STUDENTSCHOICE) {
+            require_once ('taskgivers/studentschoice.php');
+            $taskgiver= new studentschoice ();
+        }
+        if($this->poasassignment->howtochoosetask==FULLRANDOM) {
+            require_once ('taskgivers/randomchoice.php');
+            $taskgiver= new randomchoice ();
+        }
+
+        $taskgiver->process_before_tasks($this->cm->id,$this->poasassignment);
+        
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         if($this->poasassignment->howtochoosetask==STUDENTSCHOICE || $hascapmanage) {
             $table = new flexible_table('mod-poasassignment-tasks');
@@ -152,8 +166,8 @@ class tasks_tab extends abstract_tab {
             }
             $table->define_columns($columns);
             $table->define_headers($headers);
-             $table->collapsible(true);
-             $table->initialbars(true);
+            $table->collapsible(true);
+            $table->initialbars(true);
             // $table->column_class('taskfieldname', 'name');
             $table->set_attribute('class', 'tasksfields');
             $table->set_attribute('border', '1');
@@ -165,20 +179,20 @@ class tasks_tab extends abstract_tab {
                 if(!$hascapmanage && $task->hidden)
                     continue;
                 $row=array();
+
+                // Adding view icon
                 $viewurl = new moodle_url('taskview.php',array('taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
                 /* $viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
                                 '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>'; */
                 $viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('view','poasassignment').
                                 '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>';
                 $namecolumn=$task->name.' '.$viewicon;
+
                 if($task->hidden)
                     $namecolumn='<font color="#AAAAAA">'.$namecolumn;
-                if($this->poasassignment->howtochoosetask==STUDENTSCHOICE) {
-                    $takeurl = new moodle_url('warning.php?id='.$this->cm->id.'&action=taketask&taskid='.$task->id.'&userid='.$USER->id);
-                    $takeicon= '<a href="'.$takeurl.'">'.'<img src="'.$OUTPUT->pix_url('taketask','poasassignment').
-                                '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('taketask','poasassignment').'" /></a>';
-                    $namecolumn.=' '.$takeicon;
-                }
+
+                $namecolumn.=$taskgiver->get_task_extra_string($task->id,$this->cm->id);
+
                 if($hascapmanage) {
                    
                     $updateurl = new moodle_url('taskedit.php',array('taskid'=>$task->id,'mode'=>EDIT_MODE,'id'=>$this->cm->id),'u','get');
@@ -266,6 +280,7 @@ class tasks_tab extends abstract_tab {
             
 
             $table->print_html();
+            $taskgiver->process_after_tasks();
         }
         if($hascapmanage) {
             $id = $this->cm->id;
@@ -274,22 +289,8 @@ class tasks_tab extends abstract_tab {
                                                         get_string('addbuttontext','poasassignment'));
             echo '</div>';
         }
-        if($this->poasassignment->howtochoosetask==FULLRANDOM) {
-            if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
-                $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id,'hidden'=>0));
-                $tasksarray=array();
-                foreach($tasks as $task) $tasksarray[]=$task->id;
-                if(count($tasksarray)>0) {
-                    $taskid=$tasksarray[rand(0,count($tasksarray)-1)];
-                    $poasmodel->bind_task_to_assignee($USER->id,$taskid);
-                    redirect(new moodle_url('view.php',array('id'=>$this->cm->id,'tab'=>'view')),null,0);
-                    /* echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$id.
-                                                        '&action=taketaskconfirmed&userid='.$USER->id.
-                                                        '&taskid='.$taskid), 
-                                                            get_string('getrandomtask','poasassignment'),'post'); */
-                }
-            }
-        }
+
+        // TODO: выделить в класс
         if($this->poasassignment->howtochoosetask==PARAMETERRANDOM)
             $mform->display();
         
