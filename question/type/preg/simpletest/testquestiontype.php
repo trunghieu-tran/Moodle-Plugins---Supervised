@@ -536,7 +536,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result4->index == 3 && $result4->next === 0);
     }
-    function test_compare_uncanchor() {//ab
+    function test_compare_unanchor() {//ab
         $this->qtype->build_tree('ab');
         $this->qtype->finiteautomates[0][0] = new finite_automate_state;
         $this->qtype->finiteautomates[0][1] = new finite_automate_state;
@@ -551,10 +551,10 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 0);
         $result = $this->qtype->compare('OabO', 0, 1, false);
         $this->assertTrue($result->full);
-        $this->assertTrue($result->index == 2 && $result->next === 0 && $result->offset == 1);
+        $this->assertTrue($result->index == 1 && $result->next === 0 && $result->offset == 1);
         $result = $this->qtype->compare('OabO', 0, 1, true);
         $this->assertFalse($result->full);
-        $this->assertTrue($result->index == 2 && $result->next === 0 && $result->offset == 1);
+        $this->assertTrue($result->index == 1 && $result->next === 0 && $result->offset == 1);
         $result = $this->qtype->compare('OabO', 0, 2, false);
         $this->assertFalse($result->full);
         $this->assertTrue($result->index == -1 && $result->next === 'a' && $result->offset == 2);
@@ -577,7 +577,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
     }
     //General tests, testing parser + buildfa + compare (also nullable, firstpos, lastpos, followpos and other in buildfa)
     //dfa_preg_matcher without input and output data.
-    function _test_general_repeat_characters() {
+    function test_general_repeat_characters() {
         $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('cd');
         $this->assertFalse($matcher->is_matching_complete());
@@ -598,8 +598,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 33 && $matcher->next_char() ==='');
     }
-    function _test_general_assert() {
-        $matcher = new dfa_preg_matcher('^a(?=.*b)[xcvbnm]*$');
+    function test_general_assert() {
+        $matcher = new dfa_preg_matcher('^a(?=[xcvnm]*b)[xcvbnm]*$');
         $result1 = $matcher->match('an');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
@@ -617,8 +617,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
     *   this is overall test for dfa_preg_matcher class
     *   you may use it as example of test
     */
-    function _test_general_two_asserts() {
-        $matcher = new dfa_preg_matcher('^a(?=b)(?=.*c)[xcvbnm]*$');//put regular expirience in constructor for building dfa.
+    function test_general_two_asserts() {
+        $matcher = new dfa_preg_matcher('^a(?=b)(?=[xvbnm]*c)[xcvbnm]*$');//put regular expirience in constructor for building dfa.
         /*  
         *   call match method for matching string with regex, string is argument, regex was got in constructor,
         *   results of matching get with method
@@ -751,7 +751,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $matcher->match('a_incorrect');
         $this->assertTrue($matcher->next_char() === 'b');
     }
-    function _test_wave_repeat_chars() {
+    function test_wave_repeat_chars() {
         $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('ababababbbbaaaabbbabbbab');
         $this->assertTrue($matcher->next_char() === 'b');

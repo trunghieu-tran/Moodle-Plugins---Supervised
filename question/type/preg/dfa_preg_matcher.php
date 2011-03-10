@@ -374,6 +374,7 @@ class dfa_preg_matcher extends preg_matcher {
         $substringmatch = new stdClass;
         $substringmatch->full = false;
         $substringmatch->index = -1;
+        $acceptedcharcount = -1;
         do {
         /*check current character while: 1)checked substring match with regex
                                          2)current character isn't end of string
@@ -389,7 +390,7 @@ class dfa_preg_matcher extends preg_matcher {
             while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index < strlen($string)) {
+                if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
                     $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length);
                 }
                 if (!$found) {
@@ -406,7 +407,7 @@ class dfa_preg_matcher extends preg_matcher {
                     $foundkey = dfa_preg_leaf_meta::ENDREG;
                     $length = 0;
                 } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {//must be end
-                    $foundkey = dfa_preg_leaf_meta::ENDREG;
+                    //$foundkey = dfa_preg_leaf_meta::ENDREG;
                     $length = 0;
                 }
                 $maybeend = true;//may be end.
@@ -414,6 +415,9 @@ class dfa_preg_matcher extends preg_matcher {
                 $substringmatch->index = $index;
             }
             $index += $length;
+            if ($found && $foundkey != dfa_preg_leaf_meta::ENDREG) {
+                $acceptedcharcount += $length;
+            }
             if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
                 foreach ($this->finiteautomates[$assertnumber][$currentstate]->asserts as $assert) {
                     $tmpres = $this->compare($string, $assert, $index+$offset, false);//result of compare substring starting at next character with current assert
@@ -423,9 +427,9 @@ class dfa_preg_matcher extends preg_matcher {
                        match string with regex can't be after mismatch with assert
                        p.s. string can match if it not end when assert end
                     */
-                        if ($maxindex >= $tmpres->index + $tmpres->offset-2) {
+                        if ($maxindex >= $tmpres->index + $tmpres->offset) {
                             $next = $tmpres->next;
-                            $maxindex = $tmpres->index + $tmpres->offset-2;
+                            $maxindex = $tmpres->index + $tmpres->offset;
                         }
                     }
                 }
@@ -447,19 +451,15 @@ class dfa_preg_matcher extends preg_matcher {
         $result = new stdClass;
         $result->offset = $offset;
         if ($full) {//if asserts not give border to lenght of matching substring
-            if ($index - 1 == -1) {
-                $result->index = -1;
-            } else {
-                $result->index = $offset + $index - 1;
-            }
+            $result->index = $acceptedcharcount;
             $assertrequirenext = false;
         } else {
             $result->index = $maxindex;
             $assertrequirenext = true;
         }
-        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endanchor) {//if all string match with regex.
+        if (strlen($string) == $result->index + 1 && $end && $full && $correct || $maybeend && !$endanchor && $full) {//if all string match with regex.
             $result->full = true;
-        } elseif ($substringmatch->full && !$endanchor) {
+        } elseif ($substringmatch->full && !$endanchor && $full) {
             $result->full = true;
             $result->index = $substringmatch->index -1;
         } else {
@@ -625,6 +625,12 @@ class dfa_preg_matcher extends preg_matcher {
         } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
             foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
+                    array_push($equnum, $num);
+                }
+            }
+        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {//if this leaf is metacharacter
+            foreach ($this->connection[$index] as $num => $cc) {
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
                     array_push($equnum, $num);
                 }
             }

@@ -143,6 +143,10 @@ class preg_leaf_charset extends preg_leaf {
     }
 
     public function match($str, $pos, &$length) {
+        if ($pos>=strlen($str)) {
+            $length = 0;
+            return false;
+        }
         $charsetcopy = $this->charset;
         $strcopy = $str;
         $textlib = textlib_get_instance();//use textlib to avoid unicode problems
@@ -221,6 +225,10 @@ class preg_leaf_meta extends preg_leaf {
         return $result;
     }
     public function match($str, $pos, &$length) {
+        if ($pos>=strlen($str)) {
+            $length = 0;
+            return false;
+        }
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 if ($pos<strlen($str) && $str[$pos] != "\n") {
@@ -283,7 +291,7 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     public function match($str, $pos, &$length) {
-        $lenght = 0;
+        $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
@@ -304,8 +312,10 @@ class preg_leaf_assert extends preg_leaf {
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
                 $end = $pos==strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
-                $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
-                $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                if (!$end) {
+                    $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                    $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                }
                 if ($start||$end||$wW||$Ww) {
                     $result = true;
                 } else {
@@ -323,7 +333,31 @@ class preg_leaf_assert extends preg_leaf {
         return $result;
     }
     public function character() {
-        echo 'TODO: implements abstract function character for preg_leaf_backref class before use it!';
+        switch ($this->subtype) {
+            case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                if ($this->negative) {
+                    return 'notstringstart';
+                } else {
+                    return 'stringstart';
+                }
+                break;
+            case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_DOLLAR:
+                if ($this->negative) {
+                    return ' notstringend';
+                } else {
+                    return '';
+                }
+                break;
+            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+                if ($this->negative) {
+                    return 'notwordchar';
+                } else {
+                    return 'wordchar';
+                }
+                break;
+        }
     }
 }
 
