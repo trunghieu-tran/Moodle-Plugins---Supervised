@@ -483,7 +483,7 @@ class dfa_preg_node_finite_quant extends dfa_preg_operator {
         return $this->lastpos;
     }
     public function not_supported() {
-        return false;
+        return $this->pregnode->greed;
     }
     public function print_self($indent) {
         $this->print_indent($indent);
