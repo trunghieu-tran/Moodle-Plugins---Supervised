@@ -324,17 +324,8 @@ class preg_matcher {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
-        $curr = -1;
         while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                //$parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
+            $parser->doParse($token->type, $token->value);
         }
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $errstring) {
