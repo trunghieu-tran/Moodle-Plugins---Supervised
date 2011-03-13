@@ -38,6 +38,139 @@ abstract class dfa_preg_node {
     }
     
     /**
+    * DFA node factory
+    * @param pregnode preg_node child class instance
+    * @return corresponding dfa_preg_node child class instance
+    */
+    static public function &from_preg_node($pregnode) {
+        $name = $pregnode->name();
+        switch ($name) {
+            case 'node_finite_quant':
+                $pregnode =& self::convert_finite_quant($pregnode);
+                break;
+            case 'node_infinite_quant':
+                $pregnode =& self::convert_infinite_quant($pregnode);
+                break;
+            case 'node_subpatt':
+                $pregnode =& self::convert_subpatt($pregnode);
+                break;
+        }
+        $dfanodename = 'dfa_preg_'.$pregnode->name();
+        if (class_exists($dfanodename)) {
+            $dfanode = new $dfanodename($pregnode);
+        } else {
+            $dfanode = $pregnode;
+        }
+        return $dfanode;
+    }
+    
+    /**
+    * Function convert subpattern to grouping
+    * @param node node with subpattern
+    * @return node without subpattern, because grouping isn't node
+    */
+    static protected function &convert_subpatt($node) {
+        return $node->operands[0];
+    }
+    
+    /**
+    * Function convert operand{} quantificater to operand and operand? combination
+    * @param node node with {}
+    * @return node subtree with ? 
+    */
+    static protected function &convert_finite_quant($node) {
+        if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] = self::copy_preg_node($tmp);
+            $subroot->operands[1] = self::copy_preg_node($tmp);
+            $count = $node->leftborder;
+            for ($i=2; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] = self::copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            $tmp = new preg_node_finite_quant;
+            $tmp->leftborder = 0;
+            $tmp->rightborder = 1;
+            $tmp->operands[0] = $node->operands[0];
+            if ($node->leftborder == 0) {
+                $subroot->operands[0] =& self::copy_preg_node($tmp);
+                $subroot->operands[1] =& self::copy_preg_node($tmp);
+                $count = $node->rightborder - 2;
+            } else if ($node->leftborder == 1) {
+                $subroot->operands[1] =& self::copy_preg_node($tmp);
+                $count = $node->rightborder - 2;
+            } else {
+                $count = $node->rightborder - $node->leftborder;
+            }
+            for ($i=0; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] =& self::copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            return $subroot;
+        }
+        return $node;
+    }
+    
+    /**
+    * Function convert operand{} quantificater to operand, operand? and operand* combination
+    * @param node node with {}
+    * @return node subtree with ? *
+    */
+    static protected function &convert_infinite_quant($node) {
+        if ($node->leftborder == 0) {
+            return $node;
+        } else if ($node->leftborder == 1) {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] =& self::copy_preg_node($tmp);
+            $subroot->operands[1] =& self::copy_preg_node($node);
+            $subroot->operands[1]->leftborder = 0;
+        } else {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] =& self::copy_preg_node($tmp);
+            $subroot->operands[1] =& self::copy_preg_node($tmp);
+            $count = $node->leftborder;
+            for ($i=2; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] =& self::copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            $newsubroot = new preg_node_concat;
+            $newsubroot->operands[0] =& self::copy_preg_node($subroot);
+            $newsubroot->operands[1] =& self::copy_preg_node($node);
+            $newsubroot->operands[1]->leftborder = 0;
+            $subroot = $newsubroot;
+        }
+        return $subroot;
+    }
+    
+    /**
+    * Function copy node with subtree, no reference
+    * @param node node for copying
+    * @return copy of node(and subtree)
+    */
+    static protected function &copy_preg_node($node) {
+        $name = 'preg_'.$node->name();
+        $result = new $name;
+        $result = clone $node;
+        if (is_a($node, 'preg_operator')) {
+            foreach ($result->operands as $key=>$operand) {
+                if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
+                    $result->operands[$key] = self::copy_preg_node($operand);
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /**
     *Function print indent before something
     *@param indent size of indent in count of 5 dot
     */
@@ -59,22 +192,7 @@ abstract class dfa_preg_node {
     */
     abstract public function print_self($indent);
 
-    /**
-    * DFA node factory
-    * @param pregnode preg_node child class instance
-    * @return corresponding dfa_preg_node child class instance
-    */
-    static public function &from_preg_node($pregnode) {
-        $dfanodename = 'dfa_preg_'.$pregnode->name();
-        if (class_exists($dfanodename)) {
-            $dfanode = new $dfanodename($pregnode);
-        } else {
-            $dfanode = $pregnode;
-        }
-        return $dfanode;
-    }
-
-
+    
     /**
     * Return false if the node is supported by engine, interface string name to report as unsupported if not
     */
