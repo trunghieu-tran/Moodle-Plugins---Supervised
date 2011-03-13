@@ -29,7 +29,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
     function test_alternative() {
-        $matcher = new dfa_preg_matcher('^ab|cd$');
+        $matcher = new dfa_preg_matcher('^(ab|cd)$');
         $result = $matcher->match('ad');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b');
@@ -134,10 +134,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 100 && $matcher->next_char() === '');
     }
     function test_assert() {
-        $matcher = new dfa_preg_matcher('^a(?=.*b)[xcvbnm]*$');
+        $matcher = new dfa_preg_matcher('^a(?=[xcvnm]*b)[xcvbnm]*$');
         $result = $matcher->match('ax');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'b');
         $result = $matcher->match('abxcv');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 4 && $matcher->next_char() === '');
@@ -149,10 +149,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('ab');
         $matcher->match('OabO');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
         $matcher->match('OacO');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'b' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b' && $matcher->first_correct_character_index() == 1);
     }
     function test_left_anchor() {
         $matcher = new dfa_preg_matcher('^ab');
@@ -167,10 +167,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('ab$');
         $matcher->match('Oab');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
         $matcher->match('OabO');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
     }
     function test_full_anchor() {
         $matcher = new dfa_preg_matcher('^ab$');
