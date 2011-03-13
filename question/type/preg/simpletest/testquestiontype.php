@@ -639,37 +639,9 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
-    //Unit test for copy_subtree()
-    function _test_copy_subtree() {
-        $this->qtype->build_tree('(?:[original][original])(?:[original][original])');
-        $this->qtype->roots[1] = dfa_preg_matcher::copy_subtree($this->qtype->roots[0]);
-        $this->assertTrue($this->qtype->roots[1]->pregnode->operands[0]->pregnode->operands[0]->chars == 'original' && 
-                          $this->qtype->roots[1]->pregnode->operands[0]->pregnode->operands[1]->chars == 'original' &&
-                          $this->qtype->roots[1]->pregnode->operands[1]->pregnode->operands[0]->chars == 'original' && 
-                          $this->qtype->roots[1]->pregnode->operands[1]->pregnode->operands[1]->chars == 'original');
-        $this->qtype->roots[1]->pregnode->operands[0]->pregnode->operands[0]->chars = 'cloned';
-        $this->qtype->roots[1]->pregnode->operands[0]->pregnode->operands[1]->chars = 'cloned';
-        $this->qtype->roots[1]->pregnode->operands[1]->pregnode->operands[0]->chars = 'cloned';
-        $this->qtype->roots[1]->pregnode->operands[1]->pregnode->operands[1]->chars = 'cloned';
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->chars == 'original' && 
-                          $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->chars == 'original' &&
-                          $this->qtype->roots[0]->pregnode->operands[1]->pregnode->operands[0]->chars == 'original' && 
-                          $this->qtype->roots[0]->pregnode->operands[1]->pregnode->operands[1]->chars == 'original');
-    }
-    //Unit tests for convert_tree()
-    function _test_convert_tree_quantificator_plus() {//a+b
-        $this->qtype->build_tree('a+b');
-        $this->qtype->roots[0]->pregnode->operands[0]->subtype = NODE_PLUSQUANT;
-        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
-        $this->assertTrue($this->qtype->roots[0]->pregnode->operands[0]->subtype == NODE_CONC && $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->type == LEAF &&
-                          $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->type == NODE && $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[1]->subtype == NODE_ITER);
-    }
-    function _test_convert_tree_quantificator_l2r4() {//a{2,4}b
+    //Unit tests for convert tree
+    function test_convert_tree_quantificator_l2r4() {//a{2,4}b
         $this->qtype->build_tree('a{2,4}b');
-        $this->qtype->roots[0]->pregnode->operands[0]->subtype = NODE_QUANT;
-        $this->qtype->roots[0]->pregnode->operands[0]->leftborder = 2;
-        $this->qtype->roots[0]->pregnode->operands[0]->rightborder = 4;
-        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $result1 = $this->qtype->compare('ab', 0);
@@ -683,12 +655,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertFalse($result5->full);
     }
-    function _test_convert_tree_quantificator_l0r4() {//a{,4}b
+    function test_convert_tree_quantificator_l0r4() {//a{,4}b
         $this->qtype->build_tree('a{,4}b');
-        $this->qtype->roots[0]->pregnode->operands[0]->subtype = NODE_QUANT;
-        $this->qtype->roots[0]->pregnode->operands[0]->leftborder = 0;
-        $this->qtype->roots[0]->pregnode->operands[0]->rightborder = 4;
-        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $result0 = $this->qtype->compare('b', 0);
@@ -704,12 +672,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertFalse($result5->full);
     }
-    function _test_convert_tree_quantificator_l2rinf() {//a{2,}b
+    function test_convert_tree_quantificator_l2rinf() {//a{2,}b
         $this->qtype->build_tree('a{2,}b');
-        $this->qtype->roots[0]->pregnode->operands[0]->subtype = NODE_QUANT;
-        $this->qtype->roots[0]->pregnode->operands[0]->leftborder = 2;
-        $this->qtype->roots[0]->pregnode->operands[0]->rightborder = -1;
-        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $result1 = $this->qtype->compare('ab', 0);
@@ -723,9 +687,8 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
     }
-    function _test_convert_tree_subpattern() {//('a|b')
+    function test_convert_tree_subpattern() {//('a|b')
         $this->qtype->build_tree('(a|b)');
-        dfa_preg_matcher::convert_tree($this->qtype->roots[0]);
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $result1 = $this->qtype->compare('b', 0);
@@ -772,7 +735,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $matcher->match('abcd');
         $this->assertTrue($matcher->characters_left() == 5);
     }
-    function _test_wave_left_complex_regex() {
+    function test_wave_left_complex_regex() {
         $matcher = new dfa_preg_matcher('ab+c{5,9}(?:ab?c|dfg)|averylongword');
         $matcher->match('a');
         $this->assertTrue($matcher->characters_left() == 8);
