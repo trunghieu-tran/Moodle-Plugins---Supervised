@@ -59,41 +59,6 @@
         $this->errormessages[] = get_string($errorstr,'qtype_preg',$a);
         $this->error = true;
     }
-
-    static function is_conc($prevtoken, $currtoken) {
-        /*static $condsubpatt = false;
-        static $close = 0;
-        if ($currtoken == preg_parser_yyParser::CONDSUBPATT) {
-            $condsubpatt = true;
-            $close = -1;
-        }
-        if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
-            $close++;
-        }
-        if ($condsubpatt && ($currtoken == preg_parser_yyParser::OPENBRACK || $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF  ||
-            $currtoken == preg_parser_yyParser::ASSERT_FB || $currtoken == preg_parser_yyParser::ASSERT_TB || $currtoken == preg_parser_yyParser::GROUPING ||
-            $currtoken == preg_parser_yyParser::ONETIMESUBPATT)) {
-            $close--;
-        }
-        if ($close == 0) {
-            $condsubpatt = false;
-        }
-        $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
-                  $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
-                  $prevtoken == preg_parser_yyParser::ITER || $prevtoken == preg_parser_yyParser::LAZY_ITER ||
-                  $prevtoken == preg_parser_yyParser::PLUS || $prevtoken == preg_parser_yyParser::LAZY_PLUS ||
-                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT ||
-                  $prevtoken == preg_parser_yyParser::WORDBREAK || $prevtoken == preg_parser_yyParser::WORDNOTBREAK);
-        $flag2 = ($currtoken == preg_parser_yyParser::PARSLEAF || $currtoken == preg_parser_yyParser::OPENBRACK ||
-                  $currtoken == preg_parser_yyParser::GROUPING || $currtoken == preg_parser_yyParser::CONDSUBPATT ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB||
-                  $currtoken == preg_parser_yyParser::WORDBREAK || $currtoken == preg_parser_yyParser::WORDNOTBREAK ||
-                  $currtoken == preg_parser_yyParser::ONETIMESUBPATT);
-        $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
-        return $flag;*/
-        return false;
-    }
 }
 %parse_failure {
     if (!$this->error) {
@@ -113,15 +78,7 @@
 start ::= lastexpr(B). {
     $this->root = B;
 }
-expr(A) ::= expr(B) CONC expr(C). {
-    //ECHO 'CONC <br/>';
-    A = new preg_node_concat;
-    A->operands[0] = B;
-    A->operands[1] = C;
-    $this->reducecount++;
-}
 expr(A) ::= expr(B) expr(C). [CONC] {
-    //ECHO 'CONC1 <br/>';
     A = new preg_node_concat;
     A->operands[0] = B;
     A->operands[1] = C;
