@@ -64,33 +64,28 @@ class dfa_preg_matcher extends preg_matcher {
     }
     
     protected function accept_node($node) {
-        /* Old style function
-        switch ($node->subtype) {
-            case LEAF_LINK:
+        switch ($node->type) {
+            case preg_node::TYPE_LEAF_BACKREF:
                 $this->flags['link'] = true;
                 return false;
-            case NODE_CONDSUBPATT:
+            case preg_node::TYPE_NODE_COND_SUBPATT:
                 $this->flags['condsubpatt'] = true;
                 return false;
-            case NODE_ASSERTTB:
-                $this->flags['asserttb'] = true;
+            case preg_node::TYPE_LEAF_RECURSION:
+                $this->flags['leafrecursion'] = true;
                 return false;
-            case NODE_ASSERTFB:
-                $this->flags['assertfb'] = true;
+            case preg_node::TYPE_LEAF_OPTIONS:
+                $this->flags['leafoptions'] = true;
                 return false;
-            case NODE_ASSERTFF:
-                $this->flags['assertff'] = true;
-                return false;
-            case NODE_QUESTQUANT:
-            case NODE_ITER:
-            case NODE_PLUSQUANT:
-            case NODE_QUANT:
-                if ($node->greed === false) {
-                    $this->flags['lazyquant'] = true;
+            default:
+                $unsupported = $node->not_supported();
+                if ($unsupported) {
+                    $this->flags[$unsupported] = true;
                 }
+                break;
                 return false;
-        }*/
-        return true;//заглушка
+        }
+        return true;
     }
 
     /**

@@ -400,7 +400,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
     
     public function not_supported() {
-        switch ($this->subtype) {
+        switch ($this->pregnode->subtype) {
             case preg_node_assert::SUBTYPE_PLA:
                 $res = false;
                 break;
