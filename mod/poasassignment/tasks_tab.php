@@ -130,11 +130,11 @@ class tasks_tab extends abstract_tab {
         $mform=$this->parameter_search();
 
         if($this->poasassignment->howtochoosetask==STUDENTSCHOICE) {
-            require_once ('taskgivers/studentschoice.php');
+            require_once ('taskgivers/studentschoice/studentschoice.php');
             $taskgiver= new studentschoice ();
         }
         if($this->poasassignment->howtochoosetask==FULLRANDOM) {
-            require_once ('taskgivers/randomchoice.php');
+            require_once ('taskgivers/randomchoice/randomchoice.php');
             $taskgiver= new randomchoice ();
         }
 

@@ -29,6 +29,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $DB;
+$taskgivers=$DB->get_records('poasassignment_taskgivers');
+foreach ($taskgivers as $taskgiver) {
+    include_once dirname(dirname(dirname(__FILE__))).'\\'.$taskgiver->langpath.'\\en.php';
+}
+
 $string['modulename'] = 'POAS assignment';
 $string['modulenameplural'] = 'POAS assignments';
 $string['poasassignmentfieldset'] = 'Individual tasks';
