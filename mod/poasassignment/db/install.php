@@ -47,7 +47,17 @@ function xmldb_poasassignment_install() {
     $record->path='answer/answer_text.php';
     if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
         $DB->insert_record('poasassignment_plugins',$record);
-        
+
+    // Add taskgivers in table
+    $record = new stdClass();
+    $record->path = 'taskgivers/randomchoice.php';
+    if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
+        $DB->insert_record('poasassignment_taskgivers',$record);
+
+    $record->path = 'taskgivers/studentschoice.php';
+    if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
+        $DB->insert_record('poasassignment_taskgivers',$record);
+
     // Add message provider
     $provider = new stdClass();
     $provider->name = 'poasassignment_updates';
