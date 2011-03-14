@@ -50,11 +50,22 @@ function xmldb_poasassignment_install() {
 
     // Add taskgivers in table
     $record = new stdClass();
-    $record->path = 'taskgivers/randomchoice.php';
+
+    $record->name = 'randomchoice';
+    $record->path = 'taskgivers/randomchoice/randomchoice.php';
+    $record->langpath = 'taskgivers/randomchoice/lang';    
     if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
         $DB->insert_record('poasassignment_taskgivers',$record);
 
-    $record->path = 'taskgivers/studentschoice.php';
+    $record->name = 'parameterchoice';
+    $record->path = 'taskgivers/parameterchoice/parameterchoice.php';
+    $record->langpath = 'taskgivers/parameterchoice/lang';
+    if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
+        $DB->insert_record('poasassignment_taskgivers',$record);
+
+    $record->name = 'studentschoice';
+    $record->path = 'taskgivers/studentschoice/studentschoice.php';
+    $record->langpath = 'taskgivers/studentschoice/lang';
     if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
         $DB->insert_record('poasassignment_taskgivers',$record);
 
