@@ -6,6 +6,8 @@ class studentschoice extends taskgiver {
 //    function print_before_tasks() {
 //        echo "students choice";
 //    }
+    public $showtasks = true;
+    
     function get_task_extra_string($taskid,$cmid) {
         global $USER,$OUTPUT;
 
