@@ -193,5 +193,23 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('Incorrect!!!');
         $this->assertFalse($matcher->is_matching_complete());
     }
+    function test_digit() {
+        $matcher = new dfa_preg_matcher('(\d)+x');
+        $matcher->match('273x');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('ax');
+        $char = $matcher->next_char();
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue(ctype_digit($char));
+    }
+    function test_word_char() {
+        $matcher = new dfa_preg_matcher('a\wa');
+        $matcher->match('a_a');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('a{a');
+        $char = $matcher->next_char();
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue(ctype_alnum($char) || $char === '_');
+    }
 }
 ?>
