@@ -143,6 +143,7 @@ class preg_matcher {
     @return bool is tree accepted
     */
     protected function accept_regex($node) {
+        /*Old style function
         $this->accept_node($node);
         if ($node->type == NODE) {
             if ($node->subtype == NODE_CONDSUBPATT) {
@@ -153,7 +154,7 @@ class preg_matcher {
             }
             $this->accept_regex($node->firop);
         }
-
+        */
         //Add error messages for unsupported nodes
         foreach ($this->flags as $key => $value) {
             $this->errors[] = get_string('unsupported','qtype_preg',get_string($key, 'qtype_preg'));
@@ -323,17 +324,8 @@ class preg_matcher {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
-        $curr = -1;
         while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                //$parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
+            $parser->doParse($token->type, $token->value);
         }
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $errstring) {
