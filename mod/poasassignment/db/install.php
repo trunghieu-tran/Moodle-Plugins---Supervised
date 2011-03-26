@@ -62,27 +62,8 @@ function xmldb_poasassignment_install() {
             echo $record->langpath.'<br>';
             if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
                 $DB->insert_record('poasassignment_taskgivers',$record);
-            //require_once(dirname(dirname(dirname(__FILE__))).'\\taskgivers\\'.$file.'\\lang\\en.php');
         }
     }
-
-    // $record->name = 'randomchoice';
-    // $record->path = 'taskgivers/randomchoice/randomchoice.php';
-    // $record->langpath = 'taskgivers/randomchoice/lang';    
-    // if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
-        // $DB->insert_record('poasassignment_taskgivers',$record);
-
-    // $record->name = 'parameterchoice';
-    // $record->path = 'taskgivers/parameterchoice/parameterchoice.php';
-    // $record->langpath = 'taskgivers/parameterchoice/lang';
-    // if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
-        // $DB->insert_record('poasassignment_taskgivers',$record);
-
-    // $record->name = 'studentschoice';
-    // $record->path = 'taskgivers/studentschoice/studentschoice.php';
-    // $record->langpath = 'taskgivers/studentschoice/lang';
-    // if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
-        // $DB->insert_record('poasassignment_taskgivers',$record);
 
     // Add message provider
     $provider = new stdClass();
