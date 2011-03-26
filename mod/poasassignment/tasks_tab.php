@@ -34,24 +34,30 @@ class tasks_tab extends abstract_tab {
     }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
-        $taskgiver;
         
         $hascapmanage=has_capability('mod/poasassignment:managetasks',
-                            get_context_instance(CONTEXT_MODULE,$this->cm->id));
+                            get_context_instance(CONTEXT_MODULE, $this->cm->id));
         //$mform=$this->parameter_search();
 
-        if($this->poasassignment->howtochoosetask==STUDENTSCHOICE) {
-            require_once ('taskgivers/studentschoice/studentschoice.php');
-            $taskgiver = new studentschoice ();
-        }
-        if($this->poasassignment->howtochoosetask==FULLRANDOM) {
-            require_once ('taskgivers/randomchoice/randomchoice.php');
-            $taskgiver = new randomchoice ();
-        }
-        if($this->poasassignment->howtochoosetask==PARAMETERRANDOM) {
-            require_once ('taskgivers/parameterchoice/parameterchoice.php');
-            $taskgiver = new parameterchoice ();
-        }
+        $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->howtochoosetask));
+        require_once ($tg->path);
+        $taskgivername = $tg->name;
+        $taskgiver = new $taskgivername();
+        //echo $this->poasassignment->howtochoosetask;
+        //echo $tg->name;
+        
+        // if($this->poasassignment->howtochoosetask==STUDENTSCHOICE) {
+            // require_once ('taskgivers/studentschoice/studentschoice.php');
+            // $taskgiver = new studentschoice ();
+        // }
+        // if($this->poasassignment->howtochoosetask==FULLRANDOM) {
+            // require_once ('taskgivers/randomchoice/randomchoice.php');
+            // $taskgiver = new randomchoice ();
+        // }
+        // if($this->poasassignment->howtochoosetask==PARAMETERRANDOM) {
+            // require_once ('taskgivers/parameterchoice/parameterchoice.php');
+            // $taskgiver = new parameterchoice ();
+        // }
 
         $taskgiver->process_before_tasks($this->cm->id,$this->poasassignment);
         

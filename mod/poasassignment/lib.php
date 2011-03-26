@@ -92,7 +92,7 @@ function poasassignment_add_instance($poasassignment) {
     $poasassignment->timecreated = time();
     
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $poasassignment->id=$poasassignmentmodelinstance->add_instance();
+    $poasassignment->id = $poasassignmentmodelinstance->add_instance();
     poasassignment_grade_item_update($poasassignment);
     return $poasassignment->id;
 }
@@ -112,7 +112,7 @@ function poasassignment_update_instance($poasassignment) {
     $poasassignment->id = $poasassignment->instance;
     
     $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $id=$poasassignmentmodelinstance->update_instance();
+    $id = $poasassignmentmodelinstance->update_instance();
     poasassignment_grade_item_update($poasassignment);
     return $id;
 }
