@@ -43,7 +43,6 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_poasassignment_upgrade($oldversion=0) {
 
     global $CFG, $THEME, $db;
-
     $result = true;
 
 /// And upgrade begins here. For each one, you'll need one

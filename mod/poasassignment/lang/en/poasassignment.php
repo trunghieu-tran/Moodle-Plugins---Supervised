@@ -29,10 +29,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $DB;
-$taskgivers=$DB->get_records('poasassignment_taskgivers');
-foreach ($taskgivers as $taskgiver) {
-    include_once dirname(dirname(dirname(__FILE__))).'\\'.$taskgiver->langpath.'\\en.php';
+$files = scandir( dirname(dirname(dirname(__FILE__))).'\\taskgivers');
+foreach($files as $file) {
+    if(is_dir(dirname(dirname(dirname(__FILE__))).'\\taskgivers\\'.$file) && $file !== '.' && $file !== '..') {
+        require_once(dirname(dirname(dirname(__FILE__))).'\\taskgivers\\'.$file.'\\lang\\en.php');
+    }
 }
 
 $string['modulename'] = 'POAS assignment';
@@ -72,9 +73,6 @@ $string['howtochoosetask_help']='This setting has three options:
 * Random task - each student gets random task
 * Using the parameters - each student specifies desired parameters
 * Students choose their tasks - students can see all tasks and choose one of them';
-$string['randomtask']='Random task';
-$string['parameterchoice']='Using the parameters';
-$string['studentchoice']='Students choose their tasks';
 $string['secondchoice']='Second choice';
 $string['secondchoice_help']='Student can refuse task and make new choice';
 $string['uniqueness']='Task uniqueness';

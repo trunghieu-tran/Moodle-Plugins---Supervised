@@ -1000,5 +1000,14 @@ class poasassignment_model {
         }
         grade_update('mod/poasassignment', $this->poasassignment->course, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grade, null);
     }
+    static function user_have_active_task($userid, $poasassignmentid) {
+        if ($DB->record_exists('poasassignment_assignee',
+                    array('userid'=>$userid,'poasassignmentid'=>$poasassignmentid))) {
+            $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$userid,
+                                                                            'poasassignmentid'=>$poasassignmentid));
+            return ($assignee && $assignee->taskid>0);
+        }
+        return false;
+    }
 }
     
