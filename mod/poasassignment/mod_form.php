@@ -129,14 +129,13 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         foreach ($taskgivers as $taskgiver) {
             array_push($names, get_string($taskgiver->name,'poasassignment'));
         }
-        foreach($names as $name)
-            echo $name;
-
-        $mform->addElement('select', 'howtochoosetask', get_string('howtochoosetask', 'poasassignment'),
-                            array(
+        
+        $mform->addElement('select', 'howtochoosetask', get_string('howtochoosetask', 'poasassignment'),$names);
+                            /* array(
                                 get_string('randomtask', 'poasassignment'),
                                 get_string('parameterchoice', 'poasassignment'),
-                                get_string('studentchoice', 'poasassignment')));
+                                get_string('studentchoice', 'poasassignment'))); */
+                                
         $mform->disabledIf('howtochoosetask', 'activateindividualtasks');
         $mform->addHelpButton('howtochoosetask', 'howtochoosetask', 'poasassignment');
 
