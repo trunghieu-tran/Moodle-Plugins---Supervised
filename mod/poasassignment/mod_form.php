@@ -176,23 +176,28 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         if (isset($default_values['flags'])) {
             $flags = (int)$default_values['flags'];
             unset($default_values['flags']);
-            $default_values['preventlatechoice']=$flags & PREVENT_LATE_CHOICE;
-            $default_values['randomtasksafterchoicedate']=$flags & RANDOM_TASKS_AFTER_CHOICEDATE;
-            $default_values['preventlate']=$flags & PREVENT_LATE;
-            $default_values['severalattempts']=$flags & SEVERAL_ATTEMPTS;
-            $default_values['notifyteachers']=$flags & NOTIFY_TEACHERS;
-            $default_values['notifystudents']=$flags & NOTIFY_STUDENTS;
-            $default_values['activateindividualtasks']=$flags & ACTIVATE_INDIVIDUAL_TASKS;
-            $default_values['secondchoice']=$flags & SECOND_CHOICE;
-            $default_values['teacherapproval']=$flags & TEACHER_APPROVAL;
-            $default_values['newattemptbeforegrade']=$flags & ALL_ATTEMPTS_AS_ONE;
-            $default_values['finalattempts']=$flags & MATCH_ATTEMPT_AS_FINAL;
+            $default_values['preventlatechoice'] = $flags & PREVENT_LATE_CHOICE;
+            $default_values['randomtasksafterchoicedate'] = $flags & RANDOM_TASKS_AFTER_CHOICEDATE;
+            $default_values['preventlate'] = $flags & PREVENT_LATE;
+            $default_values['severalattempts'] = $flags & SEVERAL_ATTEMPTS;
+            $default_values['notifyteachers'] = $flags & NOTIFY_TEACHERS;
+            $default_values['notifystudents'] = $flags & NOTIFY_STUDENTS;
+            $default_values['activateindividualtasks'] = $flags & ACTIVATE_INDIVIDUAL_TASKS;
+            $default_values['secondchoice'] = $flags & SECOND_CHOICE;
+            $default_values['teacherapproval'] = $flags & TEACHER_APPROVAL;
+            $default_values['newattemptbeforegrade'] = $flags & ALL_ATTEMPTS_AS_ONE;
+            $default_values['finalattempts'] = $flags & MATCH_ATTEMPT_AS_FINAL;
         }
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('poasassignmentfiles');
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_poasassignment', 'poasassignmentfiles', 0, array('subdirs'=>true));
             $default_values['poasassignmentfiles'] = $draftitemid;
         }
+        if(isset($default_values['howtochoosetask'])) {
+            //echo ' уменьшаем с '.$default_values['howtochoosetask'];
+            $default_values['howtochoosetask'] = $default_values['howtochoosetask']-1;
+        }
+        
     }
 
     /** Check dates

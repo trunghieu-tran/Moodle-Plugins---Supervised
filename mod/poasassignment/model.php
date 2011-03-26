@@ -91,6 +91,7 @@ class poasassignment_model {
         global $DB;
         $this->poasassignment->flags=$this->configure_flags();
         $this->poasassignment->timemodified=time();
+        $this->poasassignment->howtochoosetask++;
         $this->poasassignment->id = $DB->insert_record('poasassignment', $this->poasassignment);
         foreach($this->plugins as $plugin) {
             require_once($plugin->path);
@@ -99,7 +100,7 @@ class poasassignment_model {
             $poasassignmentplugin->save_settings($this->poasassignment,$this->poasassignment->id);
         }
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
-        $this->save_files($this->poasassignment->poasassignmentfiles,'poasassignmentfiles',0);
+        $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);
         //$this->grade_item_update();
         return $this->poasassignment->id;
     }
@@ -110,7 +111,7 @@ class poasassignment_model {
      */
     function update_instance() {
         global $DB;
-        $this->poasassignment->flags=$this->configure_flags();
+        $this->poasassignment->flags = $this->configure_flags();
 
         foreach($this->plugins as $plugin) {
             require_once($plugin->path);
@@ -118,13 +119,13 @@ class poasassignment_model {
             $poasassignmentplugin->configure_flag($this->poasassignment);
             $poasassignmentplugin->update_settings($this->poasassignment);
         }
+        $this->poasassignment->howtochoosetask++;
+        $poasassignmentid = $DB->update_record('poasassignment', $this->poasassignment);
         
-        $poasassignmentid=$DB->update_record('poasassignment', $this->poasassignment);
-        
-        $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
-        $this->delete_files($cm->id,'poasassignment',0);
+        $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
+        $this->delete_files($cm->id, 'poasassignment', 0);
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
-        $this->save_files($this->poasassignment->poasassignmentfiles,'poasassignmentfiles',0);
+        $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);
         return $this->poasassignment->id;
     }
     
