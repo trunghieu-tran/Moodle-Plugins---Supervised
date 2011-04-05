@@ -8,21 +8,43 @@
  * @package YOURPACKAGENAME
  *//** */
 
+ define('NO_TEST', 0);
+ define('COMMON_TEST',1);
+ define('INDIVIDUAL_TEST',2);
+
+ define('SHOW_TESTING_PROGRAM_FEEDBACK',1);
+ define('SHOW_TEST_INPUT_DATA',2);
+ define('SHOW_OUTPUT_STUDENT_DATA',4);
+ define('SHOW_DIFF',8);
+ define('SHOW_TESTS_NAMES',16);
+ define('SHOW_NUMBER_OF_PASSED_TESTS',32);
+ define('SHOW_RATING',64);
+ 
 /**
- * The QTYPENAME question class
- *
- * TODO give an overview of how the class works here.
+ * Autograder parent class
  */
 class grader_qtype extends default_questiontype {
+
 
     function name() {
         return 'grader';
     }
     
-    // TODO think about whether you need to override the is_manual_graded or
-    // is_usable_by_random methods form the base class. Most the the time you
-    // Won't need to.
+    /**
+     * Returns current test mode of the grader.
+     * It can be NO_TEST, COMMON_TEST or INDIVIDUAL_TEST
+     * @return test mode
+     */
+    function get_test_mode() {
+        return NO_TEST;
+    }
 
+    function add_tests($tests) {
+        return true;
+    }
+
+    
+    
     /**
      * @return boolean to indicate success of failure.
      */
@@ -33,12 +55,63 @@ class grader_qtype extends default_questiontype {
         return true;
     }
 
+    function process_options($form,$whom) {
+        $flag = 0;
+
+        $field =$whom.'showfeedback';
+        if(isset($form->$field))
+            $flag += SHOW_TESTING_PROGRAM_FEEDBACK;
+
+        $field =$whom.'showtestinputdata';
+        if(isset($form->$field))
+            $flag += SHOW_TEST_INPUT_DATA;
+
+        $field =$whom.'showtestoutputdata';
+        if(isset($form->$field))
+            $flag += SHOW_OUTPUT_STUDENT_DATA;
+
+        $field =$whom.'showdiff';
+        if(isset($form->$field))
+            $flag += SHOW_DIFF;
+
+        $field =$whom.'showtestsnames';
+        if(isset($form->$field))
+            $flag += SHOW_TESTS_NAMES;
+
+        $field =$whom.'shownumberofpassedtest';
+        if(isset($form->$field))
+            $flag += SHOW_NUMBER_OF_PASSED_TESTS;
+
+        $field =$whom.'showrating';
+        if(isset($form->$field))
+            $flag += SHOW_RATING;
+
+        return $flag;
+    }
+    
+    function save_question($question, $form) {
+        GLOBAL $DB;
+        echo '<br>'.__FUNCTION__;
+        $question->studentshowoptionsgrp = $this->process_options($form,'student');
+        $question->teachershowoptionsgrp = $this->process_options($form,'teacher');
+
+        $record = new stdClass();
+        $record->studentshowoptionsgrp = $this->process_options($form,'student');
+        $record->teachershowoptionsgrp = $this->process_options($form,'teacher');
+        $record->id = $DB->insert_record('question_grader', $record);
+        return parent::save_question($question, $form);
+    }
     /**
      * Save the units and the answers associated with this question.
      * @return boolean to indicate success of failure.
      */
     function save_question_options($question) {
         echo '<br>'.__FUNCTION__;
+        //if(isset($this->studentshowoptionsgrp))
+        //        echo 'yes!';
+        //$question->showstudent = $this->configure_flag($question->studentshowoptionsgrp);
+        //$question->showteacher = $this->configure_flag($question->teachershowoptionsgrp);
+        
         // TODO code to save the extra data to your database tables from the
         // $question object, which has all the post data from editquestion.html
         return true;
@@ -52,7 +125,6 @@ class grader_qtype extends default_questiontype {
      */
     function delete_question($questionid) {
         echo '<br>'.__FUNCTION__;
-        // TODO delete any    
         return true;
     }
 
@@ -97,20 +169,22 @@ class grader_qtype extends default_questiontype {
         if ($options->feedback) {
     
         }
-    
+        echo '';
+        //$this->print_question_submit_buttons($question, $state, $cmoptions, $options);
         include("$CFG->dirroot/question/type/grader/display.html");
     }
     
     function grade_responses(&$question, &$state, $cmoptions) {
         echo '<br>'.__FUNCTION__;
         // TODO assign a grade to the response in state.
+        $state->raw_grade = $question->maxgrade;
+        // mark the state as graded
+        $state->event = ($state->event ==  QUESTION_EVENTCLOSE) ? QUESTION_EVENTCLOSEANDGRADE : QUESTION_EVENTGRADE;
         return true;
     }
     
     function compare_responses($question, $state, $teststate) {
         echo '<br>'.__FUNCTION__;
-        // TODO write the code to return two different student responses, and
-        // return two if the should be considered the same.
         return false;
     }
 
