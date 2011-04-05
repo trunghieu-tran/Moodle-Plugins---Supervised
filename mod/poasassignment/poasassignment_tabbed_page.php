@@ -4,11 +4,11 @@
  *  and content of current tab
  */
 class poasassignment_tabbed_page {
-    var $cm;
-    var $poasassignment;
-    var $tabs;              // array of tabs in poasassignment
-    var $currenttab;        // name of current tab
-    var $context;
+    private $cm;
+    private $poasassignment;
+    private $tabs;              // array of tabs in poasassignment
+    private $currenttab;        // name of current tab
+    private $context;
 
     /** Standard constuctor for poasassignment_tabbed_page
      * @param $tabs array of tabs to be displayed

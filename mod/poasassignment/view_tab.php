@@ -43,7 +43,7 @@ class view_tab extends abstract_tab {
     function view_status() {
         global $DB,$USER,$OUTPUT;
         // If individual tasks mode is active
-        if ($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
+        if ($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             echo $OUTPUT->heading(get_string('status','poasassignment'));
             // If user have task

@@ -141,18 +141,18 @@ class parametersearch_form extends moodleform {
         global $DB;
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$data['poasassignmentid'],'searchparameter'=>1));
         foreach($fields as $field) {
-            if($field->ftype==FLOATING && !is_numeric($data['field'.$field->id])) {
+            if(($field->ftype==FLOATING || $field->ftype==NUMBER ) && !is_numeric($data['field'.$field->id])) {
                 if(strlen($data['field'.$field->id])>0) {
                     $errors['field'.$field->id]=get_string('errormustbefloat','poasassignment');
                     return $errors;
                 }
             }
-            if($field->ftype==NUMBER && !is_int($data['field'.$field->id])) {
+            /* if($field->ftype==NUMBER && !is_int($data['field'.$field->id])) {
                 if(strlen($data['field'.$field->id])>0) {
                     $errors['field'.$field->id]=get_string('errormustbeint','poasassignment');
                     return $errors;
                 }
-            }
+            } */
 
         }
 
