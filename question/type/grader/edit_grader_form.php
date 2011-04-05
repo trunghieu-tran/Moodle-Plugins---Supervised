@@ -21,6 +21,28 @@ class question_edit_grader_form extends question_edit_form {
         echo '<br>'.__FUNCTION__;
         // TODO, add any form fields you need.
         // $mform->addElement( ... );
+        $mform->addElement('header', 'showingresults', get_string('showingresults', 'qtype_grader'));
+        $studentshowoptionsgrp=array();
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowfeedback', '', get_string('showfeedback', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowtestinputdata', '', get_string('showtestinputdata', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowtestoutputdata', '', get_string('showtestoutputdata', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowdiff', '', get_string('showdiff', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowtestsnames', '', get_string('showtestsnames', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshownumberofpassedtest', '', get_string('shownumberofpassedtest', 'qtype_grader'));
+        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 'studentshowrating', '', get_string('showrating', 'qtype_grader'));
+        $mform->addGroup($studentshowoptionsgrp, 'studentshowoptionsgrp', get_string('studentshowoptionsgrp', 'qtype_grader'), '<br>', false);
+
+        $teachershowoptionsgrp=array();
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowfeedback', '', get_string('showfeedback', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowtestinputdata', '', get_string('showtestinputdata', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowtestoutputdata', '', get_string('showtestoutputdata', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowdiff', '', get_string('showdiff', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowtestsnames', '', get_string('showtestsnames', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershownumberofpassedtest', '', get_string('shownumberofpassedtest', 'qtype_grader'));
+        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 'teachershowrating', '', get_string('showrating', 'qtype_grader'));
+        $mform->addGroup($teachershowoptionsgrp, 'teachershowoptionsgrp', get_string('teachershowoptionsgrp', 'qtype_grader'), '<br>', false);
+
+               
     }
 
     function set_data($question) {
