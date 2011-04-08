@@ -30,6 +30,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ // TODO: add POASASSIGNMENT before every constant
 defined('MOODLE_INTERNAL') || die();
 
 define('PREVENT_LATE_CHOICE', 1);

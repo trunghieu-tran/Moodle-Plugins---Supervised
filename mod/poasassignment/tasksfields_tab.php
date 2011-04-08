@@ -81,10 +81,10 @@ class tasksfields_tab extends abstract_tab {
             
             $row = array($name,
                     $poasmodel->ftypes[$field->ftype],
-                    $field->showintable,
-                    $field->searchparameter,
-                    $field->secretfield,
-                    $field->random,
+                    $field->showintable == 1 ? get_string('yes') : get_string('no'),
+                    $field->searchparameter == 1 ? get_string('yes') : get_string('no'),
+                    $field->secretfield == 1 ? get_string('yes') : get_string('no'),
+                    $field->random == 1 ? get_string('yes') : get_string('no'),
                     $range);
             $table->add_data($row);
         }
