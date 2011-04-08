@@ -16,7 +16,7 @@ class randomchoice extends taskgiver {
                     $taskid=$tasksarray[rand(0,count($tasksarray)-1)];
                     $poasmodel = poasassignment_model::get_instance($poasassignment);
                     $poasmodel->bind_task_to_assignee($USER->id,$taskid);
-                    redirect(new moodle_url('view.php',array('id'=>$cmid,'tab'=>'view')),null,0);
+                    redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
             }
     }

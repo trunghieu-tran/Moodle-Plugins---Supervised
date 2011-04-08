@@ -1,11 +1,11 @@
 <?php
 
-require_once('abstract_tab.php');
+require_once('abstract_page.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once('model.php');
-class submissions_tab extends abstract_tab {
+class submissions_page extends abstract_page {
     var $poasassignment;
-    function submissions_tab($cm,$poasassignment) {
+    function submissions_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
     }
@@ -51,7 +51,7 @@ class submissions_tab extends abstract_tab {
         
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
-        groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&tab=submissions');
+        groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
         $context=get_context_instance(CONTEXT_MODULE,$this->cm->id);
         /// Get all ppl that are allowed to submit assignments
         if ($usersid = get_enrolled_users($context, 'mod/poasassignment:view', $currentgroup, 'u.id')) {

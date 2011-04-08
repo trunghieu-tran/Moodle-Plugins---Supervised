@@ -102,9 +102,9 @@ echo '</table>';
 //echo $task->name;
 echo $OUTPUT->box_end();
 if($DB->record_exists('poasassignment_assignee',array('userid'=>$USER->id,'taskid'=>$taskid)))
-    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&tab=view'), get_string('back'));
+    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&page=view'), get_string('back'));
 else
-    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&tab=tasks'), get_string('back'));
+    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&page=tasks'), get_string('back'));
 $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$poasmodel->assignee->id));
 
 if(!$assignee ||($assignee && ($assignee->taskid==0 || !isset($assignee->taskid))))

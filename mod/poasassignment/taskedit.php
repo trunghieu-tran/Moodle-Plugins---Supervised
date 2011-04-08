@@ -15,7 +15,7 @@ $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance
 require_login($course, true, $cm);
 require_capability('mod/poasassignment:managetasks',get_context_instance(CONTEXT_MODULE,$cm->id));
 
-//add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&tab=$tab", $poasassignment->name, $cm->id);
+//add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&page=$page", $poasassignment->name, $cm->id);
 
 $PAGE->set_url('/mod/poasassignment/taskedit.php?id=$cm->id');
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
@@ -32,16 +32,16 @@ if($mode==SHOW_MODE || $mode==HIDE_MODE) {
         else
             $task->hidden=1;
         $DB->update_record('poasassignment_tasks',$task);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasks')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')),null,0);
     }
     else
         print_error('invalidtaskid','poasassignment');
 }   
 if($mode==DELETE_MODE) {
     if($taskid>0) {
-        //TODO delete task and task values & references from student's table
+        //TODO delete task and task values & references from student's pagele
         $poasmodel->delete_task($taskid);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasks')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')),null,0);
     } 
     else
         print_error('invalidtaskid','poasassignment');
@@ -49,7 +49,7 @@ if($mode==DELETE_MODE) {
 
 $mform = new taskedit_form(null,array('id'=>$cm->id,'taskid'=>$taskid,'mode'=>$mode,'poasassignmentid'=>$poasassignment->id));
 if($mform->is_cancelled()) {
-    redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasks')),null,0);
+    redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')),null,0);
 }
 else {
     if($mform->get_data()) {
@@ -59,13 +59,13 @@ else {
             if($taskid>0) {
                 //TODO update task_values
                 $poasmodel->update_task($taskid,$data);
-                redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasks')),null,0);
+                redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')),null,0);
             } else
                 error('Incorrect task id');
         }
         //TODO add task_values
         $poasmodel->add_task($data);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasks')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')),null,0);
     }
     
 }

@@ -28,7 +28,7 @@ $poasmodel = poasassignment_model::get_instance($poasassignment);
 if($mode==DELETE_MODE) {
     if($criterionid>0) {
         $poasmodel->delete_field('poasassignment_criterions',$criterionid,'poasassignment_rating_values','criterionid');
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'criterions')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'criterions')),null,0);
     } else
         error('Incorrect criterion id');
 }
@@ -36,7 +36,7 @@ if($mode==DELETE_MODE) {
 
 $mform = new criterionsedit_form(null,array('id'=>$cm->id,'criterionid'=>$criterionid,'mode'=>$mode,'poasassignmentid'=>$poasassignment->id));
 if($mform->is_cancelled()) {
-    redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'criterions')),null,0);
+    redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'criterions')),null,0);
 }
 else {
     if($mform->get_data()) {
@@ -46,13 +46,13 @@ else {
             // if($criterionid>0) {
                 // $criterion=$mform->get_data();
                 // $poasmodel->update_criterion($criterionid,$criterion);
-                // redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'criterions')),null,0);
+                // redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'criterions')),null,0);
             // } else
                 // error('Incorrect criterion id');
         // }
         
         $poasmodel->save_criterion($data);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'criterions')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'criterions')),null,0);
     }
     
 }

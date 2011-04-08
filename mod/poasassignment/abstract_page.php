@@ -4,21 +4,21 @@
  *
  *
  */
-class abstract_tab {
+class abstract_page {
     var $cm;
     var $lasterror;
-    function abstract_tab($cm) {
+    function abstract_page($cm) {
         $this->cm=$cm;
     }
 
-    /** Getter of tab capability
+    /** Getter of page capability
      * @return capability 
      */
     function get_cap() {
         return 'mod/poasassignment:view';
     }
 
-    /** Checks module settings that prohibit viewing this tab, used in has_ability_to_view
+    /** Checks module settings that prohibit viewing this page, used in has_ability_to_view
      * @return true if neither setting prohibits
      */
     function has_satisfying_parameters() {
