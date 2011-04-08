@@ -795,7 +795,7 @@ class poasassignment_model {
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
-        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id.'&tab=view');
+        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id.'&page=view');
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         $notchecked=0;
         $count=0;
@@ -817,7 +817,7 @@ class poasassignment_model {
         /// If we know how much students are enrolled on this task show "$notchecked of $count need grade" message
         if($count!=0) {
             $html = $notchecked.' '.get_string('of','poasassignment').' '.$count.' '.get_string('needgrade','poasassignment');
-            $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
+            $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')); 
             return "<align='right'>".html_writer::link($submissionsurl,$html);
         }
         else {
@@ -833,12 +833,12 @@ class poasassignment_model {
             /// If there is no enrollment on this task but someone loaded anser show "$notchecked need grade" message
             if($notchecked!=0) {
                 $html = $notchecked.' '.get_string('needgrade','poasassignment');
-                $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
+                $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')); 
                 return "<align='right'>".html_writer::link($submissionsurl,$html);
             }
         }
         $html = get_string('noattempts','poasassignment');
-        $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')); 
+        $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')); 
         return "<align='right'>".html_writer::link($submissionsurl,$html);
     }
     

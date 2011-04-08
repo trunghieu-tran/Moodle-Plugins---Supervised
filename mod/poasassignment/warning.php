@@ -55,7 +55,7 @@ switch ($action) {
                 $DB->delete_records('poasassignment_rating_values',array('attemptid'=>$attempt->id));
             }
             $DB->delete_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
-            redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
+            redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
         }
     case 'deletefield':
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
@@ -77,7 +77,7 @@ switch ($action) {
                                 array('id'=>$id,'fieldid'=>$fieldid,'action'=>'deletefieldconfirmed')), 
                                 get_string('yes'),
                                 'post');
-        echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'tab'=>'tasksfields')), get_string('no'),'get');
+        echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>'tasksfields')), get_string('no'),'get');
         echo $OUTPUT->footer();    
         break;
     case 'deletefieldconfirmed':
@@ -91,7 +91,7 @@ switch ($action) {
         $poasmodel=poasassignment_model::get_instance($poasassignment);
         $poasmodel->delete_field($fieldid);
         
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasksfields')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
         break;
     case 'taketask':
         $taskid = optional_param('taskid', -1, PARAM_INT);
@@ -132,7 +132,7 @@ switch ($action) {
         
         $poasmodel->bind_task_to_assignee($userid,$taskid);
         
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
         break;
 }
 //require_capability('mod/poasassignment:managetasks',get_context_instance(CONTEXT_MODULE,$cm->id));

@@ -30,12 +30,12 @@ $mform=new grade_form(null,array('id'=>$cm->id,'assigneeid'=>$assigneeid,'poasas
 $data=$poasmodel->get_rating_data($assigneeid);
 $mform->set_data($data);
 if($mform->is_cancelled()) {
-    redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')),null,0);
+    redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')),null,0);
 }
 else {
     if($data=$mform->get_data()) {
         $poasmodel->save_grade($assigneeid,$data);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'submissions')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')),null,0);
     }
 }
 

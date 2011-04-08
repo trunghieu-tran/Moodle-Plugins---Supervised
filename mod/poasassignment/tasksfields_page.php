@@ -1,12 +1,12 @@
 <?php
 global $CFG;
-require_once('abstract_tab.php');
+require_once('abstract_page.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once('model.php');
-class tasksfields_tab extends abstract_tab {
+class tasksfields_page extends abstract_page {
     var $poasassignment;
     
-    function tasksfields_tab($cm,$poasassignment) {
+    function tasksfields_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
     }

@@ -1,13 +1,13 @@
 <?php
 global $CFG;
-require_once('abstract_tab.php');
+require_once('abstract_page.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once('criterionsedit_form.php');
 require_once('model.php');
-class criterions_tab extends abstract_tab {
+class criterions_page extends abstract_page {
     var $poasassignment;
     
-    function criterions_tab($cm,$poasassignment) {
+    function criterions_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
     }
@@ -59,7 +59,7 @@ class criterions_tab extends abstract_tab {
         if($mform->get_data()) {
                 $data=$mform->get_data();
                 $poasmodel->save_criterion($data);
-                redirect(new moodle_url('view.php',array('id'=>$id,'tab'=>'criterions')),null,0);
+                redirect(new moodle_url('view.php',array('id'=>$id,'page'=>'criterions')),null,0);
         }
         $mform->set_data($poasmodel->get_criterions_data());
         $mform->set_data(array('id'=>$id));

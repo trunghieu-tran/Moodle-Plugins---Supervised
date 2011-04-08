@@ -61,8 +61,8 @@ class criterionsedit_form extends moodleform {
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
         
-        $mform->addElement('hidden', 'tab', 'criterions');
-        $mform->setType('tab', PARAM_TEXT);
+        $mform->addElement('hidden', 'page', 'criterions');
+        $mform->setType('page', PARAM_TEXT);
         
         //$mform->addElement('hidden', 'mode', $instance['mode']);
         //$mform->setType('mode', PARAM_INT);

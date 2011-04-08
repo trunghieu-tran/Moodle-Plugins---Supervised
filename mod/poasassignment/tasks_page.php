@@ -1,12 +1,12 @@
 <?php
-require_once('abstract_tab.php');
+require_once('abstract_page.php');
 require_once('lib.php');
 require_once('model.php');      
 require_once($CFG->libdir.'/formslib.php');
-class tasks_tab extends abstract_tab {
+class tasks_page extends abstract_page {
     var $poasassignment;
     
-    function tasks_tab($cm,$poasassignment) {
+    function tasks_page($cm,$poasassignment) {
         global  $PAGE;
         
         

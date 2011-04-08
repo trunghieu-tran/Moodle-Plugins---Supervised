@@ -35,7 +35,7 @@ foreach($plugins as $plugin) {
     }
 }
 if($answer_form->is_cancelled()) {
-    redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
+    redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
 }
 else {
     if($answer_form->get_data()) {
@@ -66,7 +66,7 @@ else {
         //noitify teacher if needed
         $poasmodel->email_teachers($poasmodel->assignee);
         
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'view')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
     }
 }
 echo $OUTPUT->header();

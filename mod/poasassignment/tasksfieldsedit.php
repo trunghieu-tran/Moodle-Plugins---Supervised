@@ -14,7 +14,7 @@ $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance
 require_login($course, true, $cm);
 require_capability('mod/poasassignment:managetasksfields',get_context_instance(CONTEXT_MODULE,$cm->id));
 
-//add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&tab=$tab", $poasassignment->name, $cm->id);
+//add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&page=$page", $poasassignment->name, $cm->id);
 $PAGE->set_url('/mod/poasassignment/tasksfieldsedit.php?id='.$id);
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
 $PAGE->set_heading($course->fullname);
@@ -24,7 +24,7 @@ global $OUTPUT,$DB;
 $poasmodel = poasassignment_model::get_instance($poasassignment);
 $mform = new tasksfieldsedit_form(null,array('id'=>$id,'fieldid'=>$fieldid,'mode'=>$mode,'poasassignmentid'=>$poasassignment->id));
 if($mform->is_cancelled()) {
-    redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasksfields')),null,0);
+    redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
 }
 else {
     if($mform->get_data()) {
@@ -34,13 +34,13 @@ else {
             if($fieldid>0) {
                 $field=$mform->get_data();
                 $poasmodel->update_task_field($fieldid,$field);
-                redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasksfields')),null,0);
+                redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
             } else
                 error('Incorrect field id');
         }
         
         $poasmodel->add_task_field($data);
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'tab'=>'tasksfields')),null,0);
+        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
     }
     
 }

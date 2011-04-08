@@ -1,14 +1,14 @@
 <?php
 
-require_once('abstract_tab.php');
+require_once('abstract_page.php');
 require_once('model.php');
-class view_tab extends abstract_tab {
+class view_page extends abstract_page {
     var $poasassignment;
     var $context;
 
     /** Constructor, initializes variables $poasassignment, $cm, $context
      */
-    function view_tab($cm,$poasassignment) {
+    function view_page($cm,$poasassignment) {
         
         $this->poasassignment = $poasassignment;
         $this->cm = $cm;
@@ -72,10 +72,10 @@ class view_tab extends abstract_tab {
                 }
             }
             else {
-                // If user have no task - show link to task tab
+                // If user have no task - show link to task page
                 echo get_string('youhavenotask', 'poasassignment');
-                $taskstaburl = new moodle_url('view.php', array('id'=>$this->cm->id, 'tab'=>'tasks'));
-                echo ' '.html_writer::link($taskstaburl, get_string('gototassktab', 'poasassignment'));
+                $taskspageurl = new moodle_url('view.php', array('id'=>$this->cm->id, 'page'=>'tasks'));
+                echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
             }
             echo $OUTPUT->box_end();
         }

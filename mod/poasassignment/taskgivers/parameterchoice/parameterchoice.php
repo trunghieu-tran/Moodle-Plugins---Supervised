@@ -82,7 +82,7 @@ class parameterchoice extends taskgiver{
                     }
                     //echo 'task with id'.$taskid.' was met '.$tasktimesmet.' times';
                     $poasmodel->bind_task_to_assignee($USER->id,$taskid);
-                    redirect(new moodle_url('view.php',array('id'=>$cmid,'tab'=>'view')),null,0);
+                    redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
                 else echo get_string('nosatisfyingtasks','poasassignment');
             }
@@ -129,8 +129,8 @@ class parametersearch_form extends moodleform {
             $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
             $mform->setType('poasassignmentid', PARAM_INT);
 
-            $mform->addElement('hidden', 'tab', 'tasks');
-            $mform->setType('tab', PARAM_TEXT);
+            $mform->addElement('hidden', 'page', 'tasks');
+            $mform->setType('page', PARAM_TEXT);
 
             $this->add_action_buttons(false, get_string('getrandomtask', 'poasassignment'));
         }
