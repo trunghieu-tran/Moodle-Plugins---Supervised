@@ -29,12 +29,6 @@
  */
 function xmldb_poasassignment_install() {
     global $DB;
-
-    // Install default common logging actions
-    update_log_display_entry('poasassignment', 'add', 'poasassignment', 'name');
-    update_log_display_entry('poasassignment', 'update', 'poasassignment', 'name');
-    update_log_display_entry('poasassignment', 'view', 'poasassignment', 'name');
-    update_log_display_entry('poasassignment', 'view all', 'poasassignment', 'name');
     
     // Add info about default plugins into table
     $record->name='poasassignment_answer_file';
@@ -55,11 +49,11 @@ function xmldb_poasassignment_install() {
     foreach($files as $file) {
         if(is_dir(dirname(dirname(__FILE__)).'\\taskgivers\\'.$file) && $file !== '.' && $file !== '..') {
             $record->name = $file;
-            echo $record->name.'<br>';
+            //echo $record->name.'<br>';
             $record->path = 'taskgivers\\'.$file.'\\'.$file.'.php';
-            echo $record->path.'<br>';
+            //echo $record->path.'<br>';
             $record->langpath = 'taskgivers\\'.$file.'\\lang';
-            echo $record->langpath.'<br>';
+            //echo $record->langpath.'<br>';
             if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
                 $DB->insert_record('poasassignment_taskgivers',$record);
         }

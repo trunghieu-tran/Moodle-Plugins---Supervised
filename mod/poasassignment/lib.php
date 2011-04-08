@@ -408,7 +408,7 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
  * @param navigation_node $poasassignmentnode The node to add module settings to
  */
 function poasassignment_extend_settings_navigation(settings_navigation $settings, navigation_node $poasassignmentnode) {
-    //echo '123!!!!';
+    
 }
 
 function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {

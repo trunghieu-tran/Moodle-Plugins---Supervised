@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/poasassignment/grader/grader/db" VERSION="20110408" COMMENT="abstract grader database"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="poasassignment_grader" COMMENT="Default comment for grader, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="studentresultoptions"/>
+        <FIELD NAME="studentresultoptions" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="teacherresultoptions"/>
+        <FIELD NAME="teacherresultoptions" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="studentresultoptions"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
