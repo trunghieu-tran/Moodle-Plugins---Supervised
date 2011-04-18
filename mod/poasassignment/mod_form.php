@@ -159,6 +159,13 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         //----------------------------------------------------------------------
         
         $mform->addElement('header', 'poasassignmentgraderslist', get_string('poasassignmentgraderslist', 'poasassignment'));
+        
+        $this->graders=$DB->get_records('poasassignment_graders');
+        foreach ($this->graders as $graderrecord) {
+            require_once($graderrecord->path);
+            $grader = new $graderrecord->name();
+            $mform->addElement('checkbox',$graderrecord->name,get_string($graderrecord->name,'poasassignment_simple_grader'));
+        }
         // TODO show graders list with checkboxes
 
         // add standard elements, common to all modules
@@ -219,6 +226,11 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         foreach ($this->plugins as $plugin) { 
             $pluginname=$plugin->name;
             $pluginname::validation($data,$errors);
+        }
+        
+        foreach ($this->graders as $grader) { 
+            $gradername = $grader->name;
+            $gradername::validation($data,$errors);
         }
         
         if (count($errors) == 0) {

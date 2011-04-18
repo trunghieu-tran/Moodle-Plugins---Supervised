@@ -413,7 +413,7 @@ function poasassignment_extend_settings_navigation(settings_navigation $settings
 
 function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
     global $PAGE,$DB;
-    $pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions');
+    $pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders');
 
     foreach($pages as $page) {
         $pagetype = $page.'_page';

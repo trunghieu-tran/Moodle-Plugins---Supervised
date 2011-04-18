@@ -239,3 +239,5 @@ $string['poasassignmentgraderslist']='Graders that will be used in this module';
 $string['finalattempts']='Can finalize attempt';
 $string['finalattempts_help']="Student cancan match his attempt as final - it means he can't reload his answer until teacher grades last attempt";
 $string['final'] = 'I am sure in my answer, finilize';
+$string['graders'] = 'Graders';
+$string['graders_help'] = 'Graders help page';
