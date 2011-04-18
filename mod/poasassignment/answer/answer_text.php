@@ -92,7 +92,7 @@ class poasassignment_answer_text extends poasassignment_answer {
         if (isset($poasassignment->answertext)) {
             $this->checked=true;
             unset($poasassignment->answertext);
-            }
+        }
         else
             $this->checked=false;
     }

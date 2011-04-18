@@ -34,6 +34,12 @@ class poasassignment_model {
      */
     private $plugins=array();
     
+    /** 
+     * Grader plugins array
+     * @var array
+     */
+    private $graders=array();
+    
     /**
      * Saves object of poasassignment_model class
      * @var poasassignment_model
@@ -60,6 +66,7 @@ class poasassignment_model {
         if(!$this->assignee)
             $this->assignee->id=0;
         $this->plugins=$DB->get_records('poasassignment_plugins');
+        $this->graders = $DB->get_records('poasassignment_graders');
     }
     /** 
      * Method is used instead of constructor. If poasassignment_model 
@@ -98,6 +105,17 @@ class poasassignment_model {
             $poasassignmentplugin = new $plugin->name();
             $poasassignmentplugin->configure_flag($this->poasassignment);
             $poasassignmentplugin->save_settings($this->poasassignment,$this->poasassignment->id);
+        }
+        foreach($this->graders as $graderrecord) {
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            if(isset($this->poasassignment->$gradername)) {
+                $rec = new stdClass();
+                $rec->poasassignmentid = $this->poasassignment->id;
+                $rec->graderid = $graderrecord->id;
+                $DB->insert_record('poasassignment_used_graders',$rec);
+            }
+            unset($this->poasassignment->$gradername);
         }
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);

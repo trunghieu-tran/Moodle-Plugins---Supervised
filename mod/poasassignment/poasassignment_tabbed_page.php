@@ -81,7 +81,7 @@ class poasassignment_tabbed_page {
         global $CFG;
         $cm=$this->cm;
         // for all pages in $pages array
-        for ($i=0;$i<count($this->pages);$i++) {
+        for ($i = 0; $i < count($this->pages); $i++) {
             $pagei = $this->pages[$i];
             $pagetype = $pagei.'_page';
             require_once($pagetype.'.php');
@@ -89,7 +89,7 @@ class poasassignment_tabbed_page {
             // If user has ability to view <pagename>_page - add page on panel
             $pageinstance = new $pagetype($cm, $this->poasassignment);
             if ($pageinstance->has_ability_to_view()) {
-                $row[]=new pageobject($pagei, "$CFG->wwwroot/mod/poasassignment/view.php?id=$cm->id&page=".$pagei,get_string($pagei, 'poasassignment'));
+                $row[] = new pageobject($pagei, "$CFG->wwwroot/mod/poasassignment/view.php?id=$cm->id&page=".$pagei,get_string($pagei, 'poasassignment'));
             }
         }
 
