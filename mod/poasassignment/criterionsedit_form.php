@@ -16,8 +16,15 @@ class criterionsedit_form extends moodleform {
         $repeatarray[] = $mform->createElement('htmleditor', 'description', get_string('criteriondescription','poasassignment'));
         $repeatarray[] = &MoodleQuickForm::createElement('text', 'weight', get_string('criterionweight','poasassignment'));
         
-        $sources[]='manually';
-        $sources[]='module';
+        $sources[] = 'manually';
+        $usedgraders = $DB->get_records('poasassignment_used_graders',array('poasassignmentid' => $instance['poasassignmentid']));
+        foreach($usedgraders as $usedgraderrecord) {
+            $grader = $DB->get_record('poasassignment_graders',array('id' => $usedgraderrecord->graderid));
+            $gradername = $grader->name;
+            require_once($grader->path);
+            $sources[] = $gradername::name();
+        }
+        //$sources[]='module';
         $repeatarray[] = &MoodleQuickForm::createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);
         
         if ($instance){
