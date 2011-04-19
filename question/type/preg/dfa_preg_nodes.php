@@ -580,7 +580,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         parent::print_self();
     }
 }
-class dfa_preg_node_finite_quant extends dfa_preg_operator {
+class dfa_preg_node_infinite_quant extends dfa_preg_operator {
     public function nullable() {
         //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
@@ -603,19 +603,6 @@ class dfa_preg_node_finite_quant extends dfa_preg_operator {
     public function not_supported() {
         return $this->pregnode->greed;
     }
-    public function print_self($indent) {
-        $this->print_indent($indent);
-        echo 'type: node quant<br/>';
-        $this->print_indent($indent);
-        echo 'left border: ', $this->pregnode->leftborder, '<br/>';
-        if (!is_a($this, 'dfa_preg_node_infinite_quant')) {    
-            $this->print_indent($indent);
-            echo 'right border: ', $this->pregnode->rightborder, '<br/>';
-        }
-        parent::print_self($indent);
-    }
-}
-class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     public function followpos(&$fpmap) {
         parent::followpos(&$fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
@@ -624,7 +611,25 @@ class dfa_preg_node_infinite_quant extends dfa_preg_node_finite_quant {
     }
     public function print_self($indent) {
         $this->print_indent($indent);
-        echo 'type: node infinite quant<br/>';
+        if (!is_a($this, 'dfa_preg_node_finite_quant')) {
+            echo 'type: node infinite quant<br/>';
+        }
+        $this->print_indent($indent);
+        echo 'left border: ', $this->pregnode->leftborder, '<br/>';
+        if (is_a($this, 'dfa_preg_node_finite_quant')) {    
+            $this->print_indent($indent);
+            echo 'right border: ', $this->pregnode->rightborder, '<br/>';
+        }
+        parent::print_self($indent);
+    }
+}
+class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
+    public function followpos(&$fpmap) {
+        dfa_preg_operator::followpos(&$fpmap);
+    }
+    public function print_self($indent) {
+        $this->print_indent($indent);
+        echo 'type: node finite quant<br/>';
         parent::print_self($indent);
     }
 }
