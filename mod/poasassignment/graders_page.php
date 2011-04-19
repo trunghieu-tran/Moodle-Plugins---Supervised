@@ -19,7 +19,10 @@ class graders_page extends abstract_page {
         global $DB,$OUTPUT;
         $id = $this->cm->id;
         $poasassignmentid = $this->poasassignment->id;
-        $mform = new graderssettings_form(null, array('id'=>$id, 'poasassignmentid'=>$poasassignmentid));
+        $mform = new graderssettings_form(null, array('id' => $id, 'poasassignmentid' => $poasassignmentid));
+        if($mform->get_data()) {
+            grader::save_settings($mform->get_data(), $poasassignmentid);            
+        }
         $mform->display();
     }
     

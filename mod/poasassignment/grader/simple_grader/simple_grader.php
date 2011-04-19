@@ -10,6 +10,9 @@ class simple_grader extends grader{
     public static function name() {
         return 'simple grader';
     }
+    public static function prefix() {
+        return __CLASS__;
+    }
     public static function validation($data, &$errors) {
         
     }
