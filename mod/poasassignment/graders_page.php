@@ -1,13 +1,14 @@
 <?php
 global $CFG;
 require_once('abstract_page.php');
+require_once('graderssettings_form.php');
 require_once('model.php');
 class graders_page extends abstract_page {
     var $poasassignment;
     
-    function criterions_page($cm,$poasassignment) {
+    function __construct($cm, $poasassignment) {
         $this->poasassignment = $poasassignment;
-        $this->cm=$cm;
+        $this->cm = $cm;
     }
     
     function get_cap() {
@@ -16,7 +17,10 @@ class graders_page extends abstract_page {
     
     function view() {
         global $DB,$OUTPUT;
-        echo '123';
+        $id = $this->cm->id;
+        $poasassignmentid = $this->poasassignment->id;
+        $mform = new graderssettings_form(null, array('id'=>$id, 'poasassignmentid'=>$poasassignmentid));
+        $mform->display();
     }
     
 }
