@@ -211,5 +211,13 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue(ctype_alnum($char) || $char === '_');
     }
+    function test_case_insensitive() {
+        $matcher = new dfa_preg_matcher('aBcD');
+        $matcher->match('Abcd');
+        $this->assertFalse($matcher->is_matching_complete());
+        $matcher = new dfa_preg_matcher('aBcD', 'i');
+        $matcher->match('Abcd');
+        $this->assertTrue($matcher->is_matching_complete());
+    }
 }
 ?>
