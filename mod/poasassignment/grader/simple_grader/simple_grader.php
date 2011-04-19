@@ -7,7 +7,7 @@ class simple_grader extends grader{
         return POASASSIGNMENT_GRADER_COMMON_TEST;
     }
     
-    public function name() {
+    public static function name() {
         return 'simple grader';
     }
     public static function validation($data, &$errors) {
