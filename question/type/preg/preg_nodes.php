@@ -115,6 +115,12 @@ abstract class preg_leaf extends preg_node {
     *Returns one of characters which contains in this leaf
     */
     abstract public function character();
+    
+    /**
+    * function gives leaf in human readable form
+    * @return human readable form of leaf
+    */
+    abstract public function tohr();
 }
 
 /**
@@ -180,6 +186,15 @@ class preg_leaf_charset extends preg_leaf {
         } else {
             return $this->charset[0];
         }
+    }
+    public function tohr() {
+        if ($this->negative) {
+            $direction = '^';
+        } else {
+            $direction = '';
+        }
+        $result = "[$direction$this->charset]";
+        return $result;
     }
 }
 
@@ -256,6 +271,26 @@ class preg_leaf_meta extends preg_leaf {
         } else {
             $length = 0;
         }
+        return $result;
+    }
+    public function tohr() {
+        if ($this->negative) {
+            $direction = '!';
+        } else {
+            $direction = '';
+        }
+        switch ($this->subtype) {
+            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+                $type = '\\w';
+                break;
+            case preg_leaf_meta::SUBTYPE_DOT:
+                $type = 'dot';
+                break;
+            case preg_leaf_meta::SUBTYPE_ENDREG:
+                $type = 'ENDREG';
+                break;
+        };
+        $result = "$direction"."meta$type";
         return $result;
     }
 }
@@ -359,6 +394,28 @@ class preg_leaf_assert extends preg_leaf {
                 break;
         }
     }
+    public function tohr() {
+        if ($this->negative) {
+            $direction = '!';
+        } else {
+            $direction = '';
+        }
+        switch ($this->subtype) {
+            case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+                $type = '^';
+                break;
+            case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_DOLLAR:
+                $type = '$';
+                break;
+            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+                $type = '\\b';
+                break;
+        };
+        $result = "$direction"."assert$type";
+        return $result;
+    }
 }
 
 class preg_leaf_backref extends preg_leaf {
@@ -375,6 +432,9 @@ class preg_leaf_backref extends preg_leaf {
     }
     public function character() {
         die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
+    }
+    public function tohr() {
+        return 'backref #'.$number;
     }
 }
 

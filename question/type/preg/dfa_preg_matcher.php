@@ -41,6 +41,9 @@ class dfa_preg_matcher extends preg_matcher {
 	var $maxnum;
     var $built;
     var $result;
+    var $picnum;//number of last picture
+    
+    var $graphvizpath;//path to dot.exe of graphviz, used only for debugging
     
     public function name() {
         return 'dfa_preg_matcher';
@@ -497,6 +500,8 @@ class dfa_preg_matcher extends preg_matcher {
             return;
         }
         parent::__construct($regex, $modifiers);
+        $this->picnum=0;
+        $this->graphvizpath = 'C:/Program Files/Graphviz2.26.3/bin/';
         //building finite automates
         if ($this->is_error_exists()) {
             return;
@@ -577,6 +582,39 @@ class dfa_preg_matcher extends preg_matcher {
             $leaf->print_self(0);
             echo '</br>';
         }
+    }
+    /**
+    * Debug function draw finite automate with number number in human readable form
+    * don't work without right to execute file
+    * @param number number of drawing finite automate
+    */
+    public function draw_fa ($number) {
+        $fadotcode = $this->generate_fa_dot_code($number);
+        $dotfile = fopen($this->graphvizpath . 'dotcode.dot', 'w');
+        foreach ($fadotcode as $fadotstring) {
+            fprintf($dotfile, "%s\n", $fadotstring);
+        }
+        chdir($this->graphvizpath);
+        exec('dot.exe -Tjpg -o"X:\home\moodle\www\question\type\preg\ZZZdfagraph'.$this->picnum.'.jpg" -Kdot dotcode.dot');
+        echo '<IMG src="http://moodle/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg"><br><br><br>';
+        $this->picnum++;
+    }
+    /**
+    * Debug function generate dot code for drawing finite automate
+    * @param number number of drawing finite automate
+    */
+    protected function generate_fa_dot_code($number) {//do it protected on end of testing!
+        $dotcode = array();
+        $dotcode[] = 'digraph {';
+        $dotcode[] = 'rankdir = LR;';
+        foreach ($this->finiteautomates[$number] as $index=>$state) {
+            foreach ($state->passages as  $leafcode=>$target) {
+                $symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+                $dotcode[] = "$index->$target"."[label=\"$symbol\"];";
+            }
+        }
+        $dotcode[] = '};';
+        return $dotcode;
     }
 }
 ?>
