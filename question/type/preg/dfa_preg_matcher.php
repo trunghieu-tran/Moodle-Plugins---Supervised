@@ -125,9 +125,6 @@ class dfa_preg_matcher extends preg_matcher {
         $this->finiteautomates[$index][0] = new finite_automate_state;
         //form the map of following
         $root->number($this->connection[$index], $maxnum);
-        if (strpos($this->modifiers, 'i') !== false) {
-            $this->for_case_insensitive();
-        }
         $root->nullable();
         $root->firstpos();
         $root->lastpos();
@@ -206,6 +203,11 @@ class dfa_preg_matcher extends preg_matcher {
         $substringmatch->full = false;
         $substringmatch->index = -1;
         $acceptedcharcount = -1;
+        if (strpos($this->modifiers, 'i') === false) {
+            $casesens=true;
+        } else {
+            $casesens=false;
+        }
         do {
         /*check current character while: 1)checked substring match with regex
                                          2)current character isn't end of string
@@ -222,7 +224,7 @@ class dfa_preg_matcher extends preg_matcher {
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
-                    $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length);
+                    $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length, $casesens);
                 }
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
@@ -483,13 +485,6 @@ class dfa_preg_matcher extends preg_matcher {
         return $result;
     }
         
-    function for_case_insensitive() {
-        foreach ($this->connection as $key1 => $val1) {
-            foreach ($val1 as $key2 => $val2) {
-                $this->connection[$key1][$key2] = strtolower($val2) . strtoupper($val2);
-            }
-        }
-    }
     /**
     *get regex and build finite automates
     @param regex - regular expirience for which will be build finite automate

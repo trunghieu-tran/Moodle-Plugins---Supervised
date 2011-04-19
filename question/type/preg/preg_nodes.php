@@ -109,7 +109,7 @@ abstract class preg_leaf extends preg_node {
     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
     * @param length the length of match (for backreference or recursion), can be 0 for asserts
     */
-    abstract public function match($str, $pos, &$length);
+    abstract public function match($str, $pos, &$length, $cs);
     
     /*
     *Returns one of characters which contains in this leaf
@@ -148,7 +148,7 @@ class preg_leaf_charset extends preg_leaf {
         return 'leaf_charset';
     }
 
-    public function match($str, $pos, &$length) {
+    public function match($str, $pos, &$length, $cs) {
         if ($pos>=strlen($str)) {
             $length = 0;
             return false;
@@ -157,7 +157,7 @@ class preg_leaf_charset extends preg_leaf {
         $strcopy = $str;
         $textlib = textlib_get_instance();//use textlib to avoid unicode problems
 
-        if ($this->caseinsensitive) {
+        if (!$cs) {
             $charsetcopy = $textlib->strtolower($charsetcopy);
             $strcopy = $textlib->strtolower($strcopy);
         }
@@ -239,7 +239,7 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
-    public function match($str, $pos, &$length) {
+    public function match($str, $pos, &$length, $cs) {
         if ($pos>=strlen($str)) {
             $length = 0;
             return false;
@@ -325,7 +325,7 @@ class preg_leaf_assert extends preg_leaf {
         return 'leaf_assert';
     }
 
-    public function match($str, $pos, &$length) {
+    public function match($str, $pos, &$length, $cs) {
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
@@ -421,7 +421,7 @@ class preg_leaf_assert extends preg_leaf {
 class preg_leaf_backref extends preg_leaf {
     public $number;
     
-    public function match($str, $pos, &$length) {
+    public function match($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
     }
     public function name() {
