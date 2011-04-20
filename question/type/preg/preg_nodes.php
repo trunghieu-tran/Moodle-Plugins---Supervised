@@ -421,20 +421,62 @@ class preg_leaf_assert extends preg_leaf {
 class preg_leaf_backref extends preg_leaf {
     public $number;
     
+    public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_BACKREF;
+    }
     public function match($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
     }
     public function name() {
         return 'leaf_backref';
     }
-    public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_BACKREF;
-    }
     public function character() {
         die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
     }
     public function tohr() {
         return 'backref #'.$number;
+    }
+}
+
+class preg_leaf_option extends preg_leaf {
+    public $posopt;
+    public $negopt;
+    
+    public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_OPTIONS;
+    }
+    public function match($str, $pos, &$length, $cs) {
+        die ('TODO: implements abstract function match for preg_leaf_option class before use it!');
+    }
+    public function name() {
+        return 'leaf_option';
+    }
+    public function character() {
+        die ('TODO: implements abstract function character for preg_leaf_option class before use it!');
+    }
+    public function tohr() {
+        return '(?'.$this->posopt.'-'.$this->negopt;
+    }
+}
+
+class preg_leaf_recursion extends preg_leaf {
+
+    public $number;
+
+    public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_RECURSION;
+    }
+    public function match($str, $pos, &$length, $cs) {
+        die ('TODO: implements abstract function match for preg_leaf_recursion class before use it!');
+    }
+    public function name() {
+        return 'leaf_recursion';
+    }
+    public function character() {
+        die ('TODO: implements abstract function character for preg_leaf_recursion class before use it!');
+    }
+    public function tohr() {
+        return 'recursion';
     }
 }
 
