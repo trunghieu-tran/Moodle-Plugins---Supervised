@@ -137,6 +137,29 @@ class poasassignment_model {
             $poasassignmentplugin->configure_flag($this->poasassignment);
             $poasassignmentplugin->update_settings($this->poasassignment);
         }
+        foreach($this->graders as $graderrecord) {
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            
+            $rec = new stdClass();
+            $rec->poasassignmentid = $this->poasassignment->id;
+            $rec->graderid = $graderrecord->id;
+                
+            $isgraderused = $DB->record_exists('poasassignment_used_graders',
+                                               array('poasassignmentid' => $rec->poasassignmentid,
+                                                     'graderid' => $rec->graderid));
+            if(isset($this->poasassignment->$gradername)) {
+                if(!$isgraderused)
+                    $DB->insert_record('poasassignment_used_graders',$rec);
+            }
+            else {
+                if($isgraderused)
+                    $DB->delete_records('poasassignment_used_graders',
+                                               array('poasassignmentid' => $rec->poasassignmentid,
+                                                     'graderid' => $rec->graderid));
+            }
+            unset($this->poasassignment->$gradername);
+        }
         $this->poasassignment->howtochoosetask++;
         $poasassignmentid = $DB->update_record('poasassignment', $this->poasassignment);
         
@@ -170,6 +193,7 @@ class poasassignment_model {
         foreach( $types as $type) {
             $DB->delete_records('poasassignment_plugins', array('id' => $type->pluginid));
         }
+        $DB->delete_records('poasassignment_used_graders',array('poasassignmentid' => $id));
         $DB->delete_records('poasassignment_type_settings', array('poasassignmentid' => $id));
         $DB->delete_records('poasassignment_criterions', array('poasassignmentid' => $id));
         $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $id));

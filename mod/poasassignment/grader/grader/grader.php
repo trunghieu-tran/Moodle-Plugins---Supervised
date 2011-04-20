@@ -61,7 +61,7 @@ abstract class grader {
      * @return string name of the grader
      */
     public static function name() {
-        return 'abstract grader';
+        return get_string('grader','poasassignment_grader');
     }
     
     public static function prefix() {
@@ -130,7 +130,7 @@ abstract class grader {
         $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgraderrecord->graderid));
         $gradername = $graderrecord->name;
         
-        $mform->addElement('header', $gradername::prefix(), $gradername::prefix());
+        $mform->addElement('header', $gradername::prefix(), $gradername::name());
         $mform->addHelpButton($gradername::prefix(), 
                               $gradername::prefix(), 
                               'poasassignment_'.$gradername::prefix());
@@ -214,7 +214,7 @@ abstract class grader {
         // Load current settings from db
         foreach(self::$settings as $field => $flag) {
             if($usedgraderrecord->teacherresultoptions & $flag)
-                $mform->setDefault($gradername::prefix().'teachershow'.$field,'true');
+                $mform->setDefault($gradername::prefix() . 'teachershow' . $field,'true');
         }
     }
     
@@ -228,13 +228,13 @@ abstract class grader {
         if($options & POASASSIGNMENT_GRADER_SHOW_RATING) 
             $html += "<br>Rating : ".(100 * $successfultestscount / count($testresults));
         if($options & POASASSIGNMENT_GRADER_SHOW_NUMBER_OF_PASSED_TESTS)
-            $html += "<br>Passed tests : ".$successfultestscount;
+            $html += "<br>Passed tests : " . $successfultestscount;
         
         foreach ($testresults as $testresult) {
             if($options & POASASSIGNMENT_GRADER_SHOW_TESTS_NAMES)
-                $html += "<br>".$testresult->testname;
+                $html += "<br>" . $testresult->testname;
             if($options & POASASSIGNMENT_GRADER_SHOW_TEST_INPUT_DATA)
-                $html += "<br>".$testresult->testinputdata;
+                $html += "<br>" . $testresult->testinputdata;
         }
     }
     

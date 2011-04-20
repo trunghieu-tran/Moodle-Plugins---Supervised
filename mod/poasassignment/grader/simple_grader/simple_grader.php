@@ -8,13 +8,15 @@ class simple_grader extends grader{
     }
     
     public static function name() {
-        return 'simple grader';
+        return get_string('simple_grader','poasassignment_simple_grader');
     }
     public static function prefix() {
         return __CLASS__;
     }
     public static function validation($data, &$errors) {
-        
+        if(isset($data[self::prefix()]) && !isset($data['answertext']))
+            $errors['answertext'] = get_string('textanswermustbeenabled',
+                                               'poasassignment_simple_grader');
     }
     
     public function test_attempt($attemptid, $taskid) {
