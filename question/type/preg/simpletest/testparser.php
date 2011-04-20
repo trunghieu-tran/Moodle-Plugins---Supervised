@@ -20,26 +20,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
-//$err = find_illegal_isnt_object($matcher->roots[0], 'root');if($err !== false){ echo '<br/> NON OBJECT!!!' . $err . '<br/>';}
-
-function find_illegal_isnt_object($node, $path) {
-    if(!is_object($node)) {
-        return $path;
-    } elseif ($node->type == NODE) {
-        if ($node->subtype == NODE_CONC || $node->subtype == NODE_ALT) {
-            $result = find_illegal_isnt_object($node->operands[1], $path . '->operands[1]');
-            if ($result !== false) {
-                return $result;
-            }
-        }
-        $result = find_illegal_isnt_object($node->operands[0], $path . '->operands[0]');
-        if ($result !== false) {
-            return $result;
-        }
-    }
-    return false;
-}
-
 class parser_test extends UnitTestCase {
 
     //Unit test for lexer
@@ -231,6 +211,21 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_PLB);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_NLB);
+    }
+    function test_lexer_recursion_and_options() {
+        $regex = '(?xm-is)(?R)(?14)';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $token = $lexer->nextToken();//(?xm-is)
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->posopt=='xm' && $token->value->negopt=='is');
+        $token = $lexer->nextToken();//(?R)
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type==preg_node::TYPE_LEAF_RECURSION && $token->value->number==0);
+        $token = $lexer->nextToken();//(?14)
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type==preg_node::TYPE_LEAF_RECURSION && $token->value->number==14);
     }
     function test_lexer_index() {
         $regex = 'ab{12,57}[abc]';
