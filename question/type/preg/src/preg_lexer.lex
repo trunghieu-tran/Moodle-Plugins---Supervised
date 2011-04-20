@@ -29,6 +29,21 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
             if ($name == 'preg_node_finite_quant') {
                 $result->rightborder = $rightborder;
             }
+        } elseif ($name == 'preg_leaf_option') {
+            $text = substr($charclass, 2, strlen($charclass)-3);
+            $index = strpos($text, '-');
+            if ($index === false) {
+                $result->posopt = $text;
+            } else {
+                $result->posopt = substr($text, 0, $index);
+                $result->negopt = substr($text, $index+1);
+            }
+        } elseif ($name == 'preg_leaf_recursion') {
+            if ($charclass[2]=='R') {
+                $result->number=0;
+            } else { 
+                $result->number = substr($charclass, 2, strlen($charclass)-3); 
+            }
         }
         $result->indfirst = $this->yychar;
         $text = $this->yytext();
@@ -264,6 +279,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> "$" {
     $leaf = $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
+    return $res;
+}
+<YYINITIAL> \(\?[imsxUXJ]*(-[imsxUXJ]*)?\) {
+    $text = $this->yytext();
+    $leaf = $this->form_node('preg_leaf_option', null, $text);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
+    return $res;
+}
+<YYINITIAL> \(\?(R|[0-9]+)\) {
+    $text = $this->yytext();
+    $leaf = $this->form_node('preg_leaf_recursion', null, $text);
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
