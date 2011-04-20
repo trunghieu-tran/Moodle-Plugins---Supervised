@@ -163,10 +163,11 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $this->graders=$DB->get_records('poasassignment_graders');
         foreach ($this->graders as $graderrecord) {
             require_once($graderrecord->path);
-            $grader = new $graderrecord->name();
             $mform->addElement('checkbox',$graderrecord->name,get_string($graderrecord->name,'poasassignment_simple_grader'));
+            $conditions = array('poasassignmentid' => $this->_instance, 'graderid' => $graderrecord->id);
+            if($DB->record_exists('poasassignment_used_graders',$conditions))
+                $mform->setDefault($graderrecord->name,'true');
         }
-        // TODO show graders list with checkboxes
 
         // add standard elements, common to all modules
         //----------------------------------------------------------------------
