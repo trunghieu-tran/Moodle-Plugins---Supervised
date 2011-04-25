@@ -1,5 +1,6 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
+$string['pluginname'] = 'Abstract autograder';
 $string['addinggrader'] = 'Adding grader';
 $string['editinggrader'] = 'Editing grader.';
 $string['grader'] = 'Abstract autograder';
