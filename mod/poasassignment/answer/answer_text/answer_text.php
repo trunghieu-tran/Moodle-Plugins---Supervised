@@ -1,5 +1,6 @@
 <?php
-require_once('answer.php');
+require_once(dirname(__FILE__).'\answer.php');
+
 // require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class poasassignment_answer_text extends poasassignment_answer {
     var $checked;
