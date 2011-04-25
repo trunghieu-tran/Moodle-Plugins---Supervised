@@ -31,16 +31,16 @@ function xmldb_poasassignment_install() {
     global $DB;
     
     // Add info about default plugins into table
-    $record->name='poasassignment_answer_file';
-    $record->path='answer/answer_file.php';
-    if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
-        $DB->insert_record('poasassignment_plugins',$record);
+    //$record->name='poasassignment_answer_file';
+    //$record->path='answer/answer_file.php';
+    //if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
+    //    $DB->insert_record('poasassignment_plugins',$record);
     
         
-    $record->name='poasassignment_answer_text';
-    $record->path='answer/answer_text.php';
-    if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
-        $DB->insert_record('poasassignment_plugins',$record);
+    //$record->name='poasassignment_answer_text';
+    //$record->path='answer/answer_text.php';
+    //if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
+    //    $DB->insert_record('poasassignment_plugins',$record);
 
     // Add taskgivers in table
     /* $record = new stdClass();
