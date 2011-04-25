@@ -1,5 +1,6 @@
 <?php
-require_once('answer.php');
+require_once(dirname(__FILE__).'\answer.php');
+//require_once('answer.php');
 
 class poasassignment_answer_file extends poasassignment_answer {
     var $checked;
