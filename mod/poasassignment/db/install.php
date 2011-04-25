@@ -43,7 +43,7 @@ function xmldb_poasassignment_install() {
         $DB->insert_record('poasassignment_plugins',$record);
 
     // Add taskgivers in table
-    $record = new stdClass();
+    /* $record = new stdClass();
 
     $files = scandir( dirname(dirname(__FILE__)).'\\taskgivers');
     foreach($files as $file) {
@@ -57,7 +57,7 @@ function xmldb_poasassignment_install() {
             if (!$DB->record_exists('poasassignment_taskgivers',array('path'=>$record->path)))
                 $DB->insert_record('poasassignment_taskgivers',$record);
         }
-    }
+     }*/
 
     // Add message provider
     $provider = new stdClass();
