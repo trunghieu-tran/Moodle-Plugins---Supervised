@@ -65,7 +65,7 @@ class poasassignment_model {
             $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
         if(!$this->assignee)
             $this->assignee->id=0;
-        $this->plugins=$DB->get_records('poasassignment_plugins');
+        $this->plugins=$DB->get_records('poasassignment_answers');
         $this->graders = $DB->get_records('poasassignment_graders');
     }
     /** 
@@ -86,7 +86,7 @@ class poasassignment_model {
      */
     public function get_plugins() {
         if(!$this->plugins)
-            $this->plugins=$DB->get_records('poasassignment_plugins');
+            $this->plugins=$DB->get_records('poasassignment_answers');
         return $this->plugins;
     }
     
@@ -189,12 +189,12 @@ class poasassignment_model {
         $this->delete_files($cm->id);
         $DB->delete_records('poasassignment', array('id' => $id));
         $DB->delete_records('poasassignment_tasks', array('poasassignmentid' => $id));
-        $types=$DB->get_records('poasassignment_type_settings', array('poasassignmentid' => $id));
+        $types=$DB->get_records('poasassignment_answer_settings', array('poasassignmentid' => $id));
         foreach( $types as $type) {
-            $DB->delete_records('poasassignment_plugins', array('id' => $type->pluginid));
+            $DB->delete_records('poasassignment_answers', array('id' => $type->pluginid));
         }
         $DB->delete_records('poasassignment_used_graders',array('poasassignmentid' => $id));
-        $DB->delete_records('poasassignment_type_settings', array('poasassignmentid' => $id));
+        $DB->delete_records('poasassignment_answer_settings', array('poasassignmentid' => $id));
         $DB->delete_records('poasassignment_criterions', array('poasassignmentid' => $id));
         $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $id));
         foreach( $fields as $field) {

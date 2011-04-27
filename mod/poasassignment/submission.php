@@ -22,7 +22,7 @@ $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulen
 
 global $DB,$USER;
 $answer_form=new answer_form(null,array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id,'id'=>$cm->id));
-//$plugins=$DB->get_records('poasassignment_plugins');
+//$plugins=$DB->get_records('poasassignment_answers');
 
 $poasmodel = poasassignment_model::get_instance($poasassignment);
 $plugins=$poasmodel->get_plugins();

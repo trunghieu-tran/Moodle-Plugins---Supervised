@@ -47,7 +47,7 @@ class submissions_page extends abstract_page {
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
         $plugins=$poasmodel->get_plugins();
-        //$plugins=$DB->get_records('poasassignment_plugins');
+        //$plugins=$DB->get_records('poasassignment_answers');
         
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);

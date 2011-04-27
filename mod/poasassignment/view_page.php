@@ -264,7 +264,7 @@ class view_page extends abstract_page {
     
     function view_answer_block() {
         global $OUTPUT,$DB,$USER;
-        //$plugins=$DB->get_records('poasassignment_plugins');
+        //$plugins=$DB->get_records('poasassignment_answers');
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
