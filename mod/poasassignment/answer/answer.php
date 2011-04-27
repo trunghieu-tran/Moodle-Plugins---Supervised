@@ -25,7 +25,7 @@ class poasassignment_answer {
     // Delete all subplugin settings from DB
     function delete_settings($poasassignmentid) {
         global $DB;
-        return $DB->delete_records('poasassignment_type_settings',array('poasassignmentid'=>$poasassignmentid));
+        return $DB->delete_records('poasassignment_answer_settings',array('poasassignmentid'=>$poasassignmentid));
     }
     
     function return_settings_type($poasassignmentid,$type) {      
@@ -37,7 +37,7 @@ class poasassignment_answer {
     // Returns true, if plugin with $pluginid subplugin is used in poasassignment with $poasassignmentid
     static function used_in_poasassignment($pluginid,$poasassignmentid) {
         global $DB;
-        return $DB->record_exists('poasassignment_type_settings',array('poasassignmentid'=>$poasassignmentid,
+        return $DB->record_exists('poasassignment_answer_settings',array('poasassignmentid'=>$poasassignmentid,
                                                                 'pluginid'=>$pluginid));    
     }
     
@@ -81,7 +81,7 @@ class answer_form extends moodleform {
         global $DB;
         $mform = $this->_form;
         $instance = $this->_customdata;
-        $plugins=$DB->get_records('poasassignment_plugins');
+        $plugins=$DB->get_records('poasassignment_answers');
         foreach($plugins as $plugin) {
             if(poasassignment_answer::used_in_poasassignment($plugin->id,$instance['poasassignmentid'])) {
                 require_once($plugin->path);

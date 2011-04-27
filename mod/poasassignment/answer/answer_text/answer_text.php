@@ -1,23 +1,23 @@
 <?php
-require_once(dirname(__FILE__).'\answer.php');
+require_once(dirname(dirname(__FILE__)).'\answer.php');
 
 // require_once($CFG->dirroot.'/course/moodleform_mod.php');
-class poasassignment_answer_text extends poasassignment_answer {
+class answer_text extends poasassignment_answer {
     var $checked;
-    function poasassignment_answer_text() {
+    function answer_text() {
         global $DB;
-        //if ($DB->get_records('poasassignment_plugins',array('name'=>'poasassignment_answer_text'))>=1) {
-        $plugin=$DB->get_record('poasassignment_plugins',array('name'=>'poasassignment_answer_text'));
+        //if ($DB->get_records('poasassignment_answers',array('name'=>'answer_text'))>=1) {
+        $plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_text'));
         if ($plugin) {
             $this->pluginid=$plugin->id;  
         }        
     }
     function insert_plugin_in_db() {
         global $DB;
-        $record->name='poasassignment_answer_text';
+        $record->name='answer_text';
         $record->path='answer/answer_text.php';
-        if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
-            $DB->insert_record('poasassignment_plugins',$record);
+        if (!$DB->record_exists('poasassignment_answers',array('name'=>$record->name,'path'=>$record->path)))
+            $DB->insert_record('poasassignment_answers',$record);
     }
     
     /** Display plugin settings 
@@ -29,7 +29,7 @@ class poasassignment_answer_text extends poasassignment_answer {
         $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));
         $mform->addElement('checkbox','answertext', get_string('answertext','poasassignment'));
         $conditions = array('poasassignmentid'=>$poasassignmentid,'pluginid'=>$this->pluginid);
-        if ($DB->record_exists('poasassignment_type_settings',$conditions))
+        if ($DB->record_exists('poasassignment_answer_settings',$conditions))
             $mform->setDefault('answertext','true');
         $mform->addHelpButton('answertext', 'answertext', 'poasassignment');
     }
@@ -70,14 +70,14 @@ class poasassignment_answer_text extends poasassignment_answer {
         if ($this->checked) {
             $settingsrecord->poasassignmentid=$id;
             $settingsrecord->pluginid=$this->pluginid;
-            $DB->insert_record('poasassignment_type_settings',$settingsrecord);
+            $DB->insert_record('poasassignment_answer_settings',$settingsrecord);
         }
     }
     function update_settings($poasassignment) {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignment->id,
                 'pluginid'=>$this->pluginid);
-        $recordexists = $DB->record_exists('poasassignment_type_settings',$conditions);
+        $recordexists = $DB->record_exists('poasassignment_answer_settings',$conditions);
         if (!$recordexists)
             $this->save_settings($poasassignment,$poasassignment->id);
         if ($recordexists && !$this->checked)
@@ -87,7 +87,7 @@ class poasassignment_answer_text extends poasassignment_answer {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid);
-        return $DB->delete_records('poasassignment_type_settings',$conditions);
+        return $DB->delete_records('poasassignment_answer_settings',$conditions);
     }
     function configure_flag($poasassignment) {
         if (isset($poasassignment->answertext)) {

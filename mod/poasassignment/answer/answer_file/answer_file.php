@@ -1,24 +1,24 @@
 <?php
-require_once(dirname(__FILE__).'\answer.php');
+require_once(dirname(dirname(__FILE__)).'\answer.php');
 //require_once('answer.php');
 
-class poasassignment_answer_file extends poasassignment_answer {
+class answer_file extends poasassignment_answer {
     var $checked;
     var $fieldnames = array ( 'fileamount','maxfilesize','fileextensions');
-    function poasassignment_answer_file() {
+    function answer_file() {
         global $DB;
-        //if ($DB->get_records('poasassignment_plugins',array('name'=>'poasassignment_answer_file'))>=1) {
-        $plugin=$DB->get_record('poasassignment_plugins',array('name'=>'poasassignment_answer_file'));
+        //if ($DB->get_records('poasassignment_answers',array('name'=>'answer_file'))>=1) {
+        $plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
         if ($plugin) {
             $this->pluginid=$plugin->id;
         }
     }
     function insert_plugin_in_db() {
         global $DB;
-        $record->name='poasassignment_answer_file';
+        $record->name='answer_file';
         $record->path='answer/answer_file.php';
-        if (!$DB->record_exists('poasassignment_plugins',array('name'=>$record->name,'path'=>$record->path)))
-            $DB->insert_record('poasassignment_plugins',$record);
+        if (!$DB->record_exists('poasassignment_answers',array('name'=>$record->name,'path'=>$record->path)))
+            $DB->insert_record('poasassignment_answers',$record);
     }
     
     /** Display plugin settings 
@@ -31,7 +31,7 @@ class poasassignment_answer_file extends poasassignment_answer {
         $mform->addElement('checkbox','answerfile', get_string('answerfile','poasassignment'));
         
         $conditions = array('poasassignmentid'=>$poasassignmentid,'pluginid'=>$this->pluginid);
-        if ($DB->record_exists('poasassignment_type_settings',$conditions))
+        if ($DB->record_exists('poasassignment_answer_settings',$conditions))
             $mform->setDefault('answerfile','true');
         $mform->addHelpButton('answerfile', 'answerfile', 'poasassignment');
         
@@ -40,8 +40,8 @@ class poasassignment_answer_file extends poasassignment_answer {
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid,
                 'name'=>'fileamount');
-        if ($DB->record_exists('poasassignment_type_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_type_settings',$conditions);
+        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
+            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
             $mform->setDefault('fileamount',$rec->value);
         }
         $mform->disabledIf('fileamount','answerfile');
@@ -53,8 +53,8 @@ class poasassignment_answer_file extends poasassignment_answer {
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid,
                 'name'=>'maxfilesize');
-        if ($DB->record_exists('poasassignment_type_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_type_settings',$conditions);
+        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
+            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
             $mform->setDefault('maxfilesize',$rec->value);
         }
         $mform->disabledIf('maxfilesize','answerfile');
@@ -64,8 +64,8 @@ class poasassignment_answer_file extends poasassignment_answer {
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid,
                 'name'=>'fileextensions');
-        if ($DB->record_exists('poasassignment_type_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_type_settings',$conditions);
+        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
+            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
             $mform->setDefault('fileextensions',$rec->value);
             }
         $mform->addHelpButton('fileextensions', 'fileextensions', 'poasassignment');
@@ -78,31 +78,31 @@ class poasassignment_answer_file extends poasassignment_answer {
     function save_settings($poasassignment, $id) {
         global $DB;
         if ($this->checked) {
-            //$plugin=$DB->get_record('poasassignment_plugins',array('name'=>'poasassignment_answer_file'));
+            //$plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
             $settingsrecord->poasassignmentid=$id;
             //$settingsrecord->pluginid=$plugin->id;
             $settingsrecord->pluginid=$this->pluginid;
             
             $settingsrecord->name='fileamount';
             $settingsrecord->value=$poasassignment->fileamount;
-            $DB->insert_record('poasassignment_type_settings',$settingsrecord);
+            $DB->insert_record('poasassignment_answer_settings',$settingsrecord);
             
             $settingsrecord->name='maxfilesize';
             $settingsrecord->value=$poasassignment->maxfilesize;
-            $DB->insert_record('poasassignment_type_settings',$settingsrecord);
+            $DB->insert_record('poasassignment_answer_settings',$settingsrecord);
             
             $settingsrecord->name='fileextensions';
             $settingsrecord->value=$poasassignment->fileextensions;
-            $DB->insert_record('poasassignment_type_settings',$settingsrecord);
+            $DB->insert_record('poasassignment_answer_settings',$settingsrecord);
         }
     }
     function update_settings($poasassignment) {
         global $DB;
-        //$plugin=$DB->get_record('poasassignment_plugins',array('name'=>'poasassignment_answer_file'));
+        //$plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
         $conditions = array('poasassignmentid'=>$poasassignment->id,
                 //'pluginid'=>$plugin->id);
                 'pluginid'=>$this->pluginid);
-        $recordexists = $DB->record_exists('poasassignment_type_settings',$conditions);
+        $recordexists = $DB->record_exists('poasassignment_answer_settings',$conditions);
         if (!$recordexists)
             $this->save_settings($poasassignment,$poasassignment->id);
         //$temp=$poasassignment->flags&64;
@@ -115,40 +115,40 @@ class poasassignment_answer_file extends poasassignment_answer {
             
             $conditions = array('poasassignmentid'=>$poasassignment->id,
                     'name'=>'fileamount');
-            $currentsetting=$DB->get_record('poasassignment_type_settings',$conditions);
+            $currentsetting=$DB->get_record('poasassignment_answer_settings',$conditions);
             $settingsrecord->id=$currentsetting->id;
             $settingsrecord->name='fileamount';
             $settingsrecord->value=$poasassignment->fileamount;
-            $DB->update_record('poasassignment_type_settings',$settingsrecord);
+            $DB->update_record('poasassignment_answer_settings',$settingsrecord);
             
             $conditions = array('poasassignmentid'=>$poasassignment->id,
                     'name'=>'maxfilesize');
-            $currentsetting=$DB->get_record('poasassignment_type_settings',$conditions);
+            $currentsetting=$DB->get_record('poasassignment_answer_settings',$conditions);
             $settingsrecord->id=$currentsetting->id;
             $settingsrecord->name='maxfilesize';
             $settingsrecord->value=$poasassignment->maxfilesize;
-            $DB->update_record('poasassignment_type_settings',$settingsrecord);
+            $DB->update_record('poasassignment_answer_settings',$settingsrecord);
             
             $conditions = array('poasassignmentid'=>$poasassignment->id,
                     'name'=>'fileextensions');
-            $currentsetting=$DB->get_record('poasassignment_type_settings',$conditions);
+            $currentsetting=$DB->get_record('poasassignment_answer_settings',$conditions);
             $settingsrecord->id=$currentsetting->id;
             $settingsrecord->name='fileextensions';
             $settingsrecord->value=$poasassignment->fileextensions;
-            $DB->update_record('poasassignment_type_settings',$settingsrecord);
+            $DB->update_record('poasassignment_answer_settings',$settingsrecord);
         }
     }
     function delete_settings($poasassignmentid) {
         global $DB;
-        //$plugin=$DB->get_record('poasassignment_plugins',array('name'=>'poasassignment_answer_file'));
+        //$plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 //'pluginid'=>$plugin->id);
                 'pluginid'=>$this->pluginid);
-        return $DB->delete_records('poasassignment_type_settings',$conditions);
+        return $DB->delete_records('poasassignment_answer_settings',$conditions);
     }
     function show_answer_form($mform,$poasassignmentid) {
         global $DB;
-        /* $plugin_settings = $DB->get_records('poasassignment_type_settings',array('poasassignmentid'=>$poasassignmentid,
+        /* $plugin_settings = $DB->get_records('poasassignment_answer_settings',array('poasassignmentid'=>$poasassignmentid,
                                                             'pluginid'=>$this->pluginid)); */
         /* $mform = new answer_form_file();
         $mform->display(); */
@@ -158,9 +158,9 @@ class poasassignment_answer_file extends poasassignment_answer {
                 
         $options = array();
         $options['subdirs']=0;
-        $plugin_settings_size = $DB->get_record('poasassignment_type_settings',array('poasassignmentid'=>$poasassignmentid,
+        $plugin_settings_size = $DB->get_record('poasassignment_answer_settings',array('poasassignmentid'=>$poasassignmentid,
                                                             'pluginid'=>$this->pluginid,'name'=>'maxfilesize'));
-        $plugin_settings_amount = $DB->get_record('poasassignment_type_settings',array('poasassignmentid'=>$poasassignmentid,
+        $plugin_settings_amount = $DB->get_record('poasassignment_answer_settings',array('poasassignmentid'=>$poasassignmentid,
                                                             'pluginid'=>$this->pluginid,'name'=>'fileamount'));  
                                                                     
         $options['maxbytes'] = $plugin_settings_size->value;

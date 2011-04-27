@@ -108,7 +108,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         
         // Adding plugins fieldsets
         //----------------------------------------------------------------------
-        $this->plugins=$DB->get_records('poasassignment_plugins');
+        $this->plugins=$DB->get_records('poasassignment_answers');
         foreach ($this->plugins as $plugin) { 
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
