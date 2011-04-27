@@ -496,7 +496,7 @@ class dfa_preg_matcher extends preg_matcher {
         }
         parent::__construct($regex, $modifiers);
         $this->picnum=0;
-        $this->graphvizpath = 'C:/Program Files/Graphviz2.26.3/bin/';
+        $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';
         //building finite automates
         if ($this->is_error_exists()) {
             return;
@@ -585,26 +585,32 @@ class dfa_preg_matcher extends preg_matcher {
     */
     public function draw_fa ($number) {
         $fadotcode = $this->generate_fa_dot_code($number);
-        $dotfile = fopen($this->graphvizpath . 'dotcode.dot', 'w');
+        $dotfile = fopen('C:/dotfile/dotcode.dot', 'w');
         foreach ($fadotcode as $fadotstring) {
             fprintf($dotfile, "%s\n", $fadotstring);
         }
         chdir($this->graphvizpath);
-        exec('dot.exe -Tjpg -o"X:\home\moodle\www\question\type\preg\ZZZdfagraph'.$this->picnum.'.jpg" -Kdot dotcode.dot');
-        echo '<IMG src="http://moodle/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg"><br><br><br>';
+        exec('dot.exe -Tjpg -o"W:/home/moodle.local/www/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" -Kdot C:/dotfile/dotcode.dot');
+        echo '<IMG src="http://moodle.local/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" width="90%"><br><br><br>';
         $this->picnum++;
+		fclose($dotfile);
     }
     /**
     * Debug function generate dot code for drawing finite automate
     * @param number number of drawing finite automate
     */
-    protected function generate_fa_dot_code($number) {//do it protected on end of testing!
+    protected function generate_fa_dot_code($number) {
         $dotcode = array();
         $dotcode[] = 'digraph {';
         $dotcode[] = 'rankdir = LR;';
         foreach ($this->finiteautomates[$number] as $index=>$state) {
             foreach ($state->passages as  $leafcode=>$target) {
                 $symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+                if ($target==-2) {
+                    $target = '"Not build yet."';
+                } elseif ($target==-1) {
+                    $target = '"End state."';
+                }
                 $dotcode[] = "$index->$target"."[label=\"$symbol\"];";
             }
         }
