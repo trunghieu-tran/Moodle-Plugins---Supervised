@@ -114,7 +114,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index number of assert (0 for main regex) for which building fa
     */
     function buildfa($index) {
-        if ($index==0) {
+		if ($index==0) {
             $root = $this->roots[0];
         } else {
             $root = $this->roots[$index]->pregnode->operands[0];
@@ -124,7 +124,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->maxnum = 0;//no one leaf numerated, yet.
         $this->finiteautomates[$index][0] = new finite_automate_state;
         //form the map of following
-        $root->number($this->connection[$index], $maxnum);
+        $root->number($this->connection[$index], $this->maxnum);
         $root->nullable();
         $root->firstpos();
         $root->lastpos();
@@ -137,7 +137,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->finiteautomates[$index][0]->marked = false;//start state not marked, because not readey, yet
         //form the determined finite automate
         while ($this->not_marked_state($index) !== false) {
-            //while has one or more not ready state.
+			//while has one or more not ready state.
             $currentstateindex = $this->not_marked_state($index);
             $this->finiteautomates[$index][$currentstateindex]->marked = true;//mark current state, because it will be ready on this step of loop
             //form not marked state for each passage of current state
@@ -178,7 +178,13 @@ class dfa_preg_matcher extends preg_matcher {
                 }
             }
         }
-    }
+		foreach ($this->finiteautomates[$index] as $key=>$state) {
+			$this->del_double($this->finiteautomates[$index][$key]->passages, $index);
+		}
+		foreach ($this->finiteautomates[$index] as $key=>$state) {
+			$this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
+		}
+	}
     /**
     *function compare regex and string, with using of finite automate builded of buildfa function
     *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
@@ -366,8 +372,9 @@ class dfa_preg_matcher extends preg_matcher {
     *function append array2 to array1, non unique values not add
     *@param arr1 - first array
     *@param arr2 - second array, which will appended to arr1
+    *@param $index index of dfa for which do verify sybol unique
     */
-    static function push_unique(&$arr1, $arr2) {// to static
+    static protected function push_unique(&$arr1, $arr2) {// to static
         if (!is_array($arr1)) {
             $arr1 = array();
         }
@@ -377,7 +384,47 @@ class dfa_preg_matcher extends preg_matcher {
             }
         }
     }
-    
+    /**
+    *function delete repeat passages frm state of dfa
+    *@param $array array of passages of state of dfa
+    *@param $index index of dfa for which do verify sybol unique
+    */
+    protected function del_double(&$array, $index) {
+        foreach ($array as $leaf=>$Passage) {
+            foreach ($array as $member=>$passage) {//variable [Pp]assage not use, need only leaf and member
+                $typeequ = $this->connection[$index][$member]->pregnode->type==$this->connection[$index][$leaf]->pregnode->type;
+                $subtypeequ = $this->connection[$index][$member]->pregnode->subtype==$this->connection[$index][$leaf]->pregnode->subtype;
+                $directionequ = $this->connection[$index][$member]->pregnode->negative==$this->connection[$index][$leaf]->pregnode->negative;
+                if ($this->connection[$index][$member]->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $this->connection[$index][$leaf]->pregnode->type==preg_node::TYPE_LEAF_CHARSET) {
+                    $charsetequ = $this->connection[$index][$member]->pregnode->charset==$this->connection[$index][$leaf]->pregnode->charset;
+                } else {
+                    $charsetequ = true;
+                }
+                if ($leaf!=$member && $typeequ && $subtypeequ && $directionequ && $charsetequ) {
+                    unset($array[$leaf]);
+                }
+            }
+        }
+    }
+   /**
+    *function unite parallel passages in dfa state
+    *@param $array array of passages of state of dfa
+    *@param $index index of dfa for which do verify sybol unique
+    */
+	protected function unite_parallel(&$array, $index) {
+		foreach ($array as $key1=>$passage1) {
+            foreach ($array as $key2=>$passage2) {
+               if($passage1==$passage2 && $key1!=$key2) {
+					$newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
+					$newleaf = dfa_preg_node::from_preg_node($newleaf);
+					$this->connection[$index][++$this->maxnum] = $newleaf;
+					$array[$this->maxnum] = $passage1;
+					unset($array[$key1]);
+					unset($array[$key2]);
+			   }
+            }
+        }
+	}
     /**
     *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
     *@param index - number of automate
@@ -491,12 +538,13 @@ class dfa_preg_matcher extends preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
-        if (!isset($regex)) {//not build tree and dfa, if regex not given
+        $this->picnum=0;
+        $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';//in few unit tests dfa_preg_matcher objects create without regex,
+																		  //but dfa will be build later and need for drawing dfa may be
+		if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
         parent::__construct($regex, $modifiers);
-        $this->picnum=0;
-        $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';
         //building finite automates
         if ($this->is_error_exists()) {
             return;

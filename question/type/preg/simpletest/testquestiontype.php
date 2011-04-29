@@ -331,18 +331,16 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->build_tree('a|b');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
-        $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2 && $this->qtype->finiteautomates[0][0]->passages[1] == 1 && 
-                            $this->qtype->finiteautomates[0][0]->passages[2] == 1);
+        $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 1 && $this->qtype->finiteautomates[0][0]->passages[3] == 1);
         $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 1 && $this->qtype->finiteautomates[0][1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
     }
     function test_buildfa_alternative_and_iteration() {//(a|b)c*
-        $this->qtype->build_tree('(?:a|b)c*');
+		$this->qtype->build_tree('(?:a|b)c*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
-        $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2);
-        $n1 = $this->qtype->finiteautomates[0][0]->passages[1];
-        $this->assertTrue(count($this->qtype->finiteautomates[0][$n1]->passages) == 2 && $this->qtype->finiteautomates[0][$n1]->passages[3] == $n1 && 
-                            $this->qtype->finiteautomates[0][$n1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
+        $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 1);
+        $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 2 && $this->qtype->finiteautomates[0][1]->passages[3] == 1 && 
+                            $this->qtype->finiteautomates[0][1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
     }
     function test_buildfa_nesting_alternative_and_iteration() {//(ab|cd)*
         $this->qtype->build_tree('(?:ab|cd)*');

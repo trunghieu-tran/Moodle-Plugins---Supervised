@@ -15,7 +15,6 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class dfa_preg_matcher_complex_test extends UnitTestCase {
-    
     function test_easy() {
         $matcher = new dfa_preg_matcher('^abcd$');
         $matcher->match('fgh');
@@ -108,7 +107,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $result = $matcher->match('ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === '');
-    }
+	}
     function test_quantificator() {
         $matcher = new dfa_preg_matcher('^ab{15,35}c$');
         $result = $matcher->match('abbbbbc');

@@ -402,6 +402,14 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         parent::print_self($indent);
     }
 }
+class dfa_preg_leaf_combo extends dfa_preg_leaf {
+    public function not_supported() {
+        return false;
+    }
+    public function print_self($indent) {
+        echo 'Error!!!<br>Combo leafs forbidden in tree, only for connection table!';
+    }
+}
 abstract class dfa_preg_operator extends dfa_preg_node {
     public function number(&$connection, &$maxnum) {
         foreach ($this->pregnode->operands as $key => $operand) {
