@@ -31,6 +31,8 @@ abstract class preg_node {
     const TYPE_LEAF_RECURSION = 5;
     //Option set
     const TYPE_LEAF_OPTIONS = 6;
+	//Combination of few leaf
+	const TYPE_LEAF_COMBO = 7;
     //Highest possible leaf type
     const TYPE_LEAF_MAX = 99;
 
@@ -416,6 +418,120 @@ class preg_leaf_assert extends preg_leaf {
         $result = "$direction"."assert$type";
         return $result;
     }
+}
+class preg_leaf_combo extends preg_leaf {
+
+    //Unite of leafs
+    const SUBTYPE_UNITE = 1;
+    //Cross of leafs
+    const SUBTYPE_CROSS = 2;
+	
+	var $childs;
+	var $subtype;
+
+    public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_COMBO;
+    }
+
+    public function consumes() {//TODO: fix it!
+        if (is_array($this->childs)) {
+			return $this->childs[0]->consumes() || $this->childs[0]->consumes();
+		} else {
+			return true;
+		}
+    }
+
+    public function name() {
+        return 'leaf_combo';
+    }
+
+    public function match($str, $pos, &$length, $cs) {
+		$match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
+		$match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
+		if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
+			if ($match0 && $match1) {
+				$length = max($length0, $length1);
+			} elseif ($match0) {
+				$length = $length0;
+			} elseif ($match1) {
+				$length = $length1;
+			} else {
+				$length = 0;
+			}
+			$result = $match0 || $match1;
+		} elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
+			$result = $match0 && $match1;
+			if ($result) {
+				$length = max($length0, $length1);
+			} else {
+				$length = 0;
+			}
+		}
+		return $result;
+    }
+    public function character() {
+		if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
+			if (is_array($this->childs)) {
+				return $this->childs[0]->character();
+		} else {
+			return 'ERROR: combo of nothing!';
+		}
+		} elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
+			die('Implement preg_leaf_combo::character() for crossing of leaf, before use it!');
+		}
+    }
+    public function tohr() {
+		if (is_array($this->childs)) {
+			return $this->childs[0]->tohr().$this->childs[1]->tohr();
+		} else {
+			return 'ERROR: combo of nothing!';
+		}
+    }
+	static public function get_unite($leaf0, $leaf1) {
+		if ($leaf0->type == preg_node::TYPE_LEAF_CHARSET && $leaf1->type == preg_node::TYPE_LEAF_CHARSET) {
+			$result = new preg_leaf_charset;
+			if ($leaf0->negative && $leaf1->negative) {
+				$result->negative = true;
+				$result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
+			} elseif ($leaf0->negative) {
+				$result->negative = true;
+				$result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
+			} elseif ($leaf1->negative) {
+				$result->negative = true;
+				$result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
+			} else {
+				$result->negative = false;
+				$result->charset = $leaf0->charset.$leaf1->charset;
+			}
+		} else {
+			$result = new preg_leaf_combo;
+			$result->subtype = preg_leaf_combo::SUBTYPE_UNITE;
+			$result->childs[0] = $leaf0;
+			$result->childs[1] = $leaf1;
+		}
+		return $result;
+	}
+	static public function get_cross($leaf0, $leaf1) {
+		die ('Implement preg_leaf_combo::get_unite(), before use it!');
+	}
+	static public function cross_charsets($charset0, $charset1) {
+		$result = '';
+		for ($i=0; $i<strlen($charset0); $i++) {
+			if (strpos($charset1, $charset0[$i])!==false) {
+				$result.$charset0[$i];
+			}
+		}
+		return $result;
+	}
+	static public function sub_charsets($charset0, $charset1) {
+		$result = '';
+		for ($i=0; $i<strlen($charset0); $i++) {
+			if (strpos($charset1, $charset0[$i])===false) {
+				$result.$charset0[$i];
+			}
+		}
+		return $result;
+	}
 }
 
 class preg_leaf_backref extends preg_leaf {
