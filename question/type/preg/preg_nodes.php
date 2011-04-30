@@ -70,18 +70,17 @@ abstract class preg_node {
 
     /**
     * Return class name without 'preg_' prefix
+    * Interface string for the node name should be exactly same (and start from upper-case character)
+    * if class not overloading ui_nodename function
     */
     abstract public function name();
 
-    /*
-    //Returns interface name string for the node
-    abstract public function nodename();//TODO - implement if will be useful
 
     //May be overloaded by childs to change name using data from $this->pregnode
     public function ui_nodename() {
-        return get_string($this->nodename(), 'qtype_preg');
+        return get_string($this->name(), 'qtype_preg');
     }
-    */
+
 }
 
 /**
@@ -148,7 +147,9 @@ class preg_leaf_charset extends preg_leaf {
         return 'leaf_charset';
     }
 
+    //TODO - ui_nodename()
     public function match($str, $pos, &$length, $cs) {
+
         if ($pos>=strlen($str)) {
             $length = 0;
             return false;
@@ -223,6 +224,9 @@ class preg_leaf_meta extends preg_leaf {
     public function name() {
         return 'leaf_meta';
     }
+
+    //TODO - ui_nodename()
+
     public function character() {
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
@@ -325,7 +329,9 @@ class preg_leaf_assert extends preg_leaf {
         return 'leaf_assert';
     }
 
+    //TODO - ui_nodename()
     public function match($str, $pos, &$length, $cs) {
+
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
@@ -459,6 +465,7 @@ class preg_leaf_option extends preg_leaf {
     }
 }
 
+    //TODO - ui_nodename()
 class preg_leaf_recursion extends preg_leaf {
 
     public $number;
@@ -516,6 +523,7 @@ class preg_node_finite_quant extends preg_operator {
         return 'node_finite_quant';
     }
 
+    //TODO - ui_nodename()
 }
 
 /**
@@ -539,6 +547,7 @@ class preg_node_infinite_quant extends preg_operator {
         return 'node_infinite_quant';
     }
 
+    //TODO - ui_nodename()
 }
 
 /**
@@ -595,6 +604,7 @@ class preg_node_assert extends preg_operator {
         return 'node_assert';
     }
 
+    //TODO - ui_nodename()
 }
 
 /**
@@ -621,6 +631,7 @@ class preg_node_subpatt extends preg_operator {
         return 'node_subpatt';
     }
 
+    //TODO - ui_nodename()
 }
 
 /**
@@ -661,6 +672,7 @@ class preg_node_cond_subpatt extends preg_operator {
         return 'node_cond_subpatt';
     }
 
+    //TODO - ui_nodename()
 }
 class preg_node_error extends preg_node {
     public function name() {
