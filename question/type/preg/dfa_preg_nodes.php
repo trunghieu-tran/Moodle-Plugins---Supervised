@@ -23,153 +23,32 @@ abstract class dfa_preg_node {
     public $firstpos;
     public $lastpos;
     public $number;
+    /**
+    * Message with UI node name describing the reason for rejection
+    */
+    public $rejectmsg;
 
-    //TODO decide, if it could also do convert_tree job...
-    public function __construct($node) {
+    public function __construct($node, &$matcher) {
         $this->pregnode = $node;
         //Convert operands to dfa nodes
         if (is_a($node, 'preg_operator')) {
             foreach ($node->operands as $key=>$operand) {
                 if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $node->operands[$key] =& self::from_preg_node($operand);
+                    $node->operands[$key] =& $matcher->from_preg_node($operand);
                 }
             }
         }
     }
-    
+
     /**
-    * DFA node factory
-    * @param pregnode preg_node child class instance
-    * @return corresponding dfa_preg_node child class instance
+    * Returns true if engine support the node, false otherwise
+    * When returnig false should also set rejectmsg field
     */
-    static public function &from_preg_node($pregnode) {
-        $name = $pregnode->name();
-        switch ($name) {
-            case 'node_finite_quant':
-                $pregnode =& self::convert_finite_quant($pregnode);
-                break;
-            case 'node_infinite_quant':
-                $pregnode =& self::convert_infinite_quant($pregnode);
-                break;
-            case 'node_subpatt':
-                $pregnode =& self::convert_subpatt($pregnode);
-                break;
-        }
-        $dfanodename = 'dfa_preg_'.$pregnode->name();
-        if (class_exists($dfanodename)) {
-            $dfanode = new $dfanodename($pregnode);
-        } else {
-            $dfanode = $pregnode;
-        }
-        return $dfanode;
+    public function accept() {
+        return true; //accepting anything by default, overload function in case of partial accepting or total rejection
     }
-    
-    /**
-    * Function convert subpattern to grouping
-    * @param node node with subpattern
-    * @return node without subpattern, because grouping isn't node
-    */
-    static protected function &convert_subpatt($node) {
-        return $node->operands[0];
-    }
-    
-    /**
-    * Function convert operand{} quantificater to operand and operand? combination
-    * @param node node with {}
-    * @return node subtree with ? 
-    */
-    static protected function &convert_finite_quant($node) {
-        if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
-            $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
-            $subroot->operands[0] = self::copy_preg_node($tmp);
-            $subroot->operands[1] = self::copy_preg_node($tmp);
-            $count = $node->leftborder;
-            for ($i=2; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] = self::copy_preg_node($tmp);
-                $subroot = $newsubroot;
-            }
-            $tmp = new preg_node_finite_quant;
-            $tmp->leftborder = 0;
-            $tmp->rightborder = 1;
-            $tmp->operands[0] = $node->operands[0];
-            if ($node->leftborder == 0) {
-                $subroot->operands[0] =& self::copy_preg_node($tmp);
-                $subroot->operands[1] =& self::copy_preg_node($tmp);
-                $count = $node->rightborder - 2;
-            } else if ($node->leftborder == 1) {
-                $subroot->operands[1] =& self::copy_preg_node($tmp);
-                $count = $node->rightborder - 2;
-            } else {
-                $count = $node->rightborder - $node->leftborder;
-            }
-            for ($i=0; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] =& self::copy_preg_node($tmp);
-                $subroot = $newsubroot;
-            }
-            return $subroot;
-        }
-        return $node;
-    }
-    
-    /**
-    * Function convert operand{} quantificater to operand, operand? and operand* combination
-    * @param node node with {}
-    * @return node subtree with ? *
-    */
-    static protected function &convert_infinite_quant($node) {
-        if ($node->leftborder == 0) {
-            return $node;
-        } else if ($node->leftborder == 1) {
-            $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
-            $subroot->operands[0] =& self::copy_preg_node($tmp);
-            $subroot->operands[1] =& self::copy_preg_node($node);
-            $subroot->operands[1]->leftborder = 0;
-        } else {
-            $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
-            $subroot->operands[0] =& self::copy_preg_node($tmp);
-            $subroot->operands[1] =& self::copy_preg_node($tmp);
-            $count = $node->leftborder;
-            for ($i=2; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
-                $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] =& self::copy_preg_node($tmp);
-                $subroot = $newsubroot;
-            }
-            $newsubroot = new preg_node_concat;
-            $newsubroot->operands[0] =& self::copy_preg_node($subroot);
-            $newsubroot->operands[1] =& self::copy_preg_node($node);
-            $newsubroot->operands[1]->leftborder = 0;
-            $subroot = $newsubroot;
-        }
-        return $subroot;
-    }
-    
-    /**
-    * Function copy node with subtree, no reference
-    * @param node node for copying
-    * @return copy of node(and subtree)
-    */
-    static protected function &copy_preg_node($node) {
-        $name = 'preg_'.$node->name();
-        $result = new $name;
-        $result = clone $node;
-        if (is_a($node, 'preg_operator')) {
-            foreach ($result->operands as $key=>$operand) {
-                if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $result->operands[$key] = self::copy_preg_node($operand);
-                }
-            }
-        }
-        return $result;
-    }
-    
+
+
     /**
     *Function print indent before something
     *@param indent size of indent in count of 5 dot
@@ -581,6 +460,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_operator {
+
     public function nullable() {
         //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
@@ -624,9 +504,11 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
+
     public function followpos(&$fpmap) {
         dfa_preg_operator::followpos(&$fpmap);
     }
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node finite quant<br/>';
