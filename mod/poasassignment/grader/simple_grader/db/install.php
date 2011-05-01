@@ -5,5 +5,6 @@ function xmldb_poasassignment_simple_grader_install() {
     $rec = new stdClass();
     $rec->name = 'simple_grader';
     $rec->path = 'grader\simple_grader\simple_grader.php';
-    $DB->insert_record('poasassignment_graders',$rec);
+    if(!$DB->record_exists('poasassignment_graders', array('name' => $rec->name)))
+        $DB->insert_record('poasassignment_graders', $rec);
 }
