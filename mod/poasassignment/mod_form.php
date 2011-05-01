@@ -106,9 +106,9 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'notifystudents', get_string('notifystudents', 'poasassignment'));
         $mform->addHelpButton('notifystudents', 'notifystudents', 'poasassignment');
         
-        // Adding plugins fieldsets
+        // Adding answers fieldsets
         //----------------------------------------------------------------------
-        $this->plugins=$DB->get_records('poasassignment_answers');
+        $this->plugins = $DB->get_records('poasassignment_answers');
         foreach ($this->plugins as $plugin) { 
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();

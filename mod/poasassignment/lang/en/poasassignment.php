@@ -29,12 +29,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$files = scandir( dirname(dirname(dirname(__FILE__))).'\\taskgivers');
+/* $files = scandir( dirname(dirname(dirname(__FILE__))).'\\taskgivers');
 foreach($files as $file) {
     if(is_dir(dirname(dirname(dirname(__FILE__))).'\\taskgivers\\'.$file) && $file !== '.' && $file !== '..') {
         require_once(dirname(dirname(dirname(__FILE__))).'\\taskgivers\\'.$file.'\\lang\\en.php');
     }
-}
+} */
 
 $string['modulename'] = 'POAS assignment';
 $string['modulenameplural'] = 'POAS assignments';

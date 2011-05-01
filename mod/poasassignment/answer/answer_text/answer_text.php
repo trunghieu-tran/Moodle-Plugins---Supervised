@@ -26,7 +26,7 @@ class answer_text extends poasassignment_answer {
      */
     function show_settings($mform,$poasassignmentid) {
         global $DB;
-        $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));
+        $mform->addElement('header','answertextheader',get_string('answertext','poasassignment_answertypes_answer_text'));
         $mform->addElement('checkbox','answertext', get_string('answertext','poasassignment'));
         $conditions = array('poasassignmentid'=>$poasassignmentid,'pluginid'=>$this->pluginid);
         if ($DB->record_exists('poasassignment_answer_settings',$conditions))
