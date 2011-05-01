@@ -7,18 +7,11 @@ class answer_file extends poasassignment_answer {
     var $fieldnames = array ( 'fileamount','maxfilesize','fileextensions');
     function answer_file() {
         global $DB;
-        //if ($DB->get_records('poasassignment_answers',array('name'=>'answer_file'))>=1) {
-        $plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
+        $plugin = $DB->get_record('poasassignment_answers',
+                                  array('name' => 'answer_file'));
         if ($plugin) {
-            $this->pluginid=$plugin->id;
+            $this->pluginid = $plugin->id;
         }
-    }
-    function insert_plugin_in_db() {
-        global $DB;
-        $record->name='answer_file';
-        $record->path='answer/answer_file.php';
-        if (!$DB->record_exists('poasassignment_answers',array('name'=>$record->name,'path'=>$record->path)))
-            $DB->insert_record('poasassignment_answers',$record);
     }
     
     /** Display plugin settings 
@@ -27,49 +20,85 @@ class answer_file extends poasassignment_answer {
      */
     function show_settings($mform,$poasassignmentid) {
         global $CFG,$COURSE,$DB;
-        $mform->addElement('header','answerfileheader',get_string('answerfile','poasassignment'));
-        $mform->addElement('checkbox','answerfile', get_string('answerfile','poasassignment'));
         
-        $conditions = array('poasassignmentid'=>$poasassignmentid,'pluginid'=>$this->pluginid);
-        if ($DB->record_exists('poasassignment_answer_settings',$conditions))
-            $mform->setDefault('answerfile','true');
-        $mform->addHelpButton('answerfile', 'answerfile', 'poasassignment');
+        // Adding header
+        //----------------------------------------------------------------------
+        $mform->addElement('header',
+                           'answerfileheader',
+                           get_string('pluginname', 'poasassignmentanswertypes_answer_file'));
+                           
+        // Adding selection checkbox
+        //----------------------------------------------------------------------
+        $mform->addElement('checkbox',
+                           'answerfile',
+                           get_string('answerfile', 'poasassignmentanswertypes_answer_file'));
         
-        $mform->addElement('select','fileamount',get_string('submissionfilesamount','poasassignment'),array(
-            1,2,3,4,5,6,7,8,9,10));
-        $conditions = array('poasassignmentid'=>$poasassignmentid,
-                'pluginid'=>$this->pluginid,
-                'name'=>'fileamount');
-        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
-            $mform->setDefault('fileamount',$rec->value);
+        $conditions = array('poasassignmentid' => $poasassignmentid, 
+                            'pluginid' => $this->pluginid);
+        if ($DB->record_exists('poasassignment_answer_settings', $conditions))
+            $mform->setDefault('answerfile', 'true');
+        $mform->addHelpButton('answerfile', 
+                              'answerfile', 
+                              'poasassignmentanswertypes_answer_file');
+        
+        // Adding file amount counter
+        //----------------------------------------------------------------------
+        $mform->addElement('select', 
+                           'fileamount', 
+                           get_string('submissionfilesamount', 
+                                      'poasassignmentanswertypes_answer_file'), 
+                           array(1,2,3,4,5,6,7,8,9,10));
+        $conditions = array('poasassignmentid' => $poasassignmentid,
+                            'pluginid' => $this->pluginid,
+                            'name' => 'fileamount');
+        if ($DB->record_exists('poasassignment_answer_settings', $conditions)) {
+            $rec = $DB->get_record('poasassignment_answer_settings', $conditions);
+            $mform->setDefault('fileamount', $rec->value);
         }
-        $mform->disabledIf('fileamount','answerfile');
-        $mform->addHelpButton('fileamount', 'submissionfilesamount', 'poasassignment');
+        $mform->disabledIf('fileamount', 'answerfile');
+        $mform->addHelpButton('fileamount', 
+                              'submissionfilesamount', 
+                              'poasassignmentanswertypes_answer_file');
+        
+        // Adding maximum upload size selectbox
+        //----------------------------------------------------------------------
         
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
-        $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
-        $mform->addElement('select', 'maxfilesize', get_string('submissionfilemaxsize', 'poasassignment'), $choices);
-        $conditions = array('poasassignmentid'=>$poasassignmentid,
-                'pluginid'=>$this->pluginid,
-                'name'=>'maxfilesize');
-        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
-            $mform->setDefault('maxfilesize',$rec->value);
+        $choices[0] = get_string('courseuploadlimit') . ' (' . display_size($COURSE->maxbytes) . ')';
+        $mform->addElement('select', 
+                           'maxfilesize', 
+                           get_string('submissionfilemaxsize', 
+                                      'poasassignmentanswertypes_answer_file'), 
+                           $choices);
+        $conditions = array('poasassignmentid' => $poasassignmentid,
+                            'pluginid' => $this->pluginid,
+                            'name' => 'maxfilesize');
+        if ($DB->record_exists('poasassignment_answer_settings', $conditions)) {
+            $rec = $DB->get_record('poasassignment_answer_settings', $conditions);
+            $mform->setDefault('maxfilesize', $rec->value);
         }
-        $mform->disabledIf('maxfilesize','answerfile');
-        $mform->addHelpButton('maxfilesize', 'submissionfilemaxsize', 'poasassignment');
+        $mform->disabledIf('maxfilesize', 'answerfile');
+        $mform->addHelpButton('maxfilesize', 
+                              'submissionfilemaxsize', 
+                              'poasassignmentanswertypes_answer_file');
         
-        $mform->addElement('text', 'fileextensions', get_string('fileextensions', 'poasassignment'), array('size'=>'64'));
-        $conditions = array('poasassignmentid'=>$poasassignmentid,
-                'pluginid'=>$this->pluginid,
-                'name'=>'fileextensions');
-        if ($DB->record_exists('poasassignment_answer_settings',$conditions)) {
-            $rec=$DB->get_record('poasassignment_answer_settings',$conditions);
-            $mform->setDefault('fileextensions',$rec->value);
+        // Adding file extensions string
+        //----------------------------------------------------------------------
+        $mform->addElement('text', 
+                           'fileextensions', 
+                           get_string('fileextensions', 'poasassignmentanswertypes_answer_file'), 
+                           array('size' => '64'));
+        $conditions = array('poasassignmentid' => $poasassignmentid,
+                            'pluginid' => $this->pluginid,
+                            'name' => 'fileextensions');
+        if ($DB->record_exists('poasassignment_answer_settings', $conditions)) {
+            $rec = $DB->get_record('poasassignment_answer_settings', $conditions);
+            $mform->setDefault('fileextensions', $rec->value);
             }
-        $mform->addHelpButton('fileextensions', 'fileextensions', 'poasassignment');
-        $mform->disabledIf('fileextensions','answerfile');
+        $mform->addHelpButton('fileextensions', 
+                              'fileextensions', 
+                              'poasassignmentanswertypes_answer_file');
+        $mform->disabledIf('fileextensions', 'answerfile');
     }
     
     static function validation($data, &$errors) {

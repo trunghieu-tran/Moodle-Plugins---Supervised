@@ -6,18 +6,11 @@ class answer_text extends poasassignment_answer {
     var $checked;
     function answer_text() {
         global $DB;
-        //if ($DB->get_records('poasassignment_answers',array('name'=>'answer_text'))>=1) {
-        $plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_text'));
+        $plugin = $DB->get_record('poasassignment_answers', 
+                                  array('name' => 'answer_text'));
         if ($plugin) {
-            $this->pluginid=$plugin->id;  
+            $this->pluginid = $plugin->id;  
         }        
-    }
-    function insert_plugin_in_db() {
-        global $DB;
-        $record->name='answer_text';
-        $record->path='answer/answer_text.php';
-        if (!$DB->record_exists('poasassignment_answers',array('name'=>$record->name,'path'=>$record->path)))
-            $DB->insert_record('poasassignment_answers',$record);
     }
     
     /** Display plugin settings 
@@ -26,12 +19,19 @@ class answer_text extends poasassignment_answer {
      */
     function show_settings($mform,$poasassignmentid) {
         global $DB;
-        $mform->addElement('header','answertextheader',get_string('answertext','poasassignment_answertypes_answer_text'));
-        $mform->addElement('checkbox','answertext', get_string('answertext','poasassignment'));
-        $conditions = array('poasassignmentid'=>$poasassignmentid,'pluginid'=>$this->pluginid);
+        $mform->addElement('header', 
+                           'answertextheader', 
+                           get_string('pluginname','poasassignmentanswertypes_answer_text'));
+        $mform->addElement('checkbox', 
+                           'answertext', 
+                           get_string('answertext','poasassignmentanswertypes_answer_text'));
+        $conditions = array('poasassignmentid' => $poasassignmentid, 
+                            'pluginid' => $this->pluginid);
         if ($DB->record_exists('poasassignment_answer_settings',$conditions))
             $mform->setDefault('answertext','true');
-        $mform->addHelpButton('answertext', 'answertext', 'poasassignment');
+        $mform->addHelpButton('answertext', 
+                              'answertext', 
+                              'poasassignmentanswertypes_answer_text');
     }
     function show_answer_form($mform) {
         $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));

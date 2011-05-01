@@ -19,7 +19,7 @@ class parameterchoice extends taskgiver{
     function parameter_search($cmid, $poasassignment) {
         global $DB,$USER;
         $poasmodel = poasassignment_model::get_instance($poasassignment);
-        $mform=new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
+        $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
         if($data=$mform->get_data()) {
             $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$poasassignment->id));
             $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$poasassignment->id,'searchparameter'=>1));
