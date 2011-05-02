@@ -62,7 +62,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($this->qtype->roots[0]->nullable());
     }
     function test_nullable_negative_character_class() {
-        $this->qtype->build_tree('[^a]');
+        $this->qtype = new dfa_preg_matcher('[^a]');
         $this->assertFalse($this->qtype->roots[0]->nullable());
     }
     function test_nullable_assert() {
@@ -335,7 +335,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 1 && $this->qtype->finiteautomates[0][1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
     }
     function test_buildfa_alternative_and_iteration() {//(a|b)c*
-		$this->qtype->build_tree('(?:a|b)c*');
+        $this->qtype->build_tree('(?:a|b)c*');
         $this->qtype->append_end(0);
         $this->qtype->buildfa(0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 1);
