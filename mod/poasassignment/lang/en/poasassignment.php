@@ -37,6 +37,7 @@ foreach($files as $file) {
 } */
 
 $string['modulename'] = 'POAS assignment';
+$string['submissionoptions'] = 'Submission options';
 $string['modulenameplural'] = 'POAS assignments';
 $string['poasassignmentfieldset'] = 'Individual tasks';
 $string['poasassignmentname'] = 'POAS assignment name';

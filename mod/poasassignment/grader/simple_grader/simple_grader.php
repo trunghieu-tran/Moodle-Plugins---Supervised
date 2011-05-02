@@ -19,7 +19,8 @@ class simple_grader extends grader{
                                                'poasassignment_simple_grader');
     }
     
-    public function test_attempt($attemptid, $taskid) {
+    public function test_attempt($attemptid) {
+        return 97;
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
