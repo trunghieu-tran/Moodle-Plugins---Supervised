@@ -65,31 +65,29 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return false;
     }
-    
+/*
     protected function accept_node($node) {
         switch ($node->type) {
             case preg_node::TYPE_LEAF_BACKREF:
-                $this->flags['link'] = true;
-                return false;
             case preg_node::TYPE_NODE_COND_SUBPATT:
-                $this->flags['condsubpatt'] = true;
+                $this->flags[$node->name()] = true;
                 return false;
             case preg_node::TYPE_LEAF_RECURSION:
-                $this->flags['leafrecursion'] = true;
+                $this->flags['leafrecursion'] = true;//TODO - add to parser, preg_nodes and strings file
                 return false;
             case preg_node::TYPE_LEAF_OPTIONS:
-                $this->flags['leafoptions'] = true;
+                $this->flags['leafoptions'] = true;//TODO - add to parser, preg_nodes and strings file
                 return false;
             default:
-                $unsupported = $node->not_supported();
+                $unsupported = $node->not_supported();//TODO - check that there is a preg_node there (not dfa_preg_node) and convert accept_node to do this job by itself without not_supported()
                 if ($unsupported) {
                     $this->flags[$unsupported] = true;
                 }
-                break;
+                break;//?? why return after break?
                 return false;
         }
         return true;
-    }
+    }*/
 
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
@@ -106,7 +104,7 @@ class dfa_preg_matcher extends preg_matcher {
         $root->operands[0] = $oldroot;
         $root->operands[1] = new preg_leaf_meta;
         $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
-        $root = dfa_preg_node::from_preg_node($root);
+        $root = $this->from_preg_node($root);//TODO fix second time converting of old root...
     }
     
     /**
@@ -416,7 +414,7 @@ class dfa_preg_matcher extends preg_matcher {
             foreach ($array as $key2=>$passage2) {
                if($passage1==$passage2 && $key1!=$key2) {
 					$newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
-					$newleaf = dfa_preg_node::from_preg_node($newleaf);
+					$newleaf = $this->from_preg_node($newleaf);
 					$this->connection[$index][++$this->maxnum] = $newleaf;
 					$array[$this->maxnum] = $passage1;
 					unset($array[$key1]);
@@ -531,7 +529,10 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $result;
     }
-        
+	public function build_tree($regex) {
+		parent::build_tree($regex);
+		$this->roots[0]= $this->dst_root;
+	}
     /**
     *get regex and build finite automates
     @param regex - regular expirience for which will be build finite automate
@@ -545,6 +546,7 @@ class dfa_preg_matcher extends preg_matcher {
             return;
         }
         parent::__construct($regex, $modifiers);
+        $this->roots[0] = $this->dst_root;//place dst root in engine specific place
         //building finite automates
         if ($this->is_error_exists()) {
             return;
@@ -560,10 +562,114 @@ class dfa_preg_matcher extends preg_matcher {
         $this->built = true;
         return;
     }
-    function build_tree($regex) {
-        parent::build_tree($regex);
-        $this->roots[0] = dfa_preg_node::from_preg_node($this->ast_root);
+
+    /**
+    * DFA node factory
+    * @param pregnode preg_node child class instance
+    * @return corresponding dfa_preg_node child class instance
+    */
+    public function &from_preg_node($pregnode) {
+        $name = $pregnode->name();
+        switch ($name) {
+            case 'node_finite_quant':
+                $pregnode =& $this->convert_finite_quant($pregnode);
+                break;
+            case 'node_infinite_quant':
+                $pregnode =& $this->convert_infinite_quant($pregnode);
+                break;
+            //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
+            case 'node_subpatt':
+                $pregnode =& $pregnode->operands[0];
+                break;
+        }
+        return parent::from_preg_node($pregnode);
     }
+
+    /**
+    * Returns prefix for engine specific classes
+    */
+    protected function nodeprefix() {
+        return 'dfa';
+    }
+
+    /**
+    * Function converts operand{} quantificator to operand and operand? combination
+    * @param node node with {}
+    * @return node subtree with ? 
+    */
+    protected function &convert_finite_quant($node) {
+        if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] = $this->copy_preg_node($tmp);
+            $subroot->operands[1] = $this->copy_preg_node($tmp);
+            $count = $node->leftborder;
+            for ($i=2; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] = $this->copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            $tmp = new preg_node_finite_quant;
+            $tmp->leftborder = 0;
+            $tmp->rightborder = 1;
+            $tmp->operands[0] = $node->operands[0];
+            if ($node->leftborder == 0) {
+                $subroot->operands[0] =& $this->copy_preg_node($tmp);
+                $subroot->operands[1] =& $this->copy_preg_node($tmp);
+                $count = $node->rightborder - 2;
+            } else if ($node->leftborder == 1) {
+                $subroot->operands[1] =& $this->copy_preg_node($tmp);
+                $count = $node->rightborder - 2;
+            } else {
+                $count = $node->rightborder - $node->leftborder;
+            }
+            for ($i=0; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] =& $this->copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            return $subroot;
+        }
+        return $node;
+    }
+
+    /**
+    * Function convert operand{} quantificater to operand, operand? and operand* combination
+    * @param node node with {}
+    * @return node subtree with ? *
+    */
+    protected function &convert_infinite_quant($node) {
+        if ($node->leftborder == 0) {
+            return $node;
+        } else if ($node->leftborder == 1) {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] =& $this->copy_preg_node($tmp);
+            $subroot->operands[1] =& $this->copy_preg_node($node);
+            $subroot->operands[1]->leftborder = 0;
+        } else {
+            $tmp = $node->operands[0];
+            $subroot = new preg_node_concat;
+            $subroot->operands[0] =& $this->copy_preg_node($tmp);
+            $subroot->operands[1] =& $this->copy_preg_node($tmp);
+            $count = $node->leftborder;
+            for ($i=2; $i<$count; $i++) {
+                $newsubroot = new preg_node_concat;
+                $newsubroot->operands[0] = $subroot;
+                $newsubroot->operands[1] =& $this->copy_preg_node($tmp);
+                $subroot = $newsubroot;
+            }
+            $newsubroot = new preg_node_concat;
+            $newsubroot->operands[0] =& $this->copy_preg_node($subroot);
+            $newsubroot->operands[1] =& $this->copy_preg_node($node);
+            $newsubroot->operands[1]->leftborder = 0;
+            $subroot = $newsubroot;
+        }
+        return $subroot;
+    }
+
     /**
     *function get string and compare it with regex
     *@param response - string which will be compared with regex
