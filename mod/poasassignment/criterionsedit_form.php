@@ -23,6 +23,11 @@ class criterionsedit_form extends moodleform {
             $gradername = $grader->name;
             require_once($grader->path);
             $sources[] = $gradername::name();
+            
+            // adding graders identificators - hidden elements to form
+            
+            $mform->addElement('hidden', 'grader' . (count($sources) - 1), $usedgraderrecord->graderid);
+            $mform->setType('grader' . (count($sources) - 1), PARAM_INT);
         }
         //$sources[]='module';
         $repeatarray[] = &MoodleQuickForm::createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);

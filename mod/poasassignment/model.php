@@ -454,15 +454,40 @@ class poasassignment_model {
                 $DB->update_record('poasassignment_attempts',$attempt);
             }
         }
-        for($i=0;$i<count($data->name);$i++) {
-            if(isset($data->name[$i]) && strlen($data->name[$i])>0) {
-                $rec->name=$data->name[$i];
-                $rec->description=$data->description[$i];
-                $rec->weight=$data->weight[$i];
-                $rec->poasassignmentid=$this->poasassignment->id;
-                //echo $data->source[$i];
-                $rec->sourceid=$data->source[$i];
-                $DB->insert_record('poasassignment_criterions',$rec);
+        for ($i=0;$i<count($data->name);$i++) {
+            if (isset($data->name[$i]) && strlen($data->name[$i])>0) {
+                $rec->name = $data->name[$i];
+                $rec->description = $data->description[$i];
+                $rec->weight = $data->weight[$i];
+                $rec->poasassignmentid = $this->poasassignment->id;
+                
+                // If grader is used, add criterion id to it's record in DB
+                if ($data->source[$i] > 0) {
+                    $name = 'grader'.$data->source[$i];
+                    // $data->$name contains id of our used grader                    
+                    $rec->sourceid = $data->$name;                    
+                }
+                else
+                    $rec->sourceid = 0;
+                
+                $rec->id = $DB->insert_record('poasassignment_criterions', $rec);
+                
+                /* if ($rec->sourceid > 0) {
+                    $usedgrader = $DB->get_record('poasassignment_used_graders', array('id' => $rec->sourceid));
+                    // if criterion for this grader really exists - create new record in DB
+                    if ($DB->record_exists('poasassignment_criterions', array('id' => $usedgrader->criterionid))) {
+                        $usedgrader->criterionid = $rec->id;
+                        $DB->insert_record('poasassignment_used_graders', $usedgrader);
+                    }
+                    // else update current record
+                    else {
+                        $usedgrader->criterionid = $rec->id;
+                        $DB->update_record('poasassignment_used_graders', $usedgrader);
+                    }
+                    $usedgrader->criterionid = $rec->id;
+                    $DB->update_record('poasassignment_used_graders', $usedgrader);
+                } */
+                
             }
         }
         //return $DB->insert_record('poasassignment_criterions',$data);
@@ -767,12 +792,57 @@ class poasassignment_model {
         return $html;
     }
     
+    public function create_assignee($userid) {
+        global $DB;
+        $rec = new stdClass();
+        $rec->userid = $userid;
+        $rec->poasassignmentid = $this->poasassignment->id;
+        $rec->taskid = 0;
+        $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
+        $this->assignee->id = $rec->id;
+        return $rec;
+    }
+    // Runs after adding submission. Calls all graders, used in module.
+    public function test_attempt($attemptid) {
+        global $DB;
+        $usedgraders = $DB->get_records('poasassignment_used_graders', 
+                                        array('poasassignmentid' => $this->poasassignment->id));
+        //$graderrecords = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgrader->graderid));
+            
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            $grader = new $gradername;
+            $rating = $grader->test_attempt($attemptid);
+            
+            $criterions = $DB->get_records('poasassignment_criterions', 
+                                           array('poasassignmentid' => $this->poasassignment->id,
+                                                 'sourceid' => $usedgrader->id));
+            foreach ($criterions as $criterion) {
+                $ratingvalue = new stdClass();
+                $ratingvalue->attemptid = $attemptid;
+                $ratingvalue->criterionid = $criterion->id;
+                
+                $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
+                $ratingvalue->assigneeid = $attempt->assigneeid;
+                
+                $ratingvalue->value = $rating;
+                //if ($attempt->draft == 0)
+                //    $ratingvalue->value = $data->$elementname;
+                $ratingvalueid = $DB->insert_record('poasassignment_rating_values', $ratingvalue);
+            }
+            
+        }
+    }
     function bind_task_to_assignee($userid,$taskid) {
         global $DB;
-        $rec->userid=$userid;
-        $rec->poasassignmentid=$this->poasassignment->id;
-        $rec->taskid=$taskid;
-        $this->assignee->id=$DB->insert_record('poasassignment_assignee',$rec);
+        $rec = $this->create_assignee($userid);
+        //$rec->userid=$userid;
+        //$rec->poasassignmentid=$this->poasassignment->id;
+        $rec->taskid = $taskid;
+        $DB->update_record('poasassignment_assignee', $rec);
+        $this->assignee->id = $rec->id;
 
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach($fields as $field) {
@@ -993,7 +1063,7 @@ class poasassignment_model {
     function email_teachers($assignee) {
         global $DB;
         
-        if(!$this->poasassignment->flags & NOTIFY_TEACHERS)
+        if(!($this->poasassignment->flags & NOTIFY_TEACHERS))
             return;
             
         $user = $DB->get_record('user', array('id'=>$assignee->userid));

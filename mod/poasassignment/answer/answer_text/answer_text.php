@@ -34,8 +34,12 @@ class answer_text extends poasassignment_answer {
                               'poasassignmentanswertypes_answer_text');
     }
     function show_answer_form($mform) {
-        $mform->addElement('header','answertextheader',get_string('answertext','poasassignment'));
-        $mform->addElement('htmleditor', 'text_editor', get_string('answertexteditor','poasassignment'));
+        $mform->addElement('header',
+                           'answertextheader',
+                           get_string('answertext','poasassignmentanswertypes_answer_text'));
+        $mform->addElement('htmleditor', 
+                           'text_editor', 
+                           get_string('answertexteditor','poasassignmentanswertypes_answer_text'));
         $mform->closeHeaderBefore('answertextheader');
     }
     function show_assignee_answer($assigneeid,$poasassignmentid,$needbox=1,$attemptid=null) {

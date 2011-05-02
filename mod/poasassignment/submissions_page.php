@@ -1,26 +1,26 @@
 <?php
 
 require_once('abstract_page.php');
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 require_once('model.php');
 class submissions_page extends abstract_page {
     var $poasassignment;
-    function submissions_page($cm,$poasassignment) {
+    function submissions_page($cm, $poasassignment) {
         $this->poasassignment = $poasassignment;
-        $this->cm=$cm;
+        $this->cm = $cm;
     }
     function get_cap() {
         return 'mod/poasassignment:grade';
     }
     
     function view() {
-        global $DB,$CFG,$OUTPUT;
+        global $DB, $CFG, $OUTPUT;
         $table = new flexible_table('mod-poasassignment-submissions');
         
-        $columns=array('picture');
-        $columns[]='fullname';
-        $headers=array(' ',get_string('fullname','poasassignment'));
-        if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
+        $columns = array('picture');
+        $columns[] = 'fullname';
+        $headers = array(' ',get_string('fullname', 'poasassignment'));
+        if($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             $columns[]='task';
             $headers[]=get_string('task','poasassignment');
         }

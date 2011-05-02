@@ -83,15 +83,16 @@ class answer_form extends moodleform {
         $instance = $this->_customdata;
         $plugins=$DB->get_records('poasassignment_answers');
         foreach($plugins as $plugin) {
-            if(poasassignment_answer::used_in_poasassignment($plugin->id,$instance['poasassignmentid'])) {
+            if(poasassignment_answer::used_in_poasassignment($plugin->id, $instance['poasassignmentid'])) {
                 require_once($plugin->path);
                 $poasassignmentplugin = new $plugin->name();
-                $poasassignmentplugin->show_answer_form($mform,$instance['poasassignmentid']);
+                $poasassignmentplugin->show_answer_form($mform, $instance['poasassignmentid']);
             }
         }
         
-        $mform->addElement('header');
-        $mform->addElement('checkbox','draft',get_string('draft','poasassignment'));
+        $mform->addElement('header', 'submissionoptions', get_string('submissionoptions', 'poasassignment'));
+        
+        $mform->addElement('checkbox', 'draft', get_string('draft', 'poasassignment'));
         
         $poasassignment  = $DB->get_record('poasassignment', array('id' => $instance['poasassignmentid']), '*', MUST_EXIST);
         $model = poasassignment_model::get_instance($poasassignment);
