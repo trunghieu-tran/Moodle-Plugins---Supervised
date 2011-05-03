@@ -428,4 +428,20 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
             $navigation->add(get_string($page,'poasassignment'),new moodle_url('/mod/poasassignment/view.php',array('id' => $cm->id, 'page' => $page)));
         }
     }
+    foreach (poasassignment_model::$extpages as $pagename => $pagepath) {
+        require_once($pagepath);
+        $pagetype = $pagename.'_page';
+        // If user has ability to view $pagepath - add page on panel
+        $poasassignment  = $DB->get_record('poasassignment', 
+                                           array('id' => $cm->instance), 
+                                           '*', 
+                                           MUST_EXIST);
+        $pageinstance = new $pagetype($cm, $poasassignment);
+        if ($pageinstance->has_ability_to_view()) {
+            $navigation->add(get_string($pagename,'poasassignment'),
+                             new moodle_url('/mod/poasassignment/view.php',
+                                            array('id' => $cm->id, 
+                                                  'page' => $pagename)));
+        }
+    }
 }

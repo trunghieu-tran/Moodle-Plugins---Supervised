@@ -67,10 +67,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $mform->setDefault('choicedate', time()+2*24*3600); // By default student have 2 days to choose task
         $mform->disabledIf('choicedate', 'activateindividualtasks');
 
-        $ynoptions = array(
-            0 => get_string('no'),
-            1 => get_string('yes'));
-
+        
         $mform->addElement('checkbox', 'preventlatechoice', get_string('preventlatechoice', 'poasassignment'));
 
         $mform->addElement('checkbox', 'randomtasksafterchoicedate', get_string('randomtasksafterchoicedate', 'poasassignment'));
