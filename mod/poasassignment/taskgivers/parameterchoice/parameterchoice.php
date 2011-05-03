@@ -15,6 +15,7 @@ require_once($CFG->libdir.'/formslib.php');
 class parameterchoice extends taskgiver{
 
     public $showtasks = true;
+    public $hassettings = true;
 
     function parameter_search($cmid, $poasassignment) {
         global $DB,$USER;
@@ -95,8 +96,53 @@ class parameterchoice extends taskgiver{
         $mform->display();
     }
     //put your code here
+    public function get_settings_form($id, $poasassignmentid) {
+        return new taskgiver_form(null, 
+                                  array('id' => $id,
+                                        'poasassignmentid' => $poasassignmentid));  
+    }
+    public function save_settings($data){
+        global $DB;
+        $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $data->poasassignmentid));
+        foreach ($fields as $field) {
+            $fieldname = 'field' . $field->id;
+            if(isset($data->$fieldname)) {
+                if(!$DB->record_exists('poasassignment_paramch', array('fieldid' => $field->id))) {
+                    $DB->insert_record('poasassignment_paramch', array('fieldid' => $field->id));
+                }
+            }
+            else {
+                $DB->delete_records('poasassignment_paramch', array('fieldid' => $field->id));
+            }
+        }
+    }
+    
 }
+class taskgiver_form extends moodleform {
+    function definition() {
+        $mform = $this->_form;
+        $instance = $this->_customdata;
+        $poasmodel= poasassignment_model::get_instance();
+        global $DB;
+        $mform->addElement('header', 'header', get_string('makefieldparameters','poasassignmenttaskgivers_parameterchoice'));
+        $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $instance['poasassignmentid']));
+        
+        foreach ($fields as $field) {
+            $mform->addElement('checkbox', 'field'.$field->id, $field->name);
+        }
+        
+        $mform->addElement('hidden', 'id', $instance['id']);
+        $mform->setType('id', PARAM_INT);
 
+        $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
+        $mform->setType('poasassignmentid', PARAM_INT);
+        
+        $mform->addElement('hidden', 'page', 'taskgiversettings');
+        $mform->setType('page', PARAM_TEXT);
+
+        $this->add_action_buttons(false, get_string('savechanges', 'admin'));
+    }
+}
 class parametersearch_form extends moodleform {
     function definition() {
         $mform = $this->_form;

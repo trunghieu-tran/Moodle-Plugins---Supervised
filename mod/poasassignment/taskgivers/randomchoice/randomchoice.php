@@ -5,6 +5,7 @@ require_once($CFG->libdir.'/formslib.php');
 class randomchoice extends taskgiver {
 
     public $showtasks = false;
+    public $hassettings = false;
 
     function process_before_tasks($cmid,$poasassignment) {
         global $USER,$DB;
