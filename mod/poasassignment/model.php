@@ -46,6 +46,8 @@ class poasassignment_model {
      */
     protected static $instance;
     
+    public static $pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders', 'taskgiversettings');
+    
     /**
      * Constructor. Cannot be called outside of the class
      * @param $poasassignment module instance

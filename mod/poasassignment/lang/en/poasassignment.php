@@ -228,3 +228,6 @@ $string['finalattempts_help'] = "Student cancan match his attempt as final - it 
 $string['final'] = 'I am sure in my answer, finilize';
 $string['graders'] = 'Graders';
 $string['graders_help'] = 'Graders help page';
+$string['taskgiversettings'] = 'Task giver\'s settings';
+$string['taskgiversettings_help'] = 'Here you can change settings of current taskgiver';
+$string['taskgiverhasnosettings'] = 'Taskgiver has no settings';

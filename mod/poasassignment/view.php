@@ -33,9 +33,11 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once('poasassignment_tabbed_page.php');
 require_once("$CFG->libdir/portfoliolib.php");
+require_once('model.php');
 
 // pages on page view.php
-$pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders');
+$pages = poasassignment_model::$pages;
+//$pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders', 'taskgiversettings');
 
 $poasassignmenttabbedpageinstance = new poasassignment_tabbed_page($pages);
 $poasassignmenttabbedpageinstance->view(); // Display page
