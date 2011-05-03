@@ -1,7 +1,6 @@
 <?php
 global $CFG;
 require_once('abstract_page.php');
-//require_once('graderssettings_form.php');
 require_once('model.php');
 class taskgiversettings_page extends abstract_page {
     var $poasassignment;
@@ -51,7 +50,6 @@ class taskgiversettings_page extends abstract_page {
             }
             $mform->set_data($data);
             if($mform->get_data()) {
-                echo '11111';
                 $taskgiver->save_settings($mform->get_data());
             }
             $mform->display(); 

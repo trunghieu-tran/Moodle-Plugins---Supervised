@@ -6,14 +6,13 @@
 class poasassignment_tabbed_page {
     private $cm;
     private $poasassignment;
-    private $pages;              // array of pages in poasassignment
     private $currentpage;        // name of current page
     private $context;
 
     /** Standard constuctor for poasassignment_tabbed_page
      * @param $pages array of pages to be displayed
      */
-    function poasassignment_tabbed_page($pages) {
+    function poasassignment_tabbed_page() {
         global $DB,$PAGE;
         $id = optional_param('id', 0, PARAM_INT);           // course_module ID, or
         $p  = optional_param('p', 0, PARAM_INT);            // poasassignment instance ID 
@@ -39,7 +38,6 @@ class poasassignment_tabbed_page {
         
         //$PAGE->navbar->add(get_string('view','poasassignment'));
 
-        $this->pages = $pages;
         $this->currentpage=$page;
         $this->cm=$cm;
         $this->poasassignment=$poasassignment;
@@ -105,19 +103,19 @@ class poasassignment_tabbed_page {
      */
     function view_body() {
         $pagetype = $this->currentpage."_page";
-        if(file_exists($pagetype.'.php')) {
-            require_once($pagetype.'.php');
-            $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
-            $poasassignmentpage->require_ability_to_view();
-            $poasassignmentpage->view();
-        }
-        else {
-            $currentpath = poasassignment_model::$extpages[$this->currentpage];
-            require_once($currentpath);
-            $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
-            $poasassignmentpage->require_ability_to_view();
-            $poasassignmentpage->view();
-        }
+        //if(file_exists($pagetype.'.php')) {
+        //    require_once($pagetype.'.php');
+        //    $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
+        //    $poasassignmentpage->require_ability_to_view();
+        //    $poasassignmentpage->view();
+        //}
+        //else {
+        $currentpath = poasassignment_model::$extpages[$this->currentpage];
+        require_once($currentpath);
+        $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
+        $poasassignmentpage->require_ability_to_view();
+        $poasassignmentpage->view();
+        //}
     }
 
     /** Dislpays header

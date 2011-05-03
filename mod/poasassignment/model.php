@@ -46,8 +46,15 @@ class poasassignment_model {
      */
     protected static $instance;
     
-    public static $pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders');
-    public static $extpages = array('taskgiversettings' => 'pages/taskgiversettings_page.php');
+    public static $pages = array();
+    public static $extpages = array('tasksfields' => 'pages/tasksfields_page.php',
+                                    'tasks' => 'pages/tasks_page.php',
+                                    'taskgiversettings' => 'pages/taskgiversettings_page.php',
+                                    'view' => 'pages/view_page.php',
+                                    'criterions' => 'pages/criterions_page.php',
+                                    'graders' => 'pages/graders_page.php',
+                                    'submissions' => 'pages/submissions_page.php'
+                                    );
     
     /**
      * Constructor. Cannot be called outside of the class
