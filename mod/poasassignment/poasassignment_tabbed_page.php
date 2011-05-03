@@ -103,12 +103,21 @@ class poasassignment_tabbed_page {
 
     /** Displays general content of the page
      */
-    function view_body() {       
+    function view_body() {
         $pagetype = $this->currentpage."_page";
-        require_once($pagetype.'.php');
-        $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
-        $poasassignmentpage->require_ability_to_view();
-        $poasassignmentpage->view();
+        if(file_exists($pagetype.'.php')) {
+            require_once($pagetype.'.php');
+            $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
+            $poasassignmentpage->require_ability_to_view();
+            $poasassignmentpage->view();
+        }
+        else {
+            $currentpath = poasassignment_model::$extpages[$this->currentpage];
+            require_once($currentpath);
+            $poasassignmentpage = new $pagetype($this->cm, $this->poasassignment);
+            $poasassignmentpage->require_ability_to_view();
+            $poasassignmentpage->view();
+        }
     }
 
     /** Dislpays header
