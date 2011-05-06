@@ -10,6 +10,22 @@
  * @package questions
  */
 
+/*
+* Class for plain lexems (that are not complete nodes), so they could contain position information too
+*/
+class preg_lexem {
+    //Subtype of lexem
+    public $subtype;
+    //Indexes of first and last characters for the lexem, they are equal if it's one-character lexem
+    public $indfirst = -1;
+    public $indlast = -1;
+
+    public function __construct($subtype, $indfirst, $indlast) {
+        $this->subtype = $subtype;
+        $this->indfirst = $indfirst;
+        $this->indlast = $indlast;
+    }
+}
 
 /**
 * Generic node class
@@ -675,11 +691,55 @@ class preg_node_cond_subpatt extends preg_operator {
     //TODO - ui_nodename()
 }
 class preg_node_error extends preg_node {
+
+    //Subtypes define a type of error
+    //Unknown parse error
+    const SUBTYPE_UNKNOWN_ERROR = 1;
+    //Too much top-level alternatives in conditional subpattern
+    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 2;
+    //Close paren without opening  xxx)
+    const SUBTYPE_WRONG_CLOSE_PAREN = 3;
+    //Open paren without closing  (xxx
+    const SUBTYPE_WRONG_OPEN_PAREN = 4;
+    //Empty parens
+    const SUBTYPE_EMPTY_PARENS = 5;
+    //Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
+    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 6;
+    //Unclosed square brackets in character class
+    const SUBTYPE_UNCLOSED_CHARCLASS = 7;
+
+    //Error strings name in qtype_preg.php lang file
+    public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt', 
+                                    preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN => 'unopenedparen', preg_node_error::SUBTYPE_WRONG_OPEN_PAREN => 'unclosedparen', 
+                                    preg_node_error::SUBTYPE_EMPTY_PARENS => 'emptyparens', preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart',
+                                    preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS => 'unclosedsqbrackets');
+
+    //Arrays of indexes in regex string describing error to highlight to the user (and include in message) - first and last
+    public $firstindxs;
+    public $lastindxs;
+    //Additional info
+    public $addinfo;
+
     public function name() {
         return 'node_error';
     }
+
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_ERROR;
+        $this->firstindxs = array();
+        $this->lastindxs = array();
+        $this->addinfo = null;
+    }
+
+    /*
+    * Returns an user interface error string for the error, represented by node
+    */
+    public function error_string() {
+        $a = new stdClass;
+        $a->indfirst = $this->firstindxs[0];
+        $a->indlast = $this->lastindxs[0];
+        $a->addinfo = $this->addinfo;
+        return get_string(preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
     }
 }
 

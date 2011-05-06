@@ -176,13 +176,13 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_PLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === preg_node_assert::SUBTYPE_NLA);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_NLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === preg_node_assert::SUBTYPE_PLB);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_PLB);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value === preg_node_assert::SUBTYPE_NLB);
+        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_NLB);
     }
     function test_lexer_metasymbol_dot() {
         $regex = '.';
@@ -198,19 +198,19 @@ class parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node::TYPE_NODE_SUBPATT);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === 'grouping');
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === 'grouping');
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value === preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_PLA);
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_PLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_NLA);
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_NLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_PLB);
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_PLB);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value === preg_node_cond_subpatt::SUBTYPE_NLB);
+        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_NLB);
     }
     function test_lexer_recursion_and_options() {
         $regex = '(?xm-is)(?R)(?14)';
@@ -324,13 +324,6 @@ class parser_test extends UnitTestCase {
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
-    function test_parser_no_anchors() {
-        $parser =& $this->run_parser('a');
-        $root = $parser->get_root();
-        $anchor = $parser->get_anchor();
-        $this->assertTrue($root->type == preg_node::TYPE_LEAF_CHARSET && $root->charset === 'a');
-        $this->assertTrue($anchor->start === false && $anchor->end === false);
-    }
     function test_parser_error() {
         $parser =& $this->run_parser('^((ab|cd)ef$');
         $this->assertTrue($parser->get_error());
@@ -393,95 +386,140 @@ class parser_test extends UnitTestCase {
         //Unclosed square brackets
         $parser =& $this->run_parser('ab(c|d)[fg\\]');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(in_array(get_string('unclosedsqbrackets', 'qtype_preg'), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 7);
         //Unclosed parenthesis
         $parser =& $this->run_parser('a(b(?:c(?=d(?!e(?<=f(?<!g(?>h');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 7);
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 7);
         //Unopened parenthesis
         $parser =& $this->run_parser(')ab(c|d)eg)');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 2);
-        $this->assertTrue(in_array(get_string('unopenedparen', 'qtype_preg'), $errormsgs));
-        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[1]->firstindxs[0] == 10);
         //Several unopened and unclosed parenthesis
         $parser =& $this->run_parser(')a)b)e(((g(');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 7);
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 7);
         //Empty parenthesis
         $parser =& $this->run_parser(')abeg(?!)f');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 2);
-        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
-        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?!'), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[2]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[2]->firstindxs[0] == 5);
+        $this->assertTrue($errornodes[2]->lastindxs[0] == 8);
         //Several empty parenthesis
         $parser =& $this->run_parser(')ab()eg(?!)f');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) >= 3);
-        $this->assertTrue(in_array(get_string('closeparenatverystart', 'qtype_preg'), $errormsgs));
-        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?!'), $errormsgs));
-        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '('), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 3);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[3]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[3]->subtype == preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[3]->firstindxs[0] == 7);
+        $this->assertTrue($errornodes[3]->lastindxs[0] == 10);
+        $this->assertTrue($errornodes[4]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[4]->subtype == preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[4]->firstindxs[0] == 3);
+        $this->assertTrue($errornodes[4]->lastindxs[0] == 4);
         //Quantifiers without argument inside parenthesis
         $parser =& $this->run_parser('?a({2,3})c(*)e(+)f');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 4);
-        /*Old style error reporting
-        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '?'), $errormsgs));
-        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '+'), $errormsgs));
-        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '*'), $errormsgs));
-        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg', '{...}'), $errormsgs));
-        */
-        $this->assertTrue(in_array(get_string('quantifieratstart', 'qtype_preg'), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 4);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[0]->lastindxs[0] == 0);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
+        $this->assertTrue($errornodes[1]->firstindxs[0] == 3);
+        $this->assertTrue($errornodes[1]->lastindxs[0] == 7);
+        $this->assertTrue($errornodes[2]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
+        $this->assertTrue($errornodes[2]->firstindxs[0] == 11);
+        $this->assertTrue($errornodes[2]->lastindxs[0] == 11);
+        $this->assertTrue($errornodes[3]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[3]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
+        $this->assertTrue($errornodes[3]->firstindxs[0] == 15);
+        $this->assertTrue($errornodes[3]->lastindxs[0] == 15);
     }
 
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
         $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 1);
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[0]->lastindxs[0] == 18);
         //Correct situation: alternatives are nested within two alternatives for conditional subpattern
         $parser =& $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))');
         $this->assertFalse($parser->get_error());
         //Unclosed second parenthesis
         $parser =& $this->run_parser('a(?(?=bc)dd|e*f|hhh');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 1);
-        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 1);
+        $this->assertTrue($errornodes[0]->lastindxs[0] == 5);
         //Two parethesis unclosed
         $parser =& $this->run_parser('(?(?=bce*f|hhh');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 2);
-        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[0]->lastindxs[0] == 4);
         //Empty assert in conditional subpattern
         $parser =& $this->run_parser('a(?(?=)');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 2);
-        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?(?='), $errormsgs));
-        $this->assertTrue(in_array(get_string('unclosedparen', 'qtype_preg', '(?(?='), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[1]->firstindxs[0] == 1);
+        $this->assertTrue($errornodes[1]->lastindxs[0] == 6);
         //Empty yes-expr in conditional subpattern
         $parser =& $this->run_parser('(?(?=ab))');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 1);
-        $this->assertTrue(in_array(get_string('emptyparens', 'qtype_preg', '(?(?='), $errormsgs));
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[1]->firstindxs[0] == 0);
+        $this->assertTrue($errornodes[1]->lastindxs[0] == 8);
         //Conditional subpattern starts at the end of expression
         $parser =& $this->run_parser('ab(?(?=');
         $this->assertTrue($parser->get_error());
-        $errormsgs = $parser->get_error_messages();
-        $this->assertTrue(count($errormsgs) == 1);
-        $this->assertTrue(in_array(get_string('openparenatend', 'qtype_preg', '(?(?='), $errormsgs));
-
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 1);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[0]->firstindxs[0] == 2);
+        $this->assertTrue($errornodes[0]->lastindxs[0] == 6);
         }
     /** 
     *Service function to run parser on regex
