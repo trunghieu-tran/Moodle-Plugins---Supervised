@@ -112,6 +112,7 @@ class preg_matcher {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
+            $this->look_for_anchors();
         } else {
             $this->ast_root = null;
         }
@@ -145,6 +146,19 @@ class preg_matcher {
     protected function is_parsing_needed() {
         //most engines will need parsing
         return true;
+    }
+
+    /**
+    * Fill anchor field to show if regex is anchored using ast_root
+    *
+    * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
+    * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+    */
+    /*protected*/ public function look_for_anchors() {
+        //TODO(performance) - write real code, for now think no anchoring is in expressions
+        $this->anchor = new stdClass;
+        $this->anchor->start = false;
+        $this->anchor->end = false;
     }
 
     /**
@@ -333,7 +347,6 @@ class preg_matcher {
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
-            $this->anchor = $parser->get_anchor();
         }
         fclose($pseudofile);
     }

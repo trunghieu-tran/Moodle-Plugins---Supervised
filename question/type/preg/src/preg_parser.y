@@ -5,8 +5,6 @@
 %include_class {
     //Root of the Abstract Syntax Tree (AST)
     private $root;
-    //Is a pattern fully anchored?
-    private $anchor;
     //Are there any errors during the parsing
     private $error;
     //Error messages for errors during the parsing
@@ -19,9 +17,6 @@
     private $quants;
 
     function __construct() {
-        $this->anchor = new stdClass;
-        $this->anchor->start = false;
-        $this->anchor->end = false;
         $this->error = false;
         $this->errormessages = array();
         $this->reducecount = 0;
@@ -33,10 +28,6 @@
 
     function get_root() {
         return $this->root;
-    }
-
-    function get_anchor() {
-        return $this->anchor;
     }
 
     function get_error() {
