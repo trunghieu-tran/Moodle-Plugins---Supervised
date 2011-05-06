@@ -343,12 +343,22 @@ class preg_matcher {
         }
         $parser->doParse(0, 0);
         if ($parser->get_error()) {
-            $this->errors = array_merge($this->errors, $parser->get_error_messages());
+            $errornodes = $parser->get_error_nodes();
+            $errormsgs = array();
+            //Generate parser error messages
+            foreach($errornodes as $node) {
+                $errormsgs[] = $this->highlight_regex($regex, $node->firstindxs[0],$node->lastindxs[0]) . '<br/>' . $node->error_string();
+            }
+            $this->errors = array_merge($this->errors, $errormsgs);
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
         }
         fclose($pseudofile);
+    }
+
+    public function highlight_regex($regex, $indfirst, $indlast) {
+        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
     }
 
     /**

@@ -7,8 +7,8 @@
     private $root;
     //Are there any errors during the parsing
     private $error;
-    //Error messages for errors during the parsing
-    private $errormessages;
+    //Copies of preg_node_error for errors during the parsing
+    private $errornodes;
     //Count of reduces made
     private $reducecount;
     //Open-parenthesis strings
@@ -18,12 +18,11 @@
 
     function __construct() {
         $this->error = false;
-        $this->errormessages = array();
+        $this->errornodes = array();
         $this->reducecount = 0;
         $this->parens = array(preg_node::TYPE_NODE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
                                 preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!',
                                 preg_node_assert::SUBTYPE_NLB => '(?<!');
-        //$this->quants = array (NODE_QUESTQUANT => '?', NODE_ITER => '*', NODE_PLUSQUANT => '+', NODE_QUANT => '{...}');
     }
 
     function get_root() {
@@ -34,26 +33,36 @@
         return $this->error;
     }
 
-    function get_error_messages() {
-        return $this->errormessages;
+    public function get_error_nodes() {
+        return $this->errornodes;
     }
 
     /**
-    *create and return an error node
-    @param errorstr translation string name for the error
-    @param a object, string or number to be used in translation string
-    @return node
+    * Create and return an error node, also add it to the array of parser errors
+    @param subtype type of error
+    @param firstindxs array of starting indexes of highlited areas
+    @param lastindxs array of ending indexes of highlited areas
+    @param addinfo additional info, supplied for this error
+    @return preg_node_error object
     */
-    protected function create_error_node($errorstr, $a = null) {
+    protected function create_error_node($subtype, $firstindxs = null, $lastindxs = null, $addinfo = null) {
         $newnode = new preg_node_error;
-        $newnode->subtype = $errorstr;
-        $this->errormessages[] = get_string($errorstr,'qtype_preg',$a);
+        $newnode->subtype = $subtype;
+        if ($firstindxs !== null) {
+            $newnode->firstindxs = $firstindxs;
+        }
+        if ($lastindxs !== null) {
+            $newnode->lastindxs = $lastindxs;
+        }
+        $newnodw->addinfo = $addinfo;
+        $this->errornodes[] = $newnode;
         $this->error = true;
+        return $newnode;
     }
 }
 %parse_failure {
     if (!$this->error) {
-        $this->errormessages[] = get_string('incorrectregex', 'qtype_preg');
+        $this->create_error_node(preg_node_error::SUBTYPE_UNKNOWN_ERROR);
         $this->error = true;
     }
 }
@@ -74,10 +83,8 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->operands[0] = B;
     A->operands[1] = C;
     $this->reducecount++;
-    if (is_object(B) && is_object(C)) {
-        A->indfirst = B->indfirst;
-        A->indlast = C->indlast;
-    }
+    A->indfirst = B->indfirst;
+    A->indlast = C->indlast;
 }
 expr(A) ::= expr(B) ALT expr(C). {
     //ECHO 'ALT <br/>';
@@ -85,10 +92,8 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->operands[0] = B;
     A->operands[1] = C;
     $this->reducecount++;
-    if (is_object(B) && is_object(C)) {
-        A->indfirst = B->indfirst;
-        A->indlast = C->indlast;
-    }
+    A->indfirst = B->indfirst;
+    A->indlast = C->indlast;
 }
 expr(A) ::= expr(B) ALT. {
     A = new preg_node_alt;
@@ -96,41 +101,36 @@ expr(A) ::= expr(B) ALT. {
     A->operands[1] = new preg_leaf_meta;
     A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     $this->reducecount++;
-    if (is_object(B)) {
-        A->indfirst = B->indfirst;
-        A->indlast = B->indlast + 1;
-    }
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast + 1;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->operands[0] = B;
     $this->reducecount++;
-    if (is_object(B)) {
-        A->indfirst = B->indfirst;
-    }
+    A->indfirst = B->indfirst;
+    A->indlast = C->indlast;
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
-    if (B !== 'grouping') {
-        if (B === preg_node::TYPE_NODE_SUBPATT || B === preg_node_subpatt::SUBTYPE_ONCEONLY) {
+    if (B->subtype !== 'grouping') {
+        if (B->subtype === preg_node::TYPE_NODE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             A = new preg_node_subpatt;
         } else {
             A = new preg_node_assert;
         }
-        if (B !== preg_node::TYPE_NODE_SUBPATT) {
-            A->subtype = B;
+        if (B->subtype !== preg_node::TYPE_NODE_SUBPATT) {
+            A->subtype = B->subtype;
         }
         A->operands[0] = C;
     } else {//grouping node
         A = C;
     }
     $this->reducecount++;
-    if (is_object(C)) {
-        A->indfirst = C->indfirst - strlen($this->parens[B]);
-        A->indlast = C->indlast + 1;
-    }
+    A->indfirst = B->indfirst;
+    A->indlast = C->indlast + 1;
 }
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     //ECHO  'CONDSUB TF <br/>';
@@ -139,22 +139,21 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
         A->operands[0] = C;
     } else {
         if (C->operands[0]->type == preg_node::TYPE_NODE_ALT || C->operands[1]->type == preg_node::TYPE_NODE_ALT) {
-            A = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
+            //One or two top-level alternative allowed in conditional subpattern 
+            A = $this->create_error_node(preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, array(D->indfirst), array(C->indlast+1));
             $this->reducecount++;
             return;
         } else {
             A->operands[0] = C->operands[0];
-            A->operands[0] = C->operands[0];
+            A->operands[1] = C->operands[1];
         }
     }
     A->operands[2] = new preg_node_assert;
-    A->operands[2]->subtype = D;
+    A->operands[2]->subtype = D->subtype;
     A->operands[2]->operands[0] = B;
     $this->reducecount++;
-    if (is_object(B) && is_object(C)) {
-        A->indfirst = B->indfirst - strlen($this->parens[D]);
-        A->indlast = C->indlast + 1;
-    }
+    A->indfirst = D->indfirst;
+    A->indlast = C->indlast + 1;
 }
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
@@ -173,114 +172,114 @@ expr(A) ::= PARSLEAF(B). {
         A->operands[1] = B;
     }
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
 }
 lastexpr(A) ::= expr(B). {
     A = B;
     $this->reducecount++;
 }
 
-expr(A) ::= expr CLOSEBRACK. [ERROR_PREC] {
+expr(A) ::= expr(B) CLOSEBRACK. [ERROR_PREC] {
     //ECHO 'UNOPENPARENS <br/>';
-    A = $this->create_error_node('unopenedparen');
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indlast + 1), array(B->indlast + 1));
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast + 1;
 }
 
-expr(A) ::= CLOSEBRACK. [ERROR_PREC_SHORT] {
+expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
     //ECHO 'CLOSEPARENATSTART <br/>';
-    if($this->reducecount == 0) {//close bracket at the very start of expression
-        A = $this->create_error_node('closeparenatverystart');
-    } else {
-        A = $this->create_error_node('closeparenatstart');
-    }
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indfirst), array(B->indfirst));
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
 }
 
-expr(A) ::= OPENBRACK(B) expr. [ERROR_PREC] {
+expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(B->indlast + 1), $this->parens[B->subtype]);
+            $emptyparens = true;
+            A->indlast = B->indlast + 1;
+        }
     }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        A = $this->create_error_node('emptyparens',$this->parens[B]);
-    } else {
-        A = $this->create_error_node('unclosedparen',$this->parens[B]);
+    if (!$emptyparens) {//regular unclosed parens
+        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
+        A->indlast = C->indlast;
     }
     $this->reducecount++;
+    A->indfirst = B->indfirst;
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node('openparenatend',$this->parens[B]);
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
 }
 
-expr(A) ::= CONDSUBPATT(B) expr CLOSEBRACK expr. [ERROR_PREC] {
+expr(A) ::= CONDSUBPATT(B) expr CLOSEBRACK(D) expr(C). [ERROR_PREC] {
     //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == D->indlast + 1) {//empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(D->indlast + 1), $this->parens[B->subtype]);
+            $emptyparens = true;
+            A->indlast = D->indlast + 1;
+        }
     }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        A = $this->create_error_node('emptyparens','(?'.$this->parens[B]);
-    } else {
-        A = $this->create_error_node('unclosedparen','(?'.$this->parens[B]);
+    if (!$emptyparens) {//regular unclosed parens
+        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
+        A->indlast = C->indlast;
     }
     $this->reducecount++;
+    A->indfirst = B->indfirst;
 }
 
-expr(A) ::= CONDSUBPATT(B) expr. [ERROR_PREC_SHORT] {
+expr(A) ::= CONDSUBPATT(B) expr(C). [ERROR_PREC_SHORT] {
     //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
+    //Two unclosed parens for conditional subpatterns
+    //Create only one error node to avoid confusion when reporting errors to the user
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//unclosed parens + empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(B->indlast + 1), $this->parens[B->subtype]);
+            $emptyparens = true;
+            A->indlast = B->indlast + 1;
+        }
     }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        A = $this->create_error_node('emptyparens','(?'.$this->parens[B]);
-        //Two unclosed brackets, firts are empty
-        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[B]);
-    } else {
-        //Two unclosed brackets, so two messages
-        A = $this->create_error_node('unclosedparen','(?'.$this->parens[B]);
-        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[B]);
+    if (!$emptyparens) {//two unclosed parens
+        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
+        A->indlast = C->indlast;
     }
     $this->reducecount++;
+    A->indfirst = B->indfirst;
 }
 
 expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
-    A = $this->create_error_node('openparenatend','(?'.$this->parens[B]);
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
 }
 
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
-    /*Now cannot determine quntifier type.
-    $quantstr = $this->quants[B->subtype];
-    if (!B->greed) {
-        $quantstr .= '?';
-    }*/
-    A = $this->create_error_node('quantifieratstart');
+    A = $this->create_error_node(preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, array(B->indfirst),  array(B->indlast));
     $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
 }
 
 lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
-    A = $this->create_error_node(C);
+    A = $this->create_error_node(C->subtype, array(C->indfirst), array(B->indlast));
     $this->reducecount++;
+    A->indfirst = C->indfirst;//NOTE - indexes may depends on C->subtype, take into account if another lexer error would be found
+    A->indlast = B->indlast;
 }
