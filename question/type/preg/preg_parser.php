@@ -111,8 +111,6 @@ class preg_parser_yyParser
 
     //Root of the Abstract Syntax Tree (AST)
     private $root;
-    //Is a pattern fully anchored?
-    private $anchor;
     //Are there any errors during the parsing
     private $error;
     //Error messages for errors during the parsing
@@ -125,9 +123,6 @@ class preg_parser_yyParser
     private $quants;
 
     function __construct() {
-        $this->anchor = new stdClass;
-        $this->anchor->start = false;
-        $this->anchor->end = false;
         $this->error = false;
         $this->errormessages = array();
         $this->reducecount = 0;
@@ -139,10 +134,6 @@ class preg_parser_yyParser
 
     function get_root() {
         return $this->root;
-    }
-
-    function get_anchor() {
-        return $this->anchor;
     }
 
     function get_error() {
@@ -165,7 +156,7 @@ class preg_parser_yyParser
         $this->errormessages[] = get_string($errorstr,'qtype_preg',$a);
         $this->error = true;
     }
-#line 171 "../preg_parser.php"
+#line 162 "../preg_parser.php"
 
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
@@ -819,12 +810,12 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 77 "../preg_parser.y"
+#line 68 "../preg_parser.y"
     function yy_r0(){
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 831 "../preg_parser.php"
-#line 80 "../preg_parser.y"
+#line 822 "../preg_parser.php"
+#line 71 "../preg_parser.y"
     function yy_r1(){
     $this->_retvalue = new preg_node_concat;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -835,8 +826,8 @@ static public $yy_action = array(
         $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
     }
-#line 843 "../preg_parser.php"
-#line 90 "../preg_parser.y"
+#line 834 "../preg_parser.php"
+#line 81 "../preg_parser.y"
     function yy_r2(){
     //ECHO 'ALT <br/>';
     $this->_retvalue = new preg_node_alt;
@@ -848,8 +839,8 @@ static public $yy_action = array(
         $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
     }
-#line 856 "../preg_parser.php"
-#line 101 "../preg_parser.y"
+#line 847 "../preg_parser.php"
+#line 92 "../preg_parser.y"
     function yy_r3(){
     $this->_retvalue = new preg_node_alt;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -861,8 +852,8 @@ static public $yy_action = array(
         $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
     }
-#line 869 "../preg_parser.php"
-#line 113 "../preg_parser.y"
+#line 860 "../preg_parser.php"
+#line 104 "../preg_parser.y"
     function yy_r4(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -871,8 +862,8 @@ static public $yy_action = array(
         $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     }
     }
-#line 879 "../preg_parser.php"
-#line 122 "../preg_parser.y"
+#line 870 "../preg_parser.php"
+#line 113 "../preg_parser.y"
     function yy_r5(){
     //ECHO 'SUBPATT '.$this->parens[$this->yystack[$this->yyidx + -2]->minor].'<br/>';
     if ($this->yystack[$this->yyidx + -2]->minor !== 'grouping') {
@@ -894,8 +885,8 @@ static public $yy_action = array(
         $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
     }
-#line 902 "../preg_parser.php"
-#line 143 "../preg_parser.y"
+#line 893 "../preg_parser.php"
+#line 134 "../preg_parser.y"
     function yy_r6(){
     //ECHO  'CONDSUB TF <br/>';
     $this->_retvalue = new preg_node_cond_subpatt;
@@ -920,8 +911,8 @@ static public $yy_action = array(
         $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
     }
-#line 928 "../preg_parser.php"
-#line 167 "../preg_parser.y"
+#line 919 "../preg_parser.php"
+#line 158 "../preg_parser.y"
     function yy_r7(){
     //ECHO 'LEAF <br/>';
     if ($this->yystack[$this->yyidx + 0]->minor->type != preg_node::TYPE_LEAF_CHARSET || !$this->yystack[$this->yyidx + 0]->minor->w && !$this->yystack[$this->yyidx + 0]->minor->W) {
@@ -940,21 +931,21 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 948 "../preg_parser.php"
-#line 185 "../preg_parser.y"
+#line 939 "../preg_parser.php"
+#line 176 "../preg_parser.y"
     function yy_r8(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
-#line 954 "../preg_parser.php"
-#line 190 "../preg_parser.y"
+#line 945 "../preg_parser.php"
+#line 181 "../preg_parser.y"
     function yy_r9(){
     //ECHO 'UNOPENPARENS <br/>';
     $this->_retvalue = $this->create_error_node('unopenedparen');
     $this->reducecount++;
     }
-#line 961 "../preg_parser.php"
-#line 196 "../preg_parser.y"
+#line 952 "../preg_parser.php"
+#line 187 "../preg_parser.y"
     function yy_r10(){
     //ECHO 'CLOSEPARENATSTART <br/>';
     if($this->reducecount == 0) {//close bracket at the very start of expression
@@ -964,8 +955,8 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 972 "../preg_parser.php"
-#line 206 "../preg_parser.y"
+#line 963 "../preg_parser.php"
+#line 197 "../preg_parser.y"
     function yy_r11(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     end($this->errormessages);
@@ -985,14 +976,14 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 993 "../preg_parser.php"
-#line 226 "../preg_parser.y"
+#line 984 "../preg_parser.php"
+#line 217 "../preg_parser.y"
     function yy_r12(){
     $this->_retvalue = $this->create_error_node('openparenatend',$this->parens[$this->yystack[$this->yyidx + 0]->minor]);
     $this->reducecount++;
     }
-#line 999 "../preg_parser.php"
-#line 231 "../preg_parser.y"
+#line 990 "../preg_parser.php"
+#line 222 "../preg_parser.y"
     function yy_r13(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     end($this->errormessages);
@@ -1012,8 +1003,8 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1020 "../preg_parser.php"
-#line 251 "../preg_parser.y"
+#line 1011 "../preg_parser.php"
+#line 242 "../preg_parser.y"
     function yy_r14(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     end($this->errormessages);
@@ -1037,14 +1028,14 @@ static public $yy_action = array(
     }
     $this->reducecount++;
     }
-#line 1045 "../preg_parser.php"
-#line 275 "../preg_parser.y"
+#line 1036 "../preg_parser.php"
+#line 266 "../preg_parser.y"
     function yy_r15(){
     $this->_retvalue = $this->create_error_node('openparenatend','(?'.$this->parens[$this->yystack[$this->yyidx + 0]->minor]);
     $this->reducecount++;
     }
-#line 1051 "../preg_parser.php"
-#line 281 "../preg_parser.y"
+#line 1042 "../preg_parser.php"
+#line 272 "../preg_parser.y"
     function yy_r16(){
     /*Now cannot determine quntifier type.
     $quantstr = $this->quants[$this->yystack[$this->yyidx + 0]->minor->subtype];
@@ -1054,13 +1045,13 @@ static public $yy_action = array(
     $this->_retvalue = $this->create_error_node('quantifieratstart');
     $this->reducecount++;
     }
-#line 1062 "../preg_parser.php"
-#line 290 "../preg_parser.y"
+#line 1053 "../preg_parser.php"
+#line 281 "../preg_parser.y"
     function yy_r17(){
     $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor);
     $this->reducecount++;
     }
-#line 1068 "../preg_parser.php"
+#line 1059 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1159,13 +1150,13 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 62 "../preg_parser.y"
+#line 53 "../preg_parser.y"
 
     if (!$this->error) {
         $this->errormessages[] = get_string('incorrectregex', 'qtype_preg');
         $this->error = true;
     }
-#line 1174 "../preg_parser.php"
+#line 1165 "../preg_parser.php"
     }
 
     /**
