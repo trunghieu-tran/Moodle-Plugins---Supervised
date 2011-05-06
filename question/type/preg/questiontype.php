@@ -67,13 +67,9 @@ class question_preg_qtype extends question_shortanswer_qtype {
         } else {//create and store matcher object
             $for_regexp=$regex;
             if ($exact) {
-                if ($for_regexp[0]!='^') {
-                    $for_regexp='^'.$for_regexp;
-                }
-                if ($for_regexp[strlen($for_regexp)-1]!='$' || 
-                        (strlen($for_regexp)>1 && $for_regexp[strlen($for_regexp)-1]=='$' && $for_regexp[strlen($for_regexp)-2]=='\\')) {
-                    $for_regexp=$for_regexp.'$';
-                }
+                //Grouping is needed in case regexp contains top-level alternatives
+                //use non-capturing grouping to not mess-up with user subpattern capturing
+                $for_regexp = '^(?:'.$for_regexp.')$';
             }
             $modifiers = null;
             if (!$usecase) {
