@@ -421,6 +421,23 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         }
         return $res;
     }
+	public function accept() {
+        if ($this->pregnode->subtype!=preg_node_assert::SUBTYPE_PLA) {
+			switch ($this->pregnode->subtype) {
+				case preg_node_assert::SUBTYPE_NLA:
+					$res = 'assertff';
+					break;
+				case preg_node_assert::SUBTYPE_PLB:
+					$res = 'asserttb';
+					break;
+				case preg_node_assert::SUBTYPE_NLB:
+					$res = 'assertfb';
+					break;
+			}
+			$this->rejectmsg = get_string($res, 'qtype_preg');
+		}
+		return true;
+    }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum + dfa_preg_node_assert::ASSERT_MIN_NUM;
         $connection[$this->number] = &$this;
@@ -469,6 +486,13 @@ class dfa_preg_node_assert extends dfa_preg_operator {
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_operator {
 
+	public function accept() {
+		if (!$this->pregnode->greed) {
+			$this->rejectmsg = get_string('lazyquant', 'qtype_preg');
+			return false;
+		}
+		return true;
+	}
     public function nullable() {
         //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
@@ -512,6 +536,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
+	
 
     public function followpos(&$fpmap) {
         dfa_preg_operator::followpos(&$fpmap);

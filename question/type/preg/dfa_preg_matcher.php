@@ -610,6 +610,7 @@ class dfa_preg_matcher extends preg_matcher {
             $tmp = new preg_node_finite_quant;
             $tmp->leftborder = 0;
             $tmp->rightborder = 1;
+			$tmp->greed = $node->greed;
             $tmp->operands[0] = $node->operands[0];
             if ($node->leftborder == 0) {
                 $subroot->operands[0] =& $this->copy_preg_node($tmp);
