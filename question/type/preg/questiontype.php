@@ -67,13 +67,9 @@ class question_preg_qtype extends question_shortanswer_qtype {
         } else {//create and store matcher object
             $for_regexp=$regex;
             if ($exact) {
-                if ($for_regexp[0]!='^') {
-                    $for_regexp='^'.$for_regexp;
-                }
-                if ($for_regexp[strlen($for_regexp)-1]!='$' || 
-                        (strlen($for_regexp)>1 && $for_regexp[strlen($for_regexp)-1]=='$' && $for_regexp[strlen($for_regexp)-2]=='\\')) {
-                    $for_regexp=$for_regexp.'$';
-                }
+                //Grouping is needed in case regexp contains top-level alternatives
+                //use non-capturing grouping to not mess-up with user subpattern capturing
+                $for_regexp = '^(?:'.$for_regexp.')$';
             }
             $modifiers = null;
             if (!$usecase) {
@@ -231,28 +227,27 @@ class question_preg_qtype extends question_shortanswer_qtype {
             $matcher->match($response);
 
             //Calculate strings for response coloring
-            //TODO - change actual style definition to the classes to work with themes correctly, requires investigation how add a new class for plugin...
             if ($matcher->match_found()) {
                 $firstindex = $matcher->first_correct_character_index();
                 $lastindex = $matcher->last_correct_character_index();
                 $wronghead = '';
                 if ($firstindex > 0) {//if there is wrong heading
-                    $wronghead = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
+                    $wronghead = '<span class="'.question_get_feedback_class(0).'">'.htmlspecialchars(substr($response, 0, $firstindex)).'</span>';
                 }
                 $correctpart = '';
                 if ($firstindex != -1) {//there were any match
-                    $correctpart = '<span style="color:#0000FF;">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
+                    $correctpart = '<span class="'.question_get_feedback_class(1).'">'.htmlspecialchars(substr($response, $firstindex, $lastindex - $firstindex + 1)).'</span>';
                 }
                 $hintedcharacter = '';
                 if (isset($state->responses['hint']) && $matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {//if hint requested and possible
-                    $hintedcharacter = '<span style="background-color:#00FF00">'.htmlspecialchars($matcher->next_char()).'</span>';
+                    $hintedcharacter = '<span class="'.question_get_feedback_class(0.5).'">'.htmlspecialchars($matcher->next_char()).'</span>';
                 }
                 $wrongtail = '';
                 if ($lastindex + 1 < strlen($response)) {//if there is wrong tail
-                    $wrongtail = '<span style="text-decoration:line-through; color:#FF0000;">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
+                    $wrongtail = '<span class="'.question_get_feedback_class(0).'">'.htmlspecialchars(substr($response, $lastindex + 1, strlen($response) - $lastindex - 1)).'</span>';
                 }
 
-                //We shouldn't show colored message if there is no match and partial matching is unavailable, because we could mislead student striking throught all reponse, even the correct parts that may be there
+                //We shouldn't show colored message if there is no match and partial matching is unavailable, because we could mislead student marking all reponse as incorrect, while the correct parts may be there
                 if ($matcher->is_matching_complete() || $matcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
                     $this->hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
                 }
