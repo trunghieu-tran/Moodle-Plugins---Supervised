@@ -47,7 +47,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         }
         $result->indfirst = $this->yychar;
         $text = $this->yytext();
-        $result->indlast = $this->yychar + strlen($text) - 1;
+        $result->indlast = $this->yychar + $this->yylength() - 1;
         return $result;
     }
 
@@ -71,7 +71,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
-            $this->errors[] = 'unclosedsqbrackets';
+            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, 0);
             $this->cc = null;
         }
 %eof}
@@ -149,51 +149,51 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node::TYPE_NODE_SUBPATT);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node::TYPE_NODE_SUBPATT, $this->yychar, $this->yychar));
     return $res;
 }
 <YYINITIAL> \) {
-    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, 0);
+    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
 <YYINITIAL> \(\?> {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK,preg_node_subpatt::SUBTYPE_ONCEONLY);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?: {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, 'grouping');
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_PLA);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?! {
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_NLA);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<= {
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_PLB);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<! {
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, preg_node_cond_subpatt::SUBTYPE_NLB);
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?= {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_PLA);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?! {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_NLA);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<= {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_PLB);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<! {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, preg_node_assert::SUBTYPE_NLB);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \. {
@@ -205,7 +205,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \| {
-    $res = $this->form_res(preg_parser_yyParser::ALT, 0);
+    $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \\[\[\]?*+{}|().] {
