@@ -419,6 +419,7 @@ class dfa_preg_matcher extends preg_matcher {
 					$array[$this->maxnum] = $passage1;
 					unset($array[$key1]);
 					unset($array[$key2]);
+					break;
 			   }
             }
         }
@@ -529,17 +530,13 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return $result;
     }
-	public function build_tree($regex) {
-		parent::build_tree($regex);
-		$this->roots[0]= $this->dst_root;
-	}
     /**
     *get regex and build finite automates
     @param regex - regular expirience for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
-        $this->picnum=0;
+		$this->picnum=0;
         $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';//in few unit tests dfa_preg_matcher objects create without regex,
 																		  //but dfa will be build later and need for drawing dfa may be
 		if (!isset($regex)) {//not build tree and dfa, if regex not given
