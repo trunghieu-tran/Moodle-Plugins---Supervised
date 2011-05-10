@@ -148,10 +148,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('ab');
         $matcher->match('OabO');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
         $matcher->match('OacO');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'b' && $matcher->first_correct_character_index() == 1);
     }
     function test_left_anchor() {
         $matcher = new dfa_preg_matcher('^ab');
@@ -166,10 +166,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher = new dfa_preg_matcher('ab$');
         $matcher->match('Oab');
         $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
         $matcher->match('OabO');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
+        $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '' && $matcher->first_correct_character_index() == 1);
     }
     function test_full_anchor() {
         $matcher = new dfa_preg_matcher('^ab$');
@@ -218,5 +218,12 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('Abcd');
         $this->assertTrue($matcher->is_matching_complete());
     }
+	function test_match_not_from_string_start() {
+		$matcher = new dfa_preg_matcher('someregex');
+		$matcher->match('sometextwithoutmatchingandsomeregexwithmatchig');
+		$this->assertTrue($matcher->is_matching_complete());
+		$this->assertTrue($matcher->first_correct_character_index()==26);
+		$this->assertTrue($matcher->last_correct_character_index()==34);
+	}
 }
 ?>
