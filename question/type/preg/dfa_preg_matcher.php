@@ -101,10 +101,10 @@ class dfa_preg_matcher extends preg_matcher {
         }
         $oldroot = $root;
         $root = new preg_node_concat;
-        $root->operands[0] = $oldroot;
         $root->operands[1] = new preg_leaf_meta;
         $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
-        $root = $this->from_preg_node($root);//TODO fix second time converting of old root...
+        $root = $this->from_preg_node($root);
+		$root->pregnode->operands[0] = $oldroot;
     }
     
     /**
