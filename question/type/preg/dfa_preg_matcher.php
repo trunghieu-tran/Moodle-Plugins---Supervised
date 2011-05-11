@@ -536,9 +536,14 @@ class dfa_preg_matcher extends preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
+		global $CFG;
 		$this->picnum=0;
-        $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';//in few unit tests dfa_preg_matcher objects create without regex,
-																		  //but dfa will be build later and need for drawing dfa may be
+		if (isset($CFG->dotpath)) {
+			$this->graphvizpath = $CFG->dotpath;//in few unit tests dfa_preg_matcher objects create without regex,
+			  								    //but dfa will be build later and need for drawing dfa may be
+		} else {
+			$this->graphvizpath = 1;
+		}
 		if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
@@ -737,24 +742,31 @@ class dfa_preg_matcher extends preg_matcher {
     * Debug function draw finite automate with number number in human readable form
     * don't work without right to execute file
     * @param number number of drawing finite automate
+	* @param $subject type of drawing, may be: 'dfa', 'tree'
     */
-    public function draw_fa ($number) {
-        $fadotcode = $this->generate_fa_dot_code($number);
-        $dotfile = fopen('C:/dotfile/dotcode.dot', 'w');
-        foreach ($fadotcode as $fadotstring) {
-            fprintf($dotfile, "%s\n", $fadotstring);
+    public function draw ($number, $subject) {
+		global $CFG;
+		if ($this->graphvizpath===1) {
+			echo '<br>ERROR: Missed path to GraphViz!<br>Can\'t draw '.$subject.'.';
+			return;
+		}
+		$tempfolder = 'W:\\home\\moodle.local\\www\\question\\type\\preg\\temp\\';
+        $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
+        $dotfile = fopen($tempfolder.'dotcode.dot', 'w');
+        foreach ($dotcode as $dotstring) {
+            fprintf($dotfile, "%s\n", $dotstring);
         }
-        chdir($this->graphvizpath);
-        exec('dot.exe -Tjpg -o"W:/home/moodle.local/www/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" -Kdot C:/dotfile/dotcode.dot');
-        echo '<IMG src="http://moodle.local/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" width="90%"><br><br><br>';
-        $this->picnum++;
 		fclose($dotfile);
+        chdir($this->graphvizpath);
+        exec('dot.exe -Tjpg -o"'.$tempfolder.$subject.$this->picnum.'.jpg" -Kdot "'.$tempfolder.'dotcode.dot"');
+        echo '<IMG src="/question/type/preg/temp/'.$subject.$this->picnum.'.jpg" alt="Can\'t display '.$subject.' #'.$this->picnum.' graph.">';
+        $this->picnum++;
     }
     /**
     * Debug function generate dot code for drawing finite automate
     * @param number number of drawing finite automate
     */
-    protected function generate_fa_dot_code($number) {
+    protected function generate_dfa_dot_code($number) {
         $dotcode = array();
         $dotcode[] = 'digraph {';
         $dotcode[] = 'rankdir = LR;';
@@ -769,6 +781,18 @@ class dfa_preg_matcher extends preg_matcher {
                 $dotcode[] = "$index->$target"."[label=\"$symbol\"];";
             }
         }
+        $dotcode[] = '};';
+        return $dotcode;
+    }
+	/**
+    * Debug function generate dot code for drawing syntax tree
+    * @param number number of drawing syntax tree
+    */
+    protected function generate_tree_dot_code($number) {
+        $dotcode = array();
+        $dotcode[] = 'digraph {';
+        $dotcode[] = 'rankdir = TB;';
+        $this->roots[$number]->generate_dot_code($dotcode, $maxnum=0);
         $dotcode[] = '};';
         return $dotcode;
     }

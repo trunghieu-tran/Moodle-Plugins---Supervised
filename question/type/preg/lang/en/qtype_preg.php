@@ -31,6 +31,8 @@ for the regular expression in given string (answer). Exact matching means match 
 Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives
 you additional flexibility: you can specify some answer with low (or zero) grade to catch common errors and give
 comments on them. You still can specify exact matches for some of you regular expressions if you start them with ^ and end with $.';
+$string['gvpath'] = 'Path to dot.exe of GraphViz';
+$string['gvdescription'] = 'Graphviz will be used for debug printing DFA and syntax tree in human readable form.';
 $string['hintbutton'] = 'Hint';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with grade less then hint grade border won\'t used in hinting.';
