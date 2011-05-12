@@ -42,7 +42,7 @@ abstract class dfa_preg_node {
 
     /**
     * Returns true if engine support the node, false otherwise
-    * When returnig false should also set rejectmsg field
+    * When returning false should also set rejectmsg field
     */
     public function accept() {
         return true; //accepting anything by default, overload function in case of partial accepting or total rejection
@@ -70,12 +70,6 @@ abstract class dfa_preg_node {
     *@param indent indent for printing info about this node
     */
     abstract public function print_self($indent);
-
-    
-    /**
-    * Return false if the node is supported by engine, interface string name to report as unsupported if not
-    */
-    abstract public function not_supported();
 
     //DFA functions
     /**
@@ -181,9 +175,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     }
 }
 class dfa_preg_leaf_charset extends dfa_preg_leaf {
-    public function not_supported() {
-        return false;
-    }
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: leaf charset ';
@@ -208,9 +200,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
             parent::number($connection, $maxnum);
         }
     }
-    public function not_supported() {
-        return false;
-    }
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: leaf meta ';
@@ -243,12 +233,14 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
     }
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
-    public function not_supported() {
+
+    public function accept() {
         if ($this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
-            return 'escg';
-        } else {
+            $this->rejectmsg = '\G';
             return false;
         }
+        return true;
+
     }
     public function print_self($indent) {
         $this->print_indent($indent);
@@ -282,9 +274,7 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
     }
 }
 class dfa_preg_leaf_combo extends dfa_preg_leaf {
-    public function not_supported() {
-        return false;
-    }
+
     public function print_self($indent) {
         echo 'Error!!!<br>Combo leafs forbidden in tree, only for connection table!';
     }
@@ -369,9 +359,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
             dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
         }        
     }
-    public function not_supported() {
-        return false;
-    }
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node concatenation<br/>';
@@ -392,9 +380,7 @@ class dfa_preg_node_alt extends dfa_preg_operator {
         $this->lastpos = array_merge($this->pregnode->operands[0]->lastpos(), $this->pregnode->operands[1]->lastpos());
         return $this->lastpos;
     }
-    public function not_supported() {
-        return false;
-    }
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: node alternative<br/>';
@@ -403,40 +389,24 @@ class dfa_preg_node_alt extends dfa_preg_operator {
 }
 class dfa_preg_node_assert extends dfa_preg_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
-    
-    public function not_supported() {
-        switch ($this->pregnode->subtype) {
-            case preg_node_assert::SUBTYPE_PLA:
-                $res = false;
-                break;
-            case preg_node_assert::SUBTYPE_NLA:
-                $res = 'assertff';
-                break;
-            case preg_node_assert::SUBTYPE_PLB:
-                $res = 'asserttb';
-                break;
-            case preg_node_assert::SUBTYPE_NLB:
+
+    public function accept() {
+        if ($this->pregnode->subtype!=preg_node_assert::SUBTYPE_PLA) {
+            switch ($this->pregnode->subtype) {
+                case preg_node_assert::SUBTYPE_NLA:
+                    $res = 'assertff';
+                    break;
+                case preg_node_assert::SUBTYPE_PLB:
+                    $res = 'asserttb';
+                    break;
+                case preg_node_assert::SUBTYPE_NLB:
                 $res = 'assertfb';
                 break;
+            }
+            $this->rejectmsg = get_string($res, 'qtype_preg');
+            return false;
         }
-        return $res;
-    }
-	public function accept() {
-        if ($this->pregnode->subtype!=preg_node_assert::SUBTYPE_PLA) {
-			switch ($this->pregnode->subtype) {
-				case preg_node_assert::SUBTYPE_NLA:
-					$res = 'assertff';
-					break;
-				case preg_node_assert::SUBTYPE_PLB:
-					$res = 'asserttb';
-					break;
-				case preg_node_assert::SUBTYPE_NLB:
-					$res = 'assertfb';
-					break;
-			}
-			$this->rejectmsg = get_string($res, 'qtype_preg');
-		}
-		return true;
+        return true;
     }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum + dfa_preg_node_assert::ASSERT_MIN_NUM;
@@ -486,13 +456,13 @@ class dfa_preg_node_assert extends dfa_preg_operator {
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_operator {
 
-	public function accept() {
-		if (!$this->pregnode->greed) {
-			$this->rejectmsg = get_string('lazyquant', 'qtype_preg');
-			return false;
-		}
-		return true;
-	}
+    public function accept() {
+        if (!$this->pregnode->greed) {
+            $this->rejectmsg = get_string('lazyquant', 'qtype_preg');
+            return false;
+        }
+        return true;
+    }
     public function nullable() {
         //{}quantificators will be converted to ? and * combination
         if ($this->pregnode->leftborder == 0) {//? or *
@@ -512,9 +482,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
         $this->lastpos = $this->pregnode->operands[0]->lastpos();
         return $this->lastpos;
     }
-    public function not_supported() {
-        return $this->pregnode->greed;
-    }
+
     public function followpos(&$fpmap) {
         parent::followpos(&$fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
@@ -536,7 +504,6 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
-	
 
     public function followpos(&$fpmap) {
         dfa_preg_operator::followpos(&$fpmap);

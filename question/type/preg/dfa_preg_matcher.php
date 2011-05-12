@@ -38,7 +38,7 @@ class dfa_preg_matcher extends preg_matcher {
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
     var $roots;//array,[0] main root, [<assert number>] assert's root
     var $finiteautomates;
-	var $maxnum;
+    var $maxnum;
     var $built;
     var $result;
     var $picnum;//number of last picture
@@ -65,29 +65,6 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return false;
     }
-/*
-    protected function accept_node($node) {
-        switch ($node->type) {
-            case preg_node::TYPE_LEAF_BACKREF:
-            case preg_node::TYPE_NODE_COND_SUBPATT:
-                $this->flags[$node->name()] = true;
-                return false;
-            case preg_node::TYPE_LEAF_RECURSION:
-                $this->flags['leafrecursion'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            case preg_node::TYPE_LEAF_OPTIONS:
-                $this->flags['leafoptions'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            default:
-                $unsupported = $node->not_supported();//TODO - check that there is a preg_node there (not dfa_preg_node) and convert accept_node to do this job by itself without not_supported()
-                if ($unsupported) {
-                    $this->flags[$unsupported] = true;
-                }
-                break;//?? why return after break?
-                return false;
-        }
-        return true;
-    }*/
 
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
@@ -104,7 +81,7 @@ class dfa_preg_matcher extends preg_matcher {
         $root->operands[1] = new preg_leaf_meta;
         $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
         $root = $this->from_preg_node($root);
-		$root->pregnode->operands[0] = $oldroot;
+        $root->pregnode->operands[0] = $oldroot;
     }
     
     /**
@@ -112,7 +89,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index number of assert (0 for main regex) for which building fa
     */
     function buildfa($index) {
-		if ($index==0) {
+        if ($index==0) {
             $root = $this->roots[0];
         } else {
             $root = $this->roots[$index]->pregnode->operands[0];
@@ -135,7 +112,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->finiteautomates[$index][0]->marked = false;//start state not marked, because not readey, yet
         //form the determined finite automate
         while ($this->not_marked_state($index) !== false) {
-			//while has one or more not ready state.
+            //while has one or more not ready state.
             $currentstateindex = $this->not_marked_state($index);
             $this->finiteautomates[$index][$currentstateindex]->marked = true;//mark current state, because it will be ready on this step of loop
             //form not marked state for each passage of current state
@@ -176,13 +153,13 @@ class dfa_preg_matcher extends preg_matcher {
                 }
             }
         }
-		foreach ($this->finiteautomates[$index] as $key=>$state) {
-			$this->del_double($this->finiteautomates[$index][$key]->passages, $index);
-		}
-		foreach ($this->finiteautomates[$index] as $key=>$state) {
-			$this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
-		}
-	}
+        foreach ($this->finiteautomates[$index] as $key=>$state) {
+            $this->del_double($this->finiteautomates[$index][$key]->passages, $index);
+        }
+        foreach ($this->finiteautomates[$index] as $key=>$state) {
+            $this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
+        }
+    }
     /**
     *function compare regex and string, with using of finite automate builded of buildfa function
     *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
@@ -409,21 +386,21 @@ class dfa_preg_matcher extends preg_matcher {
     *@param $array array of passages of state of dfa
     *@param $index index of dfa for which do verify sybol unique
     */
-	protected function unite_parallel(&$array, $index) {
-		foreach ($array as $key1=>$passage1) {
+    protected function unite_parallel(&$array, $index) {
+        foreach ($array as $key1=>$passage1) {
             foreach ($array as $key2=>$passage2) {
                if($passage1==$passage2 && $key1!=$key2) {
-					$newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
-					$newleaf = $this->from_preg_node($newleaf);
-					$this->connection[$index][++$this->maxnum] = $newleaf;
-					$array[$this->maxnum] = $passage1;
-					unset($array[$key1]);
-					unset($array[$key2]);
-					break;
-			   }
+                    $newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
+                    $newleaf = $this->from_preg_node($newleaf);
+                    $this->connection[$index][++$this->maxnum] = $newleaf;
+                    $array[$this->maxnum] = $passage1;
+                    unset($array[$key1]);
+                    unset($array[$key2]);
+                    break;
+                }
             }
         }
-	}
+    }
     /**
     *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
     *@param index - number of automate
@@ -536,10 +513,10 @@ class dfa_preg_matcher extends preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
-		$this->picnum=0;
+        $this->picnum=0;
         $this->graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';//in few unit tests dfa_preg_matcher objects create without regex,
-																		  //but dfa will be build later and need for drawing dfa may be
-		if (!isset($regex)) {//not build tree and dfa, if regex not given
+                                                                          //but dfa will be build later and need for drawing dfa may be
+        if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
         parent::__construct($regex, $modifiers);
@@ -610,7 +587,7 @@ class dfa_preg_matcher extends preg_matcher {
             $tmp = new preg_node_finite_quant;
             $tmp->leftborder = 0;
             $tmp->rightborder = 1;
-			$tmp->greed = $node->greed;
+            $tmp->greed = $node->greed;
             $tmp->operands[0] = $node->operands[0];
             if ($node->leftborder == 0) {
                 $subroot->operands[0] =& $this->copy_preg_node($tmp);
@@ -693,9 +670,9 @@ class dfa_preg_matcher extends preg_matcher {
         $this->full = $result->full;
         $this->index_first[0] = $result->offset;
         $this->index_last[0] = $result->index+$result->offset;
-		if ($result->index==-1) {
-			$this->index_last[0]=-1;
-		}
+        if ($result->index==-1) {
+            $this->index_last[0]=-1;
+        }
         if ($result->next === 0) {
             $this->next = '';
         } else {
@@ -748,7 +725,7 @@ class dfa_preg_matcher extends preg_matcher {
         exec('dot.exe -Tjpg -o"W:/home/moodle.local/www/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" -Kdot C:/dotfile/dotcode.dot');
         echo '<IMG src="http://moodle.local/question/type/preg/ZZZdfagraph'.$this->picnum.'.jpg" width="90%"><br><br><br>';
         $this->picnum++;
-		fclose($dotfile);
+        fclose($dotfile);
     }
     /**
     * Debug function generate dot code for drawing finite automate

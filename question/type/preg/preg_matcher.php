@@ -116,20 +116,6 @@ class preg_matcher {
         } else {
             $this->ast_root = null;
         }
-        if ($this->is_error_exists()) {
-            //if parsing error then no tree, nothing accept.
-            return;
-        }
-        //check regular expression for validity
-        //$this->accept_regex($this->ast_root); //old-style function TODO - delete
-        //Add error messages for unsupported nodes
-        foreach ($this->error_flags as $key => $value) {
-            $a = new stdClass;
-            $a->nodename = $key;
-            $a->pos = $value;
-            $this->errors[] = get_string('unsupported','qtype_preg',$a);
-        }
-        $this->errors = array_unique($this->errors);//Fix, for one message about one unsupported operation. TODO - check if this is necessary with flags
     }
 
     /**
@@ -160,36 +146,6 @@ class preg_matcher {
         $this->anchor->start = false;
         $this->anchor->end = false;
     }
-
-    /**
-    *check regular expression for errors using absract syntax tree
-    @param node root of the tree
-    @return bool is tree accepted
-    */ /*
-    protected function accept_regex($node) {
-        $result = accept_node($node);
-
-        //accept all child nodes
-        if(is_a($node,'preg_operator')) {
-            foreach($node->operands as $operand) {
-                $result = $result && $this->accept_regex($operand);
-            }
-        }
-
-        return $result;
-    } */
-
-    /**
-    *checks if this abstract sytax tree node supported by this matching engine, adding error messages for unsupported nodes
-    *This function should add names of strings for unsupported operations to $this->flags
-    @param node - node to check
-    @return bool is node accepted
-    */  /*
-    protected function accept_node($node) {
-        $this->flags['noabstractaccept'] = true;
-        return false;
-    }*/
-
 
     /**
     match regular expression with given string, calls match_inner from a child class to do the real matching
@@ -353,6 +309,15 @@ class preg_matcher {
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
+            //Add error messages for unsupported nodes
+            foreach ($this->error_flags as $key => $value) {
+                $a = new stdClass;
+                $a->nodename = $key;
+                $a->indfirst = $value['start'];
+                $a->indlast = $value['end'];
+                $a->engine = get_string($this->name(), 'qtype_preg');
+                $this->errors[] = $this->highlight_regex($regex, $value['start'], $value['end']) . '<br/>' . get_string('unsupported','qtype_preg',$a);
+            }
         }
         fclose($pseudofile);
     }
@@ -371,8 +336,8 @@ class preg_matcher {
             $enginenodename = $this->nodeprefix().'_preg_'.$pregnode->name();
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept()) {
-                    $this->error_flags[$enginenode->rejectmsg] = $pregnode->indfirst;
+                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->error_flags)) {//highlighting first occurence of unaccepted node
+                    $this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
                 }
             } else {
                 $enginenode = $pregnode;
