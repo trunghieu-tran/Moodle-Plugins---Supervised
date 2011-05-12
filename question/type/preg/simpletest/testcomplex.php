@@ -15,7 +15,6 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class dfa_preg_matcher_complex_test extends UnitTestCase {
-    
     function test_easy() {
         $matcher = new dfa_preg_matcher('^abcd$');
         $matcher->match('fgh');
@@ -29,7 +28,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
     function test_alternative() {
-        $matcher = new dfa_preg_matcher('^ab|cd$');
+        $matcher = new dfa_preg_matcher('^(ab|cd)$');
         $result = $matcher->match('ad');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 0 && $matcher->next_char() === 'b');
@@ -108,7 +107,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $result = $matcher->match('ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === '');
-    }
+	}
     function test_quantificator() {
         $matcher = new dfa_preg_matcher('^ab{15,35}c$');
         $result = $matcher->match('abbbbbc');
@@ -134,10 +133,10 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 100 && $matcher->next_char() === '');
     }
     function test_assert() {
-        $matcher = new dfa_preg_matcher('^a(?=.*b)[xcvbnm]*$');
+        $matcher = new dfa_preg_matcher('^a(?=[xcvnm]*b)[xcvbnm]*$');
         $result = $matcher->match('ax');
         $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'b' || $matcher->next_char() ===  'D'));
+        $this->assertTrue($matcher->last_correct_character_index() == 1 && $matcher->next_char() === 'b');
         $result = $matcher->match('abxcv');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 4 && $matcher->next_char() === '');
@@ -193,5 +192,38 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('Incorrect!!!');
         $this->assertFalse($matcher->is_matching_complete());
     }
+    function test_digit() {
+        $matcher = new dfa_preg_matcher('(\d)+x');
+        $matcher->match('273x');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('ax');
+        $char = $matcher->next_char();
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue(ctype_digit($char));
+    }
+    function test_word_char() {
+        $matcher = new dfa_preg_matcher('a\wa');
+        $matcher->match('a_a');
+        $this->assertTrue($matcher->is_matching_complete());
+        $matcher->match('a{a');
+        $char = $matcher->next_char();
+        $this->assertFalse($matcher->is_matching_complete());
+        $this->assertTrue(ctype_alnum($char) || $char === '_');
+    }
+    function test_case_insensitive() {
+        $matcher = new dfa_preg_matcher('aBcD');
+        $matcher->match('Abcd');
+        $this->assertFalse($matcher->is_matching_complete());
+        $matcher = new dfa_preg_matcher('aBcD', 'i');
+        $matcher->match('Abcd');
+        $this->assertTrue($matcher->is_matching_complete());
+    }
+	function test_match_not_from_string_start() {
+		$matcher = new dfa_preg_matcher('someregex');
+		$matcher->match('sometextwithoutmatchingandsomeregexwithmatchig');
+		$this->assertTrue($matcher->is_matching_complete());
+		$this->assertTrue($matcher->first_correct_character_index()==26);
+		$this->assertTrue($matcher->last_correct_character_index()==34);
+	}
 }
 ?>
