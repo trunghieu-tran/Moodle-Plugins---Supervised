@@ -74,7 +74,7 @@ class preg_parser_yyToken implements ArrayAccess
 // code external to the class is included here
 #line 2 "../preg_parser.y"
 
-    require_once($CFG->dirroot . '/question/type/preg/node.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 #line 80 "../preg_parser.php"
 
 /** The following structure represents a single element of the
@@ -111,12 +111,10 @@ class preg_parser_yyParser
 
     //Root of the Abstract Syntax Tree (AST)
     private $root;
-    //Is a pattern fully anchored?
-    private $anchor;
     //Are there any errors during the parsing
     private $error;
-    //Error messages for errors during the parsing
-    private $errormessages;
+    //Copies of preg_node_error for errors during the parsing
+    private $errornodes;
     //Count of reduces made
     private $reducecount;
     //Open-parenthesis strings
@@ -125,82 +123,49 @@ class preg_parser_yyParser
     private $quants;
 
     function __construct() {
-        $this->anchor = new stdClass;
-        $this->anchor->start = false;
-        $this->anchor->end = false;
         $this->error = false;
-        $this->errormessages = array();
+        $this->errornodes = array();
         $this->reducecount = 0;
-        $this->parens = array(NODE_SUBPATT => '(', NODE => '(?:', NODE_ONETIMESUBPATT => '(?>', 
-                                NODE_ASSERTTF => '(?=', NODE_ASSERTTB => '(?<=',NODE_ASSERTFF => '(?!', NODE_ASSERTFB => '(?<!');
-        $this->quants = array (NODE_QUESTQUANT => '?', NODE_ITER => '*', NODE_PLUSQUANT => '+', NODE_QUANT => '{...}');
+        $this->parens = array(preg_node::TYPE_NODE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
+                                preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!',
+                                preg_node_assert::SUBTYPE_NLB => '(?<!');
     }
 
     function get_root() {
         return $this->root;
     }
 
-    function get_anchor() {
-        return $this->anchor;
-    }
-
     function get_error() {
         return $this->error;
     }
 
-    function get_error_messages() {
-        return $this->errormessages;
+    public function get_error_nodes() {
+        return $this->errornodes;
     }
 
     /**
-    *create and return an error node
-    @param errorstr translation string name for the error
-    @param a object, string or number to be used in translation string
-    @return node
+    * Create and return an error node, also add it to the array of parser errors
+    @param subtype type of error
+    @param firstindxs array of starting indexes of highlited areas
+    @param lastindxs array of ending indexes of highlited areas
+    @param addinfo additional info, supplied for this error
+    @return preg_node_error object
     */
-    protected function create_error_node($errorstr, $a = null) {
-        $newnode = new node;
-        $newnode->type = ERROR;
-        $newnode->subtype = $errorstr;
-        $this->errormessages[] = get_string($errorstr,'qtype_preg',$a);
+    protected function create_error_node($subtype, $firstindxs = null, $lastindxs = null, $addinfo = null) {
+        $newnode = new preg_node_error;
+        $newnode->subtype = $subtype;
+        if ($firstindxs !== null) {
+            $newnode->firstindxs = $firstindxs;
+        }
+        if ($lastindxs !== null) {
+            $newnode->lastindxs = $lastindxs;
+        }
+        $newnodw->addinfo = $addinfo;
+        $this->errornodes[] = $newnode;
         $this->error = true;
+        return $newnode;
     }
-
-    static function is_conc($prevtoken, $currtoken) {
-        /*static $condsubpatt = false;
-        static $close = 0;
-        if ($currtoken == preg_parser_yyParser::CONDSUBPATT) {
-            $condsubpatt = true;
-            $close = -1;
-        }
-        if ($condsubpatt && $currtoken == preg_parser_yyParser::CLOSEBRACK) {
-            $close++;
-        }
-        if ($condsubpatt && ($currtoken == preg_parser_yyParser::OPENBRACK || $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF  ||
-            $currtoken == preg_parser_yyParser::ASSERT_FB || $currtoken == preg_parser_yyParser::ASSERT_TB || $currtoken == preg_parser_yyParser::GROUPING ||
-            $currtoken == preg_parser_yyParser::ONETIMESUBPATT)) {
-            $close--;
-        }
-        if ($close == 0) {
-            $condsubpatt = false;
-        }
-        $flag1 = ($prevtoken == preg_parser_yyParser::PARSLEAF || $prevtoken == preg_parser_yyParser::CLOSEBRACK ||
-                  $prevtoken == preg_parser_yyParser::QUEST || $prevtoken == preg_parser_yyParser::LAZY_QUEST ||
-                  $prevtoken == preg_parser_yyParser::ITER || $prevtoken == preg_parser_yyParser::LAZY_ITER ||
-                  $prevtoken == preg_parser_yyParser::PLUS || $prevtoken == preg_parser_yyParser::LAZY_PLUS ||
-                  $prevtoken == preg_parser_yyParser::QUANT || $prevtoken == preg_parser_yyParser::LAZY_QUANT ||
-                  $prevtoken == preg_parser_yyParser::WORDBREAK || $prevtoken == preg_parser_yyParser::WORDNOTBREAK);
-        $flag2 = ($currtoken == preg_parser_yyParser::PARSLEAF || $currtoken == preg_parser_yyParser::OPENBRACK ||
-                  $currtoken == preg_parser_yyParser::GROUPING || $currtoken == preg_parser_yyParser::CONDSUBPATT ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FF ||
-                  $currtoken == preg_parser_yyParser::ASSERT_TF || $currtoken == preg_parser_yyParser::ASSERT_FB||
-                  $currtoken == preg_parser_yyParser::WORDBREAK || $currtoken == preg_parser_yyParser::WORDNOTBREAK ||
-                  $currtoken == preg_parser_yyParser::ONETIMESUBPATT);
-        $flag = ($flag1 && $flag2 && isset($prevtoken) && !$condsubpatt);
-        return $flag;*/
-        return false;
-    }
-#line 206 "../preg_parser.php"
+#line 171 "../preg_parser.php"
 
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
@@ -219,17 +184,13 @@ class preg_parser_yyParser
     const ALT                            =  5;
     const CONC                           =  6;
     const PARSLEAF                       =  7;
-    const WORDBREAK                      =  8;
-    const WORDNOTBREAK                   =  9;
-    const STARTANCHOR                    = 10;
-    const QUANT                          = 11;
-    const OPENBRACK                      = 12;
-    const CONDSUBPATT                    = 13;
-    const ENDANCHOR                      = 14;
-    const LEXERROR                       = 15;
-    const YY_NO_ACTION = 52;
-    const YY_ACCEPT_ACTION = 51;
-    const YY_ERROR_ACTION = 50;
+    const QUANT                          =  8;
+    const OPENBRACK                      =  9;
+    const CONDSUBPATT                    = 10;
+    const LEXERROR                       = 11;
+    const YY_NO_ACTION = 40;
+    const YY_ACCEPT_ACTION = 39;
+    const YY_ERROR_ACTION = 38;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -278,72 +239,60 @@ class preg_parser_yyParser
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-    const YY_SZ_ACTTAB = 79;
+    const YY_SZ_ACTTAB = 55;
 static public $yy_action = array(
- /*     0 */    25,   11,    9,   26,   17,   16,   10,   24,    7,    5,
- /*    10 */     6,   11,    9,   26,   17,   16,   10,   24,    7,    5,
- /*    20 */    18,   11,    9,   26,   17,   16,   10,   24,    7,    5,
- /*    30 */    21,   11,    9,   26,   17,   16,   10,   24,    7,    5,
- /*    40 */    20,   22,   23,   26,   17,   16,   10,   19,    7,    5,
- /*    50 */     9,   26,   17,   16,   10,   24,    7,    5,   26,   17,
- /*    60 */    16,   10,   19,    7,    5,   24,    7,    5,   13,   51,
- /*    70 */    15,    3,    4,   45,    1,    8,    2,   14,   12,
+ /*     0 */    19,    8,    9,   15,   18,    7,    5,   10,   13,    8,
+ /*    10 */    17,   15,   18,    7,    5,    2,   16,    8,    4,   15,
+ /*    20 */    18,    7,    5,    1,    6,    8,   36,   15,   18,    7,
+ /*    30 */     5,   36,   12,   36,   36,   15,   14,    7,    5,   36,
+ /*    40 */    15,   18,    7,    5,   15,   14,    7,    5,   36,   18,
+ /*    50 */     7,    5,   39,   11,    3,
     );
     static public $yy_lookahead = array(
- /*     0 */     4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
- /*    10 */     4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
- /*    20 */     4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
- /*    30 */     4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
- /*    40 */     4,   14,   15,    7,    8,    9,   10,   11,   12,   13,
- /*    50 */     6,    7,    8,    9,   10,   11,   12,   13,    7,    8,
- /*    60 */     9,   10,   11,   12,   13,   11,   12,   13,   19,   17,
- /*    70 */    18,   19,   19,   20,   19,   19,   19,   19,   19,
+ /*     0 */     4,    5,   15,    7,    8,    9,   10,   15,    4,    5,
+ /*    10 */    11,    7,    8,    9,   10,   15,    4,    5,   15,    7,
+ /*    20 */     8,    9,   10,   15,    4,    5,   16,    7,    8,    9,
+ /*    30 */    10,   16,    4,   16,   16,    7,    8,    9,   10,   16,
+ /*    40 */     7,    8,    9,   10,    7,    8,    9,   10,   16,    8,
+ /*    50 */     9,   10,   13,   14,   15,
 );
     const YY_SHIFT_USE_DFLT = -5;
-    const YY_SHIFT_MAX = 15;
+    const YY_SHIFT_MAX = 11;
     static public $yy_shift_ofst = array(
- /*     0 */    36,   26,    6,   16,   -4,   36,   36,   36,   44,   36,
- /*    10 */    36,   51,   54,   54,   54,   27,
+ /*     0 */    28,   20,   12,    4,   -4,   28,   28,   28,   37,   33,
+ /*    10 */    41,   -1,
 );
-    const YY_REDUCE_USE_DFLT = -1;
-    const YY_REDUCE_MAX = 14;
+    const YY_REDUCE_USE_DFLT = -14;
+    const YY_REDUCE_MAX = 10;
     static public $yy_reduce_ofst = array(
- /*     0 */    52,   49,   49,   49,   49,   57,   53,   55,   49,   58,
- /*    10 */    59,   56,   49,   49,   49,
+ /*     0 */    39,   -8,   -8,   -8,   -8,    8,    3,    0,  -13,   -8,
+ /*    10 */    -8,
 );
     static public $yyExpectedTokens = array(
-        /* 0 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 1 */ array(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 2 */ array(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 3 */ array(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 4 */ array(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 5 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 6 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 7 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 8 */ array(6, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 9 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 10 */ array(4, 7, 8, 9, 10, 11, 12, 13, ),
-        /* 11 */ array(7, 8, 9, 10, 11, 12, 13, ),
-        /* 12 */ array(11, 12, 13, ),
-        /* 13 */ array(11, 12, 13, ),
-        /* 14 */ array(11, 12, 13, ),
-        /* 15 */ array(14, 15, ),
+        /* 0 */ array(4, 7, 8, 9, 10, ),
+        /* 1 */ array(4, 5, 7, 8, 9, 10, ),
+        /* 2 */ array(4, 5, 7, 8, 9, 10, ),
+        /* 3 */ array(4, 5, 7, 8, 9, 10, ),
+        /* 4 */ array(4, 5, 7, 8, 9, 10, ),
+        /* 5 */ array(4, 7, 8, 9, 10, ),
+        /* 6 */ array(4, 7, 8, 9, 10, ),
+        /* 7 */ array(4, 7, 8, 9, 10, ),
+        /* 8 */ array(7, 8, 9, 10, ),
+        /* 9 */ array(7, 8, 9, 10, ),
+        /* 10 */ array(8, 9, 10, ),
+        /* 11 */ array(11, ),
+        /* 12 */ array(),
+        /* 13 */ array(),
+        /* 14 */ array(),
+        /* 15 */ array(),
         /* 16 */ array(),
         /* 17 */ array(),
         /* 18 */ array(),
         /* 19 */ array(),
-        /* 20 */ array(),
-        /* 21 */ array(),
-        /* 22 */ array(),
-        /* 23 */ array(),
-        /* 24 */ array(),
-        /* 25 */ array(),
-        /* 26 */ array(),
 );
     static public $yy_default = array(
- /*     0 */    50,   43,   46,   38,   45,   47,   41,   44,   30,   50,
- /*    10 */    50,   31,   36,   29,   28,   27,   40,   39,   41,   48,
- /*    20 */    42,   33,   37,   49,   32,   34,   35,
+ /*     0 */    38,   34,   31,   28,   33,   35,   29,   32,   23,   22,
+ /*    10 */    21,   20,   30,   29,   36,   27,   25,   37,   24,   26,
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
@@ -375,12 +324,12 @@ static public $yy_action = array(
 **    YYERRORSYMBOL      is the code number of the error symbol.  If not
 **                       defined, then do no error processing.
 */
-    const YYNOCODE = 21;
+    const YYNOCODE = 17;
     const YYSTACKDEPTH = 100;
     const preg_parser_ARG_DECL = '0';
-    const YYNSTATE = 27;
-    const YYNRULE = 23;
-    const YYERRORSYMBOL = 16;
+    const YYNSTATE = 20;
+    const YYNRULE = 18;
+    const YYERRORSYMBOL = 12;
     const YYERRSYMDT = 'yy0';
     const YYFALLBACK = 0;
     /** The next table maps tokens into fallback tokens.  If a construct
@@ -455,8 +404,7 @@ static public $yy_action = array(
     static public $yyTokenName = array( 
   '$',             'ERROR_PREC_VERY_SHORT',  'ERROR_PREC_SHORT',  'ERROR_PREC',  
   'CLOSEBRACK',    'ALT',           'CONC',          'PARSLEAF',    
-  'WORDBREAK',     'WORDNOTBREAK',  'STARTANCHOR',   'QUANT',       
-  'OPENBRACK',     'CONDSUBPATT',   'ENDANCHOR',     'LEXERROR',    
+  'QUANT',         'OPENBRACK',     'CONDSUBPATT',   'LEXERROR',    
   'error',         'start',         'lastexpr',      'expr',        
     );
 
@@ -466,28 +414,23 @@ static public $yy_action = array(
      */
     static public $yyRuleName = array(
  /*   0 */ "start ::= lastexpr",
- /*   1 */ "expr ::= expr CONC expr",
- /*   2 */ "expr ::= expr expr",
- /*   3 */ "expr ::= expr ALT expr",
- /*   4 */ "expr ::= expr ALT",
- /*   5 */ "expr ::= expr QUANT",
- /*   6 */ "expr ::= OPENBRACK expr CLOSEBRACK",
- /*   7 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK",
- /*   8 */ "expr ::= PARSLEAF",
- /*   9 */ "expr ::= STARTANCHOR expr",
- /*  10 */ "lastexpr ::= lastexpr ENDANCHOR",
- /*  11 */ "lastexpr ::= expr",
- /*  12 */ "expr ::= WORDBREAK",
- /*  13 */ "expr ::= WORDNOTBREAK",
- /*  14 */ "expr ::= expr CLOSEBRACK",
- /*  15 */ "expr ::= CLOSEBRACK",
- /*  16 */ "expr ::= OPENBRACK expr",
- /*  17 */ "expr ::= OPENBRACK",
- /*  18 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr",
- /*  19 */ "expr ::= CONDSUBPATT expr",
- /*  20 */ "expr ::= CONDSUBPATT",
- /*  21 */ "expr ::= QUANT",
- /*  22 */ "lastexpr ::= lastexpr LEXERROR",
+ /*   1 */ "expr ::= expr expr",
+ /*   2 */ "expr ::= expr ALT expr",
+ /*   3 */ "expr ::= expr ALT",
+ /*   4 */ "expr ::= expr QUANT",
+ /*   5 */ "expr ::= OPENBRACK expr CLOSEBRACK",
+ /*   6 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK",
+ /*   7 */ "expr ::= PARSLEAF",
+ /*   8 */ "lastexpr ::= expr",
+ /*   9 */ "expr ::= expr CLOSEBRACK",
+ /*  10 */ "expr ::= CLOSEBRACK",
+ /*  11 */ "expr ::= OPENBRACK expr",
+ /*  12 */ "expr ::= OPENBRACK",
+ /*  13 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr",
+ /*  14 */ "expr ::= CONDSUBPATT expr",
+ /*  15 */ "expr ::= CONDSUBPATT",
+ /*  16 */ "expr ::= QUANT",
+ /*  17 */ "lastexpr ::= lastexpr LEXERROR",
     );
 
     /**
@@ -824,29 +767,24 @@ static public $yy_action = array(
      * } 
      */
     static public $yyRuleInfo = array(
-  array( 'lhs' => 17, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 3 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 3 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 3 ),
-  array( 'lhs' => 19, 'rhs' => 5 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 18, 'rhs' => 2 ),
-  array( 'lhs' => 18, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 4 ),
-  array( 'lhs' => 19, 'rhs' => 2 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 19, 'rhs' => 1 ),
-  array( 'lhs' => 18, 'rhs' => 2 ),
+  array( 'lhs' => 13, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 3 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 3 ),
+  array( 'lhs' => 15, 'rhs' => 5 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 14, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 4 ),
+  array( 'lhs' => 15, 'rhs' => 2 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 15, 'rhs' => 1 ),
+  array( 'lhs' => 14, 'rhs' => 2 ),
     );
 
     /**
@@ -869,16 +807,11 @@ static public $yy_action = array(
         10 => 10,
         11 => 11,
         12 => 12,
+        15 => 12,
         13 => 13,
         14 => 14,
-        15 => 15,
         16 => 16,
         17 => 17,
-        18 => 18,
-        19 => 19,
-        20 => 20,
-        21 => 21,
-        22 => 22,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -886,261 +819,230 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 111 "../preg_parser.y"
+#line 77 "../preg_parser.y"
     function yy_r0(){
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 898 "../preg_parser.php"
-#line 114 "../preg_parser.y"
+#line 831 "../preg_parser.php"
+#line 80 "../preg_parser.y"
     function yy_r1(){
-    //ECHO 'CONC <br/>';
-    $this->_retvalue = new node;
-    $this->_retvalue->type = NODE;
-    $this->_retvalue->subtype = NODE_CONC;
-    $this->_retvalue->firop = $this->yystack[$this->yyidx + -2]->minor;
-    $this->_retvalue->secop = $this->yystack[$this->yyidx + 0]->minor;
+    $this->_retvalue = new preg_node_concat;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 909 "../preg_parser.php"
-#line 123 "../preg_parser.y"
+#line 841 "../preg_parser.php"
+#line 88 "../preg_parser.y"
     function yy_r2(){
-    //ECHO 'CONC1 <br/>';
-    $this->_retvalue = new node;
-    $this->_retvalue->type = NODE;
-    $this->_retvalue->subtype = NODE_CONC;
-    $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
-    $this->_retvalue->secop = $this->yystack[$this->yyidx + 0]->minor;
-    $this->reducecount++;
-    }
-#line 920 "../preg_parser.php"
-#line 132 "../preg_parser.y"
-    function yy_r3(){
     //ECHO 'ALT <br/>';
-    $this->_retvalue = new node;
-    $this->_retvalue->type = NODE;
-    $this->_retvalue->subtype = NODE_ALT;
-    $this->_retvalue->firop = $this->yystack[$this->yyidx + -2]->minor;
-    $this->_retvalue->secop = $this->yystack[$this->yyidx + 0]->minor;
+    $this->_retvalue = new preg_node_alt;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -2]->minor;
+    $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -2]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 931 "../preg_parser.php"
-#line 141 "../preg_parser.y"
+#line 852 "../preg_parser.php"
+#line 97 "../preg_parser.y"
+    function yy_r3(){
+    $this->_retvalue = new preg_node_alt;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[1] = new preg_leaf_meta;
+    $this->_retvalue->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
+    }
+#line 863 "../preg_parser.php"
+#line 107 "../preg_parser.y"
     function yy_r4(){
-    $this->_retvalue = new node;
-    $this->_retvalue->type = NODE;
-    $this->_retvalue->subtype = NODE_ALT;
-    $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
-    $this->_retvalue->secop = new node;
-    $this->_retvalue->secop->type = LEAF;
-    $this->_retvalue->secop->subtype = LEAF_EMPTY;
-    $this->reducecount++;
-    }
-#line 943 "../preg_parser.php"
-#line 152 "../preg_parser.y"
-    function yy_r5(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
-    $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 950 "../preg_parser.php"
-#line 158 "../preg_parser.y"
-    function yy_r6(){
+#line 872 "../preg_parser.php"
+#line 115 "../preg_parser.y"
+    function yy_r5(){
     //ECHO 'SUBPATT '.$this->parens[$this->yystack[$this->yyidx + -2]->minor].'<br/>';
-    if ($this->yystack[$this->yyidx + -2]->minor != NODE) {
-        $this->_retvalue = new node;
-        $this->_retvalue->type = NODE;
-        $this->_retvalue->subtype = $this->yystack[$this->yyidx + -2]->minor;
-        $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
+    if ($this->yystack[$this->yyidx + -2]->minor->subtype !== 'grouping') {
+        if ($this->yystack[$this->yyidx + -2]->minor->subtype === preg_node::TYPE_NODE_SUBPATT || $this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
+            $this->_retvalue = new preg_node_subpatt;
+        } else {
+            $this->_retvalue = new preg_node_assert;
+        }
+        if ($this->yystack[$this->yyidx + -2]->minor->subtype !== preg_node::TYPE_NODE_SUBPATT) {
+            $this->_retvalue->subtype = $this->yystack[$this->yyidx + -2]->minor->subtype;
+        }
+        $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {//grouping node
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -2]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 964 "../preg_parser.php"
-#line 170 "../preg_parser.y"
-    function yy_r7(){
+#line 893 "../preg_parser.php"
+#line 134 "../preg_parser.y"
+    function yy_r6(){
     //ECHO  'CONDSUB TF <br/>';
-    $this->_retvalue = new node;
-    $this->_retvalue->type = NODE;
-    $this->_retvalue->subtype = NODE_CONDSUBPATT;
-    if ($this->yystack[$this->yyidx + -1]->minor->subtype != NODE_ALT) {
-        $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor;
+    $this->_retvalue = new preg_node_cond_subpatt;
+    if ($this->yystack[$this->yyidx + -1]->minor->type != preg_node::TYPE_NODE_ALT) {
+        $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {
-        if ($this->yystack[$this->yyidx + -1]->minor->firop->subtype == NODE_ALT || $this->yystack[$this->yyidx + -1]->minor->secop->subtype == NODE_ALT) {
-            $this->_retvalue = $this->create_error_node('threealtincondsubpatt');//One or two top-level alternative in conditional subpattern allowed
+        if ($this->yystack[$this->yyidx + -1]->minor->operands[0]->type == preg_node::TYPE_NODE_ALT || $this->yystack[$this->yyidx + -1]->minor->operands[1]->type == preg_node::TYPE_NODE_ALT) {
+            //One or two top-level alternative allowed in conditional subpattern 
+            $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, array($this->yystack[$this->yyidx + -4]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast+1));
             $this->reducecount++;
             return;
         } else {
-            $this->_retvalue->firop = $this->yystack[$this->yyidx + -1]->minor->firop;
-            $this->_retvalue->secop = $this->yystack[$this->yyidx + -1]->minor->secop;
+            $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor->operands[0];
+            $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor->operands[1];
         }
     }
-    $this->_retvalue->thirdop->type = NODE;
-    $this->_retvalue->thirdop->subtype = $this->yystack[$this->yyidx + -4]->minor;
-    $this->_retvalue->thirdop->firop = $this->yystack[$this->yyidx + -3]->minor;
+    $this->_retvalue->operands[2] = new preg_node_assert;
+    $this->_retvalue->operands[2]->subtype = $this->yystack[$this->yyidx + -4]->minor->subtype;
+    $this->_retvalue->operands[2]->operands[0] = $this->yystack[$this->yyidx + -3]->minor;
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -4]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 988 "../preg_parser.php"
-#line 192 "../preg_parser.y"
-    function yy_r8(){
+#line 918 "../preg_parser.php"
+#line 157 "../preg_parser.y"
+    function yy_r7(){
     //ECHO 'LEAF <br/>';
-    $this->_retvalue = new node;
+    if ($this->yystack[$this->yyidx + 0]->minor->type != preg_node::TYPE_LEAF_CHARSET || !$this->yystack[$this->yyidx + 0]->minor->w && !$this->yystack[$this->yyidx + 0]->minor->W) {
+        $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+    } else if ($this->yystack[$this->yyidx + 0]->minor->w) {
+        $this->_retvalue = new preg_node_alt;
+        $this->_retvalue->operands[0] = new preg_leaf_meta;
+        $this->_retvalue->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
+    } else if ($this->yystack[$this->yyidx + 0]->minor->W) {
+        $this->_retvalue = new preg_node_alt;
+        $this->_retvalue->operands[0] = new preg_leaf_meta;
+        $this->_retvalue->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+        $this->_retvalue->operands[0]->negative = true;
+        $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + 0]->minor;
+    }
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
+#line 940 "../preg_parser.php"
+#line 177 "../preg_parser.y"
+    function yy_r8(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
-#line 996 "../preg_parser.php"
-#line 198 "../preg_parser.y"
+#line 946 "../preg_parser.php"
+#line 182 "../preg_parser.y"
     function yy_r9(){
-    $this->anchor->start = true;
-    $this->_retvalue = new node;
-    $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+    //ECHO 'UNOPENPARENS <br/>';
+    $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array($this->yystack[$this->yyidx + -1]->minor->indlast + 1), array($this->yystack[$this->yyidx + -1]->minor->indlast + 1));
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 1004 "../preg_parser.php"
-#line 204 "../preg_parser.y"
+#line 955 "../preg_parser.php"
+#line 190 "../preg_parser.y"
     function yy_r10(){
-    $this->anchor->end = true;
-    $this->_retvalue = new node;
-    $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
+    //ECHO 'CLOSEPARENATSTART <br/>';
+    $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + 0]->minor->indfirst));
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
+#line 964 "../preg_parser.php"
+#line 198 "../preg_parser.y"
+    function yy_r11(){
+    //ECHO 'UNCLOSEDPARENS <br/>';
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == $this->yystack[$this->yyidx + -1]->minor->indlast + 1) {//empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array($this->yystack[$this->yyidx + -1]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast + 1), $this->parens[$this->yystack[$this->yyidx + -1]->minor->subtype]);
+            $emptyparens = true;
+            $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
+        }
+    }
+    if (!$emptyparens) {//regular unclosed parens
+        $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + -1]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast), $this->parens[$this->yystack[$this->yyidx + -1]->minor->subtype]);
+        $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    }
+#line 984 "../preg_parser.php"
+#line 217 "../preg_parser.y"
+    function yy_r12(){
+    $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + 0]->minor->indfirst),  array($this->yystack[$this->yyidx + 0]->minor->indlast), $this->parens[$this->yystack[$this->yyidx + 0]->minor->subtype]);
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
+#line 992 "../preg_parser.php"
+#line 224 "../preg_parser.y"
+    function yy_r13(){
+    //ECHO 'UNCLOSEDPARENS <br/>';
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == $this->yystack[$this->yyidx + -1]->minor->indlast + 1) {//empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array($this->yystack[$this->yyidx + -3]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast + 1), $this->parens[$this->yystack[$this->yyidx + -3]->minor->subtype]);
+            $emptyparens = true;
+            $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
+        }
+    }
+    if (!$emptyparens) {//regular unclosed parens
+        $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + -3]->minor->indfirst), array($this->yystack[$this->yyidx + -3]->minor->indlast), $this->parens[$this->yystack[$this->yyidx + -3]->minor->subtype]);
+        $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -3]->minor->indfirst;
     }
 #line 1012 "../preg_parser.php"
-#line 210 "../preg_parser.y"
-    function yy_r11(){
-    $this->_retvalue = new node;
-    $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
-    $this->reducecount++;
-    }
-#line 1019 "../preg_parser.php"
-#line 215 "../preg_parser.y"
-    function yy_r12(){
-    $this->_retvalue = new node;
-    $this->_retvalue->type = LEAF;
-    $this->_retvalue->subtype = LEAF_WORDBREAK;
-    $this->reducecount++;
-    }
-#line 1027 "../preg_parser.php"
-#line 221 "../preg_parser.y"
-    function yy_r13(){
-    $this->_retvalue = new node;
-    $this->_retvalue->type = LEAF;
-    $this->_retvalue->subtype = LEAF_WORDNOTBREAK;
-    $this->reducecount++;
-    }
-#line 1035 "../preg_parser.php"
-#line 228 "../preg_parser.y"
+#line 243 "../preg_parser.y"
     function yy_r14(){
-    //ECHO 'UNOPENPARENS <br/>';
-    $this->_retvalue = $this->create_error_node('unopenedparen');
+    //ECHO 'UNCLOSEDPARENS <br/>';
+    //Two unclosed parens for conditional subpatterns
+    //Create only one error node to avoid confusion when reporting errors to the user
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == $this->yystack[$this->yyidx + -1]->minor->indlast + 1) {//unclosed parens + empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array($this->yystack[$this->yyidx + -1]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast + 1), $this->parens[$this->yystack[$this->yyidx + -1]->minor->subtype]);
+            $emptyparens = true;
+            $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
+        }
+    }
+    if (!$emptyparens) {//two unclosed parens
+        $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + -1]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast), $this->parens[$this->yystack[$this->yyidx + -1]->minor->subtype]);
+        $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
+    }
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
+    }
+#line 1034 "../preg_parser.php"
+#line 272 "../preg_parser.y"
+    function yy_r16(){
+    $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, array($this->yystack[$this->yyidx + 0]->minor->indfirst),  array($this->yystack[$this->yyidx + 0]->minor->indlast));
+    $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
 #line 1042 "../preg_parser.php"
-#line 234 "../preg_parser.y"
-    function yy_r15(){
-    //ECHO 'CLOSEPARENATSTART <br/>';
-    if($this->reducecount == 0) {//close bracket at the very start of expression
-        $this->_retvalue = $this->create_error_node('closeparenatverystart');
-    } else {
-        $this->_retvalue = $this->create_error_node('closeparenatstart');
-    }
-    $this->reducecount++;
-    }
-#line 1053 "../preg_parser.php"
-#line 244 "../preg_parser.y"
-    function yy_r16(){
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
-    }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        $this->_retvalue = $this->create_error_node('emptyparens',$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-    } else {
-        $this->_retvalue = $this->create_error_node('unclosedparen',$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-    }
-    $this->reducecount++;
-    }
-#line 1074 "../preg_parser.php"
-#line 264 "../preg_parser.y"
+#line 279 "../preg_parser.y"
     function yy_r17(){
-    $this->_retvalue = $this->create_error_node('openparenatend',$this->parens[$this->yystack[$this->yyidx + 0]->minor]);
+    $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor->subtype, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + -1]->minor->indlast));
     $this->reducecount++;
+    $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;//NOTE - indexes may depends on $this->yystack[$this->yyidx + 0]->minor->subtype, take into account if another lexer error would be found
+    $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast;
     }
-#line 1080 "../preg_parser.php"
-#line 269 "../preg_parser.y"
-    function yy_r18(){
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
-    }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        $this->_retvalue = $this->create_error_node('emptyparens','(?'.$this->parens[$this->yystack[$this->yyidx + -3]->minor]);
-    } else {
-        $this->_retvalue = $this->create_error_node('unclosedparen','(?'.$this->parens[$this->yystack[$this->yyidx + -3]->minor]);
-    }
-    $this->reducecount++;
-    }
-#line 1101 "../preg_parser.php"
-#line 289 "../preg_parser.y"
-    function yy_r19(){
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    end($this->errormessages);
-    $unopenstr = get_string('unopenedparen','qtype_preg');
-    $closeatstartstr = get_string('closeparenatstart','qtype_preg');
-    $i = count($this->errormessages) - 1;
-    while ($i>=0 && current($this->errormessages) != $unopenstr && current($this->errormessages) != $closeatstartstr) {
-        prev($this->errormessages);//Iterate over all previous error messages except unopened brackets (to not catch 'b)c(f' as empty brackets)
-        $i--;
-    }
-    if ($i>=0 && current($this->errormessages) == $closeatstartstr) {
-        //empty brackets, avoiding two error messages
-        array_splice($this->errormessages, $i, 1);
-        $this->_retvalue = $this->create_error_node('emptyparens','(?'.$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-        //Two unclosed brackets, firts are empty
-        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-    } else {
-        //Two unclosed brackets, so two messages
-        $this->_retvalue = $this->create_error_node('unclosedparen','(?'.$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-        $this->errormessages[] = get_string('unclosedparen', 'qtype_preg', '(?'.$this->parens[$this->yystack[$this->yyidx + -1]->minor]);
-    }
-    $this->reducecount++;
-    }
-#line 1126 "../preg_parser.php"
-#line 313 "../preg_parser.y"
-    function yy_r20(){
-    $this->_retvalue = $this->create_error_node('openparenatend','(?'.$this->parens[$this->yystack[$this->yyidx + 0]->minor]);
-    $this->reducecount++;
-    }
-#line 1132 "../preg_parser.php"
-#line 319 "../preg_parser.y"
-    function yy_r21(){
-    $quantstr = $this->quants[$this->yystack[$this->yyidx + 0]->minor->subtype];
-    if (!$this->yystack[$this->yyidx + 0]->minor->greed) {
-        $quantstr .= '?';
-    }
-    $this->_retvalue = $this->create_error_node('quantifieratstart',$quantstr);
-    $this->reducecount++;
-    }
-#line 1142 "../preg_parser.php"
-#line 328 "../preg_parser.y"
-    function yy_r22(){
-    $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor);
-    $this->reducecount++;
-    }
-#line 1148 "../preg_parser.php"
+#line 1050 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1239,13 +1141,13 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 96 "../preg_parser.y"
+#line 62 "../preg_parser.y"
 
     if (!$this->error) {
-        $this->errormessages[] = get_string('incorrectregex', 'qtype_preg');
+        $this->create_error_node(preg_node_error::SUBTYPE_UNKNOWN_ERROR);
         $this->error = true;
     }
-#line 1254 "../preg_parser.php"
+#line 1156 "../preg_parser.php"
     }
 
     /**

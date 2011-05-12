@@ -42,13 +42,15 @@ class preg_matcher {
     protected $modifiers;
 
 
-    //The root of abstract syntax tree of the regular expression
+    //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
+    //The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name
+    protected $dst_root;
     //The error messages array
     protected $errors;
     //Array with flags for unsupported node types
-    protected $flags;
-    //Anchoring - object,  with 'start' and 'end' logical fields, which are true if ancho
+    protected $error_flags;
+    //Anchoring - object,  with 'start' and 'end' logical fields, which are true if all regex is anchored
     protected $anchor;
 
     //Matching results
@@ -85,7 +87,7 @@ class preg_matcher {
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
-        $this->flags = array();
+        $this->error_flags = array();
         $this->is_match = false;
 
         if ($regex === null) {
@@ -110,6 +112,7 @@ class preg_matcher {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
+            $this->look_for_anchors();
         } else {
             $this->ast_root = null;
         }
@@ -118,7 +121,15 @@ class preg_matcher {
             return;
         }
         //check regular expression for validity
-        $this->accept_regex($this->ast_root);
+        //$this->accept_regex($this->ast_root); //old-style function TODO - delete
+        //Add error messages for unsupported nodes
+        foreach ($this->error_flags as $key => $value) {
+            $a = new stdClass;
+            $a->nodename = $key;
+            $a->pos = $value;
+            $this->errors[] = get_string('unsupported','qtype_preg',$a);
+        }
+        $this->errors = array_unique($this->errors);//Fix, for one message about one unsupported operation. TODO - check if this is necessary with flags
     }
 
     /**
@@ -138,46 +149,46 @@ class preg_matcher {
     }
 
     /**
+    * Fill anchor field to show if regex is anchored using ast_root
+    *
+    * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
+    * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+    */
+    /*protected*/ public function look_for_anchors() {
+        //TODO(performance) - write real code, for now think no anchoring is in expressions
+        $this->anchor = new stdClass;
+        $this->anchor->start = false;
+        $this->anchor->end = false;
+    }
+
+    /**
     *check regular expression for errors using absract syntax tree
     @param node root of the tree
     @return bool is tree accepted
-    */
+    */ /*
     protected function accept_regex($node) {
-        $this->accept_node($node);
-        if ($node->type == NODE) {
-            if ($node->subtype == NODE_CONDSUBPATT) {
-                $this->accept_regex($node->thirdop);
+        $result = accept_node($node);
+
+        //accept all child nodes
+        if(is_a($node,'preg_operator')) {
+            foreach($node->operands as $operand) {
+                $result = $result && $this->accept_regex($operand);
             }
-            if($node->subtype == NODE_CONC || $node->subtype == NODE_ALT || $node->subtype == NODE_CONDSUBPATT) {
-                $this->accept_regex($node->secop);
-            }
-            $this->accept_regex($node->firop);
         }
 
-        //Add error messages for unsupported nodes
-        foreach ($this->flags as $key => $value) {
-            $this->errors[] = get_string('unsupported','qtype_preg',get_string($key, 'qtype_preg'));
-        }
-        $this->errors = array_unique($this->errors);//Fix, for one message about one unsupported operation.
-
-        if (empty($this->errors)) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
+        return $result;
+    } */
 
     /**
     *checks if this abstract sytax tree node supported by this matching engine, adding error messages for unsupported nodes
     *This function should add names of strings for unsupported operations to $this->flags
     @param node - node to check
     @return bool is node accepted
-    */
+    */  /*
     protected function accept_node($node) {
         $this->flags['noabstractaccept'] = true;
         return false;
-    }
+    }*/
 
 
     /**
@@ -314,8 +325,8 @@ class preg_matcher {
     }
 
     /**
-    *function do lexical and syntaxical analyze of regex and build tree, root saving in $this->roots[0]
-    @param $regex - regular expirience for building tree
+    * Function does lexical and syntaxical analysis of regex and builds tree, root saving in $this->ast_root
+    @param $regex - regular expression for building tree
     */
     /*protected*/public function build_tree($regex) {
 
@@ -323,17 +334,8 @@ class preg_matcher {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $parser = new preg_parser_yyParser;
-        $curr = -1;
         while ($token = $lexer->nextToken()) {
-            $prev = $curr;
-            $curr = $token->type;
-
-            if (preg_parser_yyParser::is_conc($prev, $curr)) {
-                //$parser->doParse(preg_parser_yyParser::CONC, 0);
-                $parser->doParse($token->type, $token->value);
-            } else {
-                $parser->doParse($token->type, $token->value);
-            }
+            $parser->doParse($token->type, $token->value);
         }
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $errstring) {
@@ -341,12 +343,68 @@ class preg_matcher {
         }
         $parser->doParse(0, 0);
         if ($parser->get_error()) {
-            $this->errors = array_merge($this->errors, $parser->get_error_messages());
+            $errornodes = $parser->get_error_nodes();
+            $errormsgs = array();
+            //Generate parser error messages
+            foreach($errornodes as $node) {
+                $errormsgs[] = $this->highlight_regex($regex, $node->firstindxs[0],$node->lastindxs[0]) . '<br/>' . $node->error_string();
+            }
+            $this->errors = array_merge($this->errors, $errormsgs);
         } else {
             $this->ast_root = $parser->get_root();
-            $this->anchor = $parser->get_anchor();
+            $this->dst_root = $this->from_preg_node($this->ast_root);
         }
         fclose($pseudofile);
+    }
+
+    public function highlight_regex($regex, $indfirst, $indlast) {
+        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
+    }
+
+    /**
+    * DST node factory
+    * @param pregnode preg_node child class instance
+    * @return corresponding xxx_preg_node child class instance
+    */
+    public function &from_preg_node($pregnode) {
+        if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
+            $enginenodename = $this->nodeprefix().'_preg_'.$pregnode->name();
+            if (class_exists($enginenodename)) {
+                $enginenode = new $enginenodename($pregnode, $this);
+                if (!$enginenode->accept()) {
+                    $this->error_flags[$enginenode->rejectmsg] = $pregnode->indfirst;
+                }
+            } else {
+                $enginenode = $pregnode;
+            }
+            return $enginenode;
+        } else {
+            return $pregnode;
+        }
+    }
+
+    /**
+    * Returns prefix for engine specific classes
+    */
+    protected function nodeprefix() {
+        return null;
+    }
+
+    /**
+    * Function copy node with subtree, no reference
+    * @param node node for copying
+    * @return copy of node(and subtree)
+    */
+    protected function &copy_preg_node($node) {
+        $result = clone $node;
+        /*if (is_a($node, 'preg_operator')) {
+            foreach ($node->operands as $key=>$operand) {
+                if (is_a($operand, 'preg_node')) {//Just to be sure this is not plain-data operand
+                    $result->operands[$key] = &$this->copy_preg_node($operand);
+                }
+            }
+        }*/
+        return $result;
     }
 }
 ?>
