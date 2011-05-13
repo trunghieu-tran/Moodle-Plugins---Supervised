@@ -36,8 +36,7 @@ require_once("$CFG->libdir/portfoliolib.php");
 require_once('model.php');
 
 // pages on page view.php
-$pages = poasassignment_model::$pages;
+//$pages = poasassignment_model::$pages;
 //$pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders', 'taskgiversettings');
-
-$poasassignmenttabbedpageinstance = new poasassignment_tabbed_page($pages);
+$poasassignmenttabbedpageinstance = new poasassignment_tabbed_page();
 $poasassignmenttabbedpageinstance->view(); // Display page
