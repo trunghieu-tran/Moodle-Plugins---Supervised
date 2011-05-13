@@ -1,34 +1,5 @@
 <?php
 
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-
-/**
- * Library of interface functions and constants for module poasassignment
- *
- * All the core Moodle functions, neeeded to allow the module to work
- * integrated in Moodle should be placed here.
- * All the poasassignment specific functions, needed to implement all the module
- * logic, should go to locallib.php. This will help to save some memory when
- * Moodle is performing actions across all modules.
- *
- * @package   mod_poasassignment
- * @copyright 2010 Your Name
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
  // TODO: add POASASSIGNMENT before every constant
 defined('MOODLE_INTERNAL') || die();
@@ -67,16 +38,10 @@ define('MULTILIST',7);
 define('TASK_RECIEVED',0);
 define('ATTEMPT_DONE',1);
 define('GRADE_DONE',2);
-/**
- * If you for some reason need to use global variables instead of constants, do not forget to make them
- * global as this file can be included inside a function scope. However, using the global variables
- * at the module level is not a recommended.
- */
+
 
 require_once(dirname(dirname(dirname(__FILE__))).'/lib/navigationlib.php');
 require_once('model.php');
-//global $NEWMODULE_GLOBAL_VARIABLE;
-//$NEWMODULE_QUESTION_OF = array('Life', 'Universe', 'Everything');
 
 /**
  * Given an object containing all the necessary data,
@@ -89,11 +54,9 @@ require_once('model.php');
  */
 function poasassignment_add_instance($poasassignment) {
     global $DB;
-
-    $poasassignment->timecreated = time();
-    
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $poasassignment->id = $poasassignmentmodelinstance->add_instance();
+    $poasassignment->timecreated = time();    
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    $poasassignment->id = $poasmodel->add_instance();
     poasassignment_grade_item_update($poasassignment);
     return $poasassignment->id;
 }
@@ -107,13 +70,11 @@ function poasassignment_add_instance($poasassignment) {
  * @return boolean Success/Fail
  */
 function poasassignment_update_instance($poasassignment) {
-    global $DB;
-    
+    global $DB;    
     $poasassignment->timemodified = time();
-    $poasassignment->id = $poasassignment->instance;
-    
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $id = $poasassignmentmodelinstance->update_instance();
+    $poasassignment->id = $poasassignment->instance;    
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    $id = $poasmodel->update_instance();
     poasassignment_grade_item_update($poasassignment);
     return $id;
 }
@@ -129,9 +90,9 @@ function poasassignment_update_instance($poasassignment) {
 function poasassignment_delete_instance($id) {
     global $DB;
     $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));    
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
     poasassignment_grade_item_delete($poasassignment);
-    return $poasassignmentmodelinstance->delete_instance($id);
+    return $poasmodel->delete_instance($id);
 }
 
 /**
@@ -350,8 +311,8 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
  */
 function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
 
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    return($poasassignmentmodelinstance->grade_item_update($grades));
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    return($poasmodel->grade_item_update($grades));
      
 }
 
@@ -362,8 +323,8 @@ function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
  * @return object poasassignment
  */
 function poasassignment_grade_item_delete($poasassignment) {
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    return($poasassignmentmodelinstance->grade_item_delete());
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    return($poasmodel->grade_item_delete());
 }
 
 /**
@@ -376,21 +337,6 @@ function poasassignment_grade_item_delete($poasassignment) {
 function poasassignment_get_user_grades($poasassignment, $userid=0) {
     global $CFG, $DB;
 
-    /* if ($userid) {
-        $user = "AND u.id = :userid";
-        $params = array('userid'=>$userid);
-    } else {
-        $user = "";
-    }
-    $params['aid'] = $poasassignment->id;
-
-    $sql = "SELECT u.id, u.id AS userid, s.grade AS rawgrade, s.submissioncomment AS feedback, s.format AS feedbackformat,
-                   s.teacher AS usermodified, s.timemarked AS dategraded, s.timemodified AS datesubmitted
-              FROM {user} u, {assignment_submissions} s
-             WHERE u.id = s.userid AND s.assignment = :aid
-                   $user";
-
-    return $DB->get_records_sql($sql, $params); */
     if($userid) {
         // return user's last attempt rating
         $assignee = $DB->get_record('poasassignment_attempts',array('userid'=>$userid));

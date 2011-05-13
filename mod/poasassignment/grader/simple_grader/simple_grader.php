@@ -14,13 +14,24 @@ class simple_grader extends grader{
         return __CLASS__;
     }
     public static function validation($data, &$errors) {
-        if(isset($data[self::prefix()]) && !isset($data['answertext']))
-            $errors['answertext'] = get_string('textanswermustbeenabled',
+        if(isset($data[self::prefix()]) && !isset($data['answerfile']))
+            $errors['answerfile'] = get_string('fileanswermustbeenabled',
                                                'poasassignment_simple_grader');
     }
     
     public function test_attempt($attemptid) {
-        return 97;
+    
+        //TODO: get path to file from database
+        $path = 'main.cpp';
+        
+        exec('cppcheck -v '.$path.' 2>&1', $arr);
+        for($i = 1; $i < count($arr); $i++) {
+            echo $arr[$i];
+        }
+        if(count($arr) == 0)
+            return 100;
+        else
+            return 50;
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
