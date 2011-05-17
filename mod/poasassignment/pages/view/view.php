@@ -54,7 +54,7 @@ class view_page extends abstract_page {
                     echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
                     // Show link to the task
-                    $taskurl = new moodle_url('taskview.php', array('taskid'=>$assignee->taskid, 'id'=>$this->cm->id), 'v', 'get');
+                    $taskurl = new moodle_url('/mod/poasassignment/pages/tasks/taskview.php', array('taskid'=>$assignee->taskid, 'id'=>$this->cm->id), 'v', 'get');
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
 
@@ -318,7 +318,9 @@ class view_page extends abstract_page {
             }
             }
             else {
+                echo '<div align="center">';
                 echo $OUTPUT->single_button(new moodle_url('submission.php',array('id'=>$this->cm->id)),get_string('addsubmission','poasassignment'));
+                echo '</div>';
             }
             
         }

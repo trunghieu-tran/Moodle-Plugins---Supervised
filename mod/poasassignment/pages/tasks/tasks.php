@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');   
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '\formslib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;
     
@@ -37,7 +37,6 @@ class tasks_page extends abstract_page {
         require_once ($tg->path);
         $taskgivername = $tg->name;
         $taskgiver = new $taskgivername();
-
         $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
         
         
