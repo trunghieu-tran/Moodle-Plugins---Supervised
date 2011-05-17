@@ -52,7 +52,7 @@ class poasassignment_model {
                                     'view' => 'pages/view/view.php',
                                     'criterions' => 'pages/criterions/criterions.php',
                                     'graders' => 'pages/graders/graders.php',
-                                    'submissions' => 'pages/submissions_page.php'
+                                    'submissions' => 'pages/submissions/submissions.php'
                                     );
     
     /**

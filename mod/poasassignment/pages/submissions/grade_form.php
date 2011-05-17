@@ -16,7 +16,7 @@ class grade_form extends moodleform {
         $attempt=$DB->get_record('poasassignment_attempts',
                                     array('assigneeid'=>$instance['assigneeid'],'attemptnumber'=>$attemptscount));
         $lateness=format_time(time()-$attempt->attemptdate);
-        $attemptsurl = new moodle_url('attempts.php',array('id'=>$instance['id'],'assigneeid'=>$instance['assigneeid']));
+        $attemptsurl = new moodle_url('/mod/poasassignment/attempts.php',array('id'=>$instance['id'],'assigneeid'=>$instance['assigneeid']));
         $mform->addElement('static', 'picture', $OUTPUT->user_picture($user),
                                                 fullname($user, true) . '<br/>' .
                                                 userdate($attempt->attemptdate) . '<br/>' .
@@ -26,44 +26,62 @@ class grade_form extends moodleform {
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
         $plugins = $poasmodel->get_plugins();
         foreach($plugins as $plugin) {
-            require_once($plugin->path);
+            require_once(dirname(dirname(dirname(__FILE__))) . '\\'.$plugin->path);
             $poasassignmentplugin = new $plugin->name();
             $mform->addElement('static',null,null,$poasassignmentplugin->show_assignee_answer($instance['assigneeid'],$instance['poasassignmentid']));
         }
         $mform->addElement('header','gradeeditheader',get_string('gradeeditheader','poasassignment'));
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$instance['poasassignmentid']));
-        for($i=0;$i<101;$i++) $opt[]=$i.'/100';
-        $weightsum=0;
-        foreach($criterions as $criterion) $weightsum+=$criterion->weight;
+        for($i=0;$i<101;$i++) 
+            $opt[]=$i.'/100';
+        $weightsum = 0;
+        foreach($criterions as $criterion) 
+            $weightsum += $criterion->weight;
         
         $context = get_context_instance(CONTEXT_MODULE, $instance['id']);
         
         $options->area    = 'poasassignment_comment';
         $options->pluginname = 'poasassignment';
+        $options->component = 'mod_poasassignment';
         $options->context = $context;
         $options->showcount = true;
         
         foreach($criterions as $criterion) {
-            $mform->addElement('html',$OUTPUT->box_start());
-            if($attempt->draft==0 || has_capability('mod/poasassignment:manageanything',$context)) {
-                $mform->addElement('select','criterion'.$criterion->id,$criterion->name.' '.$poasmodel->help_icon($criterion->description),$opt);
+            $mform->addElement('html', $OUTPUT->box_start());
+            // show grading element
+            if($attempt->draft == 0 || 
+               has_capability('mod/poasassignment:manageanything', $context)) {
+                $mform->addElement('select',
+                                   'criterion' . $criterion->id,
+                                   $criterion->name . ' ' . $poasmodel->help_icon($criterion->description),
+                                   $opt);
             }
-            $mform->addElement('static','criterion'.$criterion->id.'weight',get_string('normalizedcriterionweight','poasassignment'),round($criterion->weight/$weightsum,2));
-            $ratingvalue=$DB->get_record('poasassignment_rating_values',array('criterionid'=>$criterion->id,
-                                                                        'attemptid'=>$attempt->id));
-            if($ratingvalue) {        
-                $options->itemid  = $ratingvalue->id;
+            // show normalized criterion weight
+            $mform->addElement('static',
+                               'criterion' . $criterion->id . 'weight',
+                               get_string('normalizedcriterionweight', 'poasassignment'),
+                               round($criterion->weight / $weightsum, 2));
+            
+            // show feedback
+            $ratingvalue = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id,
+                                                                                 'attemptid' => $attempt->id));
+            if($ratingvalue) {
+                $options->itemid = $ratingvalue->id;
                 $comment= new comment($options);
-                $mform->addElement('static','criterion'.$criterion->id.'comment',get_string('comment','poasassignment'),$comment->output(true));
+                $mform->addElement('static', 
+                                   'criterion' . $criterion->id . 'comment',
+                                   get_string('comment', 'poasassignment'),
+                                   $comment->output(true));
             }
             else
                 $mform->addElement('htmleditor','criterion'.$criterion->id.'comment',get_string('comment','poasassignment'));   
+            
             $mform->addElement('html',$OUTPUT->box_end());
         }
-        if($attempt->draft==0 || has_capability('mod/poasassignment:manageanything',$context)) {
+        if($attempt->draft == 0 || has_capability('mod/poasassignment:manageanything',$context)) {
             $mform->addElement('checkbox', 'final', get_string('finalgrade','poasassignment'));
         }
-        $poasassignment=$DB->get_record('poasassignment',array('id'=>$instance['poasassignmentid']));
+        $poasassignment = $DB->get_record('poasassignment',array('id'=>$instance['poasassignmentid']));
         
         
         $mform->addElement('static','penalty',get_string('penalty','poasassignment'),$poasmodel->get_penalty($attempt->id));
