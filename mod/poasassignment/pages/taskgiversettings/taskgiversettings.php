@@ -1,7 +1,6 @@
 <?php
-global $CFG;
-require_once('abstract_page.php');
-require_once('model.php');
+require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 class taskgiversettings_page extends abstract_page {
     var $poasassignment;
     
@@ -40,14 +39,7 @@ class taskgiversettings_page extends abstract_page {
         }
         else {
             $mform = $taskgiver->get_settings_form($id, $poasassignmentid);
-            $data = new stdClass();
-            $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $poasassignmentid));
-            foreach ($fields as $field) {
-                $fieldname = 'field' . $field->id;
-                if ($DB->record_exists('poasassignment_paramch', array('fieldid' => $field->id))) {
-                    $data->$fieldname = true;
-                }
-            }
+            $data = $taskgiver->get_settings($poasassignmentid);
             $mform->set_data($data);
             if($mform->get_data()) {
                 $taskgiver->save_settings($mform->get_data());

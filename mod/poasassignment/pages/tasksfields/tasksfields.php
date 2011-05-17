@@ -1,8 +1,8 @@
 <?php
 global $CFG;
-require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 require_once($CFG->libdir.'/tablelib.php');
-require_once('model.php');
 class tasksfields_page extends abstract_page {
     var $poasassignment;
     
@@ -25,11 +25,22 @@ class tasksfields_page extends abstract_page {
         $flag=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
         if(!$flag)
             return 'errorindtaskmodeisdisabled';
-            //return get_string('errorindtaskmodeisdisabled','poasassignment');
     }
     
     function view() {
-        global $DB,$OUTPUT;
+        global $OUTPUT;
+        
+        $this->view_table();
+        
+        $id = $this->cm->id;
+        echo '<div align="center">';
+        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/tasksfieldsedit.php?id=' . $id . '?mode=' . ADD_MODE), 
+                                    get_string('addbuttontext','poasassignment'));
+        echo '</div>';
+    }
+    
+    private function view_table() {   
+        global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $table = new flexible_table('mod-poasassignment-tasksfields');
         
@@ -40,13 +51,9 @@ class tasksfields_page extends abstract_page {
                 get_string('searchparameter','poasassignment'),
                 get_string('secretfield','poasassignment'),
                 get_string('random','poasassignment'),
-                //get_string('maxvalue','poasassignment'),
-                //get_string('minvalue','poasassignment'),
-                //get_string('variants','poasassignment'));
                 get_string('range','poasassignment'));
         $table->define_columns($columns);
         $table->define_headers($headers);
-        //$table->sortable(true, 'name');
         $table->collapsible(true);
         $table->initialbars(true);
         $table->column_class('taskfieldname', 'name');
@@ -91,9 +98,5 @@ class tasksfields_page extends abstract_page {
         
 
         $table->print_html();
-        $id = $this->cm->id;
-        echo '<div align="center">';
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/tasksfieldsedit.php?id='.$id.'?mode='.ADD_MODE), get_string('addbuttontext','poasassignment'));
-        echo '</div>';
     }
 }

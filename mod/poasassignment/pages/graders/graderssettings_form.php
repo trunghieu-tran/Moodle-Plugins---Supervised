@@ -15,7 +15,6 @@ class graderssettings_form extends moodleform {
             require_once($usedgraderrecord->path);
             $gradername = $usedgraderrecord->name;
             $grader = $gradername::show_settings($mform, $graderrecord->id);
-            //$grader->show_settings($mform, $instance['poasassignmentid']);
         }
         
         $mform->addElement('hidden', 'id', $instance['id']);

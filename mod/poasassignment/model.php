@@ -46,12 +46,12 @@ class poasassignment_model {
      */
     protected static $instance;
     
-    public static $extpages = array('tasksfields' => 'pages/tasksfields_page.php',
+    public static $extpages = array('tasksfields' => 'pages/tasksfields/tasksfields.php',
                                     'tasks' => 'pages/tasks_page.php',
-                                    'taskgiversettings' => 'pages/taskgiversettings_page.php',
+                                    'taskgiversettings' => 'pages/taskgiversettings/taskgiversettings.php',
                                     'view' => 'pages/view/view.php',
                                     'criterions' => 'pages/criterions/criterions.php',
-                                    'graders' => 'pages/graders_page.php',
+                                    'graders' => 'pages/graders/graders.php',
                                     'submissions' => 'pages/submissions_page.php'
                                     );
     

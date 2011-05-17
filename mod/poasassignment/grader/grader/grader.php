@@ -117,105 +117,12 @@ abstract class grader {
         } */
     }
     /**
-     * Shows settings of the grader. Child classes can override this
-     * method to show their own settings. By default, all graders 
-     * have options, what to show to the student after testing his 
-     * program, and what to show to the teacher
+     * Shows settings of the grader. 
      * @param $mform moodle form, where grader's options are placed
      * @param $usedgraderid id of grader in poasassignment_used_graders table
      */
     public static function show_settings($mform, $usedgraderid) {
-        /* global $DB;
-        $usedgraderrecord = $DB->get_record('poasassignment_used_graders', array('id' => $usedgraderid));
-        $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgraderrecord->graderid));
-        $gradername = $graderrecord->name;
         
-        $mform->addElement('header', $gradername::prefix(), $gradername::name());
-        $mform->addHelpButton($gradername::prefix(), 
-                              $gradername::prefix(), 
-                              'poasassignment_'.$gradername::prefix());
-        
-        // Shows student options checkboxes
-        $studentshowoptionsgrp = array();
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowfeedback', 
-                                                          '', 
-                                                          get_string('showfeedback', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowtestinputdata', 
-                                                          '', 
-                                                          get_string('showtestinputdata', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowtestoutputdata', 
-                                                          '', 
-                                                          get_string('showtestoutputdata', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowdiff', 
-                                                          '', 
-                                                          get_string('showdiff', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowtestsnames', 
-                                                          '', 
-                                                          get_string('showtestsnames', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshownumberofpassedtest', 
-                                                          '', 
-                                                          get_string('shownumberofpassedtest', 'poasassignment_grader'));
-        $studentshowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'studentshowrating', 
-                                                          '', 
-                                                          get_string('showrating', 'poasassignment_grader'));
-        $mform->addGroup($studentshowoptionsgrp, 
-                         $gradername::prefix().'studentshowoptionsgrp', 
-                         get_string('studentshowoptionsgrp', 'poasassignment_grader'), 
-                         '<br>', 
-                         false);
-        // Load current settings from db
-        foreach(self::$settings as $field => $flag) {
-            if($usedgraderrecord->studentresultoptions & $flag)
-                $mform->setDefault($gradername::prefix().'studentshow'.$field,'true');
-        }
-            
-        // Shows teacher options checkboxes
-        $teachershowoptionsgrp = array();
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowfeedback', 
-                                                          '', 
-                                                          get_string('showfeedback', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowtestinputdata', 
-                                                          '', 
-                                                          get_string('showtestinputdata', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowtestoutputdata', 
-                                                          '', 
-                                                          get_string('showtestoutputdata', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowdiff', 
-                                                          '', 
-                                                          get_string('showdiff', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowtestsnames', 
-                                                          '', 
-                                                          get_string('showtestsnames', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershownumberofpassedtest', 
-                                                          '', 
-                                                          get_string('shownumberofpassedtest', 'poasassignment_grader'));
-        $teachershowoptionsgrp[] = &$mform->createElement('checkbox', 
-                                                          $gradername::prefix().'teachershowrating', 
-                                                          '', 
-                                                          get_string('showrating', 'poasassignment_grader'));
-        $mform->addGroup($teachershowoptionsgrp, 
-                         $gradername::prefix().'teachershowoptionsgrp', 
-                         get_string('teachershowoptionsgrp', 'poasassignment_grader'), 
-                         '<br>', 
-                         false);
-        // Load current settings from db
-        foreach(self::$settings as $field => $flag) {
-            if($usedgraderrecord->teacherresultoptions & $flag)
-                $mform->setDefault($gradername::prefix() . 'teachershow' . $field,'true');
-        } */
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)

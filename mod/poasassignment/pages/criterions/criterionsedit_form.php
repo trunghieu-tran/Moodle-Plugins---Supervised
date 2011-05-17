@@ -1,8 +1,6 @@
 <?php
 
 require_once($CFG->libdir.'/formslib.php');
-
-
 class criterionsedit_form extends moodleform {
     function definition(){
         global $DB;
@@ -27,7 +25,6 @@ class criterionsedit_form extends moodleform {
             $mform->addElement('hidden', 'grader' . (count($sources) - 1), $usedgraderrecord->graderid);
             $mform->setType('grader' . (count($sources) - 1), PARAM_INT);
         }
-        //$sources[]='module';
         $repeatarray[] = &MoodleQuickForm::createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);
         
         if ($instance){
@@ -38,13 +35,13 @@ class criterionsedit_form extends moodleform {
         }
         
         $repeateloptions = array();
-        //$mform->setType('weight', PARAM_NUMBER);
 
         $repeateloptions['name']['helpbutton'] = array('criterionname', 'poasassignment');
         $repeateloptions['description']['helpbutton'] = array('criteriondescription', 'poasassignment');
         $repeateloptions['weight']['helpbutton'] = array('criterionweight', 'poasassignment');
         $repeateloptions['source']['helpbutton'] = array('criterionsource', 'poasassignment');
-        //$repeateloptions['weight']['type'] = PARAM_NUMBER;
+        
+        //$repeateloptions['weight']['default'] = 1.00;
         
         
         $this->repeat_elements($repeatarray, $repeatno,
