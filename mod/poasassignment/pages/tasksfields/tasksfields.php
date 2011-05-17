@@ -15,15 +15,15 @@ class tasksfields_page extends abstract_page {
     }
     
     function has_satisfying_parameters() {
-        $flag = $this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        if(!$flag)
+        $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
+        if (!$flag)
             return false;
         return true;
     }
     
     function get_error_satisfying_parameters() {
-        $flag=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        if(!$flag)
+        $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
+        if (!$flag)
             return 'errorindtaskmodeisdisabled';
     }
     
@@ -34,7 +34,7 @@ class tasksfields_page extends abstract_page {
         
         $id = $this->cm->id;
         echo '<div align="center">';
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php?id=' . $id . '?mode=' . ADD_MODE), 
+        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php?id=' . $id), 
                                     get_string('addbuttontext','poasassignment'));
         echo '</div>';
     }
@@ -44,11 +44,10 @@ class tasksfields_page extends abstract_page {
         $poasmodel = poasassignment_model::get_instance();
         $table = new flexible_table('mod-poasassignment-tasksfields');
         $table->baseurl = $PAGE->url;
-        $columns=array('name','ftype','showintable','searchparameter','secretfield','random','range');
+        $columns=array('name','ftype','showintable','secretfield','random','range');
         $headers=array(get_string('taskfieldname','poasassignment'),
                 get_string('ftype','poasassignment'),
                 get_string('showintable','poasassignment'),
-                get_string('searchparameter','poasassignment'),
                 get_string('secretfield','poasassignment'),
                 get_string('random','poasassignment'),
                 get_string('range','poasassignment'));
@@ -66,10 +65,20 @@ class tasksfields_page extends abstract_page {
         $fields = $DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach($fields as $field) {
         
-            $updateurl = new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php',array('id'=>$this->cm->id,'fieldid'=>$field->id,'mode'=>EDIT_MODE),'u','get');
-            $deleteurl = new moodle_url('/mod/poasassignment/warning.php',array('id'=>$this->cm->id,'fieldid'=>$field->id,'action'=>'deletefield'),'d','get');
-            $updateicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/edit').
-                            '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+            $updateurl = new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php',
+                                        array('id' => $this->cm->id,
+                                              'fieldid' => $field->id), 
+                                        'u',
+                                        'get');
+            $deleteurl = new moodle_url('/mod/poasassignment/warning.php',
+                                        array('id' => $this->cm->id,
+                                              'fieldid' => $field->id,
+                                              'action' => 'deletefield'),
+                                        'd',
+                                        'get');
+            $updateicon = '<a href="' . $updateurl . '">' . '<img src="' . 
+                          $OUTPUT->pix_url('t/edit') . '" class="iconsmall" alt="' .
+                          get_string('edit') . '" title="' . get_string('edit') .'" /></a>';
             $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                             
@@ -89,7 +98,6 @@ class tasksfields_page extends abstract_page {
             $row = array($name,
                     $poasmodel->ftypes[$field->ftype],
                     $field->showintable == 1 ? get_string('yes') : get_string('no'),
-                    $field->searchparameter == 1 ? get_string('yes') : get_string('no'),
                     $field->secretfield == 1 ? get_string('yes') : get_string('no'),
                     $field->random == 1 ? get_string('yes') : get_string('no'),
                     $range);

@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once('model.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'\config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\lib.php');
 $id = optional_param('id', 0, PARAM_INT); // course_module ID
 $taskid = optional_param('taskid', -1, PARAM_INT);
 
@@ -15,7 +15,7 @@ require_capability('mod/poasassignment:view',get_context_instance(CONTEXT_MODULE
 
 add_to_log($course->id, 'poasassignment', 'taskview', "taskview.php?id=$cm->id&taskid=$taskid", $poasassignment->name, $cm->id);
 
-$PAGE->set_url('/mod/poasassignment/taskview.php?id='.$cm->id.'&taskid='.$taskid);
+$PAGE->set_url('/mod/poasassignment/pages/tasks/taskview.php?id='.$cm->id.'&taskid='.$taskid);
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
@@ -29,7 +29,7 @@ $poasmodel = poasassignment_model::get_instance($poasassignment);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($poasassignment->name);
 echo $OUTPUT->box_start();
-$task=$DB->get_record('poasassignment_tasks',array('id'=>$taskid));
+$task = $DB->get_record('poasassignment_tasks',array('id'=>$taskid));
 echo '<table>';
 echo '<tr><td align="right"><b>'.get_string('taskname','poasassignment').'</b>:</td>';
 echo '<td class="c1">'.$task->name.'</td></tr>';
@@ -37,8 +37,11 @@ echo '<td class="c1">'.$task->name.'</td></tr>';
 echo '<tr><td align="right"><b>'.get_string('taskintro','poasassignment').'</b>:</td>';
 echo '<td class="c1">'.$task->description.'</td></tr>';
 
-$fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$poasassignment->id));        
-$owntask=$DB->record_exists('poasassignment_assignee',array('userid'=>$USER->id,'taskid'=>$taskid));
+$fields = $DB->get_records('poasassignment_fields',
+                           array('poasassignmentid' => $poasassignment->id));        
+$owntask = $DB->record_exists('poasassignment_assignee',
+                              array('userid' => $USER->id,
+                                    'taskid' => $taskid));
     
 foreach($fields as $field) {
     if(!$field->secretfield || $owntask  || has_capability('mod/poasassignment:managetasks',get_context_instance(CONTEXT_MODULE,$cm->id))) {
@@ -75,7 +78,7 @@ foreach($fields as $field) {
                 }
                 if($field->ftype==LISTOFELEMENTS ) {
                     $variants=$poasmodel->get_field_variants($field->id);
-                    $variant=$variants[$taskvalue->value];
+                    $variant = $variants[$taskvalue->value];
                     //$variant = $poasmodel->get_variant($taskvalue->value,$field->variants);
                     echo '<td class="c1">'.$variant.'</td></tr>';
                 }
@@ -102,13 +105,13 @@ echo '</table>';
 //echo $task->name;
 echo $OUTPUT->box_end();
 if($DB->record_exists('poasassignment_assignee',array('userid'=>$USER->id,'taskid'=>$taskid)))
-    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&page=view'), get_string('back'));
+    echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/view.php?id='.$id.'&page=view'), get_string('back'));
 else
-    echo $OUTPUT->single_button(new moodle_url('view.php?id='.$id.'&page=tasks'), get_string('back'));
+    echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/view.php?id='.$id.'&page=tasks'), get_string('back'));
 $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$poasmodel->assignee->id));
 
 if(!$assignee ||($assignee && ($assignee->taskid==0 || !isset($assignee->taskid))))
     if($poasassignment->howtochoosetask==STUDENTSCHOICE)
-        echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$id.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id), get_string('taketask','poasassignment'));
+        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/warning.php?id='.$id.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id), get_string('taketask','poasassignment'));
 //$mform->display();
 echo $OUTPUT->footer();
