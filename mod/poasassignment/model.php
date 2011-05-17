@@ -46,12 +46,11 @@ class poasassignment_model {
      */
     protected static $instance;
     
-    public static $pages = array();
     public static $extpages = array('tasksfields' => 'pages/tasksfields_page.php',
                                     'tasks' => 'pages/tasks_page.php',
                                     'taskgiversettings' => 'pages/taskgiversettings_page.php',
-                                    'view' => 'pages/view_page.php',
-                                    'criterions' => 'pages/criterions_page.php',
+                                    'view' => 'pages/view/view.php',
+                                    'criterions' => 'pages/criterions/criterions.php',
                                     'graders' => 'pages/graders_page.php',
                                     'submissions' => 'pages/submissions_page.php'
                                     );
@@ -437,15 +436,14 @@ class poasassignment_model {
     }
     function get_criterions_data() {
         global $DB;
-        $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
+        $criterions = $DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
         if($criterions) {
-            $i=0;
+            $i = 0;
             foreach($criterions as $criterion) {
-                //echo $criterion->name;
-                $data->name[$i]=$criterion->name;
-                $data->description[$i]=$criterion->description;
-                $data->weight[$i]=$criterion->weight;
-                $data->source[$i]=$criterion->sourceid;
+                $data->name[$i] = $criterion->name;
+                $data->description[$i] = $criterion->description;
+                $data->weight[$i] = $criterion->weight;
+                $data->source[$i] = $criterion->sourceid;
                 $i++;
             }
             return $data;
