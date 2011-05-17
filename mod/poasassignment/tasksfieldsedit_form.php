@@ -25,9 +25,11 @@ class tasksfieldsedit_form extends moodleform {
                         get_string('multilist','poasassignment'));
         $mform->addElement('select','ftype',get_string('ftype','poasassignment'),$ftypes);
         $mform->addElement('checkbox','showintable',get_string('showintable','poasassignment'));
+        
         $mform->addElement('checkbox','searchparameter',get_string('searchparameter','poasassignment'));
         $mform->disabledIf('searchparameter','ftype','eq',FILE);
         $mform->disabledIf('searchparameter','random','checked');        
+        
         $mform->addElement('checkbox','secretfield',get_string('secretfield','poasassignment'));
         $mform->addElement('checkbox','random',get_string('random','poasassignment'));
         $mform->disabledIf('random','searchparameter','checked');

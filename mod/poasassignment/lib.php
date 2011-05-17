@@ -361,7 +361,7 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
     global $PAGE,$DB;
     //$poasmodel = poasassignment_model::get_instance();
     //$pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders', 'taskgiversettings');
-    $pages = poasassignment_model::$pages;
+    /* $pages = poasassignment_model::$pages;
 
     foreach($pages as $page) {
         $pagetype = $page.'_page';
@@ -373,7 +373,7 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
         if ($pageinstance->has_ability_to_view()) {
             $navigation->add(get_string($page,'poasassignment'),new moodle_url('/mod/poasassignment/view.php',array('id' => $cm->id, 'page' => $page)));
         }
-    }
+    } */
     foreach (poasassignment_model::$extpages as $pagename => $pagepath) {
         require_once($pagepath);
         $pagetype = $pagename.'_page';
