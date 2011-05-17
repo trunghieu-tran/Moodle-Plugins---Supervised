@@ -651,19 +651,30 @@ class poasassignment_model {
             return get_string('erroroutofrange','poasassignment');
     }
     
-    function get_field_variants($fieldid,$return=1,$separator="\n") {
+    /** 
+     * Returns variants of the field by field id
+     * @param int $fieldid field id
+     * @param int $asarray 
+     * @param string $separator symbols to separate variants
+     * @return mixed array with variants, if $asarray==1 or string 
+     * separated by $separator if $asarray != 1
+     */
+    function get_field_variants($fieldid, $asarray = 1, $separator = "\n") {
         global $DB;
-        $variants=$DB->get_records('poasassignment_variants',array('fieldid'=>$fieldid),'sortorder');
-        if($variants) {
+        $variants = $DB->get_records('poasassignment_variants',
+                                     array('fieldid' => $fieldid),
+                                     'sortorder');
+        if ($variants) {
             $variantvalues=array();
-            foreach ($variants as $variant) $variantvalues[]=$variant->value;
-            if($return)
+            foreach ($variants as $variant) {
+                $variantvalues[] = $variant->value;
+            }
+            if ($asarray)
                 return $variantvalues;
             else    
                 return implode($separator,$variantvalues);
         }
-        return '';
-        
+        return '';        
     }
     
      function add_task_field($data) {
