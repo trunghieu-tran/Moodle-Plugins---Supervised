@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'\config.php');
 require_once('tasksfieldsedit_form.php');
-require_once('model.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\lib.php');
 $id         = optional_param('id', 0, PARAM_INT); // course_module ID
 $fieldid    = optional_param('fieldid', -1, PARAM_INT);
 
@@ -28,7 +28,7 @@ $mform = new tasksfieldsedit_form(null, array('id' => $id,
                                               'poasassignmentid' => $poasassignment->id));
 if ($mform->is_cancelled()) {
     // return to taskfields page
-    redirect(new moodle_url('view.php',
+    redirect(new moodle_url('/mod/poasassignment/view.php',
                             array('id' => $cm->id,
                                   'page' => 'tasksfields')), 
              null, 
@@ -43,7 +43,7 @@ else {
         else {
             $poasmodel->add_task_field($data);
         }
-        redirect(new moodle_url('view.php',array('id' => $cm->id,'page' => 'tasksfields')), null, 0);
+        redirect(new moodle_url('/mod/poasassignment/view.php',array('id' => $cm->id,'page' => 'tasksfields')), null, 0);
     }
 }
 if ($fieldid > 0) {

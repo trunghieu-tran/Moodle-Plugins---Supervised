@@ -2,7 +2,7 @@
 
 require_once('abstract_page.php');
 require_once($CFG->libdir . '/tablelib.php');
-require_once('model.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 class submissions_page extends abstract_page {
     var $poasassignment;
     function submissions_page($cm, $poasassignment) {
