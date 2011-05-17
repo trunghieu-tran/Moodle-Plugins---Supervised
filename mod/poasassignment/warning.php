@@ -73,11 +73,13 @@ switch ($action) {
         echo get_string('deletefieldconfirmation','poasassignment');
         echo ' -'.$field->name;
         echo $OUTPUT->box_end();
+        echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('warning.php',
-                                array('id'=>$id,'fieldid'=>$fieldid,'action'=>'deletefieldconfirmed')), 
-                                get_string('yes'),
-                                'post');
+                                    array('id'=>$id,'fieldid'=>$fieldid,'action'=>'deletefieldconfirmed')), 
+                                    get_string('yes'),
+                                    'post');                
         echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>'tasksfields')), get_string('no'),'get');
+        echo '</div>';
         echo $OUTPUT->footer();    
         break;
     case 'deletefieldconfirmed':
@@ -91,7 +93,7 @@ switch ($action) {
         $poasmodel=poasassignment_model::get_instance($poasassignment);
         $poasmodel->delete_field($fieldid);
         
-        redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
+        redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
         break;
     case 'taketask':
         $taskid = optional_param('taskid', -1, PARAM_INT);

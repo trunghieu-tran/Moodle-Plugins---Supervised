@@ -1,13 +1,13 @@
 <?php
 
-require_once($CFG->libdir.'/formslib.php');
-require_once('lib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\lib.php');
 
 class tasksfieldsedit_form extends moodleform {
-    function definition(){
+    function definition() {
         $mform = $this->_form;
         $instance = $this->_customdata;
-        if ($instance['fieldid']>0)
+        if ($instance['fieldid'] > 0)
             $mform->addElement('header','taskfieldeditheader',get_string('taskfieldeditheader','poasassignment'));
         else
             $mform->addElement('header','taskfieldaddheader',get_string('taskfieldaddheader','poasassignment'));

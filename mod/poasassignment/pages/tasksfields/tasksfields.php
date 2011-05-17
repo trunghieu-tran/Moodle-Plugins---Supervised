@@ -34,16 +34,16 @@ class tasksfields_page extends abstract_page {
         
         $id = $this->cm->id;
         echo '<div align="center">';
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/tasksfieldsedit.php?id=' . $id . '?mode=' . ADD_MODE), 
+        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php?id=' . $id . '?mode=' . ADD_MODE), 
                                     get_string('addbuttontext','poasassignment'));
         echo '</div>';
     }
     
     private function view_table() {   
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $PAGE;
         $poasmodel = poasassignment_model::get_instance();
         $table = new flexible_table('mod-poasassignment-tasksfields');
-        
+        $table->baseurl = $PAGE->url;
         $columns=array('name','ftype','showintable','searchparameter','secretfield','random','range');
         $headers=array(get_string('taskfieldname','poasassignment'),
                 get_string('ftype','poasassignment'),
@@ -66,7 +66,7 @@ class tasksfields_page extends abstract_page {
         $fields = $DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach($fields as $field) {
         
-            $updateurl = new moodle_url('/mod/poasassignment/tasksfieldsedit.php',array('id'=>$this->cm->id,'fieldid'=>$field->id,'mode'=>EDIT_MODE),'u','get');
+            $updateurl = new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php',array('id'=>$this->cm->id,'fieldid'=>$field->id,'mode'=>EDIT_MODE),'u','get');
             $deleteurl = new moodle_url('/mod/poasassignment/warning.php',array('id'=>$this->cm->id,'fieldid'=>$field->id,'action'=>'deletefield'),'d','get');
             $updateicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/edit').
                             '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
