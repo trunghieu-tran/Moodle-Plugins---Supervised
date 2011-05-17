@@ -1,7 +1,7 @@
 <?php
 
 require_once($CFG->libdir.'/formslib.php');
-require_once('model.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 
 class taskedit_form extends moodleform {
 
@@ -61,18 +61,16 @@ class taskedit_form extends moodleform {
         }
         
         // hidden params
-        $mform->addElement('hidden', 'taskid', $instance['taskid']);
-        $mform->setType('taskid', PARAM_INT);
         
+        echo 'form' . $instance['id'];
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
-        
-        $mform->addElement('hidden', 'mode', $instance['mode']);
-        $mform->setType('mode', PARAM_INT);
         
         $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
         $mform->setType('poasassignmentid', PARAM_INT);
         
+        $mform->addElement('hidden', 'taskid', $instance['taskid']);
+        $mform->setType('taskid', PARAM_INT);
         
         $this->add_action_buttons(true, get_string('savechanges', 'admin'));
     }

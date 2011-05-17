@@ -50,6 +50,7 @@ if ($fieldid > 0) {
     $mform->set_data($DB->get_record('poasassignment_fields', array('id' => $fieldid)));
     $data = new stdClass();
     $data->variants = $poasmodel->get_field_variants($fieldid, 0);
+    $data->id = $id;
     $mform->set_data($data);
 }
 echo $OUTPUT->header();
