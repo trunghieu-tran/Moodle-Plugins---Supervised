@@ -6,19 +6,15 @@ class tasks_page extends abstract_page {
     var $poasassignment;
     
     function tasks_page($cm,$poasassignment) {
-        global  $PAGE;
-        
-        
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
-        
     }
     
     function has_satisfying_parameters() {
         global $DB,$USER;
         $flag = $this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) 
-            if (isset($assignee->taskid) && $assignee->taskid>0) {
+        if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id, 'poasassignmentid'=>$this->poasassignment->id))) 
+            if (isset($assignee->taskid) && $assignee->taskid > 0) {
                 if (!has_capability('mod/poasassignment:managetasks',
                         get_context_instance(CONTEXT_MODULE,$this->cm->id))) {
                     $this->lasterror='alreadyhavetask';
@@ -53,7 +49,7 @@ class tasks_page extends abstract_page {
         if ($hascapmanage) {
             $id = $this->cm->id;
             echo '<div align="center">';
-            echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php?id='.$id.'?mode='.ADD_MODE), 
+            echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php?id='.$id), 
                                                         get_string('addbuttontext','poasassignment'));
             echo '</div>';
         }
@@ -114,8 +110,10 @@ class tasks_page extends abstract_page {
 
             if ($hascapmanage) {
                
-                $updateurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',array('taskid'=>$task->id,'mode'=>EDIT_MODE,'id'=>$this->cm->id),'u','get');
-                $deleteurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',array('taskid'=>$task->id,'mode'=>DELETE_MODE,'id'=>$this->cm->id),'d','get');
+                $updateurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                                            array('taskid'=>$task->id,'id'=>$this->cm->id),'u','get');
+                $deleteurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                                            array('taskid'=>$task->id,'mode'=>DELETE_MODE,'id'=>$this->cm->id),'d','get');
                 
                 $showicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
                             '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';

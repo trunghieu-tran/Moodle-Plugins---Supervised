@@ -3,7 +3,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('model.php');
 require_once(dirname(__FILE__).'/lib.php');
-$id = optional_param('id', 0, PARAM_INT); // course_module ID
+$id     = optional_param('id', 0, PARAM_INT); // course_module ID
 $action = optional_param('action', null, PARAM_TEXT);
 
 $cm         = get_coursemodule_from_id('poasassignment', $id, 0, false, MUST_EXIST);
