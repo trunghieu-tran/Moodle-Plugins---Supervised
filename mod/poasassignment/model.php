@@ -47,7 +47,7 @@ class poasassignment_model {
     protected static $instance;
     
     public static $extpages = array('tasksfields' => 'pages/tasksfields/tasksfields.php',
-                                    'tasks' => 'pages/tasks_page.php',
+                                    'tasks' => 'pages/tasks/tasks.php',
                                     'taskgiversettings' => 'pages/taskgiversettings/taskgiversettings.php',
                                     'view' => 'pages/view/view.php',
                                     'criterions' => 'pages/criterions/criterions.php',
