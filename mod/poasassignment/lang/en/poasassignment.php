@@ -233,3 +233,5 @@ $string['taskgiversettings_help'] = 'Here you can change settings of current tas
 $string['taskgiverhasnosettings'] = 'Taskgiver has no settings';
 $string['errornotpositiveweight'] = 'Weight must be positive';
 $string['errornoweight'] = 'Weight must be defined';
+$string['fieldisrandom'] = 'Field is random';
+$string['fieldisfile'] = 'Field is file';

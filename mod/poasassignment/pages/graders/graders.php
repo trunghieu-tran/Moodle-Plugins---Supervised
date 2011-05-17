@@ -1,8 +1,8 @@
 <?php
 global $CFG;
-require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once('graderssettings_form.php');
-require_once('model.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 class graders_page extends abstract_page {
     var $poasassignment;
     

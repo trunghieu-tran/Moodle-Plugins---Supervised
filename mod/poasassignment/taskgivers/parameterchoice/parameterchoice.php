@@ -101,6 +101,18 @@ class parameterchoice extends taskgiver{
                                   array('id' => $id,
                                         'poasassignmentid' => $poasassignmentid));  
     }
+    public function get_settings($poasassignmentid) {
+        global $DB;
+        $data = new stdClass();
+        $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $poasassignmentid));
+        foreach ($fields as $field) {
+            $fieldname = 'field' . $field->id;
+            if ($DB->record_exists('poasassignment_paramch', array('fieldid' => $field->id))) {
+                $data->$fieldname = true;
+            }
+        }
+        return $data;
+    }
     public function save_settings($data){
         global $DB;
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $data->poasassignmentid));
@@ -128,7 +140,17 @@ class taskgiver_form extends moodleform {
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $instance['poasassignmentid']));
         
         foreach ($fields as $field) {
-            $mform->addElement('checkbox', 'field'.$field->id, $field->name);
+            if($field->random == 1) {
+                $mform->addElement('static', 'field' . $field->id, $field->name, get_string('fieldisrandom', 'poasassignment'));
+            }
+            else {
+                if($field->ftype == FILE) {
+                    $mform->addElement('static', 'field' . $field->id, $field->name, get_string('fieldisfile', 'poasassignment'));
+                }
+                else {
+                    $mform->addElement('checkbox', 'field' . $field->id, $field->name);
+                }
+            }
         }
         
         $mform->addElement('hidden', 'id', $instance['id']);
