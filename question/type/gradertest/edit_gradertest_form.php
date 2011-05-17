@@ -17,7 +17,7 @@ require_once($CFG->dirroot.'/question/type/edit_question_form.php');
  * about the Moodle forms library, which is based on the HTML Quickform PEAR library.
  */
 class question_edit_gradertest_form extends question_edit_form {
-    function definition() {
+    /* function definition() {
         global $COURSE, $CFG, $DB;
 
         $qtype = $this->qtype();
@@ -148,8 +148,19 @@ class question_edit_gradertest_form extends question_edit_form {
             $mform->hardFreezeAllVisibleExcept(array('categorymoveto', 'buttonar', 'currentgrp'));
         }
     }
-    function definition_inner(&$mform) {
+     */function definition_inner(&$mform) {
         echo '<br>'.__FUNCTION__;
+        
+        $mform->removeElement('questiontext');
+        
+        $mform->removeElement('defaultgrade');
+        $mform->removeElement('penalty');
+        $mform->removeElement('generalfeedback');
+        if (!empty($CFG->usetags)) {
+            $mform->removeElement('tagsheader');
+            $mform->removeElement('tags');
+        }
+        
         $mform->addElement('header', 'testheader', 'test');
         $mform->addElement('htmleditor', 'testtext', get_string('testtext', 'qtype_gradertest'), array('size'=>'64'));
         
@@ -159,19 +170,20 @@ class question_edit_gradertest_form extends question_edit_form {
         $filemanager_options['maxbytes'] = 0;
         $filemanager_options['maxfiles'] = -1;
         $filemanager_options['mainfile'] = true;
-        $mform->addElement('filemanager', 'testfiles', get_string('testfiles', 'qtype_gradertest'), null, $filemanager_options);
-        
-        
+        $mform->addElement('filemanager', 'testfiles', get_string('testfiles', 'qtype_gradertest'), null, $filemanager_options);        
     }
     function set_data($question) {
         echo '<br>'.__FUNCTION__;
-        // TODO, preprocess the question definition so the data is ready to load into the form.
-        // You may not need this method at all, in which case you can delete it.
-
-        // For example:
-        // if (!empty($question->options)) {
-        //     $question->customfield = $question->options->customfield;
-        // }
+        $draftitemid = file_get_submitted_draft_itemid('testfiles');
+        file_prepare_draft_area($draftitemid, 
+                                $this->context->id, 
+                                'question', 
+                                'questiontext', 
+                                ! empty($question->id) ? $question -> id : 30, 
+                                array('subdirs'=>true));
+        $default_values['testfiles'] = $draftitemid;
+        $question->testfiles = $draftitemid;
+        
         parent::set_data($question);
     }
 
