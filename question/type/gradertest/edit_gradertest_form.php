@@ -67,35 +67,9 @@ class question_edit_gradertest_form extends question_edit_form {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        /* $mform->addElement('editor', 'questiontext', get_string('questiontext', 'quiz'),
-                array('rows' => 15), $this->editoroptions);
-        $mform->setType('questiontext', PARAM_RAW); */
-
-        /* $mform->addElement('text', 'defaultgrade', get_string('defaultgrade', 'quiz'),
-                array('size' => 3));
-        $mform->setType('defaultgrade', PARAM_INT);
-        $mform->setDefault('defaultgrade', 1);
-        $mform->addRule('defaultgrade', null, 'required', null, 'client'); */
-
-        /* $mform->addElement('text', 'penalty', get_string('penaltyfactor', 'question'),
-                array('size' => 3));
-        $mform->setType('penalty', PARAM_NUMBER);
-        $mform->addRule('penalty', null, 'required', null, 'client');
-        $mform->addHelpButton('penalty', 'penaltyfactor', 'question');
-        $mform->setDefault('penalty', 0.1); */
-
-        /* $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'quiz'),
-                array('rows' => 10), $this->editoroptions);
-        $mform->setType('generalfeedback', PARAM_RAW);
-        $mform->addHelpButton('generalfeedback', 'generalfeedback', 'quiz'); */
-
+        
         // Any questiontype specific fields.
         $this->definition_inner($mform);
-
-        /* if (!empty($CFG->usetags)) {
-            $mform->addElement('header', 'tagsheader', get_string('tags'));
-            $mform->addElement('tags', 'tags', get_string('tags'));
-        } */
 
         if (!empty($this->question->id)){
             $mform->addElement('header', 'createdmodifiedheader', get_string('createdmodifiedheader', 'question'));
@@ -174,12 +148,21 @@ class question_edit_gradertest_form extends question_edit_form {
             $mform->hardFreezeAllVisibleExcept(array('categorymoveto', 'buttonar', 'currentgrp'));
         }
     }
-    //function definition_inner(&$mform) {
-    //    echo '<br>'.__FUNCTION__;
-        // TODO, add any form fields you need.
-        // $mform->addElement( ... );
-    //}
-
+    function definition_inner(&$mform) {
+        echo '<br>'.__FUNCTION__;
+        $mform->addElement('header', 'testheader', 'test');
+        $mform->addElement('htmleditor', 'testtext', get_string('testtext', 'qtype_gradertest'), array('size'=>'64'));
+        
+        $filemanager_options = array();
+        $filemanager_options['return_types'] = 3;
+        $filemanager_options['accepted_types'] = '*';
+        $filemanager_options['maxbytes'] = 0;
+        $filemanager_options['maxfiles'] = -1;
+        $filemanager_options['mainfile'] = true;
+        $mform->addElement('filemanager', 'testfiles', get_string('testfiles', 'qtype_gradertest'), null, $filemanager_options);
+        
+        
+    }
     function set_data($question) {
         echo '<br>'.__FUNCTION__;
         // TODO, preprocess the question definition so the data is ready to load into the form.
