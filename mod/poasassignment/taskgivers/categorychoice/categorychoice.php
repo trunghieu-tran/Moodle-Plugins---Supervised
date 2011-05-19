@@ -155,6 +155,14 @@ class categorychoice extends taskgiver{
             return $data;
         }
     }
+    public function delete_settings($poasassignmentid) {
+        global $DB;
+        $tg = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $poasassignmentid));
+        
+        $DB->delete_records('poasassignment_tg_cat_ctgrs', array('taskgiver_cat_id' => $tg->id));
+        $DB->delete_records('poasassignment_tg_cat_tasks', array('taskgiver_cat_id' => $tg->id));
+        $DB->delete_record('poasassignment_tg_cat', array('id' => $tg->id));
+    }
 }
 class settingmode_form extends moodleform {
     function definition() {
