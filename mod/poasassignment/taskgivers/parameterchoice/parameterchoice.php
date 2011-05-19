@@ -21,43 +21,56 @@ class parameterchoice extends taskgiver{
         global $DB,$USER;
         $poasmodel = poasassignment_model::get_instance($poasassignment);
         $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
-        if($data=$mform->get_data()) {
+        if($data = $mform->get_data()) {
             $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$poasassignment->id));
-            $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$poasassignment->id,'searchparameter'=>1));
+            $fields = parameterchoice::get_parameters_fields($poasassignment->id);
             if($fields) {
-                $satisfyingtasks=array();
+                $satisfyingtasks = array();
                 foreach($fields as $field) {
-                    $fieldelementname='field'.$field->id;
-                    $fieldvalues=$DB->get_records('poasassignment_task_values',
-                                    array('fieldid'=>$field->id));
+                    $fieldelementname = 'field' . $field->id;
+                    $fieldvalues = $DB->get_records('poasassignment_task_values',
+                                                    array('fieldid' => $field->id));
                     if($fieldvalues) {
                         if($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST || $field->ftype==STR || $field->ftype==TEXT) {
                             foreach($fieldvalues as $fieldvalue) {
+                                if(empty($fieldvalue->value)) {
+                                    continue;
+                                }
                                 if($tasks[$fieldvalue->taskid]->hidden==0) {
                                     $contains=strpos($fieldvalue->value,$data->$fieldelementname);
                                     if($contains!==false) {
-                                        for($i=0;$i<5;$i++)
+                                        for($i=0;$i<5;$i++) {
                                             $satisfyingtasks[]=$fieldvalue->taskid;
+                                        }
                                     }
                                 }
                             }
                         }
-                        if($field->ftype==NUMBER || $field->ftype==FLOATING || $field->ftype==DATE) {
-                            foreach($fieldvalues as $fieldvalue) {
-                                if($tasks[$fieldvalue->taskid]->hidden==0) {
-                                    if($data->$fieldelementname==$fieldvalue->value)
-                                        for($i=0;$i<5;$i++)
-                                            $satisfyingtasks[]=$fieldvalue->taskid;
-                                    else
-                                        if($data->$fieldelementname==0)
+                        if ($field->ftype==NUMBER || $field->ftype==FLOATING || $field->ftype==DATE) {
+                            foreach ($fieldvalues as $fieldvalue) {
+                                if(empty($fieldvalue->value)) {
+                                    continue;
+                                }
+                                if ($tasks[$fieldvalue->taskid]->hidden == 0) {
+                                    if ($data->$fieldelementname == $fieldvalue->value) {
+                                        for($i = 0; $i < 5; $i++) {
+                                            $satisfyingtasks[] = $fieldvalue->taskid;
+                                        }
+                                    }
+                                    else {
+                                        if ($data->$fieldelementname==0) {
                                             continue;
-                                        else
-                                            for($dif=1;$dif<5;$dif++)
-                                                if(abs($data->$fieldelementname-$fieldvalue->value)/$data->$fieldelementname<(0.1*$dif)) {
-                                                    for($i=0;$i<5-$dif;$i++)
-                                                        $satisfyingtasks[]=$fieldvalue->taskid;
+                                        }
+                                        else {
+                                            for($dif = 1; $dif < 5; $dif++) {
+                                                if(abs($data->$fieldelementname - $fieldvalue->value) / $data->$fieldelementname < (0.1 * $dif)) {
+                                                    for($i = 0; $i < 5 - $dif; $i++)
+                                                        $satisfyingtasks[] = $fieldvalue->taskid;
                                                     break;
                                                 }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -65,27 +78,30 @@ class parameterchoice extends taskgiver{
                 }
 
                 //echo implode($satisfyingtasks).'<br>';
-                if($satisfyingtasks) {
-                    $taskid=$satisfyingtasks[0];
-                    $tasktimesmet=1;
-                    $tmp=0;
-                    for($i=0;$i<count($satisfyingtasks);$i++) {
-                        for($j=0;$j<count($satisfyingtasks);$j++) {
-                            if($satisfyingtasks[$i]==$satisfyingtasks[$j])
+                if ($satisfyingtasks) {
+                    $taskid = $satisfyingtasks[0];
+                    $tasktimesmet = 1;
+                    $tmp = 0;
+                    for ($i = 0; $i < count($satisfyingtasks); $i++) {
+                        for ($j = 0; $j < count($satisfyingtasks); $j++) {
+                            if ($satisfyingtasks[$i] == $satisfyingtasks[$j]) {
                                 $tmp++;
-                            if($tmp>$tasktimesmet) {
-                                $taskid=$satisfyingtasks[$i];
-                                $tasktimesmet=$tmp;
+                            }
+                            if ($tmp > $tasktimesmet) {
+                                $taskid = $satisfyingtasks[$i];
+                                $tasktimesmet = $tmp;
                             }
                         }
-                         $tasktimesmet=$tmp;
-                         $tmp=0;
+                         $tasktimesmet = $tmp;
+                         $tmp = 0;
                     }
                     //echo 'task with id'.$taskid.' was met '.$tasktimesmet.' times';
                     $poasmodel->bind_task_to_assignee($USER->id,$taskid);
-                    redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
+                    redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
-                else echo get_string('nosatisfyingtasks','poasassignment');
+                else { 
+                    echo get_string('nosatisfyingtasks','poasassignment');
+                }
             }
         }
         return $mform;
@@ -128,7 +144,19 @@ class parameterchoice extends taskgiver{
             }
         }
     }
-    
+    public static function get_parameters_fields($poasassignmentid) {
+        global $DB;
+        // get all fields for current poasassignment
+        $allfields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $poasassignmentid));
+        $fields = array();
+        foreach ($allfields as $field) {
+            // add fields that are parameters in $fields
+            if ($DB->record_exists('poasassignment_paramch', array('fieldid' => $field->id))) {
+                array_push($fields, $field);
+            }
+        }
+        return $fields;
+    }
 }
 class taskgiver_form extends moodleform {
     function definition() {
@@ -137,6 +165,7 @@ class taskgiver_form extends moodleform {
         $poasmodel= poasassignment_model::get_instance();
         global $DB;
         $mform->addElement('header', 'header', get_string('makefieldparameters','poasassignmenttaskgivers_parameterchoice'));
+        
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $instance['poasassignmentid']));
         
         foreach ($fields as $field) {
@@ -171,7 +200,8 @@ class parametersearch_form extends moodleform {
         $instance = $this->_customdata;
         $poasmodel= poasassignment_model::get_instance();
         global $DB;
-        $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$instance['poasassignmentid'],'searchparameter'=>1));
+        
+        $fields = parameterchoice::get_parameters_fields($instance['poasassignmentid']);
         if($fields) {
             $mform->addElement('header','header',get_string('inputparameters','poasassignment'));
             $poasmodel= poasassignment_model::get_instance();
@@ -207,7 +237,7 @@ class parametersearch_form extends moodleform {
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
         global $DB;
-        $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$data['poasassignmentid'],'searchparameter'=>1));
+        $fields = parameterchoice::get_parameters_fields($data['poasassignmentid']);
         foreach($fields as $field) {
             if(($field->ftype==FLOATING || $field->ftype==NUMBER ) && !is_numeric($data['field'.$field->id])) {
                 if(strlen($data['field'.$field->id])>0) {
