@@ -34,8 +34,13 @@ class taskgiversettings_page extends abstract_page {
         require_once($taskgiverrec->path);
         $taskgivername = $taskgiverrec->name;
         $taskgiver = new $taskgivername();
+        echo '<div align="center"><b><big>' .
+             get_string('currenttaskgiver', 'poasassignment') .
+             ' : ' .
+             get_string('pluginname', "poasassignmenttaskgivers_$taskgivername") .
+             '</big></b></div><br>';
         if(!$taskgiver->hassettings) {
-            print_string('taskgiverhasnosettings','poasassignment');
+            print_string('taskgiverhasnosettings', 'poasassignment');
         }
         else {
             $mform = $taskgiver->get_settings_form($id, $poasassignmentid);

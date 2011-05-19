@@ -12,6 +12,7 @@ abstract class taskgiver {
     public function get_settings_form($id, $poasassignmentid) {}
     public function get_settings($poasassignmentid) {}
     public function save_settings($data) {}
+    public function delete_settings($poasassignmentid) {}
     public $showtasks;
     public $hassettings;
 }
