@@ -14,12 +14,25 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="poasassignment_tg_cat_tasks" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_tg_cat">
+    <TABLE NAME="poasassignment_tg_cat_tasks" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_tg_cat" NEXT="poasassignment_tg_cat_ctgrs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="basetaskid"/>
         <FIELD NAME="basetaskid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="taskid"/>
         <FIELD NAME="taskid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="basetaskid" NEXT="taskgiver_cat_id"/>
         <FIELD NAME="taskgiver_cat_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_tg_cat_ctgrs" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_tg_cat_tasks">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="fieldid"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="minimum"/>
+        <FIELD NAME="minimum" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="fieldid" NEXT="maximum"/>
+        <FIELD NAME="maximum" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="minimum" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="maximum" NEXT="taskgiver_cat_id"/>
+        <FIELD NAME="taskgiver_cat_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="name"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
