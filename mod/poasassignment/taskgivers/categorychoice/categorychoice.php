@@ -18,7 +18,7 @@ class categorychoice extends taskgiver{
     public $hassettings = true;
     
     private function get_mode() {
-        return optional_param('mode', null, PARAM_TEXT);
+        return optional_param('tgmode', null, PARAM_TEXT);
     }
     public function get_settings_form($id, $poasassignmentid) {
         if(!$this->get_mode()) {
@@ -34,6 +34,11 @@ class categorychoice extends taskgiver{
             }
             if($this->get_mode() == 'options') {
                 return new options_form(null,
+                                        array('id' => $id,
+                                        'poasassignmentid' => $poasassignmentid)); 
+            }
+            if($this->get_mode() == 'tasks') {
+                return new tasks_form(null,
                                         array('id' => $id,
                                         'poasassignmentid' => $poasassignmentid)); 
             }
@@ -72,6 +77,15 @@ class categorychoice extends taskgiver{
             redirect(new moodle_url('view.php', array('id' => $data->id, 'page' => 'taskgiversettings')), null, 0);
         }
     }
+    public function get_settings($poasassignmentid) {
+        if ($this->get_mode() == 'id') {
+            global $DB;
+            $data = new stdClass();
+            $rec = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $poasassignmentid));
+            $data->selectpoasassignment = $rec->basepoasassignmentid;
+            return $data;
+        }
+    }
 }
 class settingmode_form extends moodleform {
     function definition() {
@@ -99,20 +113,30 @@ class settingmode_form extends moodleform {
                                        ': ' .
                                        get_string('nobase', 'poasassignmenttaskgivers_categorychoice'));
         }
+        
+        // Show link to base poasassignment instance page (show always)
         $mform->addElement('html', '<br><a href="view.php?id=' .
-                                   $instance['id'].'&page=taskgiversettings&mode=id">' . 
+                                   $instance['id'].'&page=taskgiversettings&tgmode=id">' . 
                                    get_string('basepoasassignment', 'poasassignmenttaskgivers_categorychoice') .
                                    '</a>');
+        
+        // Show link to tasks page (only if taskgiver knows base poasassignment instance)
         if (!$nobase) {
             $mform->addElement('html', '<br><a href="view.php?id='.
                                        $instance['id'].
-                                       '&page=taskgiversettings&mode=options">' . 
-                                       get_string('options', 'poasassignmenttaskgivers_categorychoice') .
-                                       '</a></div>');
+                                       '&page=taskgiversettings&tgmode=tasks">' . 
+                                       get_string('tasks', 'poasassignmenttaskgivers_categorychoice'));
         }
-        else {
-            echo '</a></div>';
+        // Show link to category page (only if taskgiver knows base poasassignment instance)
+        if (!$nobase) {
+            $mform->addElement('html', '<br><a href="view.php?id='.
+                                       $instance['id'].
+                                       '&page=taskgiversettings&tgmode=options">' . 
+                                       get_string('options', 'poasassignmenttaskgivers_categorychoice'));
         }
+        
+        echo '</a></div>';
+        
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
 
@@ -130,6 +154,7 @@ class basechoice_form extends moodleform {
         $instance = $this->_customdata;
         global $DB;
         $poasassignmentinstances = categorychoice::get_allowed_instances($instance['poasassignmentid']);
+        $mform->addElement('header', 'basepoasassignment', get_string('basepoasassignment', 'poasassignmenttaskgivers_categorychoice'));
         $mform->addElement('select', 
                            'selectpoasassignment', 
                            get_string('selectpoasassignment', 'poasassignmenttaskgivers_categorychoice'),
@@ -143,8 +168,8 @@ class basechoice_form extends moodleform {
         $mform->addElement('hidden', 'page', 'taskgiversettings');
         $mform->setType('page', PARAM_TEXT);
         
-        $mform->addElement('hidden', 'mode', 'id');
-        $mform->setType('mode', PARAM_TEXT);
+        $mform->addElement('hidden', 'tgmode', 'id');
+        $mform->setType('tgmode', PARAM_TEXT);
         
         $this->add_action_buttons(false, get_string('savechanges', 'admin'));
     }
@@ -154,6 +179,19 @@ class options_form extends moodleform {
         $mform = $this->_form;
         $instance = $this->_customdata;
         global $DB;
+        $mform->addElement('header', 'options', get_string('options', 'poasassignmenttaskgivers_categorychoice'));
+        $mform->addElement('text', 'categoryname', get_string('categoryname', 'poasassignmenttaskgivers_categorychoice'));
+        $mform->addHelpButton('categoryname', 'categoryname', 'poasassignmenttaskgivers_categorychoice');
+        
+        //$fields = array(1,2,3);
+        //$mform->addElement('select', 'categorybasefield', get_string('categorybasefield', 'poasassignmenttaskgivers_categorychoice'), $fields);
+        //$mform->addHelpButton('categorybasefield', 'categorybasefield', 'poasassignmenttaskgivers_categorychoice');
+        
+        $mform->addElement('text', 'categorymin', get_string('categorymin', 'poasassignmenttaskgivers_categorychoice'));
+        $mform->addHelpButton('categorymin', 'categorymin', 'poasassignmenttaskgivers_categorychoice');
+        
+        $mform->addElement('text', 'categorymax', get_string('categorymax', 'poasassignmenttaskgivers_categorychoice'));
+        $mform->addHelpButton('categorymax', 'categorymax', 'poasassignmenttaskgivers_categorychoice');
         
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
@@ -164,8 +202,72 @@ class options_form extends moodleform {
         $mform->addElement('hidden', 'page', 'taskgiversettings');
         $mform->setType('page', PARAM_TEXT);
         
-        $mform->addElement('hidden', 'mode', 'options');
-        $mform->setType('mode', PARAM_TEXT);
+        $mform->addElement('hidden', 'tgmode', 'options');
+        $mform->setType('tgmode', PARAM_TEXT);
+        
+        $this->add_action_buttons(false, get_string('savechanges', 'admin'));
+    }
+}
+
+class tasks_form extends moodleform {
+    function definition() {
+        $mform = $this->_form;
+        $instance = $this->_customdata;
+        global $DB;
+        
+        // Prepare : load tasks of base instance in $basetasks
+        $myinstance = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $instance['poasassignmentid']));
+        $basetasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $myinstance->basepoasassignmentid));
+        
+        // Prepare : load coursemodule of base instance in $basecm
+        $base = $DB->get_record('poasassignment', array('id' => $myinstance->basepoasassignmentid));
+        $basecourse = $DB->get_record('course', array('id' => $base->course), '*', MUST_EXIST);
+        $basecm = get_coursemodule_from_instance('poasassignment', $base->id, $basecourse->id, false, MUST_EXIST);
+        
+        // Prepare : load tasks of current instance in $tasks
+        $currenttasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $instance['poasassignmentid']));
+        
+        $tasks = array();
+        foreach ($currenttasks as $currenttask) {
+            $tasks[$currenttask->id] = $currenttask->name;
+        }
+        $mform->addElement('header', 'tasks', get_string('tasks', 'poasassignmenttaskgivers_categorychoice'));
+        // For each task in base instance create form to choose assosiated tasks in current instance
+        foreach($basetasks as $basetask) {
+            $basetaskurl = '<a href="pages/tasks/taskview.php?id=' .
+                           $basecm->id .
+                           '&taskid=' .
+                           $basetask->id .
+                           '">' .
+                           $basetask->name .
+                           '</a>';
+            $mform->addElement('static', 
+                               'basetask' . $basetask->id, 
+                               get_string('basetask', 'poasassignmenttaskgivers_categorychoice'), 
+                               $basetaskurl);
+            $select = $mform->addElement('select', 
+                                         'currenttasks' . $basetask->id, 
+                                         get_string('currenttasks', 'poasassignmenttaskgivers_categorychoice'),
+                                         $tasks);
+            $select->setMultiple(true);
+            $mform->addHelpButton('currenttasks' . $basetask->id, 
+                                  'currenttasks', 
+                                  'poasassignmenttaskgivers_categorychoice');
+        
+        }
+        
+        
+        $mform->addElement('hidden', 'id', $instance['id']);
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
+        $mform->setType('poasassignmentid', PARAM_INT);
+        
+        $mform->addElement('hidden', 'page', 'taskgiversettings');
+        $mform->setType('page', PARAM_TEXT);
+        
+        $mform->addElement('hidden', 'tgmode', 'tasks');
+        $mform->setType('tgmode', PARAM_TEXT);
         
         $this->add_action_buttons(false, get_string('savechanges', 'admin'));
     }
