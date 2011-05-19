@@ -59,6 +59,7 @@ class categorychoice extends taskgiver{
     }
     public function save_settings($data){
         global $DB;
+        $myinstance = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $data->poasassignmentid));
         if ($this->get_mode() == 'id') {
             $rec = new stdClass();
             $rec->basepoasassignmentid = $data->selectpoasassignment;
@@ -74,6 +75,21 @@ class categorychoice extends taskgiver{
             redirect(new moodle_url('view.php', array('id' => $data->id, 'page' => 'taskgiversettings')), null, 0);
         }
         if ($this->get_mode() == 'categories') {
+            $DB->delete_records('poasassignment_tg_cat_ctgrs', array('taskgiver_cat_id' => $myinstance->id));
+            
+            for($i = 0; $i < $data->option_repeats; $i++) {
+                if(empty($data->categoryname[$i])) {
+                    continue;
+                }
+                $rec = new stdClass();
+                $rec->fieldid = $data->categoryfield[$i];
+                $rec->taskgiver_cat_id = $myinstance->id;
+                $rec->name = $data->categoryname[$i];
+                $rec->minimum = $data->categorymin[$i];
+                $rec->maximum = $data->categorymax[$i];
+                
+                $DB->insert_record('poasassignment_tg_cat_ctgrs', $rec);
+            }
             redirect(new moodle_url('view.php', array('id' => $data->id, 'page' => 'taskgiversettings')), null, 0);
         }
         if ($this->get_mode() == 'tasks') {
@@ -120,6 +136,21 @@ class categorychoice extends taskgiver{
                     $value[] = $tgcattask->taskid;
                 }
                 $data->$fieldname = $value;
+            }
+            return $data;
+        }
+        if ($this->get_mode() == 'categories') {
+            $data = new stdClass();
+            $myinstance = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $poasassignmentid));
+            $categories = $DB->get_records('poasassignment_tg_cat_ctgrs', array('taskgiver_cat_id' => $myinstance->id));
+            
+            $i = 0;
+            foreach ($categories as $category) {
+                $data->categoryname[$i] = $category->name;
+                $data->categoryfield[$i] = $category->fieldid;
+                $data->categorymin[$i] = $category->minimum;
+                $data->categorymax[$i] = $category->maximum;
+                $i++;
             }
             return $data;
         }
@@ -250,12 +281,12 @@ class managecategories_form extends moodleform {
         $repeateloptions['categorymax']['helpbutton'] = array('categorymax', 'poasassignmenttaskgivers_categorychoice');
         
         $repeatno = 2;
-        /*if ($instance){
-            $repeatno = $DB->count_records('poasassignment_criterions', array('poasassignmentid'=>$instance['poasassignmentid']));
+        if ($instance){
+            $repeatno = $DB->count_records('poasassignment_tg_cat_ctgrs', array('taskgiver_cat_id'=>$myinstance->id));
             $repeatno += 1;
         } else {
             $repeatno = 2;
-        }*/
+        }
         
         $this->repeat_elements($repeatarray, 
                                $repeatno,
@@ -290,7 +321,6 @@ class managecategories_form extends moodleform {
         $this->add_action_buttons(false, get_string('savechanges', 'admin'));
     }
 }
-
 class tasks_form extends moodleform {
     function definition() {
         $mform = $this->_form;
