@@ -98,8 +98,9 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         $taskgivers=$DB->get_records('poasassignment_taskgivers');
         $names = array();
         foreach ($taskgivers as $taskgiver) {
-            array_push($names, get_string('pluginname', 
-                                          'poasassignmenttaskgivers_' . $taskgiver->name));
+            $names[$taskgiver->id] = get_string('pluginname', 'poasassignmenttaskgivers_' . $taskgiver->name);
+            //array_push($names, get_string('pluginname', 
+            //                              'poasassignmenttaskgivers_' . $taskgiver->name));
         }
         
         $mform->addElement('select', 
@@ -174,7 +175,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         }
         if(isset($default_values['howtochoosetask'])) {
             //echo ' уменьшаем с '.$default_values['howtochoosetask'];
-            $default_values['howtochoosetask'] = $default_values['howtochoosetask']-1;
+            $default_values['howtochoosetask'] = $default_values['howtochoosetask']/*-1*/;
         }
         
     }

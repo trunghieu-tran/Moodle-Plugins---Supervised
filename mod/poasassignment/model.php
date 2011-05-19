@@ -107,7 +107,7 @@ class poasassignment_model {
         global $DB;
         $this->poasassignment->flags=$this->configure_flags();
         $this->poasassignment->timemodified=time();
-        $this->poasassignment->howtochoosetask++;
+        //$this->poasassignment->howtochoosetask++;
         $this->poasassignment->id = $DB->insert_record('poasassignment', $this->poasassignment);
         foreach ($this->plugins as $plugin) {
             require_once($plugin->path);
@@ -169,7 +169,7 @@ class poasassignment_model {
             }
             unset($this->poasassignment->$gradername);
         }
-        $this->poasassignment->howtochoosetask++;
+        //$this->poasassignment->howtochoosetask++;
         $poasassignmentid = $DB->update_record('poasassignment', $this->poasassignment);
         
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
@@ -680,7 +680,7 @@ class poasassignment_model {
         global $DB;
         $data->poasassignmentid=$this->poasassignment->id;
         $data->showintable=isset($data->showintable);
-        $data->searchparameter=isset($data->searchparameter);
+        //$data->searchparameter=isset($data->searchparameter);
         $data->secretfield=isset($data->secretfield);
         $data->random=isset($data->random);
         
@@ -713,7 +713,7 @@ class poasassignment_model {
         global $DB;
         $field->id=$fieldid;
         $field->showintable=isset($field->showintable);
-        $field->searchparameter=isset($field->searchparameter);
+        //$field->searchparameter=isset($field->searchparameter);
         $field->secretfield=isset($field->secretfield);
         $field->random=isset($field->random);
         if ($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST) {
