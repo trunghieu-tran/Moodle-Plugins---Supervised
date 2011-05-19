@@ -635,7 +635,6 @@ class poasassignment_model {
         $default_values['minvalue']=$field->minvalue;
         $default_values['maxvalue']=$field->maxvalue;
         $default_values['showintable']=$field->showintable;
-        $default_values['searchparameter']=$field->searchparameter;
         return $default_values;
     }
     

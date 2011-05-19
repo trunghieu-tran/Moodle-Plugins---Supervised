@@ -62,7 +62,6 @@ class taskedit_form extends moodleform {
         
         // hidden params
         
-        echo 'form' . $instance['id'];
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
         

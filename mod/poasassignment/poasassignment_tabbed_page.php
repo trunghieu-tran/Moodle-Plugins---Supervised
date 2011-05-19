@@ -1,7 +1,7 @@
 <?php
 
-/** Class of view.php page, displays list of tabs
- *  and content of current tab
+/** Class of view.php page, displays list of pages
+ *  and content of current page
  */
 class poasassignment_tabbed_page {
     private $cm;
