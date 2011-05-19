@@ -217,9 +217,8 @@ class managecategories_form extends moodleform {
         $mform = $this->_form;
         $instance = $this->_customdata;
         global $DB;
-        $mform->addElement('header', 'options', get_string('managecategories', 'poasassignmenttaskgivers_categorychoice'));
-        $mform->addElement('text', 'categoryname', get_string('categoryname', 'poasassignmenttaskgivers_categorychoice'));
-        $mform->addHelpButton('categoryname', 'categoryname', 'poasassignmenttaskgivers_categorychoice');
+        //$mform->addElement('header', 'options', get_string('managecategories', 'poasassignmenttaskgivers_categorychoice'),true);
+        
         
         $myinstance = $DB->get_record('poasassignment_tg_cat', array('poasassignmentid' => $instance['poasassignmentid']));
         $myfields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $myinstance->poasassignmentid));
@@ -227,14 +226,54 @@ class managecategories_form extends moodleform {
         foreach ($myfields as $myfield) {
             $fields[$myfield->id] = $myfield->name;
         }
-        $mform->addElement('select', 'categoryfield', get_string('categoryfield', 'poasassignmenttaskgivers_categorychoice'), $fields);
-        $mform->addHelpButton('categoryfield', 'categoryfield', 'poasassignmenttaskgivers_categorychoice');
+        $repeatarray = array();
+        $repeatarray[] = &MoodleQuickForm::createElement('header');
+        $repeatarray[] = &MoodleQuickForm::createElement('text', 
+                                                         'categoryname', 
+                                                         get_string('categoryname', 'poasassignmenttaskgivers_categorychoice'));
+        $repeatarray[] = &MoodleQuickForm::createElement('select', 
+                                                         'categoryfield', 
+                                                         get_string('categoryfield', 'poasassignmenttaskgivers_categorychoice'), 
+                                                         $fields);
+        $repeatarray[] = &MoodleQuickForm::createElement('text', 
+                                                         'categorymin', 
+                                                         get_string('categorymin', 'poasassignmenttaskgivers_categorychoice'));
+        $repeatarray[] = &MoodleQuickForm::createElement('text', 
+                                                         'categorymax', 
+                                                         get_string('categorymax', 'poasassignmenttaskgivers_categorychoice'));
         
-        $mform->addElement('text', 'categorymin', get_string('categorymin', 'poasassignmenttaskgivers_categorychoice'));
-        $mform->addHelpButton('categorymin', 'categorymin', 'poasassignmenttaskgivers_categorychoice');
+        $repeateloptions = array();
+
+        $repeateloptions['categoryname']['helpbutton'] = array('categoryname', 'poasassignmenttaskgivers_categorychoice');
+        $repeateloptions['categoryfield']['helpbutton'] = array('categoryfield', 'poasassignmenttaskgivers_categorychoice');
+        $repeateloptions['categorymin']['helpbutton'] = array('categorymin', 'poasassignmenttaskgivers_categorychoice');
+        $repeateloptions['categorymax']['helpbutton'] = array('categorymax', 'poasassignmenttaskgivers_categorychoice');
         
-        $mform->addElement('text', 'categorymax', get_string('categorymax', 'poasassignmenttaskgivers_categorychoice'));
-        $mform->addHelpButton('categorymax', 'categorymax', 'poasassignmenttaskgivers_categorychoice');
+        $repeatno = 2;
+        /*if ($instance){
+            $repeatno = $DB->count_records('poasassignment_criterions', array('poasassignmentid'=>$instance['poasassignmentid']));
+            $repeatno += 1;
+        } else {
+            $repeatno = 2;
+        }*/
+        
+        $this->repeat_elements($repeatarray, 
+                               $repeatno,
+                               $repeateloptions, 
+                               'option_repeats', 
+                               'option_add_fields', 
+                               2);
+        
+        //$mform->addElement('text', 'categoryname', get_string('categoryname', 'poasassignmenttaskgivers_categorychoice'));
+        
+        //$mform->addElement('select', 'categoryfield', get_string('categoryfield', 'poasassignmenttaskgivers_categorychoice'), $fields);
+        //$mform->addHelpButton('categoryfield', 'categoryfield', 'poasassignmenttaskgivers_categorychoice');
+        
+        //$mform->addElement('text', 'categorymin', get_string('categorymin', 'poasassignmenttaskgivers_categorychoice'));
+        //$mform->addHelpButton('categorymin', 'categorymin', 'poasassignmenttaskgivers_categorychoice');
+        
+        //$mform->addElement('text', 'categorymax', get_string('categorymax', 'poasassignmenttaskgivers_categorychoice'));
+        //$mform->addHelpButton('categorymax', 'categorymax', 'poasassignmenttaskgivers_categorychoice');
         
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
