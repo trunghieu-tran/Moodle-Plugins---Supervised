@@ -33,6 +33,7 @@ class gradertest_qtype extends default_questiontype {
             $testrec->weight = $question->testweight[$i];
             $testrec->testin = $question->testin[$i];
             $testrec->testout = $question->testout[$i];
+            $testrec->gradertestid = $gradertest->id;
             $DB->insert_record('question_gradertest_tests', $testrec);            
         }
         return null;
@@ -52,13 +53,15 @@ class gradertest_qtype extends default_questiontype {
     }
     function get_question_options(&$question) {
         global $DB;
-        if ($DB->record_exists('question_gradertest', array('questionid' => $question->id))) {
-            $test = $DB->get_record('question_gradertest', array('questionid' => $question->id));
-            $question->testtext = $test->text;
-            
-            //$draftitemid = file_get_submitted_draft_itemid('testfiles');
-            //file_prepare_draft_area($draftitemid, $question->context->id, 'question', 'gradertests', 0, array('subdirs'=>true));
-            //$question->testfiles = $draftitemid;
+        $gradertest = $DB->get_record('question_gradertest', array('questionid' => $question->id));
+        $tests = $DB->get_records('question_gradertest_tests', array('gradertestid' => $gradertest->id));
+        $i = 0;
+        foreach($tests as $test) {
+            $question->testname[$i] = $test->name;
+            $question->testin[$i] = $test->testin;
+            $question->testout[$i] = $test->testout;
+            $question->testweight[$i] = $test->weight;
+            $i++;
         }
     }
 

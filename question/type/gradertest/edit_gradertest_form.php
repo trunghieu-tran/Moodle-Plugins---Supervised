@@ -17,7 +17,7 @@ require_once($CFG->dirroot.'/question/type/edit_question_form.php');
  */
 class question_edit_gradertest_form extends question_edit_form {
     function definition_inner(&$mform) {
-        
+        global $DB;
         $mform->removeElement('questiontext');
         
         $mform->removeElement('defaultgrade');
@@ -47,7 +47,12 @@ class question_edit_gradertest_form extends question_edit_form {
                                                         'testweight', 
                                                         get_string('testweight', 'qtype_gradertest'));
         $repeateoptions = array();
+        
         $repeatno = 2;
+        if ($gradertest = $DB->get_record('question_gradertest', array('questionid' => $this->question->id))) {
+            $repeatno = $DB->count_records('question_gradertest_tests', array('gradertestid' => $gradertest->id));
+            $repeatno++;
+        }        
         
         $this->repeat_elements($repeatarray, 
                                $repeatno,
@@ -55,7 +60,6 @@ class question_edit_gradertest_form extends question_edit_form {
                                'option_repeats', 
                                'option_add_fields', 
                                2);
-                                     
     }
     /**
      *    Accessor for an attribute.
@@ -72,6 +76,7 @@ class question_edit_gradertest_form extends question_edit_form {
     }
     function set_data($question) {
         global $CFG, $DB;
+        
         //$draftitemid = file_get_submitted_draft_itemid('testfiles');
         //file_prepare_draft_area($draftitemid, 
         //                        $this->context->id, 
