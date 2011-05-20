@@ -361,6 +361,10 @@ class preg_leaf_assert extends preg_leaf {
     // \G
     const SUBTYPE_ESC_G = 6;
 
+    //Reference to the matcher object to be able to query it for captured subpattern
+    //Filled only to ESC_G subtype
+    public $matcher;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_ASSERT;
     }
@@ -584,7 +588,9 @@ class preg_leaf_combo extends preg_leaf {
 
 class preg_leaf_backref extends preg_leaf {
     public $number;
-    
+    //Reference to the matcher object to be able to query it for captured subpattern
+    public $matcher;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }

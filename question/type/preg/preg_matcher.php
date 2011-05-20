@@ -289,6 +289,7 @@ class preg_matcher {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
             $parser->doParse($token->type, $token->value);

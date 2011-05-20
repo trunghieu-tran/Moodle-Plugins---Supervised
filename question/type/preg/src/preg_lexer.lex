@@ -10,6 +10,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %{
     protected $errors = array();
 
+    public $matcher = null;
+
     public function get_errors() {
         return $this->errors;
     }
@@ -215,6 +217,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \\[0-9][0-9]? {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\0[0-9][0-9]?|[0-9][0-9][0-9] {
