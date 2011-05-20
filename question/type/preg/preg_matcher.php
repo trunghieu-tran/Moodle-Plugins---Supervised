@@ -284,7 +284,7 @@ class preg_matcher {
     * Function does lexical and syntaxical analysis of regex and builds tree, root saving in $this->ast_root
     @param $regex - regular expression for building tree
     */
-    /*protected*/public function build_tree($regex) {
+    protected function build_tree($regex) {
 
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
