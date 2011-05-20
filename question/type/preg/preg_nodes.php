@@ -362,7 +362,7 @@ class preg_leaf_assert extends preg_leaf {
     const SUBTYPE_ESC_G = 6;
 
     //Reference to the matcher object to be able to query it for captured subpattern
-    //Filled only to ESC_G subtype
+    //Filled only to ESC_G subtype if it would be implemented in the future
     public $matcher;
 
     public function __construct() {
@@ -383,6 +383,7 @@ class preg_leaf_assert extends preg_leaf {
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_ESC_G://there are no repetitive matching for now, so \G is equvivalent to \A
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if($pos == 0) {
                     $result = true;
@@ -411,10 +412,6 @@ class preg_leaf_assert extends preg_leaf {
                     $result = false;
                 }
                 break;
-            /*case preg_leaf_assert::SUBTYPE_ESC_G:
-                TODO: matching with SUBTYPE_ESC_G
-                trouble, because this function has not information about offset!
-                break;*/
         }
         if ($this->negative) {
             $result = !$result;
