@@ -16,6 +16,7 @@ class Yylex extends JLexBase  {
 	var $YY_EOF = 129;
 
     protected $errors = array();
+    public $matcher = null;
     public function get_errors() {
         return $this->errors;
     }
@@ -603,6 +604,7 @@ array(
 						case 17:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -18:
@@ -989,6 +991,7 @@ array(
 						case 69:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -69:
@@ -1003,6 +1006,7 @@ array(
 						case 72:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -71:
@@ -1017,6 +1021,7 @@ array(
 						case 99:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -73:
