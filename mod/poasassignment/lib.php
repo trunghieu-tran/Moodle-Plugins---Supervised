@@ -34,10 +34,16 @@ define('DATE',4);
 define('FILE',5);
 define('LISTOFELEMENTS',6);
 define('MULTILIST',7);
+define('CATEGORY',7);
 
 define('TASK_RECIEVED',0);
 define('ATTEMPT_DONE',1);
 define('GRADE_DONE',2);
+
+define('POASASSIGNMENT_NO_UNIQUENESS', 0);
+define('POASASSIGNMENT_UNIQUENESS_GROUPS', 1);
+define('POASASSIGNMENT_UNIQUENESS_GROUPINGS', 2);
+define('POASASSIGNMENT_UNIQUENESS_COURSE', 3);
 
 
 require_once(dirname(dirname(dirname(__FILE__))).'/lib/navigationlib.php');

@@ -281,12 +281,12 @@ class managecategories_form extends moodleform {
                                                          'categorymax', 
                                                          get_string('categorymax', 'poasassignmenttaskgivers_categorychoice'));
         
-        $repeateloptions = array();
+        $repeateoptions = array();
 
-        $repeateloptions['categoryname']['helpbutton'] = array('categoryname', 'poasassignmenttaskgivers_categorychoice');
-        $repeateloptions['categoryfield']['helpbutton'] = array('categoryfield', 'poasassignmenttaskgivers_categorychoice');
-        $repeateloptions['categorymin']['helpbutton'] = array('categorymin', 'poasassignmenttaskgivers_categorychoice');
-        $repeateloptions['categorymax']['helpbutton'] = array('categorymax', 'poasassignmenttaskgivers_categorychoice');
+        $repeateoptions['categoryname']['helpbutton'] = array('categoryname', 'poasassignmenttaskgivers_categorychoice');
+        $repeateoptions['categoryfield']['helpbutton'] = array('categoryfield', 'poasassignmenttaskgivers_categorychoice');
+        $repeateoptions['categorymin']['helpbutton'] = array('categorymin', 'poasassignmenttaskgivers_categorychoice');
+        $repeateoptions['categorymax']['helpbutton'] = array('categorymax', 'poasassignmenttaskgivers_categorychoice');
         
         $repeatno = 2;
         if ($instance){
@@ -298,7 +298,7 @@ class managecategories_form extends moodleform {
         
         $this->repeat_elements($repeatarray, 
                                $repeatno,
-                               $repeateloptions, 
+                               $repeateoptions, 
                                'option_repeats', 
                                'option_add_fields', 
                                2);

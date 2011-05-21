@@ -35,9 +35,11 @@ $string['uniqueness_help'] = 'This setting has three options:
 
 * No uniqueness - each student can choose any task
 * Unique within group - student can choose task if only nobody in group choosed it
-* Unique within course - student can choose task if only nobody in course choosed it';
+* Unique within grouping - student can choose task if only nobody in grouping choosed it
+* Unique within course - student can choose task if only nobody else choosed it';
 $string['nouniqueness'] = 'No uniqueness';
 $string['uniquewithingroup'] = 'Unique within group';
+$string['uniquewithingrouping'] = 'Unique within grouping';
 $string['uniquewithincourse'] = 'Unique within course';
 $string['teacherapproval'] = 'Teacher approval';
 $string['teacherapproval_help'] = 'Student needs teacher approval to make submissions';
@@ -201,3 +203,4 @@ $string['errornoweight'] = 'Weight must be defined';
 $string['fieldisrandom'] = 'Field is random';
 $string['fieldisfile'] = 'Field is file';
 $string['currenttaskgiver'] = 'Current taskgiver';
+$string['category'] = 'Category';

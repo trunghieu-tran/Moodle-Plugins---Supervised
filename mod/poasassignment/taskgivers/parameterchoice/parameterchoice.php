@@ -157,6 +157,9 @@ class parameterchoice extends taskgiver{
         }
         return $fields;
     }
+    public function delete_settings($poasassignmentid) {
+        //TODO
+    }
 }
 class taskgiver_form extends moodleform {
     function definition() {
