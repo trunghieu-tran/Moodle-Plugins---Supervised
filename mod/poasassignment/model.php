@@ -1167,6 +1167,7 @@ class poasassignment_model {
      */
     public function get_common_groups_within_course($user1, $user2, $courseid) {
         global $DB;
+        //echo "$user1 and $user2 have course $courseid";
         // Get first user's groups
         $groupmembers1 = $DB->get_records('groups_members', array('userid' => $user1));
         $groups1 = array();
@@ -1190,6 +1191,9 @@ class poasassignment_model {
         }
         return array_intersect($groups1, $groups2);
     }
+    public function get_common_groupings_within_course($user1, $user2, $courseid) {
+        return array();
+    }
     public function get_assignee_moodledata($assigneeid, $courseid, $mode = 'groupid') {
         if($assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid))) {
             $userid = $assignee->userid;
@@ -1212,7 +1216,7 @@ class poasassignment_model {
      * @param int $givehidden
      * @return array array of available tasks
      */
-    public function get_available_tasks($poasassignmentid, $userid, $givehidden) {
+    public function get_available_tasks($poasassignmentid, $userid, $givehidden = 0) {
         // Get all tasks in instance at first
         global $DB;
         $values = array();
@@ -1228,7 +1232,6 @@ class poasassignment_model {
         }
         
         // Filter tasks using 'uniqueness' field in poasassignment instance
-        
         if($instance = $DB->get_record('poasassignment', array('id' => $poasassignmentid))) {
             // If no uniqueness required, return $tasks without changes
             if($instance->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
@@ -1251,13 +1254,16 @@ class poasassignment_model {
                         foreach($assignees as $assignee) {
                             // If current user and any owner of the task have common group within 
                             // one course remove this task from array
-                            if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course) > 0)) {
+                            if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course)) > 0) {
                                 unset($tasks[$key]);
                             }
                         }
                     }
                 }
                 return $tasks;
+            }
+            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
+                
             }
             
         }
