@@ -12,7 +12,11 @@ class tasks_page extends abstract_page {
     
     function has_satisfying_parameters() {
         global $DB,$USER;
-        $flag = $this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
+        $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
+        if (!$flag) {
+            $this->lasterror='errorindtaskmodeisdisabled';
+            return false;
+        }
         if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id, 'poasassignmentid'=>$this->poasassignment->id))) 
             if (isset($assignee->taskid) && $assignee->taskid > 0) {
                 if (!has_capability('mod/poasassignment:managetasks',
@@ -21,10 +25,7 @@ class tasks_page extends abstract_page {
                     return false;
                 }
             }
-        if (!$flag) {
-            $this->lasterror='errorindtaskmodeisdisabled';
-            return false;
-        }
+        
         return true;
     }
     function view() {
@@ -55,7 +56,7 @@ class tasks_page extends abstract_page {
         
     }
     private function view_table($hascapmanage, $taskgiver) {
-        global $DB, $OUTPUT, $PAGE;
+        global $DB, $OUTPUT, $PAGE, $USER;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         $table = new flexible_table('mod-poasassignment-tasks');
         $table->baseurl = $PAGE->url;
@@ -90,7 +91,15 @@ class tasks_page extends abstract_page {
         $table->set_attribute('width', '100%');
         
         $table->setup();
-        $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
+        // Show all tasks if we can manage tasks
+        if(has_capability('mod/poasassignment:managetasks',
+                          get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+            $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
+        }
+        // Else show available for user tasks 
+        else {
+            $tasks = $poasmodel->get_available_tasks($this->poasassignment->id, $USER->id);
+        }
         foreach ($tasks as $task) {
             if (!$hascapmanage && $task->hidden)
                 continue;
@@ -123,13 +132,23 @@ class tasks_page extends abstract_page {
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                  if ($task->hidden) {
-                    $showurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',array('taskid'=>$task->id,'mode'=>SHOW_MODE,'id'=>$this->cm->id),'u','get');
+                    $showurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                                              array('taskid' => $task->id,
+                                                    'mode' => SHOW_MODE,
+                                                    'id' => $this->cm->id),
+                                              'u',
+                                              'get');
                     $showicon = '<a href="'.$showurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
                             '" class="iconsmall" alt="'.get_string('show').'" title="'.get_string('show').'" /></a>';
                     $namecolumn .= $showicon;
                 }
                 else {
-                    $hideurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',array('taskid'=>$task->id,'mode'=>HIDE_MODE,'id'=>$this->cm->id),'u','get');
+                    $hideurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                                              array('taskid' => $task->id,
+                                                    'mode' => HIDE_MODE,
+                                                    'id' => $this->cm->id),
+                                              'u',
+                                              'get');
                     $hideicon = '<a href="'.$hideurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
                             '" class="iconsmall" alt="'.get_string('hide').'" title="'.get_string('hide').'" /></a>';
                     $namecolumn .= $hideicon;
@@ -190,7 +209,6 @@ class tasks_page extends abstract_page {
                     }
                 }
             }
-            //echo format_module_intro('poassignment', $task->description, $this->cm->id);
             $table->add_data($row);
         }
             $table->print_html();
