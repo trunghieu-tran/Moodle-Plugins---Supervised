@@ -70,8 +70,12 @@ class poasassignment_model {
                         get_string('file','poasassignment'),
                         get_string('list','poasassignment'),
                         get_string('multilist','poasassignment'));
-        if (isset($this->poasassignment->id))
+        if (isset($this->poasassignment->id)) {
             $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
+        }
+        else {
+            echo 'Constructing model without id';
+        }
         if (!$this->assignee)
             $this->assignee->id=0;
         $this->plugins=$DB->get_records('poasassignment_answers');
@@ -170,6 +174,10 @@ class poasassignment_model {
             unset($this->poasassignment->$gradername);
         }
         //$this->poasassignment->howtochoosetask++;
+        $oldpoasassignment = $DB->get_record('poasassignment', array('id' => $this->poasassignment->id));
+        if($oldpoasassignment->howtochoosetask != $this->poasassignment->howtochoosetask) {
+            $this->delete_taskgiver_settings($oldpoasassignment->id, $oldpoasassignment->howtochoosetask);
+        }
         $poasassignmentid = $DB->update_record('poasassignment', $this->poasassignment);
         
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
@@ -210,6 +218,7 @@ class poasassignment_model {
             $DB->delete_records('poasassignment_task_values', array('fieldid' => $field->id));
         }
         $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $id));
+        delete_taskgiver_settings($id, $this->poasassignment->howtochoosetask);
         return true;
     }
     
@@ -1138,6 +1147,121 @@ class poasassignment_model {
             return ($assignee && $assignee->taskid>0);
         }
         return false;
+    }
+    public function delete_taskgiver_settings($poasassignmentid, $taskgiverid) {
+        global $DB;
+        if($taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $taskgiverid))) {
+            require_once($taskgiverrec->path);
+            $taskgivername = $taskgiverrec->name;
+            $tg = new $taskgivername();
+            if($tg->hassettings) {
+                $tg->delete_settings($poasassignmentid);
+            }
+        }
+    }
+    /* Get array of common groups for two users within course
+     * @param $user1 first user's id
+     * @param $user2 second user's id
+     * @param $courseid course id
+     * @return array of common groups (can be empty)
+     */
+    public function get_common_groups_within_course($user1, $user2, $courseid) {
+        global $DB;
+        // Get first user's groups
+        $groupmembers1 = $DB->get_records('groups_members', array('userid' => $user1));
+        $groups1 = array();
+        foreach($groupmembers1 as $groupmember) {
+            // Get first user's groups within $courseid
+            $groups = $DB->get_records('groups', array('id' => $groupmember->groupid,
+                                                       'courseid' => $courseid));
+            foreach($groups as $group) {
+                $groups1[] = $group->id;
+            }
+        }
+        $groupmembers2 = $DB->get_records('groups_members', array('userid' => $user2));
+        $groups2 = array();
+        foreach($groupmembers2 as $groupmember) {
+            // Get first user's groups within $courseid
+            $groups = $DB->get_records('groups', array('id' => $groupmember->groupid,
+                                                       'courseid' => $courseid));
+            foreach($groups as $group) {
+                $groups2[] = $group->id;
+            }
+        }
+        return array_intersect($groups1, $groups2);
+    }
+    public function get_assignee_moodledata($assigneeid, $courseid, $mode = 'groupid') {
+        if($assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid))) {
+            $userid = $assignee->userid;
+            if($groupmembers = $DB->get_records('poasassignment_groups_members', array('userid' => $userid))) {
+                $groups = array();
+                foreach($groupmembers as $groupmember) {
+                    $groups[] = $groupmember->groupid;
+                }
+                if($mode == 'groupid') {
+                    return $groups;
+                }                
+            }
+        }
+        return array();
+    }
+    /* Get all tasks that are available for current user
+     * Method checks instance's uniqueness, visibility of all tasks  
+     * @param int $poasassignmentid
+     * @param int $userid
+     * @param int $givehidden
+     * @return array array of available tasks
+     */
+    public function get_available_tasks($poasassignmentid, $userid, $givehidden) {
+        // Get all tasks in instance at first
+        global $DB;
+        $values = array();
+        $values['poasassignmentid'] = $poasassignmentid;
+        if(!$givehidden) {
+            $values['hidden'] = 0;
+        }
+        $tasks = $DB->get_records('poasassignment_tasks', $values);
+        
+        // If there is no tasks at this stage - return empty array
+        if(count($tasks) == 0) {
+            return $tasks;
+        }
+        
+        // Filter tasks using 'uniqueness' field in poasassignment instance
+        
+        if($instance = $DB->get_record('poasassignment', array('id' => $poasassignmentid))) {
+            // If no uniqueness required, return $tasks without changes
+            if($instance->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
+                return $tasks;
+            }
+            // If uniqueness within groups required, filter tasks
+            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
+                //Get user's group id at first
+                $usergroups = $DB->get_records('groups_members', array('userid' => $userid));
+                
+                foreach($tasks as $key => $task) {
+                    // Get all assignees that have this task
+                    $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $task->id));
+                    
+                    // If nobody have this task continue
+                    if(count($assignees) == 0) {
+                        continue;
+                    }
+                    else {
+                        foreach($assignees as $assignee) {
+                            // If current user and any owner of the task have common group within 
+                            // one course remove this task from array
+                            if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course) > 0)) {
+                                unset($tasks[$key]);
+                            }
+                        }
+                    }
+                }
+                return $tasks;
+            }
+            
+        }
+        
     }
 }
     

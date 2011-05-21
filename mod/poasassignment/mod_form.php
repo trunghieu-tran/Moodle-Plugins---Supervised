@@ -119,6 +119,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
                             array(
                                 get_string('nouniqueness', 'poasassignment'),
                                 get_string('uniquewithingroup', 'poasassignment'),
+                                get_string('uniquewithingrouping', 'poasassignment'),
                                 get_string('uniquewithincourse', 'poasassignment')));
         $mform->disabledIf('uniqueness', 'activateindividualtasks');
         $mform->addHelpButton('uniqueness', 'uniqueness', 'poasassignment');

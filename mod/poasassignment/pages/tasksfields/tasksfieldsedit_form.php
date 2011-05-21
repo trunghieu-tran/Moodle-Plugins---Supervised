@@ -22,14 +22,15 @@ class tasksfieldsedit_form extends moodleform {
                         get_string('date','poasassignment'),
                         get_string('file','poasassignment'),
                         get_string('list','poasassignment'),
-                        get_string('multilist','poasassignment'));
+                        get_string('multilist','poasassignment'),
+                        get_string('category', 'poasassignment'));
         $mform->addElement('select','ftype',get_string('ftype','poasassignment'),$ftypes);
         $mform->addElement('checkbox','showintable',get_string('showintable','poasassignment'));       
         
         $mform->addElement('checkbox','secretfield',get_string('secretfield','poasassignment'));
         
         $mform->addElement('checkbox','random',get_string('random','poasassignment'));
-        $types = array(STR, TEXT, DATE, FILE, MULTILIST);
+        $types = array(STR, TEXT, DATE, FILE, MULTILIST, CATEGORY);
         foreach ($types as $type) {
             $mform->disabledIf('random', 'ftype', 'eq', $type);
         }
