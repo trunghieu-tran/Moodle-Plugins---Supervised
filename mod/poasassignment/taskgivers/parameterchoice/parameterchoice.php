@@ -22,7 +22,11 @@ class parameterchoice extends taskgiver{
         $poasmodel = poasassignment_model::get_instance($poasassignment);
         $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
         if($data = $mform->get_data()) {
-            $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$poasassignment->id));
+            $tasks = $poasmodel->get_available_tasks($poasassignment->id, $USER->id);
+            if(count($tasks) > 0) {
+                print_string('notasks', 'poasassignmenttaskgivers_parameterchoice')
+                return;
+            }
             $fields = parameterchoice::get_parameters_fields($poasassignment->id);
             if($fields) {
                 $satisfyingtasks = array();
@@ -33,7 +37,7 @@ class parameterchoice extends taskgiver{
                     if($fieldvalues) {
                         if($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST || $field->ftype==STR || $field->ftype==TEXT) {
                             foreach($fieldvalues as $fieldvalue) {
-                                if(empty($fieldvalue->value)) {
+                                if(empty($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
                                     continue;
                                 }
                                 if($tasks[$fieldvalue->taskid]->hidden==0) {
@@ -48,7 +52,7 @@ class parameterchoice extends taskgiver{
                         }
                         if ($field->ftype==NUMBER || $field->ftype==FLOATING || $field->ftype==DATE) {
                             foreach ($fieldvalues as $fieldvalue) {
-                                if(empty($fieldvalue->value)) {
+                                if(empty($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
                                     continue;
                                 }
                                 if ($tasks[$fieldvalue->taskid]->hidden == 0) {
@@ -100,7 +104,7 @@ class parameterchoice extends taskgiver{
                     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
                 else { 
-                    echo get_string('nosatisfyingtasks','poasassignment');
+                    echo get_string('nosatisfyingtasks','poasassignmenttaskgivers_parameterchoice');
                 }
             }
         }
