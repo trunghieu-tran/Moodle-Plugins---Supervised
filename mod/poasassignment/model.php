@@ -1159,6 +1159,35 @@ class poasassignment_model {
             }
         }
     }
+    public function get_user_groups($userid, $courseid) {
+        global $DB;
+        $groupmembers = $DB->get_records('groups_members', array('userid' => $userid));
+        $ret = array();
+        foreach($groupmembers as $groupmember) {
+            // Get first user's groups within $courseid
+            $groups = $DB->get_records('groups', array('id' => $groupmember->groupid,
+                                                       'courseid' => $courseid));
+            foreach($groups as $group) {
+                $ret[] = $group->id;
+            }
+        }
+        return $ret;
+    }
+    public function get_user_groupings($userid, $courseid) {
+        global $DB;
+        $groups = $this->get_user_groups($userid, $courseid);
+        $ret = array();
+        foreach($groups as $group) {
+            $groupinggroups = $DB->get_records('groupings_groups', array('groupid' => $group));
+            foreach($groupinggroups as $groupinggroup) {
+                $groupings = $DB->get_records('groupings', array('id' => $groupinggroup->groupingid,'courseid' => $courseid));
+                foreach($groupings as $grouping) {
+                    $ret[] = $grouping->id;
+                }
+            }
+        }
+        return $ret;
+    }
     /* Get array of common groups for two users within course
      * @param $user1 first user's id
      * @param $user2 second user's id
@@ -1190,34 +1219,6 @@ class poasassignment_model {
             }
         }
         return array_intersect($groups1, $groups2);
-    }
-    public function get_common_groupings_within_course($user1, $user2, $courseid) {
-        global $DB;
-        // Get all groups for these users
-        $usersgroups = array();
-        $groups = $DB->get_records('groups_members', array('userid' => $user1));
-        foreach($groups as $group) {
-            $usersgroups[] = $group->id;
-        }
-        $groups = $DB->get_records('groups_members', array('userid' => $user2));
-        foreach($groups as $group) {
-            $usersgroups[] = $group->id;
-        }
-        // Find all common groupings for these users
-        $commongroupings = array();
-        foreach($usersgroups as $usersgroup) {
-            $groupings = $DB->get_records('groupings_groups', array('groupid' => $usersgroup));
-            foreach($groupings as $grouping) {
-                $commongroupings[] = $grouping->id;
-            }
-        }
-        // Leave common groupings within course $courseid
-        foreach ($commongroupings as $key => $commongrouping) {
-            if(!$DB->record_exists('groupings', array('courseid' => $courseid, 'id' => $commongrouping))) {
-                unset($commongroupings[$key]);
-            }
-        }
-        return $commongroupings;
     }
     public function get_assignee_moodledata($assigneeid, $courseid, $mode = 'groupid') {
         if($assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid))) {
@@ -1264,14 +1265,10 @@ class poasassignment_model {
             }
             // If uniqueness within groups or groupings required, filter tasks
             if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS || 
-               $instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
-                //Get user's group id at first
-                $usergroups = $DB->get_records('groups_members', array('userid' => $userid));
-                
+               $instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {                
                 foreach($tasks as $key => $task) {
                     // Get all assignees that have this task
                     $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $task->id));
-                    
                     // If nobody have this task continue
                     if(count($assignees) == 0) {
                         continue;
@@ -1281,6 +1278,12 @@ class poasassignment_model {
                             if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
                                 // If current user and any owner of the task have common group within 
                                 // course remove this task from array
+                                
+                                //echo "<br>user $userid have groups" . $this->get_user_groups($userid, $instance->course);
+                                //echo "<br>user $assignee->userid have groups" . $this->get_user_groups($assignee->userid, $instance->course);
+                                
+                                $commongroups = array_intersect()
+                                // TODO использовать get_user_groups
                                 if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course)) > 0) {
                                     unset($tasks[$key]);
                                 }
@@ -1288,11 +1291,29 @@ class poasassignment_model {
                             if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
                                 // If current user and any owner of the task have common grouping within 
                                 // course remove this task from array
-                                if(count($this->get_common_groupings_within_course($userid, $assignee->userid, $instance->course)) > 0) {
+                               
+                                //echo "<br>user $userid have groupings<br>";
+                                //print_r($this->get_user_groupings($userid, $instance->course));
+                                //echo "<br>user $assignee->userid have groupings<br>";
+                                //print_r($this->get_user_groupings($assignee->userid, $instance->course));
+                                
+                                $commongroupings = array_intersect($this->get_user_groupings($userid, $instance->course),
+                                                                  $this->get_user_groupings($assignee->userid, $instance->course));
+                                //echo count($commongroupings);
+                                if(count($commongroupings) > 0) {
                                     unset($tasks[$key]);
                                 }
                             }
                         }
+                    }
+                }
+                return $tasks;
+            }
+            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_COURSE) {
+                foreach($tasks as $key => $task) {
+                    // Get all assignees that have this task
+                    if($DB->record_exists('poasassignment_assignee', array('taskid' => $task->id))) {
+                        unset($tasks[$key]);
                     }
                 }
                 return $tasks;
