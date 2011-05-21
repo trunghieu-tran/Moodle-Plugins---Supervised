@@ -1192,7 +1192,32 @@ class poasassignment_model {
         return array_intersect($groups1, $groups2);
     }
     public function get_common_groupings_within_course($user1, $user2, $courseid) {
-        return array();
+        global $DB;
+        // Get all groups for these users
+        $usersgroups = array();
+        $groups = $DB->get_records('groups_members', array('userid' => $user1));
+        foreach($groups as $group) {
+            $usersgroups[] = $group->id;
+        }
+        $groups = $DB->get_records('groups_members', array('userid' => $user2));
+        foreach($groups as $group) {
+            $usersgroups[] = $group->id;
+        }
+        // Find all common groupings for these users
+        $commongroupings = array();
+        foreach($usersgroups as $usersgroup) {
+            $groupings = $DB->get_records('groupings_groups', array('groupid' => $usersgroup));
+            foreach($groupings as $grouping) {
+                $commongroupings[] = $grouping->id;
+            }
+        }
+        // Leave common groupings within course $courseid
+        foreach ($commongroupings as $key => $commongrouping) {
+            if(!$DB->record_exists('groupings', array('courseid' => $courseid, 'id' => $commongrouping))) {
+                unset($commongroupings[$key]);
+            }
+        }
+        return $commongroupings;
     }
     public function get_assignee_moodledata($assigneeid, $courseid, $mode = 'groupid') {
         if($assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid))) {
@@ -1237,8 +1262,9 @@ class poasassignment_model {
             if($instance->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
                 return $tasks;
             }
-            // If uniqueness within groups required, filter tasks
-            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
+            // If uniqueness within groups or groupings required, filter tasks
+            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS || 
+               $instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
                 //Get user's group id at first
                 $usergroups = $DB->get_records('groups_members', array('userid' => $userid));
                 
@@ -1252,18 +1278,24 @@ class poasassignment_model {
                     }
                     else {
                         foreach($assignees as $assignee) {
-                            // If current user and any owner of the task have common group within 
-                            // one course remove this task from array
-                            if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course)) > 0) {
-                                unset($tasks[$key]);
+                            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
+                                // If current user and any owner of the task have common group within 
+                                // course remove this task from array
+                                if(count($this->get_common_groups_within_course($userid, $assignee->userid, $instance->course)) > 0) {
+                                    unset($tasks[$key]);
+                                }
+                            }
+                            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
+                                // If current user and any owner of the task have common grouping within 
+                                // course remove this task from array
+                                if(count($this->get_common_groupings_within_course($userid, $assignee->userid, $instance->course)) > 0) {
+                                    unset($tasks[$key]);
+                                }
                             }
                         }
                     }
                 }
                 return $tasks;
-            }
-            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
-                
             }
             
         }
