@@ -592,8 +592,8 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         $connection[$this->number] = &$this;
     }
     public function nullable() {
-        $this->nullable = true;
-        return true;
+        $this->nullable = false;
+        return false;
     }
     public function firstpos() {
         $this->firstpos = array($this->number);
