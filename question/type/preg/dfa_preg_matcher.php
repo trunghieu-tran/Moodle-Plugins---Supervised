@@ -15,7 +15,7 @@
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_nodes.php');
 
-define('MAX_STATE_COUNT', 250);     //    if you put large constant here, than big dfa will be
+define('MAX_STATE_COUNT', 250);      //    if you put large constant here, than big dfa will be
 define('MAX_PASSAGE_COUNT', 250);    //    correct, but big dfa will be build slow, if you small
                                      //    constant here dfa will must small, but complexy regex
                                      //    will be get error on validation
@@ -30,6 +30,21 @@ class finite_automate_state {//finite automate state
     }
 }
 
+class fptab {//member of follow's map table, use on merge time only
+    public $number;
+    public $inaccessible;
+    //arrays, use member with identically indexes
+    public $aindex;//index of symbol in assert's connection
+    public $mindex;//index of symbol in main's connection
+    //reference
+    public $leaf;//contain leaf, which be on crossing of assert's and main's leaf
+    public function __construct() {
+        $this->inaccessible = true;
+        $this->aindex = array();
+        $this->mindex = array();
+    }
+}
+
 class dfa_preg_matcher extends preg_matcher {
 
     
@@ -38,10 +53,11 @@ class dfa_preg_matcher extends preg_matcher {
     var $connection;//array, $connection[0] for main regex, $connection[<assert number>] for asserts
     var $roots;//array,[0] main root, [<assert number>] assert's root
     var $finiteautomates;
-	var $maxnum;
+    var $maxnum;
     var $built;
     var $result;
     var $picnum;//number of last picture
+    protected $map;//map of symbol's following
     
     var $graphvizpath;//path to dot.exe of graphviz, used only for debugging
     
@@ -94,25 +110,28 @@ class dfa_preg_matcher extends preg_matcher {
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
+        /*
         if ($index==0) {
             $root =& $this->roots[0];
         } else {
             $root =& $this->roots[$index]->pregnode->operands[0];
         }
+        */
+        $root =& $this->roots[$index];
         $oldroot = $root;
         $root = new preg_node_concat;
         $root->operands[1] = new preg_leaf_meta;
         $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
         $root = $this->from_preg_node($root);
-		$root->pregnode->operands[0] = $oldroot;
+        $root->pregnode->operands[0] = $oldroot;
     }
     
     /**
     *function build determined finite automate, fa saving in $this->finiteautomates[$index], in $this->finiteautomates[$index][0] start state.
     *@param index number of assert (0 for main regex) for which building fa
     */
-    function buildfa($index) {
-		if ($index==0) {
+    function buildfa($index=0) {
+        if ($index==0) {
             $root = $this->roots[0];
         } else {
             $root = $this->roots[$index]->pregnode->operands[0];
@@ -121,13 +140,6 @@ class dfa_preg_matcher extends preg_matcher {
         $passcount = 0;
         $this->maxnum = 0;//no one leaf numerated, yet.
         $this->finiteautomates[$index][0] = new finite_automate_state;
-        //form the map of following
-        $root->number($this->connection[$index], $this->maxnum);
-        $root->nullable();
-        $root->firstpos();
-        $root->lastpos();
-        $root->followpos($map);
-        $root->find_asserts($this->roots);
         //create start state.
         foreach ($root->firstpos as $value) {
             $this->finiteautomates[$index][0]->passages[$value] = -2;
@@ -135,20 +147,17 @@ class dfa_preg_matcher extends preg_matcher {
         $this->finiteautomates[$index][0]->marked = false;//start state not marked, because not readey, yet
         //form the determined finite automate
         while ($this->not_marked_state($index) !== false) {
-			//while has one or more not ready state.
+            //while has one or more not ready state.
             $currentstateindex = $this->not_marked_state($index);
             $this->finiteautomates[$index][$currentstateindex]->marked = true;//mark current state, because it will be ready on this step of loop
             //form not marked state for each passage of current state
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new finite_automate_state;
-                $fpU = $this->followposU($num, $map, $this->finiteautomates[$index][$currentstateindex]->passages, $index);
+                $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow<dfa_preg_node_assert::ASSERT_MIN_NUM) {
                         //if number less then dfa_preg_node_assert::ASSERT_MIN_NUM constant than this is character class, to passages it.
                         $newstate->passages[$follow] = -2;
-                    } else {
-                        //else this is number of assert
-                        $this->finiteautomates[$index][$currentstateindex]->asserts[] = $follow;
                     }
                 }
                 if ($this->connection[$index][$num]->pregnode->type === preg_node::TYPE_LEAF_META && 
@@ -176,13 +185,14 @@ class dfa_preg_matcher extends preg_matcher {
                 }
             }
         }
-		foreach ($this->finiteautomates[$index] as $key=>$state) {
-			$this->del_double($this->finiteautomates[$index][$key]->passages, $index);
-		}
-		foreach ($this->finiteautomates[$index] as $key=>$state) {
-			$this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
-		}
-	}
+        /*
+        foreach ($this->finiteautomates[$index] as $key=>$state) {
+            $this->del_double($this->finiteautomates[$index][$key]->passages, $index);
+        }
+        foreach ($this->finiteautomates[$index] as $key=>$state) {
+            $this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
+        }*/
+    }
     /**
     *function compare regex and string, with using of finite automate builded of buildfa function
     *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
@@ -254,22 +264,6 @@ class dfa_preg_matcher extends preg_matcher {
             $index += $length;
             if ($found && $foundkey != dfa_preg_leaf_meta::ENDREG) {
                 $acceptedcharcount += $length;
-            }
-            if (count($this->finiteautomates[$assertnumber][$currentstate]->asserts)) { // if there are asserts in this state
-                foreach ($this->finiteautomates[$assertnumber][$currentstate]->asserts as $assert) {
-                    $tmpres = $this->compare($string, $assert, $index+$offset, false);//result of compare substring starting at next character with current assert
-                    $full = $tmpres->full && $full;
-                    if (!$tmpres->full) {
-                    /* if string not match with assert then assert give borders
-                       match string with regex can't be after mismatch with assert
-                       p.s. string can match if it not end when assert end
-                    */
-                        if ($maxindex >= $tmpres->index + $tmpres->offset) {
-                            $next = $tmpres->next;
-                            $maxindex = $tmpres->index + $tmpres->offset;
-                        }
-                    }
-                }
             }
             //form results of check this character
             if ($found) { //if finite automate did accept this character
@@ -372,7 +366,7 @@ class dfa_preg_matcher extends preg_matcher {
     *@param arr2 - second array, which will appended to arr1
     *@param $index index of dfa for which do verify sybol unique
     */
-    static protected function push_unique(&$arr1, $arr2) {// to static
+    static protected function push_unique(&$arr1, $arr2) {
         if (!is_array($arr1)) {
             $arr1 = array();
         }
@@ -409,21 +403,21 @@ class dfa_preg_matcher extends preg_matcher {
     *@param $array array of passages of state of dfa
     *@param $index index of dfa for which do verify sybol unique
     */
-	protected function unite_parallel(&$array, $index) {
-		foreach ($array as $key1=>$passage1) {
+    protected function unite_parallel(&$array, $index) {
+        foreach ($array as $key1=>$passage1) {
             foreach ($array as $key2=>$passage2) {
                if($passage1==$passage2 && $key1!=$key2) {
-					$newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
-					$newleaf = $this->from_preg_node($newleaf);
-					$this->connection[$index][++$this->maxnum] = $newleaf;
-					$array[$this->maxnum] = $passage1;
-					unset($array[$key1]);
-					unset($array[$key2]);
-					break;
-			   }
+                    $newleaf = preg_leaf_combo::get_unite($this->connection[$index][$key1]->pregnode, $this->connection[$index][$key2]->pregnode);
+                    $newleaf = $this->from_preg_node($newleaf);
+                    $this->connection[$index][++$this->maxnum] = $newleaf;
+                    $array[$this->maxnum] = $passage1;
+                    unset($array[$key1]);
+                    unset($array[$key2]);
+                    break;
+               }
             }
         }
-	}
+    }
     /**
     *function search not marked state if finite automate, while one not marked state will be found, searching will be stopped.
     *@param index - number of automate
@@ -536,15 +530,15 @@ class dfa_preg_matcher extends preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
-		global $CFG;
-		$this->picnum=0;
-		if (isset($CFG->dotpath)) {
-			$this->graphvizpath = $CFG->dotpath;//in few unit tests dfa_preg_matcher objects create without regex,
-			  								    //but dfa will be build later and need for drawing dfa may be
-		} else {
-			$this->graphvizpath = 1;
-		}
-		if (!isset($regex)) {//not build tree and dfa, if regex not given
+        global $CFG;
+        $this->picnum=0;
+        if (isset($CFG->dotpath)) {
+            $this->graphvizpath = $CFG->dotpath;//in few unit tests dfa_preg_matcher objects create without regex,
+                                                  //but dfa will be build later and need for drawing dfa may be
+        } else {
+            $this->graphvizpath = 1;
+        }
+        if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
         parent::__construct($regex, $modifiers);
@@ -554,17 +548,196 @@ class dfa_preg_matcher extends preg_matcher {
             return;
         }
         $this->append_end(0);
-        $this->buildfa(0);
+        //form the map of following
+        $this->roots[0]->number($this->connection[0], $this->maxnum);
+        $this->roots[0]->nullable();
+        $this->roots[0]->firstpos();
+        $this->roots[0]->lastpos();
+        $this->roots[0]->followpos($this->map[0]);
+        $this->roots[0]->find_asserts($this->roots);
         foreach ($this->roots as $key => $value) {
-            if ($key) {
+            if ($key!=0) {
+                //TODO: use subtype of assert, when few subtype will be supported.
+                $this->roots[$key] = $this->roots[$key]->pregnode->operands[0];
                 $this->append_end($key);
-                $this->buildfa($key);
+                $this->roots[$key]->number($this->connection[$key], $this->maxnum);
+                $this->roots[$key]->nullable();
+                $this->roots[$key]->firstpos();
+                $this->roots[$key]->lastpos();
+                $this->roots[$key]->followpos($this->map[$key]);
+                $this->merge_fp_maps($key);
             }
         }
+        $this->buildfa();
         $this->built = true;
         return;
     }
-
+    /**
+    * Function merge map of symbol's following, first operand $this->map[0], second operand $this->map[$num]
+    * and put result in $this->map[0]
+    * @param $num number of other map to merging
+    */
+    protected function merge_fp_maps($num) {
+        //create table of crossing
+        $table = array();
+        foreach ($this->map[$num] as $akey=>$aleaf) {
+            foreach ($this->map[0] as $mkey=>$mleaf) {
+                if ($akey!=dfa_preg_leaf_meta::ENDREG && $mkey!=dfa_preg_leaf_meta::ENDREG && $mkey!=$num) {
+                    $newleaf = preg_leaf_combo::get_cross($this->connection[0][$mkey]->pregnode, $this->connection[$num][$akey]->pregnode);
+                    $table[$akey][$mkey] = new fptab;
+                    $table[$akey][$mkey]->leaf = $this->from_preg_node($newleaf);
+                }
+            }
+        }
+        foreach ($this->map[$num] as $akey=>$aleaf) {
+            $table[$akey][dfa_preg_leaf_meta::ENDREG] = false;
+        }
+        foreach ($this->map[0] as $mkey=>$mleaf) {
+            if ($mkey!=$num) {
+                $table[dfa_preg_leaf_meta::ENDREG][$mkey] = new fptab;
+                $table[dfa_preg_leaf_meta::ENDREG][$mkey]->leaf = $this->connection[0][$mkey];
+            }
+        }
+        $newleaf = new preg_leaf_meta;
+        $newleaf->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
+        $newleaf = $this->from_preg_node($newleaf);
+        $table[dfa_preg_leaf_meta::ENDREG][dfa_preg_leaf_meta::ENDREG] = new fptab;
+        $table[dfa_preg_leaf_meta::ENDREG][dfa_preg_leaf_meta::ENDREG]->leaf = $newleaf;
+        //forming ?passages?
+        foreach ($table as $akey=>$str) {
+            if ($akey!=dfa_preg_leaf_meta::ENDREG) {
+                foreach ($str as $mkey=>$member) {
+                    if ($mkey!=dfa_preg_leaf_meta::ENDREG) {
+                        foreach ($this->map[$num][$akey] as $afollow) {
+                            foreach ($this->map[0][$mkey] as $mfollow) {
+                                if (($afollow==dfa_preg_leaf_meta::ENDREG || $mfollow!=dfa_preg_leaf_meta::ENDREG) &&
+                                    ($akey!=dfa_preg_leaf_meta::ENDREG || $mkey!=dfa_preg_leaf_meta::ENDREG)) {
+                                    if ($mfollow!=$num) {
+                                        $table[$akey][$mkey]->aindex[] = $afollow;
+                                        $table[$akey][$mkey]->mindex[] = $mfollow;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                foreach ($str as $mkey=>$member) {
+                    if ($mkey!=dfa_preg_leaf_meta::ENDREG) {
+                        foreach ($this->map[0][$mkey] as $follow) {
+                            if ($follow!=$num) {
+                                $table[$akey][$mkey]->aindex[] = $akey;//meta endreg
+                                $table[$akey][$mkey]->mindex[] = $follow;//copying passage
+                            } else {
+                                foreach ($this->roots[$num]->firstpos as $afirpos) {
+                                    foreach ($this->map[0][$num] as $mainnext) {
+                                        if ($mainnext!=dfa_preg_leaf_meta::ENDREG || $afirpos==dfa_preg_leaf_meta::ENDREG) {
+                                            $table[$akey][$mkey]->aindex[] = $afirpos;
+                                            $table[$akey][$mkey]->mindex[] = $mainnext;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //wave for deleting inaccessible postion
+            //form start front
+        $firsta = $afront = array();
+        $firstm = $mfront = array();
+        foreach ($this->roots[0]->firstpos as $firstpos) {
+            if ($firstpos!=$num) {
+                $firsta[] = $afront[] = dfa_preg_leaf_meta::ENDREG;
+                $firstm[] = $mfront[] = $firstpos;
+                $table[dfa_preg_leaf_meta::ENDREG][$firstpos]->inaccessible = false;
+            } else {
+                foreach ($this->roots[$num]->firstpos as $afirpos) {
+                    foreach ($this->map[0][$num] as $mainnext) {
+                        if ($mainnext!=dfa_preg_leaf_meta::ENDREG || $afirpos==dfa_preg_leaf_meta::ENDREG) {
+                            $firsta[] = $afront[] = $afirpos;
+                            $firstm[] = $mfront[] = $mainnext;
+                            $table[$afirpos][$mainnext]->inaccessible = false;
+                        }
+                    }
+                }
+            }
+        }
+            //wave
+        do {
+            $newafront = array();
+            $newmfront = array();
+            $newfirstposfortree = array();
+            foreach ($afront as $key=>$val) {
+                foreach ($table[$val][$mfront[$key]]->aindex as $newkey=>$apass) {
+                    if ($table[$apass][$table[$val][$mfront[$key]]->mindex[$newkey]]->inaccessible) {
+                        $newafront[] = $apass;
+                        $newmfront[] = $table[$val][$mfront[$key]]->mindex[$newkey];
+                        $table[$apass][$table[$val][$mfront[$key]]->mindex[$newkey]]->inaccessible = false;
+                    }
+                }
+            }
+            $afront = $newafront;
+            $mfront = $newmfront;
+        } while (count($afront)!=0);       
+            //deleting
+        foreach ($table as $akey=>$str) {
+            foreach ($str as $mkey=>$member) {
+                if ($member!==false && $member->inaccessible) {
+                    $table[$akey][$mkey] = false;
+                }
+            }
+        }
+        //formin fpmap from table
+            //numerating
+        $maxnum = 0;
+        $this->connection[0] = array();
+        foreach ($table as $akey=>$str) {
+            foreach ($str as $mkey=>$member) {
+                if ($member!==false) {
+                    if ($akey==dfa_preg_leaf_meta::ENDREG && $mkey==dfa_preg_leaf_meta::ENDREG) {
+                        $table[$akey][$mkey]->number = dfa_preg_leaf_meta::ENDREG;
+                        $this->connection[0][dfa_preg_leaf_meta::ENDREG] = $table[$akey][$mkey]->leaf;
+                    } else {
+                        $table[$akey][$mkey]->number = ++$maxnum;
+                        $this->connection[0][$maxnum] = $table[$akey][$mkey]->leaf;
+                    }
+                    //forming firstpos
+                    if (in_array($akey, $firsta) && in_array($mkey, $firstm) && !($table[$akey][$mkey]->leaf->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $table[$akey][$mkey]->leaf->pregnode->charset == '')) {
+                        $newfirstposfortree[] = $table[$akey][$mkey]->number;
+                    }
+                }
+            }
+        }
+        $this->roots[0]->firstpos = $newfirstposfortree;
+            //forming fpmap
+        $this->map[0] = array();
+        foreach ($table as $akey=>$str) {
+            foreach ($str as $mkey=>$member) {
+                if ($member!==false) {
+                    foreach ($member->aindex as $key=>$aind) {
+                        $this->map[0][$member->number][] = $table[$aind][$member->mindex[$key]]->number;
+                    }
+                }
+            }
+        }
+        //delete empty symbols
+        foreach ($this->map[0] as $key=>$val) {
+            if ($this->connection[0][$key]->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $this->connection[0][$key]->pregnode->charset == '') {
+                unset($this->map[0][$key]);
+                unset($this->connection[0][$key]);
+            }
+        }
+        foreach ($this->map[0] as $key=>$val) {
+            foreach ($val as $key2=>$val2) {
+                if (!array_key_exists($val2, $this->connection[0])) {
+                    unset ($this->map[0][$key][$key2]);
+                }
+            }
+        }
+        
+    }
     /**
     * DFA node factory
     * @param pregnode preg_node child class instance
@@ -615,7 +788,7 @@ class dfa_preg_matcher extends preg_matcher {
             $tmp = new preg_node_finite_quant;
             $tmp->leftborder = 0;
             $tmp->rightborder = 1;
-			$tmp->greed = $node->greed;
+            $tmp->greed = $node->greed;
             $tmp->operands[0] = $node->operands[0];
             if ($node->leftborder == 0) {
                 $subroot->operands[0] =& $this->copy_preg_node($tmp);
@@ -698,9 +871,9 @@ class dfa_preg_matcher extends preg_matcher {
         $this->full = $result->full;
         $this->index_first[0] = $result->offset;
         $this->index_last[0] = $result->index+$result->offset;
-		if ($result->index==-1) {
-			$this->index_last[0]=-1;
-		}
+        if ($result->index==-1) {
+            $this->index_last[0]=-1;
+        }
         if ($result->next === 0) {
             $this->next = '';
         } else {
@@ -742,24 +915,25 @@ class dfa_preg_matcher extends preg_matcher {
     * Debug function draw finite automate with number number in human readable form
     * don't work without right to execute file
     * @param number number of drawing finite automate
-	* @param $subject type of drawing, may be: 'dfa', 'tree'
+    * @param $subject type of drawing, may be: 'dfa', 'tree', 'fp'
     */
     public function draw ($number, $subject) {
-		global $CFG;
-		if ($this->graphvizpath===1) {
-			echo '<br>ERROR: Missed path to GraphViz!<br>Can\'t draw '.$subject.'.';
-			return;
-		}
-		$tempfolder = 'W:\\home\\moodle.local\\www\\question\\type\\preg\\temp\\';
+        global $CFG;
+        if ($this->graphvizpath===1) {
+            echo '<br>ERROR: Missed path to GraphViz!<br>Can\'t draw '.$subject.'.';
+            return;
+        }
+        $tempfolder = 'W:\\home\\moodle.local\\www\\question\\type\\preg\\temp\\';
         $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
         $dotfile = fopen($tempfolder.'dotcode.dot', 'w');
         foreach ($dotcode as $dotstring) {
             fprintf($dotfile, "%s\n", $dotstring);
         }
-		fclose($dotfile);
+        fclose($dotfile);
         chdir($this->graphvizpath);
         exec('dot.exe -Tjpg -o"'.$tempfolder.$subject.$this->picnum.'.jpg" -Kdot "'.$tempfolder.'dotcode.dot"');
         echo '<IMG src="/question/type/preg/temp/'.$subject.$this->picnum.'.jpg" alt="Can\'t display '.$subject.' #'.$this->picnum.' graph.">';
+        'IMG src="/question/type/preg/temp/'.$subject.$this->picnum.'.jpg" alt="Can\'t display '.$subject.' #'.$this->picnum.' graph."';
         $this->picnum++;
     }
     /**
@@ -772,7 +946,11 @@ class dfa_preg_matcher extends preg_matcher {
         $dotcode[] = 'rankdir = LR;';
         foreach ($this->finiteautomates[$number] as $index=>$state) {
             foreach ($state->passages as  $leafcode=>$target) {
-                $symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+                if (is_object($this->connection[$number][$leafcode]->pregnode)) {
+                    $symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+                } else {
+                    $symbol = 'ERROR: '.var_export($this->connection[$number][$leafcode]->pregnode, true);
+                }
                 if ($target==-2) {
                     $target = '"Not build yet."';
                 } elseif ($target==-1) {
@@ -784,7 +962,7 @@ class dfa_preg_matcher extends preg_matcher {
         $dotcode[] = '};';
         return $dotcode;
     }
-	/**
+    /**
     * Debug function generate dot code for drawing syntax tree
     * @param number number of drawing syntax tree
     */
@@ -793,6 +971,21 @@ class dfa_preg_matcher extends preg_matcher {
         $dotcode[] = 'digraph {';
         $dotcode[] = 'rankdir = TB;';
         $this->roots[$number]->generate_dot_code($dotcode, $maxnum=0);
+        $dotcode[] = '};';
+        return $dotcode;
+    }
+    /**
+    * Debug function generate dot code for drawing follow position map
+    * @param number number of drawing finite automate
+    */
+    protected function generate_fp_dot_code($number) {
+        $dotcode = array('digraph {', 'rankdir=LR');
+        foreach ($this->map[$number] as $start=>$ends) {
+            foreach ($ends as $end) {
+                $dotcode[] = '"'.$start.': '.$this->connection[$number][$start]->pregnode->tohr().
+                        '"->"'.$end.': '.$this->connection[$number][$end]->pregnode->tohr().'";';
+            }
+        }
         $dotcode[] = '};';
         return $dotcode;
     }

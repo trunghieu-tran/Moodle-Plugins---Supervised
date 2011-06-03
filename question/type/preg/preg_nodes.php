@@ -523,8 +523,12 @@ class preg_leaf_combo extends preg_leaf {
 				$result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
 			} else {
 				$result->negative = false;
-				$result->charset = $leaf0->charset.$leaf1->charset;
+				$result->charset =  self::unite_charsets($leaf0->charset, $leaf1->charset);
 			}
+        } else if ($leaf0->type == preg_node::TYPE_LEAF_META && $leaf0->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+            $result = $leaf1;
+        } else if ($leaf1->type == preg_node::TYPE_LEAF_META && $leaf1->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+            $result = $leaf1;
 		} else {
 			$result = new preg_leaf_combo;
 			$result->subtype = preg_leaf_combo::SUBTYPE_UNITE;
@@ -534,13 +538,38 @@ class preg_leaf_combo extends preg_leaf {
 		return $result;
 	}
 	static public function get_cross($leaf0, $leaf1) {
-		die ('Implement preg_leaf_combo::get_unite(), before use it!');
+        if ($leaf0->type == preg_node::TYPE_LEAF_CHARSET && $leaf1->type == preg_node::TYPE_LEAF_CHARSET) {
+			$result = new preg_leaf_charset;
+			if ($leaf0->negative && $leaf1->negative) {
+				$result->negative = true;
+				$result->charset = self::unite_charsets($leaf0->charset, $leaf1->charset);
+			} elseif ($leaf0->negative) {
+				$result->negative = false;
+				$result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
+			} elseif ($leaf1->negative) {
+				$result->negative = false;
+				$result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
+			} else {
+				$result->negative = false;
+				$result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
+			}
+		} else if ($leaf0->type == preg_node::TYPE_LEAF_META && $leaf0->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+            $result = $leaf1;
+        } else if ($leaf1->type == preg_node::TYPE_LEAF_META && $leaf1->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+            $result = $leaf0;
+        } else {
+			$result = new preg_leaf_combo;
+			$result->subtype = preg_leaf_combo::SUBTYPE_CROSS;
+			$result->childs[0] = $leaf0;
+			$result->childs[1] = $leaf1;
+		}
+		return $result;
 	}
 	static public function cross_charsets($charset0, $charset1) {
 		$result = '';
 		for ($i=0; $i<strlen($charset0); $i++) {
 			if (strpos($charset1, $charset0[$i])!==false) {
-				$result.$charset0[$i];
+				$result.=$charset0[$i];
 			}
 		}
 		return $result;
@@ -549,11 +578,20 @@ class preg_leaf_combo extends preg_leaf {
 		$result = '';
 		for ($i=0; $i<strlen($charset0); $i++) {
 			if (strpos($charset1, $charset0[$i])===false) {
-				$result.$charset0[$i];
+				$result.=$charset0[$i];
 			}
 		}
 		return $result;
 	}
+    static public function unite_charsets($charset0, $charset1) {
+        $result = $charset1;
+		for ($i=0; $i<strlen($charset0); $i++) {
+			if (strpos($charset1, $charset0[$i])===false) {
+				$result.=$charset0[$i];
+			}
+		}
+		return $result;
+    }
 }
 
 class preg_leaf_backref extends preg_leaf {
@@ -735,7 +773,10 @@ class preg_node_assert extends preg_operator {
     public function name() {
         return 'node_assert';
     }
-
+	public function tohr() {
+		return 'node assert';
+	}
+	
     //TODO - ui_nodename()
 }
 
