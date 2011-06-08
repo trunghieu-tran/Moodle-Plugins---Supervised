@@ -86,10 +86,31 @@ class autotester extends grader{
         $tests = array();
         foreach($testrecs as $testrec) {
             $question = $DB->get_record('question', array('id' => $testrec->questionid));
-            $tests[$testrec->id] = $question->name;
+            $tests[$question->id] = $question->name;
         }
         foreach($tasksrecs as $taskrec) {
-            $mform->addElement('select', 'task' . $taskrec->id, $taskrec->name, $tests);
+            $mform->addElement('select', 'autotester_task' . $taskrec->id, $taskrec->name, $tests);
         }
+    }
+    public static function save_settings($data, $poasassignmentid) {
+        global $DB;
+        $tasksrecs = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $poasassignmentid));
+        foreach ($tasksrecs as $taskrec) {
+            $DB->delete_records('poasassignment_gr_autotester', array('taskid' => $taskrec->id));
+            $rec = new stdClass();
+            $rec->taskid = $taskrec->id;
+            $name = 'autotester_task' . $taskrec->id;
+            $rec->questionid = $data->$name;
+            $DB->insert_record('poasassignment_gr_autotester', $rec);
+        }
+    }
+    public static function get_settings($poasassignmentid) {
+        global $DB;
+        $recs = $DB->get_records('poasassignment_gr_autotester', array());
+        $data = array();
+        foreach($recs as $rec) {
+            $data['autotester_task' . $rec->taskid] = $rec->questionid;
+        }
+        return $data;
     }
 }
