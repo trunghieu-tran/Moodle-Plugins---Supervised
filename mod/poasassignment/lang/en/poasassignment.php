@@ -204,3 +204,4 @@ $string['fieldisrandom'] = 'Field is random';
 $string['fieldisfile'] = 'Field is file';
 $string['currenttaskgiver'] = 'Current taskgiver';
 $string['category'] = 'Category';
+$string['errornograderused'] = 'Graders are not used in this instance';

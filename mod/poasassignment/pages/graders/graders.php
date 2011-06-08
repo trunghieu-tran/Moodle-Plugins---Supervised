@@ -15,6 +15,14 @@ class graders_page extends abstract_page {
         return 'mod/poasassignment:grade';
     }
     
+    function has_satisfying_parameters() {
+        global $DB;
+        if(!$DB->record_exists('poasassignment_used_graders', 
+                               array('poasassignmentid' => $this->poasassignment->id))) {
+            $this->lasterror = 'errornograderused';
+            return false;
+        }
+    }
     function view() {
         global $DB,$OUTPUT;
         $id = $this->cm->id;
