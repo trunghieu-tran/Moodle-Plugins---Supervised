@@ -125,6 +125,9 @@ abstract class grader {
     public static function show_settings($mform, $usedgraderid, $poasassignmentid) {
     }
     
+    public static function get_settings($poasassignmentid) {
+    }
+    
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
     private $testresults;
     private $successfultestscount;
