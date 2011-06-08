@@ -162,7 +162,11 @@ class parameterchoice extends taskgiver{
         return $fields;
     }
     public function delete_settings($poasassignmentid) {
-        //TODO
+        global $DB;
+        $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $poasassignmentid));
+        foreach($fields as $field) {
+            $DB->delete_records('poasassignment_paramch', array('fieldid' => $field->id));
+        }
     }
 }
 class taskgiver_form extends moodleform {
