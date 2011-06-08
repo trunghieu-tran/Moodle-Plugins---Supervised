@@ -831,21 +831,24 @@ class poasassignment_model {
     }
     // Runs after adding submission. Calls all graders, used in module.
     public function test_attempt($attemptid) {
+        echo 'testing';
         global $DB;
         $usedgraders = $DB->get_records('poasassignment_used_graders', 
                                         array('poasassignmentid' => $this->poasassignment->id));
         //$graderrecords = array();
         foreach ($usedgraders as $usedgrader) {
+            echo $usedgrader->id;
             $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgrader->graderid));
             
             require_once($graderrecord->path);
             $gradername = $graderrecord->name;
             $grader = new $gradername;
             $rating = $grader->test_attempt($attemptid);
+            echo $rating ;
             
             $criterions = $DB->get_records('poasassignment_criterions', 
                                            array('poasassignmentid' => $this->poasassignment->id,
-                                                 'sourceid' => $usedgrader->id));
+                                                 'sourceid' => $usedgrader->graderid));
             foreach ($criterions as $criterion) {
                 $ratingvalue = new stdClass();
                 $ratingvalue->attemptid = $attemptid;
@@ -857,6 +860,7 @@ class poasassignment_model {
                 $ratingvalue->value = $rating;
                 //if ($attempt->draft == 0)
                 //    $ratingvalue->value = $data->$elementname;
+                echo 'adding grade';
                 $ratingvalueid = $DB->insert_record('poasassignment_rating_values', $ratingvalue);
             }
             
