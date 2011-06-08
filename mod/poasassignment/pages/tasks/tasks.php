@@ -34,7 +34,7 @@ class tasks_page extends abstract_page {
         $hascapmanage=has_capability('mod/poasassignment:managetasks',
                             get_context_instance(CONTEXT_MODULE, $this->cm->id));
 
-        $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->howtochoosetask));
+        $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
         require_once ($tg->path);
         $taskgivername = $tg->name;
         $taskgiver = new $taskgivername();

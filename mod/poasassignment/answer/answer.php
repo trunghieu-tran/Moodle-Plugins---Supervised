@@ -2,7 +2,7 @@
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class poasassignment_answer {
 
-    var $pluginid;
+    var $answerid;
     
     function poasassignment_answer() {
     }
@@ -34,11 +34,11 @@ class poasassignment_answer {
     function delete_settings_type($poasassignmentid, $type) {
     }
     
-    // Returns true, if plugin with $pluginid subplugin is used in poasassignment with $poasassignmentid
-    static function used_in_poasassignment($pluginid,$poasassignmentid) {
+    // Returns true, if plugin with $answerid subplugin is used in poasassignment with $poasassignmentid
+    static function used_in_poasassignment($answerid,$poasassignmentid) {
         global $DB;
         return $DB->record_exists('poasassignment_ans_stngs',array('poasassignmentid'=>$poasassignmentid,
-                                                                'pluginid'=>$pluginid));    
+                                                                'answerid'=>$answerid));    
     }
     
     function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
@@ -61,7 +61,7 @@ class poasassignment_answer {
         }
         if($attemptscount>0) {
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
-            if(!$DB->record_exists('poasassignment_submissions',array('pluginid'=>$this->pluginid,'attemptid'=>$attempt->id)))
+            if(!$DB->record_exists('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id)))
                 $attemptid=$attempt->id;
             else {
                 $newattempt->attemptnumber=$attemptscount+1;

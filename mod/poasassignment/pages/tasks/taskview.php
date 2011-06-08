@@ -112,7 +112,7 @@ else
 $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$poasmodel->assignee->id));
 
 if (!$assignee ||($assignee && ($assignee->taskid==0 || !isset($assignee->taskid))))
-    if ($poasassignment->howtochoosetask==STUDENTSCHOICE)
+    if ($poasassignment->taskgiverid==STUDENTSCHOICE)
         echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/warning.php?id='.$id.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id), get_string('taketask','poasassignment'));
 //$mform->display();
 echo $OUTPUT->footer();
