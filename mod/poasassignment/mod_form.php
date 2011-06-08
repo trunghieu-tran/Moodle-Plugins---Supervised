@@ -104,12 +104,12 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         }
         
         $mform->addElement('select', 
-                           'howtochoosetask', 
-                           get_string('howtochoosetask', 'poasassignment'),
+                           'taskgiverid', 
+                           get_string('taskgiverid', 'poasassignment'),
                            $names);
                                 
-        $mform->disabledIf('howtochoosetask', 'activateindividualtasks');
-        $mform->addHelpButton('howtochoosetask', 'howtochoosetask', 'poasassignment');
+        $mform->disabledIf('taskgiverid', 'activateindividualtasks');
+        $mform->addHelpButton('taskgiverid', 'taskgiverid', 'poasassignment');
 
         $mform->addElement('checkbox', 'secondchoice', get_string('secondchoice', 'poasassignment'));
         $mform->disabledIf('secondchoice', 'activateindividualtasks');
@@ -174,9 +174,9 @@ class mod_poasassignment_mod_form extends moodleform_mod {
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_poasassignment', 'poasassignmentfiles', 0, array('subdirs'=>true));
             $default_values['poasassignmentfiles'] = $draftitemid;
         }
-        if(isset($default_values['howtochoosetask'])) {
-            //echo ' уменьшаем с '.$default_values['howtochoosetask'];
-            $default_values['howtochoosetask'] = $default_values['howtochoosetask']/*-1*/;
+        if(isset($default_values['taskgiverid'])) {
+            //echo ' уменьшаем с '.$default_values['taskgiverid'];
+            $default_values['taskgiverid'] = $default_values['taskgiverid']/*-1*/;
         }
         
     }

@@ -24,7 +24,7 @@ class autotester extends grader{
         global $DB;
         $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
         if($textanswerrec) {
-            $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'pluginid' => $textanswerrec->id));
+            $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
             //echo $submission->value;
             $f = fopen('grader\autotester\attempts\attempt' . $attemptid . '.cpp', 'w+');
             fwrite($f, $submission->value);

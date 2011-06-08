@@ -9,7 +9,7 @@ class answer_text extends poasassignment_answer {
         $plugin = $DB->get_record('poasassignment_answers', 
                                   array('name' => 'answer_text'));
         if ($plugin) {
-            $this->pluginid = $plugin->id;  
+            $this->answerid = $plugin->id;  
         }        
     }
     
@@ -26,7 +26,7 @@ class answer_text extends poasassignment_answer {
                            'answertext', 
                            get_string('answertext','poasassignmentanswertypes_answer_text'));
         $conditions = array('poasassignmentid' => $poasassignmentid, 
-                            'pluginid' => $this->pluginid);
+                            'answerid' => $this->answerid);
         if ($DB->record_exists('poasassignment_ans_stngs',$conditions))
             $mform->setDefault('answertext','true');
         $mform->addHelpButton('answertext', 
@@ -56,7 +56,7 @@ class answer_text extends poasassignment_answer {
             $attempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
         
         if($attempt) {
-            $submission=$DB->get_record('poasassignment_submissions',array('pluginid'=>$this->pluginid,'attemptid'=>$attempt->id));
+            $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
             if($submission) {
                 if($needbox)
                     $html.= $OUTPUT->box_start();
@@ -74,14 +74,14 @@ class answer_text extends poasassignment_answer {
         global $DB;
         if ($this->checked) {
             $settingsrecord->poasassignmentid=$id;
-            $settingsrecord->pluginid=$this->pluginid;
+            $settingsrecord->answerid=$this->answerid;
             $DB->insert_record('poasassignment_ans_stngs',$settingsrecord);
         }
     }
     function update_settings($poasassignment) {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignment->id,
-                'pluginid'=>$this->pluginid);
+                'answerid'=>$this->answerid);
         $recordexists = $DB->record_exists('poasassignment_ans_stngs',$conditions);
         if (!$recordexists)
             $this->save_settings($poasassignment,$poasassignment->id);
@@ -91,7 +91,7 @@ class answer_text extends poasassignment_answer {
     function delete_settings($poasassignmentid) {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignmentid,
-                'pluginid'=>$this->pluginid);
+                'answerid'=>$this->answerid);
         return $DB->delete_records('poasassignment_ans_stngs',$conditions);
     }
     function configure_flag($poasassignment) {
@@ -107,7 +107,7 @@ class answer_text extends poasassignment_answer {
 
         $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft),isset($data->final));
         $rec->assigneeid=$assigneeid;
-        $rec->pluginid=$this->pluginid;
+        $rec->answerid=$this->answerid;
         $rec->value=$data->text_editor;
         $DB->insert_record('poasassignment_submissions',$rec);
         return $rec->attemptid;
@@ -122,7 +122,7 @@ class answer_text extends poasassignment_answer {
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount));
             if($attempt) {
-                $submission=$DB->get_record('poasassignment_submissions',array('pluginid'=>$this->pluginid,'attemptid'=>$attempt->id));
+                $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
                 if($submission) 
                     $data->text_editor=$submission->value;
             }

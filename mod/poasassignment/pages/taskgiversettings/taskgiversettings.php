@@ -30,7 +30,7 @@ class taskgiversettings_page extends abstract_page {
         
         $id = $this->cm->id;
         $poasassignmentid = $this->poasassignment->id;
-        $taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $this->poasassignment->howtochoosetask));
+        $taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $this->poasassignment->taskgiverid));
         require_once($taskgiverrec->path);
         $taskgivername = $taskgiverrec->name;
         $taskgiver = new $taskgivername();
