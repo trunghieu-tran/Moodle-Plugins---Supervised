@@ -206,12 +206,12 @@ class poasassignment_model {
         $this->delete_files($cm->id);
         $DB->delete_records('poasassignment', array('id' => $id));
         $DB->delete_records('poasassignment_tasks', array('poasassignmentid' => $id));
-        $types=$DB->get_records('poasassignment_answer_settings', array('poasassignmentid' => $id));
+        $types=$DB->get_records('poasassignment_ans_stngs', array('poasassignmentid' => $id));
         foreach ( $types as $type) {
             $DB->delete_records('poasassignment_answers', array('id' => $type->pluginid));
         }
         $DB->delete_records('poasassignment_used_graders',array('poasassignmentid' => $id));
-        $DB->delete_records('poasassignment_answer_settings', array('poasassignmentid' => $id));
+        $DB->delete_records('poasassignment_ans_stngs', array('poasassignmentid' => $id));
         $DB->delete_records('poasassignment_criterions', array('poasassignmentid' => $id));
         $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $id));
         foreach ( $fields as $field) {

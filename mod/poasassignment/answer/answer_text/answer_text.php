@@ -27,7 +27,7 @@ class answer_text extends poasassignment_answer {
                            get_string('answertext','poasassignmentanswertypes_answer_text'));
         $conditions = array('poasassignmentid' => $poasassignmentid, 
                             'pluginid' => $this->pluginid);
-        if ($DB->record_exists('poasassignment_answer_settings',$conditions))
+        if ($DB->record_exists('poasassignment_ans_stngs',$conditions))
             $mform->setDefault('answertext','true');
         $mform->addHelpButton('answertext', 
                               'answertext', 
@@ -75,14 +75,14 @@ class answer_text extends poasassignment_answer {
         if ($this->checked) {
             $settingsrecord->poasassignmentid=$id;
             $settingsrecord->pluginid=$this->pluginid;
-            $DB->insert_record('poasassignment_answer_settings',$settingsrecord);
+            $DB->insert_record('poasassignment_ans_stngs',$settingsrecord);
         }
     }
     function update_settings($poasassignment) {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignment->id,
                 'pluginid'=>$this->pluginid);
-        $recordexists = $DB->record_exists('poasassignment_answer_settings',$conditions);
+        $recordexists = $DB->record_exists('poasassignment_ans_stngs',$conditions);
         if (!$recordexists)
             $this->save_settings($poasassignment,$poasassignment->id);
         if ($recordexists && !$this->checked)
@@ -92,7 +92,7 @@ class answer_text extends poasassignment_answer {
         global $DB;
         $conditions = array('poasassignmentid'=>$poasassignmentid,
                 'pluginid'=>$this->pluginid);
-        return $DB->delete_records('poasassignment_answer_settings',$conditions);
+        return $DB->delete_records('poasassignment_ans_stngs',$conditions);
     }
     function configure_flag($poasassignment) {
         if (isset($poasassignment->answertext)) {
