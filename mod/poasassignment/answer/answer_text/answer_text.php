@@ -37,7 +37,8 @@ class answer_text extends poasassignment_answer {
         $mform->addElement('header',
                            'answertextheader',
                            get_string('answertext','poasassignmentanswertypes_answer_text'));
-        $mform->addElement('htmleditor', 
+        //$mform->addElement('htmleditor', 
+        $mform->addElement('textarea', 
                            'text_editor', 
                            get_string('answertexteditor','poasassignmentanswertypes_answer_text'));
         $mform->closeHeaderBefore('answertextheader');

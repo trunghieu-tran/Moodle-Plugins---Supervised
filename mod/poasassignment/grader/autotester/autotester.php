@@ -21,7 +21,36 @@ class autotester extends grader{
     }
     
     public function test_attempt($attemptid) {
+        global $DB;
+        $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
+        if($textanswerrec) {
+            $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'pluginid' => $textanswerrec->id));
+            //echo $submission->value;
+            $f = fopen('grader\autotester\attempts\attempt' . $attemptid . '.cpp', 'w+');
+            fwrite($f, $submission->value);
+            fclose($f);
+            
+            $runf = fopen('grader\autotester\runattempt' . $attemptid . '.bat', 'w+');
+            $text = 'cd grader\autotester';  
+            $text .= "\n";
+            $text .= 'call C\vcvarsall.bat';
+            $text .= "\n";
+            $text .= 'C\bin\cl.exe ';
+            $text .= '/Feattempts\attempt' . $attemptid . '.exe ';
+            $text .= '/Foattempts\attempt' . $attemptid . '.obj ';
+            $text .= 'attempts\attempt' . $attemptid . '.cpp ';
+            $text .= "\n";
+            fwrite($runf, $text);
+            fclose($runf);            
+        }
         return 50;
+    }
+    
+    public function clean_files($attemptid) {
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+        unlink('grader\autotester\runattempt' . $attemptid . '.bat');
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe');
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.obj');
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
