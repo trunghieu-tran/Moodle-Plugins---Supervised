@@ -12,13 +12,13 @@ class criterionsedit_form extends moodleform {
         $repeatarray[] = &MoodleQuickForm::createElement('text', 'name', get_string('criterionname','poasassignment'),array('size'=>45));
         $repeatarray[] = $mform->createElement('htmleditor', 'description', get_string('criteriondescription','poasassignment'));
         $repeatarray[] = &MoodleQuickForm::createElement('text', 'weight', get_string('criterionweight','poasassignment'));
-        $sources[] = 'manually';
+        $sources[0] = 'manually';
         $usedgraders = $DB->get_records('poasassignment_used_graders',array('poasassignmentid' => $instance['poasassignmentid']));
         foreach($usedgraders as $usedgraderrecord) {
             $grader = $DB->get_record('poasassignment_graders',array('id' => $usedgraderrecord->graderid));
             $gradername = $grader->name;
             require_once($grader->path);
-            $sources[] = $gradername::name();
+            $sources[$usedgraderrecord->graderid] = $gradername::name();
             
             // adding graders identificators - hidden elements to form
             
