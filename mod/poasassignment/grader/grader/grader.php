@@ -120,9 +120,9 @@ abstract class grader {
      * Shows settings of the grader. 
      * @param $mform moodle form, where grader's options are placed
      * @param $usedgraderid id of grader in poasassignment_used_graders table
+     * @param $poasassignmentid id 
      */
-    public static function show_settings($mform, $usedgraderid) {
-        
+    public static function show_settings($mform, $usedgraderid, $poasassignmentid) {
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
