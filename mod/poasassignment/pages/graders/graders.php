@@ -22,6 +22,7 @@ class graders_page extends abstract_page {
             $this->lasterror = 'errornograderused';
             return false;
         }
+        return true;
     }
     function view() {
         global $DB,$OUTPUT;
