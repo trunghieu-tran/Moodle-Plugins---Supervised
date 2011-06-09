@@ -110,8 +110,11 @@ class poasassignment_model {
     function add_instance() {
         global $DB;
         $this->poasassignment->flags=$this->configure_flags();
-        $this->poasassignment->timemodified=time();
-        //$this->poasassignment->taskgiverid++;
+        $this->poasassignment->timemodified = time();
+        if(!isset($this->poasassignment->taskgiverid)) {
+            $this->poasassignment->taskgiverid = 0;
+        }
+        
         $this->poasassignment->id = $DB->insert_record('poasassignment', $this->poasassignment);
         foreach ($this->plugins as $plugin) {
             require_once($plugin->path);
@@ -152,6 +155,11 @@ class poasassignment_model {
     function update_instance() {
         global $DB;
         $this->poasassignment->flags = $this->configure_flags();
+        $this->poasassignment->timemodified = time();
+        if(!isset($this->poasassignment->taskgiverid)) {
+            $this->poasassignment->taskgiverid = 0;
+        }
+        
 
         foreach ($this->plugins as $plugin) {
             require_once($plugin->path);
@@ -184,7 +192,7 @@ class poasassignment_model {
         }
         //$this->poasassignment->taskgiverid++;
         $oldpoasassignment = $DB->get_record('poasassignment', array('id' => $this->poasassignment->id));
-        if($oldpoasassignment->taskgiverid != $this->poasassignment->taskgiverid) {
+        if($oldpoasassignment->taskgiverid != $this->poasassignment->taskgiverid && $oldpoasassignment->taskgiverid > 0) {
             $this->delete_taskgiver_settings($oldpoasassignment->id, $oldpoasassignment->taskgiverid);
         }
         $poasassignmentid = $DB->update_record('poasassignment', $this->poasassignment);
@@ -225,6 +233,7 @@ class poasassignment_model {
         $fields=$DB->get_records('poasassignment_fields', array('poasassignmentid' => $id));
         foreach ( $fields as $field) {
             $DB->delete_records('poasassignment_task_values', array('fieldid' => $field->id));
+            $DB->delete_records('poasassignment_variants', array('fieldid' => $field->id));
         }
         $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $id));
         $this->delete_taskgiver_settings($id, $this->poasassignment->taskgiverid);
