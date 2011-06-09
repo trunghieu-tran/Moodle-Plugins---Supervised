@@ -452,7 +452,7 @@ class poasassignment_model {
                 $data->name[$i] = $criterion->name;
                 $data->description[$i] = $criterion->description;
                 $data->weight[$i] = $criterion->weight;
-                $data->source[$i] = $criterion->sourceid;
+                $data->source[$i] = $criterion->graderid;
                 $i++;
             }
             return $data;
@@ -482,15 +482,15 @@ class poasassignment_model {
                 if ($data->source[$i] > 0) {
                     $name = 'grader'.$data->source[$i];
                     // $data->$name contains id of our used grader                    
-                    $rec->sourceid = $data->$name;                    
+                    $rec->graderid = $data->$name;                    
                 }
                 else
-                    $rec->sourceid = 0;
+                    $rec->graderid = 0;
                 
                 $rec->id = $DB->insert_record('poasassignment_criterions', $rec);
                 
-                /* if ($rec->sourceid > 0) {
-                    $usedgrader = $DB->get_record('poasassignment_used_graders', array('id' => $rec->sourceid));
+                /* if ($rec->graderid > 0) {
+                    $usedgrader = $DB->get_record('poasassignment_used_graders', array('id' => $rec->graderid));
                     // if criterion for this grader really exists - create new record in DB
                     if ($DB->record_exists('poasassignment_criterions', array('id' => $usedgrader->criterionid))) {
                         $usedgrader->criterionid = $rec->id;
@@ -848,7 +848,7 @@ class poasassignment_model {
             
             $criterions = $DB->get_records('poasassignment_criterions', 
                                            array('poasassignmentid' => $this->poasassignment->id,
-                                                 'sourceid' => $usedgrader->graderid));
+                                                 'graderid' => $usedgrader->graderid));
             foreach ($criterions as $criterion) {
                 $ratingvalue = new stdClass();
                 $ratingvalue->attemptid = $attemptid;
