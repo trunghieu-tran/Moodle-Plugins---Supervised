@@ -206,7 +206,7 @@ class poasassignment_model {
         if (! $DB->record_exists('poasassignment', array('id' => $id))) {
             return false;
         }
-        $cm = get_coursemodule_from_instance('poasassignment',$id);
+        $cm = get_coursemodule_from_instance('poasassignment', $id);
         $this->poasassignment=$DB->get_record('poasassignment',array('id'=>$id));
         
         $poasassignment_answer= new poasassignment_answer();
@@ -227,7 +227,8 @@ class poasassignment_model {
             $DB->delete_records('poasassignment_task_values', array('fieldid' => $field->id));
         }
         $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $id));
-        delete_taskgiver_settings($id, $this->poasassignment->taskgiverid);
+        $this->delete_taskgiver_settings($id, $this->poasassignment->taskgiverid);
+        //delete_course_module($cm->id);
         return true;
     }
     
@@ -1030,7 +1031,6 @@ class poasassignment_model {
         return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grades, $params);
     }
     function grade_item_delete() {
-        echo __FUNCTION__;
         global $CFG;
         require_once($CFG->libdir.'/gradelib.php');
         if (!isset($this->poasassignment->courseid)) {
@@ -1164,6 +1164,8 @@ class poasassignment_model {
     }
     public function delete_taskgiver_settings($poasassignmentid, $taskgiverid) {
         global $DB;
+        if(!($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS))
+            return;
         if($taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $taskgiverid))) {
             require_once($taskgiverrec->path);
             $taskgivername = $taskgiverrec->name;
