@@ -132,6 +132,15 @@ class poasassignment_model {
         }
         $this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         $this->save_files($this->poasassignment->poasassignmentfiles, 'poasassignmentfiles', 0);
+        
+        // Create 1 criterion
+        $criterion = new stdClass();
+        $criterion->name = get_string('standardcriterionname', 'poasassignment');
+        $criterion->description = get_string('standardcriteriondesc', 'poasassignment');
+        $criterion->weight = 1;
+        $criterion->graderid = 0;
+        $criterion->poasassignmentid = $this->poasassignment->id;
+        $DB->insert_record('poasassignment_criterions', $criterion);
         //$this->grade_item_update();
         return $this->poasassignment->id;
     }
