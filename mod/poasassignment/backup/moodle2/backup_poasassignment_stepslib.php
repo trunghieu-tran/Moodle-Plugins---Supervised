@@ -53,7 +53,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         //$submission->annotate_ids('user', 'teacher');
 
         // Define file annotations
-        $poasassignment->annotate_files('mod_poasassignment', 'intro', null); // This file area hasn't itemid
+        $poasassignment->annotate_files('mod_poasassignment', 'poasassignmentfiles', null); // This file area hasn't itemid
         //$submission->annotate_files('mod_assignment', 'submission', 'id');
         //$submission->annotate_files('mod_assignment', 'response', 'id');
 

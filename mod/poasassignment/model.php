@@ -74,7 +74,7 @@ class poasassignment_model {
             $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
         }
         else {
-            echo 'Constructing model without id';
+            //echo 'Constructing model without id';
         }
         if (!$this->assignee)
             $this->assignee->id=0;
@@ -831,20 +831,20 @@ class poasassignment_model {
     }
     // Runs after adding submission. Calls all graders, used in module.
     public function test_attempt($attemptid) {
-        echo 'testing';
+        //echo 'testing';
         global $DB;
         $usedgraders = $DB->get_records('poasassignment_used_graders', 
                                         array('poasassignmentid' => $this->poasassignment->id));
         //$graderrecords = array();
         foreach ($usedgraders as $usedgrader) {
-            echo $usedgrader->id;
+            //echo $usedgrader->id;
             $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgrader->graderid));
             
             require_once($graderrecord->path);
             $gradername = $graderrecord->name;
             $grader = new $gradername;
             $rating = $grader->test_attempt($attemptid);
-            echo $rating ;
+            //echo $rating ;
             
             $criterions = $DB->get_records('poasassignment_criterions', 
                                            array('poasassignmentid' => $this->poasassignment->id,
@@ -860,7 +860,7 @@ class poasassignment_model {
                 $ratingvalue->value = $rating;
                 //if ($attempt->draft == 0)
                 //    $ratingvalue->value = $data->$elementname;
-                echo 'adding grade';
+                //echo 'adding grade';
                 $ratingvalueid = $DB->insert_record('poasassignment_rating_values', $ratingvalue);
             }
             
@@ -1021,6 +1021,7 @@ class poasassignment_model {
         return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grades, $params);
     }
     function grade_item_delete() {
+        echo __FUNCTION__;
         global $CFG;
         require_once($CFG->libdir.'/gradelib.php');
         if (!isset($this->poasassignment->courseid)) {
