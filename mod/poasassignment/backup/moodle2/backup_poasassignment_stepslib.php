@@ -14,29 +14,18 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
                 'taskgiverid', 'uniqueness', 'penalty'));
                 
         $criterions = new backup_nested_element('criterions');
-        
         $criterion = new backup_nested_element('criterion', array('id'), array(
                 'name', 'weight', 'description', 'graderid'));
                 
         $answersettings = new backup_nested_element('answersettings');
-        
         $answersetting = new backup_nested_element('answersetting', array('id'), array(
                 'name', 'value', 'answerid'));
+                
+        $fields = new backup_nested_element('fields');
+        $field = new backup_nested_element('field', array('id'), array(
+                'ftype', 'name', 'showintable', 'valuemax', 'valuemin',
+                'secretfield', 'random', 'description'));
         
-//        $assignment = new backup_nested_element('assignment', array('id'), array(
-//            'name', 'intro', 'introformat', 'assignmenttype',
-//            'resubmit', 'preventlate', 'emailteachers', 'var1',
-//            'var2', 'var3', 'var4', 'var5',
-//            'maxbytes', 'timedue', 'timeavailable', 'grade',
-//            'timemodified'));
-
-//        $submissions = new backup_nested_element('submissions');
-
-//        $submission = new backup_nested_element('submission', array('id'), array(
-//            'userid', 'timecreated', 'timemodified', 'numfiles',
-//            'data1', 'data2', 'grade', 'submissioncomment',
-//            'format', 'teacher', 'timemarked', 'mailed'));
-
         // Build the tree
 
         // Apply for 'assignment' subplugins optional stuff at assignment level (not multiple)
@@ -48,8 +37,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $poasassignment->add_child($answersettings);
         $answersettings->add_child($answersetting);
-//        $assignment->add_child($submissions);
-//        $submissions->add_child($submission);
+        
+        $poasassignment->add_child($fields);
+        $fields->add_child($field);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -58,6 +48,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $poasassignment->set_source_table('poasassignment', array('id' => backup::VAR_ACTIVITYID));
         $criterion->set_source_table('poasassignment_criterions', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $answersetting->set_source_table('poasassignment_ans_stngs', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+        $field->set_source_table('poasassignment_fields', array('poasassignmentid' => backup::VAR_ACTIVITYID));
 
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
