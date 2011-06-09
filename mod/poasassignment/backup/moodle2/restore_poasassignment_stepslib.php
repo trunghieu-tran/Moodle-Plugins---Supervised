@@ -11,6 +11,7 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('poasassignment_criterion', '/activity/poasassignment/criterions/criterion');
         $paths[] = new restore_path_element('poasassignment_answersetting', '/activity/poasassignment/answersettings/answersetting');
         $paths[] = new restore_path_element('poasassignment_field', '/activity/poasassignment/fields/field');
+        $paths[] = new restore_path_element('poasassignment_variant', '/activity/poasassignment/fields/field/variants/variant');
 
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
@@ -82,6 +83,17 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         
         $newitemid = $DB->insert_record('poasassignment_fields', $data);
         $this->set_mapping('poasassignment_fields', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_variant($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->fieldid = $this->get_mappingid('poasassignment_fields', $data->fieldid);
+        
+        $newitemid = $DB->insert_record('poasassignment_variants', $data);
+        $this->set_mapping('poasassignment_variants', $oldid, $newitemid);
     }
     /* protected function process_assignment_submission($data) {
         global $DB;
