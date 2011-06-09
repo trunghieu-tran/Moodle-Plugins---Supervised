@@ -641,8 +641,8 @@ class poasassignment_model {
         $field = $DB->get_record('poasassignment_fields',array('id'=>$fieldid));
         $default_values['name']=$field->name;
         $default_values['ftype']=$field->ftype;
-        $default_values['minvalue']=$field->minvalue;
-        $default_values['maxvalue']=$field->maxvalue;
+        $default_values['valuemin']=$field->valuemin;
+        $default_values['valuemax']=$field->valuemax;
         $default_values['showintable']=$field->showintable;
         return $default_values;
     }
@@ -706,7 +706,7 @@ class poasassignment_model {
             }
         }
         if ($data->ftype==FLOATING || $data->ftype==NUMBER) {
-            if ($data->maxvalue==$data->minvalue)
+            if ($data->valuemax==$data->valuemin)
                 $data->random=0;
         }
         $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
@@ -739,7 +739,7 @@ class poasassignment_model {
             }
         }
         if ($field->ftype==FLOATING || $field->ftype==NUMBER) {
-            if ($field->maxvalue==$field->minvalue)
+            if ($field->valuemax==$field->valuemin)
                 $field->random=0;
         }
         return $DB->update_record('poasassignment_fields',$field);
@@ -878,11 +878,11 @@ class poasassignment_model {
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($fields as $field) {
             if ($field->random) {
-                if (!($field->minvalue==0 && $field->maxvalue==0)) {
+                if (!($field->valuemin==0 && $field->valuemax==0)) {
                     if ($field->ftype==NUMBER)
-                        $randvalue=rand($field->minvalue,$field->maxvalue);
+                        $randvalue=rand($field->valuemin,$field->valuemax);
                     if ($field->ftype==FLOATING)
-                        $randvalue=(float)rand($field->minvalue*100,$field->maxvalue*100)/100;
+                        $randvalue=(float)rand($field->valuemin*100,$field->valuemax*100)/100;
                 }
                 else {
                     if ($field->ftype==NUMBER)

@@ -110,14 +110,14 @@ class grade_form extends moodleform {
         // $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$data['poasassignmentid']));
         // foreach($fields as $field) {
             // if(!$field->random &&($field->ftype==FLOATING || $field->ftype==NUMBER)) {
-                // if(!($field->minvalue==0 && $field->maxvalue==0 )) {
-                    // if($data['field'.$field->id]>$field->maxvalue || $data['field'.$field->id]<$field->minvalue) {
+                // if(!($field->valuemin==0 && $field->valuemax==0 )) {
+                    // if($data['field'.$field->id]>$field->valuemax || $data['field'.$field->id]<$field->valuemin) {
                     // $errors['field'.$field->id]=get_string('valuemustbe','poasassignment').' '.
                                                 // get_string('morethen','poasassignment').' '.
-                                                // $field->minvalue.' '.
+                                                // $field->valuemin.' '.
                                                 // get_string('and','poasassignment').' '.
                                                 // get_string('lessthen','poasassignment').' '.
-                                                // $field->maxvalue;
+                                                // $field->valuemax;
                     // return $errors;
                     // }
                 // }
