@@ -94,6 +94,7 @@ function poasassignment_update_instance($poasassignment) {
  * @return boolean Success/Failure
  */
 function poasassignment_delete_instance($id) {
+    echo __FUNCTION__;
     global $DB;
     $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));    
     $poasmodel = poasassignment_model::get_instance($poasassignment);
@@ -330,6 +331,7 @@ function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
  * @return object poasassignment
  */
 function poasassignment_grade_item_delete($poasassignment) {
+    echo __FUNCTION__;
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     return($poasmodel->grade_item_delete());
 }

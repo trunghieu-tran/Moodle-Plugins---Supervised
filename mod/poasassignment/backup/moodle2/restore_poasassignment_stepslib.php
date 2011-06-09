@@ -31,8 +31,12 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        $data->timedue = $this->apply_date_offset($data->timedue);
-        $data->timeavailable = $this->apply_date_offset($data->timeavailable);
+        if(isset($data->timedue)) {
+            $data->timedue = $this->apply_date_offset($data->timedue);
+        }
+        if(isset($data->timeavailable)) {
+            $data->timeavailable = $this->apply_date_offset($data->timeavailable);
+        }
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
         //if ($data->grade < 0) { // scale found, get mapping
@@ -65,7 +69,7 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
 
     protected function after_execute() {
         // Add assignment related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_poasassignment', 'intro', null);
+        $this->add_related_files('mod_poasassignment', 'poasassignmentfiles', null);
         // Add assignment submission files, matching by assignment_submission itemname
         //$this->add_related_files('mod_assignment', 'submission', 'assignment_submission');
         //$this->add_related_files('mod_assignment', 'response', 'assignment_submission');
