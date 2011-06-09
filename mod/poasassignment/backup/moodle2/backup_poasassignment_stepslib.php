@@ -12,6 +12,11 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
                 'name', 'intro', 'introformat', 'timemodified', 
                 'availabledate', 'choicedate', 'deadline', 'flags',
                 'taskgiverid', 'uniqueness', 'penalty'));
+                
+        $criterions = new backup_nested_element('criterions');
+        
+        $criterion = new backup_nested_element('criterion', array('id'), array(
+                'name', 'weight', 'description', 'graderid'));
         
 //        $assignment = new backup_nested_element('assignment', array('id'), array(
 //            'name', 'intro', 'introformat', 'assignmenttype',
@@ -33,6 +38,8 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         // Remember that order is important, try moving this line to the end and compare XML
 //        $this->add_subplugin_structure('assignment', $assignment, false);
 
+        $poasassignment->add_child($criterions);
+        $criterions->add_child($criterion);
 //        $assignment->add_child($submissions);
 //        $submissions->add_child($submission);
 
@@ -41,6 +48,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
 
         // Define sources
         $poasassignment->set_source_table('poasassignment', array('id' => backup::VAR_ACTIVITYID));
+        $criterion->set_source_table('poasassignment_criterions', array('poasassignmentid' => backup::VAR_ACTIVITYID));
 
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {

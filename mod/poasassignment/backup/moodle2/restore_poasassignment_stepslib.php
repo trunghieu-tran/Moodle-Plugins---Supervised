@@ -7,11 +7,11 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
 
-        $poasassignment = new restore_path_element('poasassignment', '/activity/poasassignment');
-        $paths[] = $poasassignment;
+        $paths[] = new restore_path_element('poasassignment', '/activity/poasassignment');
+        $paths[] = new restore_path_element('poasassignment_criterion', '/activity/poasassignment/criterions/criterion');
 
         // Apply for 'assignment' subplugins optional paths at assignment level
-        $this->add_subplugin_structure('poasassignment', $poasassignment);
+        //$this->add_subplugin_structure('poasassignment', $poasassignment);
 
         //if ($userinfo) {
         //    $submission = new restore_path_element('assignment_submission', '/activity/assignment/submissions/submission');
@@ -48,7 +48,17 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
+    protected function process_poasassignment_criterion($data) {
+        global $DB;
 
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->poasassignmentid = $this->get_new_parentid('poasassignment');
+        
+        $newitemid = $DB->insert_record('poasassignment_criterions', $data);
+        $this->set_mapping('poasassignment_criterions', $oldid, $newitemid);
+    }
     /* protected function process_assignment_submission($data) {
         global $DB;
 
