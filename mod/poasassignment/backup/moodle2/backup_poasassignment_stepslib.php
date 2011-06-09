@@ -17,6 +17,11 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $criterion = new backup_nested_element('criterion', array('id'), array(
                 'name', 'weight', 'description', 'graderid'));
+                
+        $answersettings = new backup_nested_element('answersettings');
+        
+        $answersetting = new backup_nested_element('answersetting', array('id'), array(
+                'name', 'value', 'answerid'));
         
 //        $assignment = new backup_nested_element('assignment', array('id'), array(
 //            'name', 'intro', 'introformat', 'assignmenttype',
@@ -40,6 +45,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
 
         $poasassignment->add_child($criterions);
         $criterions->add_child($criterion);
+        
+        $poasassignment->add_child($answersettings);
+        $answersettings->add_child($answersetting);
 //        $assignment->add_child($submissions);
 //        $submissions->add_child($submission);
 
@@ -49,6 +57,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         // Define sources
         $poasassignment->set_source_table('poasassignment', array('id' => backup::VAR_ACTIVITYID));
         $criterion->set_source_table('poasassignment_criterions', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+        $answersetting->set_source_table('poasassignment_ans_stngs', array('poasassignmentid' => backup::VAR_ACTIVITYID));
 
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
