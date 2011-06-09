@@ -154,6 +154,10 @@ class mod_poasassignment_mod_form extends moodleform_mod {
     /** Load files and flags from existing module
      */
     function data_preprocessing(&$default_values){
+    
+        if(!isset($default_values['intro'])) {
+            $default_values['introeditor'] = array('text' => '<p>' . get_string('defaultintro', 'poasassignment') . '</p>');
+        }
         if (isset($default_values['flags'])) {
             $flags = (int)$default_values['flags'];
             unset($default_values['flags']);
