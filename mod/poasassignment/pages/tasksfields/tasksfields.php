@@ -91,7 +91,7 @@ class tasksfields_page extends abstract_page {
             // foreach ($variants as $variant) $str.=$variant->value."<br>";
             $range='';
             if($field->ftype==NUMBER || $field->ftype==FLOATING)
-                $range='['.$field->minvalue.','.$field->maxvalue.']';
+                $range='['.$field->valuemin.','.$field->valuemax.']';
             if($field->ftype==MULTILIST || $field->ftype==LISTOFELEMENTS)
                 $range=$poasmodel->get_field_variants($field->id,0,"<br>");
             

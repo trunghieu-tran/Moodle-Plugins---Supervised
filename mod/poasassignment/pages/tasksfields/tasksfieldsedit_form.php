@@ -34,19 +34,19 @@ class tasksfieldsedit_form extends moodleform {
         foreach ($types as $type) {
             $mform->disabledIf('random', 'ftype', 'eq', $type);
         }
-        //$mform->disabledIf('random','minvalue','eq','maxvalue');
+        //$mform->disabledIf('random','valuemin','eq','valuemax');
        
         
-        $mform->addElement('text','minvalue',get_string('minvalue','poasassignment'),10);
-        $mform->setDefault('minvalue', 0);
+        $mform->addElement('text','valuemin',get_string('valuemin','poasassignment'),10);
+        $mform->setDefault('valuemin', 0);
         
-        $mform->addElement('text','maxvalue',get_string('maxvalue','poasassignment'),10);
-        $mform->setDefault('maxvalue', 100);
+        $mform->addElement('text','valuemax',get_string('valuemax','poasassignment'),10);
+        $mform->setDefault('valuemax', 100);
         
         $types = array(STR, TEXT, DATE, FILE, LISTOFELEMENTS, MULTILIST);
         foreach ($types as $type) {
-            $mform->disabledIf('minvalue', 'ftype', 'eq', $type);
-            $mform->disabledIf('maxvalue', 'ftype', 'eq', $type);
+            $mform->disabledIf('valuemin', 'ftype', 'eq', $type);
+            $mform->disabledIf('valuemax', 'ftype', 'eq', $type);
         }
         
         $mform->addElement('textarea','variants',get_string('variants','poasassignment'),'rows="10" cols="50"');
@@ -81,9 +81,9 @@ class tasksfieldsedit_form extends moodleform {
                 return $errors;
             }
         }
-        if (isset($data['maxvalue']) && isset($data['minvalue'])) {
-            if ($data['maxvalue'] < $data['minvalue']) {
-                $errors['maxvalue'] = get_string('errormaxislessthenmin', 'poasassignment');
+        if (isset($data['valuemax']) && isset($data['valuemin'])) {
+            if ($data['valuemax'] < $data['valuemin']) {
+                $errors['valuemax'] = get_string('errormaxislessthenmin', 'poasassignment');
                 return $errors;
             }
         }
