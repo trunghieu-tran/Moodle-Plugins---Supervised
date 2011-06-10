@@ -29,6 +29,10 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $variants = new backup_nested_element('variants');
         $variant = new backup_nested_element('variant', array('id'), array(
                 'fieldid', 'sortorder', 'value'));
+                
+        $usedgraders = new backup_nested_element('usedgraders');
+        $usedgrader = new backup_nested_element('usedgrader', array('id'), array(
+                'graderid'));
         
         // Build the tree
 
@@ -47,6 +51,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $field->add_child($variants);
         $variants->add_child($variant);
+        
+        $poasassignment->add_child($usedgraders);
+        $usedgraders->add_child($usedgrader);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -57,7 +64,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $answersetting->set_source_table('poasassignment_ans_stngs', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $field->set_source_table('poasassignment_fields', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $variant->set_source_table('poasassignment_variants', array('fieldid' => backup::VAR_PARENTID));
-
+        $usedgrader->set_source_table('poasassignment_used_graders', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));

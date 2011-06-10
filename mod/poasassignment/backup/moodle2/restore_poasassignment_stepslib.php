@@ -12,6 +12,7 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('poasassignment_answersetting', '/activity/poasassignment/answersettings/answersetting');
         $paths[] = new restore_path_element('poasassignment_field', '/activity/poasassignment/fields/field');
         $paths[] = new restore_path_element('poasassignment_variant', '/activity/poasassignment/fields/field/variants/variant');
+        $paths[] = new restore_path_element('poasassignment_usedgrader', '/activity/poasassignment/usedgraders/usedgrader');
 
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
@@ -94,6 +95,17 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         
         $newitemid = $DB->insert_record('poasassignment_variants', $data);
         $this->set_mapping('poasassignment_variants', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_usedgrader($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->poasassignmentid = $this->get_new_parentid('poasassignment');
+        
+        $newitemid = $DB->insert_record('poasassignment_used_graders', $data);
+        $this->set_mapping('poasassignment_used_graders', $oldid, $newitemid);
     }
     /* protected function process_assignment_submission($data) {
         global $DB;
