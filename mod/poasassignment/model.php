@@ -548,14 +548,14 @@ class poasassignment_model {
     }
     function get_rating_data($assigneeid) {
         global $DB;
-        $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
-        $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
-        $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$attempt->assigneeid));
-        $data->final=$assignee->finalized;
-        if ($ratingvalues=$DB->get_records('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
+        $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
+        $attempt = $DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
+        $assignee = $DB->get_record('poasassignment_assignee',array('id'=>$attempt->assigneeid));
+        $data->final = $assignee->finalized;
+        if ($ratingvalues = $DB->get_records('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
             foreach ($ratingvalues as $ratingvalue) {
-                $field='criterion'.$ratingvalue->criterionid;
-                $data->$field=$ratingvalue->value;    
+                $field = 'criterion' . $ratingvalue->criterionid;
+                $data->$field = $ratingvalue->value;    
             }
             return $data;
         }
@@ -583,7 +583,9 @@ class poasassignment_model {
         $options->area    = 'poasassignment_comment';
         $options->pluginname = 'poasassignment';
         $options->context = $context;
+        $options->cm = $cm;
         $options->showcount = true;
+        $options->component = 'mod_poasassignment';
         
         $attemptscount = $DB->count_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
         $attempt = $DB->get_record('poasassignment_attempts', 
@@ -711,6 +713,7 @@ class poasassignment_model {
         //$data->searchparameter=isset($data->searchparameter);
         $data->secretfield=isset($data->secretfield);
         $data->random=isset($data->random);
+        $data->assigneeid = 0;
         
         $fieldid= $DB->insert_record('poasassignment_fields',$data);
         if ($data->ftype==LISTOFELEMENTS || $data->ftype==MULTILIST) {
@@ -828,7 +831,6 @@ class poasassignment_model {
         $files = $fs->get_area_files($contextid, 'mod_poasassignment', $filearea, $itemid, 'sortorder');
         if (count($files) <1) 
             return;
-        
         $this->prepare_files($dir,$contextid,$filearea,$itemid);
         $htmlid = 'poasassignment_files_tree_'.uniqid();        
         $PAGE->requires->js_init_call('M.mod_poasassignment.init_tree', array(true, $htmlid));

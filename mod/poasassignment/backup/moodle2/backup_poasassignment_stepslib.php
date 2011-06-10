@@ -62,6 +62,10 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $submissions = new backup_nested_element('submissions');
         $submission = new backup_nested_element('submission', array('id'), array(
                 'attemptid', 'answerid', 'value'));
+                
+        $ratings = new backup_nested_element('ratings');
+        $rating = new backup_nested_element('rating', array('id'), array(
+                'criterionid', 'value', 'attemptid'));
         
         // Build the tree
 
@@ -110,6 +114,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $attempt->add_child($submissions);
         $submissions->add_child($submission);
+        
+        $attempt->add_child($ratings);
+        $ratings->add_child($rating);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -136,6 +143,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $attempt->set_source_table('poasassignment_attempts', array('assigneeid' => backup::VAR_PARENTID));
         $extraassignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $submission->set_source_table('poasassignment_submissions', array('attemptid' => backup::VAR_PARENTID));
+        $rating->set_source_table('poasassignment_rating_values', array('attemptid' => backup::VAR_PARENTID));
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));

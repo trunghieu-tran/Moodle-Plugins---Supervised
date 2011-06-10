@@ -32,6 +32,9 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('poasassignment_submission', 
                 '/activity/poasassignment/assignees/assignee/attempts/attempt/submissions/submission');
                 
+        $paths[] = new restore_path_element('poasassignment_ratings', 
+                '/activity/poasassignment/assignees/assignee/attempts/attempt/ratings/rating');
+                
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
 
@@ -225,6 +228,19 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         
         $newitemid = $DB->insert_record('poasassignment_submissions', $data);
         $this->set_mapping('poasassignment_submissions', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_ratings($data) {
+        echo '<br>'.__FUNCTION__;
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->attemptid = $this->get_mappingid('poasassignment_attempts', $data->attemptid);
+        $data->criterionid = $this->get_mappingid('poasassignment_criterions', $data->criterionid);
+        
+        $newitemid = $DB->insert_record('poasassignment_rating_values', $data);
+        $this->set_mapping('poasassignment_rating_values', $oldid, $newitemid);
     }
     /* protected function process_assignment_submission($data) {
         global $DB;

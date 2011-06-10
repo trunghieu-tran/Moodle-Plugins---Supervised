@@ -47,6 +47,7 @@ class grade_form extends moodleform {
         $options->showcount = true;
         
         foreach($criterions as $criterion) {
+            echo "criterion $criterion->id is here";
             $mform->addElement('html', $OUTPUT->box_start());
             // show grading element
             if($attempt->draft == 0 || 

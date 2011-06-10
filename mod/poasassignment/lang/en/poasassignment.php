@@ -205,3 +205,6 @@ $string['fieldisfile'] = 'Field is file';
 $string['currenttaskgiver'] = 'Current taskgiver';
 $string['category'] = 'Category';
 $string['errornograderused'] = 'Graders are not used in this instance';
+$string['standardcriterionname'] = 'Grade';
+$string['standardcriteriondesc'] = 'Total grade for submission';
+$string['defaultintro'] = ' POAS assignment example';
