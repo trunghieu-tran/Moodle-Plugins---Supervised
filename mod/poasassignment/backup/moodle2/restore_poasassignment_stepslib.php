@@ -29,6 +29,9 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         // now it's time to come back to assignees and define lastattemptid
         $paths[] = new restore_path_element('poasassignment_assignee_add_lastattemptid', '/activity/poasassignment/extraassignees/extraassignee');
                 
+        $paths[] = new restore_path_element('poasassignment_submission', 
+                '/activity/poasassignment/assignees/assignee/attempts/attempt/submissions/submission');
+                
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
 
@@ -211,6 +214,18 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         
         $DB->update_record('poasassignment_assignee', $assignee);
     }
+    protected function process_poasassignment_submission($data) {
+        echo '<br>'.__FUNCTION__;
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->attemptid = $this->get_mappingid('poasassignment_attempts', $data->attemptid);
+        
+        $newitemid = $DB->insert_record('poasassignment_submissions', $data);
+        $this->set_mapping('poasassignment_submissions', $oldid, $newitemid);
+    }
     /* protected function process_assignment_submission($data) {
         global $DB;
 
@@ -233,6 +248,9 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         //print_r($this);
         // Add assignment related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_poasassignment', 'poasassignmentfiles', null);
+        $this->add_related_files('mod_poasassignment', 'poasassignmenttaskfiles', 'poasassignment_task_values');
+        $this->add_related_files('mod_poasassignment', 'submissionfiles', 'poasassignment_submission');
+        $this->add_related_files('mod_poasassignment', 'commentfiles', null);
         // Add assignment submission files, matching by assignment_submission itemname
         //$this->add_related_files('mod_assignment', 'submission', 'assignment_submission');
         //$this->add_related_files('mod_assignment', 'response', 'assignment_submission');
