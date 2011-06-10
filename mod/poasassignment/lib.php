@@ -363,6 +363,12 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
 function poasassignment_extend_settings_navigation(settings_navigation $settings, navigation_node $poasassignmentnode) {
     
 }
+function poasassignment_comment_permissions($comment_param) {
+    return array('post'=>true, 'view'=>true);
+}
+function poasassignment_comment_validate($comment_param) {
+    return true;
+}
 
 function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
     global $PAGE,$DB;
