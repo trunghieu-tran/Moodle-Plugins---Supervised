@@ -106,7 +106,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         // userinfo 
         
         $assignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
-        
+        $randomtaskvalue->set_source_table('poasassignment_task_values', array('assigneeid' => backup::VAR_PARENTID));
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));
