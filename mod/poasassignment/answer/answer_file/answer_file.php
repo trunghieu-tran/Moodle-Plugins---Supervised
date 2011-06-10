@@ -239,7 +239,6 @@ class answer_file extends poasassignment_answer {
         if($attempt) {
             $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
             if($submission) {
-                
                 if($needbox)
                     $html.=$OUTPUT->box_start();
                 $cm = get_coursemodule_from_instance('poasassignment',$poasassignmentid);
@@ -250,7 +249,7 @@ class answer_file extends poasassignment_answer {
             }
             return $html;
                 //echo $submission->value;
-        }        
+        }
     }
     
     function get_answer_values($poasassignmentid) {

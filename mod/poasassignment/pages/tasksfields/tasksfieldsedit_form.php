@@ -22,8 +22,8 @@ class tasksfieldsedit_form extends moodleform {
                         get_string('date','poasassignment'),
                         get_string('file','poasassignment'),
                         get_string('list','poasassignment'),
-                        get_string('multilist','poasassignment'),
-                        get_string('category', 'poasassignment'));
+                        get_string('multilist','poasassignment'));
+                        //get_string('category', 'poasassignment'));
         $mform->addElement('select','ftype',get_string('ftype','poasassignment'),$ftypes);
         $mform->addElement('checkbox','showintable',get_string('showintable','poasassignment'));       
         
