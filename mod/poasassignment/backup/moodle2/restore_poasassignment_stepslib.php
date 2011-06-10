@@ -23,6 +23,12 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('poasassignment_randomtaskvalue', 
                 '/activity/poasassignment/assignees/assignee/randomtaskvalues/randomtaskvalue');
                 
+        $paths[] = new restore_path_element('poasassignment_attempt', 
+                '/activity/poasassignment/assignees/assignee/attempts/attempt');
+        
+        // now it's time to come back to assignees and define lastattemptid
+        $paths[] = new restore_path_element('poasassignment_assignee_add_lastattemptid', '/activity/poasassignment/extraassignees/extraassignee');
+                
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
 
@@ -178,6 +184,32 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         
         $newitemid = $DB->insert_record('poasassignment_task_values', $data);
         $this->set_mapping('poasassignment_task_values', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_attempt($data) {
+        echo '<br>'.__FUNCTION__;
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->assigneeid = $this->get_mappingid('poasassignment_assignee', $data->assigneeid);
+        
+        $newitemid = $DB->insert_record('poasassignment_attempts', $data);
+        $this->set_mapping('poasassignment_attempts', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_assignee_add_lastattemptid($data) {
+        echo '<br>'.__FUNCTION__;
+        global $DB;
+
+        $data = (object)$data;
+        $newitemid = $this->get_mappingid('poasassignment_assignee', $data->id);
+        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $newitemid));
+        $assignee->lastattemptid = $this->get_mappingid('poasassignment_attempts', $assignee->lastattemptid);
+        
+        // $data->lastattemptid - we will be back soon to update this value. 
+        // At the moment we don't have attempts
+        
+        $DB->update_record('poasassignment_assignee', $assignee);
     }
     /* protected function process_assignment_submission($data) {
         global $DB;

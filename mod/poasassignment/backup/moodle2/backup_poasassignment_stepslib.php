@@ -50,6 +50,15 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $randomtaskvalues = new backup_nested_element('randomtaskvalues');
         $randomtaskvalue = new backup_nested_element('randomtaskvalue', array('id'), array(
                 'taskid', 'fieldid', 'value', 'assigneeid'));
+                
+        $attempts = new backup_nested_element('attempts');
+        $attempt = new backup_nested_element('attempt', array('id'), array(
+                'assigneeid', 'attemptnumber', 'rating', 'attemptdate', 
+                'ratingdate', 'disablepenalty', 'draft', 'final'));
+                
+        $extraassignees = new backup_nested_element('extraassignees');
+        $extraassignee = new backup_nested_element('extraassignee', array('id'), array('lastattemptid'));
+        
         // Build the tree
 
         // Apply for 'assignment' subplugins optional stuff at assignment level (not multiple)
@@ -77,6 +86,10 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $task->add_child($nonrandomtaskvalues);
         $nonrandomtaskvalues->add_child($nonrandomtaskvalue);
         
+        if($userinfo)
+            echo 'userinfoyes';
+        else
+            echo 'userinfono';
         //userinfo
         
         $poasassignment->add_child($assignees);
@@ -84,6 +97,12 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $assignee->add_child($randomtaskvalues);
         $randomtaskvalues->add_child($randomtaskvalue);
+        
+        $assignee->add_child($attempts);
+        $attempts->add_child($attempt);
+        
+        $poasassignment->add_child($extraassignees);
+        $extraassignees->add_child($extraassignee);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -107,6 +126,8 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $assignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $randomtaskvalue->set_source_table('poasassignment_task_values', array('assigneeid' => backup::VAR_PARENTID));
+        $attempt->set_source_table('poasassignment_attempts', array('assigneeid' => backup::VAR_PARENTID));
+        $extraassignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));
