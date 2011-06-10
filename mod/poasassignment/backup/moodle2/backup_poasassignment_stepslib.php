@@ -59,6 +59,10 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $extraassignees = new backup_nested_element('extraassignees');
         $extraassignee = new backup_nested_element('extraassignee', array('id'), array('lastattemptid'));
         
+        $submissions = new backup_nested_element('submissions');
+        $submission = new backup_nested_element('submission', array('id'), array(
+                'attemptid', 'answerid', 'value'));
+        
         // Build the tree
 
         // Apply for 'assignment' subplugins optional stuff at assignment level (not multiple)
@@ -103,6 +107,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $poasassignment->add_child($extraassignees);
         $extraassignees->add_child($extraassignee);
+        
+        $attempt->add_child($submissions);
+        $submissions->add_child($submission);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -128,6 +135,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $randomtaskvalue->set_source_table('poasassignment_task_values', array('assigneeid' => backup::VAR_PARENTID));
         $attempt->set_source_table('poasassignment_attempts', array('assigneeid' => backup::VAR_PARENTID));
         $extraassignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+        $submission->set_source_table('poasassignment_submissions', array('attemptid' => backup::VAR_PARENTID));
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));
@@ -140,6 +148,9 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
 
         // Define file annotations
         $poasassignment->annotate_files('mod_poasassignment', 'poasassignmentfiles', null); // This file area hasn't itemid
+        $nonrandomtaskvalue->annotate_files('mod_poasassignment', 'poasassignmenttaskfiles', 'id');
+        $submission->annotate_files('mod_poasassignment', 'submissionfiles', 'id');
+        $poasassignment->annotate_files('mod_poasassignment', 'commentfiles', null);
         //$submission->annotate_files('mod_assignment', 'submission', 'id');
         //$submission->annotate_files('mod_assignment', 'response', 'id');
 
