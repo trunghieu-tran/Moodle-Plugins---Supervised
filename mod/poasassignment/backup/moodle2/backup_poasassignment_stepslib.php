@@ -33,7 +33,23 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $usedgraders = new backup_nested_element('usedgraders');
         $usedgrader = new backup_nested_element('usedgrader', array('id'), array(
                 'graderid'));
+                
+        $tasks = new backup_nested_element('tasks');
+        $task = new backup_nested_element('task', array('id'), array(
+                'name', 'description', 'deadline', 'hidden'));
+                
+        $nonrandomtaskvalues = new backup_nested_element('nonrandomtaskvalues');
+        $nonrandomtaskvalue = new backup_nested_element('nonrandomtaskvalue', array('id'), array(
+                'taskid', 'fieldid', 'value', 'assigneeid'));
         
+        //userinfo here
+        $assignees = new backup_nested_element('assignees');
+        $assignee = new backup_nested_element('assignee', array('id'), array(
+                'userid', 'teacher', 'timemarked', 'taskid', 'finalized', 'lastattemptid'));
+        
+        $randomtaskvalues = new backup_nested_element('randomtaskvalues');
+        $randomtaskvalue = new backup_nested_element('randomtaskvalue', array('id'), array(
+                'taskid', 'fieldid', 'value', 'assigneeid'));
         // Build the tree
 
         // Apply for 'assignment' subplugins optional stuff at assignment level (not multiple)
@@ -54,6 +70,20 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $poasassignment->add_child($usedgraders);
         $usedgraders->add_child($usedgrader);
+        
+        $poasassignment->add_child($tasks);
+        $tasks->add_child($task);
+        
+        $task->add_child($nonrandomtaskvalues);
+        $nonrandomtaskvalues->add_child($nonrandomtaskvalue);
+        
+        //userinfo
+        
+        $poasassignment->add_child($assignees);
+        $assignees->add_child($assignee);
+        
+        $assignee->add_child($randomtaskvalues);
+        $randomtaskvalues->add_child($randomtaskvalue);
 
         // Apply for 'assignment' subplugins optional stuff at submission level (not multiple)
 //        $this->add_subplugin_structure('assignment', $submission, false);
@@ -65,6 +95,18 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         $field->set_source_table('poasassignment_fields', array('poasassignmentid' => backup::VAR_ACTIVITYID));
         $variant->set_source_table('poasassignment_variants', array('fieldid' => backup::VAR_PARENTID));
         $usedgrader->set_source_table('poasassignment_used_graders', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+        $task->set_source_table('poasassignment_tasks', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+                
+        $nonrandomtaskvalue->set_source_sql("
+                SELECT *
+                  FROM {poasassignment_task_values}
+                  WHERE assigneeid = 0 AND taskid = ?",
+                  array(backup::VAR_PARENTID));
+                  
+        // userinfo 
+        
+        $assignee->set_source_table('poasassignment_assignee', array('poasassignmentid' => backup::VAR_ACTIVITYID));
+        
         // All the rest of elements only happen if we are including user info
         //if ($userinfo) {
         //    $submission->set_source_table('assignment_submissions', array('assignment' => backup::VAR_PARENTID));

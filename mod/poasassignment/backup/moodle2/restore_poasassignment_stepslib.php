@@ -13,7 +13,9 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('poasassignment_field', '/activity/poasassignment/fields/field');
         $paths[] = new restore_path_element('poasassignment_variant', '/activity/poasassignment/fields/field/variants/variant');
         $paths[] = new restore_path_element('poasassignment_usedgrader', '/activity/poasassignment/usedgraders/usedgrader');
-
+        $paths[] = new restore_path_element('poasassignment_task', '/activity/poasassignment/tasks/task');
+        $paths[] = new restore_path_element('poasassignment_nonrandomtaskvalue', '/activity/poasassignment/tasks/task/nonrandomtaskvalues/nonrandomtaskvalue');
+        $paths[] = new restore_path_element('poasassignment_assignee', '/activity/poasassignment/assignees/assignee');
         // Apply for 'assignment' subplugins optional paths at assignment level
         //$this->add_subplugin_structure('poasassignment', $poasassignment);
 
@@ -107,6 +109,45 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
         $newitemid = $DB->insert_record('poasassignment_used_graders', $data);
         $this->set_mapping('poasassignment_used_graders', $oldid, $newitemid);
     }
+    
+    protected function process_poasassignment_task($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->poasassignmentid = $this->get_new_parentid('poasassignment');
+        
+        $newitemid = $DB->insert_record('poasassignment_tasks', $data);
+        $this->set_mapping('poasassignment_tasks', $oldid, $newitemid);
+    }
+    protected function process_poasassignment_nonrandomtaskvalue($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->taskid = $this->get_mappingid('poasassignment_tasks', $data->taskid);
+        $data->fieldid = $this->get_mappingid('poasassignment_fields', $data->fieldid);
+        
+        $newitemid = $DB->insert_record('poasassignment_task_values', $data);
+        $this->set_mapping('poasassignment_task_values', $oldid, $newitemid);
+    }
+    
+    protected function process_poasassignment_assignee($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+        
+        $data->poasassignmentid = $this->get_new_parentid('poasassignment');
+        $data->taskid = $this->get_mappingid('poasassignment_tasks', $data->taskid);
+        // $data->lastattemptid - we will be back soon to update this value. 
+        // At the moment we don't have attempts
+        
+        $newitemid = $DB->insert_record('poasassignment_assignee', $data);
+        $this->set_mapping('poasassignment_assignee', $oldid, $newitemid);
+    }
     /* protected function process_assignment_submission($data) {
         global $DB;
 
@@ -126,6 +167,7 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
     } */
 
     protected function after_execute() {
+        //print_r($this);
         // Add assignment related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_poasassignment', 'poasassignmentfiles', null);
         // Add assignment submission files, matching by assignment_submission itemname
