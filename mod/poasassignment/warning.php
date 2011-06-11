@@ -9,7 +9,7 @@ $action = optional_param('action', null, PARAM_TEXT);
 $cm         = get_coursemodule_from_id('poasassignment', $id, 0, false, MUST_EXIST);
 $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
-    
+$poasmodel=poasassignment_model::get_instance($poasassignment);
 require_login($course, true, $cm);
     
 global $OUTPUT,$DB,$PAGE;
@@ -47,8 +47,10 @@ switch ($action) {
             print_error('invalidassigneeid','poasassignment');
         
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
-        if(has_capability('mod/poasassignment:managetasks',$context)) {
-            $DB->delete_records('poasassignment_assignee',array('id'=>$assigneeid));
+        if($poasmodel->can_cancel_task($assigneeid, $context)) {
+        //if(has_capability('mod/poasassignment:managetasks',$context)) {
+            $poasmodel->cancel_task($assigneeid);
+            //$DB->delete_records('poasassignment_assignee',array('id'=>$assigneeid));
             $attempts=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
             foreach($attempts as $attempt) {
                 $DB->delete_records('poasassignment_submissions',array('attemptid'=>$attempt->id));
@@ -128,9 +130,13 @@ switch ($action) {
             print_error('invalidtaskid','poasassignment');
         if(!isset($userid) || $userid<1)
             print_error('invaliduserid','poasassignment');
-        if($DB->record_exists('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$poasassignment->id)))
+        
+        $assignee = $DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$poasassignment->id));
+        if($assignee && $assignee->taskid > 0) {
+        //if($DB->record_exists('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$poasassignment->id)))
             print_error('alreadyhavetask','poasassignment');
-        $poasmodel=poasassignment_model::get_instance($poasassignment);
+        }
+        
         
         $poasmodel->bind_task_to_assignee($userid,$taskid);
         

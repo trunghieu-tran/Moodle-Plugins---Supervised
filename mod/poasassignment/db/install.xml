@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/db" VERSION="20110610" COMMENT="XMLDB file for Moodle mod/poasassignment"
+<XMLDB PATH="mod/poasassignment/db" VERSION="20110611" COMMENT="XMLDB file for Moodle mod/poasassignment"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -123,7 +123,8 @@
         <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemarked" NEXT="taskid"/>
         <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="finalized"/>
         <FIELD NAME="finalized" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid" NEXT="lastattemptid"/>
-        <FIELD NAME="lastattemptid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="finalized"/>
+        <FIELD NAME="lastattemptid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="finalized" NEXT="taskindex"/>
+        <FIELD NAME="taskindex" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastattemptid"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="taskid"/>
