@@ -47,11 +47,11 @@ class view_page extends abstract_page {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             echo $OUTPUT->heading(get_string('status','poasassignment'));
             // If user have task
-            if ($DB->record_exists('poasassignment_assignee',
-                    array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) {
+            //if ($DB->record_exists('poasassignment_assignee',
+            //        array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) {
                 $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$USER->id,
                                                                             'poasassignmentid'=>$this->poasassignment->id));
-                if ($assignee && $assignee->taskid>0) {
+                if ($assignee && $assignee->taskid > 0) {
                     echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
                     // Show link to the task
@@ -69,13 +69,29 @@ class view_page extends abstract_page {
                                 '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                         echo ' '.$deleteicon;
                     }
+                    if(!empty($this->poasassignment->deadline)) {
+                        echo '<br><br>';
+                        echo '<b>' . 
+                        get_string('timetocompletetask', 'poasassignment') . 
+                        ': ' .
+                        format_time(time() - $this->poasassignment->deadline) . 
+                        '</b>';
+                    }
                 }
-            }
+            //}
             else {
                 // If user have no task - show link to task page
                 echo get_string('youhavenotask', 'poasassignment');
                 $taskspageurl = new moodle_url('view.php', array('id'=>$this->cm->id, 'page'=>'tasks'));
                 echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
+                if(!empty($this->poasassignment->choicedate)) {
+                    echo '<br><br>';
+                    echo '<b>' . 
+                        get_string('timetochoosetask', 'poasassignment') . 
+                        ': ' .
+                        format_time(time() - $this->poasassignment->choicedate) . 
+                        '</b>';
+                }
             }
             echo $OUTPUT->box_end();
         }
