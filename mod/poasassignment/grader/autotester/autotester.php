@@ -22,6 +22,8 @@ class autotester extends grader{
     
     public function test_attempt($attemptid) {
         global $DB;
+        
+        // step 1: compile student's program
         $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
         if($textanswerrec) {
             $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
@@ -43,9 +45,32 @@ class autotester extends grader{
             fwrite($runf, $text);
             fclose($runf);            
         }
+        
+        // step 2: create test files
+        
+        // step 2.1 get task id
+        $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
+        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid));
+        
+        // step 2.2 get grader tests
+        
+        $rec = $DB->get_record('poasassignment_gr_autotester', array('taskid' => $assignee->taskid));
+        $gradertestrec = $DB->get_record('question_gradertest', array('questionid' => $rec->questionid));
+        $gradertests = $DB->get_records('question_gradertest_tests', array('gradertestid' => $gradertestrec->id));
+        
+        $this->create_test_files($gradertests, 'grader\autotester\attempts\tests\\');
+        
+        // step 3: call each test and update testing result table
         return 50;
     }
     
+    public function create_test_files($tests, $path) {
+        foreach($tests as $test) {
+            $f = fopen($path . $test->id . '.txt', 'w+');
+            fwrite($f, $test->testin);
+            fclose($f);
+        }
+    }
     public function clean_files($attemptid) {
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
         unlink('grader\autotester\runattempt' . $attemptid . '.bat');
