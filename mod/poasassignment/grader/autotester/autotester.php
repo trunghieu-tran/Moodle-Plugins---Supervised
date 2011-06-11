@@ -45,7 +45,7 @@ class autotester extends grader{
             fwrite($runf, $text);
             fclose($runf);            
         }
-        
+        exec('Call grader\autotester\runattempt' . $attemptid . '.bat');
         // step 2: create test files
         
         // step 2.1 get task id
@@ -58,24 +58,60 @@ class autotester extends grader{
         $gradertestrec = $DB->get_record('question_gradertest', array('questionid' => $rec->questionid));
         $gradertests = $DB->get_records('question_gradertest_tests', array('gradertestid' => $gradertestrec->id));
         
-        $this->create_test_files($gradertests, 'grader\autotester\attempts\tests\\');
+        $this->create_test_files($gradertests, 'grader\autotester\attempts\tests\\', $attemptid);
         
         // step 3: call each test and update testing result table
+        $results = $this->run_tests($gradertests, 'grader\autotester\attempts\tests\\', $attemptid);
+        print_r($results);
+        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
         return 50;
     }
-    
-    public function create_test_files($tests, $path) {
+    public function run_tests($tests, $path, $attemptid) {
+        $testresults = array();
+        array_reverse($tests);
         foreach($tests as $test) {
-            $f = fopen($path . $test->id . '.txt', 'w+');
+            $out = array();
+            $command = 'grader\autotester\attempts\attempt'. 
+                        $attemptid . 
+                        '.exe';
+            $command .= '<';
+            $command .= $path . 
+                        'test_' . 
+                        $test->id . 
+                        '_' . 
+                        $attemptid . 
+                        '.txt';
+            exec($command, $out);
+            $testresult = new stdClass();
+            $testresult->testid = $test->id;
+            $testresult->attemptid = $attemptid;
+            $testresult->out = $out[0];
+            $testresults[] = $testresult;
+        }
+        return $testresults;
+    }
+    public function create_test_files($tests, $path, $attemptid) {
+        foreach($tests as $test) {
+            $f = fopen($path . 
+                    'test_' . 
+                    $test->id . 
+                    '_'. 
+                    $attemptid .
+                    '.txt', 'w+');
+                    
             fwrite($f, $test->testin);
             fclose($f);
         }
     }
-    public function clean_files($attemptid) {
+    public function clean_files($attemptid, $path, $tests) {
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
         unlink('grader\autotester\runattempt' . $attemptid . '.bat');
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe');
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.obj');
+        
+        foreach($tests as $test) {
+            unlink($path . 'test_' . $test->id . '_'. $attemptid . '.txt');
+        }
     }
     
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
