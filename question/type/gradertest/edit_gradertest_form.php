@@ -15,20 +15,20 @@ require_once($CFG->dirroot.'/question/type/edit_question_form.php');
  * See http://docs.moodle.org/en/Development:lib/formslib.php for information
  * about the Moodle forms library, which is based on the HTML Quickform PEAR library.
  */
-class question_edit_gradertest_form extends question_edit_form {
+class qtype_gradertest_edit_form extends question_edit_form {
     function definition_inner(&$mform) {
         global $DB;
         $mform->removeElement('questiontext');
         
-        $mform->removeElement('defaultgrade');
-        $mform->removeElement('penalty');
+        $mform->removeElement('defaultmark');
+        //$mform->removeElement('penalty');
         $mform->removeElement('generalfeedback');
         if (!empty($CFG->usetags)) {
             $mform->removeElement('tagsheader');
             $mform->removeElement('tags');
         }
         $repeatarray = array();
-        $label = '123';
+        //$label = '123';
         $repeatarray[] = MoodleQuickForm::createElement('header');
         $repeatarray[] = MoodleQuickForm::createElement('text', 
                                                         'testname', 
@@ -47,9 +47,8 @@ class question_edit_gradertest_form extends question_edit_form {
                                                         'testweight', 
                                                         get_string('testweight', 'qtype_gradertest'));
         $repeateoptions = array();
-        
         $repeatno = 2;
-        if ($gradertest = $DB->get_record('question_gradertest', array('questionid' => $this->question->id))) {
+        if (!empty($this->question->id) && $gradertest = $DB->get_record('question_gradertest', array('questionid' => $this->question->id))) {
             $repeatno = $DB->count_records('question_gradertest_tests', array('gradertestid' => $gradertest->id));
             $repeatno++;
         }        

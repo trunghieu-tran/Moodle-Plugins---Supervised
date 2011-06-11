@@ -1,5 +1,5 @@
 <?
-class gradertest_qtype extends default_questiontype {
+class qtype_gradertest extends question_type {
 
     public $fileoptions = array('subdirs' => false,
                                 'maxfiles' => -1,
@@ -66,4 +66,4 @@ class gradertest_qtype extends default_questiontype {
     }
 
 }
-question_register_questiontype(new gradertest_qtype());
+//question_register_questiontype(new gradertest_qtype());
