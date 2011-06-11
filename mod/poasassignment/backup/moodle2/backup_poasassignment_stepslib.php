@@ -45,7 +45,8 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         //userinfo here
         $assignees = new backup_nested_element('assignees');
         $assignee = new backup_nested_element('assignee', array('id'), array(
-                'userid', 'teacher', 'timemarked', 'taskid', 'finalized', 'lastattemptid'));
+                'userid', 'teacher', 'timemarked', 'taskid', 'finalized', 
+                'lastattemptid', 'taskindex'));
         
         $randomtaskvalues = new backup_nested_element('randomtaskvalues');
         $randomtaskvalue = new backup_nested_element('randomtaskvalue', array('id'), array(
@@ -71,6 +72,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
 
         // Apply for 'assignment' subplugins optional stuff at assignment level (not multiple)
         // Remember that order is important, try moving this line to the end and compare XML
+        $this->add_subplugin_structure('poasassignmenttaskgivers', $poasassignment, false);
 //        $this->add_subplugin_structure('assignment', $assignment, false);
 
         $poasassignment->add_child($criterions);

@@ -52,7 +52,7 @@ else {
                     $attemptid = $poasassignmentplugin->save_answer($poasmodel->assignee->id, $data);
                 }
                 else {
-                    $assigneeid = $poasmodel->create_assignee($USER->id)->id;
+                    $assigneeid = $poasmodel->get_assignee($USER->id)->id;
                     $attemptid = $poasassignmentplugin->save_answer($assigneeid, $data);
                 }
             }

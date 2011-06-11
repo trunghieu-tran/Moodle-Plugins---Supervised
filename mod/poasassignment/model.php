@@ -236,6 +236,7 @@ class poasassignment_model {
             $DB->delete_records('poasassignment_variants', array('fieldid' => $field->id));
         }
         $DB->delete_records('poasassignment_fields', array('poasassignmentid' => $id));
+        $DB->delete_records('poasassignment_assignee',array('poasassignmentid' => $id));
         $this->delete_taskgiver_settings($id, $this->poasassignment->taskgiverid);
         //delete_course_module($cm->id);
         return true;
@@ -840,14 +841,25 @@ class poasassignment_model {
         return $html;
     }
     
-    public function create_assignee($userid) {
+    public function get_assignee($userid) {
         global $DB;
-        $rec = new stdClass();
-        $rec->userid = $userid;
-        $rec->poasassignmentid = $this->poasassignment->id;
-        $rec->taskid = 0;
-        $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
-        $this->assignee->id = $rec->id;
+        if(!$DB->record_exists('poasassignment_assignee', 
+                array('userid' => $userid, 'poasassignmentid' => $this->poasassignment->id))) {
+            
+            $rec = new stdClass();
+            $rec->userid = $userid;
+            $rec->poasassignmentid = $this->poasassignment->id;
+            $rec->taskid = 0;
+            $rec->taskindex = 0;
+            $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
+            
+        }
+        else {
+            $rec = $DB->get_record('poasassignment_assignee', 
+                    array('userid' => $userid, 'poasassignmentid' => $this->poasassignment->id));
+        }
+        $this->assignee->id = $rec->id;      
+        
         return $rec;
     }
     // Runs after adding submission. Calls all graders, used in module.
@@ -889,10 +901,11 @@ class poasassignment_model {
     }
     function bind_task_to_assignee($userid,$taskid) {
         global $DB;
-        $rec = $this->create_assignee($userid);
+        $rec = $this->get_assignee($userid);
         //$rec->userid=$userid;
         //$rec->poasassignmentid=$this->poasassignment->id;
         $rec->taskid = $taskid;
+        $rec->taskindex++;
         $DB->update_record('poasassignment_assignee', $rec);
         $this->assignee->id = $rec->id;
 
@@ -927,6 +940,22 @@ class poasassignment_model {
                 $DB->insert_record('poasassignment_task_values',$randrec);
             }
         }
+    }
+    
+    function cancel_task($assigneeid) {
+        global $DB;
+        $rec = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
+        $rec->taskid = 0;
+        $DB->update_record('poasassignment_assignee', $rec);
+    }
+    
+    function can_cancel_task($assigneeid, $context) {
+        global $DB;
+        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
+        
+        $has_cap = has_capability('mod/poasassignment:managetasks', $context);
+        $has_ability = ($this->poasassignment->flags & SECOND_CHOICE) && ($assignee->taskindex < 2);
+        return ($has_cap || $has_ability);
     }
     
     function help_icon($text) {

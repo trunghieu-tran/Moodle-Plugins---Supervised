@@ -41,6 +41,7 @@ class view_page extends abstract_page {
      */
     function view_status() {
         global $DB,$USER,$OUTPUT;
+        $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         // If individual tasks mode is active
         if ($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
@@ -58,9 +59,9 @@ class view_page extends abstract_page {
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
 
-                    // TODO: second choice option must be checked too
-                    // If user have capability to cancel task - show cancel button
-                    if (has_capability('mod/poasassignment:managetasks', $this->context)) {
+                    // If user can cancel task - show cancel button
+                    if($poasmodel->can_cancel_task($assignee->id, $this->context)) {
+                    //if (has_capability('mod/poasassignment:managetasks', $this->context)) {
                         $deleteurl = new moodle_url('warning.php', array('action'=>'canceltask',
                                                                         'assigneeid'=>$assignee->id,
                                                                         'id'=>$this->cm->id), 'd', 'post');

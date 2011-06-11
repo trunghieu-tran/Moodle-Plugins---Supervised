@@ -36,7 +36,7 @@ class restore_poasassignment_activity_structure_step extends restore_activity_st
                 '/activity/poasassignment/assignees/assignee/attempts/attempt/ratings/rating');
                 
         // Apply for 'assignment' subplugins optional paths at assignment level
-        //$this->add_subplugin_structure('poasassignment', $poasassignment);
+        $this->add_subplugin_structure('poasassignmenttaskgivers', $poasassignment);
 
         //if ($userinfo) {
         //    $submission = new restore_path_element('assignment_submission', '/activity/assignment/submissions/submission');
