@@ -208,3 +208,5 @@ $string['errornograderused'] = 'Graders are not used in this instance';
 $string['standardcriterionname'] = 'Grade';
 $string['standardcriteriondesc'] = 'Total grade for submission';
 $string['defaultintro'] = ' POAS assignment example';
+$string['timetochoosetask'] = 'Your time to make choice';
+$string['timetocompletetask'] = 'Your time to complete task';
