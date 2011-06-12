@@ -8,3 +8,5 @@ $string['testname'] = 'Test name';
 $string['testin'] = 'Test input data'; 
 $string['testout'] = 'Test output data';
 $string['studentout'] = 'Program output data';
+$string['testpassed'] = 'Test passed successfully';
+$string['testnotpassed'] = 'Test is not passed';

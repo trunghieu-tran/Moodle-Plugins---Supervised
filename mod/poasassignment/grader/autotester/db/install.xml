@@ -21,7 +21,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="testid"/>
         <FIELD NAME="testid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="attemptid"/>
         <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="testid" NEXT="studentout"/>
-        <FIELD NAME="studentout" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="attemptid"/>
+        <FIELD NAME="studentout" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="attemptid" NEXT="testpassed"/>
+        <FIELD NAME="testpassed" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="studentout"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
