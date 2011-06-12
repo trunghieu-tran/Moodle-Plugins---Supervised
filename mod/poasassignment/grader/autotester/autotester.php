@@ -73,11 +73,11 @@ class autotester extends grader{
             if($result->studentout == $gradertests[$result->testid]->testout) {
                 $grade += 100 * ($gradertests[$result->testid]->weight) / ($totalweight);
             }
-            else {
-                echo $result->studentout;
-                echo '!=';
-                echo $gradertests[$result->testid]->testout;
-            }
+            //else {
+            //    echo $result->studentout;
+            //    echo '!=';
+            //    echo $gradertests[$result->testid]->testout;
+            //}
         }
         $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
         return $grade;
@@ -85,6 +85,7 @@ class autotester extends grader{
     public function run_tests($tests, $path, $attemptid) {
         global $DB;
         $testresults = array();
+        //$tests = array_reverse($tests);
         foreach($tests as $test) {
             $out = array();
             $command = 'grader\autotester\attempts\attempt'. 
@@ -102,6 +103,12 @@ class autotester extends grader{
             $testresult->testid = $test->id;
             $testresult->attemptid = $attemptid;
             $testresult->studentout = $out[0];
+            if($testresult->studentout == $test->testout) {
+                $testresult->testpassed = 1;
+            }
+            else {
+                $testresult->testpassed = 0;
+            }
             $testresult->id = $DB->insert_record('poasassignment_gr_at_res', $testresult);
             $testresults[] = $testresult;
         }
@@ -242,11 +249,12 @@ class autotester extends grader{
             $html .= get_string('studentout', 'poasassignment_autotester'). ' ' . $result->studentout;
             $html .= '<br>';
             if($test->testout == $result->studentout) {
-                $html .= 'passed';
+                $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
             }
             else {
-                $html .= 'not passed';
+                $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
             }
+            $html .= '<br>';
             $html .= '<br>';
         }
         return $html;
