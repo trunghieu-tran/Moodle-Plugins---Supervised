@@ -210,3 +210,5 @@ $string['standardcriteriondesc'] = 'Total grade for submission';
 $string['defaultintro'] = ' POAS assignment example';
 $string['timetochoosetask'] = 'Your time to make choice';
 $string['timetocompletetask'] = 'Your time to complete task';
+$string['attempts_help'] = 'At this page you can see all your attempts';
+$string['lasttestresults'] = 'Results of the last test';

@@ -62,13 +62,29 @@ class autotester extends grader{
         
         // step 3: call each test and update testing result table
         $results = $this->run_tests($gradertests, 'grader\autotester\attempts\tests\\', $attemptid);
-        print_r($results);
+        
+        // step 4: compare student's output and test's output and produce grade
+        $totalweight = 0;
+        foreach($gradertests as $test) {
+            $totalweight += $test->weight;
+        }
+        $grade = 0;
+        foreach ($results as $result) {
+            if($result->studentout == $gradertests[$result->testid]->testout) {
+                $grade += 100 * ($gradertests[$result->testid]->weight) / ($totalweight);
+            }
+            else {
+                echo $result->studentout;
+                echo '!=';
+                echo $gradertests[$result->testid]->testout;
+            }
+        }
         $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
-        return 50;
+        return $grade;
     }
     public function run_tests($tests, $path, $attemptid) {
+        global $DB;
         $testresults = array();
-        array_reverse($tests);
         foreach($tests as $test) {
             $out = array();
             $command = 'grader\autotester\attempts\attempt'. 
@@ -85,7 +101,8 @@ class autotester extends grader{
             $testresult = new stdClass();
             $testresult->testid = $test->id;
             $testresult->attemptid = $attemptid;
-            $testresult->out = $out[0];
+            $testresult->studentout = $out[0];
+            $testresult->id = $DB->insert_record('poasassignment_gr_at_res', $testresult);
             $testresults[] = $testresult;
         }
         return $testresults;
@@ -202,5 +219,36 @@ class autotester extends grader{
             $data['autotester_task' . $rec->taskid] = $rec->questionid;
         }
         return $data;
+    }
+    
+    function have_test_results($attemptid) {
+        global $DB;
+        return $DB->record_exists('poasassignment_gr_at_res', array('attemptid' => $attemptid));
+    }
+    
+    function show_test_results($attemptid, $context) {
+        global $USER, $DB, $OUTPUT;
+        $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
+        $html = '';
+        foreach ($results as $result) {
+            // TODO capability
+            $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
+            $html .= get_string('testname', 'poasassignment_autotester'). ' ' . $test->name;
+            $html .= '<br>';
+            $html .= get_string('testin', 'poasassignment_autotester'). ' ' . $test->testin;
+            $html .= '<br>';
+            $html .= get_string('testout', 'poasassignment_autotester'). ' ' . $test->testout;
+            $html .= '<br>';
+            $html .= get_string('studentout', 'poasassignment_autotester'). ' ' . $result->studentout;
+            $html .= '<br>';
+            if($test->testout == $result->studentout) {
+                $html .= 'passed';
+            }
+            else {
+                $html .= 'not passed';
+            }
+            $html .= '<br>';
+        }
+        return $html;
     }
 }

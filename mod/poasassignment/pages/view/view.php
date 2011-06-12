@@ -31,6 +31,7 @@ class view_page extends abstract_page {
         $this->view_status();
         $this->view_dates();
         $this->view_feedback();
+        $this->view_testresult();
         $this->view_answer_block();
     }
     
@@ -160,8 +161,10 @@ class view_page extends abstract_page {
         $attemptscount=count($attempts);
         // show latest graded feedback
         foreach($attempts as $attempt) {
-            if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id)))
+            if(!$attempt->ratingdate) {
+            //if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id)))
                 continue;
+            }
             echo $OUTPUT->box_start();
             echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
             echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
@@ -278,6 +281,33 @@ class view_page extends abstract_page {
         } */                            
     }
     
+    function view_testresult() {
+        global $DB, $OUTPUT, $USER;
+        $poasmodel = poasassignment_model::get_instance();
+        if(!$DB->record_exists('poasassignment_used_graders', array('poasassignmentid' => $this->poasassignment->id)))
+            return;
+        if(!$assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
+                                                                            'userid'=>$USER->id)))
+            return;
+        
+        $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
+        
+        foreach ($attempts as $attempt) {
+            // ask grader if student have test results
+            if(!$poasmodel->have_test_results($attempt)) {
+                continue;
+            }
+            else {
+                echo $OUTPUT->box_start();
+                echo $OUTPUT->heading(get_string('lasttestresults','poasassignment'));
+                echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
+                echo $poasmodel->show_test_results($attempt);
+                echo $OUTPUT->box_end();
+                break;
+            }
+        }
+        
+    }
     function view_answer_block() {
         global $OUTPUT,$DB,$USER;
         //$plugins=$DB->get_records('poasassignment_answers');

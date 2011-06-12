@@ -182,4 +182,12 @@ abstract class grader {
     function show_tests($poasassignmentid,$taskid=-1){
     
     }
+    
+    function have_test_results($attemptid) {
+        return false;
+    }
+    
+    function show_test_results($attemptid, $context) {
+        return '';
+    }
 }
