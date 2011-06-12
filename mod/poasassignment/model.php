@@ -50,9 +50,10 @@ class poasassignment_model {
                                     'tasks' => 'pages/tasks/tasks.php',
                                     'taskgiversettings' => 'pages/taskgiversettings/taskgiversettings.php',
                                     'view' => 'pages/view/view.php',
+                                    'attempts' => 'pages/attempts/attempts.php',
                                     'criterions' => 'pages/criterions/criterions.php',
                                     'graders' => 'pages/graders/graders.php',
-                                    'submissions' => 'pages/submissions/submissions.php'
+                                    'submissions' => 'pages/submissions/submissions.php'                                    
                                     );
     
     /**
@@ -946,6 +947,7 @@ class poasassignment_model {
         global $DB;
         $rec = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
         $rec->taskid = 0;
+        $rec->lastattemptid = 0;
         $DB->update_record('poasassignment_assignee', $rec);
     }
     
@@ -1084,6 +1086,7 @@ class poasassignment_model {
         global $DB,$OUTPUT;
         if (isset($attempt->rating) && 
                             $DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
+                            
             echo $OUTPUT->heading(get_string('feedback','poasassignment'));
             if ($attempt->ratingdate < $latestattempt->attemptdate)
                 echo $OUTPUT->heading(get_string('oldfeedback','poasassignment'));
@@ -1122,7 +1125,32 @@ class poasassignment_model {
             echo $OUTPUT->box_end();
         }
     }
-    
+    function have_test_results($attempt) {
+        global $DB;
+        $usedgraders = $DB->get_records('poasassignment_used_graders', array('poasassignmentid' => $this->poasassignment->id));
+        foreach($usedgraders as $usedgrader) {
+            $graderrec = $this->graders[$usedgrader->graderid];
+            require_once($graderrec->path);
+            $gradername = $graderrec->name;
+            $grader = new $gradername;
+            if($grader->have_test_results($attempt->id))
+                return true;
+        }
+    }
+    function show_test_results($attempt) {
+        global $DB;
+        $usedgraders = $DB->get_records('poasassignment_used_graders', array('poasassignmentid' => $this->poasassignment->id));
+        $html = '';
+        foreach($usedgraders as $usedgrader) {
+            $graderrec = $this->graders[$usedgrader->graderid];
+            require_once($graderrec->path);
+            $gradername = $graderrec->name;
+            $grader = new $gradername;
+            if($grader->have_test_results($attempt->id))
+                $html .= $grader->show_test_results($attempt->id, $this->context);
+        }
+        return $html;
+    }
     function trigger_poasassignment_event($mode,$assigneeid) {
         //global $DB,$USER;
         //echo 'triggering event';
