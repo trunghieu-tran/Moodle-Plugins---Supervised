@@ -18,6 +18,7 @@ class grade_form extends moodleform {
         $lateness=format_time(time()-$attempt->attemptdate);
         $poasassignment = $DB->get_record('poasassignment',array('id'=>$instance['poasassignmentid']));
         $attemptsurl = new moodle_url('/mod/poasassignment/attempts.php',array('id'=>$instance['id'],'assigneeid'=>$instance['assigneeid']));
+        $userurl = new moodle_url('/user/profile.php',array('id'=>$user->id));
         if($poasassignment->flags && ACTIVATE_INDIVIDUAL_TASKS) {
             $taskviewurl = new moodle_url('/mod/poasassignment/pages/tasks/taskview.php', array('id'=>$instance['id'], 'taskid' => $assignee->taskid));
         }
@@ -25,7 +26,7 @@ class grade_form extends moodleform {
             $taskviewurl = '';
         }
         $mform->addElement('static', 'picture', $OUTPUT->user_picture($user),
-                                                fullname($user, true) . '<br/>' .
+                                                html_writer::link($userurl,fullname($user, true)) . '<br>'.
                                                 userdate($attempt->attemptdate) . '<br/>' .
                                                 $lateness.' '.get_string('ago','poasassignment').'<br>'.
                                                 html_writer::link($attemptsurl,get_string('studentattempts','poasassignment') . '<br>'.
