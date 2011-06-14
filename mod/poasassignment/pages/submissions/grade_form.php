@@ -16,12 +16,20 @@ class grade_form extends moodleform {
         $attempt=$DB->get_record('poasassignment_attempts',
                                     array('assigneeid'=>$instance['assigneeid'],'attemptnumber'=>$attemptscount));
         $lateness=format_time(time()-$attempt->attemptdate);
+        $poasassignment = $DB->get_record('poasassignment',array('id'=>$instance['poasassignmentid']));
         $attemptsurl = new moodle_url('/mod/poasassignment/attempts.php',array('id'=>$instance['id'],'assigneeid'=>$instance['assigneeid']));
+        if($poasassignment->flags && ACTIVATE_INDIVIDUAL_TASKS) {
+            $taskviewurl = new moodle_url('/mod/poasassignment/pages/tasks/taskview.php', array('id'=>$instance['id'], 'taskid' => $assignee->taskid));
+        }
+        else {
+            $taskviewurl = '';
+        }
         $mform->addElement('static', 'picture', $OUTPUT->user_picture($user),
                                                 fullname($user, true) . '<br/>' .
                                                 userdate($attempt->attemptdate) . '<br/>' .
                                                 $lateness.' '.get_string('ago','poasassignment').'<br>'.
-                                                html_writer::link($attemptsurl,get_string('studentattempts','poasassignment')));
+                                                html_writer::link($attemptsurl,get_string('studentattempts','poasassignment') . '<br>'.
+                                                html_writer::link($taskviewurl,get_string('stundetstask','poasassignment'))));
         
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
         $plugins = $poasmodel->get_plugins();
@@ -81,7 +89,7 @@ class grade_form extends moodleform {
         if($attempt->draft == 0 || has_capability('mod/poasassignment:manageanything',$context)) {
             $mform->addElement('checkbox', 'final', get_string('finalgrade','poasassignment'));
         }
-        $poasassignment = $DB->get_record('poasassignment',array('id'=>$instance['poasassignmentid']));
+        
         
         
         $mform->addElement('static','penalty',get_string('penalty','poasassignment'),$poasmodel->get_penalty($attempt->id));
