@@ -28,7 +28,6 @@ if (!$DB->record_exists('poasassignment_criterions',array('poasassignmentid'=>$p
 $poasmodel = poasassignment_model::get_instance($poasassignment);
 $mform = new grade_form(null,array('id'=>$cm->id,'assigneeid'=>$assigneeid,'poasassignmentid'=>$poasassignment->id));
 $data = $poasmodel->get_rating_data($assigneeid);
-print_r($data);
 $mform->set_data($data);
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cm->id,'page'=>'submissions')),null,0);

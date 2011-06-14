@@ -35,7 +35,9 @@ class tasksfields_page extends abstract_page {
         $id = $this->cm->id;
         echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php?id=' . $id), 
-                                    get_string('addbuttontext','poasassignment'));
+                                    get_string('addtaskfield','poasassignment'));
+        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/categoryedit.php?id=' . $id), 
+                                    get_string('addcategoryfield','poasassignment'));
         echo '</div>';
     }
     

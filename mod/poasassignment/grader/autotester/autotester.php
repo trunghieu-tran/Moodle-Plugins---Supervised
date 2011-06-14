@@ -82,7 +82,7 @@ class autotester extends grader{
         $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
         return $grade;
     }
-    public function run_tests($tests, $path, $attemptid) {
+    private function run_tests($tests, $path, $attemptid) {
         global $DB;
         $testresults = array();
         //$tests = array_reverse($tests);
@@ -114,7 +114,7 @@ class autotester extends grader{
         }
         return $testresults;
     }
-    public function create_test_files($tests, $path, $attemptid) {
+    private function create_test_files($tests, $path, $attemptid) {
         foreach($tests as $test) {
             $f = fopen($path . 
                     'test_' . 
@@ -127,7 +127,7 @@ class autotester extends grader{
             fclose($f);
         }
     }
-    public function clean_files($attemptid, $path, $tests) {
+    private function clean_files($attemptid, $path, $tests) {
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
         unlink('grader\autotester\runattempt' . $attemptid . '.bat');
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe');
