@@ -73,7 +73,9 @@ class submissions_page extends abstract_page {
         $user=$DB->get_record('user',array('id'=>$userid));
         $user=$DB->get_record('user',array('id'=>$userid));
         $row[]=$OUTPUT->user_picture($user);
-        $row[]=$user->firstname.' '.$user->lastname;
+        $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+        $row[]=html_writer::link($userurl,fullname($user, true));
+        //$row[]=$user->firstname.' '.$user->lastname;
         $assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
         
         if($indtasks) {
