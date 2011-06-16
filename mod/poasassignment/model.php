@@ -44,7 +44,7 @@ class poasassignment_model {
      * Saves object of poasassignment_model class
      * @var poasassignment_model
      */
-    protected static $instance;
+    protected static $model;
     
     public static $extpages = array('tasksfields' => 'pages/tasksfields/tasksfields.php',
                                     'tasks' => 'pages/tasks/tasks.php',
@@ -55,6 +55,17 @@ class poasassignment_model {
                                     'graders' => 'pages/graders/graders.php',
                                     'submissions' => 'pages/submissions/submissions.php'                                    
                                     );
+    private $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
+                           'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
+                           'preventlate' => PREVENT_LATE,
+                           'severalattempts' => SEVERAL_ATTEMPTS,
+                           'notifyteachers' => NOTIFY_TEACHERS,
+                           'notifystudents' => NOTIFY_STUDENTS,
+                           'activateindividualtasks' => ACTIVATE_INDIVIDUAL_TASKS,
+                           'secondchoice' => SECOND_CHOICE,
+                           'teacherapproval' => TEACHER_APPROVAL,
+                           'newattemptbeforegrade' => ALL_ATTEMPTS_AS_ONE,
+                           'finalattempts' => MATCH_ATTEMPT_AS_FINAL);
     
     /**
      * Constructor. Cannot be called outside of the class
@@ -89,10 +100,10 @@ class poasassignment_model {
      * @return poasassignment_model
      */
     static function &get_instance($poasassignment=null) {
-        if (self::$instance==null) {
-            self::$instance = new self($poasassignment);
+        if (self::$model==null) {
+            self::$model = new self($poasassignment);
         }
-        return self::$instance;
+        return self::$model;
     }
     /** 
      * Returns poasassignment answer plugins
@@ -104,6 +115,9 @@ class poasassignment_model {
         return $this->plugins;
     }
     
+    public static function new_add_instance($instance) {
+        $instance->timecreated = time();
+    }
     /** 
      * Inserts poasassignment data into DB
      * @return int poasassignment id
@@ -247,52 +261,61 @@ class poasassignment_model {
      * Converts some poasassignments settings into one variable
      * @return int
      */
-    function configure_flags() {
+    function configure_flags($instance = null) {
         $flags = 0;
-        if (isset($this->poasassignment->preventlatechoice)) {
-            $flags+=PREVENT_LATE_CHOICE;
-            unset($this->poasassignment->preventlatechoice);
+        if($instance == null) {
+            $instance = $this->poasassignment;
         }
-        if (isset($this->poasassignment->randomtasksafterchoicedate)) {
-            $flags+=RANDOM_TASKS_AFTER_CHOICEDATE;
-            unset($this->poasassignment->randomtasksafterchoicedate);
+        foreach($this->flags as $field => $flag) {
+            if (isset($instance->$field)) {
+                $flags += $flag;
+            }
         }
-        if (isset($this->poasassignment->preventlate)) {
-            $flags+=PREVENT_LATE;
-            unset($this->poasassignment->preventlate);
-        }
-        if (isset($this->poasassignment->severalattempts)) {
-            $flags+=SEVERAL_ATTEMPTS;
-            unset($this->poasassignment->severalattempts);
-        }
-        if (isset($this->poasassignment->notifyteachers)) {
-            $flags+=NOTIFY_TEACHERS;
-            unset($this->poasassignment->notifyteachers);
-        }
-        if (isset($this->poasassignment->notifystudents)) {
-            $flags+=NOTIFY_STUDENTS;
-            unset($this->poasassignment->notifystudents);
-        }
-        if (isset($this->poasassignment->activateindividualtasks)) {
-            $flags+=ACTIVATE_INDIVIDUAL_TASKS;
-            unset($this->poasassignment->activateindividualtasks);
-        }
-        if (isset($this->poasassignment->secondchoice)) {
-            $flags+=SECOND_CHOICE;
-            unset($this->poasassignment->secondchoice);
-        }
-        if (isset($this->poasassignment->teacherapproval)) {
-            $flags+=TEACHER_APPROVAL;
-            unset($this->poasassignment->teacherapproval);
-        }
-        if (isset($this->poasassignment->newattemptbeforegrade)) {
-            $flags+=ALL_ATTEMPTS_AS_ONE;
-            unset($this->poasassignment->newattemptbeforegrade);
-        }
-        if (isset($this->poasassignment->finalattempts)) {
-            $flags+=MATCH_ATTEMPT_AS_FINAL;
-            unset($this->poasassignment->finalattempts);
-        }
+        
+        // if (isset($this->poasassignment->preventlatechoice)) {
+            // $flags+=PREVENT_LATE_CHOICE;
+            // unset($this->poasassignment->preventlatechoice);
+        // }
+        // if (isset($this->poasassignment->randomtasksafterchoicedate)) {
+            // $flags+=RANDOM_TASKS_AFTER_CHOICEDATE;
+            // unset($this->poasassignment->randomtasksafterchoicedate);
+        // }
+        // if (isset($this->poasassignment->preventlate)) {
+            // $flags+=PREVENT_LATE;
+            // unset($this->poasassignment->preventlate);
+        // }
+        // if (isset($this->poasassignment->severalattempts)) {
+            // $flags+=SEVERAL_ATTEMPTS;
+            // unset($this->poasassignment->severalattempts);
+        // }
+        // if (isset($this->poasassignment->notifyteachers)) {
+            // $flags+=NOTIFY_TEACHERS;
+            // unset($this->poasassignment->notifyteachers);
+        // }
+        // if (isset($this->poasassignment->notifystudents)) {
+            // $flags+=NOTIFY_STUDENTS;
+            // unset($this->poasassignment->notifystudents);
+        // }
+        // if (isset($this->poasassignment->activateindividualtasks)) {
+            // $flags+=ACTIVATE_INDIVIDUAL_TASKS;
+            // unset($this->poasassignment->activateindividualtasks);
+        // }
+        // if (isset($this->poasassignment->secondchoice)) {
+            // $flags+=SECOND_CHOICE;
+            // unset($this->poasassignment->secondchoice);
+        // }
+        // if (isset($this->poasassignment->teacherapproval)) {
+            // $flags+=TEACHER_APPROVAL;
+            // unset($this->poasassignment->teacherapproval);
+        // }
+        // if (isset($this->poasassignment->newattemptbeforegrade)) {
+            // $flags+=ALL_ATTEMPTS_AS_ONE;
+            // unset($this->poasassignment->newattemptbeforegrade);
+        // }
+        // if (isset($this->poasassignment->finalattempts)) {
+            // $flags+=MATCH_ATTEMPT_AS_FINAL;
+            // unset($this->poasassignment->finalattempts);
+        // }
         return $flags;
     }
     
