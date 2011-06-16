@@ -219,3 +219,5 @@ $string['apply'] = 'Apply';
 $string['categoryname'] = 'Category name';
 $string['groupname'] = 'Name of the group';
 $string['groupname_help'] = 'Calculated group name';
+$string['stundetstask'] = 'Student\'s task';
+$string['nonexistentmoduleinstance'] = 'The module you trying to use does not exist';
