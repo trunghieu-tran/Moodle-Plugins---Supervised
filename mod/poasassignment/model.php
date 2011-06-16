@@ -55,7 +55,7 @@ class poasassignment_model {
                                     'graders' => 'pages/graders/graders.php',
                                     'submissions' => 'pages/submissions/submissions.php'                                    
                                     );
-    private $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
+    private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
                            'preventlate' => PREVENT_LATE,
                            'severalattempts' => SEVERAL_ATTEMPTS,
@@ -71,17 +71,10 @@ class poasassignment_model {
      * Constructor. Cannot be called outside of the class
      * @param $poasassignment module instance
      */
-    private function __construct($poasassignment=null) {
+    private function __construct($poasassignment = null) {
+        //echo 'creating';
         global $DB,$USER;
         $this->poasassignment = $poasassignment;
-        $this->ftypes = array(get_string('char','poasassignment'),
-                        get_string('text','poasassignment'),
-                        get_string('float','poasassignment'),
-                        get_string('int','poasassignment'),
-                        get_string('date','poasassignment'),
-                        get_string('file','poasassignment'),
-                        get_string('list','poasassignment'),
-                        get_string('multilist','poasassignment'));
         if (isset($this->poasassignment->id)) {
             $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id));
         }
@@ -90,8 +83,7 @@ class poasassignment_model {
         }
         if (!$this->assignee)
             $this->assignee->id=0;
-        $this->plugins=$DB->get_records('poasassignment_answers');
-        $this->graders = $DB->get_records('poasassignment_graders');
+        $this->initArrays();
     }
     /** 
      * Method is used instead of constructor. If poasassignment_model 
@@ -105,6 +97,38 @@ class poasassignment_model {
         }
         return self::$model;
     }
+    static function &get_einstance() {
+        if (self::$model == null) {
+            self::$model = new self($id, $id);
+        }
+        return self::$model;
+    }
+    
+    public function cash_instance($id) {
+        global $DB;
+        if (!$DB->record_exists('poasassignment', array('id' => $id))) {
+            print_error('nonexistentmoduleinstance', 'poasassignment');
+        }
+        else {
+            $this->poasassignment = $DB->get_record('poasassignment', array('id' => $id));
+        }
+        echo "now i store instance $id";
+    }
+    private function initArrays() {
+        global $DB;
+        $this->ftypes = array(get_string('char','poasassignment'),
+                              get_string('text','poasassignment'),
+                              get_string('float','poasassignment'),
+                              get_string('int','poasassignment'),
+                              get_string('date','poasassignment'),
+                              get_string('file','poasassignment'),
+                              get_string('list','poasassignment'),
+                              get_string('multilist','poasassignment'));
+                        
+        $this->plugins=$DB->get_records('poasassignment_answers');
+        $this->graders = $DB->get_records('poasassignment_graders');
+        $this->taskgivers = $DB->get_records('poasassignment_taskgivers');
+    }
     /** 
      * Returns poasassignment answer plugins
      * @return array 
@@ -116,7 +140,15 @@ class poasassignment_model {
     }
     
     public static function new_add_instance($instance) {
+        global $DB;
         $instance->timecreated = time();
+        $instance->flags = self::configure_flags($instance);
+        if(!isset($instance->taskgiverid)) {
+            $instance->taskgiverid = 0;
+        }
+        
+        $DB->insert_record('poasassignment', $instance);
+        // TODO load instance data into singleton
     }
     /** 
      * Inserts poasassignment data into DB
@@ -124,7 +156,7 @@ class poasassignment_model {
      */
     function add_instance() {
         global $DB;
-        $this->poasassignment->flags=$this->configure_flags();
+        $this->poasassignment->flags = self::configure_flags($this->poasassignment);
         $this->poasassignment->timemodified = time();
         if(!isset($this->poasassignment->taskgiverid)) {
             $this->poasassignment->taskgiverid = 0;
@@ -169,7 +201,7 @@ class poasassignment_model {
      */
     function update_instance() {
         global $DB;
-        $this->poasassignment->flags = $this->configure_flags();
+        $this->poasassignment->flags = self::configure_flags($this->poasassignment);
         $this->poasassignment->timemodified = time();
         if(!isset($this->poasassignment->taskgiverid)) {
             $this->poasassignment->taskgiverid = 0;
@@ -261,61 +293,13 @@ class poasassignment_model {
      * Converts some poasassignments settings into one variable
      * @return int
      */
-    function configure_flags($instance = null) {
+    private static function configure_flags($instance) {
         $flags = 0;
-        if($instance == null) {
-            $instance = $this->poasassignment;
-        }
-        foreach($this->flags as $field => $flag) {
+        foreach(self::$flags as $field => $flag) {
             if (isset($instance->$field)) {
                 $flags += $flag;
             }
         }
-        
-        // if (isset($this->poasassignment->preventlatechoice)) {
-            // $flags+=PREVENT_LATE_CHOICE;
-            // unset($this->poasassignment->preventlatechoice);
-        // }
-        // if (isset($this->poasassignment->randomtasksafterchoicedate)) {
-            // $flags+=RANDOM_TASKS_AFTER_CHOICEDATE;
-            // unset($this->poasassignment->randomtasksafterchoicedate);
-        // }
-        // if (isset($this->poasassignment->preventlate)) {
-            // $flags+=PREVENT_LATE;
-            // unset($this->poasassignment->preventlate);
-        // }
-        // if (isset($this->poasassignment->severalattempts)) {
-            // $flags+=SEVERAL_ATTEMPTS;
-            // unset($this->poasassignment->severalattempts);
-        // }
-        // if (isset($this->poasassignment->notifyteachers)) {
-            // $flags+=NOTIFY_TEACHERS;
-            // unset($this->poasassignment->notifyteachers);
-        // }
-        // if (isset($this->poasassignment->notifystudents)) {
-            // $flags+=NOTIFY_STUDENTS;
-            // unset($this->poasassignment->notifystudents);
-        // }
-        // if (isset($this->poasassignment->activateindividualtasks)) {
-            // $flags+=ACTIVATE_INDIVIDUAL_TASKS;
-            // unset($this->poasassignment->activateindividualtasks);
-        // }
-        // if (isset($this->poasassignment->secondchoice)) {
-            // $flags+=SECOND_CHOICE;
-            // unset($this->poasassignment->secondchoice);
-        // }
-        // if (isset($this->poasassignment->teacherapproval)) {
-            // $flags+=TEACHER_APPROVAL;
-            // unset($this->poasassignment->teacherapproval);
-        // }
-        // if (isset($this->poasassignment->newattemptbeforegrade)) {
-            // $flags+=ALL_ATTEMPTS_AS_ONE;
-            // unset($this->poasassignment->newattemptbeforegrade);
-        // }
-        // if (isset($this->poasassignment->finalattempts)) {
-            // $flags+=MATCH_ATTEMPT_AS_FINAL;
-            // unset($this->poasassignment->finalattempts);
-        // }
         return $flags;
     }
     
