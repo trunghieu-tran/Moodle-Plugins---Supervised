@@ -26,7 +26,7 @@ class parameterchoice extends taskgiver{
         $poasmodel = poasassignment_model::get_instance($poasassignment);
         $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
         if($data = $mform->get_data()) {
-            $tasks = $poasmodel->get_available_tasks($poasassignment->id, $USER->id);
+            $tasks = $poasmodel->get_available_tasks($USER->id);
             if(count($tasks) > 0) {
                 print_string('notasks', 'poasassignmenttaskgivers_parameterchoice');
                 return $mform;

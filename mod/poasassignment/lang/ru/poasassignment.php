@@ -130,3 +130,5 @@ $string['commentfiles']='Добавить ответный файл';
 $string['getrandomtask']='Получить случайное задание';
 $string['multilist']='Список со множественным выбором';
 $string['finalgrade']='Finalize grade';
+$string['taskgiversettings'] = 'Настройка стратегии выдачи заданий';
+$string['graders'] = 'Плагины автоматического оценивания';

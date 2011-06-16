@@ -98,7 +98,7 @@ class tasks_page extends abstract_page {
         }
         // Else show available for user tasks 
         else {
-            $tasks = $poasmodel->get_available_tasks($this->poasassignment->id, $USER->id);
+            $tasks = $poasmodel->get_available_tasks($USER->id);
         }
         foreach ($tasks as $task) {
             if (!$hascapmanage && $task->hidden)
