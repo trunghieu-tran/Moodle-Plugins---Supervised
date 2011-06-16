@@ -65,6 +65,8 @@ function poasassignment_add_instance($poasassignment) {
     $poasassignment->id = $poasmodel->add_instance();
     poasassignment_grade_item_update($poasassignment);
     return $poasassignment->id;
+    
+    $poasmodel = poasassignment_model::get_instance_by_id();
 }
 
 /**

@@ -94,10 +94,12 @@ class answer_form extends moodleform {
         
         $mform->addElement('checkbox', 'draft', get_string('draft', 'poasassignment'));
         
-        $poasassignment  = $DB->get_record('poasassignment', array('id' => $instance['poasassignmentid']), '*', MUST_EXIST);
-        $model = poasassignment_model::get_instance($poasassignment);
+        //$poasassignment  = $DB->get_record('poasassignment', array('id' => $instance['poasassignmentid']), '*', MUST_EXIST);
+        $model = poasassignment_model::get_instance();
+        $model->cash_instance($instance['poasassignmentid']);
+        //$model = poasassignment_model::get_instance($poasassignment);
         
-        if($model->poasassignment->flags & MATCH_ATTEMPT_AS_FINAL) {
+        if($model->get_poasassignment()->flags & MATCH_ATTEMPT_AS_FINAL) {
             $mform->addElement('checkbox','final',get_string('final','poasassignment'));
         }        
         

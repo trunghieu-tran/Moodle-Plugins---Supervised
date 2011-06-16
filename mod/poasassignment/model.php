@@ -23,6 +23,8 @@ class poasassignment_model {
      */     
     var $context;
     
+    private $cm;
+    private $course;
      /**
      * Context of poasassignment instance
      */  
@@ -97,12 +99,6 @@ class poasassignment_model {
         }
         return self::$model;
     }
-    static function &get_einstance() {
-        if (self::$model == null) {
-            self::$model = new self($id, $id);
-        }
-        return self::$model;
-    }
     
     public function cash_instance($id) {
         global $DB;
@@ -110,9 +106,25 @@ class poasassignment_model {
             print_error('nonexistentmoduleinstance', 'poasassignment');
         }
         else {
-            $this->poasassignment = $DB->get_record('poasassignment', array('id' => $id));
+            if(!isset($this->poasassignment) 
+               || $this->poasassignment->id !== $id) {
+                $this->poasassignment = $DB->get_record('poasassignment', array('id' => $id));
+                $this->course = $DB->get_record('course', 
+                                                array('id' => $this->poasassignment->course), 
+                                                '*', 
+                                                MUST_EXIST);
+                $this->cm = get_coursemodule_from_instance('poasassignment', 
+                                                           $this->poasassignment->id, 
+                                                           $this->course->id, 
+                                                           false, 
+                                                           MUST_EXIST);
+                $this->context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
+            }
         }
         echo "now i store instance $id";
+    }
+    public function cash_assignee_by_user_id($userid) {
+        $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
     }
     private function initArrays() {
         global $DB;
@@ -139,16 +151,17 @@ class poasassignment_model {
         return $this->plugins;
     }
     
-    public static function new_add_instance($instance) {
-        global $DB;
-        $instance->timecreated = time();
-        $instance->flags = self::configure_flags($instance);
-        if(!isset($instance->taskgiverid)) {
-            $instance->taskgiverid = 0;
-        }
-        
-        $DB->insert_record('poasassignment', $instance);
-        // TODO load instance data into singleton
+    public function get_poasassignment() {
+        return $this->poasassignment;
+    }
+    public function get_cm() {
+        return $this->cm;
+    }
+    public function get_course() {
+        return $this->course;
+    }
+    public function get_context() {
+        return $this->context;
     }
     /** 
      * Inserts poasassignment data into DB

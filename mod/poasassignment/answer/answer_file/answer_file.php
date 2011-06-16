@@ -266,7 +266,7 @@ class answer_file extends poasassignment_answer {
                     $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
                     if($submission) {
                         $data = file_prepare_standard_filemanager($data, 'answerfiles', $filemanager_options, $context, 'mod_poasassignment', 'submissionfiles', $submission->id);    
-                        }
+                    }
                 }
             }
         return $data;
