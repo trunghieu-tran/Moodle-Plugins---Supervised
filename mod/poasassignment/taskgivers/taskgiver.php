@@ -13,7 +13,11 @@ abstract class taskgiver {
     public function get_settings($poasassignmentid) {}
     public function save_settings($data) {}
     public function delete_settings($poasassignmentid) {}
-    public $showtasks;
-    public $hassettings;
+    public static function has_settings() {
+        return false;
+    }
+    public static function show_tasks() {
+        return false;
+    }
 }
 ?>

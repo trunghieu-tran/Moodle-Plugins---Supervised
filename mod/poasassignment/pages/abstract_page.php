@@ -1,9 +1,5 @@
 <?php
-
-/** 
- *
- *
- */
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 class abstract_page {
     var $cm;
     var $lasterror;
@@ -46,13 +42,13 @@ class abstract_page {
      * @return true if has capability to view
      */
     function has_cap() {
-        return has_capability($this->get_cap(),get_context_instance(CONTEXT_MODULE,$this->cm->id));
+        return has_capability($this->get_cap(),poasassignment_model::get_instance()->get_context());
     }
 
     /** Requires capabilities to view, used in has_ability_to_view
      */
     function require_cap() {
-        return require_capability($this->get_cap(),get_context_instance(CONTEXT_MODULE,$this->cm->id));
+        return require_capability($this->get_cap(),poasassignment_model::get_instance()->get_context());
     }
     function view() {
     }

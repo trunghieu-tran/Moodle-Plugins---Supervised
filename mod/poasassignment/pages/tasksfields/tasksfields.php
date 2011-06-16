@@ -16,17 +16,13 @@ class tasksfields_page extends abstract_page {
     
     function has_satisfying_parameters() {
         $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
-        if (!$flag)
+        if (!$flag) {
+            $this->lasterror = 'errorindtaskmodeisdisabled';
             return false;
+        }
         return true;
     }
-    
-    function get_error_satisfying_parameters() {
-        $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
-        if (!$flag)
-            return 'errorindtaskmodeisdisabled';
-    }
-    
+        
     function view() {
         global $OUTPUT;
         
