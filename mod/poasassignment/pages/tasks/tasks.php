@@ -42,7 +42,7 @@ class tasks_page extends abstract_page {
         
         
 
-        if ($hascapmanage || $taskgiver->showtasks) {
+        if ($hascapmanage || $taskgivername::show_tasks) {
             $this->view_table($hascapmanage, $taskgiver);
             $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
         }

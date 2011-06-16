@@ -6,11 +6,9 @@ require_once($CFG->libdir . '\tablelib.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 require_once($CFG->libdir.'/formslib.php');
 class criterions_page extends abstract_page {
-    //var $poasassignment;
     
     function criterions_page(/* $cm, $poasassignment */) {
-        //$this->poasassignment = $poasassignment;
-        //$this->cm = $cm;
+        
     }
     
     function get_cap() {

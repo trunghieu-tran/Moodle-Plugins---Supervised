@@ -2,35 +2,45 @@
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 class taskgiversettings_page extends abstract_page {
-    var $poasassignment;
+    //var $poasassignment;
     
     function __construct($cm, $poasassignment) {
-        $this->poasassignment = $poasassignment;
-        $this->cm = $cm;
+        //$this->poasassignment = $poasassignment;
+        //$this->cm = $cm;
     }
     
     function get_cap() {
         return 'mod/poasassignment:grade';
     }
      function has_satisfying_parameters() {
-        $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
-        if(!$flag)
+        if(!poasassignment_model::get_instance()->has_flag(ACTIVATE_INDIVIDUAL_TASKS)) {
+            $this->lasterror = 'errorindtaskmodeisdisabled';
             return false;
+        }
+        global $DB;
+        $tgid = poasassignment_model::get_instance()->get_poasassignment()->taskgiverid;
+        if(!$DB->record_exists('poasassignment_taskgivers', array('id' => $tgid))) {
+            $this->lasterror = 'errorindtaskmodeisdisabled';
+            return false;
+        }
+        else {
+            $tg = $DB->get_record('poasassignment_taskgivers', array('id' => $tgid));
+            $tgname = $tg->name;
+            require_once($tg->path);
+            if (!$tgname::has_settings()) {
+                $this->lasterror = 'errorthistghasntsettings';
+                return false;
+            }
+        }
         return true;
     }
     
-    function get_error_satisfying_parameters() {
-        $flag=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        if(!$flag)
-            return 'errorindtaskmodeisdisabled';
-    } 
-    
     function view() {
         global $DB;
-        
-        $id = $this->cm->id;
-        $poasassignmentid = $this->poasassignment->id;
-        $taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $this->poasassignment->taskgiverid));
+        $model = poasassignment_model::get_instance();
+        $id = $model->get_cm()->id;
+        $poasassignmentid = $model->get_poasassignment()->id;
+        $taskgiverrec = $DB->get_record('poasassignment_taskgivers', array('id' => $model->get_poasassignment()->taskgiverid));
         require_once($taskgiverrec->path);
         $taskgivername = $taskgiverrec->name;
         $taskgiver = new $taskgivername();
@@ -39,7 +49,7 @@ class taskgiversettings_page extends abstract_page {
              ' : ' .
              get_string('pluginname', "poasassignmenttaskgivers_$taskgivername") .
              '</big></b></div><br>';
-        if(!$taskgiver->hassettings) {
+        if(!$taskgivername::has_settings()) {
             print_string('taskgiverhasnosettings', 'poasassignment');
         }
         else {

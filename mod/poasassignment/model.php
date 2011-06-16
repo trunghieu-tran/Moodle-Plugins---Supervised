@@ -42,6 +42,8 @@ class poasassignment_model {
      */
     private $graders=array();
     
+    private $usedgraders;
+    
     /**
      * Saves object of poasassignment_model class
      * @var poasassignment_model
@@ -162,6 +164,14 @@ class poasassignment_model {
     }
     public function get_context() {
         return $this->context;
+    }
+    
+    public function get_graders() {
+        return $graders;
+    }
+    
+    public function has_flag($flag) {
+        return ($this->poasassignment->flags & $flag);
     }
     /** 
      * Inserts poasassignment data into DB
@@ -529,29 +539,11 @@ class poasassignment_model {
                     $rec->graderid = 0;
                 
                 $rec->id = $DB->insert_record('poasassignment_criterions', $rec);
-                
-                /* if ($rec->graderid > 0) {
-                    $usedgrader = $DB->get_record('poasassignment_used_graders', array('id' => $rec->graderid));
-                    // if criterion for this grader really exists - create new record in DB
-                    if ($DB->record_exists('poasassignment_criterions', array('id' => $usedgrader->criterionid))) {
-                        $usedgrader->criterionid = $rec->id;
-                        $DB->insert_record('poasassignment_used_graders', $usedgrader);
-                    }
-                    // else update current record
-                    else {
-                        $usedgrader->criterionid = $rec->id;
-                        $DB->update_record('poasassignment_used_graders', $usedgrader);
-                    }
-                    $usedgrader->criterionid = $rec->id;
-                    $DB->update_record('poasassignment_used_graders', $usedgrader);
-                } */
-                
             }
         }
-        //return $DB->insert_record('poasassignment_criterions',$data);
     }
     
-    function update_criterion($data) {
+    /*function update_criterion($data) {
         global $DB;
         
         for($i=0;$i<count($data->name);$i++) {
@@ -567,7 +559,7 @@ class poasassignment_model {
         }
         $criterion->id=$criterionid;
         return $DB->update_record('poasassignment_criterions',$criterion);
-    }
+    }*/
     function get_rating_data($assigneeid) {
         global $DB;
         $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
@@ -1197,7 +1189,7 @@ class poasassignment_model {
         $user = $DB->get_record('user', array('id'=>$assignee->userid));
         $eventdata= new stdClass();
         
-        $teachers = $this->get_graders($user);
+        $teachers = $this->get_teachers($user);
         
         
         $eventdata->name = 'poasassignment_updates';
@@ -1215,7 +1207,7 @@ class poasassignment_model {
         }
         
     }
-    function get_graders() {
+    function get_teachers() {
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         $potgraders = get_users_by_capability($context, 'mod/poasassignment:grade', '', '', '', '', '', '', false, false);
@@ -1258,7 +1250,7 @@ class poasassignment_model {
             require_once($taskgiverrec->path);
             $taskgivername = $taskgiverrec->name;
             $tg = new $taskgivername();
-            if($tg->hassettings) {
+            if($taskgivername::has_settings()) {
                 $tg->delete_settings($poasassignmentid);
             }
         }

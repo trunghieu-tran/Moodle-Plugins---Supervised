@@ -14,8 +14,12 @@ require_once dirname(dirname(__FILE__)).'\taskgiver.php';
 require_once($CFG->libdir.'/formslib.php');
 class parameterchoice extends taskgiver{
 
-    public $showtasks = true;
-    public $hassettings = true;
+    public static function has_settings() {
+        return true;
+    }
+    public static function show_tasks() {
+        return true;
+    }
 
     function parameter_search($cmid, $poasassignment) {
         global $DB,$USER;

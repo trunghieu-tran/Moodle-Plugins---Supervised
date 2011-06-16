@@ -37,7 +37,7 @@ class poasassignment_tabbed_page {
         $this->currentpage = $page;
         
         $PAGE->set_url('/mod/poasassignment/view.php', array('id' => $cm->id,'page'=>$page));
-        $PAGE->set_title($course->shortname.': '.get_string('modulmodulename','poasassignment').': '.$poasassignment->name);
+        $PAGE->set_title($course->shortname.': '.get_string('modulename','poasassignment').': '.$poasassignment->name);
         $PAGE->set_heading($course->fullname);
         $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
 
@@ -63,6 +63,7 @@ class poasassignment_tabbed_page {
         else {
             $this->view_body();
         }
+        
         $this->view_footer();        
     }
 
@@ -93,9 +94,5 @@ class poasassignment_tabbed_page {
     function view_footer() {
         global $OUTPUT;
         echo $OUTPUT->footer();
-    }
-
-    function view_navigation() {
-        
     }
 }

@@ -4,8 +4,12 @@ require_once dirname(dirname(__FILE__)).'\taskgiver.php';
 require_once($CFG->libdir.'/formslib.php');
 class randomchoice extends taskgiver {
 
-    public $showtasks = false;
-    public $hassettings = false;
+    public static function has_settings() {
+        return false;
+    }
+    public static function show_tasks() {
+        return false;
+    }
 
     function process_before_tasks($cmid, $poasassignment) {
         global $USER,$DB;
