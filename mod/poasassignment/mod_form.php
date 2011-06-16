@@ -3,14 +3,14 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once('model.php');
 class mod_poasassignment_mod_form extends moodleform_mod {
 
     var $plugins=array();
     /** Displays main options of poasassignment
      */
     function definition() {
-
-        global $COURSE, $CFG;
+        global $COURSE, $CFG, $DB;
         $mform =& $this->_form;
         
         // Adding the "general" fieldset

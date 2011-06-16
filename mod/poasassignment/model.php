@@ -121,6 +121,7 @@ class poasassignment_model {
                                                            false, 
                                                            MUST_EXIST);
                 $this->context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
+                echo 'change';
             }
         }
         echo "now i store instance $id";
@@ -171,7 +172,7 @@ class poasassignment_model {
     }
     
     public function has_flag($flag) {
-        return ($this->poasassignment->flags & $flag);
+        return (isset($this->poasassignment) && $this->poasassignment->flags & $flag);
     }
     /** 
      * Inserts poasassignment data into DB
@@ -1291,11 +1292,11 @@ class poasassignment_model {
      * @param int $givehidden
      * @return array array of available tasks
      */
-    public function get_available_tasks($poasassignmentid, $userid, $givehidden = 0) {
+    public function get_available_tasks($userid, $givehidden = 0) {
         // Get all tasks in instance at first
         global $DB;
         $values = array();
-        $values['poasassignmentid'] = $poasassignmentid;
+        $values['poasassignmentid'] = $this->poasassignment->id;
         if(!$givehidden) {
             $values['hidden'] = 0;
         }
@@ -1307,7 +1308,7 @@ class poasassignment_model {
         }
         
         // Filter tasks using 'uniqueness' field in poasassignment instance
-        if($instance = $DB->get_record('poasassignment', array('id' => $poasassignmentid))) {
+        if($instance = $DB->get_record('poasassignment', array('id' => $this->poasassignment->id))) {
             // If no uniqueness required, return $tasks without changes
             if($instance->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
                 return $tasks;

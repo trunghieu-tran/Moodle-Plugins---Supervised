@@ -26,7 +26,7 @@ class taskgiversettings_page extends abstract_page {
         else {
             $tg = $DB->get_record('poasassignment_taskgivers', array('id' => $tgid));
             $tgname = $tg->name;
-            require_once($tg->path);
+            require_once(dirname(dirname(dirname(__FILE__))) . '\\' . $tg->path);
             if (!$tgname::has_settings()) {
                 $this->lasterror = 'errorthistghasntsettings';
                 return false;
@@ -49,18 +49,13 @@ class taskgiversettings_page extends abstract_page {
              ' : ' .
              get_string('pluginname', "poasassignmenttaskgivers_$taskgivername") .
              '</big></b></div><br>';
-        if(!$taskgivername::has_settings()) {
-            print_string('taskgiverhasnosettings', 'poasassignment');
+        $mform = $taskgiver->get_settings_form($id, $poasassignmentid);
+        $data = $taskgiver->get_settings($poasassignmentid);
+        $mform->set_data($data);
+        if($mform->get_data()) {
+            $taskgiver->save_settings($mform->get_data());
         }
-        else {
-            $mform = $taskgiver->get_settings_form($id, $poasassignmentid);
-            $data = $taskgiver->get_settings($poasassignmentid);
-            $mform->set_data($data);
-            if($mform->get_data()) {
-                $taskgiver->save_settings($mform->get_data());
-            }
-            $mform->display(); 
-        }
+        $mform->display(); 
     }
     
 }
