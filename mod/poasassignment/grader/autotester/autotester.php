@@ -251,7 +251,6 @@ class autotester extends grader{
             $html .= '<b><big>' . get_string('testout', 'poasassignment_autotester') . '</big></b>';
             $html .= '<br>' . $test->testout;
             $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
-            
             if($test->testout == $result->studentout) {
                 $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
                 $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';

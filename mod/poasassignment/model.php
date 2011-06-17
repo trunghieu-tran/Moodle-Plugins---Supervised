@@ -892,7 +892,8 @@ class poasassignment_model {
         global $DB;
         $usedgraders = $DB->get_records('poasassignment_used_graders', 
                                         array('poasassignmentid' => $this->poasassignment->id));
-        //$graderrecords = array();
+        
+        $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
         foreach ($usedgraders as $usedgrader) {
             //echo $usedgrader->id;
             $graderrecord = $DB->get_record('poasassignment_graders', array('id' => $usedgrader->graderid));
@@ -911,7 +912,6 @@ class poasassignment_model {
                 $ratingvalue->attemptid = $attemptid;
                 $ratingvalue->criterionid = $criterion->id;
                 
-                $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
                 $ratingvalue->assigneeid = $attempt->assigneeid;
                 
                 $ratingvalue->value = $rating;
@@ -921,6 +921,32 @@ class poasassignment_model {
                 $ratingvalueid = $DB->insert_record('poasassignment_rating_values', $ratingvalue);
             }
             
+        }
+        // if attempt grades for all criterions, caluclulate total grade
+        $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $this->poasassignment->id));
+        $allcriterions = true;
+        $totalweight = 0;
+        $criteriongrades = array();
+        foreach($criterions as $criterion) {
+            if(!$DB->record_exists('poasassignment_rating_values', array('criterionid' => $criterion->id, 'attemptid' => $attemptid))) {
+                $allcriterions = false;
+                break;
+            }
+            else {
+                $rating = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id, 'attemptid' => $attemptid));
+                $criteriongrades[$criterion->id] = $rating->value;
+                $totalweight += $criterion->weight;
+            }
+        }
+        if ($allcriterions) {
+            $grade = 0;
+            foreach($criterions as $criterion) {
+                $grade += $criteriongrades[$criterion->id] * round($criterion->weight / $totalweight, 2);
+            }
+            $attempt->rating = $grade;
+            $attempt->ratingdate = time();
+            $DB->update_record('poasassignment_attempts', $attempt);
+            // TODO Просто вызвать функцию, которая выставляет оценку
         }
     }
     function bind_task_to_assignee($userid,$taskid) {
