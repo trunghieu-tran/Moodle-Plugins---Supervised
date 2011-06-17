@@ -42,7 +42,7 @@ class tasks_page extends abstract_page {
         
         
 
-        if ($hascapmanage || $taskgivername::show_tasks) {
+        if ($hascapmanage || $taskgivername::show_tasks()) {
             $this->view_table($hascapmanage, $taskgiver);
             $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
         }
@@ -63,10 +63,10 @@ class tasks_page extends abstract_page {
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $this->poasassignment->id));
         
         
-        $columns[]='name';
-        $columns[]='description';
-        $headers[]='name';
-        $headers[]='description';
+        $columns[]=get_string('taskname', 'poasassignment');
+        $columns[]=get_string('taskdescription', 'poasassignment');
+        $headers[]=get_string('taskname', 'poasassignment');
+        $headers[]=get_string('taskdescription', 'poasassignment');
         
         if (count($fields)) {
             foreach ($fields as $field) {

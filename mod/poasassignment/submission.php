@@ -14,7 +14,7 @@ require_capability('mod/poasassignment:submit', get_context_instance(CONTEXT_MOD
 add_to_log($course->id, 'poasassignment', 'submission', 
             "submission.php?id=$cm->id", $poasassignment->name, $cm->id);
             
-global $OUTPUT,$DB,$PAGE;
+global $OUTPUT,$DB,$PAGE,$USER;
 $PAGE->set_url('/mod/poasassignment/view.php?id=' . $cm->id);
 $PAGE->set_title(get_string('modulename', 'poasassignment') . ':' . $poasassignment->name);
 $PAGE->set_heading($course->fullname);
@@ -26,7 +26,10 @@ $answer_form = new answer_form(null, array('poasassignmentid' => $poasassignment
                                            'id' => $cm->id));
 //$plugins=$DB->get_records('poasassignment_answers');
 
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+//$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
+$poasmodel->cash_assignee_by_user_id($USER->id);
 $plugins=$poasmodel->get_plugins();
 foreach($plugins as $plugin) {
     if (poasassignment_answer::used_in_poasassignment($plugin->id, $poasassignment->id)) {
