@@ -22,7 +22,8 @@ $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulen
     
 global $OUTPUT,$DB,$USER;
 
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 
 //$mform = new taskview_form(null,array('id'=>$cm->id,'taskid'=>$taskid,'poasassignmentid'=>$poasassignment->id));
 

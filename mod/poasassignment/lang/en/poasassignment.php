@@ -141,7 +141,6 @@ $string['taskhidden'] = 'Task is hidden from students';
 $string['errormustbefloat'] = 'It must be fraction';
 $string['errormustbeint'] = 'It must be integer';
 $string['nosatisfyingtasks'] = 'There is no task that satisfies your requirements';
-$string['inputparameters'] = 'Input preferred parameters of task';
 $string['taskunavailable'] = 'Task is hidden';
 $string['errornoname'] = 'You must define name';
 $string['invalidassigneeid'] = 'Invalid assignee id';

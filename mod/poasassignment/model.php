@@ -122,10 +122,10 @@ class poasassignment_model {
                                                            false, 
                                                            MUST_EXIST);
                 $this->context = get_context_instance(CONTEXT_MODULE,$this->cm->id);
-                echo 'change';
+                //echo 'change';
             }
         }
-        echo "now i store instance $id";
+        //echo "now i store instance $id";
     }
     public function cash_assignee_by_user_id($userid) {
         global $DB;
@@ -1143,7 +1143,8 @@ class poasassignment_model {
             if ($attempt->draft==0) {
                 echo get_string('penalty','poasassignment').'='.$this->get_penalty($attempt->id);
                 $ratingwithpenalty=$attempt->rating - $this->get_penalty($attempt->id);
-                echo '<br>'.get_string('totalratingis','poasassignment').' '.$ratingwithpenalty;
+                echo $OUTPUT->heading(get_string('totalratingis','poasassignment').' '.$ratingwithpenalty);
+                //echo '<br>'.get_string('totalratingis','poasassignment').' '.$ratingwithpenalty;
             }
             echo $OUTPUT->box_end();
         }

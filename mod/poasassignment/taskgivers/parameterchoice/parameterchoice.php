@@ -23,11 +23,14 @@ class parameterchoice extends taskgiver{
 
     function parameter_search($cmid, $poasassignment) {
         global $DB,$USER;
-        $poasmodel = poasassignment_model::get_instance($poasassignment);
+        //$poasmodel = poasassignment_model::get_instance($poasassignment);
+        $poasmodel = poasassignment_model::get_instance();
+        $poasmodel->cash_instance($poasassignment->id);
+        $poasmodel->cash_assignee_by_user_id($USER->id);
         $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
         if($data = $mform->get_data()) {
             $tasks = $poasmodel->get_available_tasks($USER->id);
-            if(count($tasks) > 0) {
+            if(count($tasks) == 0) {
                 print_string('notasks', 'poasassignmenttaskgivers_parameterchoice');
                 return $mform;
             }
@@ -218,7 +221,7 @@ class parametersearch_form extends moodleform {
         
         $fields = parameterchoice::get_parameters_fields($instance['poasassignmentid']);
         if($fields) {
-            $mform->addElement('header','header',get_string('inputparameters','poasassignment'));
+            $mform->addElement('header','header',get_string('inputparameters','poasassignmenttaskgivers_parameterchoice'));
             $poasmodel= poasassignment_model::get_instance();
             foreach($fields as $field) {
                 if($field->ftype!=MULTILIST && $field->ftype!=LISTOFELEMENTS)

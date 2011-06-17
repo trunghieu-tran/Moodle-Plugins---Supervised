@@ -40,6 +40,7 @@ class autotester extends grader{
             $text .= 'C\bin\cl.exe ';
             $text .= '/Feattempts\attempt' . $attemptid . '.exe ';
             $text .= '/Foattempts\attempt' . $attemptid . '.obj ';
+            $text .= '/Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /W3 /nologo /ZI /TP /errorReport:prompt ';
             $text .= 'attempts\attempt' . $attemptid . '.cpp ';
             $text .= "\n";
             fwrite($runf, $text);
@@ -54,7 +55,9 @@ class autotester extends grader{
         
         // step 2.2 get grader tests
         
-        $rec = $DB->get_record('poasassignment_gr_autotester', array('taskid' => $assignee->taskid));
+        if(! $rec = $DB->get_record('poasassignment_gr_autotester', array('taskid' => $assignee->taskid))) {
+            return 100;
+        }
         $gradertestrec = $DB->get_record('question_gradertest', array('questionid' => $rec->questionid));
         $gradertests = $DB->get_records('question_gradertest_tests', array('gradertestid' => $gradertestrec->id));
         
@@ -102,7 +105,17 @@ class autotester extends grader{
             $testresult = new stdClass();
             $testresult->testid = $test->id;
             $testresult->attemptid = $attemptid;
-            $testresult->studentout = $out[0];
+            if(count($out) > 1) {
+                $testresult->studentout = '';
+                foreach ($out as $outline) {
+                    $testresult->studentout .= $outline;
+                    $testresult->studentout .= "\n";
+                }
+            }
+            else {  
+                $testresult->studentout = $out[0];
+            }
+            
             if($testresult->studentout == $test->testout) {
                 $testresult->testpassed = 1;
             }
@@ -129,9 +142,14 @@ class autotester extends grader{
     }
     private function clean_files($attemptid, $path, $tests) {
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+        unlink('grader\autotester\vc90.idb');
+        unlink('grader\autotester\vc90.pdb');
         unlink('grader\autotester\runattempt' . $attemptid . '.bat');
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe');
         unlink('grader\autotester\attempts\attempt' . $attemptid . '.obj');
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.pdb');
+        unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe.manifest');
         
         foreach($tests as $test) {
             unlink($path . 'test_' . $test->id . '_'. $attemptid . '.txt');
@@ -143,19 +161,6 @@ class autotester extends grader{
     private $successfultestscount;
     
     public function show_result($options) {
-        //TODO: вернемся когда это можно будет увидеть, остальные флаги нужно доработать еще будет
-        $html = "";
-        if($options & POASASSIGNMENT_GRADER_SHOW_RATING) 
-            $html += "<br>Rating : ".(100 * $successfultestscount / count($testresults));
-        if($options & POASASSIGNMENT_GRADER_SHOW_NUMBER_OF_PASSED_TESTS)
-            $html += "<br>Passed tests : ".$successfultestscount;
-        
-        foreach ($testresults as $testresult) {
-            if($options & POASASSIGNMENT_GRADER_SHOW_TESTS_NAMES)
-                $html += "<br>".$testresult->testname;
-            if($options & POASASSIGNMENT_GRADER_SHOW_TEST_INPUT_DATA)
-                $html += "<br>".$testresult->testinputdata;
-        }
     }
     
     // TODO: работа с тестами когда ими займусь ближе
@@ -241,22 +246,23 @@ class autotester extends grader{
             // TODO capability
             $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
             $html .= $OUTPUT->heading(get_string('testname', 'poasassignment_autotester') . ' : ' . $test->name);
-            //$html .= '<br>' . $test->name;
-            //$html .= '<br>';
-            $html .= get_string('testin', 'poasassignment_autotester');
-            $html .= '<br>' . $test->testin . '<br>';
-            $html .= get_string('testout', 'poasassignment_autotester');
-            $html .= '<br>' . $test->testout . '<br>';
-            $html .= get_string('studentout', 'poasassignment_autotester');
-            $html .= '<br>' . $result->studentout . '<br>';
+            $html .= '<b><big>' . get_string('testin', 'poasassignment_autotester') . '</big></b>';
+            $html .= '<br>' . $test->testin;
+            $html .= '<b><big>' . get_string('testout', 'poasassignment_autotester') . '</big></b>';
+            $html .= '<br>' . $test->testout;
+            $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
+            
             if($test->testout == $result->studentout) {
+                $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
                 $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
             }
             else {
+                $html .= '<br><div style="background : RED">' . $result->studentout . '</div><br>';
                 $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
             }
             $html .= '<br>';
         }
+        $html = str_replace("\n", '<br>', $html);
         return $html;
     }
 }
