@@ -4,11 +4,11 @@ require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once('graderssettings_form.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 class graders_page extends abstract_page {
-    var $poasassignment;
+    //var $poasassignment;
     
-    function __construct($cm, $poasassignment) {
-        $this->poasassignment = $poasassignment;
-        $this->cm = $cm;
+    function __construct(/* $cm, $poasassignment */) {
+        //$this->poasassignment = $poasassignment;
+        //$this->cm = $cm;
     }
     
     function get_cap() {
@@ -18,7 +18,7 @@ class graders_page extends abstract_page {
     function has_satisfying_parameters() {
         global $DB;
         if(!$DB->record_exists('poasassignment_used_graders', 
-                               array('poasassignmentid' => $this->poasassignment->id))) {
+                               array('poasassignmentid' => poasassignment_model::get_instance()->get_poasassignment()->id))) {
             $this->lasterror = 'errornograderused';
             return false;
         }
@@ -26,8 +26,11 @@ class graders_page extends abstract_page {
     }
     function view() {
         global $DB,$OUTPUT;
-        $id = $this->cm->id;
-        $poasassignmentid = $this->poasassignment->id;
+        $model = poasassignment_model::get_instance();
+        $id = $model->get_cm()->id;
+        //$id = $this->cm->id;
+        $poasassignmentid = $model->get_poasassignment()->id;
+        //$poasassignmentid = $this->poasassignment->id;
         $mform = new graderssettings_form(null, array('id' => $id, 'poasassignmentid' => $poasassignmentid));
         $graders = $DB->get_records('poasassignment_used_graders', array('poasassignmentid' => $poasassignmentid));
             

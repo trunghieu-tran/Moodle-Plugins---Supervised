@@ -11,7 +11,7 @@ $fieldid = optional_param('fieldid', 0, PARAM_INT);
 $cm             = get_coursemodule_from_id('poasassignment', $id, 0, false, MUST_EXIST);
 $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $poasassignment = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
-    
+
 require_login($course, true, $cm);
 require_capability('mod/poasassignment:managetasksfields', get_context_instance(CONTEXT_MODULE, $cm->id));
 
@@ -25,7 +25,9 @@ $PAGE->set_button(update_module_button($cm->id,
 
                          
 global $OUTPUT,$DB;
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+//$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 $mform = new categoryedit_form(null, array('id' => $id,
                                            'categoryid' => $categoryid,
                                            'fieldid' => $fieldid,

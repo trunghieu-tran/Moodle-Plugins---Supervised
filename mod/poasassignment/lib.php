@@ -397,10 +397,13 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
             require_once($pagepath);
             $pagetype = $pagename.'_page';
             // If user has ability to view $pagepath - add page on panel
-            $poasassignment  = $DB->get_record('poasassignment', 
-                                               array('id' => $cm->instance), 
-                                               '*', 
-                                               MUST_EXIST);
+            //$poasassignment  = $DB->get_record('poasassignment', 
+            //                                   array('id' => $cm->instance), 
+            //                                   '*', 
+            //                                   MUST_EXIST);
+            if(!$pagetype::display_in_navbar()) {
+                continue;
+            }
             $pageinstance = new $pagetype($cm, $poasassignment);
             if ($pageinstance->has_ability_to_view()) {
                 $navigation->add(get_string($pagename,'poasassignment'),

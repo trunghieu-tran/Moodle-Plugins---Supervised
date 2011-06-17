@@ -240,21 +240,21 @@ class autotester extends grader{
         foreach ($results as $result) {
             // TODO capability
             $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
-            $html .= get_string('testname', 'poasassignment_autotester'). ' ' . $test->name;
-            $html .= '<br>';
-            $html .= get_string('testin', 'poasassignment_autotester'). ' ' . $test->testin;
-            $html .= '<br>';
-            $html .= get_string('testout', 'poasassignment_autotester'). ' ' . $test->testout;
-            $html .= '<br>';
-            $html .= get_string('studentout', 'poasassignment_autotester'). ' ' . $result->studentout;
-            $html .= '<br>';
+            $html .= $OUTPUT->heading(get_string('testname', 'poasassignment_autotester') . ' : ' . $test->name);
+            //$html .= '<br>' . $test->name;
+            //$html .= '<br>';
+            $html .= get_string('testin', 'poasassignment_autotester');
+            $html .= '<br>' . $test->testin . '<br>';
+            $html .= get_string('testout', 'poasassignment_autotester');
+            $html .= '<br>' . $test->testout . '<br>';
+            $html .= get_string('studentout', 'poasassignment_autotester');
+            $html .= '<br>' . $result->studentout . '<br>';
             if($test->testout == $result->studentout) {
                 $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
             }
             else {
                 $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
             }
-            $html .= '<br>';
             $html .= '<br>';
         }
         return $html;

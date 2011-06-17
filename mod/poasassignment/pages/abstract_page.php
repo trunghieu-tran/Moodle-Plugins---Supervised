@@ -53,4 +53,8 @@ class abstract_page {
     function view() {
     }
     
+    public static function display_in_navbar() {
+        return true;
+    }
+    
 }

@@ -22,7 +22,9 @@ $PAGE->set_button(update_module_button($cm->id,
                                        get_string('modulename', 'poasassignment')));
     
 global $OUTPUT,$DB;
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+//$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 $mform = new tasksfieldsedit_form(null, array('id' => $id,
                                               'fieldid' => $fieldid,
                                               'poasassignmentid' => $poasassignment->id));

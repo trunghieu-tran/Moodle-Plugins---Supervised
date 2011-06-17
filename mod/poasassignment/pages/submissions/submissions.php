@@ -143,12 +143,14 @@ class submissions_page extends abstract_page {
                     }
                     else {
                         $row[]='-';
-                        $row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
+                        $row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
+                        //$row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
                     }
                 }
                 if(!isset($attempt->rating)) {
                     $row[]='-';
-                    $row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
+                    $row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
+                    //$row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
                 }
             }
             else {

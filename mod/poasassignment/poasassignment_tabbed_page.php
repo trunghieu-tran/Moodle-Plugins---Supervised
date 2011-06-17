@@ -10,7 +10,7 @@ class poasassignment_tabbed_page {
      * @param $pages array of pages to be displayed
      */
     function poasassignment_tabbed_page() {
-        global $DB,$PAGE;
+        global $DB,$PAGE,$USER;
         $id = optional_param('id', 0, PARAM_INT);           // course_module ID, or
         $p  = optional_param('p', 0, PARAM_INT);            // poasassignment instance ID 
         $page = optional_param('page', 'view', PARAM_TEXT);     // set 'view' as default page
@@ -28,6 +28,7 @@ class poasassignment_tabbed_page {
         }
         
         poasassignment_model::get_instance()->cash_instance($poasassignment->id);
+        poasassignment_model::get_instance()->cash_assignee_by_user_id($USER->id);
 
         require_login($course, true, $cm);
 

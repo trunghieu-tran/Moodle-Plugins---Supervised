@@ -127,7 +127,12 @@ class poasassignment_model {
         echo "now i store instance $id";
     }
     public function cash_assignee_by_user_id($userid) {
-        $this->assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
+        global $DB;
+        $this->assignee=$DB->get_record('poasassignment_assignee',
+                                        array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
+        if(!$this->assignee) {
+            $this->assignee->id = 0;
+        }
     }
     private function initArrays() {
         global $DB;

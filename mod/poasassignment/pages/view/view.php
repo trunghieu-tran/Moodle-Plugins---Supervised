@@ -16,8 +16,8 @@ class view_page extends abstract_page {
 
     function view() {
         global $OUTPUT,$USER;
-        $poasmodel = poasassignment_model::get_instance($this->poasassignment);
-        
+        //$poasmodel = poasassignment_model::get_instance($this->poasassignment);
+        $poasmodel = poasassignment_model::get_instance();
         // Show submission statistics if user has capability
         if (has_capability('mod/poasassignment:grade', $this->context))
             echo '<div align="right">'.$poasmodel->get_statistics().'</div>';
@@ -210,20 +210,20 @@ class view_page extends abstract_page {
     function view_answer_block() {
         global $OUTPUT,$DB,$USER;
         //$plugins=$DB->get_records('poasassignment_answers');
-        $poasmodel=poasassignment_model::get_instance($this->poasassignment);
+        //$poasmodel=poasassignment_model::get_instance($this->poasassignment);
+        $poasmodel=poasassignment_model::get_instance();
         $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
         // if individual tasks mode is active
         if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
-
             if($DB->record_exists('poasassignment_assignee',
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
                 if($attempt=$DB->get_record('poasassignment_attempts',
                             array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount))) {
                     echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
                     echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attemptscount.' ('.userdate($attempt->attemptdate).')');
-                    $attemptsurl = new moodle_url('attempts.php',array('id'=>$this->cm->id,'assigneeid'=>$attempt->assigneeid)); 
-                    echo '<br>'.html_writer::link($attemptsurl,get_string('myattempts','poasassignment'));
+                    // $attemptsurl = new moodle_url('attempts.php',array('id'=>$this->cm->id,'assigneeid'=>$attempt->assigneeid)); 
+                    // echo '<br>'.html_writer::link($attemptsurl,get_string('myattempts','poasassignment'));
                     foreach($plugins as $plugin) {
                         require_once($plugin->path);
                         $poasassignmentplugin = new $plugin->name();
