@@ -10,7 +10,7 @@ $assigneeid = optional_param('assigneeid', -1, PARAM_INT);
 $cm             = get_coursemodule_from_id('poasassignment', $id, 0, false, MUST_EXIST);
 $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $poasassignment = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
-    
+
 require_login($course, true, $cm);
 require_capability('mod/poasassignment:grade', get_context_instance(CONTEXT_MODULE,$cm->id));
 
@@ -25,7 +25,9 @@ global $OUTPUT,$DB,$USER;
 if (!$DB->record_exists('poasassignment_criterions',array('poasassignmentid'=>$poasassignment->id))) {
     print_error('errornocriterions','poasassignment');
 }    
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+//$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 $mform = new grade_form(null,array('id'=>$cm->id,'assigneeid'=>$assigneeid,'poasassignmentid'=>$poasassignment->id));
 $data = $poasmodel->get_rating_data($assigneeid);
 $mform->set_data($data);

@@ -38,7 +38,9 @@ if ($mode == SHOW_MODE || $mode == HIDE_MODE) {
     else
         print_error('invalidtaskid','poasassignment');
 }   
-$poasmodel = poasassignment_model::get_instance($poasassignment);
+//$poasmodel = poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 if ($mode == DELETE_MODE) {
     if ($taskid > 0) {
         //TODO delete task and task values & references from student's pagele
