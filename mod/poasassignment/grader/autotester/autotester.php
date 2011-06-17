@@ -19,34 +19,18 @@ class autotester extends grader{
                                                'poasassignment_autotester');
         //TODO проверить режим инд. заданий
     }
-    
+    //private $cpath = 'C\\';
+    private $cpath = 'D:\Program Files\Microsoft Visual Studio 9.0\VC\\';
     public function test_attempt($attemptid) {
         global $DB;
         
         // step 1: compile student's program
-        $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
-        if($textanswerrec) {
-            $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
-            //echo $submission->value;
-            $f = fopen('grader\autotester\attempts\attempt' . $attemptid . '.cpp', 'w+');
-            fwrite($f, $submission->value);
-            fclose($f);
-            
-            $runf = fopen('grader\autotester\runattempt' . $attemptid . '.bat', 'w+');
-            $text = 'cd grader\autotester';  
-            $text .= "\n";
-            $text .= 'call C\vcvarsall.bat';
-            $text .= "\n";
-            $text .= 'C\bin\cl.exe ';
-            $text .= '/Feattempts\attempt' . $attemptid . '.exe ';
-            $text .= '/Foattempts\attempt' . $attemptid . '.obj ';
-            $text .= '/Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /W3 /nologo /ZI /TP /errorReport:prompt ';
-            $text .= 'attempts\attempt' . $attemptid . '.cpp ';
-            $text .= "\n";
-            fwrite($runf, $text);
-            fclose($runf);            
+        if(!$this->compile($attemptid)) {
+            $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
+            print_error('errorexewasntcreated', 'poasassignment_autotester');
+            return 0;
         }
-        exec('Call grader\autotester\runattempt' . $attemptid . '.bat');
+        
         // step 2: create test files
         
         // step 2.1 get task id
@@ -84,6 +68,38 @@ class autotester extends grader{
         }
         $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
         return $grade;
+    }
+    /**
+     * Compiles source code using VC compiler
+     *
+     * @param int $attemptid
+     * @return true if "exe" file was created
+     */
+    private function compile($attemptid) {
+        global $DB;
+        $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
+        if($textanswerrec) {
+            $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
+            $f = fopen('grader\autotester\attempts\attempt' . $attemptid . '.cpp', 'w+');
+            fwrite($f, $submission->value);
+            fclose($f);
+            
+            $runf = fopen('grader\autotester\runattempt' . $attemptid . '.bat', 'w+');
+            $text = 'cd grader\autotester';  
+            $text .= "\n";
+            $text .= 'call "' . $this->cpath . 'vcvarsall.bat"';
+            $text .= "\n";
+            $text .= '"' . $this->cpath . 'bin\cl.exe" ';
+            $text .= '/Feattempts\attempt' . $attemptid . '.exe ';
+            $text .= '/Foattempts\attempt' . $attemptid . '.obj ';
+            $text .= '/Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /W3 /nologo /ZI /TP /errorReport:prompt ';
+            $text .= 'attempts\attempt' . $attemptid . '.cpp ';
+            $text .= "\n";
+            fwrite($runf, $text);
+            fclose($runf);
+            exec('Call grader\autotester\runattempt' . $attemptid . '.bat', $out);
+        }
+        return file_exists('grader\autotester\attempts\attempt' . $attemptid . '.exe ');        
     }
     private function run_tests($tests, $path, $attemptid) {
         global $DB;
@@ -140,19 +156,24 @@ class autotester extends grader{
             fclose($f);
         }
     }
-    private function clean_files($attemptid, $path, $tests) {
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
-        unlink('grader\autotester\vc90.idb');
-        unlink('grader\autotester\vc90.pdb');
-        unlink('grader\autotester\runattempt' . $attemptid . '.bat');
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe');
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.obj');
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.pdb');
-        unlink('grader\autotester\attempts\attempt' . $attemptid . '.exe.manifest');
+    private function clean_files($attemptid, $path, $tests = array()) {
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+        $this->safe_delete_file('grader\autotester\vc90.idb');
+        $this->safe_delete_file('grader\autotester\vc90.pdb');
+        $this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.obj');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.pdb');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe.manifest');
         
         foreach($tests as $test) {
-            unlink($path . 'test_' . $test->id . '_'. $attemptid . '.txt');
+            $this->safe_delete_file($path . 'test_' . $test->id . '_'. $attemptid . '.txt');
+        }
+    }
+    private function safe_delete_file($path) {
+        if(file_exists($path)) {
+            unlink($path);
         }
     }
     

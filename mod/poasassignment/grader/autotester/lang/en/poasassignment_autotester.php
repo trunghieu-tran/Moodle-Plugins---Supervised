@@ -10,3 +10,4 @@ $string['testout'] = 'Test output data';
 $string['studentout'] = 'Program output data';
 $string['testpassed'] = 'Test passed successfully';
 $string['testnotpassed'] = 'Test is not passed';
+$string['errorexewasntcreated'] = 'EXE file wasn\'t created. Maybe Your code have an error';
