@@ -57,7 +57,8 @@ class poasassignment_model {
                                     'attempts' => 'pages/attempts/attempts.php',
                                     'criterions' => 'pages/criterions/criterions.php',
                                     'graders' => 'pages/graders/graders.php',
-                                    'submissions' => 'pages/submissions/submissions.php'                                    
+                                    'submissions' => 'pages/submissions/submissions.php',
+                                    'grade' => 'pages/grade/grade.php'   
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
@@ -178,6 +179,10 @@ class poasassignment_model {
     
     public function has_flag($flag) {
         return (isset($this->poasassignment) && $this->poasassignment->flags & $flag);
+    }
+    
+    public function get_assigneeid() {
+        return $this->assignee->id;
     }
     /** 
      * Inserts poasassignment data into DB
