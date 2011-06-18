@@ -19,12 +19,15 @@ class autotester extends grader{
                                                'poasassignment_autotester');
         //TODO проверить режим инд. заданий
     }
-    //private $cpath = 'C\\';
     private $cpath = 'D:\Program Files\Microsoft Visual Studio 9.0\VC\\';
     
     private $lastout = '';
     
     private static $commentareaname = 'poasassignment_attempt_autotester_comment';
+    
+    private static $colorextra = 'YELLOW';
+    private static $colornormal = 'WHITE';
+    private static $colormissed = 'RED';
     
     public function test_attempt($attemptid) {
         global $DB;
@@ -143,8 +146,8 @@ class autotester extends grader{
             else {  
                 $testresult->studentout = $out[0];
             }
-            
-            if($testresult->studentout == $test->testout) {
+            $td = str_replace("\r", '',$test->testout);
+            if($testresult->studentout == $td) {
                 $testresult->testpassed = 1;
             }
             else {
@@ -312,72 +315,174 @@ class autotester extends grader{
         global $USER, $DB, $OUTPUT;
         $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
         $html = '';
-        $needdiff = 1;
+        $html .= $OUTPUT->box_start();
         $html .= $this->safe_show_attempt_comment($attemptid);
+        $html .= $this->safe_show_statistics($attemptid);
+        $html .= $this->safe_show_rating($attemptid);
+        $html .= $OUTPUT->box_end();
         foreach ($results as $result) {
-            // TODO capability
+            $html .= $OUTPUT->box_start();
             $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
-            $html .= $OUTPUT->heading(get_string('testname', 'poasassignment_autotester') . ' : ' . $test->name);
-            $html .= '<b><big><div align="center">' . get_string('testin', 'poasassignment_autotester') . '</div></big></b>';
-            $html .= '<br><div align="left">' . $test->testin . '</div>';
-            $td = str_replace("\r", '',$test->testout);
-            if($needdiff) {
-                $testoutdataarray = explode("\n", $td);
-                $studentoutarray = explode("\n", $result->studentout);
-                $ret = $this->diff($studentoutarray, $testoutdataarray);
-                $diffres = '';
-                foreach($ret as $retelement) {
-                    if(is_array($retelement) && count($retelement['d']) + count($retelement['i']) == 0) {
-                        continue;
-                    }
-                    if(is_array($retelement)) {
-                        if(count($retelement['d']) > 0) {
-                            $diffres .= '<div style="background : YELLOW">' . implode(" ", $retelement['d']) . '</div>';
-                        }
-                        if(count($retelement['i']) > 0) {
-                            $diffres .= '<div style="background : RED">' . implode(" ", $retelement['i']) . '</div>';
-                        }
-                    }
-                    else {
-                        $diffres .= $retelement .'<br>';
-                    }
-                }
-                $html .= '<b><big><div align="center">' . get_string('diff', 'poasassignment_autotester') . '</div></big></b><br>';
-                $html .= $diffres;
-            }
-            else {
-                $html .= '<b><big>' . get_string('testout', 'poasassignment_autotester') . '</big></b>';
-                $html .= '<br>' . $test->testout;
-                $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
-                if($td == $result->studentout) {
-                    $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
-                }
-                else {
-                    $html .= '<br><div style="background : RED">' . $result->studentout . '</div><br>';
-                }
-                $html .= '<br>';
-            }
-            if($td == $result->studentout) {
+            
+            $html .= $this->safe_show_testname($test->name);
+            $html .= $this->safe_show_testin($test->testin);
+            $html .= $this->safe_show_testout($test->testout);
+            $html .= $this->safe_show_studentout($result->studentout);
+            $html .= $this->safe_show_diff($result->studentout, $test->testout);
+            
+            $html .= '<br>';
+            if($result->testpassed) {
                 $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
             }
             else {
                 $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
             }
-            $html .= '<br>';
+            $html .= $OUTPUT->box_end();
         }
         $html = str_replace("\n", '<br>', $html);
         return $html;
     }
     private function safe_show_attempt_comment($attemptid) {
         global $DB, $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:testingfeedback', $context)) {
+            return '';
+        }
         $html = '';
         if($DB->record_exists('comments', array('commentarea' => self::$commentareaname, 'itemid' => $attemptid))) {
             $commentoptions = $this->default_comment_options();
             $commentoptions->itemid  = $attemptid;
             $comment = new comment($commentoptions);
-            $html .= $OUTPUT->heading(get_string('commentsfromgrader', 'poasassignment_autotester'));
+            $html .= '<big><b>' . get_string('commentsfromgrader', 'poasassignment_autotester') . '</b></big>';
             $html .= $comment->output(true);
         }
         return $html;
+    }
+    private function safe_show_statistics($attemptid) {
+        global $DB;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:numberofpassedtests', $context)) {
+            return '';
+        }
+        $pos = $DB->count_records('poasassignment_gr_at_res', array('attemptid' => $attemptid, 'testpassed' => 1));
+        $total = 0;
+        
+        $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid), 'assigneeid');
+        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid));
+        if ($rec = $DB->get_record('poasassignment_gr_autotester', array('taskid' => $assignee->taskid))) {
+            $gradertestrec = $DB->get_record('question_gradertest', array('questionid' => $rec->questionid));
+            $total = $DB->count_records('question_gradertest_tests', array('gradertestid' => $gradertestrec->id));
+        }
+        $html = '<big><b>'
+                . get_string('passedtests','poasassignment_autotester') 
+                . ' : '
+                . $pos 
+                . ' ' 
+                . get_string('from','poasassignment_autotester') 
+                . ' '
+                . $total
+                . '</b></big>';
+        return $html;
+    }
+    private function safe_show_testname($testname) {
+        global $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:testnames', $context)) {
+            return '';
+        }
+        return $OUTPUT->heading($testname);
+    }
+    private function safe_show_testout($testout) {
+        global $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:testoutput', $context)) {
+            return '';
+        }
+        $testout = str_replace("\r", '', $testout);
+        $html = '';
+        $html .= $OUTPUT->heading(get_string('testout', 'poasassignment_autotester'));
+        $html .= '<br>' . $testout;
+        return $html;
+    }
+    private function safe_show_testin($testin) {
+        global $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:testinput', $context)) {
+            return '';
+        }
+        $testout = str_replace("\r", '', $testin);
+        $html = '';
+        $html .= $OUTPUT->heading(get_string('testout', 'poasassignment_autotester'));
+        $html .= '<br>' . $testout;
+        return $html;
+    }
+    private function safe_show_studentout($studentout) {
+        global $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:studentoutput', $context)) {
+            return '';
+        }
+        $html = '';
+        //$html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
+        $html .= $OUTPUT->heading(get_string('studentout', 'poasassignment_autotester'));
+        $html .= '<br>' . $studentout . '<br>';
+        return $html;
+    }
+    private function safe_show_diff($studentout, $testout) {
+        global $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if(!has_capability('mod/poasassignment_grader:diff', $context)) {
+            return '';
+        }
+        $html = '';
+        $testout = str_replace("\r", '',$testout);
+        $testout = explode("\n", $testout);
+        $studentout = explode("\n", $studentout);
+        $diffarray = $this->diff($studentout, $testout);
+        $html .= $OUTPUT->heading(get_string('diff', 'poasassignment_autotester'));
+        foreach ($diffarray as $diffelement) {
+            if(is_array($diffelement) && count($diffelement['d']) + count($diffelement['i']) == 0) {
+                continue;
+            }
+            if(is_array($diffelement)) {
+                if(count($diffelement['d']) > 0) {
+                    $html .= '<div style="background : '
+                            . self::$colorextra
+                            . '">' 
+                            . implode(" ", $diffelement['d']) 
+                            . '</div>';
+                }
+                if(count($diffelement['i']) > 0) {
+                    $html .= '<div style="background : '
+                            . self::$colormissed
+                            . '">' 
+                            . implode(" ", $diffelement['i']) 
+                            . '</div>';
+                }
+            }
+            else {
+                $html .= '<div style="background : '
+                        . self::$colornormal
+                        . '">' 
+                        . $diffelement 
+                        . '</div>';
+            }
+        }
+        return $html;
+    }
+    private function safe_show_rating($attemptid) {
+        global $DB, $OUTPUT;
+        $context = poasassignment_model::get_instance()->get_context();
+        if (!has_capability('mod/poasassignment_grader:rating', $context)) {
+            return '';
+        }
+        $val = $DB->get_record('poasassignment_rating_values', array('attemptid' => $attemptid));
+        if (!$val) {
+            $rating = 0;
+        }
+        else {
+            $rating = $val->value;
+        }
+        return '<br><b><big>' . get_string('graderrating', 'poasassignment_autotester') . ' : ' . $rating .'</big></b>';
     }
 }
