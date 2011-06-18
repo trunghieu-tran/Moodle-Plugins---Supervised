@@ -222,3 +222,5 @@ $string['stundetstask'] = 'Student\'s task';
 $string['nonexistentmoduleinstance'] = 'The module you trying to use does not exist';
 $string['errornonexistenttaskgiver'] = 'The taskgiver could not be found in DB';
 $string['errorthistghasntsettings'] = 'This taskgiver hasn\'t settings';
+$string['graderresults'] = 'Grader\'s results';
+$string['graderresults_help'] = 'Help';

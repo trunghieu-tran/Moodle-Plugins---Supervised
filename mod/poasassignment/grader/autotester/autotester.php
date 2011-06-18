@@ -57,7 +57,8 @@ class autotester extends grader{
         }
         $grade = 0;
         foreach ($results as $result) {
-            if($result->studentout == $gradertests[$result->testid]->testout) {
+            $testout = str_replace("\r", '',$gradertests[$result->testid]->testout);
+            if($result->studentout == $testout) {
                 $grade += 100 * ($gradertests[$result->testid]->weight) / ($totalweight);
             }
             //else {
@@ -157,10 +158,10 @@ class autotester extends grader{
         }
     }
     private function clean_files($attemptid, $path, $tests = array()) {
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+        //$this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
         $this->safe_delete_file('grader\autotester\vc90.idb');
         $this->safe_delete_file('grader\autotester\vc90.pdb');
-        $this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
+        //$this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.obj');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
@@ -258,29 +259,77 @@ class autotester extends grader{
         global $DB;
         return $DB->record_exists('poasassignment_gr_at_res', array('attemptid' => $attemptid));
     }
+    function diff($old, $new){
+        $maxlen = 0;
+        foreach($old as $oindex => $ovalue){
+                $nkeys = array_keys($new, $ovalue);
+                foreach($nkeys as $nindex){
+                        $matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
+                                $matrix[$oindex - 1][$nindex - 1] + 1 : 1;
+                        if($matrix[$oindex][$nindex] > $maxlen){
+                                $maxlen = $matrix[$oindex][$nindex];
+                                $omax = $oindex + 1 - $maxlen;
+                                $nmax = $nindex + 1 - $maxlen;
+                        }
+                }       
+        }
+        if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
+        return array_merge(
+                $this->diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+                array_slice($new, $nmax, $maxlen),
+                $this->diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+    }
     
     function show_test_results($attemptid, $context) {
         global $USER, $DB, $OUTPUT;
         $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
         $html = '';
+        $needdiff = 1;
         foreach ($results as $result) {
             // TODO capability
             $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
             $html .= $OUTPUT->heading(get_string('testname', 'poasassignment_autotester') . ' : ' . $test->name);
-            $html .= '<b><big>' . get_string('testin', 'poasassignment_autotester') . '</big></b>';
-            $html .= '<br>' . $test->testin;
-            $html .= '<b><big>' . get_string('testout', 'poasassignment_autotester') . '</big></b>';
-            $html .= '<br>' . $test->testout;
-            $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
-            if($test->testout == $result->studentout) {
-                $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
-                $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
+            $html .= '<b><big><div align="center">' . get_string('testin', 'poasassignment_autotester') . '</div></big></b>';
+            $html .= '<br><div align="left">' . $test->testin . '</div>';
+            $td = str_replace("\r", '',$test->testout);
+            if($needdiff) {
+                $testoutdataarray = explode("\n", $td);
+                $studentoutarray = explode("\n", $result->studentout);
+                $ret = $this->diff($studentoutarray, $testoutdataarray);
+                $diffres = '';
+                foreach($ret as $retelement) {
+                    if(is_array($retelement) && count($retelement['d']) + count($retelement['i']) == 0) {
+                        continue;
+                    }
+                    if(is_array($retelement)) {
+                        if(count($retelement['d']) > 0) {
+                            $diffres .= '<div style="background : YELLOW">' . implode(" ", $retelement['d']) . '</div>';
+                        }
+                        if(count($retelement['i']) > 0) {
+                            $diffres .= '<div style="background : RED">' . implode(" ", $retelement['i']) . '</div>';
+                        }
+                    }
+                    else {
+                        $diffres .= $retelement .'<br>';
+                    }
+                }
+                $html .= '<b><big><div align="center">' . get_string('diff', 'poasassignment_autotester') . '</div></big></b><br>';
+                $html .= $diffres;
             }
             else {
-                $html .= '<br><div style="background : RED">' . $result->studentout . '</div><br>';
-                $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
+                $html .= '<b><big>' . get_string('testout', 'poasassignment_autotester') . '</big></b>';
+                $html .= '<br>' . $test->testout;
+                $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
+                if($td == $result->studentout) {
+                    $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
+                    $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
+                }
+                else {
+                    $html .= '<br><div style="background : RED">' . $result->studentout . '</div><br>';
+                    $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
+                }
+                $html .= '<br>';
             }
-            $html .= '<br>';
         }
         $html = str_replace("\n", '<br>', $html);
         return $html;

@@ -55,6 +55,7 @@ class poasassignment_model {
                                     'taskgiversettings' => 'pages/taskgiversettings/taskgiversettings.php',
                                     'view' => 'pages/view/view.php',
                                     'attempts' => 'pages/attempts/attempts.php',
+                                    'graderresults' => 'pages/graderresults/graderresults.php',
                                     'criterions' => 'pages/criterions/criterions.php',
                                     'graders' => 'pages/graders/graders.php',
                                     'submissions' => 'pages/submissions/submissions.php',
