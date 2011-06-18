@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/grader/autotester/db" VERSION="20110612" COMMENT="XMLDB file for Moodle mod/poasassignment/grader/autotester"
+<XMLDB PATH="mod/poasassignment/grader/autotester/db" VERSION="20110618" COMMENT="XMLDB file for Moodle mod/poasassignment/grader/autotester"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >

@@ -183,7 +183,7 @@ abstract class grader {
     
     }
     
-    function have_test_results($attemptid) {
+    public static function attempt_was_tested($attemptid) {
         return false;
     }
     

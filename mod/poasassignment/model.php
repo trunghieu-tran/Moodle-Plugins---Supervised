@@ -175,7 +175,7 @@ class poasassignment_model {
     }
     
     public function get_graders() {
-        return $graders;
+        return $this->graders;
     }
     
     public function has_flag($flag) {
@@ -1183,8 +1183,8 @@ class poasassignment_model {
             $graderrec = $this->graders[$usedgrader->graderid];
             require_once($graderrec->path);
             $gradername = $graderrec->name;
-            $grader = new $gradername;
-            if($grader->have_test_results($attempt->id))
+            //$grader = new $gradername;
+            if($gradername::attempt_was_tested($attempt->id))
                 return true;
         }
     }
@@ -1197,15 +1197,12 @@ class poasassignment_model {
             require_once($graderrec->path);
             $gradername = $graderrec->name;
             $grader = new $gradername;
-            if($grader->have_test_results($attempt->id))
+            if($gradername::attempt_was_tested($attempt->id))
                 $html .= $grader->show_test_results($attempt->id, $this->context);
         }
         return $html;
     }
     function trigger_poasassignment_event($mode,$assigneeid) {
-        //global $DB,$USER;
-        //echo 'triggering event';
-        // ��������� �������, �������� ������, ��������� ������
         $eventdata = new stdClass();
         $eventdata->student=$assigneeid;
         $eventdate->poasassignmentid=$this->poasassignment->id;

@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(dirname(__FILE__)).'\grader\grader.php');
-
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/comment/lib.php');
 class autotester extends grader{
     
     public function get_test_mode() {
@@ -21,16 +21,26 @@ class autotester extends grader{
     }
     //private $cpath = 'C\\';
     private $cpath = 'D:\Program Files\Microsoft Visual Studio 9.0\VC\\';
+    
+    private $lastout = '';
+    
+    private static $commentareaname = 'poasassignment_attempt_autotester_comment';
+    
     public function test_attempt($attemptid) {
         global $DB;
         
         // step 1: compile student's program
-        if(!$this->compile($attemptid)) {
+        $compiled = $this->compile($attemptid);
+        
+        $out = implode("\n", $this->lastout);
+        $out = mb_convert_encoding($out, 'utf8', 'cp866');
+        $this->add_attempt_grader_comment($attemptid, $out);
+        
+        if(!$compiled) {
             $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
-            print_error('errorexewasntcreated', 'poasassignment_autotester');
+            print_error('errorexewasntcreated', 'poasassignment_autotester', '', null, $out);
             return 0;
         }
-        
         // step 2: create test files
         
         // step 2.1 get task id
@@ -99,6 +109,7 @@ class autotester extends grader{
             fwrite($runf, $text);
             fclose($runf);
             exec('Call grader\autotester\runattempt' . $attemptid . '.bat', $out);
+            $this->lastout = $out;
         }
         return file_exists('grader\autotester\attempts\attempt' . $attemptid . '.exe ');        
     }
@@ -158,10 +169,10 @@ class autotester extends grader{
         }
     }
     private function clean_files($attemptid, $path, $tests = array()) {
-        //$this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
         $this->safe_delete_file('grader\autotester\vc90.idb');
         $this->safe_delete_file('grader\autotester\vc90.pdb');
-        //$this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
+        $this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.obj');
         $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
@@ -177,7 +188,22 @@ class autotester extends grader{
             unlink($path);
         }
     }
-    
+    private function add_attempt_grader_comment($attemptid, $text) {
+        $commentoptions = $this->default_comment_options();
+        $commentoptions->itemid  = $attemptid;
+        $comment = new comment($commentoptions);
+        $comment->add($text);
+    }
+    private function default_comment_options() {
+        $commentoptions = new stdClass();
+        $commentoptions->area    = self::$commentareaname;
+        $commentoptions->pluginname = 'poasassignment';
+        $commentoptions->context = poasassignment_model::get_instance()->get_context();
+        $commentoptions->cm = poasassignment_model::get_instance()->get_cm();
+        $commentoptions->showcount = true;
+        $commentoptions->component = 'mod_poasassignment';
+        return $commentoptions;
+    }
     // Заполняются после выполнения оценивания (массив simple_test_result'ов)
     private $testresults;
     private $successfultestscount;
@@ -255,9 +281,11 @@ class autotester extends grader{
         return $data;
     }
     
-    function have_test_results($attemptid) {
+    public static function attempt_was_tested($attemptid) {
         global $DB;
-        return $DB->record_exists('poasassignment_gr_at_res', array('attemptid' => $attemptid));
+        $testsuccessfull = $DB->record_exists('poasassignment_gr_at_res', array('attemptid' => $attemptid));
+        $hasdebuginfo = $DB->record_exists('comments', array('commentarea' => self::$commentareaname, 'itemid' => $attemptid));
+        return ($testsuccessfull || $hasdebuginfo);
     }
     function diff($old, $new){
         $maxlen = 0;
@@ -285,6 +313,7 @@ class autotester extends grader{
         $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
         $html = '';
         $needdiff = 1;
+        $html .= $this->safe_show_attempt_comment($attemptid);
         foreach ($results as $result) {
             // TODO capability
             $test = $DB->get_record('question_gradertest_tests', array('id' => $result->testid));
@@ -322,16 +351,33 @@ class autotester extends grader{
                 $html .= '<br><b><big>' . get_string('studentout', 'poasassignment_autotester') . '</big></b>';
                 if($td == $result->studentout) {
                     $html .= '<br><div style="background : LIME">' . $result->studentout . '</div><br>';
-                    $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
                 }
                 else {
                     $html .= '<br><div style="background : RED">' . $result->studentout . '</div><br>';
-                    $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
                 }
                 $html .= '<br>';
             }
+            if($td == $result->studentout) {
+                $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
+            }
+            else {
+                $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
+            }
+            $html .= '<br>';
         }
         $html = str_replace("\n", '<br>', $html);
+        return $html;
+    }
+    private function safe_show_attempt_comment($attemptid) {
+        global $DB, $OUTPUT;
+        $html = '';
+        if($DB->record_exists('comments', array('commentarea' => self::$commentareaname, 'itemid' => $attemptid))) {
+            $commentoptions = $this->default_comment_options();
+            $commentoptions->itemid  = $attemptid;
+            $comment = new comment($commentoptions);
+            $html .= $OUTPUT->heading(get_string('commentsfromgrader', 'poasassignment_autotester'));
+            $html .= $comment->output(true);
+        }
         return $html;
     }
 }
