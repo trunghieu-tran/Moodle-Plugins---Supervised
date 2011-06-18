@@ -366,7 +366,8 @@ function poasassignment_extend_settings_navigation(settings_navigation $settings
     
 }
 function poasassignment_comment_permissions($comment_param) {
-    return array('post'=>true, 'view'=>true);
+    $return = array('post'=>true, 'view'=>true);
+    return $return;
 }
 function poasassignment_comment_validate($comment_param) {
     return true;
