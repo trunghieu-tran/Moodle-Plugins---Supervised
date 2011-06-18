@@ -9,7 +9,8 @@ $action = optional_param('action', null, PARAM_TEXT);
 $cm         = get_coursemodule_from_id('poasassignment', $id, 0, false, MUST_EXIST);
 $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
-$poasmodel=poasassignment_model::get_instance($poasassignment);
+$poasmodel = poasassignment_model::get_instance();
+$poasmodel->cash_instance($poasassignment->id);
 require_login($course, true, $cm);
     
 global $OUTPUT,$DB,$PAGE;
