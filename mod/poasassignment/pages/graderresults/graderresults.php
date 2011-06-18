@@ -9,14 +9,17 @@ class graderresults_page extends abstract_page {
         $this->attemptid = optional_param('attemptid', 0, PARAM_INT);
         if ($this->attemptid == 0) {
             $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
-            $rec = $DB->get_record('poasassignment_assignee', array('userid' => $USER->id, 'poasassignmentid' => $poasassignmentid), 'lastattemptid');
-            $this->attemptid = $rec->lastattemptid;
+            if($rec = $DB->get_record('poasassignment_assignee', array('userid' => $USER->id, 'poasassignmentid' => $poasassignmentid), 'lastattemptid')) {
+                $this->attemptid = $rec->lastattemptid;
+            }
         }
     }
     
     function has_satisfying_parameters() {
-        // TODO
-        return true;
+        global $DB;
+        $poasmodel = poasassignment_model::get_instance();
+        $attempt = $DB->get_record('poasassignment_attempts',array('id'=>$this->attemptid));
+        return $poasmodel->have_test_results($attempt);
     }
     
     function view() {

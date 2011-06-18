@@ -59,8 +59,7 @@ else {
                     $attemptid = $poasassignmentplugin->save_answer($assigneeid, $data);
                 }
             }
-        }        
-        
+        }
         // save attempt as last attempt of this assignee
         $poasmodel->assignee->lastattemptid = $attemptid;
         //echo '...lastattemptid='.$attemptid;

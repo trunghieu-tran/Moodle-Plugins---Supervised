@@ -893,7 +893,9 @@ class poasassignment_model {
         global $DB;
         $usedgraders = $DB->get_records('poasassignment_used_graders', 
                                         array('poasassignmentid' => $this->poasassignment->id));
-        
+        if(count($usedgraders) == 0) {
+            return;
+        }
         $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
         foreach ($usedgraders as $usedgrader) {
             //echo $usedgrader->id;
@@ -923,7 +925,7 @@ class poasassignment_model {
             }
             
         }
-        // if attempt grades for all criterions, caluclulate total grade
+        // if attempt has grades for all criterions, caluclulate total grade
         $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $this->poasassignment->id));
         $allcriterions = true;
         $totalweight = 0;

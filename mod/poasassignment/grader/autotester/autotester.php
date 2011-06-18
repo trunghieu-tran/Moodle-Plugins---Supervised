@@ -23,7 +23,8 @@ class autotester extends grader{
     
     private $lastout = '';
     
-    private static $commentareaname = 'poasassignment_attempt_autotester_comment';
+    private static $attemptcommentarea = 'poasassignment_attempt_autotester_comment';
+    private static $testcommentarea = 'poasassignment_test_autotester_comment';
     
     private static $colorextra = 'YELLOW';
     private static $colornormal = 'WHITE';
@@ -199,7 +200,7 @@ class autotester extends grader{
     }
     private function default_comment_options() {
         $commentoptions = new stdClass();
-        $commentoptions->area    = self::$commentareaname;
+        $commentoptions->area    = self::$attemptcommentarea;
         $commentoptions->pluginname = 'poasassignment';
         $commentoptions->context = poasassignment_model::get_instance()->get_context();
         $commentoptions->cm = poasassignment_model::get_instance()->get_cm();
@@ -287,7 +288,7 @@ class autotester extends grader{
     public static function attempt_was_tested($attemptid) {
         global $DB;
         $testsuccessfull = $DB->record_exists('poasassignment_gr_at_res', array('attemptid' => $attemptid));
-        $hasdebuginfo = $DB->record_exists('comments', array('commentarea' => self::$commentareaname, 'itemid' => $attemptid));
+        $hasdebuginfo = $DB->record_exists('comments', array('commentarea' => self::$attemptcommentarea, 'itemid' => $attemptid));
         return ($testsuccessfull || $hasdebuginfo);
     }
     function diff($old, $new){
@@ -337,6 +338,13 @@ class autotester extends grader{
             else {
                 $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
             }
+            
+            $options = $this->default_comment_options();
+            $options->area = self::$testcommentarea;
+            $options->itemid = $result->id;
+            $comment = new comment($options);
+            
+            $html .= $comment->output(true);
             $html .= $OUTPUT->box_end();
         }
         $html = str_replace("\n", '<br>', $html);
@@ -349,7 +357,7 @@ class autotester extends grader{
             return '';
         }
         $html = '';
-        if($DB->record_exists('comments', array('commentarea' => self::$commentareaname, 'itemid' => $attemptid))) {
+        if($DB->record_exists('comments', array('commentarea' => self::$attemptcommentarea, 'itemid' => $attemptid))) {
             $commentoptions = $this->default_comment_options();
             $commentoptions->itemid  = $attemptid;
             $comment = new comment($commentoptions);
