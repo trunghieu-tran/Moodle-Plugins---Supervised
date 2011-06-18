@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/db" VERSION="20110618" COMMENT="XMLDB file for Moodle mod/poasassignment"
+<XMLDB PATH="mod/poasassignment/db" VERSION="20110619" COMMENT="XMLDB file for Moodle mod/poasassignment"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -181,8 +181,7 @@
         <FIELD NAME="ratingdate" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="attemptdate" NEXT="disablepenalty"/>
         <FIELD NAME="disablepenalty" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ratingdate" NEXT="draft"/>
         <FIELD NAME="draft" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="disablepenalty" NEXT="final"/>
-        <FIELD NAME="final" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="draft" NEXT="gradercomment"/>
-        <FIELD NAME="gradercomment" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="gradercomment" PREVIOUS="final"/>
+        <FIELD NAME="final" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="draft"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assigneeid"/>

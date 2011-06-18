@@ -224,3 +224,5 @@ $string['errornonexistenttaskgiver'] = 'The taskgiver could not be found in DB';
 $string['errorthistghasntsettings'] = 'This taskgiver hasn\'t settings';
 $string['graderresults'] = 'Grader\'s results';
 $string['graderresults_help'] = 'Help';
+$string['assignee'] = 'Student';
+$string['attempt'] = 'Attempt';
