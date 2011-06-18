@@ -13,3 +13,6 @@ $string['testnotpassed'] = 'Test is not passed';
 $string['errorexewasntcreated'] = 'EXE file wasn\'t created. Maybe Your code have an error';
 $string['diff'] = 'Diff';
 $string['commentsfromgrader'] = 'Comments from autotester';
+$string['passedtests'] = 'Test passed';
+$string['from'] = 'from';
+$string['graderrating'] = 'Grader\'s rating for the attempt';
