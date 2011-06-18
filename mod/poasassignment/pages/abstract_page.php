@@ -58,3 +58,52 @@ class abstract_page {
     }
     
 }
+
+class assignee_choose_form extends moodleform {
+    function definition() {
+        global $DB;
+        $mform = $this->_form;
+        $instance = $this->_customdata;
+        $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        $recs = $DB->get_records('poasassignment_assignee',array('poasassignmentid' => $poasassignmentid));
+        foreach ($recs as $rec) {
+            if($rec->lastattemptid == 0) {
+                unset($recs[$rec->id]);
+                continue;
+            }
+            $user = $DB->get_record('user', array('id' => $rec->userid));
+            $recs[$rec->id] = fullname($user, true);
+        }
+        $mform->addElement('select', 'assigneeid', get_string('assignee', 'poasassignment'),$recs);
+        $mform->addElement('submit', 'submit', 'go');
+        
+        $mform->addElement('hidden', 'id', $instance['id']);
+        $mform->setType('id', PARAM_INT);
+        
+        $page = 'attempts';
+        if(isset($instance['page'])) {
+            $page = $instance['page'];
+        }
+        $mform->addElement('hidden', 'page', $page);        
+        $mform->setType('page', PARAM_TEXT);
+    }
+}
+class attempt_choose_form extends moodleform {
+    function definition() {
+        global $DB;
+        $mform = $this->_form;
+        $instance = $this->_customdata;
+        $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        $attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $instance['assigneeid']),'id DESC');
+        foreach ($attempts as $attempt) {
+            $attempts[$attempt->id] = get_string('attempt', 'poasassignment') . $attempt->attemptnumber . ':' . userdate($attempt->attemptdate);
+        }
+        $mform->addElement('select', 'attemptid', get_string('attempt', 'poasassignment'),$attempts);
+        $mform->addElement('submit', 'submit', 'go');
+        
+        $mform->addElement('hidden', 'id', $instance['id']);
+        $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'page', 'graderresults');
+        $mform->setType('page', PARAM_TEXT);
+    }
+}

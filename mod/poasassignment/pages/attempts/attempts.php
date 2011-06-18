@@ -45,7 +45,14 @@ class attempts_page extends abstract_page {
             if(isset($assignee->lastattempt)) */
         return true;
     }
-    
+    function view_assignee_block() {
+        $html = '';
+        $poasmodel = poasassignment_model::get_instance();
+        if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
+            $mform = new assignee_choose_form(null, array('id' => $poasmodel->get_cm()->id));
+            $mform->display();
+        }
+    }
     function view() {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
@@ -54,6 +61,7 @@ class attempts_page extends abstract_page {
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
         $latestattempt=$DB->get_record('poasassignment_attempts',array('id'=>$this->assignee->lastattemptid));
         $attemptscount=count($attempts);  
+        echo $this->view_assignee_block();
         foreach($attempts as $attempt) {    
             echo $OUTPUT->box_start();
             echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
@@ -78,5 +86,5 @@ class attempts_page extends abstract_page {
             $poasmodel->show_feedback($attempt,$latestattempt,$criterions,$this->context);
             echo $OUTPUT->box_end();
         }
-        }
+    }
 }
