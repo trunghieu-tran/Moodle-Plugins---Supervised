@@ -14,9 +14,14 @@ class autotester extends grader{
         return __CLASS__;
     }
     public static function validation($data, &$errors) {
-        if(isset($data[self::prefix()]) && !isset($data['answertext']))
+        if(isset($data[self::prefix()]) && !isset($data['answertext'])) {
             $errors['answertext'] = get_string('textanswermustbeenabled',
-                                               'poasassignment_autotester');
+                                               'poasassignment_autotester');            
+        }
+        if(isset($data[self::prefix()]) && !isset($data['answertext'])) {
+            $errors['answerfile'] = get_string('fileanswermustbeenabled',
+                                               'poasassignment_autotester');            
+        }
         //TODO проверить режим инд. заданий
     }
     private $cpath = 'D:\Program Files\Microsoft Visual Studio 9.0\VC\\';
@@ -81,7 +86,7 @@ class autotester extends grader{
             //    echo $gradertests[$result->testid]->testout;
             //}
         }
-        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\', $gradertests);
+        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
         return $grade;
     }
     /**
@@ -93,11 +98,14 @@ class autotester extends grader{
     private function compile($attemptid) {
         global $DB;
         $textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_text'));
+        //$textanswerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_file'));
+        mkdir("grader\autotester\attempts\attempt$attemptid");
         if($textanswerrec) {
             $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
-            $f = fopen('grader\autotester\attempts\attempt' . $attemptid . '.cpp', 'w+');
+            $f = fopen("grader\autotester\attempts\attempt$attemptid\attempt$attemptid.cpp", 'w+');
             fwrite($f, $submission->value);
             fclose($f);
+            //$this->add_submission_files($atemptid);
             
             $runf = fopen('grader\autotester\runattempt' . $attemptid . '.bat', 'w+');
             $text = 'cd grader\autotester';  
@@ -105,17 +113,20 @@ class autotester extends grader{
             $text .= 'call "' . $this->cpath . 'vcvarsall.bat"';
             $text .= "\n";
             $text .= '"' . $this->cpath . 'bin\cl.exe" ';
-            $text .= '/Feattempts\attempt' . $attemptid . '.exe ';
-            $text .= '/Foattempts\attempt' . $attemptid . '.obj ';
+            $text .= "/Feattempts\attempt$attemptid\attempt$attemptid.exe ";
+            $text .= "/Foattempts\attempt$attemptid\attempt$attemptid.obj ";
             $text .= '/Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /W3 /nologo /ZI /TP /errorReport:prompt ';
-            $text .= 'attempts\attempt' . $attemptid . '.cpp ';
+            $text .= "attempts\attempt$attemptid\attempt$attemptid.cpp";
             $text .= "\n";
             fwrite($runf, $text);
             fclose($runf);
             exec('Call grader\autotester\runattempt' . $attemptid . '.bat', $out);
             $this->lastout = $out;
         }
-        return file_exists('grader\autotester\attempts\attempt' . $attemptid . '.exe ');        
+        return file_exists("grader\autotester\attempts\attempt$attemptid\attempt$attemptid.exe");        
+    }
+    private function add_submission_files() {
+        
     }
     private function run_tests($tests, $path, $attemptid) {
         global $DB;
@@ -123,17 +134,21 @@ class autotester extends grader{
         //$tests = array_reverse($tests);
         foreach($tests as $test) {
             $out = array();
-            $command = 'grader\autotester\attempts\attempt'. 
-                        $attemptid . 
-                        '.exe';
+            $command = "grader\autotester\attempts\attempt$attemptid\attempt$attemptid.exe";
+            //$command = 'grader\autotester\attempts\attempt'. 
+            //            $attemptid . 
+            //            '.exe';
             $command .= '<';
-            $command .= $path . 
-                        'test_' . 
-                        $test->id . 
-                        '_' . 
-                        $attemptid . 
-                        '.txt';
+            $command .= "grader\autotester\attempts\attempt$attemptid\\tests\\test_$test->id.txt";
+            //$command .= $path . 
+            //            'test_' . 
+            //            $test->id . 
+            //            '_' . 
+            //            $attemptid . 
+            //            '.txt';
+            
             exec($command, $out);
+            
             $testresult = new stdClass();
             $testresult->testid = $test->id;
             $testresult->attemptid = $attemptid;
@@ -160,31 +175,32 @@ class autotester extends grader{
         return $testresults;
     }
     private function create_test_files($tests, $path, $attemptid) {
+        mkdir("grader\autotester\attempts\attempt$attemptid\\tests");
         foreach($tests as $test) {
-            $f = fopen($path . 
-                    'test_' . 
-                    $test->id . 
-                    '_'. 
-                    $attemptid .
-                    '.txt', 'w+');
-                    
+            $f = fopen("grader\autotester\attempts\attempt$attemptid\\tests\\test_$test->id.txt", 'w+');
             fwrite($f, $test->testin);
             fclose($f);
         }
     }
-    private function clean_files($attemptid, $path, $tests = array()) {
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.cpp');
+    private function clean_files($attemptid, $path) {
+        $this->delete_file_or_dir("grader\autotester\attempts\attempt$attemptid");
+        rmdir("grader\autotester\attempts\attempt$attemptid");
         $this->safe_delete_file('grader\autotester\vc90.idb');
         $this->safe_delete_file('grader\autotester\vc90.pdb');
         $this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe');
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.obj');
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.ilk');
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.pdb');
-        $this->safe_delete_file('grader\autotester\attempts\attempt' . $attemptid . '.exe.manifest');
-        
-        foreach($tests as $test) {
-            $this->safe_delete_file($path . 'test_' . $test->id . '_'. $attemptid . '.txt');
+    }
+    private function delete_file_or_dir($path) {
+        $content = scandir($path);
+        foreach ($content as $item) {
+            if(is_file("$path\\$item")) {
+                unlink("$path\\$item");
+            }
+            else {
+                if($item != '.' && $item != '..' && is_dir("$path\\$item") ) {
+                    $this->delete_file_or_dir("$path\\$item");
+                    rmdir("$path\\$item");
+                }
+            }
         }
     }
     private function safe_delete_file($path) {
