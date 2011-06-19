@@ -30,7 +30,7 @@ $answer_form = new answer_form(null, array('poasassignmentid' => $poasassignment
 $poasmodel = poasassignment_model::get_instance();
 $poasmodel->cash_instance($poasassignment->id);
 $poasmodel->cash_assignee_by_user_id($USER->id);
-$plugins=$poasmodel->get_plugins();
+$plugins = $poasmodel->get_plugins();
 foreach($plugins as $plugin) {
     if (poasassignment_answer::used_in_poasassignment($plugin->id, $poasassignment->id)) {
         require_once($plugin->path);
@@ -45,19 +45,15 @@ if ($answer_form->is_cancelled()) {
 else {
     if ($answer_form->get_data()) {
         $data=$answer_form->get_data();
-        //save data            
+        //save data
+        $assignee = $poasmodel->get_assignee($USER->id);
+        $poasmodel->cash_assignee_by_user_id($USER->id);
+        $attemptid = $poasmodel->save_attempt($data);
         foreach($plugins as $plugin) {
             if(poasassignment_answer::used_in_poasassignment($plugin->id, $poasassignment->id)) {
                 require_once($plugin->path);
-                $poasassignmentplugin = new $plugin->name();
-                
-                if ($poasmodel->assignee->id != 0) {
-                    $attemptid = $poasassignmentplugin->save_answer($poasmodel->assignee->id, $data);
-                }
-                else {
-                    $assigneeid = $poasmodel->get_assignee($USER->id)->id;
-                    $attemptid = $poasassignmentplugin->save_answer($assigneeid, $data);
-                }
+                $answerplugin = new $plugin->name();
+                $answerplugin->save_submission($attemptid, $data);
             }
         }
         // save attempt as last attempt of this assignee

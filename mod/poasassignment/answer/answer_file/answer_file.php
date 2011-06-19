@@ -214,18 +214,18 @@ class answer_file extends poasassignment_answer {
         else
             $this->checked=false;
     }
-    function save_answer($assigneeid,$data) {
-        $poasmodel = poasassignment_model::get_instance();
+    
+    public function save_submission($attemptid, $data) {
         global $DB;
+        $poasmodel = poasassignment_model::get_instance();
+        $submission = new stdClass();
         
-        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft),isset($data->final));
-        $rec->assigneeid=$assigneeid;
-        $rec->answerid=$this->answerid;
-        $name='answerfiles_filemanager';
-        $rec->value=$data->$name;
-        $submissionid=$DB->insert_record('poasassignment_submissions',$rec);
-        $poasmodel->save_files($data->$name,'submissionfiles',$submissionid);
-        return $rec->attemptid;
+        $submission->attemptid = $attemptid;
+        $submission->answerid = $this->answerid;
+        $submission->value = $data->answerfiles_filemanager;
+        $submission->id =  $DB->insert_record('poasassignment_submissions', $submission);
+        $poasmodel->save_files($data->answerfiles_filemanager,'submissionfiles',$submission->id);
+        return $submission->id;
     }
     
     function show_assignee_answer($assigneeid,$poasassignmentid,$needbox=1) {

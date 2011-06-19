@@ -41,6 +41,9 @@ class poasassignment_answer {
                                                                 'answerid'=>$answerid));    
     }
     
+    public function save_submission($attemptid, $data) {
+    }
+    
     function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
         global $DB;
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
