@@ -865,6 +865,29 @@ class poasassignment_model {
         $html .= '</div>';
         return $html;
     }
+    public function create_copies($filearea, $itemid) {
+        $contextid = $this->get_context()->id;
+        $fs = get_file_storage();
+        $dir =$fs->get_area_tree($contextid, 'mod_poasassignment', $filearea, $itemid);
+        $arr = $this->get_files_content($dir, $filearea, $itemid);
+        return $arr;
+        //print_r($arr);
+    }
+    
+    public function get_files_content($dir, $filearea, $itemid) {
+        global $CFG;
+        $contextid = $this->get_context()->id;
+        $arr = array();
+        foreach ($dir['subdirs'] as $subdir) {
+            $arr[$subdir['dirname']] = $this->get_files_content($subdir, $filearea, $itemid);
+        }
+        foreach ($dir['files'] as $file) {
+            $filename = $file->get_filename();
+            $contents = $file->get_content();            
+            $arr[$filename] = mb_convert_encoding($contents, 'utf8', 'windows-1251');;
+        }
+        return $arr;
+    }
     
     public function get_assignee($userid) {
         global $DB;

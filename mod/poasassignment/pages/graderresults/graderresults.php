@@ -26,8 +26,12 @@ class graderresults_page extends abstract_page {
         if(!$DB->record_exists('poasassignment_used_graders', array('poasassignmentid' =>$poasmodel->get_poasassignment()->id))) {
             return false;
         }
-        $attempt = $DB->get_record('poasassignment_attempts',array('id'=>$this->attemptid));
-        return $poasmodel->have_test_results($attempt);
+        if($attempt = $DB->get_record('poasassignment_attempts',array('id'=>$this->attemptid))) {
+            return $poasmodel->have_test_results($attempt);
+        }
+        else {
+            return false;
+        }
     }
     
     function view() {

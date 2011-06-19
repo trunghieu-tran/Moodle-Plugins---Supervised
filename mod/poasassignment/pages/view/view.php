@@ -27,6 +27,7 @@ class view_page extends abstract_page {
 
         // Show task files
         echo $poasmodel->view_files($this->context->id, 'poasassignmentfiles',0);
+        $poasmodel->create_copies('poasassignmentfiles', 0);
         echo $OUTPUT->box_end();
         $this->view_status();
         $this->view_dates();
