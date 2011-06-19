@@ -314,8 +314,9 @@ class autotester extends grader{
     
     function show_test_results($attemptid, $context) {
         global $USER, $DB, $OUTPUT;
-        $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
         $html = '';
+        $html .= $this->update_results($attemptid);
+        $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
         $html .= $OUTPUT->box_start();
         $html .= $this->safe_show_attempt_comment($attemptid);
         $html .= $this->safe_show_statistics($attemptid);
@@ -331,13 +332,7 @@ class autotester extends grader{
             $html .= $this->safe_show_studentout($result->studentout);
             $html .= $this->safe_show_diff($result->studentout, $test->testout);
             
-            $html .= '<br>';
-            if($result->testpassed) {
-                $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
-            }
-            else {
-                $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
-            }
+            $html .= $this->safe_show_result($result);            
             
             $options = $this->default_comment_options();
             $options->area = self::$testcommentarea;
@@ -492,5 +487,101 @@ class autotester extends grader{
             $rating = $val->value;
         }
         return '<br><b><big>' . get_string('graderrating', 'poasassignment_autotester') . ' : ' . $rating .'</big></b>';
+    }
+    private function safe_show_result($result) {
+        $html = '<br>';
+        
+        
+        $switchto = 1;
+        $switchtext = get_string('settestpassed','poasassignment_autotester');
+        if($result->testpassed) {
+            $html .= '<b>' . get_string('testpassed', 'poasassignment_autotester') . '</b>';
+            $switchto = 0;
+            $switchtext = get_string('settestnotpassed','poasassignment_autotester');
+        }
+        else {
+            $html .= '<b>' . get_string('testnotpassed', 'poasassignment_autotester') . '</b>';
+        }
+        if(has_capability('mod/poasassignment:grade', poasassignment_model::get_instance()->get_context())) {
+            //print link 
+            $page = optional_param('page', 'view', PARAM_TEXT);
+            $cmid = poasassignment_model::get_instance()->get_cm()->id;
+            $url = new moodle_url('view.php',array('id' => $cmid, 
+                                                   'page' => $page,
+                                                   'resultid' => $result->id,
+                                                   'testpassed' => $switchto));
+            $html .= '<br>';
+            $html .= html_writer::link($url, $switchtext);
+        }
+        return $html;
+    }
+    private function update_results($attemptid) {
+        
+        global $DB;
+        $html = '';
+        $model = poasassignment_model::get_instance();
+        if(has_capability('mod/poasassignment:grade', poasassignment_model::get_instance()->get_context())) {
+            //print link 
+            $resultid = optional_param('resultid', 0, PARAM_INT);
+            $testpassed = optional_param('testpassed', 0, PARAM_INT);
+            
+            if($result = $DB->get_record('poasassignment_gr_at_res', array('id' => $resultid))) {
+                $result->testpassed = $testpassed;
+                $DB->update_record('poasassignment_gr_at_res', $result);
+                //update common grade
+                if($attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid))) {
+                    if($assignee = $DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid))) {
+                        if($rec = $DB->get_record('poasassignment_gr_autotester', array('taskid' => $assignee->taskid))) {
+                            if($gradertestrec = $DB->get_record('question_gradertest', array('questionid' => $rec->questionid))) {
+                                if($gradertests = $DB->get_records('question_gradertest_tests', array('gradertestid' => $gradertestrec->id))) {
+                                    //update rativg value
+                                    $totalweight = 0;
+                                    foreach($gradertests as $test) {
+                                        $totalweight += $test->weight;
+                                    }
+                                    $grade = 0;
+                                    $results = $DB->get_records('poasassignment_gr_at_res', array('attemptid' => $attemptid));
+                                    foreach ($results as $result) {
+                                        if($result->testpassed) {
+                                            $grade += 100 * ($gradertests[$result->testid]->weight) / ($totalweight);
+                                        }
+                                    }
+                                    $criterions = $DB->get_records('poasassignment_criterions', 
+                                           array('poasassignmentid' => $model->get_poasassignment()->id,
+                                                 'graderid' => $this->get_my_id()));
+                                                 
+                                    foreach ($criterions as $criterion) {
+                                        $ratingvalue = $DB->get_record('poasassignment_rating_values', array('criterionid' => $criterion->id,
+                                                                                                             'attemptid' => $attemptid));
+                                        $ratingvalue->value = $grade;
+                                        $ratingvalueid = $DB->update_record('poasassignment_rating_values', $ratingvalue);
+                                    }
+                                    
+                                    //update attempt rating
+                                    $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $model->get_poasassignment()->id));
+                                    $totalcriterionweight = 0;
+                                    foreach ($criterions as $criterion) {
+                                        $totalcriterionweight += $criterion->weight;
+                                    }
+                                    $ratingvalues = $DB->get_records('poasassignment_rating_values', array('attemptid' => $attemptid));
+                                    $attemptgrade = 0;
+                                    foreach ($ratingvalues as $ratingvalue) {
+                                        $attemptgrade += $ratingvalue->value * round($criterions[$ratingvalue->criterionid]->weight/$totalcriterionweight,2);
+                                    }
+                                    $attempt->ratingdate = time();
+                                    $attempt->rating = $attemptgrade;
+                                    $DB->update_record('poasassignment_attempts', $attempt);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $html;
+    }
+    private function get_my_id() {
+        global $DB;
+        return $DB->get_record('poasassignment_graders', array('name' => 'autotester'))->id;
     }
 }

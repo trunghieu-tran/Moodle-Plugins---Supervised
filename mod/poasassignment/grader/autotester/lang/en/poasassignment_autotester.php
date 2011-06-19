@@ -16,3 +16,5 @@ $string['commentsfromgrader'] = 'Comments from autotester';
 $string['passedtests'] = 'Test passed';
 $string['from'] = 'from';
 $string['graderrating'] = 'Grader\'s rating for the attempt';
+$string['settestnotpassed'] = 'Mark test as not passed';
+$string['settestpassed'] = 'Mark test as passed';

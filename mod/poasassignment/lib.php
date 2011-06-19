@@ -34,7 +34,7 @@ define('DATE',4);
 define('FILE',5);
 define('LISTOFELEMENTS',6);
 define('MULTILIST',7);
-define('CATEGORY',7);
+define('CATEGORY',8);
 
 define('TASK_RECIEVED',0);
 define('ATTEMPT_DONE',1);
