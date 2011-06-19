@@ -865,7 +865,7 @@ class poasassignment_model {
         $html .= '</div>';
         return $html;
     }
-    public function create_copies($filearea, $itemid) {
+    public function get_files($filearea, $itemid) {
         $contextid = $this->get_context()->id;
         $fs = get_file_storage();
         $dir =$fs->get_area_tree($contextid, 'mod_poasassignment', $filearea, $itemid);
@@ -888,7 +888,19 @@ class poasassignment_model {
         }
         return $arr;
     }
-    
+    public function save_attempt($data) {
+        global $DB;
+        $attempt = new stdClass();
+        $attempt->draft = isset($data->draft);
+        $attempt->final = isset($data->final);
+        $attempt->assigneeid = $this->assignee->id;
+        $attempt->attemptdate = time();
+        $attempt->disablepenalty = 0;
+        
+        $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$this->assignee->id));
+        $attempt->attemptnumber = $attemptscount + 1;
+        return $DB->insert_record('poasassignment_attempts', $attempt);
+    }
     public function get_assignee($userid) {
         global $DB;
         if(!$DB->record_exists('poasassignment_assignee', 

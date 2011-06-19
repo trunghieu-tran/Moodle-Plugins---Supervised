@@ -47,7 +47,7 @@ class autotester extends grader{
         
         if(!$compiled) {
             $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
-            print_error('errorexewasntcreated', 'poasassignment_autotester', '', null, $out);
+            print_error('errorexewasntcreated', 'poasassignment_autotester', '', null, mb_convert_encoding($out, 'utf8', 'cp866'));
             return 0;
         }
         // step 2: create test files
@@ -86,7 +86,7 @@ class autotester extends grader{
             //    echo $gradertests[$result->testid]->testout;
             //}
         }
-        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
+        //$this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
         return $grade;
     }
     /**
@@ -102,10 +102,12 @@ class autotester extends grader{
         mkdir("grader\autotester\attempts\attempt$attemptid");
         if($textanswerrec) {
             $submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $textanswerrec->id));
-            $f = fopen("grader\autotester\attempts\attempt$attemptid\attempt$attemptid.cpp", 'w+');
-            fwrite($f, $submission->value);
-            fclose($f);
-            //$this->add_submission_files($atemptid);
+            if(strlen($submission->value) > 0) {
+                $f = fopen("grader\autotester\attempts\attempt$attemptid\attempt$attemptid.cpp", 'w+');
+                fwrite($f, $submission->value);
+                fclose($f);
+            }
+            $str = $this->add_submission_files($attemptid);
             
             $runf = fopen('grader\autotester\runattempt' . $attemptid . '.bat', 'w+');
             $text = 'cd grader\autotester';  
@@ -114,9 +116,12 @@ class autotester extends grader{
             $text .= "\n";
             $text .= '"' . $this->cpath . 'bin\cl.exe" ';
             $text .= "/Feattempts\attempt$attemptid\attempt$attemptid.exe ";
-            $text .= "/Foattempts\attempt$attemptid\attempt$attemptid.obj ";
+            //$text .= "/Foattempts\attempt$attemptid\attempt$attemptid.obj ";
             $text .= '/Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /W3 /nologo /ZI /TP /errorReport:prompt ';
-            $text .= "attempts\attempt$attemptid\attempt$attemptid.cpp";
+            if(strlen($submission->value) > 0) {
+                $text .= " attempts\attempt$attemptid\attempt$attemptid.cpp";
+            }
+            $text .= $this->get_files($attemptid);
             $text .= "\n";
             fwrite($runf, $text);
             fclose($runf);
@@ -125,8 +130,52 @@ class autotester extends grader{
         }
         return file_exists("grader\autotester\attempts\attempt$attemptid\attempt$attemptid.exe");        
     }
-    private function add_submission_files() {
-        
+    private function add_submission_files($attemptid) {
+        global $DB;
+        $answerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_file'));
+        if($submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $answerrec->id))) {
+            $model = poasassignment_model::get_instance();
+            $files = $model->get_files('submissionfiles', $submission->id);
+            
+            //print_r($files);
+            $this->create_files("grader\autotester\attempts\attempt$attemptid",$files);
+        }
+    }
+    private function get_files($attemptid) {
+        global $DB;
+        $answerrec = $DB->get_record('poasassignment_answers', array('name' => 'answer_file'));
+        if($submission = $DB->get_record('poasassignment_submissions', array('attemptid' => $attemptid, 'answerid' => $answerrec->id))) {
+            $model = poasassignment_model::get_instance();
+            $files = $model->get_files('submissionfiles', $submission->id);
+            
+            return $this->get_filenames("attempts\attempt$attemptid",$files);
+        }
+        return '';
+    }
+    private function get_filenames($path, $files) {
+        $names = '';
+        foreach($files as $name => $element) {
+            if(is_array($element)) {
+                $names .= $this->get_filenames("$path\\$name", $element);
+            }
+            else {
+                $names .= " $path\\$name";
+            }
+        }
+        return $names;
+    }
+    private function create_files($path, $files) {
+        foreach($files as $name => $element) {
+            if(is_array($element)) {
+                mkdir("$path\\$name");
+                $this->create_files("$path\\$name", $element);
+            }
+            else {
+                $f = fopen("$path\\$name", 'w+');
+                fwrite($f, $element);
+                fclose($f);
+            }
+        }
     }
     private function run_tests($tests, $path, $attemptid) {
         global $DB;

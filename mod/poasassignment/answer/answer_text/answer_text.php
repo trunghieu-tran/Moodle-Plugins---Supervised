@@ -106,15 +106,13 @@ class answer_text extends poasassignment_answer {
         else
             $this->checked=false;
     }
-    function save_answer($assigneeid,$data) {
-        global $DB,$USER;
-
-        $rec->attemptid=$this->bind_submission_to_attempt($assigneeid,isset($data->draft),isset($data->final));
-        $rec->assigneeid=$assigneeid;
-        $rec->answerid=$this->answerid;
-        $rec->value=$data->text_editor;
-        $DB->insert_record('poasassignment_submissions',$rec);
-        return $rec->attemptid;
+    public function save_submission($attemptid, $data) {
+        global $DB;
+        $submission = new stdClass();
+        $submission->attemptid = $attemptid;
+        $submission->answerid = $this->answerid;
+        $submission->value = $data->text_editor;
+        return $DB->insert_record('poasassignment_submissions', $submission);
     }
     
     function get_answer_values() {
