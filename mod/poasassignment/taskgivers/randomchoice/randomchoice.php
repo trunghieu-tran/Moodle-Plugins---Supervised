@@ -13,9 +13,12 @@ class randomchoice extends taskgiver {
 
     function process_before_tasks($cmid, $poasassignment) {
         global $USER,$DB;
+        if(has_capability('mod/poasassignment:managetasks',poasassignment_model::get_instance()->get_context())) {
+            return;
+        }
         if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id))) {
             $model = poasassignment_model::get_instance();
-            $tasks = poasassignment_model::get_instance($poasassignment)->get_available_tasks($USER->id);
+            $tasks = $model->get_available_tasks($USER->id);
             $tasksarray = array();
             foreach($tasks as $task) 
                 $tasksarray[] = $task->id;

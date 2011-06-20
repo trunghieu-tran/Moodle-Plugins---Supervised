@@ -984,6 +984,7 @@ class poasassignment_model {
             $attempt->rating = $grade;
             $attempt->ratingdate = time();
             $DB->update_record('poasassignment_attempts', $attempt);
+            $this->update_assignee_gradebook_grade($DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid)));
             // TODO Просто вызвать функцию, которая выставляет оценку
         }
     }
@@ -1300,7 +1301,7 @@ class poasassignment_model {
         $grade->userid = $assignee->userid;
         $attempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
         if ($attempt) {
-            $grade->rawgrade = $attempt->rating;
+            $grade->rawgrade = $attempt->rating - $this->get_penalty($attempt->id);
             $grade->dategraded = $attempt->ratingdate;
             $grade->datesubmitted = $attempt->attemptdate;
         }
