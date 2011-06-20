@@ -112,8 +112,8 @@ else
     echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/view.php?id='.$id.'&page=tasks'), get_string('back'));
 $assignee=$DB->get_record('poasassignment_assignee',array('id'=>$poasmodel->assignee->id));
 
-if (!$assignee ||($assignee && ($assignee->taskid==0 || !isset($assignee->taskid))))
-    if ($poasassignment->taskgiverid==STUDENTSCHOICE)
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/warning.php?id='.$id.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id), get_string('taketask','poasassignment'));
+//if (!$assignee ||($assignee && ($assignee->taskid==0 || !isset($assignee->taskid))))
+//    if ($poasassignment->taskgiverid==STUDENTSCHOICE)
+//        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/warning.php?id='.$id.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id), //get_string('taketask','poasassignment'));
 //$mform->display();
 echo $OUTPUT->footer();

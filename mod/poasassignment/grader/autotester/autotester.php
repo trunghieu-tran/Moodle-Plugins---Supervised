@@ -47,7 +47,7 @@ class autotester extends grader{
         
         if(!$compiled) {
             $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
-            print_error('errorexewasntcreated', 'poasassignment_autotester', '', null, mb_convert_encoding($out, 'utf8', 'cp866'));
+            print_error('errorexewasntcreated', 'poasassignment_autotester', '', null, $out);
             return 0;
         }
         // step 2: create test files
@@ -86,7 +86,7 @@ class autotester extends grader{
             //    echo $gradertests[$result->testid]->testout;
             //}
         }
-        //$this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
+        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
         return $grade;
     }
     /**
@@ -233,7 +233,9 @@ class autotester extends grader{
     }
     private function clean_files($attemptid, $path) {
         $this->delete_file_or_dir("grader\autotester\attempts\attempt$attemptid");
-        rmdir("grader\autotester\attempts\attempt$attemptid");
+        if(file_exists("grader\autotester\attempts\attempt$attemptid")) {
+            rmdir("grader\autotester\attempts\attempt$attemptid");
+        }
         $this->safe_delete_file('grader\autotester\vc90.idb');
         $this->safe_delete_file('grader\autotester\vc90.pdb');
         $this->safe_delete_file('grader\autotester\runattempt' . $attemptid . '.bat');

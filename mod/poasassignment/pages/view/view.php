@@ -8,7 +8,6 @@ class view_page extends abstract_page {
     /** Constructor, initializes variables $poasassignment, $cm, $context
      */
     function view_page($cm,$poasassignment) {
-        
         $this->poasassignment = $poasassignment;
         $this->cm = $cm;
         $this->context=get_context_instance(CONTEXT_MODULE, $cm->id);
@@ -18,6 +17,7 @@ class view_page extends abstract_page {
         global $OUTPUT,$USER;
         //$poasmodel = poasassignment_model::get_instance($this->poasassignment);
         $poasmodel = poasassignment_model::get_instance();
+        $poasmodel->cash_assignee_by_user_id($USER->id);
         // Show submission statistics if user has capability
         if (has_capability('mod/poasassignment:grade', $this->context))
             echo '<div align="right">'.$poasmodel->get_statistics().'</div>';
@@ -210,8 +210,6 @@ class view_page extends abstract_page {
     }
     function view_answer_block() {
         global $OUTPUT,$DB,$USER;
-        //$plugins=$DB->get_records('poasassignment_answers');
-        //$poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $poasmodel=poasassignment_model::get_instance();
         $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
