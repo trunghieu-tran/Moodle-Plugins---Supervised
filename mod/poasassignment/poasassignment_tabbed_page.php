@@ -32,6 +32,9 @@ class poasassignment_tabbed_page {
 
         require_login($course, true, $cm);
         $this->include_page($page);
+        
+        $PAGE->navbar->add(get_string($this->currentpage, 'poasassignment'));
+        
         // Add record to log
         add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&page=$page", $poasassignment->name, $cm->id);
 
@@ -47,6 +50,7 @@ class poasassignment_tabbed_page {
     private function include_page($page) {
         $pagetype = $page . '_page';
         if(array_key_exists($page, poasassignment_model::$extpages)) {
+            $currentpath = poasassignment_model::$extpages[$page];
             require_once($currentpath);
             $this->currentpage = $page;
         }
@@ -59,41 +63,36 @@ class poasassignment_tabbed_page {
      */
     function view() {
         global $PAGE;
-
-        require_capability('mod/poasassignment:view', poasassignment_model::get_instance()->get_context());
-
-        $PAGE->navbar->add(get_string($this->currentpage, 'poasassignment'));
-        $html = '';
-        $html .= $this->get_header($this->currentpage);
-        echo $html;
+        $pagetype = $this->currentpage . "_page";
+        require_capability('mod/poasassignment:view', poasassignment_model::get_instance()->get_context());        
+        echo $this->get_header($this->currentpage);
         // Check available date or students
         if (time() < poasassignment_model::get_instance()->get_poasassignment()->availabledate 
             && !has_capability('mod/poasassignment:managetasks', poasassignment_model::get_instance()->get_context())) {
             
-            echo get_string('thismoduleisntopenedyet', 'poasassignment');
+            print_error('thismoduleisntopenedyet', 'poasassignment');
         }
         else {
             $this->view_body();
         }
-        
-        echo $this->get_footer();        
+        echo $this->get_footer();
     }
 
     /** Displays general content of the page
      */
     function view_body() {
         $pagetype = $this->currentpage."_page";
-        $currentpath = poasassignment_model::$extpages[$this->currentpage];
+        //$currentpath = poasassignment_model::$extpages[$this->currentpage];
         //require_once($currentpath);
         $poasassignmentpage = new $pagetype(poasassignment_model::get_instance()->get_cm(), 
                                             poasassignment_model::get_instance()->get_poasassignment());
         $poasassignmentpage->require_ability_to_view();
-        if ($pagetype::use_echo()) { 
-            $poasassignmentpage->view();
-        }
-        else {
-            echo $poasassignmentpage->view();
-        }
+        //if ($pagetype::use_echo()) { 
+        $poasassignmentpage->view();
+        //}
+        //else {
+        //    return $poasassignmentpage->view();
+        //}
     }
 
     /** Dislpays header

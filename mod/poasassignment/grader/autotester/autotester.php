@@ -86,7 +86,7 @@ class autotester extends grader{
             //    echo $gradertests[$result->testid]->testout;
             //}
         }
-        //$this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
+        $this->clean_files($attemptid, 'grader\autotester\attempts\tests\\');
         return $grade;
     }
     /**
