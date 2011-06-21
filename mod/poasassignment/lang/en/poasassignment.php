@@ -240,3 +240,4 @@ $string['poasassignment:view'] = 'Ability to view module instance';
 $string['poasassignment:viewownsubmission'] = 'Ability to view own submissions';
 $string['errorassigneenoattempts'] = 'This assignee hasn\'t done any attempt';
 $string['erroranothersattempts'] = 'You can\'t see another\'s attempts';
+$string['errorunknownpage'] = 'Unknown page';
