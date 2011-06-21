@@ -52,9 +52,9 @@ class poasassignment_tabbed_page {
         require_capability('mod/poasassignment:view', poasassignment_model::get_instance()->get_context());
 
         $PAGE->navbar->add(get_string($this->currentpage, 'poasassignment'));
-
-        $this->view_header($this->currentpage);
-
+        $html = '';
+        $html .= $this->get_header($this->currentpage);
+        echo $html;
         // Check available date or students
         if (time() < poasassignment_model::get_instance()->get_poasassignment()->availabledate 
             && !has_capability('mod/poasassignment:managetasks', poasassignment_model::get_instance()->get_context())) {
@@ -65,7 +65,7 @@ class poasassignment_tabbed_page {
             $this->view_body();
         }
         
-        $this->view_footer();        
+        echo $this->get_footer();        
     }
 
     /** Displays general content of the page
@@ -77,23 +77,33 @@ class poasassignment_tabbed_page {
         $poasassignmentpage = new $pagetype(poasassignment_model::get_instance()->get_cm(), 
                                             poasassignment_model::get_instance()->get_poasassignment());
         $poasassignmentpage->require_ability_to_view();
-        $poasassignmentpage->view();
+        if ($pagetype::use_echo()) { 
+            $poasassignmentpage->view();
+        }
+        else {
+            echo $poasassignmentpage->view();
+        }
     }
 
     /** Dislpays header
      */
-    function view_header() {
+    function get_header() {
         global $OUTPUT;
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading(poasassignment_model::get_instance()->get_poasassignment()->name.' : '.
-                        get_string($this->currentpage, 'poasassignment').
-                        $OUTPUT->help_icon($this->currentpage, 'poasassignment'));
+        $html = '';
+        $html .= $OUTPUT->header();
+        $instancename = poasassignment_model::get_instance()->get_poasassignment()->name;
+        $header = $instancename . ' : '. get_string($this->currentpage, 'poasassignment') 
+                . $OUTPUT->help_icon($this->currentpage, 'poasassignment');
+        $html .= $OUTPUT->heading($header);
+        return $html;
     }
 
     /** Dislpays footer
      */
-    function view_footer() {
+    function get_footer() {
         global $OUTPUT;
-        echo $OUTPUT->footer();
+        $html = '';
+        $html .= $OUTPUT->footer();
+        return $html;
     }
 }

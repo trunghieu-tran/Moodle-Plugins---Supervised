@@ -2,51 +2,49 @@
 global $CFG;
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+
 class attempts_page extends abstract_page {
-    var $poasassignment;
-    var $assignee;
-    var $context;
-    function attempts_page($cm, $poasassignment) {
+    function __construct() {
         global $DB, $USER;
-        $this->poasassignment = $poasassignment;
-        $this->cm = $cm;
-        $this->context = get_context_instance(CONTEXT_MODULE, $cm->id);
         
         $assigneeid = optional_param('assigneeid', 0, PARAM_INT);
         if($assigneeid > 0) {
             $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid,));
         }
         else {
+            $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
             $this->assignee = $DB->get_record('poasassignment_assignee', 
-                                              array('userid' => $USER->id, 'poasassignmentid' => $poasassignment->id));
+                                              array('userid' => $USER->id, 
+                                                    'poasassignmentid' => $poasassignmentid));
         }
     }
     
     function has_satisfying_parameters() {
         global $DB,$USER;
-        // TODO
+        $context = poasassignment_model::get_instance()->get_context();
+        // Page exists always for teachers
+        if(has_capability('mod/poasassignment:grade', $context)) {
+            return true;
+        }
+        // Page exists, if assignee has attempts
         if ($this->assignee && $this->assignee->lastattemptid > 0) {
-            if($this->assignee->userid == $USER->id || 
-                    has_capability('mod/poasassignment:grade', $this->context)) {
-                    
+            // Page content is available if assignee wants to see his own attempts
+            // or teacher wants to see them
+            if($this->assignee->userid == $USER->id) {
                 return true;
             }
             else {
+                $this->lasterror = 'erroranothersattempts';
                 return false;
             }
         }
         else {
+            $this->lasterror = 'errorassigneenoattempts';
             return false;
         }
-        
-        /* if ($assignee = $DB->get_record('poasassignment_assignee',
-                                        array('userid' => $USER->id, 
-                                              'poasassignmentid' => $this->poasassignment->id))) {
-            if(isset($assignee->lastattempt)) */
         return true;
     }
     function view_assignee_block() {
-        $html = '';
         $poasmodel = poasassignment_model::get_instance();
         if (has_capability('mod/poasassignment:grade', $poasmodel->get_context())) {
             $mform = new assignee_choose_form(null, array('id' => $poasmodel->get_cm()->id));
@@ -55,36 +53,48 @@ class attempts_page extends abstract_page {
     }
     function view() {
         global $DB, $OUTPUT;
-        $poasmodel = poasassignment_model::get_instance($this->poasassignment);
-        $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$this->assignee->id),'attemptnumber'));
-        $plugins=$poasmodel->get_plugins();
-        $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
-        $latestattempt=$DB->get_record('poasassignment_attempts',array('id'=>$this->assignee->lastattemptid));
-        $attemptscount=count($attempts);  
-        echo $this->view_assignee_block();
-        foreach($attempts as $attempt) {    
-            echo $OUTPUT->box_start();
-            echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
-            
-            // show attempt's submission
-            foreach($plugins as $plugin) {
-                require_once($plugin->path);
-                $poasassignmentplugin = new $plugin->name();
-                echo $poasassignmentplugin->show_assignee_answer($this->assignee->id,$this->poasassignment->id,1,$attempt->id);
-            }
-            // show disablepenalty/enablepenalty button
-            if(has_capability('mod/poasassignment:grade',$this->context)) {
-                if(isset($attempt->disablepenalty) && $attempt->disablepenalty==1) {
-                    echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$this->cm->id.'&action=enablepenalty&attemptid='.$attempt->id), 
-                                                            get_string('enablepenalty','poasassignment'));
+        $poasmodel = poasassignment_model::get_instance();
+        $poasassignmentid = $poasmodel->get_poasassignment()->id;
+        $html = '';
+        $this->view_assignee_block();
+        // teacher has access to the page even if he has no task or attempts
+        if(isset($this->assignee->id)) {
+            $attempts = array_reverse($DB->get_records('poasassignment_attempts',
+                                                       array('assigneeid'=>$this->assignee->id), 
+                                                       'attemptnumber'));
+            $plugins = $poasmodel->get_plugins();
+            $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid'=>$poasassignmentid));
+            $latestattempt = $DB->get_record('poasassignment_attempts', array('id'=>$this->assignee->lastattemptid));
+            $attemptscount = count($attempts);  
+            foreach($attempts as $attempt) {    
+                $html .= $OUTPUT->box_start();
+                $html .= $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
+                
+                // show attempt's submission
+                foreach($plugins as $plugin) {
+                    require_once($plugin->path);
+                    $poasassignmentplugin = new $plugin->name();
+                    $html .= $poasassignmentplugin->show_assignee_answer($this->assignee->id,$poasassignmentid,1,$attempt->id);
                 }
-                else {
-                    echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$this->cm->id.'&action=disablepenalty&attemptid='.$attempt->id), 
-                                                            get_string('disablepenalty','poasassignment'));
+                // show disablepenalty/enablepenalty button
+                if(has_capability('mod/poasassignment:grade',$poasmodel->get_context())) {
+                    $cmid = $poasmodel->get_cm()->id;
+                    if(isset($attempt->disablepenalty) && $attempt->disablepenalty==1) {
+                        $html .= $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=enablepenalty&attemptid='.$attempt->id), 
+                                                                get_string('enablepenalty','poasassignment'));
+                    }
+                    else {
+                        $html .= $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=disablepenalty&attemptid='.$attempt->id), 
+                                                                get_string('disablepenalty','poasassignment'));
+                    }
                 }
+                $html .= $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$poasmodel->get_context());
+                $html .= $OUTPUT->box_end();
             }
-            $poasmodel->show_feedback($attempt,$latestattempt,$criterions,$this->context);
-            echo $OUTPUT->box_end();
         }
+        echo $html;
+    }
+    public static function use_echo() {
+        return false;
     }
 }

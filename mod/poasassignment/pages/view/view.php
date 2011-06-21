@@ -175,7 +175,7 @@ class view_page extends abstract_page {
                 $poasassignmentplugin = new $plugin->name();
                 echo $poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,1,$attempt->id);
             }
-            $poasmodel->show_feedback($attempt,$latestattempt,$criterions,$this->context);
+            echo $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$this->context);
             echo $OUTPUT->box_end();
             break;
         }                      

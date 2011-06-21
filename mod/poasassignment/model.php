@@ -1170,27 +1170,29 @@ class poasassignment_model {
         return grade_update('mod/poasassignment', $this->poasassignment->courseid, 'mod', 'poasassignment', $this->poasassignment->id, 0, NULL, array('deleted'=>1));
     }
     
-    function show_feedback($attempt,$latestattempt,$criterions,$context) {
+    function get_feedback($attempt,$latestattempt,$criterions,$context) {
         global $DB,$OUTPUT;
+        $html = '';
         if (isset($attempt->rating) && 
                             $DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
                             
-            echo $OUTPUT->heading(get_string('feedback','poasassignment'));
-            if ($attempt->ratingdate < $latestattempt->attemptdate)
-                echo $OUTPUT->heading(get_string('oldfeedback','poasassignment'));
-            echo $OUTPUT->box_start();
+            $html .= $OUTPUT->heading(get_string('feedback','poasassignment'));
+            if ($attempt->ratingdate < $latestattempt->attemptdate) {
+                $html .= $OUTPUT->heading(get_string('oldfeedback','poasassignment'));
+            }
+            $html .= $OUTPUT->box_start();
             foreach ($criterions as $criterion) {
                 $ratingvalue=$DB->get_record('poasassignment_rating_values',
                         array('criterionid'=>$criterion->id,
                                 'attemptid'=>$attempt->id));
                 if ($ratingvalue) {                
                     
-                    echo $OUTPUT->box_start();
-                    echo $criterion->name.'<br>';
+                    $html .= $OUTPUT->box_start();
+                    $html .= $criterion->name.'<br>';
                     if ($attempt->draft==0) {
                         if (has_capability('mod/poasassignment:seecriteriondescription',$context))
-                            echo $criterion->description.'<br>';
-                        echo $ratingvalue->value.'/100<br>';
+                            $html .= $criterion->description.'<br>';
+                        $html .= $ratingvalue->value.'/100<br>';
                     }
                     $options = new stdClass();
                     $options->area    = 'poasassignment_comment';
@@ -1200,19 +1202,20 @@ class poasassignment_model {
                     $options->showcount = true;
                     $options->itemid  = $ratingvalue->id;
                     $comment = new comment($options);
-                    $comment->output(false);
-                    echo $OUTPUT->box_end();
+                    $html .= $comment->output(true);
+                    $html .= $OUTPUT->box_end();
                 }
             }
-            echo $this->view_files($context->id,'commentfiles',$attempt->id);
+            $html .= $this->view_files($context->id,'commentfiles',$attempt->id);
             if ($attempt->draft==0) {
-                echo get_string('penalty','poasassignment').'='.$this->get_penalty($attempt->id);
+                $html .= get_string('penalty','poasassignment').'='.$this->get_penalty($attempt->id);
                 $ratingwithpenalty=$attempt->rating - $this->get_penalty($attempt->id);
-                echo $OUTPUT->heading(get_string('totalratingis','poasassignment').' '.$ratingwithpenalty);
+                $html .= $OUTPUT->heading(get_string('totalratingis','poasassignment').' '.$ratingwithpenalty);
                 //echo '<br>'.get_string('totalratingis','poasassignment').' '.$ratingwithpenalty;
             }
-            echo $OUTPUT->box_end();
+            $html .= $OUTPUT->box_end();
         }
+        return $html;
     }
     function have_test_results($attempt) {
         global $DB;

@@ -27,7 +27,7 @@ switch ($action) {
             $attempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
             $attempt->disablepenalty=1;
             $DB->update_record('poasassignment_attempts',$attempt);
-            redirect(new moodle_url('attempts.php',array('id'=>$cm->id,'assigneeid'=>$attempt->assigneeid)));
+            redirect(new moodle_url('view.php',array('id'=>$cm->id,'page' => 'attempts', 'assigneeid'=>$attempt->assigneeid)));
         }        
         break;
     case 'enablepenalty':
@@ -39,7 +39,7 @@ switch ($action) {
             $attempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
             $attempt->disablepenalty=0;
             $DB->update_record('poasassignment_attempts',$attempt);
-            redirect(new moodle_url('attempts.php',array('id'=>$cm->id,'assigneeid'=>$attempt->assigneeid)));
+            redirect(new moodle_url('view.php',array('id'=>$cm->id,'page' => 'attempts', 'assigneeid'=>$attempt->assigneeid)));
         }        
         break;
     case 'canceltask':
