@@ -375,21 +375,6 @@ function poasassignment_comment_validate($comment_param) {
 
 function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
     global $PAGE,$DB;
-    //$poasmodel = poasassignment_model::get_instance();
-    //$pages = array('tasksfields', 'tasks', 'view', 'criterions', 'submissions', 'graders', 'taskgiversettings');
-    /* $pages = poasassignment_model::$pages;
-
-    foreach($pages as $page) {
-        $pagetype = $page.'_page';
-        require_once($pagetype.'.php');
-
-        // If user has ability to view <pagename>_page - add page on panel
-        $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance), '*', MUST_EXIST);
-        $pageinstance = new $pagetype($cm, $poasassignment);
-        if ($pageinstance->has_ability_to_view()) {
-            $navigation->add(get_string($page,'poasassignment'),new moodle_url('/mod/poasassignment/view.php',array('id' => $cm->id, 'page' => $page)));
-        }
-    } */
     $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance));
     if($poasassignment) {
         poasassignment_model::get_instance()->cash_instance($poasassignment->id);

@@ -1,13 +1,16 @@
 <?php
 require_once(dirname(dirname(__FILE__)) . '\model.php');
 class abstract_page {
-    var $cm;
+    //var $cm;
     var $lasterror;
-    function abstract_page($cm) {
-        $this->cm=$cm;
+    //function abstract_page($cm) {
+    //    $this->cm=$cm;
+    //}
+    
+    function abstract_page() {
     }
 
-    /** Getter of page capability
+    /** Getting page view capability
      * @return capability 
      */
     function get_cap() {
@@ -42,7 +45,7 @@ class abstract_page {
      * @return true if has capability to view
      */
     function has_cap() {
-        return has_capability($this->get_cap(),poasassignment_model::get_instance()->get_context());
+        return has_capability($this->get_cap(), poasassignment_model::get_instance()->get_context());
     }
 
     /** Requires capabilities to view, used in has_ability_to_view
@@ -57,6 +60,13 @@ class abstract_page {
         return true;
     }
     
+    /** This function is temporary. All pages instaed of using echo 
+     *  must use variable to add elements and return this variable
+     *  This is connected with redirecting.
+     */
+    public static function use_echo() {
+        return true;
+    }
 }
 
 class assignee_choose_form extends moodleform {
