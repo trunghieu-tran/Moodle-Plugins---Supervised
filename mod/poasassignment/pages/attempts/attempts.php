@@ -4,26 +4,41 @@ require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 
 class attempts_page extends abstract_page {
+    private $assigneeid;
+
     function __construct() {
-        global $DB, $USER;
+        global $DB, $USER;        
+        $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
         
-        $assigneeid = optional_param('assigneeid', 0, PARAM_INT);
-        if($assigneeid > 0) {
-            $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid,));
-        }
-        else {
-            $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
-            $this->assignee = $DB->get_record('poasassignment_assignee', 
-                                              array('userid' => $USER->id, 
-                                                    'poasassignmentid' => $poasassignmentid));
-        }
+        //if($assigneeid > 0) {
+        //    $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid,));
+        //}
+        //else {
+        //    $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        //    $this->assignee = $DB->get_record('poasassignment_assignee', 
+        //                                      array('userid' => $USER->id, 
+        //                                            'poasassignmentid' => $poasassignmentid));
+        //}
     }
     
     function has_satisfying_parameters() {
         global $DB,$USER;
         $context = poasassignment_model::get_instance()->get_context();
+        $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        if ($this->assigneeid > 0) {
+            if (! $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $this->assigneeid))) {
+                $this->lasterror = 'errornonexistentassignee';
+                return false;
+            }
+        }
+        else {
+            $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+            $this->assignee = $DB->get_record('poasassignment_assignee', 
+                                              array('userid' => $USER->id,
+                                                    'poasassignmentid' => $poasassignmentid));
+        }
         // Page exists always for teachers
-        if(has_capability('mod/poasassignment:grade', $context)) {
+        if (has_capability('mod/poasassignment:grade', $context)) {
             return true;
         }
         // Page exists, if assignee has attempts
