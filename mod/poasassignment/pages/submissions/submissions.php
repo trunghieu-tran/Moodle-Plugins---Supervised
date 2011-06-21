@@ -1,4 +1,5 @@
 <?php
+global $CFG;
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');   
 require_once($CFG->libdir . '\tablelib.php');
@@ -81,7 +82,7 @@ class submissions_page extends abstract_page {
         if($indtasks) {
             if($assignee) {
                 $task=$DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
-                $taskurl = new moodle_url('/mod/poasassignment/pages/tasks/taskview.php',array('taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get'); 
+                $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get'); 
                 $deleteurl = new moodle_url('warning.php',array('action'=>'canceltask','assigneeid'=>$assignee->id,'id'=>$this->cm->id),'d','post');
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
@@ -131,7 +132,7 @@ class submissions_page extends abstract_page {
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
             if($attempt) {
-                $gradeurl = new moodle_url('/mod/poasassignment/pages/submissions/grade.php',array('assigneeid'=>$assignee->id,'id'=>$this->cm->id)); 
+                $gradeurl = new moodle_url('view.php',array('page' => 'grade', 'assigneeid'=>$assignee->id,'id'=>$this->cm->id)); 
                 if(isset($attempt->rating)) {
                     if($attempt->draft==0) {
                         $row[]=userdate($attempt->ratingdate);

@@ -9,16 +9,6 @@ class attempts_page extends abstract_page {
     function __construct() {
         global $DB, $USER;        
         $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
-        
-        //if($assigneeid > 0) {
-        //    $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid,));
-        //}
-        //else {
-        //    $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
-        //    $this->assignee = $DB->get_record('poasassignment_assignee', 
-        //                                      array('userid' => $USER->id, 
-        //                                            'poasassignmentid' => $poasassignmentid));
-        //}
     }
     
     function has_satisfying_parameters() {

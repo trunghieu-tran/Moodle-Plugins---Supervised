@@ -28,7 +28,7 @@ class abstract_page {
      */
     function require_ability_to_view() {
         if(!$this->has_satisfying_parameters())
-            print_error($this->lasterror,'poasassignment');
+            print_error($this->lasterror, 'poasassignment');
         $this->require_cap();
     }
 
@@ -51,7 +51,7 @@ class abstract_page {
     /** Requires capabilities to view, used in has_ability_to_view
      */
     function require_cap() {
-        return require_capability($this->get_cap(),poasassignment_model::get_instance()->get_context());
+        return require_capability($this->get_cap(), poasassignment_model::get_instance()->get_context());
     }
     function view() {
     }

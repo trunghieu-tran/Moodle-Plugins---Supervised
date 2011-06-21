@@ -1,4 +1,5 @@
 <?php
+global $CFG;
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');   
 require_once($CFG->libdir . '\formslib.php');
@@ -106,7 +107,7 @@ class tasks_page extends abstract_page {
             $row = array();
 
             // Adding view icon
-            $viewurl = new moodle_url('/mod/poasassignment/pages/tasks/taskview.php',array('taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
+            $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
             $viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('view','poasassignment').
                             '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>';
             $namecolumn=$task->name.' '.$viewicon;

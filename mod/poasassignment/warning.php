@@ -19,15 +19,15 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
 switch ($action) {
     case 'disablepenalty':
-        $attemptid=optional_param('attemptid',-1,PARAM_INT);
-        if(!isset($attemptid) ||$attemptid<1)
-            print_error('invalidattemptid','poasassignment');
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
-        if(has_capability('mod/poasassignment:grade',$context)) {
-            $attempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
-            $attempt->disablepenalty=1;
-            $DB->update_record('poasassignment_attempts',$attempt);
-            redirect(new moodle_url('view.php',array('id'=>$cm->id,'page' => 'attempts', 'assigneeid'=>$attempt->assigneeid)));
+        $attemptid=optional_param('attemptid', -1, PARAM_INT);
+        if(!isset($attemptid) || $attemptid < 1)
+            print_error('invalidattemptid', 'poasassignment');
+        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        if(has_capability('mod/poasassignment:grade', $context)) {
+            $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
+            $attempt->disablepenalty = 1;
+            $DB->update_record('poasassignment_attempts', $attempt);
+            redirect(new moodle_url('view.php',array('id' => $cm->id,'page' => 'attempts', 'assigneeid' => $attempt->assigneeid)));
         }        
         break;
     case 'enablepenalty':
@@ -116,7 +116,7 @@ switch ($action) {
                                 array('id'=>$id,'taskid'=>$taskid,'userid'=>$userid,'action'=>'taketaskconfirmed')), 
                                 get_string('yes'),
                                 'post');
-        echo $OUTPUT->single_button(new moodle_url('taskview.php',array('id'=>$id,'taskid'=>$taskid)), get_string('no'),'get');
+        echo $OUTPUT->single_button(new moodle_url('view.php',array('page'=> 'taskview', 'id'=>$id, 'taskid'=>$taskid)), get_string('no'),'get');
         echo $OUTPUT->footer();    
         break;
     case 'taketaskconfirmed':
