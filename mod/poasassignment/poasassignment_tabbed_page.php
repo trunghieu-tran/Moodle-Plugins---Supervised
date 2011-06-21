@@ -31,17 +31,28 @@ class poasassignment_tabbed_page {
         poasassignment_model::get_instance()->cash_assignee_by_user_id($USER->id);
 
         require_login($course, true, $cm);
-
+        $this->include_page($page);
         // Add record to log
         add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&page=$page", $poasassignment->name, $cm->id);
 
-        $this->currentpage = $page;
+        //$this->currentpage = $page;
         
         $PAGE->set_url('/mod/poasassignment/view.php', array('id' => $cm->id,'page'=>$page));
         $PAGE->set_title($course->shortname.': '.get_string('modulename','poasassignment').': '.$poasassignment->name);
         $PAGE->set_heading($course->fullname);
         $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
 
+    }
+    
+    private function include_page($page) {
+        $pagetype = $page . '_page';
+        if(array_key_exists($page, poasassignment_model::$extpages)) {
+            require_once($currentpath);
+            $this->currentpage = $page;
+        }
+        else {
+            print_error('errorunknownpage','poasassignment');
+        }
     }
 
     /** Method calls all view-methods in class
@@ -73,7 +84,7 @@ class poasassignment_tabbed_page {
     function view_body() {
         $pagetype = $this->currentpage."_page";
         $currentpath = poasassignment_model::$extpages[$this->currentpage];
-        require_once($currentpath);
+        //require_once($currentpath);
         $poasassignmentpage = new $pagetype(poasassignment_model::get_instance()->get_cm(), 
                                             poasassignment_model::get_instance()->get_poasassignment());
         $poasassignmentpage->require_ability_to_view();
