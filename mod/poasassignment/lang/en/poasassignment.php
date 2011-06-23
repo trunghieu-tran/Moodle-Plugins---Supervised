@@ -247,3 +247,6 @@ $string['errornonexistenttask'] = 'The task does not exist';
 $string['errornonexistentassignee'] = 'The assignee does not exist';
 $string['grade_help'] = 'Grade page';
 $string['submission_help'] = 'Submission page';
+$string['errornonexistentfield'] = 'The field does not exist';
+$string['taskfieldedit'] = 'Task field edit';
+$string['taskfieldedit_help'] = 'Task field edit help';
