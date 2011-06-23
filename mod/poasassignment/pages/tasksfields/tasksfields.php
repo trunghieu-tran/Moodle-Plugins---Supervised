@@ -30,7 +30,7 @@ class tasksfields_page extends abstract_page {
         
         $id = $this->cm->id;
         echo '<div align="center">';
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php?id=' . $id), 
+        echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskfieldedit')), 
                                     get_string('addtaskfield','poasassignment'));
         echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/categoryedit.php?id=' . $id), 
                                     get_string('addcategoryfield','poasassignment'));
@@ -63,9 +63,10 @@ class tasksfields_page extends abstract_page {
         $fields = $DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach($fields as $field) {
         
-            $updateurl = new moodle_url('/mod/poasassignment/pages/tasksfields/tasksfieldsedit.php',
+            $updateurl = new moodle_url('view.php',
                                         array('id' => $this->cm->id,
-                                              'fieldid' => $field->id), 
+                                              'fieldid' => $field->id,
+                                              'page' => 'taskfieldedit'), 
                                         'u',
                                         'get');
             $deleteurl = new moodle_url('/mod/poasassignment/warning.php',

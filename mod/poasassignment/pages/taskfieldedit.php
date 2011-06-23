@@ -1,9 +1,76 @@
 <?php
+global $CFG;
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 
-require_once($CFG->libdir . '/formslib.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\lib.php');
-
-class tasksfieldsedit_form extends moodleform {
+class taskfieldedit_page extends abstract_page {
+    private $fieldid;
+    private $field;
+    function __construct() {
+        $this->fieldid = optional_param('fieldid', 0, PARAM_INT);
+    }
+    function get_cap() {
+        return 'mod/poasassignment:managetasksfields';
+    }
+    function has_satisfying_parameters() {
+        // page is available if individual tasks mode is avtive
+        $flag = poasassignment_model::get_instance()->has_flag(ACTIVATE_INDIVIDUAL_TASKS);
+        if (!$flag) {
+            $this->lasterror = 'errorindtaskmodeisdisabled';
+            return false;
+        }
+        // field is available for edidting if exists
+        global $DB;
+        $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        $options = array('id' => $this->fieldid, 'poasassignmentid' => $poasassignmentid);
+        $fieldexistsininstance = $this->field = $DB->get_record('poasassignment_fields', $options);
+        if($this->fieldid != 0 && !$fieldexistsininstance ) {
+            $this->lasterror = 'errornonexistentfield';
+            return false;
+        }
+        return true;
+    }
+    function view() {
+        global $DB, $OUTPUT, $USER;
+        $model = poasassignment_model::get_instance();
+        $poasassignmentid = $model->get_poasassignment()->id;
+        $mform = new taskfieldedit_form(null, array('id' => $model->get_cm()->id,
+                                                      'fieldid' => $this->fieldid,
+                                                      'poasassignmentid' => $poasassignmentid));
+        if ($mform->is_cancelled()) {
+            // return to taskfields page
+            redirect(new moodle_url('view.php',
+                                    array('id' => $model->get_cm()->id,
+                                          'page' => 'tasksfields')), 
+                     null, 
+                     0);
+        }
+        else {
+            if ($mform->get_data()) {
+                $data = $mform->get_data();    
+                if ($this->fieldid > 0) {
+                    $model->update_task_field($this->fieldid, $data);
+                }
+                else {
+                    $model->add_task_field($data);
+                }
+                redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
+            }
+        }
+        if ($this->fieldid > 0) {
+            $mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
+            $data = new stdClass();
+            $data->variants = $model->get_field_variants($this->fieldid, 0);
+            $data->id = $model->get_cm()->id;
+            $mform->set_data($data);
+        }
+        $mform->display();
+    }
+    public static function display_in_navbar() {
+        return false;
+    }
+}
+class taskfieldedit_form extends moodleform {
     function definition() {
         $mform = $this->_form;
         $instance = $this->_customdata;
@@ -61,6 +128,8 @@ class tasksfieldsedit_form extends moodleform {
         $mform->setType('fieldid', PARAM_INT);
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'page', 'taskfieldedit');
+        $mform->setType('id', PARAM_TEXT);
         $mform->addElement('hidden', 'poasassignmentid', $instance['poasassignmentid']);
         $mform->setType('poasassignmentid', PARAM_INT);
         
