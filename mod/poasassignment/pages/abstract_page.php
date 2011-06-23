@@ -53,7 +53,7 @@ class abstract_page {
     function require_cap() {
         return require_capability($this->get_cap(), poasassignment_model::get_instance()->get_context());
     }
-    function pre_view() {
+    public function pre_view() {
     }
     function view() {
     }

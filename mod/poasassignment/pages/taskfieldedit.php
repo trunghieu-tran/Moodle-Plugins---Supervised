@@ -6,6 +6,7 @@ require_once(dirname(dirname(__FILE__)) . '\model.php');
 class taskfieldedit_page extends abstract_page {
     private $fieldid;
     private $field;
+    private $mform;
     function __construct() {
         $this->fieldid = optional_param('fieldid', 0, PARAM_INT);
     }
@@ -30,14 +31,13 @@ class taskfieldedit_page extends abstract_page {
         }
         return true;
     }
-    function view() {
-        global $DB, $OUTPUT, $USER;
+    public function pre_view() {
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
-        $mform = new taskfieldedit_form(null, array('id' => $model->get_cm()->id,
+        $this->mform = new taskfieldedit_form(null, array('id' => $model->get_cm()->id,
                                                       'fieldid' => $this->fieldid,
                                                       'poasassignmentid' => $poasassignmentid));
-        if ($mform->is_cancelled()) {
+        if ($this->mform->is_cancelled()) {
             // return to taskfields page
             redirect(new moodle_url('view.php',
                                     array('id' => $model->get_cm()->id,
@@ -46,8 +46,8 @@ class taskfieldedit_page extends abstract_page {
                      0);
         }
         else {
-            if ($mform->get_data()) {
-                $data = $mform->get_data();    
+            if ($this->mform->get_data()) {
+                $data = $this->mform->get_data();    
                 if ($this->fieldid > 0) {
                     $model->update_task_field($this->fieldid, $data);
                 }
@@ -57,14 +57,19 @@ class taskfieldedit_page extends abstract_page {
                 redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
             }
         }
+    }
+    function view() {
+        global $DB, $OUTPUT, $USER;
+        $model = poasassignment_model::get_instance();
+        $poasassignmentid = $model->get_poasassignment()->id;
         if ($this->fieldid > 0) {
-            $mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
+            $this->mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
             $data = new stdClass();
             $data->variants = $model->get_field_variants($this->fieldid, 0);
             $data->id = $model->get_cm()->id;
-            $mform->set_data($data);
+            $this->mform->set_data($data);
         }
-        $mform->display();
+        $this->mform->display();
     }
     public static function display_in_navbar() {
         return false;
