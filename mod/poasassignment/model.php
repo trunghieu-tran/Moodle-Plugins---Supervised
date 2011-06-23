@@ -50,19 +50,21 @@ class poasassignment_model {
      */
     protected static $model;
     
-    public static $extpages = array('tasksfields' => 'pages/tasksfields/tasksfields.php',
-                                    'tasks' => 'pages/tasks/tasks.php',
-                                    'taskgiversettings' => 'pages/taskgiversettings/taskgiversettings.php',
-                                    'view' => 'pages/view/view.php',
-                                    'attempts' => 'pages/attempts/attempts.php',
-                                    'graderresults' => 'pages/graderresults/graderresults.php',
-                                    'criterions' => 'pages/criterions/criterions.php',
-                                    'graders' => 'pages/graders/graders.php',
-                                    'submissions' => 'pages/submissions/submissions.php',
-                                    'grade' => 'pages/grade/grade.php',
-                                    'taskview' => 'pages/taskview/taskview.php',
+    public static $extpages = array('tasksfields' => 'pages/tasksfields.php',
+                                    'tasks' => 'pages/tasks.php',
+                                    'taskgiversettings' => 'pages/taskgiversettings.php',
+                                    'view' => 'pages/view.php',
+                                    'attempts' => 'pages/attempts.php',
+                                    'graderresults' => 'pages/graderresults.php',
+                                    'criterions' => 'pages/criterions.php',
+                                    'graders' => 'pages/graders.php',
+                                    'submissions' => 'pages/submissions.php',
+                                    'grade' => 'pages/grade.php',
+                                    'taskview' => 'pages/taskview.php',
                                     'submission' => 'pages/submission.php',
-                                    'taskfieldedit' => 'pages/taskfieldedit.php'
+                                    'taskfieldedit' => 'pages/taskfieldedit.php',
+                                    'categoryedit' => 'pages/categoryedit.php',
+                                    'taskedit' => 'pages/taskedit.php'
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
@@ -1060,10 +1062,8 @@ class poasassignment_model {
         $alt = $text;        
         $attributes = array('src'=>$src, 'alt'=>$alt, 'class'=>'iconhelp');
         $output = html_writer::empty_tag('img', $attributes);
-        
-        $url = new moodle_url('/mod/poasassignment/pages/tasksfields/taskfielddescription.php', array('text' => $text));
-        //$title = get_string('helpprefix2', '', trim($title, ". \t"));
-        $title = get_string('taskfielddescription','poasassignment');
+        $url = new moodle_url('/mod/poasassignment/showtext.php', array('text' => $text));
+        $title = get_string('about','poasassignment');
         $attributes = array('href'=>$url, 'title'=>$title);
         $id = html_writer::random_id('helpicon');
         $attributes['id'] = $id;

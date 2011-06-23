@@ -1,7 +1,7 @@
 <?php
 global $CFG;
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 require_once($CFG->libdir.'/tablelib.php');
 class tasksfields_page extends abstract_page {
     var $poasassignment;
@@ -32,7 +32,7 @@ class tasksfields_page extends abstract_page {
         echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskfieldedit')), 
                                     get_string('addtaskfield','poasassignment'));
-        echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasksfields/categoryedit.php?id=' . $id), 
+        echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'categoryedit')), 
                                     get_string('addcategoryfield','poasassignment'));
         echo '</div>';
     }

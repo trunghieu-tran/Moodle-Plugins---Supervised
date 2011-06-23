@@ -1,7 +1,7 @@
 <?php
 global $CFG;
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');   
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');   
 require_once($CFG->libdir . '\formslib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;
@@ -50,8 +50,7 @@ class tasks_page extends abstract_page {
         if ($hascapmanage) {
             $id = $this->cm->id;
             echo '<div align="center">';
-            echo $OUTPUT->single_button(new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php?id='.$id), 
-                                                        get_string('addbuttontext','poasassignment'));
+            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addbuttontext','poasassignment')); 
             echo '</div>';
         }
         
@@ -119,10 +118,10 @@ class tasks_page extends abstract_page {
 
             if ($hascapmanage) {
                
-                $updateurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
-                                            array('taskid'=>$task->id,'id'=>$this->cm->id),'u','get');
-                $deleteurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
-                                            array('taskid'=>$task->id,'mode'=>DELETE_MODE,'id'=>$this->cm->id),'d','get');
+                $updateurl = new moodle_url('view.php',
+                                            array('taskid'=>$task->id,'id'=>$this->cm->id,'page' => 'taskedit'),'u','get');
+                $deleteurl = new moodle_url('view.php',
+                                            array('taskid'=>$task->id,'mode'=>DELETE_MODE,'id'=>$this->cm->id,'page' => 'taskedit'),'d','get');
                 
                 $showicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
                             '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
@@ -133,10 +132,11 @@ class tasks_page extends abstract_page {
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                  if ($task->hidden) {
-                    $showurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                    $showurl = new moodle_url('view.php',
                                               array('taskid' => $task->id,
                                                     'mode' => SHOW_MODE,
-                                                    'id' => $this->cm->id),
+                                                    'id' => $this->cm->id,
+                                                    'page' => 'taskedit'),
                                               'u',
                                               'get');
                     $showicon = '<a href="'.$showurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
@@ -144,10 +144,11 @@ class tasks_page extends abstract_page {
                     $namecolumn .= $showicon;
                 }
                 else {
-                    $hideurl = new moodle_url('/mod/poasassignment/pages/tasks/taskedit.php',
+                    $hideurl = new moodle_url('view.php',
                                               array('taskid' => $task->id,
                                                     'mode' => HIDE_MODE,
-                                                    'id' => $this->cm->id),
+                                                    'id' => $this->cm->id,
+                                                    'page' => 'taskedit'),
                                               'u',
                                               'get');
                     $hideicon = '<a href="'.$hideurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
