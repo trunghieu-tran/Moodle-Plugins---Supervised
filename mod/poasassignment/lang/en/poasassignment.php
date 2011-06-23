@@ -246,3 +246,4 @@ $string['taskview_help'] = 'This pages conatins information about one task';
 $string['errornonexistenttask'] = 'The task does not exist';
 $string['errornonexistentassignee'] = 'The assignee does not exist';
 $string['grade_help'] = 'Grade page';
+$string['submission_help'] = 'Submission page';
