@@ -116,6 +116,9 @@ class answer_form extends moodleform {
         $mform->addElement('hidden', 'userid', $instance['userid']);
         $mform->setType('userid', PARAM_INT);
         
+        $mform->addElement('hidden', 'page', 'submission');
+        $mform->setType('userid', PARAM_TEXT);
+        
         $this->add_action_buttons(true,get_string('sendsubmission', 'poasassignment'));
     }
 }
