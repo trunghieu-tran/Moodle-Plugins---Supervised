@@ -1,7 +1,7 @@
 <?php
 global $CFG;
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');   
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 require_once($CFG->libdir . '\tablelib.php');
 class submissions_page extends abstract_page {
     var $poasassignment;

@@ -1,13 +1,12 @@
 <?php
 global $CFG;
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
+require_once('abstract_page.php');
 require_once($CFG->libdir . '\tablelib.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 require_once($CFG->libdir.'/formslib.php');
 class criterions_page extends abstract_page {
     private $mform;
-    function criterions_page(/* $cm, $poasassignment */) {
-        
+    function criterions_page() {        
     }
     
     function get_cap() {

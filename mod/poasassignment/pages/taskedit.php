@@ -1,8 +1,91 @@
 <?php
+global $CFG;
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 
-require_once($CFG->libdir.'/formslib.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
-
+class taskedit_page extends abstract_page {
+    private $taskid;
+    
+    function __construct() {
+        global $DB;
+        $this->taskid = optional_param('taskid', 0, PARAM_INT);
+        $this->mode   = optional_param('mode', null, PARAM_INT);
+    }
+    function get_cap() {
+        return 'mod/poasassignment:managetasks';
+    }
+    
+    function has_satisfying_parameters() {
+        global $DB;
+        if($this->taskid != 0 && !$this->task = $DB->get_record('poasassignment_tasks', array('id' => $this->taskid))) {        
+            $this->lasterror = 'errornonexistenttask';
+            return false;
+        }
+        return true;
+    }
+    function pre_view() {
+        global $DB;
+        $model = poasassignment_model::get_instance();
+        if ($this->mode == SHOW_MODE || $this->mode == HIDE_MODE) {
+            if (isset($this->taskid) && $this->taskid > 0) {
+                $this->task = $DB->get_record('poasassignment_tasks', array('id'=>$this->taskid));
+                if ($this->mode == SHOW_MODE) {
+                    $this->task->hidden = 0;
+                }
+                else {
+                    $this->task->hidden = 1;
+                }
+                $DB->update_record('poasassignment_tasks', $this->task);
+                redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
+            }
+            else
+                print_error('invalidtaskid','poasassignment');
+        }
+        if ($this->mode == DELETE_MODE) {
+            if ($this->taskid > 0) {
+                //TODO delete task and task values & references from student's pagele
+                $model->delete_task($this->taskid);
+                redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
+            } 
+            else
+                print_error('invalidtaskid','poasassignment');
+        }
+        $poasassignmentid = $model->get_poasassignment()->id;
+        $this->mform = new taskedit_form(null, array('id' => $model->get_cm()->id, 
+                                       'taskid' => $this->taskid,
+                                       'poasassignmentid' => $poasassignmentid));
+        if ($this->mform->is_cancelled()) {
+            redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 
+                                                      'page' => 'tasks')), 
+                                                      null, 
+                                                      0);
+        }
+        else {
+            if ($this->mform->get_data()) {
+                $data = $this->mform->get_data();
+                if ($this->taskid > 0) {
+                    $model->update_task($this->taskid,$data);            
+                }
+                else {
+                    $model->add_task($data);
+                }
+                redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
+            }
+            
+        }
+        if ($this->taskid > 0) {
+            $data = $model->get_task_values($this->taskid);
+            $data->id = $model->get_cm()->id;
+            $this->mform->set_data($data);
+        }
+    }
+    function view() {
+        $this->mform->display();
+    }
+    public static function display_in_navbar() {
+        return false;
+    }
+}
 class taskedit_form extends moodleform {
 
     function definition(){
@@ -70,6 +153,8 @@ class taskedit_form extends moodleform {
         
         $mform->addElement('hidden', 'taskid', $instance['taskid']);
         $mform->setType('taskid', PARAM_INT);
+        $mform->addElement('hidden', 'page', 'taskedit');
+        $mform->setType('taskid', PARAM_TEXT);
         
         $this->add_action_buttons(true, get_string('savechanges', 'admin'));
     }
@@ -96,14 +181,6 @@ class taskedit_form extends moodleform {
                 $errors['field'.$field->id]=get_string('errornovariants','poasassignment');
                 return $errors;
             }
-            // if($field->ftype==FLOATING && !is_numeric($data['field'.$field->id])) {
-                // $errors['field'.$field->id]=get_string('errormustbefloat','poasassignment');
-                // return $errors;
-            // }
-            // if($field->ftype==NUMBER && !is_int($data['field'.$field->id])) {
-                // $errors['field'.$field->id]=get_string('errormustbeint','poasassignment');
-                // return $errors;
-            // }
             
         }
        

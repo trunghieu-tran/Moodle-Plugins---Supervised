@@ -4,7 +4,7 @@ require_once('abstract_page.php');
 require_once(dirname(dirname(__FILE__)) . '\model.php');
 
 class submission_page extends abstract_page {
-    
+    private $mform;
     function __construct() {
     }
     function get_cap() {
@@ -14,11 +14,11 @@ class submission_page extends abstract_page {
         // TODO
         return true;
     }
-    function view() {
+    public function pre_view() {
         global $DB, $OUTPUT, $USER;
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
-        $answer_form = new answer_form(null, array('poasassignmentid' => $poasassignmentid, 
+        $this->mform = new answer_form(null, array('poasassignmentid' => $poasassignmentid, 
                                            'userid' => $USER->id,
                                            'id' => $model->get_cm()->id));
         $plugins = $model->get_plugins();
@@ -27,15 +27,15 @@ class submission_page extends abstract_page {
             require_once($plugin->path);
             $poasassignmentplugin = new $plugin->name();
             $preloadeddata = $poasassignmentplugin->get_answer_values($poasassignmentid);
-            $answer_form->set_data($preloadeddata);
+            $this->mform->set_data($preloadeddata);
             }
         }
-        if ($answer_form->is_cancelled()) {
+        if ($this->mform->is_cancelled()) {
             redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id,'page' => 'view')), null, 0);
         }
         else {
-            if ($answer_form->get_data()) {
-                $data = $answer_form->get_data();
+            if ($this->mform->get_data()) {
+                $data = $this->mform->get_data();
                 //save data
                 $assignee = $model->get_assignee($USER->id);
                 $model->cash_assignee_by_user_id($USER->id);
@@ -66,8 +66,11 @@ class submission_page extends abstract_page {
                                         0);
             }
         }
+    }
+    function view() {
+        global $OUTPUT;
         echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-        $answer_form->display();
+        $this->mform->display();
         echo $OUTPUT->box_end();
     }
     public static function display_in_navbar() {

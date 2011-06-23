@@ -1,7 +1,7 @@
 <?php
 global $CFG;
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 
 class attempts_page extends abstract_page {
     private $assigneeid;

@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
-require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
+require_once('abstract_page.php');
+require_once(dirname(dirname(__FILE__)) . '\model.php');
 class grade_page extends abstract_page{
     private $assigneeid;
     private $assignee;
@@ -86,7 +86,7 @@ class grade_form extends moodleform {
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
         $plugins = $poasmodel->get_plugins();
         foreach($plugins as $plugin) {
-            require_once(dirname(dirname(dirname(__FILE__))) . '\\'.$plugin->path);
+            require_once(dirname(dirname(__FILE__)) . '\\'.$plugin->path);
             $poasassignmentplugin = new $plugin->name();
             $mform->addElement('static',null,null,$poasassignmentplugin->show_assignee_answer($instance['assigneeid'],$instance['poasassignmentid']));
         }
