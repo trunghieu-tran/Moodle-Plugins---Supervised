@@ -2,11 +2,10 @@
 global $CFG;
 require_once(dirname(dirname(__FILE__)) . '\abstract_page.php');
 require_once($CFG->libdir . '\tablelib.php');
-//require_once('criterionsedit_form.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '\model.php');
 require_once($CFG->libdir.'/formslib.php');
 class criterions_page extends abstract_page {
-    
+    private $mform;
     function criterions_page(/* $cm, $poasassignment */) {
         
     }
@@ -14,21 +13,24 @@ class criterions_page extends abstract_page {
     function get_cap() {
         return 'mod/poasassignment:managecriterions';
     }
-    
+    public function pre_view() {        
+        $poasmodel = poasassignment_model::get_instance();
+        $id = $poasmodel->get_cm()->id;
+        $this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
+        if($this->mform->get_data()) {
+                $data = $this->mform->get_data();
+                $poasmodel->save_criterion($data);
+                redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+        }
+    }
     function view() {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $id = $poasmodel->get_cm()->id;
-        $mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
-        
-        if($mform->get_data()) {
-                $data = $mform->get_data();
-                $poasmodel->save_criterion($data);
-                redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
-        }
-        $mform->set_data($poasmodel->get_criterions_data());
-        $mform->set_data(array('id' => $id));        
-        $mform->display();
+        //$mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
+        $this->mform->set_data($poasmodel->get_criterions_data());
+        //$this->mform->set_data(array('id' => $id));        
+        $this->mform->display();
     }
 }
 class criterionsedit_form extends moodleform {
