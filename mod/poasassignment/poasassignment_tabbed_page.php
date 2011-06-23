@@ -64,16 +64,21 @@ class poasassignment_tabbed_page {
     function view() {
         global $PAGE;
         $pagetype = $this->currentpage . "_page";
-        require_capability('mod/poasassignment:view', poasassignment_model::get_instance()->get_context());        
-        echo $this->get_header($this->currentpage);
+        $model = poasassignment_model::get_instance();
+        require_capability('mod/poasassignment:view', $model->get_context());
         // Check available date or students
-        if (time() < poasassignment_model::get_instance()->get_poasassignment()->availabledate 
-            && !has_capability('mod/poasassignment:managetasks', poasassignment_model::get_instance()->get_context())) {
+        if (time() < $model->get_poasassignment()->availabledate 
+            && !has_capability('mod/poasassignment:managetasks', $model->get_context())) {
             
             print_error('thismoduleisntopenedyet', 'poasassignment');
         }
         else {
-            $this->view_body();
+            $poasassignmentpage = new $pagetype($model->get_cm(), 
+                                                $model->get_poasassignment());
+            $poasassignmentpage->require_ability_to_view();
+            $poasassignmentpage->pre_view();
+            echo $this->get_header($this->currentpage);
+            $poasassignmentpage->view();
         }
         echo $this->get_footer();
     }
@@ -81,18 +86,7 @@ class poasassignment_tabbed_page {
     /** Displays general content of the page
      */
     function view_body() {
-        $pagetype = $this->currentpage."_page";
-        //$currentpath = poasassignment_model::$extpages[$this->currentpage];
-        //require_once($currentpath);
-        $poasassignmentpage = new $pagetype(poasassignment_model::get_instance()->get_cm(), 
-                                            poasassignment_model::get_instance()->get_poasassignment());
-        $poasassignmentpage->require_ability_to_view();
-        //if ($pagetype::use_echo()) { 
-        $poasassignmentpage->view();
-        //}
-        //else {
-        //    return $poasassignmentpage->view();
-        //}
+        
     }
 
     /** Dislpays header
