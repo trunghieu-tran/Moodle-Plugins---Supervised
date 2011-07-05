@@ -337,7 +337,7 @@ class preg_leaf_meta extends preg_leaf {
             case preg_leaf_meta::SUBTYPE_ENDREG:
                 $type = 'ENDREG';
                 break;
-			case preg_leaf_meta::SUBTYPE_EMPTY:
+            case preg_leaf_meta::SUBTYPE_EMPTY:
                 $type = 'eps';
                 break;
         };

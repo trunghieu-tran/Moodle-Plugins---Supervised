@@ -244,20 +244,24 @@ class nfa {
 	}
 	
 	/**
-	 * returns the longest match using a string as input
+	 * returns the longest match using a string as input. matching is proceeded from a given start position
 	 * @param str - the original input string
 	 * @param startpos - index of the start position to match
 	 * @param issubpattern - true if matching a subpattern
+	 * @param cs - is matching case sensitive
 	 * @return - the longest character sequence matched
 	 */
-	public function match($str, $startpos, $issubpattern) {	// TODO
+	public function match($str, $startpos, $issubpattern, $cs) {	// TODO
 	
 	}
 	
 	/**
     * debug function for generating dot code for drawing nfa
+	 * @param dot_filename - name of the dot file
+	 * @param jpg_filename - name of the resulting jpg file
     */
-	public function nfa2dot() {
+	public function draw_nfa($dot_filename, $jpg_filename) {
+		$dotfile = fopen($dot_filename, 'w');
 		// numerate all states
 		$tmp = 0;
 		foreach ($this->states as $cur_state)
@@ -266,36 +270,23 @@ class nfa {
 			$tmp++;
 		}
 		// generate dot code
-		$dotcode = array();
-		$dotcode[] = 'digraph {';
-		$dotcode[] = 'rankdir = LR;';
+		fprintf($dotfile, "digraph {\n");
+		fprintf($dotfile, "rankdir = LR;\n");
 		foreach ($this->states as $cur_state) {			
 			$index1 = $cur_state->id;
 			// draw a single state
 			if (count($cur_state->next) == 0)
-				$dotcode[] = "$index1";
+				fprintf($dotfile, "%s\n", "$index1");
 			// draw a state with transitions
 			else
 				foreach ($cur_state->next as  $cur_transition) {
 					$index2 = $cur_transition->state->id;
 					$lab = $cur_transition->pregleaf->tohr();
-					$dotcode[] = "$index1->$index2"."[label=\"$lab\"];";
+					fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
 				}
 		}
-		$dotcode[] = '};';
-		return $dotcode;
-	}
-	
-	/**
-    * debug function for drawing nfa
-    */
-	public function draw_nfa($dot_filename, $jpg_filename) {
-		$dotcode = $this->nfa2dot();
-        $dotfile = fopen($dot_filename, 'w');
-        foreach ($dotcode as $str) {
-            fprintf($dotfile, "%s\n", $str);
-        }
-        chdir($this->graphvizpath);
+		fprintf($dotfile, "};");
+		chdir($this->graphvizpath);
         exec("dot.exe -Tjpg -o\"$jpg_filename\" -Kdot $dot_filename");
         echo "<IMG src=\"$jpg_filename\" width=\"90%\">";
         fclose($dotfile);
@@ -591,7 +582,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 /**
 * defines subpatterns
 */
-class nfa_preg_node_subpatt extends nfa_preg_operator {	// TODO
+class nfa_preg_node_subpatt extends nfa_preg_operator {
 
 	public function create_automaton(&$stack_of_automatons, &$subpatterns) {
 		$this->operands[0]->create_automaton($stack_of_automatons, $subpatterns);

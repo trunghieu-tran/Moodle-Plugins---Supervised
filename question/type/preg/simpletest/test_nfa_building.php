@@ -85,13 +85,13 @@ class nfa_building_test extends UnitTestCase {
 		$st2 = new nfa_state;
 		$st3 = new nfa_state;
 		
-		$tr_o = new preg_leaf_charset;	$tr_o->charset = 'o';
-		$tr_a = new preg_leaf_charset;	$tr_a->charset = 'a';		
-		$tr_eps = new preg_leaf_meta;	$tr_eps->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-		$tr_any = new preg_leaf_meta;	$tr_any->subtype = preg_leaf_meta::SUBTYPE_DOT;
-		$tr_asrt = new preg_leaf_assert; $tr_asrt->subtype = preg_leaf_assert::SUBTYPE_DOLLAR;
-		$tr_h = new preg_leaf_charset;	$tr_a->charset = 'h';
-		$tr_AZ = new preg_leaf_charset;	$tr_a->charset = 'A-Z';
+		$tr_o = new preg_leaf_charset;		$tr_o->charset = 'o';
+		$tr_a = new preg_leaf_charset;		$tr_a->charset = 'a';		
+		$tr_eps = new preg_leaf_meta;		$tr_eps->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+		$tr_any = new preg_leaf_meta;		$tr_any->subtype = preg_leaf_meta::SUBTYPE_DOT;
+		$tr_asrt = new preg_leaf_assert;	$tr_asrt->subtype = preg_leaf_assert::SUBTYPE_DOLLAR;
+		$tr_h = new preg_leaf_charset;		$tr_a->charset = 'h';
+		$tr_AZ = new preg_leaf_charset;		$tr_a->charset = 'A-Z';
 		
 		$st0->append_transition(new nfa_transition(&$tr_o, &$st3));
 		$st2->append_transition(new nfa_transition(&$tr_o, &$st3));
@@ -129,7 +129,7 @@ class nfa_building_test extends UnitTestCase {
 		
 		$tr_o = new preg_leaf_charset;	$tr_o->charset = 'o';
 		$tr_a = new preg_leaf_charset;	$tr_a->charset = 'a';
-		$tr_az = new preg_leaf_charset;	$tr_az->charset = 'a-z';		
+		$tr_az = new preg_leaf_charset;	$tr_az->charset = 'a-z';
 		$tr_eps = new preg_leaf_meta;	$tr_eps->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
 		$tr_c = new preg_leaf_charset;	$tr_c->charset = 'c';
 		$tr_d = new preg_leaf_charset;	$tr_d->charset = 'd';
