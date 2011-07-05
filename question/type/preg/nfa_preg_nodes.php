@@ -239,8 +239,13 @@ class nfa {
 	 * @param newres - new result, an object of processing_state
 	 * @return - true if new result is more suitable
 	 */
-	public function is_new_result_more_suitable(&$oldres, &$newres) {	// TODO
-	
+	public function is_new_result_more_suitable(&$oldres, &$newres) {
+		if	(($oldres->state != $this->endstate && $newres->matchcnt >= $oldres->matchcnt) ||										// new match is longer
+			($newres->state == $this->endstate && $oldres->state != $this->endstate) ||											// new match is full
+			($newres->state == $this->endstate && $oldres->state == $this->endstate && $newres->matchcnt >= $oldres->matchcnt))	// new match is full and longer
+			return true;
+		else
+			return false;
 	}
 	
 	/**
@@ -251,8 +256,67 @@ class nfa {
 	 * @param cs - is matching case sensitive
 	 * @return - the longest character sequence matched
 	 */
-	public function match($str, $startpos, $issubpattern, $cs) {	// TODO
-	
+	public function match($str, $startpos, $issubpattern, $cs) {
+		$curstates = array();	// states which the automaton is in
+		$skipstates = array();	// contains states where infinite quantifiers start. it's used to protect from loops like ()*
+		
+		$result = new processing_state($this->startstate, 0, false, 0, array());
+		
+		array_push($curstates, $result);
+		while (count($curstates) != 0) {
+			$newstates = array();
+			// we'll replace curstates with newstates by the end of this cycle
+			while (count($curstates) != 0) {
+				// get the current state
+				$currentstate = array_pop($curstates);
+				// kill epsilon-cycles
+				$skip = false;
+				if ($currentstate->state->starts_infinite_quant) {
+					// skipstates is sorted by matchcnt because every transition adds a character
+					for ($i = count($skipstates) - 1; $i >= 0 && !$skip && $currentstate->matchcnt <= $skipstates[$i]->matchcnt; $i--)
+						if ($skipstates[$i] == $currentstate)
+							$skip = true;
+					if (!$skip)
+						array_push($skipstates, $currentstate);
+				}
+				// skip this state if matching a subpattern and this is the end state
+				if ($issubpattern && $currentstate->state == $this->endstate)
+					$skip = true;
+					
+				// iterate over all transitions
+				for ($i = 0; !$skip && $i < count($currentstate->state->next); $i++) {					
+					$pos = $currentstate->matchcnt;
+					$length = 0;
+					$next = $currentstate->state->next[$i];
+					if ($next->pregleaf->match($str, $startpos + $pos, &$length, $cs)) {
+						$newstate = new processing_state($next->state, $startpos + $pos + $length, false, 0, $currentstate->assertions);
+						// clear newstate->assertions if a character matched
+						if ($length > 0)
+							$newstate->assertions = array();
+						elseif (!(is_a($next->pregleaf, 'preg_leaf_meta') && $next->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY))
+							array_push($newstate->assertions, $next->pregleaf);
+						// save the state
+						array_push($newstates, $newstate);
+						// save the next state as a result if it's a matching state
+						if ($next->state == $this->endstate && $this->is_new_result_more_suitable(&$result, &$newstate))
+							$result = $newstate;
+					} else {
+						if ($this->is_new_result_more_suitable(&$result, &$currentstate))
+							$result = $currentstate;
+					}
+				}
+			}
+			
+			// replace curstates with newstates
+			for ($i = 0; $i < count($newstates); $i++)
+				array_push($curstates, $newstates[$i]);
+			$newstates = array();
+		}
+		$result->isfullmatch = ($result->state == $this->endstate);
+		if (!$issubpattern && !$result->isfullmatch) {
+			// TODO character generation
+		}
+		return $result;
 	}
 	
 	/**

@@ -288,7 +288,7 @@ class preg_leaf_meta extends preg_leaf {
         return $result;
     }
     protected function match_inner($str, $pos, &$length, $cs) {
-        if ($pos>=strlen($str)) {
+        if ($pos>strlen($str)) {
             $length = 0;
             return false;
         }
@@ -309,6 +309,10 @@ class preg_leaf_meta extends preg_leaf {
                 } else {
                     $result =  false;
                 }
+                break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $length = 0;
+                return true;
                 break;
         }
         if ($this->negative) {
