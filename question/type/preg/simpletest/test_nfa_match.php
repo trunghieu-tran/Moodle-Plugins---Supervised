@@ -110,6 +110,12 @@ class nfa_match_test extends UnitTestCase {
 		$this->assertTrue($res->isfullmatch && $res->matchcnt == 5);
 	}
 	
+	function test_match_empty_loops() {
+		$matcher = new nfa_preg_matcher('^*[a-z 0-9](\b)+a${1,}');
+		$res = $matcher->automaton->match(' a', 0, false, false);
+		$this->assertTrue($res->isfullmatch && $res->matchcnt == 2);
+	}
+	
 
 }
 
