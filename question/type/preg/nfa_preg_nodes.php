@@ -240,7 +240,7 @@ class nfa {
 	 * @return - true if new result is more suitable
 	 */
 	public function is_new_result_more_suitable(&$oldres, &$newres) {
-		if	(($oldres->state != $this->endstate && $newres->matchcnt >= $oldres->matchcnt) ||										// new match is longer
+		if	(($oldres->state != $this->endstate && $newres->matchcnt >= $oldres->matchcnt) ||									// new match is longer
 			($newres->state == $this->endstate && $oldres->state != $this->endstate) ||											// new match is full
 			($newres->state == $this->endstate && $oldres->state == $this->endstate && $newres->matchcnt >= $oldres->matchcnt))	// new match is full and longer
 			return true;
@@ -274,7 +274,7 @@ class nfa {
 				if ($currentstate->state->starts_infinite_quant) {
 					// skipstates is sorted by matchcnt because every transition adds a character
 					for ($i = count($skipstates) - 1; $i >= 0 && !$skip && $currentstate->matchcnt <= $skipstates[$i]->matchcnt; $i--)
-						if ($skipstates[$i] == $currentstate)
+						if ($skipstates[$i]->state === $currentstate->state && $skipstates[$i]->matchcnt == $currentstate->matchcnt)
 							$skip = true;
 					if (!$skip)
 						array_push($skipstates, $currentstate);
