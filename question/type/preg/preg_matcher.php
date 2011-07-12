@@ -334,7 +334,7 @@ class preg_matcher {
     */
     public function &from_preg_node($pregnode) {
         if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
-            $enginenodename = $this->nodeprefix().'_preg_'.$pregnode->name();
+            $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
                 if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->error_flags)) {//highlighting first occurence of unaccepted node
@@ -350,9 +350,17 @@ class preg_matcher {
     }
 
     /**
+    * Returns engine node name by preg node name
+    * Overload in case of sophisticated node name schemes
+    */
+    protected function get_engine_node_name($pregname) {
+        return $this->node_prefix().'_preg_'.$pregname;
+    }
+
+    /**
     * Returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return null;
     }
 
