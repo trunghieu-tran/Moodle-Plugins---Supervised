@@ -1,7 +1,7 @@
 <?php
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
 
 
 class nfa_preg_matcher extends preg_matcher {
@@ -29,6 +29,7 @@ class nfa_preg_matcher extends preg_matcher {
 		case preg_matcher::PARTIAL_MATCHING:
 		case preg_matcher::NEXT_CHARACTER:
 		case preg_matcher::CHARACTERS_LEFT:
+		case preg_matcher::SUBPATTERN_CAPTURING:
 			return true;
 			break;
 		}
@@ -46,11 +47,12 @@ class nfa_preg_matcher extends preg_matcher {
 			$enginenodename = 'nfa_preg_'.$pregnode->name();
 			if (class_exists($enginenodename)) {
 				$enginenode = new $enginenodename(&$pregnode, $this);
-				if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg, $this->error_flags))	// highlighting first occurence of unaccepted node
+				if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg, $this->error_flags)) {	// highlighting first occurence of unaccepted node
 					$this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
-				else {	// append operands
-					foreach ($pregnode->operands as $curOperand)
+				} else {	// append operands
+					foreach ($pregnode->operands as $curOperand) {
 						array_push($enginenode->operands, $this->from_preg_node($curOperand));
+					}
 					return $enginenode;
 				}
 			}
@@ -59,9 +61,9 @@ class nfa_preg_matcher extends preg_matcher {
 		elseif (is_a($pregnode,'preg_leaf')) {
 			$engineleaf = new nfa_preg_leaf(&$pregnode, &$this);
 			return $engineleaf;
-		}
-		else
+		} else {
 			return $pregnode;
+		}
 	}
 
 	/**
@@ -70,8 +72,9 @@ class nfa_preg_matcher extends preg_matcher {
 	*/
 	function match_inner($str) {
 		$cs = false;	// is matching case sensitive
-		if (strpos($this->modifiers, 'i') === false)
+		if (strpos($this->modifiers, 'i') === false) {
 			$cs = true;
+		}
 		$curresult = new processing_state($this->automaton->startstate, 0, false, 0, array(), array(), array());
 		$startpos = 0;
 		$len = strlen($str);
@@ -86,8 +89,10 @@ class nfa_preg_matcher extends preg_matcher {
 		// save the result
 		$this->is_match = ($curresult->matchcnt > 0);
 		$this->full = $curresult->isfullmatch;
-		$this->index_first[0] = $startpos;
-		$this->index_last[0] = $startpos + $curresult->matchcnt - 1;
+		foreach ($curresult->subpattern_indexes_last as $key=>$index) {
+			$this->index_last[$key] = $startpos + $index;
+			$this->index_first[$key] = $startpos + $curresult->subpattern_indexes_first[$key];
+		}
 		$this->next = $curresult->nextpossible;
 	}
 
