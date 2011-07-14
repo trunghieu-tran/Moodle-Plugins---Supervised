@@ -41,12 +41,12 @@ class nfa_building_test extends UnitTestCase {
 		$tr_a = new preg_leaf_charset;	$tr_a->charset = 'a';
 		$tr_eps = new preg_leaf_meta;	$tr_eps->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
 
-		$st1->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st1->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st1->append_transition(new nfa_transition(&$tr_eps, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3));
+		$st1->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st1->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st1->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
 
 		$st0->merge(&$st1);
 		$this->assertTrue($st0->is_equal(&$st2));
@@ -64,14 +64,14 @@ class nfa_building_test extends UnitTestCase {
 		$tr_eps = new preg_leaf_meta;	$tr_eps->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
 		$tr_any = new preg_leaf_meta;	$tr_any->subtype = preg_leaf_meta::SUBTYPE_DOT;
 
-		$st0->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_eps, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_any, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_any, &$st3));
+		$st0->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_any, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_any, &$st3, false));
 
 		$st0->merge(&$st1);
 		$this->assertTrue($st0->is_equal(&$st2));
@@ -92,21 +92,21 @@ class nfa_building_test extends UnitTestCase {
 		$tr_h = new preg_leaf_charset;		$tr_a->charset = 'h';
 		$tr_AZ = new preg_leaf_charset;		$tr_a->charset = 'A-Z';
 
-		$st0->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_o, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_a, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_eps, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_any, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_any, &$st3));
-		$st0->append_transition(new nfa_transition(&$tr_asrt, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_asrt, &$st3));
-		$st1->append_transition(new nfa_transition(&$tr_any, &$st3));
-		$st1->append_transition(new nfa_transition(&$tr_h, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_h, &$st3));
-		$st1->append_transition(new nfa_transition(&$tr_AZ, &$st3));
-		$st2->append_transition(new nfa_transition(&$tr_AZ, &$st3));
+		$st0->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_o, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_a, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_eps, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_any, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_any, &$st3, false));
+		$st0->append_transition(new nfa_transition(&$tr_asrt, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_asrt, &$st3, false));
+		$st1->append_transition(new nfa_transition(&$tr_any, &$st3, false));
+		$st1->append_transition(new nfa_transition(&$tr_h, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_h, &$st3, false));
+		$st1->append_transition(new nfa_transition(&$tr_AZ, &$st3, false));
+		$st2->append_transition(new nfa_transition(&$tr_AZ, &$st3, false));
 
 
 		$st0->merge(&$st1);
@@ -134,19 +134,19 @@ class nfa_building_test extends UnitTestCase {
 		$tr_d = new preg_leaf_charset;	$tr_d->charset = 'd';
 		$tr_e = new preg_leaf_charset;	$tr_e->charset = 'e';
 
-		$st0->append_transition(new nfa_transition(&$tr_a, &$to0));
-		$st2->append_transition(new nfa_transition(&$tr_a, &$to0));
-		$st0->append_transition(new nfa_transition(&$tr_az, &$to1));
-		$st2->append_transition(new nfa_transition(&$tr_az, &$to1));
-		$st0->append_transition(new nfa_transition(&$tr_eps, &$to2));
-		$st2->append_transition(new nfa_transition(&$tr_eps, &$to2));
-		$st1->append_transition(new nfa_transition(&$tr_a, &$to0));
-		$st0->append_transition(new nfa_transition(&$tr_c, &$to2));
-		$st2->append_transition(new nfa_transition(&$tr_c, &$to2));
-		$st1->append_transition(new nfa_transition(&$tr_d, &$to3));
-		$st2->append_transition(new nfa_transition(&$tr_d, &$to3));
-		$st1->append_transition(new nfa_transition(&$tr_e, &$to4));
-		$st2->append_transition(new nfa_transition(&$tr_e, &$to4));
+		$st0->append_transition(new nfa_transition(&$tr_a, &$to0, false));
+		$st2->append_transition(new nfa_transition(&$tr_a, &$to0, false));
+		$st0->append_transition(new nfa_transition(&$tr_az, &$to1, false));
+		$st2->append_transition(new nfa_transition(&$tr_az, &$to1, false));
+		$st0->append_transition(new nfa_transition(&$tr_eps, &$to2, false));
+		$st2->append_transition(new nfa_transition(&$tr_eps, &$to2, false));
+		$st1->append_transition(new nfa_transition(&$tr_a, &$to0, false));
+		$st0->append_transition(new nfa_transition(&$tr_c, &$to2, false));
+		$st2->append_transition(new nfa_transition(&$tr_c, &$to2, false));
+		$st1->append_transition(new nfa_transition(&$tr_d, &$to3, false));
+		$st2->append_transition(new nfa_transition(&$tr_d, &$to3, false));
+		$st1->append_transition(new nfa_transition(&$tr_e, &$to4, false));
+		$st2->append_transition(new nfa_transition(&$tr_e, &$to4, false));
 
 		$st0->merge(&$st1);
 		$this->assertTrue($st0->is_equal(&$st2));
@@ -164,7 +164,7 @@ class nfa_building_test extends UnitTestCase {
 	}
 
 	function test_build_alt() {
-		$matcher = new nfa_preg_matcher('^ab|cd$|');
+		$matcher = new nfa_preg_matcher('a{1,}|^ab|b{1,2}|(sp)|cd$|');
 		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_alt.jpg');
 	}
 
@@ -212,9 +212,14 @@ class nfa_building_test extends UnitTestCase {
 		$matcher = new nfa_preg_matcher('a|(bc)|(de)|f');
 		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_alt.jpg');
 	}
+	
+	function test_build_subpatt_brace() {
+		$matcher = new nfa_preg_matcher('(a){1,2}');
+		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_brace.jpg');
+	}
 
 	function test_build_subpatt_aster() {
-		$matcher = new nfa_preg_matcher('^(ab)*');
+		$matcher = new nfa_preg_matcher('(a*)*');
 		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_aster.jpg');
 	}
 

@@ -125,7 +125,9 @@ class nfa_match_test extends UnitTestCase {
 	function test_match_easy() {
 		$matcher = new nfa_preg_matcher('^a((b(c))*)d$');
 		$matcher->match('abcbcd');
-		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == strlen('abcbcd') - 1);
+		$this->assertTrue(	$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 5 &&
+							$matcher->first_correct_character_index(1) == 1 && $matcher->last_correct_character_index(1) == 4 &&
+							$matcher->first_correct_character_index(2) == 1 && $matcher->last_correct_character_index(2) == 2);
 	}
 	function test_match_subpatterns_alternated() {
 		$matcher = new nfa_preg_matcher('((ab)|(cd)|(efgh))');
