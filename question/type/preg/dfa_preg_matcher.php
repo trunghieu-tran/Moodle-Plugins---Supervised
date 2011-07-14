@@ -562,7 +562,7 @@ class dfa_preg_matcher extends preg_matcher {
     /**
     * Returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return 'dfa';
     }
 
