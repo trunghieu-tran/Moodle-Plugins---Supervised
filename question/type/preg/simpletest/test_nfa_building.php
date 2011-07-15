@@ -164,7 +164,7 @@ class nfa_building_test extends UnitTestCase {
 	}
 
 	function test_build_alt() {
-		$matcher = new nfa_preg_matcher('a{1,}|^ab|b{1,2}|(sp)|cd$|');
+		$matcher = new nfa_preg_matcher('(ab)|a{1,}|^ab|b{1,2}|(sp)|cd$|');
 		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_alt.jpg');
 	}
 
@@ -212,10 +212,15 @@ class nfa_building_test extends UnitTestCase {
 		$matcher = new nfa_preg_matcher('a|(bc)|(de)|f');
 		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_alt.jpg');
 	}
-	
-	function test_build_subpatt_brace() {
-		$matcher = new nfa_preg_matcher('(a){1,2}');
-		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_brace.jpg');
+
+	function test_build_subpatt_brace_finite() {
+		$matcher = new nfa_preg_matcher('(a){3,6}');
+		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_brace_finite.jpg');
+	}
+
+	function test_build_subpatt_brace_infinite() {
+		$matcher = new nfa_preg_matcher('(a){3,}');
+		$matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_subpatt_brace_infinite.jpg');
 	}
 
 	function test_build_subpatt_aster() {

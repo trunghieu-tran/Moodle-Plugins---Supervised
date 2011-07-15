@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+	die('Direct access to this script is forbidden.');	///  It must be included from a Moodle page
 }
 
 require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
@@ -10,15 +10,15 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
 class nfa_match_test extends UnitTestCase {
 
 
-    function setUp() {
-    }
+	function setUp() {
+	}
 
-    function tearDown() {
-    }
+	function tearDown() {
+	}
 
 /****************************************************************************************************************************************************************/
 /*                                                                                                                                                              */
-/*                                                          	      tests for nfa::match()                                                       		        */
+/*                                                                     tests for nfa::match()                                                                   */
 /*                                                                                                                                                              */
 /****************************************************************************************************************************************************************/
 
@@ -53,14 +53,6 @@ class nfa_match_test extends UnitTestCase {
 		$res = $matcher->automaton->match('a_a', 0, false);
 		$this->assertTrue($res->isfullmatch && $res->matchcnt == 3);
 		$res = $matcher->automaton->match('a{a', 0, false);
-		$this->assertTrue(!$res->isfullmatch && $res->matchcnt == 1);
-	}
-
-	function test_match_cs() {
-		$matcher = new nfa_preg_matcher('aBcD');
-		$res = $matcher->automaton->match('abcd', 0, false);
-		$this->assertTrue($res->isfullmatch && $res->matchcnt == 4);
-		$res = $matcher->automaton->match('abcd', 0, true);
 		$this->assertTrue(!$res->isfullmatch && $res->matchcnt == 1);
 	}
 
@@ -118,23 +110,115 @@ class nfa_match_test extends UnitTestCase {
 
 /****************************************************************************************************************************************************************/
 /*                                                                                                                                                              */
-/*                                                          	      tests for nfa_preg_matcher::match()                                                       */
+/*                                                              tests for nfa_preg_matcher::match()                                                             */
 /*                                                                                                                                                              */
 /****************************************************************************************************************************************************************/
 
-	function test_match_easy() {
+	function test_match_subpatterns_nested() {
 		$matcher = new nfa_preg_matcher('^a((b(c))*)d$');
 		$matcher->match('abcbcd');
 		$this->assertTrue(	$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 5 &&
 							$matcher->first_correct_character_index(1) == 1 && $matcher->last_correct_character_index(1) == 4 &&
 							$matcher->first_correct_character_index(2) == 1 && $matcher->last_correct_character_index(2) == 2);
 	}
+
+	function test_match_subpatterns_concatenated() {
+		$matcher = new nfa_preg_matcher('(ab)(cd)(ef)');
+		$matcher->match('_abcdef');
+		$this->assertTrue(	$matcher->is_matching_complete() && $matcher->first_correct_character_index() == 1 && $matcher->last_correct_character_index() == 6 &&
+							$matcher->first_correct_character_index(1) == 1 && $matcher->last_correct_character_index(1) == 2 &&
+							$matcher->first_correct_character_index(2) == 3 && $matcher->last_correct_character_index(2) == 4 &&
+							$matcher->first_correct_character_index(3) == 5 && $matcher->last_correct_character_index(3) == 6);
+	}
+
 	function test_match_subpatterns_alternated() {
 		$matcher = new nfa_preg_matcher('((ab)|(cd)|(efgh))');
 		$matcher->match('abcdefgh');
 		$this->assertTrue($matcher->is_matching_complete() && $matcher->first_correct_character_index() == 4 && $matcher->last_correct_character_index() == 7);
 	}
 
+	function test_match_questquant() {
+		$matcher = new nfa_preg_matcher('^ab?c$');
+		$res = $matcher->match('ac');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 1);
+		$res = $matcher->match('abc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('abbc');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 1);
+	}
+
+	function test_match_negative_charset() {
+		$matcher = new nfa_preg_matcher('^a[^b]cd$');
+		$res = $matcher->match('abcd');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 0);
+		$res = $matcher->match('axcd');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 3);
+	}
+
+	function test_match_many_alternatives() {
+		$matcher = new nfa_preg_matcher('^(?:ab|cd|ef|gh)i$');
+		$res = $matcher->match('abi');
+		$this->assertTrue($matcher->is_matching_complete());
+		$this->assertTrue($matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('cdi');
+		$this->assertTrue($matcher->is_matching_complete());
+		$this->assertTrue($matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('efi');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('ghi');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('yzi');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+	}
+
+	function test_match_repeated_chars() {
+		$matcher = new nfa_preg_matcher('(?:a|b)*abb$');
+		$res = $matcher->match('ab');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 1);
+		$res = $matcher->match('abb');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('...ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 78);
+	}
+
+	function test_match_brace_finite() {
+		$matcher = new nfa_preg_matcher('^ab{15,35}c$');
+		$res = $matcher->match('abbbbbc');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 5);
+		$res = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 26);
+		$res = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 35);
+	}
+
+	function test_match_brace_infinite() {
+		$matcher = new nfa_preg_matcher('^ab{15,}c$');
+		$res = $matcher->match('abbbbbc');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 5);
+		$res = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 26);
+		$res = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 103);
+	}
+
+	 function test_match_plus() {
+		$matcher = new nfa_preg_matcher('^ab+c$');
+		$res = $matcher->match('ac');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 0);
+		$res = $matcher->match('abc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 2);
+		$res = $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 100);
+	}
+
+	function test_match_cs() {
+		$matcher = new nfa_preg_matcher('aBcD');
+		$res = $matcher->match('abcd');
+		$this->assertTrue(!$matcher->is_matching_complete() && $matcher->last_correct_character_index() == 0);
+		$matcher = new nfa_preg_matcher('aBcD', 'i');
+		$res = $matcher->match('abcd');
+		$this->assertTrue($matcher->is_matching_complete() && $matcher->last_correct_character_index() == 3);
+	}
 }
 
 ?>

@@ -35,8 +35,6 @@ class nfa_state
 
 	public $subpattend = 0;					// number of the subpattern which ends in this state
 
-	public $prevstate;						// a reference to the state before the end of a subpattern. it's used to reduce count of epsilon-transitions in repeated subpatterns
-
 	public $id;								// id of the state, debug variable
 
 	/**
@@ -68,9 +66,6 @@ class nfa_state
 			if ($curnext->state == $oldref) {
 				$curnext->state = $newref;
 			}
-		//if ($this->prevstate == $oldref) {
-			//$this->prevstate = $newref;
-		//}
 	}
 
 	/**
@@ -88,6 +83,9 @@ class nfa_state
 		}
 		if ($with->subpattstart) {
 			$this->subpattstart = $with->subpattstart;
+		}
+		if ($with->subpattend) {
+			$this->subpattend = $with->subpattend;
 		}
 	}
 
@@ -213,47 +211,6 @@ class nfa {
 	}
 
 	/**
-	* removes subpatterns from the automaton
-	*/
-	public function remove_subpatterns() {
-		foreach ($this->states as $key=>$curstate) {
-			if ($curstate->subpattstart != 0) {
-				$curstate->subpattstart = 0;
-				// delete epsilon-transitions
-				if ($curstate->prevstate->startsinfinitequant) {
-					$curstate->startsinfinitequant = true;
-				}
-				// update start states
-				if ($this->startstate == $curstate->prevstate) {
-					$this->startstate = $curstate;
-				}
-				// move transitions
-				foreach ($curstate->prevstate->next as $curnext) {
-					if (!($curnext->pregleaf->type == preg_node::TYPE_LEAF_META && $curnext->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY && $curnext->state == $curstate)) {
-						$curstate->append_transition($curnext);
-					}
-				}
-				$this->update_state_references($curstate->prevstate, $curstate);
-				$this->remove_state($curstate->prevstate);
-			}
-			if ($curstate->subpattend != 0) {
-				$curstate->subpattend = 0;
-				// delete epsilon-transitions
-				if ($curstate->startsinfinitequant) {
-					$curstate->prevstate->startsinfinitequant = true;
-				}
-				// update start states
-				if ($this->endstate == $curstate) {
-					$this->endstate = $curstate->prevstate;
-				}
-				$curstate->prevstate->next = array();
-				$this->update_state_references($curstate, $curstate->prevstate);
-				$this->remove_state($curstate);
-			}
-		}
-	}
-
-	/**
 	 * moves states from the automaton referred to by $from to this automaton
 	 * @param from - a reference to the automaton containing states to be moved
 	 */
@@ -368,8 +325,8 @@ class nfa {
 		}
 		$result->isfullmatch = ($result->state == $this->endstate);
 		if ($result->matchcnt > 0) {
-			$result->subpattern_indexes_first[0] = 0;
-			$result->subpattern_indexes_last[0] = $result->matchcnt - 1;
+			$result->subpattern_indexes_first[0] = $startpos;
+			$result->subpattern_indexes_last[0] = $startpos + $result->matchcnt - 1;
 		} else {
 			$result->subpattern_indexes_first[0] = -1;
 			$result->subpattern_indexes_last[0] = -1;
@@ -443,8 +400,9 @@ abstract class nfa_preg_node {
 	/**
 	 * creates an automaton corresponding to this node
 	 * @param stackofautomatons - a stack which operators pop automatons off and operands push automatons onto
+	 * @param issubpattern - true if epsilon transitions are needed at the beginning and at the end of the automaton
 	 */
-	abstract public function create_automaton(&$stackofautomatons);
+	abstract public function create_automaton(&$stackofautomatons, $issubpattern);
 
 	public function __construct(&$node, &$matcher) {
 		$this->pregnode = $node;
@@ -458,7 +416,7 @@ abstract class nfa_preg_node {
 */
 class nfa_preg_leaf extends nfa_preg_node {
 
-	public function create_automaton(&$stackofautomatons) {
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
 		// create start and end states of the resulting automaton
 		$start = new nfa_state;
 		$end = new nfa_state;
@@ -487,10 +445,10 @@ abstract class nfa_preg_operator extends nfa_preg_node {
 */
 class nfa_preg_node_concat extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons) {
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
 		// first, operands create their automatons
-		$this->operands[0]->create_automaton(&$stackofautomatons);
-		$this->operands[1]->create_automaton(&$stackofautomatons);
+		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
+		$this->operands[1]->create_automaton(&$stackofautomatons, $issubpattern);
 		// take automata and concatenate them
 		$second = array_pop($stackofautomatons);
 		$first = array_pop($stackofautomatons);
@@ -511,10 +469,10 @@ class nfa_preg_node_concat extends nfa_preg_operator {
 */
 class nfa_preg_node_alt extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons) {
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
 		// first, operands create their automatons
-		$this->operands[0]->create_automaton(&$stackofautomatons);
-		$this->operands[1]->create_automaton(&$stackofautomatons);
+		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
+		$this->operands[1]->create_automaton(&$stackofautomatons, $issubpattern);
 		// take automata and alternate them
 		$second = array_pop($stackofautomatons);
 		$first = array_pop($stackofautomatons);
@@ -552,8 +510,8 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for * or {0,} quantifier
 	 */
-	private function create_aster(&$stackofautomatons) {
-		$this->operands[0]->create_automaton(&$stackofautomatons);
+	private function create_aster(&$stackofautomatons, $issubpattern) {
+		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
 		$body = array_pop($stackofautomatons);
 		$from = $body->startstate;
 		if ($body->endstate->subpattend != 0) {
@@ -572,18 +530,17 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for {m,} quantifier
 	 */
-	private function create_brace(&$stackofautomatons) {
+	private function create_brace(&$stackofautomatons, $issubpattern) {
 		// create an automaton for body ($leftborder + 1) times
 		$leftborder = $this->pregnode->leftborder;
 		for ($i = 0; $i < $leftborder + 1; $i++) {
-			$this->operands[0]->create_automaton(&$stackofautomatons);
+			$this->operands[0]->create_automaton(&$stackofautomatons, ($i == $leftborder));
 		}
 		$res = null;	// the resulting automaton
 		// linking automatons to the resulting one
 		for ($i = 0; $i < $leftborder + 1; $i++) {
 			$cur = array_pop($stackofautomatons);
 			if ($i > 0) {
-				$cur->remove_subpatterns();
 				// the last block is repeated
 				if ($i == $leftborder) {
 					foreach ($cur->startstate->next as $curnext) {
@@ -607,11 +564,11 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 		array_push($stackofautomatons, $res);
 	}
 
-	public function create_automaton(&$stackofautomatons) {
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
 		if ($this->pregnode->leftborder == 0) {
-			$this->create_aster(&$stackofautomatons);
+			$this->create_aster(&$stackofautomatons, $issubpattern);
 		} else {
-			$this->create_brace(&$stackofautomatons);
+			$this->create_brace(&$stackofautomatons, $issubpattern);
 		}
 	}
 
@@ -625,8 +582,8 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for ? quantifier
 	 */
-	private function create_qu(&$stackofautomatons) {
-		$this->operands[0]->create_automaton(&$stackofautomatons);
+	private function create_qu(&$stackofautomatons, $issubpattern) {
+		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
 		$body = array_pop($stackofautomatons);
 		$epsleaf = new preg_leaf_meta;
 		$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
@@ -637,12 +594,12 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for {m, n} quantifier
 	 */
-	private function create_brace(&$stackofautomatons) {
+	private function create_brace(&$stackofautomatons, $issubpattern) {
 		// create an automaton for body ($leftborder + 1) times
 		$leftborder = $this->pregnode->leftborder;
 		$rightborder = $this->pregnode->rightborder;
 		for ($i = 0; $i < $rightborder; $i++) {
-			$this->operands[0]->create_automaton(&$stackofautomatons);
+			$this->operands[0]->create_automaton(&$stackofautomatons, ($i == $rightborder - 1));
 		}
 		$res = null;		// the resulting automaton
 		$endstate = null;	// the end state, required if $leftborder != $rightborder
@@ -658,7 +615,6 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 				$cur->startstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
 			}
 			if ($i > 0) {
-				$cur->remove_subpatterns();
 				$cur->update_state_references($cur->startstate, $res->endstate);
 				$res->endstate->merge($cur->startstate);
 				$cur->remove_state($cur->startstate);
@@ -674,11 +630,11 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 		array_push($stackofautomatons, $res);
 	}
 
-	public function create_automaton(&$stackofautomatons) {
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
 		if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
-			$this->create_qu(&$stackofautomatons);
+			$this->create_qu(&$stackofautomatons, $issubpattern);
 		} else {
-			$this->create_brace(&$stackofautomatons);
+			$this->create_brace(&$stackofautomatons, $issubpattern);
 		}
 	}
 
@@ -689,24 +645,24 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 */
 class nfa_preg_node_subpatt extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons) {
-		$this->operands[0]->create_automaton(&$stackofautomatons);
-		$body = array_pop($stackofautomatons);
-		$startstate = new nfa_state;
-		$endstate = new nfa_state;
-		$body->startstate->subpattstart = $this->pregnode->number;
-		$body->startstate->prevstate = $startstate;
-		$endstate->subpattend = $this->pregnode->number;
-		$endstate->prevstate = $body->endstate;
-		array_push($body->states, $startstate);
-		array_push($body->states, $endstate);
-		$epsleaf = new preg_leaf_meta;
-		$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-		$startstate->append_transition(new nfa_transition($epsleaf, $body->startstate, false));
-		$body->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
-		$body->startstate = $startstate;
-		$body->endstate = $endstate;
-		array_push($stackofautomatons, $body);
+	public function create_automaton(&$stackofautomatons, $issubpattern) {
+		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
+		if ($issubpattern) {
+			$body = array_pop($stackofautomatons);
+			$startstate = new nfa_state;
+			$endstate = new nfa_state;
+			$body->startstate->subpattstart = $this->pregnode->number;
+			$endstate->subpattend = $this->pregnode->number;
+			array_push($body->states, $startstate);
+			array_push($body->states, $endstate);
+			$epsleaf = new preg_leaf_meta;
+			$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+			$startstate->append_transition(new nfa_transition($epsleaf, $body->startstate, false));
+			$body->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
+			$body->startstate = $startstate;
+			$body->endstate = $endstate;
+			array_push($stackofautomatons, $body);
+		}
 	}
 
 }
