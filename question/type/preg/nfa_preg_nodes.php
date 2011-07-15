@@ -257,7 +257,7 @@ class nfa {
 	 * @param cs - is matching case sensitive
 	 * @return - the longest character sequence matched
 	 */
-	public function match($str, $startpos, $cs) {
+	public function match($str, $startpos) {
 		$curstates = array();	// states which the automaton is in
 		$skipstates = array();	// contains states where infinite quantifiers start. it's used to protect from loops like ()*
 
@@ -297,7 +297,7 @@ class nfa {
 					$pos = $currentstate->matchcnt;
 					$length = 0;
 					$next = $currentstate->state->next[$i];
-					if ($next->pregleaf->match($str, $startpos + $pos, &$length, $cs)) {
+					if ($next->pregleaf->match($str, $startpos + $pos, &$length, !$next->pregleaf->caseinsensitive )) {
 						$newstate = new processing_state($next->state, $pos + $length, false, 0, $currentstate->assertions, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last);
 						// clear newstate->assertions if a character matched
 						if ($length > 0) {

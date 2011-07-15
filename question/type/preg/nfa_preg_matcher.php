@@ -71,16 +71,12 @@ class nfa_preg_matcher extends preg_matcher {
 	* @param str a string to match
 	*/
 	function match_inner($str) {
-		$cs = false;	// is matching case sensitive
-		if (strpos($this->modifiers, 'i') === false) {
-			$cs = true;
-		}
 		$curresult = new processing_state($this->automaton->startstate, 0, false, 0, array(), array(), array());
 		$startpos = 0;
 		$len = strlen($str);
 		// match from all indexes
 		for ($j = 0; $j < $len; $j++) {
-			$tmp = $this->automaton->match($str, $j, $cs);
+			$tmp = $this->automaton->match($str, $j);
 			if ($this->automaton->is_new_result_more_suitable(&$curresult, &$tmp)) {
 				$curresult = $tmp;
 				$startpos = $j;
