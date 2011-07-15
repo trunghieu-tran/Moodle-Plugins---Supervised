@@ -90,8 +90,8 @@ class nfa_preg_matcher extends preg_matcher {
 		$this->is_match = ($curresult->matchcnt > 0);
 		$this->full = $curresult->isfullmatch;
 		foreach ($curresult->subpattern_indexes_last as $key=>$index) {
-			$this->index_last[$key] = $startpos + $index;
-			$this->index_first[$key] = $startpos + $curresult->subpattern_indexes_first[$key];
+			$this->index_last[$key] = $index;
+			$this->index_first[$key] = $curresult->subpattern_indexes_first[$key];
 		}
 		$this->next = $curresult->nextpossible;
 	}
@@ -99,7 +99,7 @@ class nfa_preg_matcher extends preg_matcher {
 	public function __construct($regex = null, $modifiers = null) {
 		parent::__construct($regex, $modifiers);
 		$stack = array();
-		$this->dst_root->create_automaton(&$stack, &$this->subpatterns);
+		$this->dst_root->create_automaton(&$stack, true);
 		$this->automaton = array_pop($stack);
 
 	}
