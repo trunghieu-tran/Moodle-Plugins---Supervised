@@ -437,6 +437,13 @@ class nfa_preg_leaf extends nfa_preg_node {
 abstract class nfa_preg_operator extends nfa_preg_node {
 
 	public $operands = array();	// an array of operands
+	
+	public function __construct($node, &$matcher) {
+		parent::__construct($node, $matcher);
+		foreach ($this->pregnode->operands as &$operand) {
+			array_push($this->operands, $matcher->from_preg_node($operand));
+		}
+	}
 
 }
 

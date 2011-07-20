@@ -18,6 +18,26 @@ class nfa_preg_matcher extends preg_matcher {
 	public function name() {
 		return 'nfa_preg_matcher';
 	}
+	
+	protected function get_engine_node_name($pregname) {
+		switch($pregname) {
+        case 'node_finite_quant':
+		case 'node_infinite_quant':
+		case 'node_concat':
+		case 'node_alt':
+		case 'node_subpatt':
+			return 'nfa_preg_'.$pregname;
+			break;
+		case 'leaf_charset':
+		case 'leaf_meta':
+		case 'leaf_assert':
+		case 'node_assert':
+			return 'nfa_preg_leaf';
+			break;
+		}
+		
+		return parent::get_engine_node_name($pregname);
+    }
 
 	/**
 	* returns true for supported capabilities
@@ -34,36 +54,6 @@ class nfa_preg_matcher extends preg_matcher {
 			break;
 		}
 		return false;
-	}
-
-	/**
-	* DST node factory, overloaded, recursive
-	* @param pregnode - preg_node child class instance
-	* @return corresponding nfa_preg_node child class instance
-	*/
-	public function &from_preg_node(&$pregnode) {
-		// if it's an operator - do some recursion
-		if (is_a($pregnode,'preg_operator')) {
-			$enginenodename = 'nfa_preg_'.$pregnode->name();
-			if (class_exists($enginenodename)) {
-				$enginenode = new $enginenodename(&$pregnode, $this);
-				if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg, $this->error_flags)) {	// highlighting first occurence of unaccepted node
-					$this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
-				} else {	// append operands
-					foreach ($pregnode->operands as $curOperand) {
-						array_push($enginenode->operands, $this->from_preg_node($curOperand));
-					}
-					return $enginenode;
-				}
-			}
-		}
-		// if it's a leaf - create an nfa transition
-		elseif (is_a($pregnode,'preg_leaf')) {
-			$engineleaf = new nfa_preg_leaf(&$pregnode, &$this);
-			return $engineleaf;
-		} else {
-			return $pregnode;
-		}
 	}
 
 	/**
@@ -97,7 +87,6 @@ class nfa_preg_matcher extends preg_matcher {
 		$stack = array();
 		$this->dst_root->create_automaton(&$stack, true);
 		$this->automaton = array_pop($stack);
-
 	}
 
 }
