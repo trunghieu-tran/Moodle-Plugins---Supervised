@@ -18,8 +18,8 @@ require_once($CFG->dirroot.'/question/type/edit_question_form.php');
 class qtype_gradertest_edit_form extends question_edit_form {
     function definition_inner(&$mform) {
         global $DB;
-        $mform->removeElement('questiontext');
-        
+        //$mform->removeElement('questiontext');
+        $mform->addHelpButton('questiontext','tasktext','qtype_gradertest');
         $mform->removeElement('defaultmark');
         //$mform->removeElement('penalty');
         $mform->removeElement('generalfeedback');
