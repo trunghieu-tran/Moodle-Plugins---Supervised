@@ -74,23 +74,6 @@ class preg_matcher {
         return 'preg_matcher';
     }
 
-	 /**
-    * numerates subpatterns
-    * @param pregnode - preg_node child class instance
-    * @param cnt - current subpattern count
-    */
-	protected function numerate_subpatterns(&$pregnode, &$cnt) {
-		 if (is_a($pregnode,'preg_operator')) {
-		    if (is_a($pregnode,'preg_node_subpatt')) {
-				$cnt++;
-				$pregnode->number = $cnt;
-			}
-			foreach ($pregnode->operands as $curop) {
-				$this->numerate_subpatterns($curop, &$cnt);
-			}
-         }
-	}
-
     /**
     *parse regex and do all necessary preprocessing
     @param regex - regular expression for which will be build finite automate
@@ -129,8 +112,6 @@ class preg_matcher {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-			$subpattcnt = 0;
-			$this->numerate_subpatterns($this->ast_root, $subpattcnt);
             $this->look_for_anchors();
         } else {
             $this->ast_root = null;

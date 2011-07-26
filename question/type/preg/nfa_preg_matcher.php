@@ -21,7 +21,7 @@ class nfa_preg_matcher extends preg_matcher {
 	
 	protected function get_engine_node_name($pregname) {
 		switch($pregname) {
-        case 'node_finite_quant':
+		case 'node_finite_quant':
 		case 'node_infinite_quant':
 		case 'node_concat':
 		case 'node_alt':
@@ -37,7 +37,7 @@ class nfa_preg_matcher extends preg_matcher {
 		}
 		
 		return parent::get_engine_node_name($pregname);
-    }
+	}
 
 	/**
 	* returns true for supported capabilities
@@ -81,9 +81,28 @@ class nfa_preg_matcher extends preg_matcher {
 		}
 		$this->next = $curresult->nextpossible;
 	}
+	
+	/**
+	* numerates subpatterns
+	* @param pregnode - preg_node child class instance
+	* @param cnt - current subpattern count
+	*/
+	protected function numerate_subpatterns(&$pregnode, &$cnt) {
+		if (is_a($pregnode, 'preg_operator')) {
+			if (is_a($pregnode, 'preg_node_subpatt')) {
+				$cnt++;
+				$pregnode->number = $cnt;
+			}
+			foreach ($pregnode->operands as $curop) {
+				$this->numerate_subpatterns($curop, $cnt);
+			}
+		 }
+	}
 
 	public function __construct($regex = null, $modifiers = null) {
 		parent::__construct($regex, $modifiers);
+		$subpattcnt = 0;
+		$this->numerate_subpatterns($this->ast_root, $subpattcnt);
 		$stack = array();
 		$this->dst_root->create_automaton(&$stack, true);
 		$this->automaton = array_pop($stack);
