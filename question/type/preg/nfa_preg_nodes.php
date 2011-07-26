@@ -162,14 +162,6 @@ class nfa {
 	var $graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';	// path to dot.exe of graphviz
 
 	/**
-	 * merges assertions with next non-assertion transition
-	 * @param path - a reference to the vector containing transitions to be merged
-	 */
-	private function merge_transitions(&$path) {	// TODO
-
-	}
-
-	/**
 	 * generates a next possible character by a given path
 	 * @param lastchar - the last character matched
 	 * @param path - a reference to the path with merged assertions
@@ -420,6 +412,13 @@ class nfa_preg_leaf extends nfa_preg_node {
 		// create start and end states of the resulting automaton
 		$start = new nfa_state;
 		$end = new nfa_state;
+		if ($this->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+			$epsleaf = new preg_leaf_meta;
+			$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+			$oldleaf = $this->pregnode;
+			$this->pregnode = $epsleaf;
+			array_push($this->pregnode->mergedassertions, $oldleaf);
+		}
 		$start->append_transition(new nfa_transition($this->pregnode, $end, false));
 		$res = new nfa;
 		$res->append_state($start);
