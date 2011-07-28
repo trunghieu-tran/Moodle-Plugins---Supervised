@@ -412,13 +412,6 @@ class nfa_preg_leaf extends nfa_preg_node {
 		// create start and end states of the resulting automaton
 		$start = new nfa_state;
 		$end = new nfa_state;
-		if ($this->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
-			$epsleaf = new preg_leaf_meta;
-			$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-			$oldleaf = $this->pregnode;
-			$this->pregnode = $epsleaf;
-			array_push($this->pregnode->mergedassertions, $oldleaf);
-		}
 		$start->append_transition(new nfa_transition($this->pregnode, $end, false));
 		$res = new nfa;
 		$res->append_state($start);
