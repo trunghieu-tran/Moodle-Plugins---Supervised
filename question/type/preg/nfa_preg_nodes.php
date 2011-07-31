@@ -7,11 +7,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class nfa_transition
 {
-	public $loops = false;	// true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
+	public $loops = false;		// true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
 
-	public $pregleaf;		// transition data, a reference to an object of preg_leaf
+	public $pregleaf;			// transition data, a reference to an object of preg_leaf
 
-	public $state;			// the state which this transition leads to, a reference to an object of nfa_state
+	public $state;				// the state which this transition leads to, a reference to an object of nfa_state
+
+	public $subpatt_start = array();		// an array of subpatterns which start in this transition
+
+	public $subpatt_end = array();			// an array of subpatterns which end in this transition
+
+	public $belongs_to_subpatt = array();	// an array of subpatterns which this transition belongs to
 
 	public function __construct(&$_pregleaf, &$_state, $_loops) {
 		$this->pregleaf = $_pregleaf;
@@ -30,10 +36,6 @@ class nfa_state
 	public $startsinfinitequant = false;	// true if this state starts an infinite quantifier either * or + or {m,}
 
 	public $next = array();					// an array of objects of nfa_transition
-
-	public $subpattstart = 0;				// number of the subpattern which starts in this state
-
-	public $subpattend = 0;					// number of the subpattern which ends in this state
 
 	public $id;								// id of the state, debug variable
 
@@ -81,12 +83,6 @@ class nfa_state
 		if ($with->startsinfinitequant) {
 			$this->startsinfinitequant = true;
 		}
-		if ($with->subpattstart) {
-			$this->subpattstart = $with->subpattstart;
-		}
-		if ($with->subpattend) {
-			$this->subpattend = $with->subpattend;
-		}
 	}
 
 	/**
@@ -112,39 +108,20 @@ class processing_state {
 
 	public $nextpossible;				// the next possible character
 
-	public $assertions = array();		// an array containing last assertions matched. this field is used when generating a next possible character
-
 	public $subpattern_indexes_first = array();	// key = subpattern number
 
 	public $subpattern_indexes_last = array();	// key = subpattern number
+	
+	public $subpatterns_captured = array();		// an array containing subpatterns captured at the moment
 
-	public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_assertions, $_subpattern_indexes_first, $_subpattern_indexes_last) {
+	public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured) {
 		$this->state = $_state;
 		$this->matchcnt = $_matchcnt;
 		$this->isfullmatch = $_isfullmatch;
 		$this->nextpossible = $_nextpossible;
-		$this->assertions = $_assertions;
 		$this->subpattern_indexes_first = $_subpattern_indexes_first;
 		$this->subpattern_indexes_last = $_subpattern_indexes_last;
-	}
-}
-
-/*!
- * contains information about a path to the matching state
- * used when generating a next possible character
- */
-class path {
-
-	public $state;				// a reference to the last state of the path, used when constucting $path
-
-	public $path = array();		// an array containing transitions (objects of preg_leaf) to the matching state
-
-	public $length;				// length of the path in characters
-
-	public function __construct(&$_state, $_path, $_length) {
-		$this->state = $_state;
-		$this->path = $_path;
-		$this->length = $_length;
+		$this->subpatterns_captured = $_subpatterns_captured;
 	}
 }
 
@@ -180,6 +157,19 @@ class nfa {
 	 */
 	private function wave_to_the_end($lastchar, &$state) {	// TODO
 
+	}
+	
+	/**
+	 * clears $subpatt_start, $subpatt_end and $belongs_to_subpatt in every transition of the automaton
+	 */
+	public function remove_subpatterns() {
+		foreach ($this->states as $curstate) {
+			foreach ($curstate->next as $curnext) {
+				$curnext->subpatt_start = array();
+				$curnext->subpatt_end = array();
+				$curnext->belongs_to_subpatt = array();
+			}
+		}
 	}
 
 	/**
@@ -267,36 +257,36 @@ class nfa {
 				if ($currentstate->state->startsinfinitequant) {
 					// skipstates is sorted by matchcnt because transitions add characters
 					for ($i = count($skipstates) - 1; $i >= 0 && !$skip && $currentstate->matchcnt <= $skipstates[$i]->matchcnt; $i--)
-						if ($skipstates[$i]->state === $currentstate->state && $skipstates[$i]->matchcnt == $currentstate->matchcnt && $skipstates[$i]->subpattern_indexes_last == $currentstate->subpattern_indexes_last) {
+						if ($skipstates[$i]->state === $currentstate->state && $skipstates[$i]->matchcnt == $currentstate->matchcnt) {
 							$skip = true;
 						}
 					if (!$skip) {
 						array_push($skipstates, $currentstate);
 					}
 				}
-
-				// save subpattern indexes
-				if (!$skip && $currentstate->state->subpattstart && !array_key_exists($currentstate->state->subpattstart, $currentstate->subpattern_indexes_first)) {
-					$currentstate->subpattern_indexes_first[$currentstate->state->subpattstart] = $startpos + $currentstate->matchcnt;
-					$currentstate->subpattern_indexes_last[$currentstate->state->subpattstart] = -1;
-				}
-				if (!$skip && $currentstate->state->subpattend && array_key_exists($currentstate->state->subpattend, $currentstate->subpattern_indexes_last) && $currentstate->subpattern_indexes_last[$currentstate->state->subpattend] == -1) {
-					$currentstate->subpattern_indexes_last[$currentstate->state->subpattend] = $startpos + $currentstate->matchcnt - 1;
-				}
-
 				// iterate over all transitions
 				for ($i = 0; !$skip && $i < count($currentstate->state->next); $i++) {
 					$pos = $currentstate->matchcnt;
 					$length = 0;
 					$next = $currentstate->state->next[$i];
 					if ($next->pregleaf->match($str, $startpos + $pos, &$length, !$next->pregleaf->caseinsensitive )) {
-						$newstate = new processing_state($next->state, $pos + $length, false, 0, $currentstate->assertions, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last);
-						// clear newstate->assertions if a character matched
-						if ($length > 0) {
-							$newstate->assertions = array();
-						} elseif (!(is_a($next->pregleaf, 'preg_leaf_meta') && $next->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY)) {
-							array_push($newstate->assertions, $next->pregleaf);
+						// save subpattern indexes
+						foreach ($next->subpatt_start as $key=>$subpatt) {
+							if (!isset($currentstate->subpattern_indexes_first[$key])) {
+								$currentstate->subpattern_indexes_first[$key] = $startpos + $pos;
+							}
 						}
+						foreach ($next->subpatt_end as $key=>$subpatt) {
+							if (isset($currentstate->subpattern_indexes_first[$key]) && !(isset($currentstate->subpatterns_captured[$key]) && $currentstate->subpatterns_captured[$key])) {
+								$currentstate->subpattern_indexes_last[$key] = $startpos + $pos + $length - 1;
+							}
+						}
+						foreach ($currentstate->subpattern_indexes_first as $key=>$subpatt) {
+							if (!isset($next->belongs_to_subpatt[$key]) && isset($currentstate->subpattern_indexes_last[$key])) {
+								$currentstate->subpatterns_captured[$key] = true;
+							}
+						}						
+						$newstate = new processing_state($next->state, $pos + $length, false, 0, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
 						// save the state
 						array_push($newstates, $newstate);
 						// save the next state as a result if it's a matching state
@@ -394,7 +384,7 @@ abstract class nfa_preg_node {
 	 * @param stackofautomatons - a stack which operators pop automatons off and operands push automatons onto
 	 * @param issubpattern - true if epsilon transitions are needed at the beginning and at the end of the automaton
 	 */
-	abstract public function create_automaton(&$stackofautomatons, $issubpattern);
+	abstract public function create_automaton(&$stackofautomatons);
 
 	public function __construct(&$node, &$matcher) {
 		$this->pregnode = $node;
@@ -408,7 +398,7 @@ abstract class nfa_preg_node {
 */
 class nfa_preg_leaf extends nfa_preg_node {
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
+	public function create_automaton(&$stackofautomatons) {
 		// create start and end states of the resulting automaton
 		$start = new nfa_state;
 		$end = new nfa_state;
@@ -444,10 +434,10 @@ abstract class nfa_preg_operator extends nfa_preg_node {
 */
 class nfa_preg_node_concat extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
+	public function create_automaton(&$stackofautomatons) {
 		// first, operands create their automatons
-		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
-		$this->operands[1]->create_automaton(&$stackofautomatons, $issubpattern);
+		$this->operands[0]->create_automaton(&$stackofautomatons);
+		$this->operands[1]->create_automaton(&$stackofautomatons);
 		// take automata and concatenate them
 		$second = array_pop($stackofautomatons);
 		$first = array_pop($stackofautomatons);
@@ -468,29 +458,29 @@ class nfa_preg_node_concat extends nfa_preg_operator {
 */
 class nfa_preg_node_alt extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
+	public function create_automaton(&$stackofautomatons) {
 		// first, operands create their automatons
-		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
-		$this->operands[1]->create_automaton(&$stackofautomatons, $issubpattern);
+		$this->operands[0]->create_automaton(&$stackofautomatons);
+		$this->operands[1]->create_automaton(&$stackofautomatons);
 		// take automata and alternate them
 		$second = array_pop($stackofautomatons);
 		$first = array_pop($stackofautomatons);
 		$epsleaf = new preg_leaf_meta;
 		$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-		// add a new end state if the end state of the first automaton is looped or if it is the end of a subpattern
+		// add a new end state if the end state of the first automaton is looped
 		$endlooped = false;
 		foreach ($first->endstate->next as $curnext) {
 			if ($curnext->loops) {
 				$endlooped = true;
 			}
 		}
-		if ($endlooped || $first->endstate->subpattend != 0) {
+		if ($endlooped) {
 			$endstate = new nfa_state;
 			$first->append_state($endstate);
 			$first->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
 			$first->endstate = $endstate;
 		}
-		// start states are merged, end states are alternated by an epsilon-transition for correct subpattern and loop capturing
+		// start states are merged, end states are alternated by an epsilon-transition for correct loop capturing
 		$second->update_state_references($second->startstate, $first->startstate);
 		$first->startstate->merge($second->startstate);
 		$second->remove_state($second->startstate);
@@ -509,14 +499,10 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for * or {0,} quantifier
 	 */
-	private function create_aster(&$stackofautomatons, $issubpattern) {
-		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
+	private function create_aster(&$stackofautomatons) {
+		$this->operands[0]->create_automaton(&$stackofautomatons);
 		$body = array_pop($stackofautomatons);
-		$from = $body->startstate;
-		if ($body->endstate->subpattend != 0) {
-			$from = $body->startstate->next[0]->state;
-		}
-		foreach ($from->next as $curnext) {
+		foreach ($body->startstate->next as $curnext) {
 			$body->endstate->append_transition(new nfa_transition($curnext->pregleaf, $curnext->state, true));
 			$curnext->state->startsinfinitequant = true;
 		}
@@ -529,17 +515,18 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for {m,} quantifier
 	 */
-	private function create_brace(&$stackofautomatons, $issubpattern) {
+	private function create_brace(&$stackofautomatons) {
 		// create an automaton for body ($leftborder + 1) times
 		$leftborder = $this->pregnode->leftborder;
 		for ($i = 0; $i < $leftborder + 1; $i++) {
-			$this->operands[0]->create_automaton(&$stackofautomatons, ($i == $leftborder));
+			$this->operands[0]->create_automaton(&$stackofautomatons);
 		}
 		$res = null;	// the resulting automaton
 		// linking automatons to the resulting one
 		for ($i = 0; $i < $leftborder + 1; $i++) {
 			$cur = array_pop($stackofautomatons);
 			if ($i > 0) {
+				$cur->remove_subpatterns();
 				// the last block is repeated
 				if ($i == $leftborder) {
 					foreach ($cur->startstate->next as $curnext) {
@@ -563,11 +550,11 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 		array_push($stackofautomatons, $res);
 	}
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
+	public function create_automaton(&$stackofautomatons) {
 		if ($this->pregnode->leftborder == 0) {
-			$this->create_aster(&$stackofautomatons, $issubpattern);
+			$this->create_aster(&$stackofautomatons);
 		} else {
-			$this->create_brace(&$stackofautomatons, $issubpattern);
+			$this->create_brace(&$stackofautomatons);
 		}
 	}
 
@@ -581,8 +568,8 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for ? quantifier
 	 */
-	private function create_qu(&$stackofautomatons, $issubpattern) {
-		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
+	private function create_qu(&$stackofautomatons) {
+		$this->operands[0]->create_automaton(&$stackofautomatons);
 		$body = array_pop($stackofautomatons);
 		$epsleaf = new preg_leaf_meta;
 		$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
@@ -593,7 +580,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 	/**
 	 * creates an automaton for {m, n} quantifier
 	 */
-	private function create_brace(&$stackofautomatons, $issubpattern) {
+	private function create_brace(&$stackofautomatons) {
 		// create an automaton for body ($leftborder + 1) times
 		$leftborder = $this->pregnode->leftborder;
 		$rightborder = $this->pregnode->rightborder;
@@ -614,6 +601,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 				$cur->startstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
 			}
 			if ($i > 0) {
+				$cur->remove_subpatterns();
 				$cur->update_state_references($cur->startstate, $res->endstate);
 				$res->endstate->merge($cur->startstate);
 				$cur->remove_state($cur->startstate);
@@ -629,11 +617,11 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 		array_push($stackofautomatons, $res);
 	}
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
+	public function create_automaton(&$stackofautomatons) {
 		if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
-			$this->create_qu(&$stackofautomatons, $issubpattern);
+			$this->create_qu(&$stackofautomatons);
 		} else {
-			$this->create_brace(&$stackofautomatons, $issubpattern);
+			$this->create_brace(&$stackofautomatons);
 		}
 	}
 
@@ -644,24 +632,21 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 */
 class nfa_preg_node_subpatt extends nfa_preg_operator {
 
-	public function create_automaton(&$stackofautomatons, $issubpattern) {
-		$this->operands[0]->create_automaton(&$stackofautomatons, $issubpattern);
-		if ($issubpattern) {
-			$body = array_pop($stackofautomatons);
-			$startstate = new nfa_state;
-			$endstate = new nfa_state;
-			$body->startstate->subpattstart = $this->pregnode->number;
-			$endstate->subpattend = $this->pregnode->number;
-			array_push($body->states, $startstate);
-			array_push($body->states, $endstate);
-			$epsleaf = new preg_leaf_meta;
-			$epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-			$startstate->append_transition(new nfa_transition($epsleaf, $body->startstate, false));
-			$body->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
-			$body->startstate = $startstate;
-			$body->endstate = $endstate;
-			array_push($stackofautomatons, $body);
+	public function create_automaton(&$stackofautomatons) {
+		$this->operands[0]->create_automaton(&$stackofautomatons);
+		$body = array_pop($stackofautomatons);
+		foreach ($body->startstate->next as $next) {
+			$next->subpatt_start[$this->pregnode->number] = true;			
 		}
+		foreach ($body->states as $state) {
+			foreach ($state->next as $next) {
+				$next->belongs_to_subpatt[$this->pregnode->number] = true;
+				if ($next->state === $body->endstate) {
+					$next->subpatt_end[$this->pregnode->number] = true;
+				}
+			}
+		}
+		array_push($stackofautomatons, $body);
 	}
 
 }
