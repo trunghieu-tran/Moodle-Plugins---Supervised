@@ -104,7 +104,7 @@ class nfa_preg_matcher extends preg_matcher {
 		$subpattcnt = 0;
 		$this->numerate_subpatterns($this->ast_root, $subpattcnt);
 		$stack = array();
-		$this->dst_root->create_automaton(&$stack, true);
+		$this->dst_root->create_automaton(&$stack);
 		$this->automaton = array_pop($stack);
 	}
 
