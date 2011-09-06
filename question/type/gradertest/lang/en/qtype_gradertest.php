@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $string['gradertest'] = 'Test for grader';
 $string['pluginname'] = 'Test for grader';
 $string['gradertestsummary'] = 'Saves input and output data';
