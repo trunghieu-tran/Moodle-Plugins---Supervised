@@ -221,6 +221,18 @@ class preg_matcher {
     }
 
     /**
+    * Calculate last character index from first index (should be in $this->index_first) and length
+    * Use to adopt you engine in case it finds length instead of character index
+    * Results is set in $this->index_last
+    @param length array of lengths of matches with (sub)patterns
+    */
+    protected function from_length_to_last_index($length) {
+        foreach($length as $num=>$len) {
+            $this->index_last[$num] = $this->index_first[$num] + $len - 1;
+        }
+    }
+
+    /**
     @param subpattern subpattern number, 0 for the whole match
     *returns first correct character index
     */
