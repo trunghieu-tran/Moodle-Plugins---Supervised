@@ -65,7 +65,7 @@ class nfa_preg_matcher extends preg_matcher {
         $startpos = 0;
         $len = strlen($str);
         // match from all indexes
-        for ($j = 0; $j < $len; $j++) {
+        for ($j = 0; $j < $len && !$curresult->isfullmatch; $j++) {
             $tmp = $this->automaton->match($str, $j);
             if ($this->automaton->is_new_result_more_suitable(&$curresult, &$tmp)) {
                 $curresult = $tmp;
@@ -101,6 +101,9 @@ class nfa_preg_matcher extends preg_matcher {
 
     public function __construct($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
+		if (!isset($regex) || !empty($this->errors)) {
+            return;
+        }
         $subpattcnt = 0;
         $this->numerate_subpatterns($this->ast_root, $subpattcnt);
         $stack = array();
