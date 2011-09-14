@@ -11,7 +11,7 @@ class nfa_preg_matcher extends preg_matcher {
     /**
     * returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return 'nfa';
     }
 
@@ -47,9 +47,25 @@ class nfa_preg_matcher extends preg_matcher {
     public function is_supporting($capability) {
         switch($capability) {
         case preg_matcher::PARTIAL_MATCHING:
-        case preg_matcher::NEXT_CHARACTER:
-        case preg_matcher::CHARACTERS_LEFT:
+        //case preg_matcher::NEXT_CHARACTER:
+        //case preg_matcher::CHARACTERS_LEFT:
         case preg_matcher::SUBPATTERN_CAPTURING:
+            return true;
+            break;
+        }
+        return false;
+    }
+    
+    function is_node_acceptable($pregnode) {
+        switch ($pregnode->name()) {
+        case 'node_finite_quant':
+        case 'node_infinite_quant':
+        case 'node_concat':
+        case 'node_alt':
+        case 'node_subpatt':
+        case 'leaf_charset':
+        case 'leaf_meta':
+        case 'leaf_assert':
             return true;
             break;
         }
@@ -101,7 +117,7 @@ class nfa_preg_matcher extends preg_matcher {
 
     public function __construct($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
-		if (!isset($regex) || !empty($this->errors)) {
+        if (!isset($regex) || !empty($this->errors)) {
             return;
         }
         $subpattcnt = 0;
