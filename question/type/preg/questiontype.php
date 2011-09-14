@@ -31,7 +31,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     public function available_engines() {
         return array('preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
                         'dfa_preg_matcher' => get_string('dfa_preg_matcher','qtype_preg'),
-                        'nfa_preg_matcher' => 'nfa_preg_matcher'/*,		// TODO: use get_string();
+                        'nfa_preg_matcher' => get_string('nfa_preg_matcher','qtype_preg')/*,        
                         'backtracking_preg_matcher' => 'backtracking_preg_matcher'*/);
     }
 

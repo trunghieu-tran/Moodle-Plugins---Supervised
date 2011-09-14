@@ -63,7 +63,6 @@ class preg_error_unacceptable_modifier extends preg_error {
 
 }
 
-
 class preg_matcher {
 
 
@@ -251,7 +250,7 @@ class preg_matcher {
     * return an associative array of match results, helper method
     */
     public function get_match_results() {
-        $res = array('is_match' => $this->is_match)
+        $res = array('is_match' => $this->is_match);
         if ($this->is_match) {
             $res['full'] = $this->full;
             $res['index_first'] = $this->index_first;
@@ -364,6 +363,13 @@ class preg_matcher {
         }
         return $res;
     }
+    
+    /**
+    * Is a preg_node_... or a preg_leaf_... supported by the engine?
+    */
+    protected function is_node_acceptable($pregnode) {
+        return false;    // Should be overloaded by child classes
+    }
 
     /**
     * Function does lexical and syntaxical analysis of regex and builds tree, root saving in $this->ast_root
@@ -412,6 +418,9 @@ class preg_matcher {
     */
     public function &from_preg_node($pregnode) {
         if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
+            if (!$this->is_node_acceptable($pregnode)) {
+                $this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+            }
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);

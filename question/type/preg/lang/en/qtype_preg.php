@@ -56,6 +56,7 @@ $string['node_infinite_quant'] = 'Infinite quantificator';
 $string['node_subpatt'] = 'Subpattern';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal hint grade border. This effectively disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
+$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from feedback or choose another engine.';
 $string['preg'] = 'Regular expression';
