@@ -81,29 +81,23 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return false;
     }
-/*
-    protected function accept_node($node) {
-        switch ($node->type) {
-            case preg_node::TYPE_LEAF_BACKREF:
-            case preg_node::TYPE_NODE_COND_SUBPATT:
-                $this->flags[$node->name()] = true;
-                return false;
-            case preg_node::TYPE_LEAF_RECURSION:
-                $this->flags['leafrecursion'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            case preg_node::TYPE_LEAF_OPTIONS:
-                $this->flags['leafoptions'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            default:
-                $unsupported = $node->not_supported();//TODO - check that there is a preg_node there (not dfa_preg_node) and convert accept_node to do this job by itself without not_supported()
-                if ($unsupported) {
-                    $this->flags[$unsupported] = true;
-                }
-                break;//?? why return after break?
-                return false;
+
+    function is_node_acceptable($pregnode) {
+        switch ($pregnode->name()) {
+        case 'node_finite_quant':
+        case 'node_infinite_quant':
+        case 'node_concat':
+        case 'node_alt':
+        case 'node_subpatt':
+        case 'node_assert':
+        case 'leaf_charset':
+        case 'leaf_meta':
+        case 'leaf_assert':
+            return true;
+            break;
         }
-        return true;
-    }*/
+        return false;
+    }
 
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
@@ -763,7 +757,7 @@ class dfa_preg_matcher extends preg_matcher {
     /**
     * Returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return 'dfa';
     }
 

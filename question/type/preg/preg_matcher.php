@@ -12,6 +12,56 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 
+class preg_error {
+
+    //Human-understandable error message
+    public $errormsg;
+    //
+    public $index_first;
+    //
+    public $index_last;
+    
+    protected function highlight_regex($regex, $indfirst, $indlast) {
+        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
+    }
+
+}
+
+class preg_error_parser extends preg_error {
+
+    public function __construct($regex, $parsernode) {
+        $this->index_first = $parsernode->firstindxs[0];
+        $this->index_last = $parsernode->lastindxs[0];
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
+    }
+
+}
+
+class preg_error_unacceptable_node extends preg_error {
+
+    public function __construct($regex, $matcher, $nodename, $indexes) {
+        $a = new stdClass;
+        $a->nodename = $nodename;
+        $a->indfirst = $indexes['start'];
+        $a->indlast = $indexes['end'];
+        $a->engine = get_string($matcher->name(), 'qtype_preg');
+        $this->index_first = $a->indfirst;
+        $this->index_last = $a->indlast;
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported','qtype_preg',$a);
+    }
+
+}
+
+class preg_error_unacceptable_modifier extends preg_error {
+
+    public function __construct($matcher, $modifier) {
+        $a = new stdClass;
+        $a->modifier = $modifier;
+        $a->classname = $matcher->name();
+        $this->errormsg = get_string('unsupportedmodifier','qtype_preg',$a);
+    }
+
+}
 
 class preg_matcher {
 
@@ -99,10 +149,7 @@ class preg_matcher {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $a = new stdClass;
-                    $a->modifier = $modifiers[$i];
-                    $a->classname = $this->name();
-                    $this->errors[] = get_string('unsupportedmodifier','qtype_preg',$a);
+                    $this->errors[] = new preg_error_unsupported_modifier($this, $modifiers[$i]);
                 }
             }
         }
@@ -116,20 +163,6 @@ class preg_matcher {
         } else {
             $this->ast_root = null;
         }
-        if ($this->is_error_exists()) {
-            //if parsing error then no tree, nothing accept.
-            return;
-        }
-        //check regular expression for validity
-        //$this->accept_regex($this->ast_root); //old-style function TODO - delete
-        //Add error messages for unsupported nodes
-        foreach ($this->error_flags as $key => $value) {
-            $a = new stdClass;
-            $a->nodename = $key;
-            $a->pos = $value;
-            $this->errors[] = get_string('unsupported','qtype_preg',$a);
-        }
-        $this->errors = array_unique($this->errors);//Fix, for one message about one unsupported operation. TODO - check if this is necessary with flags
     }
 
     /**
@@ -160,36 +193,6 @@ class preg_matcher {
         $this->anchor->start = false;
         $this->anchor->end = false;
     }
-
-    /**
-    *check regular expression for errors using absract syntax tree
-    @param node root of the tree
-    @return bool is tree accepted
-    */ /*
-    protected function accept_regex($node) {
-        $result = accept_node($node);
-
-        //accept all child nodes
-        if(is_a($node,'preg_operator')) {
-            foreach($node->operands as $operand) {
-                $result = $result && $this->accept_regex($operand);
-            }
-        }
-
-        return $result;
-    } */
-
-    /**
-    *checks if this abstract sytax tree node supported by this matching engine, adding error messages for unsupported nodes
-    *This function should add names of strings for unsupported operations to $this->flags
-    @param node - node to check
-    @return bool is node accepted
-    */  /*
-    protected function accept_node($node) {
-        $this->flags['noabstractaccept'] = true;
-        return false;
-    }*/
-
 
     /**
     match regular expression with given string, calls match_inner from a child class to do the real matching
@@ -243,6 +246,27 @@ class preg_matcher {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
     }
 
+    /** 
+    * return an associative array of match results, helper method
+    */
+    public function get_match_results() {
+        $res = array('is_match' => $this->is_match);
+        if ($this->is_match) {
+            $res['full'] = $this->full;
+            $res['index_first'] = $this->index_first;
+            $res['index_last'] = $this->index_last;
+            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $res['next'] = $this->next;
+            }
+            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+                $res['left'] = $this->left;
+            }
+        } else {
+            $res['full'] = false;
+        }
+        return $res;
+    }
+
     /**
     * is there a matching at all?
     */
@@ -262,6 +286,18 @@ class preg_matcher {
     */
     public function count_subpatterns() {
         return count($this->index_first) - 1;//-1 to not include full match
+    }
+
+    /**
+    * Calculate last character index from first index (should be in $this->index_first) and length
+    * Use to adopt you engine in case it finds length instead of character index
+    * Results is set in $this->index_last
+    @param length array of lengths of matches with (sub)patterns
+    */
+    protected function from_length_to_last_index($length) {
+        foreach($length as $num=>$len) {
+            $this->index_last[$num] = $this->index_first[$num] + $len - 1;
+        }
     }
 
     /**
@@ -321,18 +357,32 @@ class preg_matcher {
     @return array of errors
     */
     public function get_errors() {
-        return $this->errors;
+        $res = array();
+        foreach($this->errors as $error) {
+            $res[] = $error->errormsg;
+        }
+        return $res;
+    }
+    
+    /**
+    * Is a preg_node_... or a preg_leaf_... supported by the engine?
+    */
+    protected function is_node_acceptable($pregnode) {
+        return false;    // Should be overloaded by child classes
     }
 
     /**
     * Function does lexical and syntaxical analysis of regex and builds tree, root saving in $this->ast_root
     @param $regex - regular expression for building tree
     */
-    /*protected*/public function build_tree($regex) {
+    protected function build_tree($regex) {
 
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
+        $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
+        $lexer->globalmodifiers = $this->modifiers;
+        $lexer->localmodifiers = $this->modifiers;
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
             $parser->doParse($token->type, $token->value);
@@ -347,18 +397,18 @@ class preg_matcher {
             $errormsgs = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
-                $errormsgs[] = $this->highlight_regex($regex, $node->firstindxs[0],$node->lastindxs[0]) . '<br/>' . $node->error_string();
+                $errormsgs[] = new preg_error_parser($regex, $node);
             }
             $this->errors = array_merge($this->errors, $errormsgs);
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
+            //Add error messages for unsupported nodes
+            foreach ($this->error_flags as $key => $value) {
+                $this->errors[] = new preg_error_unacceptable_node($regex, $this, $key, $value);
+            }
         }
         fclose($pseudofile);
-    }
-
-    public function highlight_regex($regex, $indfirst, $indlast) {
-        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
     }
 
     /**
@@ -368,11 +418,14 @@ class preg_matcher {
     */
     public function &from_preg_node($pregnode) {
         if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
-            $enginenodename = $this->nodeprefix().'_preg_'.$pregnode->name();
+            if (!$this->is_node_acceptable($pregnode)) {
+                $this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+            }
+            $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept()) {
-                    $this->error_flags[$enginenode->rejectmsg] = $pregnode->indfirst;
+                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->error_flags)) {//highlighting first occurence of unaccepted node
+                    $this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
                 }
             } else {
                 $enginenode = $pregnode;
@@ -384,9 +437,17 @@ class preg_matcher {
     }
 
     /**
+    * Returns engine node name by preg node name
+    * Overload in case of sophisticated node name schemes
+    */
+    protected function get_engine_node_name($pregname) {
+        return $this->node_prefix().'_preg_'.$pregname;
+    }
+
+    /**
     * Returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return null;
     }
 
