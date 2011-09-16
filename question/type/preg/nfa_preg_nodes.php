@@ -24,6 +24,17 @@ class nfa_transition
         $this->state = $_state;
         $this->loops = $_loops;
     }
+    
+    /**
+     * returns number of characters consumed by this transition
+     */
+    public function length() {
+        // TODO: backrefs
+        if ($this->pregleaf->consumes()) {
+            return 1;            
+        }
+        return 0;        
+    }
 
 }
 
@@ -107,6 +118,8 @@ class processing_state {
     public $isfullmatch;                // whether the match is full
 
     public $nextpossible;                // the next possible character
+    
+    public $left;                        // number of characters left for matching
 
     public $subpattern_indexes_first = array();    // key = subpattern number
 
@@ -114,11 +127,12 @@ class processing_state {
     
     public $subpatterns_captured = array();        // an array containing subpatterns captured at the moment
 
-    public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured) {
+    public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_left, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured) {
         $this->state = $_state;
         $this->matchcnt = $_matchcnt;
         $this->isfullmatch = $_isfullmatch;
         $this->nextpossible = $_nextpossible;
+        $this->left = $_left;
         $this->subpattern_indexes_first = $_subpattern_indexes_first;
         $this->subpattern_indexes_last = $_subpattern_indexes_last;
         $this->subpatterns_captured = $_subpatterns_captured;
@@ -146,16 +160,6 @@ class nfa {
      * @return - a character corresponding to the given path
      */
     private function generate_character($lastchar, &$path, $pathindex) {    // TODO
-
-    }
-
-    /**
-     * finds the shortest path to the matching state
-     * @param lastchar - the last character matched
-     * @param state - the last successful state
-     * @return - the shortest path to complete match
-     */
-    private function wave_to_the_end($lastchar, &$state) {    // TODO
 
     }
     
@@ -231,6 +235,38 @@ class nfa {
             return false;
         }
     }
+    
+    /**
+     * returns the minimal number of characters left for matching
+     * @param laststate - the last state of the automaton, an object of processing_state
+     * @return - number of characters left for matching
+     */
+    public function characters_left($laststate) {
+        $curstates = array();    // states which the automaton is in
+        $result = -1;
+        array_push($curstates, $laststate);
+        while (count($curstates) != 0) {
+            $newstates = array();
+            while (count($curstates) != 0) {
+                $currentstate = array_pop($curstates);
+                if (count($currentstate->state->next) == 0  && ($result == -1 || ($result != -1 && $currentstate->matchcnt < $result))) {
+                    $result = $currentstate->matchcnt;
+                }
+                for ($i = 0; $i < count($currentstate->state->next); $i++) {
+                    if (!$currentstate->state->next[$i]->loops) {
+                        $next = $currentstate->state->next[$i];
+                        $newstate = new processing_state($next->state, $currentstate->matchcnt + $next->length(), false, 0, -1, array(), array(), array());
+                        array_push($newstates, $newstate);
+                    }
+                }
+            }
+            for ($i = 0; $i < count($newstates); $i++) {
+                array_push($curstates, $newstates[$i]);
+            }
+            $newstates = array();
+        }
+        return $result - $laststate->matchcnt;
+    }
 
     /**
      * returns the longest match using a string as input. matching is proceeded from a given start position
@@ -243,7 +279,7 @@ class nfa {
         $curstates = array();    // states which the automaton is in
         $skipstates = array();    // contains states where infinite quantifiers start. it's used to protect from loops like ()*
 
-        $result = new processing_state($this->startstate, 0, false, 0, array(), array(), array());
+        $result = new processing_state($this->startstate, 0, false, 0, -1, array(), array(), array());
 
         array_push($curstates, $result);
         while (count($curstates) != 0) {
@@ -286,7 +322,7 @@ class nfa {
                                 $currentstate->subpatterns_captured[$key] = true;
                             }
                         }                        
-                        $newstate = new processing_state($next->state, $pos + $length, false, 0, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
+                        $newstate = new processing_state($next->state, $pos + $length, false, 0, -1, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
                         // save the state
                         array_push($newstates, $newstate);
                         // save the next state as a result if it's a matching state
@@ -315,6 +351,9 @@ class nfa {
         }
         if (!$result->isfullmatch) {
             // TODO character generation
+            $result->left = $this->characters_left($result);
+        } else {
+            $result->left = 0;
         }
         /*foreach ($result->subpattern_indexes_first as $id=>$sp) {
             echo "id=".$id."index1=".$sp."index2=".$result->subpattern_indexes_last[$id]."<br />";

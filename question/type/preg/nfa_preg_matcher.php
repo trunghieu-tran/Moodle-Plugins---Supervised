@@ -48,7 +48,7 @@ class nfa_preg_matcher extends preg_matcher {
         switch($capability) {
         case preg_matcher::PARTIAL_MATCHING:
         //case preg_matcher::NEXT_CHARACTER:
-        //case preg_matcher::CHARACTERS_LEFT:
+        case preg_matcher::CHARACTERS_LEFT:
         case preg_matcher::SUBPATTERN_CAPTURING:
             return true;
             break;
@@ -77,7 +77,7 @@ class nfa_preg_matcher extends preg_matcher {
     * @param str a string to match
     */
     function match_inner($str) {
-        $curresult = new processing_state($this->automaton->startstate, 0, false, 0, array(), array(), array());
+        $curresult = new processing_state($this->automaton->startstate, 0, false, 0, -1, array(), array(), array());
         $startpos = 0;
         $len = strlen($str);
         // match from all indexes
@@ -96,6 +96,7 @@ class nfa_preg_matcher extends preg_matcher {
             $this->index_first[$key] = $curresult->subpattern_indexes_first[$key];
         }
         $this->next = $curresult->nextpossible;
+        $this->left = $curresult->left;
     }
     
     /**
