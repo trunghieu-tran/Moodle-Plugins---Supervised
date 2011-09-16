@@ -41,19 +41,16 @@ class test_cross_from_nfa extends UnitTestCase {
         if ($obtained['is_match'] || $expected['is_match']) {
             if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
                 $this->assertTrue($expected['index_first'] == $obtained['index_first']);
-            } else {
-                $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
-            }
-            if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
                 $this->assertTrue($expected['index_last'] == $obtained['index_last']);
             } else {
+                $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
                 $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
             }
             if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                //$this->assertTrue(($expected['next'] == 0 && $obtained['next'] == 0) || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next' 
+                //$this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next' 
             }
             if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                //$this->assertTrue($expected['left'] == $obtained['left']);
+                $this->assertTrue(in_array($obtained['left'], $expected['left']));
             }
         }
     }
@@ -64,7 +61,7 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abcbcd');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>1,2=>1,3=>2), 'index_last'=>array(0=>5,1=>4,2=>2,3=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>1,2=>1,3=>2), 'index_last'=>array(0=>5,1=>4,2=>2,3=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -76,7 +73,7 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('_abcdef');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>1,1=>1,2=>3,3=>5), 'index_last'=>array(0=>6,1=>2,2=>4,3=>6), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>1,1=>1,2=>3,3=>5), 'index_last'=>array(0=>6,1=>2,2=>4,3=>6), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -88,7 +85,7 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abcdefgh');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>0,2=>0), 'index_last'=>array(0=>1,1=>1,2=>1), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>0,2=>0), 'index_last'=>array(0=>1,1=>1,2=>1), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -100,13 +97,13 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('ac');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbc');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>1, 'next'=>'c');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>array(1), 'next'=>'c');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -118,10 +115,10 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abcd');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>3, 'next'=>'acdefghijklmnopqrstuvwxyz0123456789!?.,');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>array(3), 'next'=>'acdefghijklmnopqrstuvwxyz0123456789!?.,');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('axcd');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>3), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>3), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -133,19 +130,19 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abi');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('cdi');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('efi');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('ghi');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('yzi');
-                $expected = array('is_match'=>false, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>3, 'next'=>'aceg');
+                $expected = array('is_match'=>false, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>array(3), 'next'=>'aceg');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -157,13 +154,13 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('ab');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>1, 'next'=>'b');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>array(3), 'next'=>'b');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abb');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('...ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>3), 'index_last'=>array(0=>78), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>3), 'index_last'=>array(0=>78), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -175,13 +172,13 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abbbbbc');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>5), 'left'=>11, 'next'=>'b');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>5), 'left'=>array(11), 'next'=>'b');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>26), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>26), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>35), 'left'=>1, 'next'=>'c');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>35), 'left'=>array(1), 'next'=>'c');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -193,14 +190,14 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abbbbbc');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>5), 'left'=>11, 'next'=>'b');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>5), 'left'=>array(11), 'next'=>'b');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>26), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>26), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>103), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>103), 'left'=>array(0), 'next'=>'');
+                $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
     }
@@ -211,13 +208,13 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('ac');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>2, 'next'=>'b');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>array(2), 'next'=>'b');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>100), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>100), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
@@ -229,11 +226,11 @@ class test_cross_from_nfa extends UnitTestCase {
             if (!$this->check_for_errors($matcher))
             {
                 $matcher->match('abcd');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>3, 'next'=>'B');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>0), 'left'=>array(3), 'next'=>'B');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher = new nfa_preg_matcher('aBcD', 'i');
                 $matcher->match('abcd');
-                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>3), 'left'=>0, 'next'=>null);
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>3), 'left'=>array(0), 'next'=>'');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
         }
