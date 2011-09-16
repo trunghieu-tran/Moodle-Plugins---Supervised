@@ -418,9 +418,6 @@ class preg_matcher {
     */
     public function &from_preg_node($pregnode) {
         if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
-            if (!$this->is_node_acceptable($pregnode)) {
-                $this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
-            }
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
@@ -429,6 +426,9 @@ class preg_matcher {
                 }
             } else {
                 $enginenode = $pregnode;
+                if (!$this->is_node_acceptable($pregnode)) {
+                    $this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+                }
             }
             return $enginenode;
         } else {
