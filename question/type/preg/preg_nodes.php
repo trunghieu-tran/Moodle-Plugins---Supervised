@@ -111,6 +111,8 @@ abstract class preg_leaf extends preg_node {
     public $caseinsensitive = false;
     //Is leaf negative?
     public $negative = false;
+    //Assertions, merged into this node (preg_leaf_assert objects)
+    public $mergedassertions = array();
 
     /*
     * Returns true if the leaf consume character from the string during matching, false if it is an assertion
@@ -121,12 +123,36 @@ abstract class preg_leaf extends preg_node {
 
     /*
     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
-    * Default implementation is good for simple consuming classes
+    * Contains universal code to deal with merged assertions. Overload match_inner to define you leaf type matching
     * @param str string with which matching is supporting
     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
     * @param length the length of match (for backreference or recursion), can be 0 for asserts
+    * @param cs case sensitivity of the match
     */
-    abstract public function match($str, $pos, &$length, $cs);
+    public function match($str, $pos, &$length, $cs)
+    {
+        $result = true;
+        //Check merged assertions
+        foreach($this->mergedassertions as $assert) {
+            $result = $result && $assert->match($str, $pos, $length, $cs);
+        }
+        //Now check this leaf
+        if ($result) {
+            $result = $this->match_inner($str, $pos, $length, $cs);
+        }
+
+        return $result;
+    }
+
+    /*
+    * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
+    * Implement details of particular leaf matching
+    * @param str string with which matching is supporting
+    * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
+    * @param length the length of match (for backreference or recursion), can be 0 for asserts
+    * @param cs case sensitivity of the match
+    */
+    abstract protected function match_inner($str, $pos, &$length, $cs);
     
     /*
     *Returns one of characters which contains in this leaf
@@ -166,7 +192,7 @@ class preg_leaf_charset extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
 
         if ($pos>=strlen($str)) {
             $length = 0;
@@ -261,8 +287,8 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
-    public function match($str, $pos, &$length, $cs) {
-        if ($pos>=strlen($str)) {
+    protected function match_inner($str, $pos, &$length, $cs) {
+        if ($pos>=strlen($str) && $this->subtype != preg_leaf_meta::SUBTYPE_EMPTY) {
             $length = 0;
             return false;
         }
@@ -283,6 +309,10 @@ class preg_leaf_meta extends preg_leaf {
                 } else {
                     $result =  false;
                 }
+                break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $length = 0;
+                return true;
                 break;
         }
         if ($this->negative) {
@@ -311,6 +341,9 @@ class preg_leaf_meta extends preg_leaf {
             case preg_leaf_meta::SUBTYPE_ENDREG:
                 $type = 'ENDREG';
                 break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $type = 'eps';
+                break;
         };
         $result = "$direction"."meta$type";
         return $result;
@@ -335,6 +368,10 @@ class preg_leaf_assert extends preg_leaf {
     // \G
     const SUBTYPE_ESC_G = 6;
 
+    //Reference to the matcher object to be able to query it for captured subpattern
+    //Filled only to ESC_G subtype if it would be implemented in the future
+    public $matcher;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_ASSERT;
     }
@@ -348,11 +385,12 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
 
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_ESC_G://there are no repetitive matching for now, so \G is equvivalent to \A
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if($pos == 0) {
                     $result = true;
@@ -381,10 +419,6 @@ class preg_leaf_assert extends preg_leaf {
                     $result = false;
                 }
                 break;
-            /*case preg_leaf_assert::SUBTYPE_ESC_G:
-                TODO: matching with SUBTYPE_ESC_G
-                trouble, because this function has not information about offset!
-                break;*/
         }
         if ($this->negative) {
             $result = !$result;
@@ -467,7 +501,7 @@ class preg_leaf_combo extends preg_leaf {
         return 'leaf_combo';
     }
 
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
 		$match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
 		$match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
 		if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
@@ -596,11 +630,13 @@ class preg_leaf_combo extends preg_leaf {
 
 class preg_leaf_backref extends preg_leaf {
     public $number;
-    
+    //Reference to the matcher object to be able to query it for captured subpattern
+    public $matcher;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
     }
     public function name() {
@@ -621,7 +657,7 @@ class preg_leaf_option extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_OPTIONS;
     }
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_option class before use it!');
     }
     public function name() {
@@ -643,7 +679,7 @@ class preg_leaf_recursion extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_RECURSION;
     }
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_recursion class before use it!');
     }
     public function name() {

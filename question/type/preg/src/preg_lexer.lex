@@ -10,6 +10,14 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %{
     protected $errors = array();
 
+    //A reference to the matcher object to be passed to some nodes
+    public $matcher = null;
+    //Global modifiers as a string - defined for entire expression
+    public $globalmodifiers = '';
+    //Local modifiers - turned on (or off) using options in the expression
+    //It's contains copy of a global modifiers at start, but could be changed later
+    public $localmodifiers ='';
+
     public function get_errors() {
         return $this->errors;
     }
@@ -18,6 +26,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         $result = new $name;
         if ($subtype !== null) {
             $result->subtype = $subtype;
+        }
+        //set i modifier for leafs
+        if (is_a($result, 'preg_leaf')) {
+            if(strpos($this->localmodifiers,'i')!==false) {
+                $result->caseinsensitive = true;
+            }
         }
         if ($name == 'preg_leaf_charset') {
             $result->charset = $charclass;
@@ -215,6 +229,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \\[0-9][0-9]? {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\0[0-9][0-9]?|[0-9][0-9][0-9] {
