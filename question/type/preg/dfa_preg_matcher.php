@@ -82,23 +82,6 @@ class dfa_preg_matcher extends preg_matcher {
         return false;
     }
 
-    function is_node_acceptable($pregnode) {
-        switch ($pregnode->name()) {
-        case 'node_finite_quant':
-        case 'node_infinite_quant':
-        case 'node_concat':
-        case 'node_alt':
-        case 'node_subpatt':
-        case 'node_assert':
-        case 'leaf_charset':
-        case 'leaf_meta':
-        case 'leaf_assert':
-            return true;
-            break;
-        }
-        return false;
-    }
-
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
     *@param index - number of tree for adding end's leaf.

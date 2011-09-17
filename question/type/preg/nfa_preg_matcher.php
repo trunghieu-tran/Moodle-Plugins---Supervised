@@ -58,11 +58,6 @@ class nfa_preg_matcher extends preg_matcher {
     
     function is_node_acceptable($pregnode) {
         switch ($pregnode->name()) {
-        case 'node_finite_quant':
-        case 'node_infinite_quant':
-        case 'node_concat':
-        case 'node_alt':
-        case 'node_subpatt':
         case 'leaf_charset':
         case 'leaf_meta':
         case 'leaf_assert':

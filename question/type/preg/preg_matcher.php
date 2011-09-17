@@ -11,57 +11,7 @@
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
-
-class preg_error {
-
-    //Human-understandable error message
-    public $errormsg;
-    //
-    public $index_first;
-    //
-    public $index_last;
-    
-    protected function highlight_regex($regex, $indfirst, $indlast) {
-        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
-    }
-
-}
-
-class preg_error_parser extends preg_error {
-
-    public function __construct($regex, $parsernode) {
-        $this->index_first = $parsernode->firstindxs[0];
-        $this->index_last = $parsernode->lastindxs[0];
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
-    }
-
-}
-
-class preg_error_unacceptable_node extends preg_error {
-
-    public function __construct($regex, $matcher, $nodename, $indexes) {
-        $a = new stdClass;
-        $a->nodename = $nodename;
-        $a->indfirst = $indexes['start'];
-        $a->indlast = $indexes['end'];
-        $a->engine = get_string($matcher->name(), 'qtype_preg');
-        $this->index_first = $a->indfirst;
-        $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported','qtype_preg',$a);
-    }
-
-}
-
-class preg_error_unacceptable_modifier extends preg_error {
-
-    public function __construct($matcher, $modifier) {
-        $a = new stdClass;
-        $a->modifier = $modifier;
-        $a->classname = $matcher->name();
-        $this->errormsg = get_string('unsupportedmodifier','qtype_preg',$a);
-    }
-
-}
+require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
 class preg_matcher {
 
@@ -397,7 +347,7 @@ class preg_matcher {
             $errormsgs = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
-                $errormsgs[] = new preg_error_parser($regex, $node);
+                $errormsgs[] = new preg_parsing_error($regex, $node);
             }
             $this->errors = array_merge($this->errors, $errormsgs);
         } else {
@@ -405,7 +355,7 @@ class preg_matcher {
             $this->dst_root = $this->from_preg_node($this->ast_root);
             //Add error messages for unsupported nodes
             foreach ($this->error_flags as $key => $value) {
-                $this->errors[] = new preg_error_unacceptable_node($regex, $this, $key, $value);
+                $this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
             }
         }
         fclose($pseudofile);
