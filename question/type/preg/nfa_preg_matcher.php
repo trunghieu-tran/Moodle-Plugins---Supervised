@@ -169,8 +169,8 @@ class nfa_preg_matcher extends preg_matcher {
         $skipstates = array();   // contains states where infinite quantifiers start. it's used to protect from loops like ()*
 
         $result = new processing_state($this->automaton->startstate, 0, false, 0, -1, array(), array(), array());
-        $this->index_first = array();
-        $this->index_last = array();
+        $this->index_first = array(0=>$startpos);
+        $this->index_last = array(0=>$startpos-1);
         array_push($curstates, $result);
         while (count($curstates) != 0) {
             $newstates = array();
