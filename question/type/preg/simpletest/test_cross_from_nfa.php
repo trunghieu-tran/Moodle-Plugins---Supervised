@@ -304,12 +304,14 @@ class test_cross_from_nfa extends UnitTestCase {
         }
     }
     
-    function test_match_experiment() {
+    function test_match_backref_simple() {
        
-            $matcher = new nfa_preg_matcher('(ab)f\\1');
+            $matcher = new nfa_preg_matcher('((abc)\2)\1');
             if (!$this->check_for_errors($matcher))
             {
-                $matcher->match('abab');
+                $matcher->match('abcabcabcabc');
+                $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>0,2=>0), 'index_last'=>array(0=>11,1=>5,2=>2), 'left'=>array(0), 'next'=>'');
+                $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
     }
 }

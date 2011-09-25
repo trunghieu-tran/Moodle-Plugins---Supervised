@@ -644,7 +644,30 @@ class preg_leaf_backref extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
     protected function match_inner($str, $pos, &$length, $cs) {
-        die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
+        // TODO: partial matching
+        if ($pos>=strlen($str)) {
+            $length = 0;
+            return false;
+        }
+        $strcopy = $str;
+        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
+
+        if (!$cs) {
+            $strcopy = $textlib->strtolower($strcopy);
+        }
+        
+        $start = $this->matcher->first_correct_character_index($this->number);
+        $len = $this->matcher->last_correct_character_index($this->number) - $start + 1;
+        $subpatt = $textlib->substr($strcopy, $start, $len);
+
+        $result = ($textlib->strpos($strcopy, $subpatt, $pos) == $pos);
+
+        if ($result) {
+            $length = $len;
+        } else {
+            $length = 0;
+        }
+        return $result;
     }
     public function name() {
         return 'leaf_backref';
