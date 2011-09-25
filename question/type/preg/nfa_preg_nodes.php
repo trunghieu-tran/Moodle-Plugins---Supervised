@@ -7,33 +7,22 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class nfa_transition
 {
-    public $loops = false;        // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
+    public $loops = false;       // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
 
     public $pregleaf;            // transition data, a reference to an object of preg_leaf
 
-    public $state;                // the state which this transition leads to, a reference to an object of nfa_state
+    public $state;               // the state which this transition leads to, a reference to an object of nfa_state
 
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
 
-    public $subpatt_end = array();            // an array of subpatterns which end in this transition
+    public $subpatt_end = array();          // an array of subpatterns which end in this transition
 
-    public $belongs_to_subpatt = array();    // an array of subpatterns which this transition belongs to
+    public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops) {
         $this->pregleaf = $_pregleaf;
         $this->state = $_state;
         $this->loops = $_loops;
-    }
-    
-    /**
-     * returns number of characters consumed by this transition
-     */
-    public function length() {
-        // TODO: backrefs
-        if ($this->pregleaf->consumes()) {
-            return 1;            
-        }
-        return 0;        
     }
 
 }
@@ -46,9 +35,9 @@ class nfa_state
 
     public $startsinfinitequant = false;    // true if this state starts an infinite quantifier either * or + or {m,}
 
-    public $next = array();                    // an array of objects of nfa_transition
+    public $next = array();                 // an array of objects of nfa_transition
 
-    public $id;                                // id of the state, debug variable
+    public $id;                             // id of the state, debug variable
 
     /**
      * appends a next possible state
@@ -106,45 +95,11 @@ class nfa_state
 }
 
 /**
- * defines a state of an automaton when running
- * used when matching a string
- */
-class processing_state {
-
-    public $state;                        // a reference to the state which automaton is in
-
-    public $matchcnt;                    // the number of characters matched
-
-    public $isfullmatch;                // whether the match is full
-
-    public $nextpossible;                // the next possible character
-    
-    public $left;                        // number of characters left for matching
-
-    public $subpattern_indexes_first = array();    // key = subpattern number
-
-    public $subpattern_indexes_last = array();    // key = subpattern number
-    
-    public $subpatterns_captured = array();        // an array containing subpatterns captured at the moment
-
-    public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_left, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured) {
-        $this->state = $_state;
-        $this->matchcnt = $_matchcnt;
-        $this->isfullmatch = $_isfullmatch;
-        $this->nextpossible = $_nextpossible;
-        $this->left = $_left;
-        $this->subpattern_indexes_first = $_subpattern_indexes_first;
-        $this->subpattern_indexes_last = $_subpattern_indexes_last;
-        $this->subpatterns_captured = $_subpatterns_captured;
-    }
-}
-
-/**
  * defines a nondeterministic finite automaton
  */
 class nfa {
 
-    public $startstate;            // a reference to the start nfa_state of the automaton
+    public $startstate;          // a reference to the start nfa_state of the automaton
 
     public $endstate;            // a reference to the end nfa_state of the automaton
 
@@ -152,17 +107,6 @@ class nfa {
 
     var $graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';    // path to dot.exe of graphviz
 
-    /**
-     * generates a next possible character by a given path
-     * @param lastchar - the last character matched
-     * @param path - a reference to the path with merged assertions
-     * @param pathindex - index of the current transition
-     * @return - a character corresponding to the given path
-     */
-    private function generate_character($lastchar, &$path, $pathindex) {    // TODO
-
-    }
-    
     /**
      * clears $subpatt_start, $subpatt_end and $belongs_to_subpatt in every transition of the automaton
      */
@@ -218,149 +162,6 @@ class nfa {
         foreach ($this->states as $curstate) {
             $curstate->update_state_references($oldref, $newref);
         }
-    }
-
-    /**
-     * checks if new result is better than old result
-     * @param oldres - old result, an object of processing_state
-     * @param newres - new result, an object of processing_state
-     * @return - true if new result is more suitable
-     */
-    public function is_new_result_more_suitable(&$oldres, &$newres) {
-        if    (($oldres->state != $this->endstate && $newres->matchcnt >= $oldres->matchcnt) ||                                        // new match is longer
-            ($newres->state == $this->endstate && $oldres->state != $this->endstate) ||                                                // new match is full
-            ($newres->state == $this->endstate && $oldres->state == $this->endstate && $newres->matchcnt >= $oldres->matchcnt)) {    // new match is full and longer
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * returns the minimal number of characters left for matching
-     * @param laststate - the last state of the automaton, an object of processing_state
-     * @return - number of characters left for matching
-     */
-    public function characters_left($laststate) {
-        $curstates = array();    // states which the automaton is in
-        $result = -1;
-        array_push($curstates, $laststate);
-        while (count($curstates) != 0) {
-            $newstates = array();
-            while (count($curstates) != 0) {
-                $currentstate = array_pop($curstates);
-                if (count($currentstate->state->next) == 0  && ($result == -1 || ($result != -1 && $currentstate->matchcnt < $result))) {
-                    $result = $currentstate->matchcnt;
-                }
-                for ($i = 0; $i < count($currentstate->state->next); $i++) {
-                    if (!$currentstate->state->next[$i]->loops) {
-                        $next = $currentstate->state->next[$i];
-                        $newstate = new processing_state($next->state, $currentstate->matchcnt + $next->length(), false, 0, -1, array(), array(), array());
-                        array_push($newstates, $newstate);
-                    }
-                }
-            }
-            for ($i = 0; $i < count($newstates); $i++) {
-                array_push($curstates, $newstates[$i]);
-            }
-            $newstates = array();
-        }
-        return $result - $laststate->matchcnt;
-    }
-
-    /**
-     * returns the longest match using a string as input. matching is proceeded from a given start position
-     * @param str - the original input string
-     * @param startpos - index of the start position to match
-     * @param cs - is matching case sensitive
-     * @return - the longest character sequence matched
-     */
-    public function match($str, $startpos) {
-        $curstates = array();    // states which the automaton is in
-        $skipstates = array();    // contains states where infinite quantifiers start. it's used to protect from loops like ()*
-
-        $result = new processing_state($this->startstate, 0, false, 0, -1, array(), array(), array());
-
-        array_push($curstates, $result);
-        while (count($curstates) != 0) {
-            $newstates = array();
-            // we'll replace curstates with newstates by the end of this cycle
-            while (count($curstates) != 0) {
-                // get the current state
-                $currentstate = array_pop($curstates);
-                // kill epsilon-cycles
-                $skip = false;
-                if ($currentstate->state->startsinfinitequant) {
-                    // skipstates is sorted by matchcnt because transitions add characters
-                    for ($i = count($skipstates) - 1; $i >= 0 && !$skip && $currentstate->matchcnt <= $skipstates[$i]->matchcnt; $i--)
-                        if ($skipstates[$i]->state === $currentstate->state && $skipstates[$i]->matchcnt == $currentstate->matchcnt) {
-                            $skip = true;
-                        }
-                    if (!$skip) {
-                        array_push($skipstates, $currentstate);
-                    }
-                }
-                // iterate over all transitions
-                for ($i = 0; !$skip && $i < count($currentstate->state->next); $i++) {
-                    $pos = $currentstate->matchcnt;
-                    $length = 0;
-                    $next = $currentstate->state->next[$i];
-                    if ($next->pregleaf->match($str, $startpos + $pos, &$length, !$next->pregleaf->caseinsensitive )) {
-                        // save subpattern indexes
-                        foreach ($next->subpatt_start as $key=>$subpatt) {
-                            if (!isset($currentstate->subpattern_indexes_first[$key])) {
-                                $currentstate->subpattern_indexes_first[$key] = $startpos + $pos;
-                            }
-                        }
-                        foreach ($next->subpatt_end as $key=>$subpatt) {
-                            if (isset($currentstate->subpattern_indexes_first[$key]) && !(isset($currentstate->subpatterns_captured[$key]) && $currentstate->subpatterns_captured[$key])) {
-                                $currentstate->subpattern_indexes_last[$key] = $startpos + $pos + $length - 1;
-                            }
-                        }
-                        foreach ($currentstate->subpattern_indexes_first as $key=>$subpatt) {
-                            if (!isset($next->belongs_to_subpatt[$key]) && isset($currentstate->subpattern_indexes_last[$key])) {
-                                $currentstate->subpatterns_captured[$key] = true;
-                            }
-                        }                        
-                        $newstate = new processing_state($next->state, $pos + $length, false, 0, -1, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
-                        // save the state
-                        array_push($newstates, $newstate);
-                        // save the next state as a result if it's a matching state
-                        if ($next->state == $this->endstate && $this->is_new_result_more_suitable(&$result, &$newstate)) {
-                            $result = $newstate;
-                        }
-                    } elseif ($this->is_new_result_more_suitable(&$result, &$currentstate)) {
-                            $result = $currentstate;
-                    }
-                }
-            }
-
-            // replace curstates with newstates
-            for ($i = 0; $i < count($newstates); $i++) {
-                array_push($curstates, $newstates[$i]);
-            }
-            $newstates = array();
-        }
-        $result->isfullmatch = ($result->state == $this->endstate);
-        if ($result->matchcnt > 0) {
-            $result->subpattern_indexes_first[0] = $startpos;
-            $result->subpattern_indexes_last[0] = $startpos + $result->matchcnt - 1;
-        } else {
-            $result->subpattern_indexes_first[0] = -1;
-            $result->subpattern_indexes_last[0] = -1;
-        }
-        if (!$result->isfullmatch) {
-            // TODO character generation
-            $result->left = $this->characters_left($result);
-        } else {
-            $result->left = 0;
-        }
-        /*foreach ($result->subpattern_indexes_first as $id=>$sp) {
-            echo "id=".$id."index1=".$sp."index2=".$result->subpattern_indexes_last[$id]."<br />";
-        }
-        echo $result->matchcnt."<br />";*/
-        return $result;
-
     }
 
     /**
@@ -627,7 +428,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
             $this->operands[0]->create_automaton(&$stackofautomatons, ($i == $rightborder - 1));
         }
         $res = null;        // the resulting automaton
-        $endstate = null;    // the end state, required if $leftborder != $rightborder
+        $endstate = null;   // the end state, required if $leftborder != $rightborder
         if ($leftborder != $rightborder) {
             $endstate = new nfa_state;
         }
