@@ -36,22 +36,26 @@ class test_cross_from_nfa extends UnitTestCase {
     }
     
     function compare_expected_with_obtained($matcher, $expected, $obtained) {
-        $this->assertTrue($expected['is_match'] == $obtained['is_match']);
-        $this->assertTrue($expected['full'] == $obtained['full']);
-        if ($obtained['is_match'] || $expected['is_match']) {
+        $passed = $this->assertTrue($expected['is_match'] == $obtained['is_match']);
+        $passed &= $this->assertTrue($expected['full'] == $obtained['full']);
+        if ($obtained['is_match'] && $expected['is_match']) {
             if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
-                $this->assertTrue($expected['index_first'] == $obtained['index_first']);
-                $this->assertTrue($expected['index_last'] == $obtained['index_last']);
+                $passed &= $this->assertTrue($expected['index_first'] == $obtained['index_first']);
+                $passed &= $this->assertTrue($expected['index_last'] == $obtained['index_last']);
             } else {
-                $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
-                $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
+                $passed &= $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
+                $passed &= $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
             }
             if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next' 
+                $passed &= $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next' 
             }
             if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $this->assertTrue(in_array($obtained['left'], $expected['left']));
+                $passed &= $this->assertTrue(in_array($obtained['left'], $expected['left']));
             }
+        }
+        if (!$passed) {
+            $msg = $matcher->name() . " works seriously wrong<br />";
+            echo $msg;
         }
     }
     
@@ -311,6 +315,9 @@ class test_cross_from_nfa extends UnitTestCase {
             {
                 $matcher->match('abcabcabcabc');
                 $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0,1=>0,2=>0), 'index_last'=>array(0=>11,1=>5,2=>2), 'left'=>array(0), 'next'=>'');
+                $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
+                $matcher->match('abcabc');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0,1=>0,2=>0), 'index_last'=>array(0=>5,1=>5,2=>2), 'left'=>array(6), 'next'=>'a');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
             }
     }
