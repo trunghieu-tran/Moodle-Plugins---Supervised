@@ -12,7 +12,7 @@ class nfa_transition
     public $pregleaf;            // transition data, a reference to an object of preg_leaf
 
     public $state;               // the state which this transition leads to, a reference to an object of nfa_state
-    
+
     public $replaceable;         // eps-transitions are replaced by next non-eps transitions for merging simple assertions
 
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
@@ -40,25 +40,45 @@ class nfa_state
 
     public $next = array();                 // an array of objects of nfa_transition
 
+    public $previous = array();             // an array of objects of nfa_transition
+
     public $id;                             // id of the state, debug variable
 
     /**
      * appends a next possible state
-     * @param next - a reference to the transition to be appended
+     * @param transition - a reference to the transition to be appended
+     * $return - true if transition was appended
      */
-    public function append_transition(&$next) {
+    public function append_transition(&$transition) {
+        // avoid self-loops by eps-transitions
+        if ($transition->state === $this && $transition->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+            return false;
+        }
         $exists = false;
-        $size = count($this->next);
         // not unique transitions are not appended
         foreach($this->next as $curnext) {
-            if ($curnext->pregleaf == $next->pregleaf && $curnext->state === $next->state) {
+            if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
                 $exists = true;
             }
         }
         if (!$exists) {
-            array_push($this->next, $next);
+            array_push($this->next, $transition);
+            array_push($transition->state->previous, new nfa_transition($this, $transition->pregleaf, $transition->loops));
         }
         return !$exists;
+    }
+
+    /**
+     * removes a transition
+     * @param transition - a reference to the transition to be removed
+     */
+    public function remove_transition(&$transition) {
+        foreach($this->next as $key=>$curnext) {
+            if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
+                unset($this->next[$key]);
+                unset($transition->state->previous[$key]);
+            }
+        }
     }
 
     /**
@@ -67,10 +87,16 @@ class nfa_state
      * @param newref - a reference to the new state
      */
     public function update_state_references(&$oldref, &$newref) {
-        foreach($this->next as $curnext)
+        foreach($this->next as $curnext) {
             if ($curnext->state == $oldref) {
                 $curnext->state = $newref;
             }
+        }
+        foreach($this->previous as $curprev) {
+            if ($curprev->state == $oldref) {
+                $curprev->state = $newref;
+            }
+        }
     }
 
     /**
@@ -79,13 +105,10 @@ class nfa_state
      */
     public function merge(&$with) {
         // move all transitions from $with to $this state
-        foreach($with->next as $curnext) {
-            $this->append_transition($curnext);
+        foreach($with->next as $curnext) {            // this function is called always with update_state_references
+            $this->append_transition($curnext);       // so $previous will be updated too
         }
-        // unite fields by logical "or"
-        if ($with->startsinfinitequant) {
-            $this->startsinfinitequant = true;
-        }
+        $this->startsinfinitequant = $this->startsinfinitequant || $with->startsinfinitequant;
     }
 
     /**
@@ -122,11 +145,44 @@ class nfa {
             }
         }
     }
-    
-    public function replace_eps_transitions() {
-        // TODO
+
+    /**
+     * appends an eps-transition to the end for merging simple assertions
+     */
+    public function append_endeps() {
+        $epsleaf = new preg_leaf_meta;
+        $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+        $end = new nfa_state;
+        $this->append_state($end);
+        $this->endstate->append_transition(new nfa_transition($epsleaf, $end, false));
+        $this->endstate = $end;
     }
-    
+
+    /**
+     * replaces all eps-transitions with next non-eps transitions
+     */
+    public function replace_eps_transitions() {
+        foreach ($this->states as $keystate=>$curstate) {
+            do {    // iterate until all transitions aren't replaceable
+                foreach ($curstate->next as $keynext=>$curnext) {
+                    if ($curnext->replaceable) {
+                        foreach ($curnext->state->next as $newnext) {
+                            $this->states[$keystate]->append_transition($newnext);
+                        }
+                        $this->states[$keystate]->remove_transition($curnext);
+                    }
+                }
+                $replaceable_cnt = 0;
+                foreach ($curstate->next as $keynext=>$curnext) {
+                    if ($curnext->replaceable) {
+                        $replaceable_cnt++;
+                    }
+                }
+            } while ($replaceable_cnt);
+
+        }
+    }
+
     public function merge_simple_assertions() {
         // TODO
     }
@@ -253,7 +309,7 @@ class nfa_preg_leaf extends nfa_preg_node {
         // create start and end states of the resulting automaton
         $start = new nfa_state;
         $end = new nfa_state;
-        $start->append_transition(new nfa_transition($this->pregnode, $end, false));
+        $start->append_transition(new nfa_transition($this->pregnode, $end, false, $this->pregnode->subtype == preg_leaf_meta::SUBTYPE_EMPTY));
         $res = new nfa;
         $res->append_state($start);
         $res->append_state($end);
@@ -270,7 +326,7 @@ class nfa_preg_leaf extends nfa_preg_node {
 abstract class nfa_preg_operator extends nfa_preg_node {
 
     public $operands = array();    // an array of operands
-    
+
     public function __construct($node, &$matcher) {
         parent::__construct($node, $matcher);
         foreach ($this->pregnode->operands as &$operand) {
@@ -491,7 +547,7 @@ class nfa_preg_node_subpatt extends nfa_preg_operator {
         $this->operands[0]->create_automaton(&$stackofautomatons);
         $body = array_pop($stackofautomatons);
         foreach ($body->startstate->next as $next) {
-            $next->subpatt_start[$this->pregnode->number] = true;            
+            $next->subpatt_start[$this->pregnode->number] = true;
         }
         foreach ($body->states as $state) {
             foreach ($state->next as $next) {
