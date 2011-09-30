@@ -23,7 +23,7 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function check_for_errors($matcher) {
         if ($matcher->is_error_exists()) {
             $errors = $matcher->get_errors();
@@ -34,23 +34,23 @@ class test_cross_from_nfa extends UnitTestCase {
         }
         return false;
     }
-    
+
     function compare_expected_with_obtained($matcher, $expected, $obtained) {
         $passed = $this->assertTrue($expected['is_match'] == $obtained['is_match']);
-        $passed &= $this->assertTrue($expected['full'] == $obtained['full']);
+        $passed = $passed && $this->assertTrue($expected['full'] == $obtained['full']);
         if ($obtained['is_match'] && $expected['is_match']) {
             if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
-                $passed &= $this->assertTrue($expected['index_first'] == $obtained['index_first']);
-                $passed &= $this->assertTrue($expected['index_last'] == $obtained['index_last']);
+                $passed = $passed && $this->assertTrue($expected['index_first'] == $obtained['index_first']);
+                $passed = $passed && $this->assertTrue($expected['index_last'] == $obtained['index_last']);
             } else {
-                $passed &= $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
-                $passed &= $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
+                $passed = $passed && $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
+                $passed = $passed && $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
             }
             if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $passed &= $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next' 
+                $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next'
             }
             if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $passed &= $this->assertTrue(in_array($obtained['left'], $expected['left']));
+                $passed = $passed && $this->assertTrue(in_array($obtained['left'], $expected['left']));
             }
         }
         if (!$passed) {
@@ -58,7 +58,7 @@ class test_cross_from_nfa extends UnitTestCase {
             echo $msg;
         }
     }
-    
+
     function test_match_concat() {
         foreach ($this->engines as $enginename) {
             $matcher = new $enginename('^the matcher works');
@@ -75,7 +75,7 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function test_match_alt() {
         foreach ($this->engines as $enginename) {
             $matcher = new $enginename('^abc|def$');
@@ -92,7 +92,7 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function test_match_assertions_simple_1() {
         foreach ($this->engines as $enginename) {
             $matcher = new $enginename('^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]');
@@ -109,7 +109,7 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function test_match_assertions_simple_2() {
         foreach ($this->engines as $enginename) {
             $matcher = new $enginename('^abc[a-z.?!]\b[a-zA-Z]');
@@ -123,7 +123,7 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function test_match_zero_length_loop() {
         foreach ($this->engines as $enginename) {
             $matcher = new $enginename('^*[a-z 0-9](?:\b)+a${1,}');
@@ -307,9 +307,9 @@ class test_cross_from_nfa extends UnitTestCase {
             }
         }
     }
-    
+
     function test_match_backref_simple() {
-       
+
             $matcher = new nfa_preg_matcher('((abc)\2)\1');
             if (!$this->check_for_errors($matcher))
             {
