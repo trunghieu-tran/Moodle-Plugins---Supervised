@@ -313,6 +313,7 @@ class nfa_preg_matcher extends preg_matcher {
         $stack = array();
         $this->dst_root->create_automaton(&$stack);
         $this->automaton = array_pop($stack);
+        $this->automaton->replace_eps_transitions();
     }
 
 }
