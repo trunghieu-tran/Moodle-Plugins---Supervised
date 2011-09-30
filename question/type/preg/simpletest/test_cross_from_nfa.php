@@ -230,7 +230,7 @@ class test_cross_from_nfa extends UnitTestCase {
             $matcher = new $enginename('(?:a|b)*abb$');
            if (!$this->check_for_errors($matcher)) {
                 $matcher->match('ab');
-                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>array(3), 'next'=>'b');
+                $expected = array('is_match'=>true, 'full'=>false, 'index_first'=>array(0=>0), 'index_last'=>array(0=>1), 'left'=>array(1,3), 'next'=>'ab');
                 $this->compare_expected_with_obtained($matcher, $expected, $matcher->get_match_results());
                 $matcher->match('abb');
                 $expected = array('is_match'=>true, 'full'=>true, 'index_first'=>array(0=>0), 'index_last'=>array(0=>2), 'left'=>array(0), 'next'=>'');

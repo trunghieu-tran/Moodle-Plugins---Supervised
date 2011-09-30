@@ -12,6 +12,8 @@ class nfa_transition
     public $pregleaf;            // transition data, a reference to an object of preg_leaf
 
     public $state;               // the state which this transition leads to, a reference to an object of nfa_state
+    
+    public $replaceable;         // eps-transitions are replaced by next non-eps transitions for merging simple assertions
 
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
 
@@ -19,10 +21,11 @@ class nfa_transition
 
     public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
-    public function __construct(&$_pregleaf, &$_state, $_loops) {
+    public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false) {
         $this->pregleaf = $_pregleaf;
         $this->state = $_state;
         $this->loops = $_loops;
+        $this->replaceable = $_replaceable;
     }
 
 }
@@ -118,6 +121,14 @@ class nfa {
                 $curnext->belongs_to_subpatt = array();
             }
         }
+    }
+    
+    public function replace_eps_transitions() {
+        // TODO
+    }
+    
+    public function merge_simple_assertions() {
+        // TODO
     }
 
     /**
@@ -307,24 +318,28 @@ class nfa_preg_node_alt extends nfa_preg_operator {
         $first = array_pop($stackofautomatons);
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-        // add a new end state if the end state of the first automaton is looped
-        $endlooped = false;
-        foreach ($first->endstate->next as $curnext) {
-            if ($curnext->loops) {
-                $endlooped = true;
+        // add a new end state if the current end state is looped    (for both of automata)
+        $automata = array($first, $second);
+        foreach ($automata as $cur) {
+            $endlooped = false;
+            foreach ($cur->endstate->next as $curnext) {
+                if ($curnext->loops) {
+                    $endlooped = true;
+                }
+            }
+            if ($endlooped) {
+                $endstate = new nfa_state;
+                $cur->append_state($endstate);
+                $cur->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false, true));
+                $cur->endstate = $endstate;
             }
         }
-        if ($endlooped) {
-            $endstate = new nfa_state;
-            $first->append_state($endstate);
-            $first->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
-            $first->endstate = $endstate;
-        }
-        // start states are merged, end states are alternated by an epsilon-transition for correct loop capturing
-        $second->update_state_references($second->startstate, $first->startstate);
+        // start and end states are merged
         $first->startstate->merge($second->startstate);
+        $second->update_state_references($second->startstate, $first->startstate);
+        $second->update_state_references($second->endstate, $first->endstate);
         $second->remove_state($second->startstate);
-        $second->endstate->append_transition(new nfa_transition($epsleaf, $first->endstate, false));
+        $second->remove_state($second->endstate);
         $first->move_states($second);
         array_push($stackofautomatons, $first);
     }
@@ -348,7 +363,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         }
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-        $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false));
+        $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false, true));
         array_push($stackofautomatons, $body);
     }
 
@@ -375,7 +390,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                     }
                     $epsleaf = new preg_leaf_meta;
                     $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-                    $cur->startstate->append_transition(new nfa_transition($epsleaf, $cur->endstate, false));
+                    $cur->startstate->append_transition(new nfa_transition($epsleaf, $cur->endstate, false, true));
                 }
                 // merging
                 $cur->update_state_references($cur->startstate, $res->endstate);
@@ -413,7 +428,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         $body = array_pop($stackofautomatons);
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-        $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false));
+        $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false, true));
         array_push($stackofautomatons, $body);
     }
 
@@ -438,7 +453,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stackofautomatons);
             if ($i >= $leftborder && $leftborder != $rightborder) {
-                $cur->startstate->append_transition(new nfa_transition($epsleaf, $endstate, false));
+                $cur->startstate->append_transition(new nfa_transition($epsleaf, $endstate, false, true));
             }
             if ($i > 0) {
                 $cur->remove_subpatterns();
