@@ -120,6 +120,17 @@ abstract class preg_leaf extends preg_node {
     public function consumes() {
         return true;
     }
+    
+    /*
+    * Returns a clone of the leaf including merged assertions
+    */
+    public function get_clone() {
+        $res = clone $this;
+        $res->mergedassertions = array();
+        foreach ($this->mergedassertions as $assert)
+            $res->mergedassertions[] = $assert->get_clone();
+        return $res;
+    }
 
     /*
     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
