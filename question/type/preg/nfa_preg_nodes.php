@@ -21,11 +21,26 @@ class nfa_transition
 
     public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
-    public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false) {
-        $this->pregleaf = $_pregleaf;
+    public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false, $_subpatt_start = array(), $_subpatt_end = array(), $_belongs_to_subpatt = array()) {
+        $this->pregleaf = $_pregleaf->get_clone();    // the leaf should be unique
         $this->state = $_state;
         $this->loops = $_loops;
         $this->replaceable = $_replaceable;
+        foreach ($_subpatt_start as $key=>$subpatt) {
+            $this->subpatt_start[$key] = $subpatt;
+        }
+        foreach ($_subpatt_end as $key=>$subpatt) {
+            $this->subpatt_end[$key] = $subpatt;
+        }
+        foreach ($_belongs_to_subpatt as $key=>$subpatt) {
+            $this->belongs_to_subpatt[$key] = $subpatt;
+        }
+    }
+    
+    public function get_clone() {
+        $res = new nfa_transition($this->pregleaf, $this->state, $this->loops, $this->replaceable, $this->subpatt_start, $this->subpatt_end, $this->belongs_to_subpatt);
+        $res->state =& $this->state;
+        return $res;
     }
 
 }
@@ -47,23 +62,28 @@ class nfa_state
     /**
      * appends a next possible state
      * @param transition - a reference to the transition to be appended
+     * @param assertion - an assertion (preg_leaf_assert) to be merged to this transition
      * $return - true if transition was appended
      */
-    public function append_transition(&$transition) {
+    public function append_transition(&$transition, $assertion = null) {
         // avoid self-loops by eps-transitions
         if ($transition->state === $this && $transition->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             return false;
         }
         $exists = false;
+        $transition_copy = $transition->get_clone();
+        if ($assertion != null) {
+            $transition_copy->pregleaf->mergedassertions[] = $assertion->get_clone();
+        }
         // not unique transitions are not appended
         foreach($this->next as $curnext) {
-            if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
+            if ($curnext->pregleaf == $transition_copy->pregleaf && $curnext->state === $transition_copy->state && $curnext->pregleaf->mergedassertions === $transition_copy->pregleaf->mergedassertions) {
                 $exists = true;
             }
         }
         if (!$exists) {
-            array_push($this->next, $transition);
-            array_push($transition->state->previous, new nfa_transition($this, $transition->pregleaf, $transition->loops));
+            array_push($this->next, $transition_copy);
+            array_push($transition->state->previous, new nfa_transition($transition->pregleaf, $this, $transition->loops));
         }
         return !$exists;
     }
@@ -75,8 +95,13 @@ class nfa_state
     public function remove_transition(&$transition) {
         foreach($this->next as $key=>$curnext) {
             if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
+                // delete an element from $curnext->state->previous
+                foreach ($curnext->state->previous as $keyprev=>$curprev) {
+                    if ($curprev->pregleaf == $transition->pregleaf && $curprev->state === $this) {
+                        unset($curnext->state->previous[$keyprev]);
+                    }
+                }
                 unset($this->next[$key]);
-                unset($transition->state->previous[$key]);
             }
         }
     }
@@ -184,7 +209,19 @@ class nfa {
     }
 
     public function merge_simple_assertions() {
-        // TODO
+        foreach ($this->states as $keystate=>$curstate) {
+            foreach ($curstate->next as $keynext=>$curnext) {
+                if (is_a($curnext->pregleaf, 'preg_leaf_assert')) {
+                    foreach ($curnext->state->next as $newnext) {
+                        $this->states[$keystate]->append_transition($newnext, $curnext->pregleaf);
+                    }
+                    $this->states[$keystate]->remove_transition($curnext);
+                    if (count($curnext->state->previous) == 0) {
+                        $this->remove_state($curnext->state);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -202,6 +239,10 @@ class nfa {
     public function remove_state(&$state) {
         foreach ($this->states as $key=>$curstate) {
             if ($curstate == $state) {
+                // removing all connections with this state
+                foreach ($curstate->next as $keynext=>$next) {
+                    $this->states[$key]->remove_transition($next);
+                }
                 unset($this->states[$key]);
             }
         }
@@ -228,6 +269,16 @@ class nfa {
     public function update_state_references(&$oldref, &$newref) {
         foreach ($this->states as $curstate) {
             $curstate->update_state_references($oldref, $newref);
+        }
+    }
+    
+    private function tohr_recursive($pregleaf, &$str) {
+        $str = $str . $pregleaf->tohr();
+        foreach ($pregleaf->mergedassertions as $assert) {
+            $str = $str . $assert->tohr();
+            if ($assert->mergedassertions != array()) {
+                tohr_recursive($assert, $str);
+            }
         }
     }
 
@@ -258,7 +309,9 @@ class nfa {
             else
                 foreach ($curstate->next as $curtransition) {
                     $index2 = $curtransition->state->id;
-                    $lab = $curtransition->pregleaf->tohr();
+                    //$lab = $curtransition->pregleaf->tohr();
+                    $lab = "";
+                    $this->tohr_recursive($curtransition->pregleaf, $lab);
                     fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
                 }
         }

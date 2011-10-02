@@ -314,6 +314,7 @@ class nfa_preg_matcher extends preg_matcher {
         $this->automaton = array_pop($stack);
         $this->automaton->append_endeps();
         $this->automaton->replace_eps_transitions();
+        $this->automaton->merge_simple_assertions();
     }
 
 }

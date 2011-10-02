@@ -164,7 +164,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_alt() {
-        $matcher = new nfa_preg_matcher('(ab)|a{1,}|^ab|b{1,2}|(sp)|cd$|');
+        $matcher = new nfa_preg_matcher('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|');
         $matcher->automaton->draw_nfa('C:/dotfile/dotcode.dot', 'C:/dotfile/test_build_alt.jpg');
     }
 
