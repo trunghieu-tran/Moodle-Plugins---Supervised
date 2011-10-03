@@ -42,7 +42,7 @@ class test_cross_from_nfa extends UnitTestCase {
         $question = new question_preg_qtype();
         $en = $question->available_engines();
         foreach ($en as $key=>$value) {
-            if ($key != 'preg_php_matcher'/) {
+            if ($key != 'preg_php_matcher') {
                 $this->engines[] = $key;
             }
         }
