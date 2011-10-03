@@ -33,7 +33,7 @@ class poasassignment_tabbed_page {
         require_login($course, true, $cm);
         $this->include_page($page);
         
-        $PAGE->navbar->add(get_string($this->currentpage, 'poasassignment'));
+        //$PAGE->navbar->add(get_string($this->currentpage, 'poasassignment'));
         
         // Add record to log
         add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&page=$page", $poasassignment->name, $cm->id);
@@ -49,47 +49,41 @@ class poasassignment_tabbed_page {
     
     private function include_page($page) {
         $pagetype = $page . '_page';
-        if(array_key_exists($page, poasassignment_model::$extpages)) {
-            $currentpath = poasassignment_model::$extpages[$page];
-            require_once($currentpath);
-            $this->currentpage = $page;
+        if(!array_key_exists($page, poasassignment_model::$extpages)) {
+			print_error('errorunknownpage','poasassignment');            
         }
-        else {
-            print_error('errorunknownpage','poasassignment');
-        }
+        $currentpath = poasassignment_model::$extpages[$page];
+		require_once($currentpath);
+		$this->currentpage = $page;
     }
 
-    /** Method calls all view-methods in class
+    /** 
+	 * Displays content of the current page, if possible
      */
     function view() {
         global $PAGE;
         $pagetype = $this->currentpage . "_page";
         $model = poasassignment_model::get_instance();
         require_capability('mod/poasassignment:view', $model->get_context());
+		
         // Check available date or students
-        if (time() < $model->get_poasassignment()->availabledate 
-            && !has_capability('mod/poasassignment:managetasks', $model->get_context())) {
-            
-            print_error('thismoduleisntopenedyet', 'poasassignment');
-        }
-        else {
-            $poasassignmentpage = new $pagetype($model->get_cm(), 
-                                                $model->get_poasassignment());
-            $poasassignmentpage->require_ability_to_view();
-            $poasassignmentpage->pre_view();
-            echo $this->get_header($this->currentpage);
-            $poasassignmentpage->view();
-        }
+		if (($error = $model->check_dates()) != null) {
+			print_error($error, 'poasassignment');
+		}
+        // Check abilities and execute page's logic
+		$poasassignmentpage = new $pagetype($model->get_cm(), 
+											$model->get_poasassignment());
+		$poasassignmentpage->require_ability_to_view();
+		$poasassignmentpage->pre_view();
+		// Display header
+		echo $this->get_header($this->currentpage);
+		// Display body
+		$poasassignmentpage->view();
+		// Display footer
         echo $this->get_footer();
     }
 
-    /** Displays general content of the page
-     */
-    function view_body() {
-        
-    }
-
-    /** Dislpays header
+    /** Returns header
      */
     function get_header() {
         global $OUTPUT;
@@ -102,7 +96,7 @@ class poasassignment_tabbed_page {
         return $html;
     }
 
-    /** Dislpays footer
+    /** Returns footer
      */
     function get_footer() {
         global $OUTPUT;

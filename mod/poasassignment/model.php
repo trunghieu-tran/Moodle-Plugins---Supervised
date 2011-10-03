@@ -1314,6 +1314,7 @@ class poasassignment_model {
         grade_update('mod/poasassignment', $this->poasassignment->course, 'mod', 'poasassignment', $this->poasassignment->id, 0, $grade, null);
     }
     static function user_have_active_task($userid, $poasassignmentid) {
+		global $DB;
         if ($DB->record_exists('poasassignment_assignee',
                     array('userid'=>$userid,'poasassignmentid'=>$poasassignmentid))) {
             $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$userid,
@@ -1441,5 +1442,44 @@ class poasassignment_model {
         }
         
     }
+	public function check_dates() {
+		// Проверка параметров, связанных с датой открытия задания
+		if ($this->get_poasassignment()->availabledate != 0) {
+			if (time() < $this->get_poasassignment()->availabledate) {
+				// TODO полный список capability, позволяющий заходить в задание до открытия
+				if (!has_capability('mod/poasassignment:managetasks', $this->get_context())) {
+					// Если у пользователя нет права на просмотр задания до открытия - сообщить
+					// об ошибке
+					return 'thismoduleisntopenedyet';
+				}
+			}
+		}
+		// TODO выполнять только если это студент
+		// Проверка параметров, связанных с датой выбора задания
+		if ($this->get_poasassignment()->choicedate != 0) {
+			if (time() > $this->get_poasassignment()->choicedate) {
+				global $USER;
+				$assignee = $this->get_assignee($USER->id);
+				if ($assignee->taskid == 0) {
+					$taskid = poasassignment_model::get_random_task_id($this->get_available_tasks($USER->id));
+					if ($taskid == -1 ) {
+						print_error('errormodulehavenotasktogiveyou','poasassignment');
+					}
+					$this->bind_task_to_assignee($USER->id, $taskid);
+				}				
+			}
+		}
+	}
+	static function get_random_task_id($tasks) {
+		$tasksarray = array();
+		foreach($tasks as $task) 
+			$tasksarray[] = $task->id;
+		if(count($tasksarray) > 0) {
+			return $tasksarray[rand(0, count($tasksarray) - 1)];
+		}
+		else {
+			return -1;
+		}
+	}
 }
     
