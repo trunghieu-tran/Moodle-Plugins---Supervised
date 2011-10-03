@@ -255,3 +255,4 @@ $string['categoryedit_help'] = 'categoryedit_help';
 $string['about'] = 'More information';
 $string['taskedit'] = 'Task edit';
 $string['taskedit_help'] = 'Task edit help';
+$string['errormodulehavenotasktogiveyou'] = 'Module have no available tasks for you. Inform your teacher';

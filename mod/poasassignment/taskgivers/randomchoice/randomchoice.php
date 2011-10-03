@@ -19,13 +19,14 @@ class randomchoice extends taskgiver {
         if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id))) {
             $model = poasassignment_model::get_instance();
             $tasks = $model->get_available_tasks($USER->id);
-            $tasksarray = array();
-            foreach($tasks as $task) 
-                $tasksarray[] = $task->id;
-            if(count($tasksarray) > 0) {
-                $taskid = $tasksarray[rand(0, count($tasksarray) - 1)];
+			$taskid = poasassignment_model::get_random_task_id($tasks);
+            //$tasksarray = array();
+            //foreach($tasks as $task) 
+            //    $tasksarray[] = $task->id;
+            if($taskid > -1) {
+                //$taskid = $tasksarray[rand(0, count($tasksarray) - 1)];
                 $poasmodel = poasassignment_model::get_instance($poasassignment);
-                $poasmodel->bind_task_to_assignee($USER->id,$taskid);
+                $poasmodel->bind_task_to_assignee($USER->id, $taskid);
                 redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
             }
             else {
