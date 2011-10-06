@@ -55,8 +55,6 @@ class nfa_state
 
     public $next = array();                 // an array of objects of nfa_transition
 
-    public $previous = array();             // an array of objects of nfa_transition
-
     public $id;                             // id of the state, debug variable
 
     /**
@@ -83,7 +81,6 @@ class nfa_state
         }
         if (!$exists) {
             array_push($this->next, $transition_copy);
-            array_push($transition->state->previous, new nfa_transition($transition->pregleaf, $this, $transition->loops));
         }
         return !$exists;
     }
@@ -95,12 +92,6 @@ class nfa_state
     public function remove_transition(&$transition) {
         foreach($this->next as $key=>$curnext) {
             if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
-                // delete an element from $curnext->state->previous
-                foreach ($curnext->state->previous as $keyprev=>$curprev) {
-                    if ($curprev->pregleaf == $transition->pregleaf && $curprev->state === $this) {
-                        unset($curnext->state->previous[$keyprev]);
-                    }
-                }
                 unset($this->next[$key]);
             }
         }
@@ -115,11 +106,6 @@ class nfa_state
         foreach($this->next as $curnext) {
             if ($curnext->state == $oldref) {
                 $curnext->state = $newref;
-            }
-        }
-        foreach($this->previous as $curprev) {
-            if ($curprev->state == $oldref) {
-                $curprev->state = $newref;
             }
         }
     }
@@ -216,10 +202,45 @@ class nfa {
                         $this->states[$keystate]->append_transition($newnext, $curnext->pregleaf);
                     }
                     $this->states[$keystate]->remove_transition($curnext);
-                    if (count($curnext->state->previous) == 0) {
-                        $this->remove_state($curnext->state);
+                }
+            }
+        }
+    }
+    
+    /**
+     * there are unreachable states after merging simple assertions. this function deletes them
+     */
+    public function delete_unreachable_states() {
+        $curstates = array();    // states which the automaton is in
+        $reachedstates = array();
+        array_push($curstates, $this->startstate);
+        // detecting reachable states
+        while (count($curstates) != 0) {
+            $newstates = array();
+            while (count($curstates) != 0) {
+                $currentstate = array_pop($curstates);
+                array_push($reachedstates, $currentstate);
+                foreach ($currentstate->next as $next) {
+                    if (!$next->loops) {
+                        array_push($newstates, $next->state);
                     }
                 }
+            }
+            foreach ($newstates as $state) {
+                array_push($curstates, $state);
+            }
+            $newstates = array();
+        }
+        // deleting unreachable states
+        foreach ($this->states as $state) {
+            $found = false;
+            foreach ($reachedstates as $reached) {
+                if ($reached === $state) {
+                    $found = true;
+                }
+            }
+            if (!$found) {
+                $this->remove_state($state);
             }
         }
     }
@@ -238,7 +259,7 @@ class nfa {
      */
     public function remove_state(&$state) {
         foreach ($this->states as $key=>$curstate) {
-            if ($curstate == $state) {
+            if ($curstate === $state) {
                 // removing all connections with this state
                 foreach ($curstate->next as $keynext=>$next) {
                     $this->states[$key]->remove_transition($next);
@@ -272,6 +293,11 @@ class nfa {
         }
     }
     
+    /**
+    * debug function for generating human-readable leafs including merged assertions
+    * @param pregleaf - object of preg_leaf_...
+    * @param str - a string for storing the result
+    */
     private function tohr_recursive($pregleaf, &$str) {
         $str = $str . $pregleaf->tohr();
         foreach ($pregleaf->mergedassertions as $assert) {
@@ -309,7 +335,6 @@ class nfa {
             else
                 foreach ($curstate->next as $curtransition) {
                     $index2 = $curtransition->state->id;
-                    //$lab = $curtransition->pregleaf->tohr();
                     $lab = "";
                     $this->tohr_recursive($curtransition->pregleaf, $lab);
                     fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
@@ -549,7 +574,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
         for ($i = 0; $i < $rightborder; $i++) {
-            $this->operands[0]->create_automaton(&$stackofautomatons, ($i == $rightborder - 1));
+            $this->operands[0]->create_automaton(&$stackofautomatons);
         }
         $res = null;        // the resulting automaton
         $endstate = null;   // the end state, required if $leftborder != $rightborder
