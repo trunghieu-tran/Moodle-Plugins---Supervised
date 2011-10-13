@@ -42,6 +42,9 @@ class view_page extends abstract_page {
      *  mode is activate.
      */
     function view_status() {
+		if (!has_capability('mod/poasassignment:havetask', $this->context)) {
+			return;
+		}
         global $DB,$USER,$OUTPUT;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         // If individual tasks mode is active
@@ -121,11 +124,17 @@ class view_page extends abstract_page {
             }
             if (!empty($this->poasassignment->choicedate)) {
                 echo '<tr><td align="right"><b>'.get_string('selectbefore','poasassignment').'</b>:</td>';
-                echo '    <td class="c1">'.userdate($this->poasassignment->choicedate).'</td></tr>';
+                echo '<td class="c1">' 
+						. userdate($this->poasassignment->choicedate)
+						. ' ('
+						. format_time(time() - $this->poasassignment->choicedate).')</td></tr>';
             }
             if (!empty($this->poasassignment->deadline)) {
                 echo '<tr><td align="right"><b>'.get_string('deadline','poasassignment').'</b>:</td>';
-                echo '    <td class="c1">'.userdate($this->poasassignment->deadline).'</td></tr>';        
+				echo '<td class="c1">' 
+						. userdate($this->poasassignment->deadline)
+						. ' ('
+						. format_time(time() - $this->poasassignment->deadline).')</td></tr>';				
             }
             echo '</table>';
             echo $OUTPUT->box_end();
