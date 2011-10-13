@@ -54,7 +54,7 @@ class submissions_page extends abstract_page {
         groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
         $context=get_context_instance(CONTEXT_MODULE,$this->cm->id);
         /// Get all ppl that are allowed to submit assignments
-        if ($usersid = get_enrolled_users($context, 'mod/poasassignment:view', $currentgroup, 'u.id')) {
+        if ($usersid = get_enrolled_users($context, 'mod/poasassignment:havetask', $currentgroup, 'u.id')) {
             $usersid = array_keys($usersid);
         }
         
