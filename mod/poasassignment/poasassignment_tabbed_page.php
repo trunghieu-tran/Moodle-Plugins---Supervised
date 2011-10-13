@@ -64,6 +64,8 @@ class poasassignment_tabbed_page {
         global $PAGE;
         $pagetype = $this->currentpage . "_page";
         $model = poasassignment_model::get_instance();
+		
+		// ѕроверка стандартной capability на просмотр модул€
         require_capability('mod/poasassignment:view', $model->get_context());
 		
         // Check available date or students
