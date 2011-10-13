@@ -159,3 +159,4 @@ $string['timetochoosetask'] = 'Осталось времени чтобы выб
 $string['gototasskpage'] = 'Перейти к выбору задания';
 $string['erroryouhadtochoosetask'] = 'К этому сроку вы должны были выбрать задание';
 $string['errormodulehavenotasktogiveyou'] = 'К этому сроку вы должны были выбрать задание. Модуль должен был выдать вам случайное задание, но у него нет доступных вариантов';
+$string['ago'] = 'тому назад';
