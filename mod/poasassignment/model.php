@@ -1454,18 +1454,27 @@ class poasassignment_model {
 				}
 			}
 		}
-		// TODO выполнять только если это студент
 		// Проверка параметров, связанных с датой выбора задания
-		if ($this->get_poasassignment()->choicedate != 0) {
+		if (has_capability('mod/poasassignment:havetask', $this->get_context()) 
+			&& $this->get_poasassignment()->choicedate != 0) {
 			if (time() > $this->get_poasassignment()->choicedate) {
 				global $USER;
 				$assignee = $this->get_assignee($USER->id);
+				// Если у студента нет задания
 				if ($assignee->taskid == 0) {
-					$taskid = poasassignment_model::get_random_task_id($this->get_available_tasks($USER->id));
-					if ($taskid == -1 ) {
-						print_error('errormodulehavenotasktogiveyou','poasassignment');
+					// Если требуется выдать случайное
+					if ($this->has_flag(RANDOM_TASKS_AFTER_CHOICEDATE)) {
+						// Попробовать выдать задание
+						$taskid = poasassignment_model::get_random_task_id($this->get_available_tasks($USER->id));
+						if ($taskid == -1 ) {
+							return 'errormodulehavenotasktogiveyou';
+						}
+						$this->bind_task_to_assignee($USER->id, $taskid);
 					}
-					$this->bind_task_to_assignee($USER->id, $taskid);
+					else {
+						// Вернуть ошибку
+						return 'erroryouhadtochoosetask';
+					}
 				}				
 			}
 		}
