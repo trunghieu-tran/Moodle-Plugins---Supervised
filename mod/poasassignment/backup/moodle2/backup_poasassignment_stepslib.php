@@ -95,11 +95,12 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         
         $task->add_child($nonrandomtaskvalues);
         $nonrandomtaskvalues->add_child($nonrandomtaskvalue);
-        
+       /* 
         if($userinfo)
             echo 'userinfoyes';
         else
             echo 'userinfono';
+			*/
         //userinfo
         
         $poasassignment->add_child($assignees);

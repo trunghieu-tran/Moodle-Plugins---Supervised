@@ -8,7 +8,7 @@ class submission_page extends abstract_page {
     function __construct() {
     }
     function get_cap() {
-        return 'mod/poasassignment:submit';
+        return 'mod/poasassignment:havetask';
     }
     function has_satisfying_parameters() {
         // TODO
