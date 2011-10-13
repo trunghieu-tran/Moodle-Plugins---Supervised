@@ -257,3 +257,4 @@ $string['taskedit'] = 'Task edit';
 $string['taskedit_help'] = 'Task edit help';
 $string['errormodulehavenotasktogiveyou'] = 'You had to choose task. Module tried to give you random task, but have no available tasks';
 $string['erroryouhadtochoosetask'] = 'You had to choose task';
+$string['ago'] = 'ago';

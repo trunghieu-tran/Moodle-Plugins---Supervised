@@ -1490,5 +1490,13 @@ class poasassignment_model {
 			return -1;
 		}
 	}
+	
+	public static function time_difference($time) {
+		$result = format_time(time() - $time);
+		if (time() > $time) {
+			$result .= ' ' . get_string('ago','poasassignment');
+		}
+		return $result;
+	}
 }
     

@@ -89,7 +89,7 @@ class view_page extends abstract_page {
                 echo get_string('youhavenotask', 'poasassignment');
                 $taskspageurl = new moodle_url('view.php', array('id'=>$this->cm->id, 'page'=>'tasks'));
                 echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
-                if(!empty($this->poasassignment->choicedate)) {
+                if(!empty($this->poasassignment->choicedate) && time() < $this->poasassignment->choicedate) {
                     echo '<br><br>';
                     echo '<b>' . 
                         get_string('timetochoosetask', 'poasassignment') . 
@@ -124,23 +124,28 @@ class view_page extends abstract_page {
             }
             if (!empty($this->poasassignment->choicedate)) {
                 echo '<tr><td align="right"><b>'.get_string('selectbefore','poasassignment').'</b>:</td>';
+				//$extra = format_time(time() - $this->poasassignment->choicedate);
+				//if (time() > $this->poasassignment->choicedate) {
+				//	$extra .= ' ' . get_string('ago','poasassignment');
+				//}
                 echo '<td class="c1">' 
 						. userdate($this->poasassignment->choicedate)
 						. ' ('
-						. format_time(time() - $this->poasassignment->choicedate).')</td></tr>';
+						. poasassignment_model::time_difference($this->poasassignment->choicedate)
+						.')</td></tr>';
             }
             if (!empty($this->poasassignment->deadline)) {
                 echo '<tr><td align="right"><b>'.get_string('deadline','poasassignment').'</b>:</td>';
 				echo '<td class="c1">' 
 						. userdate($this->poasassignment->deadline)
 						. ' ('
-						. format_time(time() - $this->poasassignment->deadline).')</td></tr>';				
+						. poasassignment_model::time_difference($this->poasassignment->deadline)
+						. ')</td></tr>';				
             }
             echo '</table>';
             echo $OUTPUT->box_end();
         }
     }
-
     function view_feedback_optimized() {
         global $OUTPUT,$DB,$USER;
         if($assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
