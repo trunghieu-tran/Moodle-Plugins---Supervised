@@ -1084,8 +1084,8 @@ class poasassignment_model {
         $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         $notchecked=0;
         $count=0;
-        /// Get all ppl that are allowed to submit assignments
-        if ($usersid = get_enrolled_users($context, 'mod/assignment:view', $currentgroup, 'u.id')) {
+		
+        if ($usersid = get_enrolled_users($context, 'mod/poasassignment:havetask', $currentgroup, 'u.id')) {
             $usersid = array_keys($usersid);
             $count=count($usersid);
             foreach ($usersid as $userid) {
