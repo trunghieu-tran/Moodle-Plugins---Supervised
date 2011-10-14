@@ -86,11 +86,8 @@ class tasks_page extends abstract_page {
         $table->define_headers($headers);
         $table->collapsible(true);
         $table->initialbars(true);
-        // $table->column_class('taskfieldname', 'name');
-        $table->set_attribute('class', 'tasksfields');
-        $table->set_attribute('border', '1');
-        $table->set_attribute('width', '100%');
-        
+        $table->set_attribute('class', 'poasassignment-table');
+        		
         $table->setup();
         // Show all tasks if we can manage tasks
         if(has_capability('mod/poasassignment:managetasks',

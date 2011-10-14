@@ -24,7 +24,18 @@ class taskedit_page extends abstract_page {
         return true;
     }
     function pre_view() {
-        global $DB;
+        global $DB, $PAGE;
+		$id = poasassignment_model::get_instance()->get_cm()->id;
+		// add navigation nodes
+		$tasks = new moodle_url('view.php', array('id' => $id,
+														'page' => 'tasks'));
+		$PAGE->navbar->add(get_string('tasks','poasassignment'), $tasks);
+		
+		$taskedit = new moodle_url('view.php', array('id' => $id,
+														  'page' => 'taskedit',
+														  'taskid' => $this->taskid));
+		$PAGE->navbar->add(get_string('taskedit','poasassignment'), $taskedit);
+		
         $model = poasassignment_model::get_instance();
         if ($this->mode == SHOW_MODE || $this->mode == HIDE_MODE) {
             if (isset($this->taskid) && $this->taskid > 0) {

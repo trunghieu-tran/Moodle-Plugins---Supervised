@@ -61,9 +61,9 @@ class tasksfields_page extends abstract_page {
         $table->collapsible(true);
         $table->initialbars(true);
         $table->column_class('taskfieldname', 'name');
-        $table->set_attribute('class', 'tasksfields');
-        $table->set_attribute('border', '1');
-        $table->set_attribute('width', '100%');
+        $table->set_attribute('class', 'poasassignment-table');
+        //$table->set_attribute('border', '1');
+        //$table->set_attribute('width', '100%');
         
 		$table->sortable(true, 'lastname');
 		$table->no_sorting('range');
