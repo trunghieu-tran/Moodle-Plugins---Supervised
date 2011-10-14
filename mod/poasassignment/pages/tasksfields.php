@@ -27,7 +27,9 @@ class tasksfields_page extends abstract_page {
         $id = $this->cm->id;
 		$this->view_controls($id);
 		
+		echo '<div id="poasassignment-taskfields">';
         $count = $this->view_table();
+		echo '</div>';
 		if ($count > 4) {
 			$this->view_controls($id);
 		}
@@ -114,8 +116,7 @@ class tasksfields_page extends abstract_page {
                     $field->random == 1 ? get_string('yes') : get_string('no'),
                     $range);
             $table->add_data($row);
-        }       
-
+        }       		
         $table->print_html();
 		return count($fields);
     }
