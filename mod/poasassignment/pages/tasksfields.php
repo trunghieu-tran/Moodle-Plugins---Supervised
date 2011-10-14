@@ -24,19 +24,24 @@ class tasksfields_page extends abstract_page {
     }
         
     function view() {
-        global $OUTPUT;
-        
-        $this->view_table();
-        
         $id = $this->cm->id;
-        echo '<div align="center">';
+		$this->view_controls($id);
+		
+        $count = $this->view_table();
+		if ($count > 4) {
+			$this->view_controls($id);
+		}
+        
+    }
+    private function view_controls($id) {		
+        global $OUTPUT;
+		echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskfieldedit')), 
                                     get_string('addtaskfield','poasassignment'));
-        echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'categoryedit')), 
-                                    get_string('addcategoryfield','poasassignment'));
+        /*echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'categoryedit')), 
+                                    get_string('addcategoryfield','poasassignment'));*/
         echo '</div>';
-    }
-    
+	}
     private function view_table() {   
         global $DB, $OUTPUT, $PAGE;
         $poasmodel = poasassignment_model::get_instance();
@@ -58,9 +63,17 @@ class tasksfields_page extends abstract_page {
         $table->set_attribute('border', '1');
         $table->set_attribute('width', '100%');
         
+		$table->sortable(true, 'lastname');
+		$table->no_sorting('range');
         $table->setup();
-        
-        $fields = $DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
+		
+        if ($table->get_sql_sort()) {
+			$sort = $table->get_sql_sort();
+        }
+		else {			
+			$sort = '';
+		}
+        $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid'=>$this->poasassignment->id), $sort);
         foreach($fields as $field) {
         
             $updateurl = new moodle_url('view.php',
@@ -101,9 +114,9 @@ class tasksfields_page extends abstract_page {
                     $field->random == 1 ? get_string('yes') : get_string('no'),
                     $range);
             $table->add_data($row);
-        }
-        
+        }       
 
         $table->print_html();
+		return count($fields);
     }
 }
