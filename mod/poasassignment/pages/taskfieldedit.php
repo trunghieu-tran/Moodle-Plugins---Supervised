@@ -32,6 +32,19 @@ class taskfieldedit_page extends abstract_page {
         return true;
     }
     public function pre_view() {
+		
+		global $PAGE;
+		$id = poasassignment_model::get_instance()->get_cm()->id;
+		// add navigation nodes
+		$tasksfields = new moodle_url('view.php', array('id' => $id,
+														'page' => 'tasksfields'));
+		$PAGE->navbar->add(get_string('tasksfields','poasassignment'), $tasksfields);
+		
+		$taskfieldedit = new moodle_url('view.php', array('id' => $id,
+														  'page' => 'taskfieldedit',
+														  'fieldid' => $this->fieldid));
+		$PAGE->navbar->add(get_string('taskfieldedit','poasassignment'), $taskfieldedit);
+		
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
         $this->mform = new taskfieldedit_form(null, array('id' => $model->get_cm()->id,
@@ -60,6 +73,7 @@ class taskfieldedit_page extends abstract_page {
     }
     function view() {
         global $DB, $OUTPUT, $USER;
+		
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
         if ($this->fieldid > 0) {
