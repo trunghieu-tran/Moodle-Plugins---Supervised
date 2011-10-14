@@ -9,6 +9,7 @@ class taskview_page extends abstract_page {
     function __construct() {
         global $DB;
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
+		$this->from = optional_param('from', 'tasks', PARAM_TEXT);
     }
     
     function has_satisfying_parameters() {
@@ -19,6 +20,19 @@ class taskview_page extends abstract_page {
         }
         return true;
     }
+	function pre_view() {
+		// add navigation nodes
+		global $PAGE;
+		$id = poasassignment_model::get_instance()->get_cm()->id;
+		$tasks = new moodle_url('view.php', array('id' => $id,
+												  'page' => 'tasks'));
+		$PAGE->navbar->add(get_string('tasks','poasassignment'), $tasks);
+		
+		$taskview = new moodle_url('view.php', array('id' => $id,
+													 'page' => 'taskview',
+													 'taskid' => $this->taskid));
+		$PAGE->navbar->add(get_string('taskview','poasassignment'). ' ' . $this->task->name, $taskview);
+	}
     function view() {
         global $DB, $OUTPUT, $USER;
         $model = poasassignment_model::get_instance();
@@ -102,6 +116,12 @@ class taskview_page extends abstract_page {
         }
         $html .= '</table>';
         $html .= $OUTPUT->box_end();
+		// Add back button
+		$id = poasassignment_model::get_instance()->get_cm()->id;
+		if ($this->from ==='view' || $this->from === 'tasks') {
+			$html .= $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>$this->from)), 
+											get_string('backto'.$this->from,'poasassignment'),'get');
+		}
         echo $html;
     }
     public static function display_in_navbar() {

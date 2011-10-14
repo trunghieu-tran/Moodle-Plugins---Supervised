@@ -60,7 +60,13 @@ class view_page extends abstract_page {
                     echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
                     // Show link to the task
-                    $taskurl = new moodle_url('view.php', array('page' => 'taskview', 'taskid'=>$assignee->taskid, 'id'=>$this->cm->id), 'v', 'get');
+                    $taskurl = new moodle_url('view.php', 
+											  array('page' => 'taskview', 
+													'taskid' => $assignee->taskid, 
+													'id' => $this->cm->id,
+													'from' => 'view'), 
+											  'v', 
+											  'get');
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
 

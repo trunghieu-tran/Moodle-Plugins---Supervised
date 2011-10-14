@@ -166,3 +166,5 @@ $string['addtaskfield'] = 'Добавить новое поле';
 $string['range'] = 'Диапазон';
 $string['taskfielddescription'] = 'Описание поля';
 $string['deletefieldconfirmation'] = 'Вы уверены что хотите удалить это поле?';
+$string['backtotasks'] = 'Обратно к заданиям';
+$string['backtoview'] = 'Обратно к главной странице';
