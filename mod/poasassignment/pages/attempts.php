@@ -28,7 +28,7 @@ class attempts_page extends abstract_page {
                                                     'poasassignmentid' => $poasassignmentid));
         }
         // Page exists always for teachers
-        if (has_capability('mod/poasassignment:grade', $context)) {
+        if (has_capability('mod/poasassignment:grade', $context) || has_capability('mod/poasassignment:finalgrades', $context)) {
             return true;
         }
         // Page exists, if assignee has attempts
@@ -36,7 +36,13 @@ class attempts_page extends abstract_page {
             // Page content is available if assignee wants to see his own attempts
             // or teacher wants to see them
             if($this->assignee->userid == $USER->id) {
-                return true;
+				if (has_capability('mod/poasassignment:viewownsubmission', $context)) {
+					return true;
+				}
+				else {
+					$this->lasterror = 'errorviewownsubmissioncap';
+					return false;
+				}
             }
             else {
                 $this->lasterror = 'erroranothersattempts';

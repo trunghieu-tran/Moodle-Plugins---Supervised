@@ -260,3 +260,4 @@ $string['erroryouhadtochoosetask'] = 'You had to choose task';
 $string['ago'] = 'ago';
 $string['backtotasks'] = 'Back to tasks';
 $string['backtoview'] = 'Back to view';
+$string ['errorviewownsubmissioncap'] = 'You can\'t see your own submissions';
