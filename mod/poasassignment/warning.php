@@ -74,15 +74,16 @@ switch ($action) {
         echo $OUTPUT->heading($poasassignment->name);
         echo $OUTPUT->box_start();
         echo get_string('deletefieldconfirmation','poasassignment');
-        echo ' -'.$field->name;
+        echo '<br>- ' . $field->name;
         echo $OUTPUT->box_end();
-        echo '<div align="center">';
-        echo $OUTPUT->single_button(new moodle_url('warning.php',
+        echo '<div align="center" class="buttons">';
+        $yesbutton =  $OUTPUT->single_button(new moodle_url('warning.php',
                                     array('id'=>$id,'fieldid'=>$fieldid,'action'=>'deletefieldconfirmed')), 
                                     get_string('yes'),
                                     'post');                
-        echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>'tasksfields')), get_string('no'),'get');
+        $nobutton =  $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>'tasksfields')), get_string('no'),'get');
         echo '</div>';
+		echo '<table align="center"><tr><td>'.$yesbutton.'</td><td>'.$nobutton.'</td></tr></table>';
         echo $OUTPUT->footer();    
         break;
     case 'deletefieldconfirmed':
