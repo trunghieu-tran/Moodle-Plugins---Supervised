@@ -65,6 +65,7 @@ $string['criterionname'] = 'Название критерия';
 $string['criterionweight'] = 'Вес критерия';
 $string['criterionsource'] = 'Источник оценки';
 $string['criterionmanual'] = 'Вручную';
+$string['taskfieldedit'] = 'Редактирование поля';
 $string['gradesfields'] = "Поля таблицы оцени";
 $string['secretfield'] = 'Поле скрыто от студентов';
 $string['random'] = 'Случайное поле';
