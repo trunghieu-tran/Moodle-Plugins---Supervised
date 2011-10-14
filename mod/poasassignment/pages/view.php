@@ -116,18 +116,14 @@ class view_page extends abstract_page {
     function view_dates() {
         global $OUTPUT;
         if (!empty($this->poasassignment->availabledate) && !empty($this->poasassignment->choicedate) && !empty($this->poasassignment->deadline)) {
-            echo $OUTPUT->box_start();
+            echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
             echo '<table>';
             if (!empty($this->poasassignment->availabledate)) {
-                echo '<tr><td align="right"><b>'.get_string('availablefrom','poasassignment').'</b>:</td>';
+                echo '<tr><td class="c0">'.get_string('availablefrom','poasassignment').':</td>';
                 echo '    <td class="c1">'.userdate($this->poasassignment->availabledate).'</td></tr>';
             }
             if (!empty($this->poasassignment->choicedate)) {
-                echo '<tr><td align="right"><b>'.get_string('selectbefore','poasassignment').'</b>:</td>';
-				//$extra = format_time(time() - $this->poasassignment->choicedate);
-				//if (time() > $this->poasassignment->choicedate) {
-				//	$extra .= ' ' . get_string('ago','poasassignment');
-				//}
+                echo '<tr><td class="c0">'.get_string('selectbefore','poasassignment').':</td>';
                 echo '<td class="c1">' 
 						. userdate($this->poasassignment->choicedate)
 						. ' ('
@@ -135,7 +131,7 @@ class view_page extends abstract_page {
 						.')</td></tr>';
             }
             if (!empty($this->poasassignment->deadline)) {
-                echo '<tr><td align="right"><b>'.get_string('deadline','poasassignment').'</b>:</td>';
+                echo '<tr><td class="c0">'.get_string('deadline','poasassignment').':</td>';
 				echo '<td class="c1">' 
 						. userdate($this->poasassignment->deadline)
 						. ' ('
