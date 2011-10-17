@@ -1193,6 +1193,7 @@ class poasassignment_model {
                     $html .= $OUTPUT->box_start();
                     $html .= $criterion->name.'<br>';
                     if ($attempt->draft==0) {
+						//$poasmodel->help_icon($field->description)
                         if (has_capability('mod/poasassignment:seecriteriondescription',$context))
                             $html .= $criterion->description.'<br>';
                         $html .= $ratingvalue->value.'/100<br>';
