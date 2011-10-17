@@ -221,6 +221,10 @@ class view_page extends abstract_page {
         
     }
     function view_answer_block() {
+		$poasmodel=poasassignment_model::get_instance();
+		if (!has_capability('mod/poasassignment:havetask', $poasmodel->get_context())) {
+			return;
+		}
 		require_once('attempts.php');
         global $OUTPUT,$DB,$USER;
         $poasmodel=poasassignment_model::get_instance();

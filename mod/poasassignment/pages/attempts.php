@@ -92,7 +92,6 @@ class attempts_page extends abstract_page {
                                                                 get_string('disablepenalty','poasassignment'));
                     }
                 }
-                //echo $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$poasmodel->get_context());
 				$canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
 				attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
                 echo $OUTPUT->box_end();
