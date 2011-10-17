@@ -10,7 +10,6 @@ class qtype_gradertest_renderer extends qtype_renderer {
 		
 		global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/form/filemanager.php');
-		//print_r($options);
 		$options = array('subdirs' => 1, 
 						 'accepted_types' => '*', 
 						 'return_types' => FILE_INTERNAL);
