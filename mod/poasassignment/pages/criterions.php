@@ -9,9 +9,10 @@ class criterions_page extends abstract_page {
     function criterions_page() {        
     }
     
-    function get_cap() {
+    /*function get_cap() {
         return 'mod/poasassignment:managecriterions';
     }
+	*/
     public function pre_view() {        
         $poasmodel = poasassignment_model::get_instance();
         $id = $poasmodel->get_cm()->id;
@@ -26,11 +27,51 @@ class criterions_page extends abstract_page {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $id = $poasmodel->get_cm()->id;
+		$context = $poasmodel->get_context();
         //$mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
-        $this->mform->set_data($poasmodel->get_criterions_data());
-        //$this->mform->set_data(array('id' => $id));        
-        $this->mform->display();
+		if (has_capability('mod/poasassignment:managecriterions', $context)) {
+			$this->mform->set_data($poasmodel->get_criterions_data());
+			//$this->mform->set_data(array('id' => $id));        
+			$this->mform->display();
+		}
+		else {
+			$this->show_read_only_criterions();
+		}
+        
     }
+	private function show_read_only_criterions() {
+		global $OUTPUT, $DB;
+		$poasmodel = poasassignment_model::get_instance();
+		$criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' =>$poasmodel->poasassignment->id));
+		$weightsum = 0;
+		foreach($criterions as $criterion) {
+            $weightsum += $criterion->weight;
+		}
+		$canseedescription = has_capability('mod/poasassignment:seecriteriondescription', 
+											$poasmodel->get_context());
+		foreach ($criterions as $criterion) {
+			echo '<table class="poasassignment-table">';
+			
+			echo '<tr>';
+			echo '<td class = "header">' . get_string('criterionname', 'poasassignment') . '</td>';
+			echo '<td>' . $criterion->name . '</td>';
+			echo '</tr>';
+			if ($canseedescription) {
+				echo '<tr>';
+				echo '<td class = "header">' . get_string('criteriondescription', 'poasassignment') . '</td>';
+				echo '<td>' . $criterion->description . '</td>';
+				echo '</tr>';
+			}
+			
+			echo '<tr>';
+			echo '<td class = "header">' . get_string('criterionweight', 'poasassignment') . '</td>';
+			echo '<td>' . round($criterion->weight / $weightsum, 2) . '</td>';
+			echo '</tr>';
+			
+			echo '</table>';
+			echo '<br>';
+		}
+	}
 }
 class criterionsedit_form extends moodleform {
     function definition(){
@@ -41,7 +82,7 @@ class criterionsedit_form extends moodleform {
         $repeatarray = array();
         $repeatarray[] = &MoodleQuickForm::createElement('header', 'criterionheader');
         $repeatarray[] = &MoodleQuickForm::createElement('text', 'name', get_string('criterionname','poasassignment'),array('size'=>45));
-        $repeatarray[] = $mform->createElement('htmleditor', 'description', get_string('criteriondescription','poasassignment'));
+        $repeatarray[] = $mform->createElement('textarea', 'description', get_string('criteriondescription','poasassignment'));
         $repeatarray[] = &MoodleQuickForm::createElement('text', 'weight', get_string('criterionweight','poasassignment'));
         $sources[0] = 'manually';
         //TODO cash used graders in model class
