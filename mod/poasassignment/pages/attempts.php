@@ -66,7 +66,7 @@ class attempts_page extends abstract_page {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $poasassignmentid = $poasmodel->get_poasassignment()->id;
-        $html = '';
+        //$html = '';
         $this->view_assignee_block();
         // teacher has access to the page even if he has no task or attempts
         if(isset($this->assignee->id)) {
@@ -77,35 +77,66 @@ class attempts_page extends abstract_page {
             $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid'=>$poasassignmentid));
             $latestattempt = $DB->get_record('poasassignment_attempts', array('id'=>$this->assignee->lastattemptid));
             $attemptscount = count($attempts);  
-            foreach($attempts as $attempt) {    
-                $html .= $OUTPUT->box_start();
-                $html .= $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
+            foreach($attempts as $attempt) {
+				attempts_page::show_attempt($attempt);
+                //echo $OUTPUT->box_start();
+                //echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
                 
-                // show attempt's submission
+                /*// show attempt's submission
                 foreach($plugins as $plugin) {
                     require_once($plugin->path);
                     $poasassignmentplugin = new $plugin->name();
-                    $html .= $poasassignmentplugin->show_assignee_answer($this->assignee->id,$poasassignmentid,1,$attempt->id);
+                    echo $poasassignmentplugin->show_assignee_answer($this->assignee->id,$poasassignmentid,1,$attempt->id);
                 }
+				*/
                 // show disablepenalty/enablepenalty button
                 if(has_capability('mod/poasassignment:grade',$poasmodel->get_context())) {
                     $cmid = $poasmodel->get_cm()->id;
                     if(isset($attempt->disablepenalty) && $attempt->disablepenalty==1) {
-                        $html .= $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=enablepenalty&attemptid='.$attempt->id), 
+                        echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=enablepenalty&attemptid='.$attempt->id), 
                                                                 get_string('enablepenalty','poasassignment'));
                     }
                     else {
-                        $html .= $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=disablepenalty&attemptid='.$attempt->id), 
+                        echo $OUTPUT->single_button(new moodle_url('warning.php?id='.$cmid.'&action=disablepenalty&attemptid='.$attempt->id), 
                                                                 get_string('disablepenalty','poasassignment'));
                     }
                 }
-                $html .= $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$poasmodel->get_context());
-                $html .= $OUTPUT->box_end();
+                echo $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$poasmodel->get_context());
+                //echo $OUTPUT->box_end();
             }
         }
-        echo $html;
     }
     public static function use_echo() {
         return false;
     }
+	public static function show_attempt($attempt, $showcontent = true) {
+		echo '<table class="poasassignment-table" width="100%">';
+			
+		$values = array(
+						get_string('attemptnumber','poasassignment') => $attempt->attemptnumber,
+						get_string('attemptdate','poasassignment') => userdate($attempt->attemptdate),
+						//get_string('attempt','poasassignment') => '',
+						get_string('draft', 'poasassignment') => $attempt->draft == 1 ? get_string('yes') : get_string('no'));
+		
+		if ($showcontent) {
+			$poasmodel = poasassignment_model::get_instance();
+			$plugins = $poasmodel->get_plugins();
+			$content = '';
+			foreach($plugins as $plugin) {
+				require_once($plugin->path);
+				$poasassignmentplugin = new $plugin->name();
+				$content .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0);
+			}
+			$values[get_string('attempt','poasassignment')] = $content;
+		}
+		
+		foreach($values as $header => $value) {
+			echo '<tr>';
+			echo '<td class="header">' . $header . '</td>';
+			echo '<td>' . $value . '</td>';
+			echo '</tr>';
+		}
+		
+		echo '</table>';
+	}
 }
