@@ -41,15 +41,9 @@ class question_grader_strategy implements question_grading_strategy {
 	protected $question;
 	public function __construct(qtype_gradertest_question $question) {
         $this->question = $question;
-		$f = fopen('type/gradertest/log.txt', 'a');
-		fputs($f, '__construct ' . date('h:i:s A') . "\n");
-		fclose($f);
     }
 	public function grade(array $response) {
-		$f = fopen('type/gradertest/log.txt', 'a');
-		fputs($f, 'grade ' . date('h:i:s A') . "\n");
-		fclose($f);
-		//print_r($response);
+		print_r($response);
 		$answer->fraction = 0.8;
 		$answer->feedback = 'excellent';
 		$answer->answer = 'answer';
@@ -58,9 +52,6 @@ class question_grader_strategy implements question_grading_strategy {
 	}
 
     public function get_correct_answer() {
-		$f = fopen('type/gradertest/log.txt', 'a');
-		fputs($f, 'get_correct_answer ' . date('h:i:s A') . "\n");
-		fclose($f);
 		$answer = new stdClass();
 		$answer->fraction = 1.0;
 		$answer->feedback = 'excellent';
