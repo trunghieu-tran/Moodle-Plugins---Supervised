@@ -6,10 +6,13 @@
 	margin: 1em auto;
 	border: none;
 }
-.poasassignment-table {width:100%}
-.poasassignment-table .header { background: none repeat scroll 0 0 #f6f6f6; border-bottom-width: 2px;}
+/*.poasassignment-table {width:100%}*/
+.poasassignment-table .header { background: none repeat scroll 0 0 #f6f6f6; font-weight:bold;}
 .poasassignment-table .header,
 .poasassignment-table td{border: 1px solid #ddd;}
+#citerions-table td {border: 1px solid #ddd;}
+#criterions-table .c0 {text-align:right; font-weight:bold; background: #f6f6f6;}
+
 /*.buttons .singlebutton{}
 #page-mod-poasassignment-view .header { background: none repeat scroll 0 0 #f6f6f6; border-bottom-width: 2px; }
 #page-mod-poasassignment-view th {font-weight: normal;}*/
