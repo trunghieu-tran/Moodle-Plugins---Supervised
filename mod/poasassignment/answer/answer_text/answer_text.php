@@ -64,8 +64,8 @@ class answer_text extends poasassignment_answer {
                 $value = $submission->value;
                 $value = str_replace('<', '&lt;', $value);
                 $value = str_replace('>', '&gt;', $value);
-                $value = str_replace("\n", '<br>', $value);
-                $value = str_replace(' ', '&nbsp', $value);                
+                //$value = str_replace("\n", '<br>', $value);
+                //$value = str_replace(' ', '&nbsp', $value);                
                 $html.= $value;                
                 
                 if($needbox)
