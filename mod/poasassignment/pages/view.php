@@ -179,19 +179,15 @@ class view_page extends abstract_page {
         // show latest graded feedback
         foreach($attempts as $attempt) {
             if(!$attempt->ratingdate) {
-            //if(!$DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id)))
                 continue;
-            }
-            echo $OUTPUT->box_start();
-            echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
-            echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attempt->attemptnumber.' ('.userdate($attempt->attemptdate).')');
-            // show attempt's submission
-            foreach($plugins as $plugin) {
-                require_once($plugin->path);
-                $poasassignmentplugin = new $plugin->name();
-                echo $poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,1,$attempt->id);
-            }
-            echo $poasmodel->get_feedback($attempt,$latestattempt,$criterions,$this->context);
+            }			
+			echo $OUTPUT->box_start();
+			echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
+			$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
+			attempts_page::show_attempt($attempt, $hascap);
+			//TODO cap view descr
+			$canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
+			attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
             echo $OUTPUT->box_end();
             break;
         }                      
@@ -225,25 +221,20 @@ class view_page extends abstract_page {
         
     }
     function view_answer_block() {
+		require_once('attempts.php');
         global $OUTPUT,$DB,$USER;
         $poasmodel=poasassignment_model::get_instance();
         $plugins=$poasmodel->get_plugins();
         $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
         // if individual tasks mode is active
-        if($this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS) {
+        if($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             if($DB->record_exists('poasassignment_assignee',
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
                 if($attempt=$DB->get_record('poasassignment_attempts',
                             array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount))) {
-                    echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
-                    echo $OUTPUT->heading(get_string('attemptnumber','poasassignment').':'.$attemptscount.' ('.userdate($attempt->attemptdate).')');
-                    // $attemptsurl = new moodle_url('attempts.php',array('id'=>$this->cm->id,'assigneeid'=>$attempt->assigneeid)); 
-                    // echo '<br>'.html_writer::link($attemptsurl,get_string('myattempts','poasassignment'));
-                    foreach($plugins as $plugin) {
-                        require_once($plugin->path);
-                        $poasassignmentplugin = new $plugin->name();
-                        echo $poasassignmentplugin->show_assignee_answer($poasmodel->assignee->id,$this->poasassignment->id);
-                    }
+					$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
+					echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
+					attempts_page::show_attempt($attempt, $hascap);
                     
                     /* If student has several attempts and hasn't final grade */
                     if($this->poasassignment->flags&SEVERAL_ATTEMPTS && $poasmodel->assignee->finalized!=1) {

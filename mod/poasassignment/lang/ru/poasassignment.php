@@ -168,4 +168,6 @@ $string['taskfielddescription'] = 'Описание поля';
 $string['deletefieldconfirmation'] = 'Вы уверены что хотите удалить это поле?';
 $string['backtotasks'] = 'Обратно к заданиям';
 $string['backtoview'] = 'Обратно к главной странице';
-$string ['errorviewownsubmissioncap'] = 'Вам недоступны собственные ответы';
+$string['errorviewownsubmissioncap'] = 'Вам недоступны собственные ответы';
+$string['attemptdate'] = 'Дата попытки';
+$string['attempt'] = 'Попытка';
