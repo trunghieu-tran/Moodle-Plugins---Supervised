@@ -40,15 +40,15 @@ class submissions_page extends abstract_page {
         $table->collapsible(true);
         $table->initialbars(true);
         /* $table->column_suppress('fullname'); */
-        $table->set_attribute('border', '1');
-        $table->set_attribute('width', '100%');
+        //$table->set_attribute('border', '1');
+		$table->set_attribute('class', 'poasassignment-table');
+		$table->set_attribute('width', '100%');
         
         $table->setup();
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
         $plugins=$poasmodel->get_plugins();
         //$plugins=$DB->get_records('poasassignment_answers');
-        
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
         groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
@@ -57,14 +57,11 @@ class submissions_page extends abstract_page {
         if ($usersid = get_enrolled_users($context, 'mod/poasassignment:havetask', $currentgroup, 'u.id')) {
             $usersid = array_keys($usersid);
         }
-        
         $indtasks=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        foreach($usersid as $userid) {
+        foreach($usersid as $userid) {			
             $row = $this->get_row($userid, $this->poasassignment->id, $indtasks, $plugins);
             $table->add_data($row);
         }
-        
-
         $table->print_html();
     }
     private function get_row($userid, $poasassignmentid, $indtasks, $plugins) {
@@ -93,12 +90,15 @@ class submissions_page extends abstract_page {
                 $row[]=get_string('notask','poasassignment');
         }
         $submis='';
-        if($assignee)
+        if($assignee) {
             foreach($plugins as $plugin) {
                 require_once($plugin->path);
                 $poasassignmentplugin = new $plugin->name();
-                $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0).'<br>';                
+                $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);                
             }
+		}
+		//$submis='lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
+		$submis = shorten_text($submis);
         $row[]=$submis;
         if($assignee) {
             $attempts = $DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
