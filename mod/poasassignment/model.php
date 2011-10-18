@@ -1129,17 +1129,18 @@ class poasassignment_model {
     
     function get_penalty($attemptid) {
         global $DB;
-        $currentattempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
-        $attempts=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$currentattempt->assigneeid),'attemptnumber');
-        $realnumber=$currentattempt->attemptnumber;
+        $currentattempt = $DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
+        $attempts = $DB->get_records('poasassignment_attempts',array('assigneeid'=>$currentattempt->assigneeid), 'attemptnumber');
+        $realnumber = $currentattempt->attemptnumber;
         foreach ($attempts as $attempt) {
-            if ($attempt->disablepenalty==1) {
+            if ($attempt->disablepenalty == 1) {
                 $realnumber--;
             }
         }
-        if ($this->poasassignment->penalty*($realnumber-1)>=0)
-            return $this->poasassignment->penalty*($realnumber-1);
-        else return 0;
+        if ($this->poasassignment->penalty * ($realnumber - 1) >= 0)
+            return $this->poasassignment->penalty * ($realnumber - 1);
+        else 
+			return 0;
         return ;
     }
     

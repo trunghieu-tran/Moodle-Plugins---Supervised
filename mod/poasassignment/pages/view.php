@@ -125,11 +125,11 @@ class view_page extends abstract_page {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'dates');
             echo '<table>';
             if (!empty($this->poasassignment->availabledate)) {
-                echo '<tr><td class="c0">'.get_string('availablefrom','poasassignment').':</td>';
+                echo '<tr><td class="c0">'.get_string('availablefrom','poasassignment').'</td>';
                 echo '    <td class="c1">'.userdate($this->poasassignment->availabledate).'</td></tr>';
             }
             if (!empty($this->poasassignment->choicedate)) {
-                echo '<tr><td class="c0">'.get_string('selectbefore','poasassignment').':</td>';
+                echo '<tr><td class="c0">'.get_string('selectbefore','poasassignment').'</td>';
                 echo '<td class="c1">' 
 						. userdate($this->poasassignment->choicedate)
 						. ' ('
@@ -137,7 +137,7 @@ class view_page extends abstract_page {
 						.')</td></tr>';
             }
             if (!empty($this->poasassignment->deadline)) {
-                echo '<tr><td class="c0">'.get_string('deadline','poasassignment').':</td>';
+                echo '<tr><td class="c0">'.get_string('deadline','poasassignment').'</td>';
 				echo '<td class="c1">' 
 						. userdate($this->poasassignment->deadline)
 						. ' ('
@@ -185,7 +185,6 @@ class view_page extends abstract_page {
 			echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
 			$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
 			attempts_page::show_attempt($attempt, $hascap);
-			//TODO cap view descr
 			$canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
 			attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
             echo $OUTPUT->box_end();
