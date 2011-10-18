@@ -128,6 +128,7 @@ class submissions_page extends abstract_page {
         //$row[]='submission date';
         //$row[]='grade date';
         if($assignee) {
+			
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
             if($attempt) {
@@ -135,7 +136,7 @@ class submissions_page extends abstract_page {
 				if (isset($attempt->ratingdate)) {
 					$row[] = userdate($attempt->ratingdate);
 					if (isset($attempt->rating)) {
-						$ratingwithpenalty = $attempt->rating-$poasmodel->get_penalty($attempt->id);
+						$ratingwithpenalty = $attempt->rating - $poasmodel->get_penalty($attempt->id);
 						if($attempt->ratingdate < $attempt->attemptdate)
                             $row[] = $ratingwithpenalty 
 									 . ' (' 
@@ -156,10 +157,33 @@ class submissions_page extends abstract_page {
 					}
 				}
 				else {
-					$row[] = '-';
-					$row[] = get_string('draft','poasassignment') 
+					$lastgraded = $poasmodel->get_last_graded_attempt($assignee->id);
+					if ($lastgraded == null) {	
+						$row[] = '-';
+					}
+					else {
+						$row[] = userdate($lastgraded->ratingdate);
+					}
+					
+					if ($attempt->draft == 1) {
+						$row[] = get_string('draft','poasassignment') 
 								 . ' ' 
 								 . html_writer::link($gradeurl, get_string('leavecomment', 'poasassignment'));
+					}
+					else {						
+						if ($lastgraded == null) {
+							$row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
+						}
+						else {
+							$ratingwithpenalty = $lastgraded->rating - $poasmodel->get_penalty($lastgraded->id);
+							$row[] = $ratingwithpenalty
+									.' ('
+									.get_string('outdated','poasassignment')
+									.') '
+									.html_writer::link($gradeurl,get_string('editgrade','poasassignment'));
+						}
+					}
+					
 				}
 				/*
                 if(isset($attempt->rating)) {

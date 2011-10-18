@@ -101,7 +101,6 @@ class grade_form extends moodleform {
         $options->component = 'mod_poasassignment';
         $options->context = $context;
         $options->showcount = true;
-        
         foreach($criterions as $criterion) {
             $mform->addElement('html', $OUTPUT->box_start());
             // show grading element
@@ -143,7 +142,7 @@ class grade_form extends moodleform {
         
         // hidden params
         $mform->addElement('hidden', 'weightsum', $weightsum);
-        $mform->setType('weightsum', PARAM_INT);
+        $mform->setType('weightsum', PARAM_FLOAT);
         
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
