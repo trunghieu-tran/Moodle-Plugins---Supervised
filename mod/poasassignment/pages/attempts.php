@@ -103,30 +103,38 @@ class attempts_page extends abstract_page {
         return false;
     }
 	public static function show_attempt($attempt, $showcontent = true) {
-		echo '<table class="poasassignment-table" width="100%">';
-			
-		$values = array(
-						get_string('attemptnumber','poasassignment') => $attempt->attemptnumber,
-						get_string('attemptdate','poasassignment') => userdate($attempt->attemptdate),
-						//get_string('attempt','poasassignment') => '',
-						get_string('draft', 'poasassignment') => $attempt->draft == 1 ? get_string('yes') : get_string('no'));
+		$poasmodel = poasassignment_model::get_instance();
+		echo '<table class="poasassignment-table" align="center">';
 		
+		$values = array(
+						'attemptnumber' => $attempt->attemptnumber,
+						'attemptdate' => userdate($attempt->attemptdate),
+						'draft' => $attempt->draft == 1 ? get_string('yes') : get_string('no'),
+						'attemptisfinal' => $attempt->final == 1 ? get_string('yes') : get_string('no'),
+						'attempthaspenalty' => $attempt->disablepenalty == 1 ? get_string('no') : get_string('yes'),
+						'attempttotalpenalty' => $poasmodel->get_penalty($attempt->id));
+		foreach($values as $key => $value) {			
+			echo '<tr>';
+			echo '<td class="header" >' . get_string($key,'poasassignment') . '</td>';
+			if ($key == 'attempthaspenalty' || $key == 'attempttotalpenalty') {
+				echo '<td class="critical" style="text-align:center;">' . $value . '</td>';
+			}
+			else {
+				echo '<td style="text-align:center;">' . $value . '</td>';
+			}
+			echo '</tr>';
+		}
 		if ($showcontent) {
 			$poasmodel = poasassignment_model::get_instance();
 			$plugins = $poasmodel->get_plugins();
-			$content = '';
+			$attemptcontent = '';
 			foreach($plugins as $plugin) {
 				require_once($plugin->path);
 				$poasassignmentplugin = new $plugin->name();
-				$content .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0, $attempt->id);
+				$attemptcontent .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0, $attempt->id);
 			}
-			$values[get_string('attempt','poasassignment')] = $content;
-		}
-		
-		foreach($values as $header => $value) {
 			echo '<tr>';
-			echo '<td class="header">' . $header . '</td>';
-			echo '<td>' . $value . '</td>';
+			echo '<td colspan="2">' . $attemptcontent . '</td>';
 			echo '</tr>';
 		}
 		
@@ -145,6 +153,7 @@ class attempts_page extends abstract_page {
             if ($attempt->ratingdate < $latestattempt->attemptdate) {
                 $heading .= ' (' . get_string('oldfeedback','poasassignment') . ')';
             }
+			$heading .= ' - ' . userdate($attempt->ratingdate);
 			echo $OUTPUT->heading($heading);
             //echo $OUTPUT->box_start();
 			

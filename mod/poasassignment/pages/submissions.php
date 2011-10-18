@@ -132,36 +132,61 @@ class submissions_page extends abstract_page {
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
             $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount));
             if($attempt) {
-                $gradeurl = new moodle_url('view.php',array('page' => 'grade', 'assigneeid'=>$assignee->id,'id'=>$this->cm->id)); 
+                $gradeurl = new moodle_url('view.php',array('page' => 'grade', 'assigneeid'=>$assignee->id,'id'=>$this->cm->id));
+				if (isset($attempt->ratingdate)) {
+					$row[] = userdate($attempt->ratingdate);
+					if (isset($attempt->rating)) {
+						$ratingwithpenalty = $attempt->rating-$poasmodel->get_penalty($attempt->id);
+						if($attempt->ratingdate < $attempt->attemptdate)
+                            $row[] = $ratingwithpenalty 
+									 . ' (' 
+									 . get_string('outdated','poasassignment')
+									 . ') ' 
+									 . html_writer::link($gradeurl, get_string('editgrade', 'poasassignment'));
+                        else {
+                            $row[] = $ratingwithpenalty
+									 . ' '
+									 . html_writer::link($gradeurl, get_string('editgrade', 'poasassignment'));
+						}
+					}
+					else {
+						// Если нет оценки но есть дата - это был черновик
+						$row[] = get_string('draft','poasassignment') 
+								 . ' ' 
+								 . html_writer::link($gradeurl, get_string('leavecomment', 'poasassignment'));
+					}
+				}
+				else {
+					$row[] = '-';
+					$row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
+				}
+				/*
                 if(isset($attempt->rating)) {
-                    if($attempt->draft==0) {
-                        $row[]=userdate($attempt->ratingdate);
-                        $ratingwithpenalty=$attempt->rating-$poasmodel->get_penalty($attempt->id);
-                        if($attempt->ratingdate<$attempt->attemptdate)
+                    if($attempt->draft == 0) {
+                        $ratingwithpenalty = $attempt->rating-$poasmodel->get_penalty($attempt->id);
+                        if($attempt->ratingdate < $attempt->attemptdate)
                             $row[]=$ratingwithpenalty.' ('.get_string('outdated','poasassignment').') '.html_writer::link($gradeurl,get_string('editgrade','poasassignment'));
                         else
                             $row[]=$ratingwithpenalty.' '.html_writer::link($gradeurl,get_string('editgrade','poasassignment'));
                     }
                     else {
-                        $row[]='-';
+                        //$row[]='-';
                         $row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
                         //$row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
                     }
                 }
                 if(!isset($attempt->rating)) {
-                    $row[]='-';
                     $row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
-                    //$row[]=html_writer::link($gradeurl,get_string('addgrade','poasassignment'));
-                }
+                }*/				
             }
             else {
-                $row[]='-';
-                $row[]='-';
+                $row[]=get_string('noattemptsshort', 'poasassignment');
+                $row[]=get_string('noattemptsshort', 'poasassignment');
             }
         }
         else {
-                $row[]='-';
-                $row[]='-';
+                $row[]=get_string('noattemptsshort', 'poasassignment');
+                $row[]=get_string('noattemptsshort', 'poasassignment');
         }
         return $row;
     }
