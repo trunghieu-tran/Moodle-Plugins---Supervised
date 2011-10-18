@@ -97,7 +97,6 @@ class submissions_page extends abstract_page {
                 $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);                
             }
 		}
-		//$submis='lorem ipsum lorem ipsum lorem ipsumlorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum';
 		$submis = shorten_text($submis);
         $row[]=$submis;
         if($assignee) {
@@ -158,7 +157,9 @@ class submissions_page extends abstract_page {
 				}
 				else {
 					$row[] = '-';
-					$row[] = $OUTPUT->action_link($gradeurl, get_string('addgrade','poasassignment'));
+					$row[] = get_string('draft','poasassignment') 
+								 . ' ' 
+								 . html_writer::link($gradeurl, get_string('leavecomment', 'poasassignment'));
 				}
 				/*
                 if(isset($attempt->rating)) {

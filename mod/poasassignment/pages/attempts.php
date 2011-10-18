@@ -79,7 +79,7 @@ class attempts_page extends abstract_page {
             $attemptscount = count($attempts);  
             foreach($attempts as $attempt) {
 				echo $OUTPUT->box_start();
-				attempts_page::show_attempt($attempt);
+				echo attempts_page::show_attempt($attempt);
                 // show disablepenalty/enablepenalty button
                 if(has_capability('mod/poasassignment:grade',$poasmodel->get_context())) {
                     $cmid = $poasmodel->get_cm()->id;
@@ -104,7 +104,8 @@ class attempts_page extends abstract_page {
     }
 	public static function show_attempt($attempt, $showcontent = true) {
 		$poasmodel = poasassignment_model::get_instance();
-		echo '<table class="poasassignment-table" align="center">';
+		$html = '';
+		$html .= '<table class="poasassignment-table" align="center">';
 		
 		$values = array(
 						'attemptnumber' => $attempt->attemptnumber,
@@ -114,15 +115,15 @@ class attempts_page extends abstract_page {
 						'attempthaspenalty' => $attempt->disablepenalty == 1 ? get_string('no') : get_string('yes'),
 						'attempttotalpenalty' => $poasmodel->get_penalty($attempt->id));
 		foreach($values as $key => $value) {			
-			echo '<tr>';
-			echo '<td class="header" >' . get_string($key,'poasassignment') . '</td>';
+			$html .= '<tr>';
+			$html .= '<td class="header" >' . get_string($key,'poasassignment') . '</td>';
 			if ($key == 'attempthaspenalty' || $key == 'attempttotalpenalty') {
-				echo '<td class="critical" style="text-align:center;">' . $value . '</td>';
+				$html .= '<td class="critical" style="text-align:center;">' . $value . '</td>';
 			}
 			else {
-				echo '<td style="text-align:center;">' . $value . '</td>';
+				$html .= '<td style="text-align:center;">' . $value . '</td>';
 			}
-			echo '</tr>';
+			$html .= '</tr>';
 		}
 		if ($showcontent) {
 			$poasmodel = poasassignment_model::get_instance();
@@ -133,12 +134,13 @@ class attempts_page extends abstract_page {
 				$poasassignmentplugin = new $plugin->name();
 				$attemptcontent .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0, $attempt->id);
 			}
-			echo '<tr>';
-			echo '<td colspan="2">' . $attemptcontent . '</td>';
-			echo '</tr>';
+			$html .= '<tr>';
+			$html .= '<td colspan="2">' . $attemptcontent . '</td>';
+			$html .= '</tr>';
 		}
 		
-		echo '</table>';
+		$html .= '</table>';
+		return $html;
 	}
 	public static function show_feedback($attempt, $latestattempt, $showdescription) {
         global $DB,$OUTPUT;
