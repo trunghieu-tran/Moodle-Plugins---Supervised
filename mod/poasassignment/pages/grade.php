@@ -84,12 +84,8 @@ class grade_form extends moodleform {
                                                 html_writer::link($taskviewurl,get_string('stundetstask','poasassignment'))));
         
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
-        $plugins = $poasmodel->get_plugins();
-        foreach($plugins as $plugin) {
-            require_once(dirname(dirname(__FILE__)) . '\\'.$plugin->path);
-            $poasassignmentplugin = new $plugin->name();
-            $mform->addElement('static',null,null,$poasassignmentplugin->show_assignee_answer($instance['assigneeid'],$instance['poasassignmentid']));
-        }
+		require_once('attempts.php');
+		$mform->addElement('static',null,null,attempts_page::show_attempt($attempt));
         $mform->addElement('header','gradeeditheader',get_string('gradeeditheader','poasassignment'));
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$instance['poasassignmentid']));
         for($i=0;$i<101;$i++) 

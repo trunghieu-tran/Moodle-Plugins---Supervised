@@ -184,7 +184,7 @@ class view_page extends abstract_page {
 			echo $OUTPUT->box_start();
 			echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
 			$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
-			attempts_page::show_attempt($attempt, $hascap);
+			echo attempts_page::show_attempt($attempt, $hascap);
 			$canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
 			attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
             echo $OUTPUT->box_end();
@@ -237,7 +237,7 @@ class view_page extends abstract_page {
                             array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount))) {
 					$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
 					echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
-					attempts_page::show_attempt($attempt, $hascap);
+					echo attempts_page::show_attempt($attempt, $hascap);
                     
                     /* If student has several attempts and hasn't final grade */
                     if($this->poasassignment->flags&SEVERAL_ATTEMPTS && $poasmodel->assignee->finalized!=1) {
