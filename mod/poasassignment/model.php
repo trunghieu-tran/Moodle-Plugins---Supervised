@@ -647,13 +647,13 @@ class poasassignment_model {
                 //$comment = new comment($options);
                 //$comment->add($data->$elementcommentname);
             }
-            if ($attempt->draft == 0)
-                $rating += $data->$elementname * round($criterion->weight / $data->weightsum, 2);
+            if ($attempt->draft == 0) {
+                $rating += $data->$elementname * round($criterion->weight / $data->weightsum, 2);			
+			}
         }
-        if ($attempt->draft == 0)
+        if ($attempt->draft == 0) {
             $attempt->rating = $rating;
-            //echo $attempt->draft;
-            //echo $attempt->rating;
+		}
         $attempt->ratingdate = time();
         $DB->update_record('poasassignment_attempts', $attempt);
         $assignee = $DB->get_record('poasassignment_assignee', array('id'=>$assigneeid));
@@ -1451,6 +1451,28 @@ class poasassignment_model {
 			$result .= ' ' . get_string('ago','poasassignment');
 		}
 		return $result;
+	}
+	/*
+	 * @return attempt or null
+	 */
+	public function get_last_attempt($assigneeid) {
+		global $DB;
+		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
+		return $rec;
+	}
+	/*
+	 * @return attempt or null
+	 */
+	public function get_last_graded_attempt($assigneeid) {	
+		global $DB;
+		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? AND rating >= 0 AND ratingdate > 0 ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
+		return $rec;
+	}
+	
+	public function get_last_commented_attempt($assigneeid) {
+		global $DB;
+		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? AND ratingdate > 0 ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
+		return $rec;
 	}
 }
     

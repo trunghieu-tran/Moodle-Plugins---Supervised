@@ -36,13 +36,13 @@ class attempts_page extends abstract_page {
             // Page content is available if assignee wants to see his own attempts
             // or teacher wants to see them
             if($this->assignee->userid == $USER->id) {
-				if (has_capability('mod/poasassignment:viewownsubmission', $context)) {
+				//if (has_capability('mod/poasassignment:viewownsubmission', $context)) {
 					return true;
-				}
-				else {
-					$this->lasterror = 'errorviewownsubmissioncap';
-					return false;
-				}
+				//}
+				//else {
+				//	$this->lasterror = 'errorviewownsubmissioncap';
+				//	return false;
+				//}
             }
             else {
                 $this->lasterror = 'erroranothersattempts';
@@ -79,7 +79,8 @@ class attempts_page extends abstract_page {
             $attemptscount = count($attempts);  
             foreach($attempts as $attempt) {
 				echo $OUTPUT->box_start();
-				echo attempts_page::show_attempt($attempt);
+				$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
+				echo attempts_page::show_attempt($attempt, $hascap);
                 // show disablepenalty/enablepenalty button
                 if(has_capability('mod/poasassignment:grade',$poasmodel->get_context())) {
                     $cmid = $poasmodel->get_cm()->id;
