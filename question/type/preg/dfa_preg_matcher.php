@@ -81,6 +81,17 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return false;
     }
+    
+    function is_node_acceptable($pregnode) {
+        switch ($pregnode->name()) {
+        case 'leaf_charset':
+        case 'leaf_meta':
+        case 'leaf_assert':
+            return true;
+            break;
+        }
+        return false;
+    }
 
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)

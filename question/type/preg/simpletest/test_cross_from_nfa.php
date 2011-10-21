@@ -1,112 +1,14 @@
 <?php
 
-/**
-* Data-driven cross-testing of matchers.
-*
-*     A test function should:
-*     -be named "test_match_..."
-*     -return an array of input and output data as in the following example:
-*       array(
-*             'regex'=>'^[-.\w]+[a-z]{2,6}$',    // a regular expression
-*             'modifiers'=>'i',                  // modifiers. it's not necessary to define this element
-*             'tests'=>array($test1,...,$testn)  // array containing tests in the format described below. count of these tests is unlimited
-*             );
-*
-*    An array of expected results ($test-i) should look like:
-*       array(
-*             'str'=>'sample string',            // a string to match
-*             'is_match'=>true,                  // is there a match?
-*             'full'=>true,                      // is it full?
-*             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
-*             'index_last'=>array(0=>2),         // indexes of last correct characters for subpatterns.
-*             'left'=>array(0),                  // number of characters left to complete match. different engines can return different results, that's why it is an array
-*             'next'=>'');                       // a string of possible next characters in case of not full match
-*/
-
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
-require_once($CFG->dirroot . '/lib/questionlib.php');
-require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
+require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
-class test_cross_from_nfa extends UnitTestCase {
+class test_cross_from_nfa extends preg_cross_tester {
 
-    var $question;            // an object of question_preg_qtype
-    var $engines = array();   // an array of available engines
-
-    public function __construct() {
-        $question = new question_preg_qtype();
-        $en = $question->available_engines();
-        foreach ($en as $key=>$value) {
-            if ($key != 'preg_php_matcher') {
-                $this->engines[] = $key;
-            }
-        }
-    }
-
-    function check_for_errors($matcher) {
-        if ($matcher->is_error_exists()) {
-            $errors = $matcher->get_errors();
-            foreach ($errors as $error) {
-                echo "$error<br />";
-            }
-            return true;
-        }
-        return false;
-    }
-
-    function test() {
-        $testmethods = get_class_methods($this);
-        foreach ($testmethods as $curtestmethod) {
-            // filtering class methods by names. A test method name should start with 'test_match_'
-            $pos = strstr($curtestmethod, 'test_match_');
-            if ($pos != false && $pos == 0) {
-                $data = $this->$curtestmethod();
-                $regex = $data['regex'];
-                $modifiers = null;
-                if (array_key_exists('modifiers', $data)) {
-                    $modifiers = $data['modifiers'];
-                }
-                // iterate over available engines
-                foreach ($this->engines as $enginename) {
-                    $matcher = new $enginename($regex, $modifiers);
-                    if (!$this->check_for_errors($matcher)) {
-                        // iterate over all tests
-                        foreach ($data['tests'] as $expected) {
-                            $matcher->match($expected['str']);
-                            $obtained = $matcher->get_match_results();
-                            $passed = $this->assertTrue($expected['is_match'] == $obtained['is_match']);
-                            $passed = $passed && $this->assertTrue($expected['full'] == $obtained['full']);
-                            if ($obtained['is_match'] && $expected['is_match']) {
-                                if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
-                                    $passed = $passed && $this->assertTrue($expected['index_first'] == $obtained['index_first']);
-                                    $passed = $passed && $this->assertTrue($expected['index_last'] == $obtained['index_last']);
-                                } else {
-                                    $passed = $passed && $this->assertTrue($expected['index_first'][0] == $obtained['index_first'][0]);
-                                    $passed = $passed && $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0]);
-                                }
-                                if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                                    $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false);        // expected 'next' contains obtained 'next'
-                                }
-                                if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                                    $passed = $passed && $this->assertTrue(in_array($obtained['left'], $expected['left']));
-                                }
-                            }
-                            if (!$passed) {
-                                $msg = $matcher->name() . " works seriously wrong<br />";
-                                echo $msg;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    function test_match_concat() {
+    function data_for_test_concat() {
         $test1 = array( 'str'=>'the matcher works',
                         'is_match'=>true,
                         'full'=>true,
@@ -135,7 +37,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_alt() {
+    function data_for_test_alt() {
         $test1 = array( 'str'=>'abcf',
                         'is_match'=>true,
                         'full'=>true,
@@ -164,7 +66,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_assertions_simple_1() {
+    function data_for_test_assertions_simple_1() {
         $test1 = array( 'str'=>' abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -193,7 +95,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_assertions_simple_2() {
+    function data_for_test_assertions_simple_2() {
         $test1 = array( 'str'=>'abc?z',
                         'is_match'=>true,
                         'full'=>true,
@@ -214,7 +116,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2));
     }
 
-    function test_match_zero_length_loop() {
+    function data_for_test_zero_length_loop() {
         $test1 = array( 'str'=>' a',
                         'is_match'=>true,
                         'full'=>true,
@@ -227,7 +129,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_subpatterns_nested() {
+    function data_for_test_subpatterns_nested() {
         $test1 = array( 'str'=>'abcbcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -240,7 +142,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_subpatterns_concatenated() {
+    function data_for_test_subpatterns_concatenated() {
         $test1 = array( 'str'=>'_abcdef',
                         'is_match'=>true,
                         'full'=>true,
@@ -253,7 +155,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_subpatterns_alternated() {
+    function data_for_test_subpatterns_alternated() {
         $test1 = array( 'str'=>'abcdefgh',
                         'is_match'=>true,
                         'full'=>true,
@@ -266,7 +168,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_questquant() {
+    function data_for_test_questquant() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -295,7 +197,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_negative_charset() {
+    function data_for_test_negative_charset() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>false,
@@ -324,7 +226,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_many_alternatives() {
+    function data_for_test_many_alternatives() {
         $test1 = array( 'str'=>'abi',
                         'is_match'=>true,
                         'full'=>true,
@@ -369,7 +271,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function test_match_repeated_chars() {
+    function data_for_test_repeated_chars() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
@@ -398,7 +300,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_brace_finite() {
+    function data_for_test_brace_finite() {
         $test1 = array( 'str'=>'abbbbbc',
                         'is_match'=>true,
                         'full'=>false,
@@ -427,7 +329,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_brace_infinite() {
+    function data_for_test_brace_infinite() {
         $test1 = array( 'str'=>'abbbbbc',
                         'is_match'=>true,
                         'full'=>false,
@@ -456,7 +358,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_plus() {
+    function data_for_test_plus() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>false,
@@ -485,7 +387,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function test_match_cs() {
+    function data_for_test_cs() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>false,
@@ -498,7 +400,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_cins() {
+    function data_for_test_cins() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -512,7 +414,7 @@ class test_cross_from_nfa extends UnitTestCase {
                      'tests'=>array($test1));
     }
 
-    function test_match_backref_simple() {
+    function data_for_test_backref_simple() {
         $test1 = array( 'str'=>'abcabcabcabc',
                         'is_match'=>true,
                         'full'=>true,
