@@ -36,8 +36,8 @@ class nfa_transition
             $this->belongs_to_subpatt[$key] = $subpatt;
         }
     }
-    
-    public function get_clone() {
+
+    public function &get_clone() {
         $res = new nfa_transition($this->pregleaf, $this->state, $this->loops, $this->replaceable, $this->subpatt_start, $this->subpatt_end, $this->belongs_to_subpatt);
         $res->state =& $this->state;
         return $res;
@@ -55,7 +55,13 @@ class nfa_state
 
     public $next = array();                 // an array of objects of nfa_transition
 
+    public $previous = array();
+
     public $id;                             // id of the state, debug variable
+
+    public function append_previous(&$transition) {
+
+    }
 
     /**
      * appends a next possible state
@@ -68,6 +74,7 @@ class nfa_state
         if ($transition->state === $this && $transition->pregleaf->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             return false;
         }
+
         $exists = false;
         $transition_copy = $transition->get_clone();
         if ($assertion != null) {
@@ -81,8 +88,13 @@ class nfa_state
         }
         if (!$exists) {
             array_push($this->next, $transition_copy);
+            $transition_copy = $transition_copy->get_clone();
+            $transition_copy->state =& $this;
+            array_push($transition->state->previous, $transition_copy);
+            if ($transition->loops) {
+                $this->startsinfinitequant = true;
+            }
         }
-        return !$exists;
     }
 
     /**
@@ -92,6 +104,12 @@ class nfa_state
     public function remove_transition(&$transition) {
         foreach($this->next as $key=>$curnext) {
             if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
+                // delete an element from $curnext->state->previous
+                foreach ($curnext->state->previous as $keyprev=>$curprev) {
+                    if ($curprev->pregleaf == $transition->pregleaf && $curprev->state === $this) {
+                        unset($curnext->state->previous[$keyprev]);
+                    }
+                }
                 unset($this->next[$key]);
             }
         }
@@ -104,8 +122,13 @@ class nfa_state
      */
     public function update_state_references(&$oldref, &$newref) {
         foreach($this->next as $curnext) {
-            if ($curnext->state == $oldref) {
+            if ($curnext->state === $oldref) {
                 $curnext->state = $newref;
+            }
+        }
+        foreach($this->previous as $curprev) {
+            if ($curprev->state === $oldref) {
+                $curprev->state = $newref;
             }
         }
     }
@@ -115,10 +138,8 @@ class nfa_state
      * @param with - a reference to state the to be merged with
      */
     public function merge(&$with) {
-        // move all transitions from $with to $this state
-        foreach($with->next as $curnext) {            // this function is called always with update_state_references
-            $this->append_transition($curnext);       // so $previous will be updated too
-        }
+        $this->next = array_merge($this->next, $with->next);
+        $this->previous = array_merge($this->previous, $with->previous);
         $this->startsinfinitequant = $this->startsinfinitequant || $with->startsinfinitequant;
     }
 
@@ -195,18 +216,49 @@ class nfa {
     }
 
     public function merge_simple_assertions() {
+        $i=0;
+        $this->draw_nfa("C:/dotfile/dotcode.dot", "C:/dotfile/0.jpg");
         foreach ($this->states as $keystate=>$curstate) {
-            foreach ($curstate->next as $keynext=>$curnext) {
-                if (is_a($curnext->pregleaf, 'preg_leaf_assert')) {
-                    foreach ($curnext->state->next as $newnext) {
-                        $this->states[$keystate]->append_transition($newnext, $curnext->pregleaf);
+            do {
+                $tobeappended = array();
+                foreach ($curstate->next as $keynext=>$curnext) {
+                    if (is_a($curnext->pregleaf, 'preg_leaf_assert')) {
+                        // saving next transitions
+                        foreach ($curnext->state->next as $newnext) {
+                            $newnext->loops = $newnext->loops || $curnext->loops;
+                            if ($newnext->pregleaf != $curnext->pregleaf)
+                                $tobeappended[] = $newnext;
+                            //$this->states[$keystate]->append_transition($newnext, $curnext->pregleaf);
+                        }
+                        $state = $curnext->state;
+                        $this->states[$keystate]->remove_transition($curnext);
+                        $in = 0;
+                        foreach ($curnext->state->previous as $curprev)
+                            //if (!$curprev->loops)
+                                $in++;
+                        if ($in == 0) {
+                            $this->remove_state($state);
+                        }
+                        $i++;
+                        $this->draw_nfa("C:/dotfile/dotcode.dot", "C:/dotfile/$i.jpg");
                     }
-                    $this->states[$keystate]->remove_transition($curnext);
                 }
-            }
+                foreach ($tobeappended as $a) {
+                    if (isset($this->states[$keystate]))
+                    $this->states[$keystate]->append_transition($a, $curnext->pregleaf);
+                }
+
+                $assertcnt = 0;
+                foreach ($curstate->next as $keynext=>$curnext) {
+                    if (is_a($curnext->pregleaf, 'preg_leaf_assert')) {
+                        $assertcnt++;
+                    }
+                }
+            } while ($assertcnt > 0);
+
         }
     }
-    
+
     /**
      * there are unreachable states after merging simple assertions. this function deletes them
      */
@@ -274,12 +326,8 @@ class nfa {
      * @param from - a reference to the automaton containing states to be moved
      */
     public function move_states(&$from) {
-        // iterate until all states are moved
-        foreach ($from->states as $curstate) {
-            array_push($this->states, $curstate);
-        }
-        // clear the source
-        $from->states = array();
+        $this->states = array_merge($this->states, $from->states);
+        $from->states = array();    // clear the source
     }
 
     /**
@@ -292,7 +340,7 @@ class nfa {
             $curstate->update_state_references($oldref, $newref);
         }
     }
-    
+
     /**
     * debug function for generating human-readable leafs including merged assertions
     * @param pregleaf - object of preg_leaf_...
@@ -303,7 +351,7 @@ class nfa {
         foreach ($pregleaf->mergedassertions as $assert) {
             $str = $str . $assert->tohr();
             if ($assert->mergedassertions != array()) {
-                tohr_recursive($assert, $str);
+                $this->tohr_recursive($assert, $str);
             }
         }
     }
@@ -337,6 +385,8 @@ class nfa {
                     $index2 = $curtransition->state->id;
                     $lab = "";
                     $this->tohr_recursive($curtransition->pregleaf, $lab);
+                    if ($curtransition->loops)
+                        $lab = $lab."*";
                     fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
                 }
         }
@@ -345,6 +395,7 @@ class nfa {
         exec("dot.exe -Tjpg -o\"$jpgfilename\" -Kdot $dotfilename");
         echo "<IMG src=\"$jpgfilename\" width=\"90%\">";
         fclose($dotfile);
+        unlink($dotfilename);
     }
 
 }
@@ -469,9 +520,10 @@ class nfa_preg_node_alt extends nfa_preg_operator {
             }
         }
         // start and end states are merged
-        $first->startstate->merge($second->startstate);
         $second->update_state_references($second->startstate, $first->startstate);
         $second->update_state_references($second->endstate, $first->endstate);
+        $first->startstate->merge($second->startstate);
+        $first->endstate->merge($second->endstate);
         $second->remove_state($second->startstate);
         $second->remove_state($second->endstate);
         $first->move_states($second);
@@ -493,7 +545,6 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         $body = array_pop($stackofautomatons);
         foreach ($body->startstate->next as $curnext) {
             $body->endstate->append_transition(new nfa_transition($curnext->pregleaf, $curnext->state, true));
-            $curnext->state->startsinfinitequant = true;
         }
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
@@ -520,7 +571,6 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                 if ($i == $leftborder) {
                     foreach ($cur->startstate->next as $curnext) {
                         $cur->endstate->append_transition(new nfa_transition($curnext->pregleaf, $curnext->state, true));
-                        $curnext->state->startsinfinitequant = true;
                     }
                     $epsleaf = new preg_leaf_meta;
                     $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
@@ -577,7 +627,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
             $this->operands[0]->create_automaton(&$stackofautomatons);
         }
         $res = null;        // the resulting automaton
-        $endstate = null;   // the end state, required if $leftborder != $rightborder
+        $endstate = null;   // temporary variable, required if $leftborder != $rightborder
         if ($leftborder != $rightborder) {
             $endstate = new nfa_state;
         }
@@ -591,6 +641,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
             }
             if ($i > 0) {
                 $cur->remove_subpatterns();
+                $endstate->update_state_references($cur->startstate, $res->endstate);
                 $cur->update_state_references($cur->startstate, $res->endstate);
                 $res->endstate->merge($cur->startstate);
                 $cur->remove_state($cur->startstate);
@@ -602,6 +653,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         }
         if ($leftborder != $rightborder) {
             $res->update_state_references($endstate, $res->endstate);
+            $res->endstate->merge($endstate);
         }
         array_push($stackofautomatons, $res);
     }
