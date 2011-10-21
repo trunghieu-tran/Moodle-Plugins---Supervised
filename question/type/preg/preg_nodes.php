@@ -124,7 +124,7 @@ abstract class preg_leaf extends preg_node {
     /*
     * Returns a clone of the leaf including merged assertions
     */
-    public function get_clone() {
+    public function &get_clone() {
         $res = clone $this;
         $res->mergedassertions = array();
         foreach ($this->mergedassertions as $assert)
