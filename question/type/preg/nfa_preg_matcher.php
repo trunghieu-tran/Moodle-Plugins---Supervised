@@ -137,12 +137,20 @@ class nfa_preg_matcher extends preg_matcher {
                 }
                 foreach ($currentstate->state->next as $next) {
                     if (!$next->loops) {
-                        $length = 0;
-                        /*if (is_a($next->pregleaf, 'preg_leaf_backref'))
-                            $length = $this->index_last[$next->pregleaf->number] - $this->index_first[$next->pregleaf->number];
-                        else*/ if ($next->pregleaf->consumes())
-                            $length = 1;
-                        $newstate = new processing_state($next->state, $currentstate->matchcnt + $length/*$next->length()*/, false, 0, -1, array(), array(), array());
+                        $length = $next->pregleaf->consumes();
+                        
+                        // save subpattern indexes
+                        foreach ($next->subpatt_start as $key=>$subpatt) {
+                            if (!isset($this->index_first[$key])) {
+                                $this->index_first[$key] = $currentstate->matchcnt + $length;    // saving to index_first for backreference capturing
+                            }
+                        }
+                        foreach ($next->subpatt_end as $key=>$subpatt) {
+                            if (!isset($this->index_last[$key])) {
+                                $this->index_last[$key] = $currentstate->matchcnt + $length;    // saving to index_last
+                            }
+                        }                        
+                        $newstate = new processing_state($next->state, $currentstate->matchcnt + $length, false, 0, -1, array(), array(), array());
                         array_push($newstates, $newstate);
                     }
                 }
@@ -204,7 +212,7 @@ class nfa_preg_matcher extends preg_matcher {
                             foreach ($next->subpatt_end as $key=>$subpatt) {
                                 if (isset($currentstate->subpattern_indexes_first[$key]) && !(isset($currentstate->subpatterns_captured[$key]) && $currentstate->subpatterns_captured[$key])) {
                                     $currentstate->subpattern_indexes_last[$key] = $startpos + $pos + $length - 1;
-                                    $this->index_last[$key] = $startpos + $pos + $length - 1;
+                                    $this->index_last[$key] = $startpos + $pos + $length - 1;    // saving to index_last
                                 }
                             }
                             foreach ($currentstate->subpattern_indexes_first as $key=>$subpatt) {
