@@ -432,7 +432,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'a');
 
         return array('regex'=>'((abc)\2)\1',
-                     'tests'=>array($test1/*, $test2*/));
+                     'tests'=>array($test1, $test2));
     }
 }
 
