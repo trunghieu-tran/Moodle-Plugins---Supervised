@@ -201,18 +201,14 @@ class preg_matcher {
     */
     public function get_match_results() {
         $res = array('is_match' => $this->is_match);
-        if ($this->is_match) {
-            $res['full'] = $this->full;
-            $res['index_first'] = $this->index_first;
-            $res['index_last'] = $this->index_last;
-            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $res['next'] = $this->next;
-            }
-            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $res['left'] = $this->left;
-            }
-        } else {
-            $res['full'] = false;
+        $res['full'] = $this->full;
+        $res['index_first'] = $this->index_first;
+        $res['index_last'] = $this->index_last;
+        if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+            $res['next'] = $this->next;
+        }
+        if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+            $res['left'] = $this->left;
         }
         return $res;
     }
@@ -249,13 +245,21 @@ class preg_matcher {
             $this->index_last[$num] = $this->index_first[$num] + $len - 1;
         }
     }
+    
+    /**
+    @param subpattern subpattern number
+    *returns true if subpattern is captured
+    */
+    public function is_subpattern_captured($subpattern) {
+        return array_key_exists($subpattern, $this->index_last);
+    }
 
     /**
     @param subpattern subpattern number, 0 for the whole match
     *returns first correct character index
     */
     public function first_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_first[$subpattern];
@@ -267,7 +271,7 @@ class preg_matcher {
     @return the index of last correct character
     */
     public function last_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_last[$subpattern];

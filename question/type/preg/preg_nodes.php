@@ -663,12 +663,15 @@ class preg_leaf_backref extends preg_leaf {
     }
 
     public function consumes() {
+        if (!$this->matcher->is_subpattern_captured($this->number)) {
+            return 0;
+        }
         return $this->matcher->last_correct_character_index($this->number) - $this->matcher->first_correct_character_index($this->number) + 1;
     }
 
     protected function match_inner($str, $pos, &$length, $cs) {
         $textlib = textlib_get_instance();
-        if ($pos >= $textlib->strlen($str)) {
+        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $textlib->strlen($str)) {
             $length = 0;
             return false;
         }
@@ -681,12 +684,11 @@ class preg_leaf_backref extends preg_leaf {
         
         $start = $this->matcher->first_correct_character_index($this->number);
         $end = $this->matcher->last_correct_character_index($this->number);
-        $len = $end - $start + 1;
         $matchlen = 0;
 
         $result = true;
         // check char by char
-        for ($i = $start; $result && $i < $start + $len; $i++) {
+        for ($i = $start; $result && $i <= $end; $i++) {
             $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
             if ($result) {
                 $matchlen++;
@@ -707,7 +709,7 @@ class preg_leaf_backref extends preg_leaf {
         die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
     }
     public function tohr() {
-        return 'backref #'.$number;
+        return 'backref #'.$this->number;
     }
 }
 

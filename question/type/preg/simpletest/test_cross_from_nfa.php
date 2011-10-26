@@ -20,8 +20,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test2 = array( 'str'=>'_the matcher works',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>-1),
-                        'index_last'=>array(0=>-1),
+                        'index_first'=>array(0=>18),
+                        'index_last'=>array(0=>17),
                         'left'=>array(17),
                         'next'=>'t');
 
@@ -91,7 +91,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(2),
                         'next'=>'abcdefghijklmnopqrstuvwxyz');
 
-		return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
+        return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -112,7 +112,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(1),
                         'next'=>'');    // can't generate a character
 
-	    return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
+        return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2));
     }
 
@@ -262,8 +262,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test5 = array( 'str'=>'yzi',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>0),
+                        'index_first'=>array(0=>3),
+                        'index_last'=>array(0=>2),
                         'left'=>array(3),
                         'next'=>'aceg');
 
