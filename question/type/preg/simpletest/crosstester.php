@@ -99,7 +99,7 @@ class preg_cross_tester extends UnitTestCase {
                             $obtained = $matcher->get_match_results();
                             $passed = $this->assertTrue($expected['is_match'] == $obtained['is_match'], "$matchername failed 'is_match' check on regex '$regex' and string '$str'");
                             $passed = $passed && $this->assertTrue($expected['full'] == $obtained['full'], "$matchername failed 'full' check on regex '$regex' and string '$str'");
-                            //if ($obtained['is_match'] && $expected['is_match']) {
+                            if ($obtained['is_match'] && $expected['is_match']) {
                                 if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
                                     $passed = $passed && $this->assertTrue($expected['index_first'] == $obtained['index_first'], "$matchername failed 'index_first' check on regex '$regex' and string '$str'");
                                     $passed = $passed && $this->assertTrue($expected['index_last'] == $obtained['index_last'], "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
@@ -113,7 +113,7 @@ class preg_cross_tester extends UnitTestCase {
                                 if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
                                     $passed = $passed && $this->assertTrue(in_array($obtained['left'], $expected['left']), "$matchername failed 'left' check on regex '$regex' and string '$str'");
                                 }
-                            //}
+                            }
                         }
                     }
                 }
