@@ -91,7 +91,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(2),
                         'next'=>'abcdefghijklmnopqrstuvwxyz');
 
-		return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
+        return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
     }
 
@@ -112,7 +112,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(1),
                         'next'=>'');    // can't generate a character
 
-	    return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
+        return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2));
     }
 
@@ -429,10 +429,60 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'index_last'=>array(0=>5,1=>5,2=>2),
                         'left'=>array(6),
-                        'next'=>'a');
+                        'next'=>'a');    // backref #1 not captured at all
+                        
+        $test3 = array( 'str'=>'abcabcab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0,2=>0),
+                        'index_last'=>array(0=>7,1=>5,2=>2),
+                        'left'=>array(4),
+                        'next'=>'c');    // backref #1 captured partially
 
         return array('regex'=>'((abc)\2)\1',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+    
+    function data_for_test_alternated_backrefs() {
+        $test1 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,3=>2),
+                        'index_last'=>array(0=>3,1=>1,3=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'cdcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,2=>0,3=>2),
+                        'index_last'=>array(0=>3,2=>1,3=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(?:(ab)|(cd))(\1|\2)',
                      'tests'=>array($test1, $test2));
+    }
+    
+    function data_for_test_backrefquantified() {
+        $test1 = array( 'str'=>'ababcdababcdababcdababcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>0),
+                        'index_last'=>array(0=>23,1=>5,2=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'cdcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,2=>0,3=>2),
+                        'index_last'=>array(0=>3,2=>1,3=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'((ab)\2cd)*\1',
+                     'tests'=>array($test1));
     }
 }
 
