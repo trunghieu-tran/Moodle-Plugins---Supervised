@@ -251,11 +251,19 @@ class preg_matcher {
     }
 
     /**
+    @param subpattern subpattern number
+    *returns true if subpattern is captured
+    */
+    public function is_subpattern_captured($subpattern) {
+        return array_key_exists($subpattern, $this->index_last);
+    }
+
+    /**
     @param subpattern subpattern number, 0 for the whole match
     *returns first correct character index
     */
     public function first_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_first[$subpattern];
@@ -267,7 +275,7 @@ class preg_matcher {
     @return the index of last correct character
     */
     public function last_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_last[$subpattern];
