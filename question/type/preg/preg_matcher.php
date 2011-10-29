@@ -54,6 +54,8 @@ class preg_matcher {
     protected $anchor;
 
     //Matching results
+    //String with which match is performed
+    protected $str;
     //Is any match found?
     protected $is_match;
     //Is match full or partial?
@@ -156,6 +158,7 @@ class preg_matcher {
             throw new qtype_preg_exception('Error: trying to do matching on regex with errors!');
         }
 
+        $this->str = $str;
         //Are results cached already?
         if (array_key_exists($str,$this->result_cache)) {
             $result = $this->result_cache[$str];
@@ -279,6 +282,19 @@ class preg_matcher {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_last[$subpattern];
+    }
+
+    /**
+    * returns (partialy) matched portion of string
+    */
+    public function matched_part($subpattern = 0) {
+        if(array_key_exists($subpattern, $this->index_first)) {
+            return substr($this->str, $this->index_first[$subpattern], $this->index_last[$subpattern] - $this->index_first[$subpattern] + 1);
+        } else if ($subpattern > $this->count_subpatterns()) {
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+        } else {
+            return '';
+        }
     }
 
     /**
