@@ -292,7 +292,7 @@ class dfa_preg_matcher extends preg_matcher {
             $wres = $this->wave($currentstate, $assertnumber);
             $key = $wres->nextkey;
             $result->left = $wres->left;
-            $result->next = $this->connection[$assertnumber][$key]->pregnode->character();
+            $result->next = $this->connection[$assertnumber][$key]->pregnode->next_character($string, $result->index);
         } else {
             $result->next = $next;
             $wres = $this->wave($currentstate, $assertnumber);

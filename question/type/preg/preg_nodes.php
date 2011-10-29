@@ -115,10 +115,10 @@ abstract class preg_leaf extends preg_node {
     public $mergedassertions = array();
 
     /*
-    * Returns true if the leaf consume character from the string during matching, false if it is an assertion
+    * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
     */
     public function consumes() {
-        return true;
+        return 1;
     }
     
     /*
@@ -166,9 +166,12 @@ abstract class preg_leaf extends preg_node {
     abstract protected function match_inner($str, $pos, &$length, $cs);
     
     /*
-    *Returns one of characters which contains in this leaf
+    * Returns a character suitable for both this leaf and merged assertions and previous character
+    * @param str string already matched
+    * @param pos position of the last matched character in the string
+    * @param length number of characters matched in case of partial backreference match
     */
-    abstract public function character();
+    abstract public function next_character($str, $pos, $length = 0);
     
     /**
     * function gives leaf in human readable form
@@ -204,14 +207,13 @@ class preg_leaf_charset extends preg_leaf {
 
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $cs) {
-
-        if ($pos>=strlen($str)) {
+        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
+        if ($pos>=$textlib->strlen($str)) {
             $length = 0;
             return false;
         }
         $charsetcopy = $this->charset;
         $strcopy = $str;
-        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
 
         if (!$cs) {
             $charsetcopy = $textlib->strtolower($charsetcopy);
@@ -231,7 +233,7 @@ class preg_leaf_charset extends preg_leaf {
         return $result;
     }
     
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         if ($this->negative) {
             $i = ord(' ');
             while (strchr(chr($i), $this->charset) !== false) {
@@ -243,6 +245,7 @@ class preg_leaf_charset extends preg_leaf {
             return $this->charset[0];
         }
     }
+
     public function tohr() {
         if ($this->negative) {
             $direction = '^';
@@ -284,12 +287,12 @@ class preg_leaf_meta extends preg_leaf {
     
     public function consumes() {
         if ($this->subtype = preg_leaf_meta::SUBTYPE_EMPTY) {
-            return false;
+            return 0;
         }
-        return true;
+        return 1;
     }
 
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $result = 'D';
@@ -306,13 +309,14 @@ class preg_leaf_meta extends preg_leaf {
         return $result;
     }
     protected function match_inner($str, $pos, &$length, $cs) {
-        if ($pos>=strlen($str) && $this->subtype != preg_leaf_meta::SUBTYPE_EMPTY) {
+        $textlib = textlib_get_instance();
+        if ($pos >= $textlib->strlen($str) && $this->subtype != preg_leaf_meta::SUBTYPE_EMPTY) {
             $length = 0;
             return false;
         }
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
-                if ($pos<strlen($str) && $str[$pos] != "\n") {
+                if ($pos < $textlib->strlen($str) && $str[$pos] != "\n") {
                     $length = 1;
                     return true;
                 } else {
@@ -395,7 +399,7 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     public function consumes() {
-        return false;
+        return 0;
     }
 
     public function name() {
@@ -404,7 +408,7 @@ class preg_leaf_assert extends preg_leaf {
 
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $cs) {
-
+        $textlib = textlib_get_instance();
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
@@ -418,7 +422,7 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($pos == strlen($str)) {
+                if ($pos == $textlib->strlen($str)) {
                     $result = true;
                 } else {
                     $result = false;
@@ -426,7 +430,7 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
-                $end = $pos==strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
+                $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
                 if (!$end) {
                     $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
                     $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
@@ -443,7 +447,7 @@ class preg_leaf_assert extends preg_leaf {
         }
         return $result;
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
@@ -509,7 +513,7 @@ class preg_leaf_combo extends preg_leaf {
 
     public function consumes() {//TODO: fix it!
         if (is_array($this->childs)) {
-            return $this->childs[0]->consumes() || $this->childs[0]->consumes();
+            return $this->childs[0]->consumes() + $this->childs[0]->consumes();
         } else {
             return true;
         }
@@ -543,15 +547,15 @@ class preg_leaf_combo extends preg_leaf {
         }
         return $result;
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
             if (is_array($this->childs)) {
-                return $this->childs[0]->character();
+                return $this->childs[0]->next_character($str, $pos, $length);
         } else {
             return 'ERROR: combo of nothing!';
         }
         } elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
-            die('Implement preg_leaf_combo::character() for crossing of leaf, before use it!');
+            die('Implement preg_leaf_combo::next_character($str, $pos, $length) for crossing of leaf, before use it!');
         }
     }
     public function tohr() {
@@ -619,8 +623,9 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function cross_charsets($charset0, $charset1) {
         $result = '';
-        for ($i=0; $i<strlen($charset0); $i++) {
-            if (strpos($charset1, $charset0[$i])!==false) {
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])!==false) {
                 $result.=$charset0[$i];
             }
         }
@@ -628,8 +633,9 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function sub_charsets($charset0, $charset1) {
         $result = '';
-        for ($i=0; $i<strlen($charset0); $i++) {
-            if (strpos($charset1, $charset0[$i])===false) {
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -637,8 +643,9 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function unite_charsets($charset0, $charset1) {
         $result = $charset1;
-        for ($i=0; $i<strlen($charset0); $i++) {
-            if (strpos($charset1, $charset0[$i])===false) {
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -654,9 +661,17 @@ class preg_leaf_backref extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
+
+    public function consumes() {
+        if (!$this->matcher->is_subpattern_captured($this->number)) {
+            return 0;
+        }
+        return $this->matcher->last_correct_character_index($this->number) - $this->matcher->first_correct_character_index($this->number) + 1;
+    }
+
     protected function match_inner($str, $pos, &$length, $cs) {
-        // TODO: partial matching
-        if ($pos>=strlen($str)) {
+        $textlib = textlib_get_instance();
+        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $textlib->strlen($str)) {
             $length = 0;
             return false;
         }
@@ -668,13 +683,20 @@ class preg_leaf_backref extends preg_leaf {
         }
         
         $start = $this->matcher->first_correct_character_index($this->number);
-        $len = $this->matcher->last_correct_character_index($this->number) - $start + 1;
-        $subpatt = $textlib->substr($strcopy, $start, $len);
+        $end = $this->matcher->last_correct_character_index($this->number);
+        $matchlen = 0;
 
-        $result = ($textlib->strpos($strcopy, $subpatt, $pos) == $pos);
+        $result = true;
+        // check char by char
+        for ($i = $start; $result && $i <= $end; $i++) {
+            $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
+            if ($result) {
+                $matchlen++;
+            }
+        }
 
         if ($result) {
-            $length = $len;
+            $length = $matchlen;
         } else {
             $length = 0;
         }
@@ -683,11 +705,11 @@ class preg_leaf_backref extends preg_leaf {
     public function name() {
         return 'leaf_backref';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
     }
     public function tohr() {
-        return 'backref #'.$number;
+        return 'backref #'.$this->number;
     }
 }
 
@@ -704,7 +726,7 @@ class preg_leaf_option extends preg_leaf {
     public function name() {
         return 'leaf_option';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         die ('TODO: implements abstract function character for preg_leaf_option class before use it!');
     }
     public function tohr() {
@@ -726,7 +748,7 @@ class preg_leaf_recursion extends preg_leaf {
     public function name() {
         return 'leaf_recursion';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0){
         die ('TODO: implements abstract function character for preg_leaf_recursion class before use it!');
     }
     public function tohr() {
