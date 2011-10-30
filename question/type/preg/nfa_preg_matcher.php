@@ -8,24 +8,18 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
  * used when matching a string
  */
 class processing_state {
-
     public $state;                       // a reference to the state which automaton is in
-
     public $matchcnt;                    // the number of characters matched
-
     public $isfullmatch;                 // whether the match is full
-
     public $nextpossible;                // the next possible character
-
     public $left;                        // number of characters left for matching
-
     public $subpattern_indexes_first = array();   // key = subpattern number
-
     public $subpattern_indexes_last = array();    // key = subpattern number
-
     public $subpatterns_captured = array();       // an array containing subpatterns captured at the moment
+    public $backreftransition;                    // != null if the last transition matched is a backreference
+    public $backrefmatchlen;                      // length of the last match
 
-    public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_left, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured) {
+    public function __construct(&$_state, $_matchcnt, $_isfullmatch, $_nextpossible, $_left, $_subpattern_indexes_first, $_subpattern_indexes_last, $_subpatterns_captured, $_backreftransition = null, $_backrefmatchlen = 0) {
         $this->state = $_state;
         $this->matchcnt = $_matchcnt;
         $this->isfullmatch = $_isfullmatch;
@@ -34,6 +28,8 @@ class processing_state {
         $this->subpattern_indexes_first = $_subpattern_indexes_first;
         $this->subpattern_indexes_last = $_subpattern_indexes_last;
         $this->subpatterns_captured = $_subpatterns_captured;
+        $this->backreftransition = $_backreftransition;
+        $this->backrefmatchlen = $_backrefmatchlen;
     }
 }
 
@@ -127,7 +123,14 @@ class nfa_preg_matcher extends preg_matcher {
     public function characters_left($laststate) {
         $curstates = array();    // states which the automaton is in
         $result = -1;
-        array_push($curstates, $laststate);
+        if ($laststate->backrefmatchlen == 0) {
+            array_push($curstates, $laststate);
+        } else {
+            $transition = $laststate->backreftransition;
+            $length = $laststate->subpattern_indexes_last[$transition->pregleaf->number] - $laststate->subpattern_indexes_first[$transition->pregleaf->number] + 1 - $laststate->backrefmatchlen;
+            $newstate = new processing_state($transition->state, $laststate->matchcnt + $length, false, 0, -1, array(), array(), array());
+            array_push($curstates, $newstate);
+        }
         while (count($curstates) != 0) {
             $newstates = array();
             while (count($curstates) != 0) {
@@ -241,6 +244,13 @@ class nfa_preg_matcher extends preg_matcher {
                             }
                             // save the state
                             array_push($newstates, $newstate);
+                        } else if ($length > 0) {    // (length > 0) equals to (next->pregleaf is a backreference)
+                            $currentstate->matchcnt += $length;
+                            $currentstate->backreftransition = $next;
+                            $currentstate->backrefmatchlen = $length;
+                            if ($this->is_new_result_more_suitable(&$result, &$currentstate)) {
+                                $result = $currentstate;
+                            }
                         }
                     }
                     $this->index_first = array();
