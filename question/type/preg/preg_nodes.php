@@ -671,7 +671,8 @@ class preg_leaf_backref extends preg_leaf {
 
     protected function match_inner($str, $pos, &$length, $cs) {
         $textlib = textlib_get_instance();
-        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $textlib->strlen($str)) {
+        $len = $textlib->strlen($str);
+        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $len) {
             $length = 0;
             return false;
         }
@@ -681,25 +682,22 @@ class preg_leaf_backref extends preg_leaf {
         if (!$cs) {
             $strcopy = $textlib->strtolower($strcopy);
         }
-        
         $start = $this->matcher->first_correct_character_index($this->number);
         $end = $this->matcher->last_correct_character_index($this->number);
         $matchlen = 0;
-
         $result = true;
         // check char by char
-        for ($i = $start; $result && $i <= $end; $i++) {
+        for ($i = $start; $result && $i <= $end && $i + $pos < $len; $i++) {
             $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
             if ($result) {
                 $matchlen++;
             }
         }
-
-        if ($result) {
-            $length = $matchlen;
-        } else {
-            $length = 0;
+        // if the string has not enough characters
+        if ($end + $pos >= $len) {
+            $result = false;
         }
+        $length = $matchlen;        
         return $result;
     }
     public function name() {
