@@ -310,30 +310,11 @@ class nfa_preg_matcher extends preg_matcher {
         $this->left = $result->left;
     }
 
-    /**
-    * numerates subpatterns
-    * @param pregnode - preg_node child class instance
-    * @param cnt - current subpattern count
-    */
-    protected function numerate_subpatterns(&$pregnode, &$cnt) {
-        if (is_a($pregnode, 'preg_operator')) {
-            if (is_a($pregnode, 'preg_node_subpatt')) {
-                $cnt++;
-                $pregnode->number = $cnt;
-            }
-            foreach ($pregnode->operands as $curop) {
-                $this->numerate_subpatterns($curop, $cnt);
-            }
-         }
-    }
-
     public function __construct($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
         if (!isset($regex) || !empty($this->errors)) {
             return;
         }
-        $subpattcnt = 0;
-        $this->numerate_subpatterns($this->ast_root, $subpattcnt);
         $stack = array();
         $this->dst_root->create_automaton(&$stack);
         $this->automaton = array_pop($stack);

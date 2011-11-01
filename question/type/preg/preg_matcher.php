@@ -40,6 +40,8 @@ class preg_matcher {
     protected $regex;
     //Modifiers for regular expression
     protected $modifiers;
+    //Max number of a subpattern available in regular expression
+    protected $maxsubpatt;
 
 
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
@@ -366,6 +368,7 @@ class preg_matcher {
             $parser->doParse($token->type, $token->value);
         }
         $lexerrors = $lexer->get_errors();
+        $this->maxsubpatt = $lexer->get_max_subpattern();
         foreach ($lexerrors as $errstring) {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
         }

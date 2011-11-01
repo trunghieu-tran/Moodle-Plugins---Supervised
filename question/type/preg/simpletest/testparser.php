@@ -22,270 +22,61 @@ require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 
 class parser_test extends UnitTestCase {
 
-    //Unit test for lexer
-    function test_lexer_quantificators() {
-        $regex = '?*+{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}?';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();//?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 1 && $token->value->greed);
-        $token = $lexer->nextToken();//*
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 0 && $token->value->greed);
-        $token = $lexer->nextToken();//+
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 1 && $token->value->greed);
-        $token = $lexer->nextToken();//{1,5}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 1 && $token->value->rightborder == 5 && $token->value->greed);
-        $token = $lexer->nextToken();//{,5}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 5 && $token->value->greed);
-        $token = $lexer->nextToken();//{1,}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 1 && $token->value->greed);
-        $token = $lexer->nextToken();//{5}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 5 && $token->value->rightborder == 5 && $token->value->greed);
-        $token = $lexer->nextToken();//*?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 0 && !$token->value->greed);
-        $token = $lexer->nextToken();//??
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 1 && !$token->value->greed);
-        $token = $lexer->nextToken();//+?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT && $token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 1 && !$token->value->greed);
-        $token = $lexer->nextToken();//{1,5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 1 && $token->value->rightborder == 5 && !$token->value->greed);
-        $token = $lexer->nextToken();//{,5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 5 && !$token->value->greed);
-        $token = $lexer->nextToken();//{1,}?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 1 && !$token->value->greed);
-        $token = $lexer->nextToken();//{5}?
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 5 && $token->value->rightborder == 5 && !$token->value->greed);
-    }
-    function test_lexer_backslach() {
-        $regex = '\\\\\\*\\[\\23\\023\\x23\\d\\s\\t\\b\\B';//\\\*\[\23\023\x23\d\s\t\b\B
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();//\\
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == '\\');
-        $token = $lexer->nextToken();//\*
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == '*');
-        $token = $lexer->nextToken();//\[
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == '[');
-        $token = $lexer->nextToken();//\23
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $token = $lexer->nextToken();//\023
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && ord($token->value->charset) == 023);
-        $token = $lexer->nextToken();//\x23
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && ord($token->value->charset) == 0x23);
-        $token = $lexer->nextToken();//\d
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == '0123456789');
-        $token = $lexer->nextToken();//\s
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == ' ');
-        $token = $lexer->nextToken();//\t
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == chr(9));
-        $token = $lexer->nextToken();//\b
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$token->value->negative);
-        $token = $lexer->nextToken();//\B
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->type == preg_node::TYPE_LEAF_ASSERT && $token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $token->value->negative);
-    }
-    function test_lexer_charclass() {
-        //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
-        $regex = '[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d][3-6]';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();//[a]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'a');
-        $token = $lexer->nextToken();//[abc]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'abc');
-        $token = $lexer->nextToken();//[ab{]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'ab{');
-        $token = $lexer->nextToken();//[ab\\]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'ab\\');
-        $token = $lexer->nextToken();//[ab\]]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'ab]');
-        $token = $lexer->nextToken();//[a\db]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'a0123456789b');
-        $token = $lexer->nextToken();//[a-d]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == 'abcd');
-        $token = $lexer->nextToken();//[3-6]
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET && $token->value->charset == '3456');
-    }
-    function test_lexer_few_number_in_quant() {
-        //{135,12755139}{135,}{,12755139}{135}
-        $regex = '{135,12755139}{135,}{,12755139}{135}';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();//{135,12755139}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 12755139 && $token->value->greed);
-        $token = $lexer->nextToken();//{135,}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT && $token->value->leftborder == 135 && $token->value->greed);
-        $token = $lexer->nextToken();//{,12755139}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 0 && $token->value->rightborder == 12755139 && $token->value->greed);
-        $token = $lexer->nextToken();//{135}
-        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT && $token->value->leftborder == 135 && $token->value->rightborder == 135 && $token->value->greed);
-    }
-    function test_lexer_anchors() {
-        //^a|b$
-        $regex = '^a|b$';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype === preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $token = $lexer->nextToken();
-        $token = $lexer->nextToken();
-        $token = $lexer->nextToken();
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
-    }
-    function test_lexer_asserts() {
-        $regex = '(?=(?!(?<=(?<!';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_PLA);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_NLA);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_PLB);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_assert::SUBTYPE_NLB);
-    }
-    function test_lexer_metasymbol_dot() {
-        $regex = '.';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF && $token->value->type == preg_node::TYPE_LEAF_META && $token->value->subtype === preg_leaf_meta::SUBTYPE_DOT);
-    }
-    function test_lexer_subpatterns() {
-        $regex = '((?:(?>(?(?=(?(?!(?(?<=(?(?<!';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node::TYPE_NODE_SUBPATT);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === 'grouping');
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK && $token->value->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_PLA);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_NLA);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_PLB);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT && $token->value->subtype === preg_node_cond_subpatt::SUBTYPE_NLB);
-    }
-    function test_lexer_recursion_and_options() {
-        $regex = '(?xm-is)(?R)(?14)';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();//(?xm-is)
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->posopt=='xm' && $token->value->negopt=='is');
-        $token = $lexer->nextToken();//(?R)
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type==preg_node::TYPE_LEAF_RECURSION && $token->value->number==0);
-        $token = $lexer->nextToken();//(?14)
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type==preg_node::TYPE_LEAF_RECURSION && $token->value->number==14);
-    }
-    function test_lexer_index() {
-        $regex = 'ab{12,57}[abc]';
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->value->indfirst == 0);
-        $this->assertTrue($token->value->indlast == 0);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->value->indfirst == 1);
-        $this->assertTrue($token->value->indlast == 1);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->value->indfirst == 2);
-        $this->assertTrue($token->value->indlast == 8);
-        $token = $lexer->nextToken();
-        $this->assertTrue($token->value->indfirst == 9);
-        $this->assertTrue($token->value->indlast == 13);
-    }
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
         $parser =& $this->run_parser('a|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == 'b');
     }
     function test_parser_quantification() {//ab+
         $parser =& $this->run_parser('ab+');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[1]->leftborder == 1);
-        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[0]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT);
+        $this->assertTrue($root->operands[1]->leftborder == 1);
+        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->operands[0]->charset == 'b');
     }
     function test_parser_alt_and_quantif() {//a*|b
         $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_INFINITE_QUANT && $root->operands[0]->leftborder == 0);
-        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_INFINITE_QUANT);
+        $this->assertTrue($root->operands[0]->leftborder == 0);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == 'b');
     }
     function test_parser_concatenation() {//ab
         $parser =& $this->run_parser('ab');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == 'b');
     }
     function test_parser_alt_and_conc() {//ab|cd
         $parser =& $this->run_parser('ab|cd');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->charset == 'b');
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[0]->charset == 'c');
-        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->operands[1]->charset == 'd');
+        $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->operands[0]->charset == 'c');
+        $this->assertTrue($root->operands[1]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->operands[1]->charset == 'd');
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
         $parser =& $this->run_parser('(?:a|b)*abb');
@@ -294,35 +85,50 @@ class parser_test extends UnitTestCase {
         $matcher->append_end(0);
         $matcher->buildfa(0);
         $res = $matcher->compare('ab', 0);
-        $this->assertTrue(!$res->full && $res->index == 1 && ($res->next == 'a' || $res->next == 'b'));
+        $this->assertTrue(!$res->full);
+        $this->assertTrue($res->index == 1);
+        $this->assertTrue(($res->next == 'a' || $res->next == 'b'));
         $res = $matcher->compare('abb', 0);
-        $this->assertTrue($res->full && $res->index == 2 && $res->next == 0);
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->index == 2);
+        $this->assertTrue($res->next == 0);
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbab', 0);
-        $this->assertTrue(!$res->full && $res->index == 57 && ($res->next == 'a' || $res->next == 'b'));
+        $this->assertTrue(!$res->full);
+        $this->assertTrue($res->index == 57);
+        $this->assertTrue(($res->next == 'a' || $res->next == 'b'));
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
-        $this->assertTrue($res->full && $res->index == 58 && $res->next == 0);  
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->index == 58);
+        $this->assertTrue($res->next == 0);  
     }
     function test_parser_two_anchors() {
         $parser =& $this->run_parser('^a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[0]->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->operands[1]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_start_anchor() {
         $parser =& $this->run_parser('^a');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[1]->charset == 'a');
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == 'a');
     }
     function test_parser_end_anchor() {
         $parser =& $this->run_parser('a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET && $root->operands[0]->charset == 'a');
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_error() {
         $parser =& $this->run_parser('^((ab|cd)ef$');
@@ -345,32 +151,42 @@ class parser_test extends UnitTestCase {
         $fb = $root->operands[0]->operands[1];
         $tf = $root->operands[1]->operands[1]->operands[0];
         $ff = $root->operands[1]->operands[1]->operands[1];
-        $this->assertTrue($tf->type == preg_node::TYPE_NODE_ASSERT && $tf->subtype == preg_node_assert::SUBTYPE_PLA);
-        $this->assertTrue($ff->type == preg_node::TYPE_NODE_ASSERT && $ff->subtype == preg_node_assert::SUBTYPE_NLA);
-        $this->assertTrue($fb->type == preg_node::TYPE_NODE_ASSERT && $fb->subtype == preg_node_assert::SUBTYPE_NLB);
-        $this->assertTrue($tb->type == preg_node::TYPE_NODE_ASSERT && $tb->subtype == preg_node_assert::SUBTYPE_PLB);
+        $this->assertTrue($tf->type == preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($tf->subtype == preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($ff->type == preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($ff->subtype == preg_node_assert::SUBTYPE_NLA);
+        $this->assertTrue($fb->type == preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($fb->subtype == preg_node_assert::SUBTYPE_NLB);
+        $this->assertTrue($tb->type == preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($tb->subtype == preg_node_assert::SUBTYPE_PLB);
     }
     function test_parser_metasymbol_dot() {
         $parser =& $this->run_parser('.');
         $root = $parser->get_root();
-        $this->assertTrue($root->type == preg_node::TYPE_LEAF_META && $root->subtype == preg_leaf_meta::SUBTYPE_DOT);
+        $this->assertTrue($root->type == preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->subtype == preg_leaf_meta::SUBTYPE_DOT);
     }
     function test_parser_word_break() {
         $parser =& $this->run_parser('a\b');
         $root = $parser->get_root();
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && !$root->operands[1]->negative);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue(!$root->operands[1]->negative);
     }
     function test_parser_word_not_break() {
         $parser =& $this->run_parser('a\B');
         $root = $parser->get_root();
-        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT && $root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK && $root->operands[1]->negative);
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT);
+        $this->assertTrue($root->operands[1]->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($root->operands[1]->negative);
     }
     function test_parser_subpatterns() {
         $parser =& $this->run_parser('((?:(?(?=a)(?>b)|a)))');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_COND_SUBPATT);
-        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT && $root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
     function test_parser_index() {
         $parser =& $this->run_parser('abcdefgh|(abcd)*');
