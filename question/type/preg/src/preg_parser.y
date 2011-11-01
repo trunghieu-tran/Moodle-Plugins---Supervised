@@ -118,6 +118,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     if (B->subtype !== 'grouping') {
         if (B->subtype === preg_node::TYPE_NODE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             A = new preg_node_subpatt;
+            A->number = B->number;
         } else {
             A = new preg_node_assert;
         }

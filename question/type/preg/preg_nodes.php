@@ -27,6 +27,19 @@ class preg_lexem {
     }
 }
 
+/*
+* Class for plain subpattern lexems
+*/
+class preg_lexem_subpatt extends preg_lexem {
+	//Number of subpattern
+    public $number;
+
+    public function __construct($subtype, $indfirst, $indlast, $number) {
+        parent::__construct($subtype, $indfirst, $indlast);
+        $this->number = $number;
+    }
+}
+
 /**
 * Generic node class
 */
