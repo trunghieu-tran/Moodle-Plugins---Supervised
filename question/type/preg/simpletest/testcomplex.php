@@ -187,16 +187,15 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 2 && $matcher->next_char() === '');
     }
     function test_loop_assert() {
-        $matcher = new dfa_preg_matcher('a((?=[^b])[xcvbnm])+');//$matcher->draw(0, 'fp');$matcher->draw(0, 'dfa');
+        $matcher = new dfa_preg_matcher('a((?=[^b])[xcvbnm])+');
         $matcher->match('axcv');
         $this->assertTrue($matcher->is_matching_complete());
         $matcher->match('abxv');
         $this->assertFalse($matcher->is_matching_complete());
-        $matcher = new dfa_preg_matcher('(a(?=[^b])[xcvbnm])+');$matcher->draw(0, 'fp');$matcher->draw(0, 'dfa');
+        $matcher = new dfa_preg_matcher('(a(?=[^b])[xcvbnm])+');
         $matcher->match('axacav');
         $this->assertTrue($matcher->is_matching_complete());
         $matcher->match('ab');
-        echo $matcher->last_correct_character_index();
         $this->assertFalse($matcher->is_matching_complete());
     }
     function test_no_anchor() {
