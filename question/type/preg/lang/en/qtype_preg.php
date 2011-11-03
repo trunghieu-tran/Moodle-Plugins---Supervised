@@ -31,6 +31,8 @@ for the regular expression in given string (answer). Exact matching means match 
 Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives
 you additional flexibility: you can specify some answer with low (or zero) grade to catch common errors and give
 comments on them. You still can specify exact matches for some of you regular expressions if you start them with ^ and end with $.';
+$string['gvpath'] = 'Path to dot.exe of GraphViz';
+$string['gvdescription'] = 'Graphviz will be used for debug printing DFA and syntax tree in human readable form.';
 $string['hintbutton'] = 'Hint';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with grade less then hint grade border won\'t used in hinting.';
@@ -56,6 +58,7 @@ $string['node_infinite_quant'] = 'Infinite quantificator';
 $string['node_subpatt'] = 'Subpattern';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal hint grade border. This effectively disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
+$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from feedback or choose another engine.';
 $string['preg'] = 'Regular expression';
