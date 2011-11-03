@@ -1040,7 +1040,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_last'=>array(0=>15),
                         'left'=>array(0),
                         'next'=>'');
-
+                        
         return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
     }
