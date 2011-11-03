@@ -79,6 +79,18 @@ class preg_matcher {
     }
 
     /**
+    *resets first and last indexes to -1 and -2 for all subpatterns
+    */
+    protected function reset_subpattern_indexes() {
+        $this->index_last = array();
+        $this->index_first = array();
+        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
+            $this->index_first[$i] = -1;
+            $this->index_last[$i] = -2;
+        }
+    }
+
+    /**
     *parse regex and do all necessary preprocessing
     @param regex - regular expression for which will be build finite automate
     @param modifiers - modifiers of regular expression
@@ -86,8 +98,6 @@ class preg_matcher {
     public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
         $this->full = false;
-        $this->index_last = array();
-        $this->index_first = array();
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
@@ -117,6 +127,7 @@ class preg_matcher {
         } else {
             $this->ast_root = null;
         }
+        $this->reset_subpattern_indexes();
     }
 
     /**
@@ -180,7 +191,13 @@ class preg_matcher {
             $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
             $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
         } else {//do some sanity checks
-            if(!$this->is_supporting(preg_matcher::SUBPATTERN_CAPTURING) && $this->count_subpatterns() > 0) {
+            $subpattcnt = 0;
+            foreach ($this->index_first as $key=>$value) {
+                if ($key != 0 && $this->index_last[$key] >= $value) {
+                    $subpattcnt++;
+                }
+            }
+            if(!$this->is_supporting(preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
             if(!isset($this->index_first[0]) || !isset($this->index_last[0])) {
@@ -260,7 +277,10 @@ class preg_matcher {
     *returns true if subpattern is captured
     */
     public function is_subpattern_captured($subpattern) {
-        return array_key_exists($subpattern, $this->index_last);
+        if ($subpattern > $this->maxsubpatt) {
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+        }
+        return ($this->index_last[$subpattern] >= 0);
     }
 
     /**
@@ -268,7 +288,7 @@ class preg_matcher {
     *returns first correct character index
     */
     public function first_correct_character_index($subpattern = 0) {
-        if (!array_key_exists($subpattern, $this->index_last)) {
+        if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_first[$subpattern];
@@ -280,7 +300,7 @@ class preg_matcher {
     @return the index of last correct character
     */
     public function last_correct_character_index($subpattern = 0) {
-        if (!array_key_exists($subpattern, $this->index_last)) {
+        if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_last[$subpattern];
