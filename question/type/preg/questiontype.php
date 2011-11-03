@@ -18,13 +18,6 @@ require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 
 class question_preg_qtype extends question_shortanswer_qtype {
 
-    //key is answer id, value is matcher object
-    //keys will be unique across many questions since answer id's are unique
-    protected $matchers_cache = array();
-
-    //Needed to pass hinted message to the question form, should be deleted when moving for renderers
-    protected $hintmessage = '';
-
     /**
     * returns an array of engines
     */
@@ -47,41 +40,6 @@ class question_preg_qtype extends question_shortanswer_qtype {
         array_splice($extraquestionfields, 0, 1, 'question_preg');
         array_push($extraquestionfields, 'correctanswer', 'exactmatch','usehint','hintpenalty','hintgradeborder','engine');
         return $extraquestionfields;
-    }
-
-    /**
-    * create or get suitable matcher object for given engine, regex and options
-    @param engine string engine name
-    @param regex string regular expression to match
-    @param $exact bool exact macthing mode
-    @param $usecase bool case sensitive mode
-    @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
-    @return matcher object
-    */
-    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null) {
-        global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
-
-        if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
-            $matcher =& $this->matchers_cache[$answerid];
-        } else {//create and store matcher object
-            $for_regexp=$regex;
-            if ($exact) {
-                //Grouping is needed in case regexp contains top-level alternatives
-                //use non-capturing grouping to not mess-up with user subpattern capturing
-                $for_regexp = '^(?:'.$for_regexp.')$';
-            }
-            $modifiers = null;
-            if (!$usecase) {
-                $modifiers = 'i';
-            }
-            $matcher = new $engine($for_regexp, $modifiers);
-            if ($answerid !== null) {
-                $this->matchers_cache[$answerid] =& $matcher;
-            }
-        }
-
-        return $matcher;
     }
 
     function save_question_options($question) {
@@ -110,7 +68,7 @@ class question_preg_qtype extends question_shortanswer_qtype {
     * Override compare responses for Hint button to work right after Submit without changing response
     * This may not be needed if the best fit answer would be saved in DB in reponses - TODO - probably could wait before new question engine
     */
-    function compare_responses($question, $state, $teststate) {
+/*    function compare_responses($question, $state, $teststate) {
         $result = parent::compare_responses($question, $state, $teststate);
         //if hint requiested grade and apply penalty anyway, because if $teststate isn't direct predecessor of $state, than Hint won't work if the student entered exactly same response before
         //Hinting needs grading to work for now
@@ -118,28 +76,13 @@ class question_preg_qtype extends question_shortanswer_qtype {
             $result = false;
         }
         return $result;
-    }
+    }*/
 
-  /*
-     * Override the parent class method, to show correct answer.
-     */
-    function get_correct_responses(&$question, &$state) {
-        return array(''=>$question->options->correctanswer);
-    }
-    
-    function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
-        parent::print_question_submit_buttons(&$question, &$state, $cmoptions, $options);
-        if (($cmoptions->optionflags & QUESTION_ADAPTIVE) and !$options->readonly and $question->options->usehint) {
-            echo '<input type="submit" name="', $question->name_prefix, 'hint" value="',
-                    get_string('hintbutton','qtype_preg'), '" class=" btn" onclick="',
-                    "form.action = form.action + '#q", $question->id, "'; return true;", '" />';
-        }
-    }
 
     /**
     * function additionaly fill $state->responses['__answer'] with best fit answer for further hinting
     */
-    function grade_responses(&$question, &$state, $cmoptions) {
+/*    function grade_responses(&$question, &$state, $cmoptions) {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$question->options->engine.'.php');
         $querymatcher = new $question->options->engine;//this matcher will be used to query engine capabilities
@@ -215,6 +158,16 @@ class question_preg_qtype extends question_shortanswer_qtype {
         $state->event = ($state->event ==  QUESTION_EVENTCLOSE) ? QUESTION_EVENTCLOSEANDGRADE : QUESTION_EVENTGRADE;
 
         return true;
+    }
+*/
+
+    function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
+        parent::print_question_submit_buttons(&$question, &$state, $cmoptions, $options);
+        if (($cmoptions->optionflags & QUESTION_ADAPTIVE) and !$options->readonly and $question->options->usehint) {
+            echo '<input type="submit" name="', $question->name_prefix, 'hint" value="',
+                    get_string('hintbutton','qtype_preg'), '" class=" btn" onclick="',
+                    "form.action = form.action + '#q", $question->id, "'; return true;", '" />';
+        }
     }
 
     function print_question_formulation_and_controls(&$question, &$state, $cmoptions, $options) {

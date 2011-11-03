@@ -199,6 +199,27 @@ class preg_matcher {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
     }
 
+    /** 
+    * return an associative array of match results, helper method
+    */
+    public function get_match_results() {
+        $res = array('is_match' => $this->is_match)
+        if ($this->is_match) {
+            $res['full'] = $this->full;
+            $res['index_first'] = $this->index_first;
+            $res['index_last'] = $this->index_last;
+            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $res['next'] = $this->next;
+            }
+            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+                $res['left'] = $this->left;
+            }
+        } else {
+            $res['full'] = false;
+        }
+        return $res;
+    }
+
     /**
     * is there a matching at all?
     */
