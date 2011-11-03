@@ -11,7 +11,7 @@
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
-
+require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
 class preg_matcher {
 
@@ -49,11 +49,13 @@ class preg_matcher {
     //The error messages array
     protected $errors;
     //Array with flags for unsupported node types
-    protected $error_flags;
+    //protected $error_flags;
     //Anchoring - object,  with 'start' and 'end' logical fields, which are true if all regex is anchored
     protected $anchor;
 
     //Matching results
+    //String with which match is performed
+    protected $str;
     //Is any match found?
     protected $is_match;
     //Is match full or partial?
@@ -87,7 +89,7 @@ class preg_matcher {
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
-        $this->error_flags = array();
+        //$this->error_flags = array();
         $this->is_match = false;
 
         if ($regex === null) {
@@ -99,10 +101,7 @@ class preg_matcher {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $a = new stdClass;
-                    $a->modifier = $modifiers[$i];
-                    $a->classname = $this->name();
-                    $this->errors[] = get_string('unsupportedmodifier','qtype_preg',$a);
+                    $this->errors[] = new preg_error_unsupported_modifier($this, $modifiers[$i]);
                 }
             }
         }
@@ -159,6 +158,7 @@ class preg_matcher {
             throw new qtype_preg_exception('Error: trying to do matching on regex with errors!');
         }
 
+        $this->str = $str;
         //Are results cached already?
         if (array_key_exists($str,$this->result_cache)) {
             $result = $this->result_cache[$str];
@@ -203,7 +203,7 @@ class preg_matcher {
     * return an associative array of match results, helper method
     */
     public function get_match_results() {
-        $res = array('is_match' => $this->is_match)
+        $res = array('is_match' => $this->is_match);
         if ($this->is_match) {
             $res['full'] = $this->full;
             $res['index_first'] = $this->index_first;
@@ -254,11 +254,19 @@ class preg_matcher {
     }
 
     /**
+    @param subpattern subpattern number
+    *returns true if subpattern is captured
+    */
+    public function is_subpattern_captured($subpattern) {
+        return array_key_exists($subpattern, $this->index_last);
+    }
+
+    /**
     @param subpattern subpattern number, 0 for the whole match
     *returns first correct character index
     */
     public function first_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_first[$subpattern];
@@ -270,10 +278,23 @@ class preg_matcher {
     @return the index of last correct character
     */
     public function last_correct_character_index($subpattern = 0) {
-        if ($subpattern > $this->count_subpatterns()) {
+        if (!array_key_exists($subpattern, $this->index_last)) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
         return $this->index_last[$subpattern];
+    }
+
+    /**
+    * returns (partialy) matched portion of string
+    */
+    public function matched_part($subpattern = 0) {
+        if(array_key_exists($subpattern, $this->index_first)) {
+            return substr($this->str, $this->index_first[$subpattern], $this->index_last[$subpattern] - $this->index_first[$subpattern] + 1);
+        } else if ($subpattern > $this->count_subpatterns()) {
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -310,7 +331,22 @@ class preg_matcher {
     @return array of errors
     */
     public function get_errors() {
+        $res = array();
+        foreach($this->errors as $error) {
+            $res[] = $error->errormsg;
+        }
+        return $res;
+    }
+
+    public function get_error_objects() {
         return $this->errors;
+    }
+
+    /**
+    * Is a preg_node_... or a preg_leaf_... supported by the engine?
+    */
+    protected function is_node_acceptable($pregnode) {
+        return false;    // Should be overloaded by child classes
     }
 
     /**
@@ -339,27 +375,18 @@ class preg_matcher {
             $errormsgs = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
-                $errormsgs[] = $this->highlight_regex($regex, $node->firstindxs[0],$node->lastindxs[0]) . '<br/>' . $node->error_string();
+                $errormsgs[] = new preg_parsing_error($regex, $node);
             }
             $this->errors = array_merge($this->errors, $errormsgs);
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             //Add error messages for unsupported nodes
-            foreach ($this->error_flags as $key => $value) {
-                $a = new stdClass;
-                $a->nodename = $key;
-                $a->indfirst = $value['start'];
-                $a->indlast = $value['end'];
-                $a->engine = get_string($this->name(), 'qtype_preg');
-                $this->errors[] = $this->highlight_regex($regex, $value['start'], $value['end']) . '<br/>' . get_string('unsupported','qtype_preg',$a);
-            }
+            //foreach ($this->error_flags as $key => $value) {
+                //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
+            //}
         }
         fclose($pseudofile);
-    }
-
-    public function highlight_regex($regex, $indfirst, $indlast) {
-        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
     }
 
     /**
@@ -372,11 +399,16 @@ class preg_matcher {
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->error_flags)) {//highlighting first occurence of unaccepted node
-                    $this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->errors/*error_flags*/)) {//highlighting first occurence of unaccepted node
+                    //$this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+                    $this->errors[$enginenode->rejectmsg] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             } else {
                 $enginenode = $pregnode;
+                if (!$this->is_node_acceptable($pregnode)) {
+                    $this->errors[] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                    //$this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+                }
             }
             return $enginenode;
         } else {
