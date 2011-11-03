@@ -128,7 +128,7 @@ class nfa_preg_matcher extends preg_matcher {
         } else {
             $transition = $laststate->backreftransition;
             $length = $laststate->subpattern_indexes_last[$transition->pregleaf->number] - $laststate->subpattern_indexes_first[$transition->pregleaf->number] + 1 - $laststate->backrefmatchlen;
-            $newstate = new processing_state($transition->state, $laststate->matchcnt + $length, false, 0, -1, array(), array(), array());
+            $newstate = new processing_state($transition->state, $laststate->matchcnt + $length, false, 0, -1, $laststate->subpattern_indexes_first, $laststate->subpattern_indexes_last, $laststate->subpatterns_captured);
             array_push($curstates, $newstate);
         }
         while (count($curstates) != 0) {
@@ -152,7 +152,7 @@ class nfa_preg_matcher extends preg_matcher {
                             $length = $next->pregleaf->consumes();
                         }
                         if (!$skip) {
-                            $newstate = new processing_state($next->state, $currentstate->matchcnt + $length, false, 0, -1, array(), array(), array());
+                            $newstate = new processing_state($next->state, $currentstate->matchcnt + $length, false, 0, -1, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
                             // save subpattern indexes
                             foreach ($next->subpatt_start as $key=>$subpatt) {
                                 if (!isset($newstate->subpattern_indexes_first[$key])) {
@@ -188,9 +188,9 @@ class nfa_preg_matcher extends preg_matcher {
         $curstates = array();    // states which the automaton is in
         $skipstates = array();   // contains states where infinite quantifiers start. it's used to protect from loops like ()*
 
-        $result = new processing_state($this->automaton->startstate, 0, false, 0, -1, array(), array(), array());
-        $this->index_first = array();    // to be sure
-        $this->index_last = array();
+        $this->reset_subpattern_indexes();
+        $result = new processing_state($this->automaton->startstate, 0, false, 0, -1, $this->index_first, $this->index_last, array());
+        
         array_push($curstates, $result);
         while (count($curstates) != 0) {
             $newstates = array();
@@ -226,12 +226,12 @@ class nfa_preg_matcher extends preg_matcher {
                             $newstate = new processing_state($next->state, $pos + $length, false, 0, -1, $currentstate->subpattern_indexes_first, $currentstate->subpattern_indexes_last, $currentstate->subpatterns_captured);
                             // save subpattern indexes
                             foreach ($next->subpatt_start as $key=>$subpatt) {
-                                if (!isset($newstate->subpattern_indexes_first[$key])) {
+                                if ($newstate->subpattern_indexes_first[$key] < 0) {
                                     $newstate->subpattern_indexes_first[$key] = $startpos + $pos;
                                 }
                             }
                             foreach ($next->subpatt_end as $key=>$subpatt) {
-                                if (isset($newstate->subpattern_indexes_first[$key]) && !(isset($newstate->subpatterns_captured[$key]) && $newstate->subpatterns_captured[$key])) {
+                                if ($newstate->subpattern_indexes_first[$key] >= 0 && !(isset($newstate->subpatterns_captured[$key]) && $newstate->subpatterns_captured[$key])) {
                                     $newstate->subpattern_indexes_last[$key] = $startpos + $pos + $length - 1;
                                     $subpatt_exists = false;
                                     foreach ($newstate->state->next as $nextnext) {        // search for this subpattern in next transitions
@@ -253,11 +253,9 @@ class nfa_preg_matcher extends preg_matcher {
                             }
                         }
                     }
-                    $this->index_first = array();
-                    $this->index_last = array();
+                    $this->reset_subpattern_indexes();
                 }
             }
-
             // replace curstates with newstates
             foreach ($newstates as $state) {
                 array_push($curstates, $state);
