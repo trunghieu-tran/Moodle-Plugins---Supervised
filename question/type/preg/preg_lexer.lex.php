@@ -547,7 +547,7 @@ array(
 						case 7:
 							{
     $this->maxsubpatt++;
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node::TYPE_NODE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 						case -8:

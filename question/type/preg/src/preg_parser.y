@@ -20,9 +20,9 @@
         $this->error = false;
         $this->errornodes = array();
         $this->reducecount = 0;
-        $this->parens = array(preg_node::TYPE_NODE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
-                                preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!',
-                                preg_node_assert::SUBTYPE_NLB => '(?<!');
+        $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
+                              preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
+                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
     }
 
     function get_root() {
@@ -116,15 +116,15 @@ expr(A) ::= expr(B) QUANT(C). {
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
     if (B->subtype !== 'grouping') {
-        if (B->subtype === preg_node::TYPE_NODE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
+        if (B->subtype === preg_node_subpatt::SUBTYPE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             A = new preg_node_subpatt;
             A->number = B->number;
         } else {
             A = new preg_node_assert;
         }
-        if (B->subtype !== preg_node::TYPE_NODE_SUBPATT) {
+        //if (B->subtype !== preg_node::TYPE_NODE_SUBPATT) {
             A->subtype = B->subtype;
-        }
+       // }
         A->operands[0] = C;
     } else {//grouping node
         A = C;

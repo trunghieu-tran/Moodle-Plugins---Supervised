@@ -280,7 +280,7 @@ class lexer_test extends UnitTestCase {
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
 		$this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
@@ -308,7 +308,7 @@ class lexer_test extends UnitTestCase {
         $lexer = new Yylex($pseudofile);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
 		$this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
@@ -319,13 +319,13 @@ class lexer_test extends UnitTestCase {
 		$this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node::TYPE_NODE_SUBPATT);		
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);		
 		$this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
 		$this->assertTrue($token->value->number === 4);
     }
     function test_lexer_recursion_and_options() {

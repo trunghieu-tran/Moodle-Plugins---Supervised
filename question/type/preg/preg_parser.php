@@ -126,9 +126,9 @@ class preg_parser_yyParser
         $this->error = false;
         $this->errornodes = array();
         $this->reducecount = 0;
-        $this->parens = array(preg_node::TYPE_NODE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
-                                preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!',
-                                preg_node_assert::SUBTYPE_NLB => '(?<!');
+        $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
+                              preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
+                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
     }
 
     function get_root() {
@@ -869,15 +869,15 @@ static public $yy_action = array(
     function yy_r5(){
     //ECHO 'SUBPATT '.$this->parens[$this->yystack[$this->yyidx + -2]->minor].'<br/>';
     if ($this->yystack[$this->yyidx + -2]->minor->subtype !== 'grouping') {
-        if ($this->yystack[$this->yyidx + -2]->minor->subtype === preg_node::TYPE_NODE_SUBPATT || $this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
+        if ($this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_SUBPATT || $this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             $this->_retvalue = new preg_node_subpatt;
             $this->_retvalue->number = $this->yystack[$this->yyidx + -2]->minor->number;
         } else {
             $this->_retvalue = new preg_node_assert;
         }
-        if ($this->yystack[$this->yyidx + -2]->minor->subtype !== preg_node::TYPE_NODE_SUBPATT) {
+        //if ($this->yystack[$this->yyidx + -2]->minor->subtype !== preg_node::TYPE_NODE_SUBPATT) {
             $this->_retvalue->subtype = $this->yystack[$this->yyidx + -2]->minor->subtype;
-        }
+       // }
         $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {//grouping node
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
