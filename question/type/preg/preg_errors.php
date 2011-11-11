@@ -54,13 +54,19 @@ class preg_modifier_error extends preg_error {
 
 }
 
-// Regex is too large to build FA (too many transitions or states in fa)
-class preg_fa_building_error extends preg_error {
+// FA is too large
+class preg_too_complex_error extends preg_error {
 
-    public function __construct($matcher, $indexes) {
+    public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
         $a = new stdClass;
-        $a->indfirst = $indexes['start'];
-        $a->indlast = $indexes['end'];
+        if ($indexes['start'] == -1 && $indexes['end'] == -2) {
+            $textlib = textlib_get_instance();
+            $a->indfirst = 0;
+            $a->indlast = $textlib->strlen($regex) - 1;
+        } else {
+            $a->indfirst = $indexes['start'];
+            $a->indlast = $indexes['end'];
+        }
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
