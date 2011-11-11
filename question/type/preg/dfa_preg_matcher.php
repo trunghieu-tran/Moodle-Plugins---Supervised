@@ -168,7 +168,7 @@ class dfa_preg_matcher extends preg_matcher {
                 }
                 $passcount++;
                 if (($passcount > MAX_PASSAGE_COUNT || $statecount > MAX_STATE_COUNT) && MAX_STATE_COUNT != 0 && MAX_PASSAGE_COUNT != 0) {
-                    $this->errors[] = get_string('toolargedfa', 'qtype_preg');
+                    $this->errors[] = get_string('toolargefa', 'qtype_preg');
                     return;
                 }
             }
@@ -556,7 +556,7 @@ class dfa_preg_matcher extends preg_matcher {
                 $this->merge_fp_maps($key);
             }
         }
-        $this->buildfa();
+        $this->buildfa();	// TODO: check for dfa size!
         $this->built = true;
         return;
     }
