@@ -169,7 +169,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \( {
     $this->maxsubpatt++;
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node::TYPE_NODE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \) {
