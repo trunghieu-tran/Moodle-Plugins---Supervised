@@ -75,6 +75,6 @@ $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by engine {$a->classname}.';
 $string['usehint'] = 'Use hint';
 $string['usehint_help'] = 'In adaptive mode show student Hint button allowing getting one-character hint with applying Hint penalty. Not all matching engines support hinting.';
-$string['toolargefa'] = 'FA size limit exhausted, the regex is too complex. FA building is stopped.';
+$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask you administrator to increase time and memory limits or simplify you regular expression.';
 ?>
 
