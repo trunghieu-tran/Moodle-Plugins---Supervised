@@ -36,6 +36,10 @@ class processing_state {
 
 class nfa_preg_matcher extends preg_matcher {
 
+    public $statelimit = 250;
+    
+    public $transitionlimit = 250;
+
     public $automaton;    // an nfa corresponding to the given regex
 
     /**
@@ -314,7 +318,13 @@ class nfa_preg_matcher extends preg_matcher {
             return;
         }
         $stack = array();
-        $this->dst_root->create_automaton(&$stack);
+        $statecount = 0;
+        $transitioncount = 0;
+        $errornode = $this->dst_root->create_automaton(&$this, &$stack, &$statecount, &$transitioncount);
+        if ($errornode != null) {
+            $this->errors[] = new preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
+            return;
+        }
         $this->automaton = array_pop($stack);
         //$this->automaton->append_endeps();
         //$this->automaton->replace_eps_transitions();
