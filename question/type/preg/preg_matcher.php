@@ -178,6 +178,9 @@ class preg_matcher {
             $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
             $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
         } else {//do some sanity checks
+            if(!$this->is_supporting(preg_matcher::PARTIAL_MATCHING) && !$this->full) {//if no partial matching, than non full match = no match at all
+                $this->is_match = false;
+            }
             if(!$this->is_supporting(preg_matcher::SUBPATTERN_CAPTURING) && $this->count_subpatterns() > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
