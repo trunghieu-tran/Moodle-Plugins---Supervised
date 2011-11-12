@@ -82,15 +82,10 @@ class preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
-        $this->errors = array();
-        $this->full = false;
-        $this->index_last = array();
-        $this->index_first = array();
-        $this->next = '';
-        $this->left = -1;
+
         $this->result_cache = array();
         //$this->error_flags = array();
-        $this->is_match = false;
+        $this->errors = array();
 
         if ($regex === null) {
             return;
@@ -170,6 +165,14 @@ class preg_matcher {
             $this->is_match = $result['is_match'];
             return $this->full;
         }
+
+        //Clear results members before matching
+        $this->full = false;
+        $this->index_last = array();
+        $this->index_first = array();
+        $this->next = '';
+        $this->left = -1;
+        $this->is_match = false;
 
         $this->match_inner($str);
 
