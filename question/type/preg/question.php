@@ -57,9 +57,6 @@ class qtype_preg_question extends question_graded_automatically_with_countback
     //Other fields
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
     protected $matchers_cache = array();
-    //Needed to pass hinted message to the question form, should be deleted when moving for renderers
-    //TODO - check how to implement now
-    protected $hintmessage = '';
     /** @var cache of best fit answer: keys in array are 'answer' and 'match'. */
     protected $bestfitanswer = array();
     /** @var reponse for which best fit answer is calculated as a string */
@@ -233,7 +230,7 @@ class qtype_preg_question extends question_graded_automatically_with_countback
     }
 
     public function get_correct_responses() {
-        return array('answer'=>$this->correctanswer);
+        return array('answer' => $this->correctanswer);
     }
 
     public function summarise_reponse(array $response) {
@@ -243,5 +240,33 @@ class qtype_preg_question extends question_graded_automatically_with_countback
             $resp = null;
         }
         return $resp;
+    }
+
+    /*
+    * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
+    @param subject string to insert subpatterns
+    @param question question object to create matcher
+    @param state state of the question attempt to get response
+    @return changed string
+    */
+    function insert_subpatterns($subject, $response) {
+        //Sanity check 
+        if (strpos($subject,'{$') === false || strpos($subject,'}') === false 
+            || $this->bestfitanswer==array()) {
+            //there are no placeholders for sure or no match found 
+            return $subject;
+        }
+
+        $answer = $response['answer'];
+        $matchresults = $this->bestfitanswer['match'];
+
+        foreach ($matchresults['index_first'] as $i => $startindex) {
+            $search = '{$'.$i.'}';
+            $endindex = $matchresults['index_last'][$i];
+            $replace = substr($response, $startindex, $endindex - $startindex + 1);
+            $subject = str_replace($search, $replace, $subject);
+        }
+
+        return $subject;
     }
 }
