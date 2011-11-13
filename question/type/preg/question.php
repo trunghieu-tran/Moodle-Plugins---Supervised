@@ -33,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_preg_question extends question_graded_automatically_with_countback
-        implements question_automatically_gradable_with_countback {
+class qtype_preg_question extends question_graded_automatically
+        implements question_automatically_gradable {
 
     //Fields defining a question
     /** @var array of question_answer objects. */
@@ -159,8 +159,9 @@ class qtype_preg_question extends question_graded_automatically_with_countback
     }
 
     public function get_matching_answer(array $response) {
-        if ($this->get_best_fit_answer($response)['match']['full']) {
-            return $this->bestfitanswer['answer'];
+        $bestfit = $this->get_best_fit_answer($response);
+        if ($bestfit['match']['full']) {
+            return $bestfit['answer'];
         }
         return array();
     }
@@ -229,17 +230,24 @@ class qtype_preg_question extends question_graded_automatically_with_countback
         return $matcher;
     }
 
-    public function get_correct_responses() {
+    public function get_correct_response() {
         return array('answer' => $this->correctanswer);
     }
 
-    public function summarise_reponse(array $response) {
+    public function summarise_response(array $response) {
         if (isset($response['answer'])) {
             $resp = $response['answer'];
         } else {
             $resp = null;
         }
         return $resp;
+    }
+
+    public function get_validation_error(array $response) {
+        if ($this->is_gradable_response($response)) {
+            return '';
+        }
+        return get_string('pleaseenterananswer', 'qtype_shortanswer');
     }
 
     /*
