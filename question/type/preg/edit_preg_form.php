@@ -19,9 +19,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      */
     function definition_inner(&$mform) {
         global $CFG;
-        global $QTYPES;
 
-        $engines = $QTYPES[$this->qtype()]->available_engines();
+        question_bank::load_question_definition_classes($this->qtype());
+        $qtype = new qtype_preg;
+        $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine','preg_php_matcher');
         $mform->addHelpButton('engine','engine','qtype_preg');
@@ -63,7 +64,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     }
 
     function validation($data, $files) {
-        global $QTYPES;
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
@@ -84,7 +84,9 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i);
+                question_bank::load_question_definition_classes($this->qtype());
+                $qtype = new qtype_preg;
+                $matcher =& $qtype->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';
