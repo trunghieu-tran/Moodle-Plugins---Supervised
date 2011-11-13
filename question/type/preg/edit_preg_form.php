@@ -11,7 +11,7 @@ require_once($CFG->dirroot.'/question/type/shortanswer/edit_shortanswer_form.php
 /**
  * preg editing form definition.
  */
-class question_edit_preg_form extends question_edit_shortanswer_form {
+class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
      * Add question-type specific form fields.
      *
