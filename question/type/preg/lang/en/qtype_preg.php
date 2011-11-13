@@ -61,6 +61,7 @@ $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
 $string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from feedback or choose another engine.';
+$string['pluginname'] = 'Regular expression';
 $string['preg'] = 'Regular expression';
 $string['preg_help'] = 'Regular expression is a form of writing a pattern to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match part of the answer (which can be used, for example, to catch common errors and give appropriate comments).<br/>This question use php perl-compatible regular expression syntax. There is many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression there: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.<br/>';
 $string['preg_php_matcher'] = 'PHP preg extension';
