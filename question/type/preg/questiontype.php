@@ -16,7 +16,7 @@
 
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 
-class question_preg_qtype extends question_shortanswer_qtype {
+class qtype_preg extends qtype_shortanswer {
 
     /**
     * returns an array of engines
