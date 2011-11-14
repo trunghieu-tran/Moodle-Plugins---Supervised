@@ -26,6 +26,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * question which could return some specific hints and want to use *withhint behaviours should implement this
+ */
+interface question_with_specific_hints {
+
+    /**
+     * returns an array of available specific hint types depending on question settings
+     * the keys are hint type indentifiers, unique for the qtype
+     * the values are interface strings with the hint description (without "hint" word!)
+     */
+    public function available_specific_hint_types();
+
+    /** 
+     * returns specific hint value of given hint type for given response
+     */
+    public function specific_hint($hinttype, $response);
+
+    /** 
+     * returns penalty for using specific hint of given hint type (possibly for given response)
+     */
+    public function penalty_for_specific_hint($hinttype, $response);
+}
+
 
 /**
  * Represents a preg question.
@@ -34,7 +57,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable {
+        implements question_automatically_gradable question_with_specific_hints {
 
     //Fields defining a question
     /** @var array of question_answer objects. */
@@ -67,7 +90,7 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     public function get_expected_data() {
-        return array('answer' => PARAM_RAW_TRIMMED/*, 'hint' => PARAM_BOOL*/);
+        return array('answer' => PARAM_RAW_TRIMMED);
     }
 
     public function is_complete_response(array $response) {
@@ -264,6 +287,10 @@ class qtype_preg_question extends question_graded_automatically
     @return changed string
     */
     function insert_subpatterns($subject, $response) {
+
+        //To be sure best fit answer is calculated
+        $this->get_best_fit_answer($response);
+
         //Sanity check 
         if (strpos($subject,'{$') === false || strpos($subject,'}') === false 
             || $this->bestfitanswer==array()) {
@@ -282,5 +309,41 @@ class qtype_preg_question extends question_graded_automatically
         }
 
         return $subject;
+    }
+
+    //////////Specific hints implementation part
+
+    /**
+    * returns an array of available specific hint types
+    */
+    public function available_specific_hint_types() {
+        if ($this->usehint) {
+        return array('hintnextchar' => get_string('hintnextchar','qtype_preg')
+                    );
+        }
+
+        return null;
+    }
+
+        /** 
+     * returns specific hint value of given hint type for given response
+     */
+    public function specific_hint($hinttype, $response) {
+        switch($hinttype) {
+            case 'hintnextchar':
+                $bestfitanswer = $this->get_best_fit_answer($response);
+                return $bestfitanswer['match']['next'];
+        }
+    }
+
+    /** 
+     * returns penalty for using specific hint of given hint type (possibly for given response)
+     */
+    public function penalty_for_specific_hint($hinttype, $response) {
+        switch($hinttype) {
+            case 'hintnextchar':
+                return $this->hintpenalty;
+        }
+        return 0;
     }
 }
