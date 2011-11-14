@@ -56,7 +56,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 $wronghead = html_writer::tag('span', htmlspecialchars(substr($currentanswer, 0, $firstindex)), array('class' => $this->feedback_class(0)));
             }
             $correctpart = '';
-            $spanattrs['class'] = ;
             if ($firstindex != -1) {//there were any match
                 $correctpart = html_writer::tag('span', htmlspecialchars(substr($currentanswer, $firstindex, $lastindex - $firstindex + 1)), array('class' => $this->feedback_class(1)));
             }
@@ -65,7 +64,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 $hintedcharacter = html_writer::tag('span', htmlspecialchars($matchresults['next']), array('class' => $this->feedback_class(0.5)));
             }
             $wrongtail = '';
-            $spanattrs['class'] = ;
             if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
                 $wrongtail =  html_writer::tag('span', htmlspecialchars(substr($currentanswer, $lastindex + 1, strlen($currentanswer) - $lastindex - 1)), array('class' => $this->feedback_class(0)));
             }
@@ -81,7 +79,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $feedback = '';
         if($answer->feedback) {
             $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
-            $feedback = question->format_text($feedbacktext, $answer->feedbackformat,
+            $feedback = $question->format_text($feedbacktext, $answer->feedbackformat,
                 $qa, 'question', 'answerfeedback', $answer->id);
         }
 
@@ -89,9 +87,9 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     public function correct_response(question_attempt $qa) {
-        $question = ;
 
-        $answer = $qa->get_question()->get_correct_response()['answer'];
+        $correctresponse = $qa->get_question()->get_correct_response(); 
+        $answer = $correctresponse['answer'];
         if (!$answer) { //Correct answer isn't set by the teacher
             return '';
         }
