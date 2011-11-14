@@ -67,7 +67,7 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     public function get_expected_data() {
-        return array('answer' => PARAM_RAW_TRIMMED, 'hint' => PARAM_BOOL);
+        return array('answer' => PARAM_RAW_TRIMMED/*, 'hint' => PARAM_BOOL*/);
     }
 
     public function is_complete_response(array $response) {
@@ -111,14 +111,20 @@ class qtype_preg_question extends question_graded_automatically
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $this->hintgradeborder) {
                     $bestfitanswer = $answer;
+                    $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id);
+                    $matcher->match($response['answer']);
+                    $matchresult = $matcher->get_match_results();
+                    if ($knowleftcharacters) {
+                        $maxfitness = (-1)*$matcher->characters_left();
+                    } else {
+                        $maxfitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
+                    }
                     break;//anyone that fits border helps
                 }
             }
         }
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
-        $maxfitness = (-1)*(strlen($response['answer'])+1);
         $full = false;
-        $matchresult = array();
         foreach ($this->answers as $answer) {
             $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id);
             $full = $matcher->match($response['answer']);
@@ -173,7 +179,7 @@ class qtype_preg_question extends question_graded_automatically
         $state = question_state::$gradedwrong;
         if ($bestfitanswer['match']['full']) {//TODO - implement partial grades for partially correct answers
             $grade = $bestfitanswer['answer']->fraction;
-            $state = question_state::graded_state_for_fraction($fraction);
+            $state = question_state::graded_state_for_fraction($bestfitanswer['answer']->fraction);
         }
 
         return array($grade, $state);
