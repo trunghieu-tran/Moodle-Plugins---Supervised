@@ -85,7 +85,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 question_bank::load_question_definition_classes($this->qtype());
-                $qtype = new qtype_preg;
+                $qtype = new qtype_preg_question;
                 $matcher =& $qtype->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
