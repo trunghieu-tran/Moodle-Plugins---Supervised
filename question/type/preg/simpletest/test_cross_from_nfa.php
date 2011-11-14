@@ -20,8 +20,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test2 = array( 'str'=>'_the matcher works',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>-1),
-                        'index_last'=>array(0=>-1),
+                        'index_first'=>array(0=>18),
+                        'index_last'=>array(0=>17),
                         'left'=>array(17),
                         'next'=>'t');
 
@@ -159,8 +159,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test1 = array( 'str'=>'abcdefgh',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'index_last'=>array(0=>1,1=>1,2=>1),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>-1,4=>-1),
+                        'index_last'=>array(0=>1,1=>1,2=>1,3=>-2,4=>-2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -262,8 +262,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test5 = array( 'str'=>'yzi',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>0),
+                        'index_first'=>array(0=>3),
+                        'index_last'=>array(0=>2),
                         'left'=>array(3),
                         'next'=>'aceg');
 
@@ -447,16 +447,16 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test1 = array( 'str'=>'abab',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,3=>2),
-                        'index_last'=>array(0=>3,1=>1,3=>3),
+                        'index_first'=>array(0=>0,1=>0,2=>-1,3=>2),
+                        'index_last'=>array(0=>3,1=>1,2=>-2,3=>3),
                         'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'cdcd',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,2=>0,3=>2),
-                        'index_last'=>array(0=>3,2=>1,3=>3),
+                        'index_first'=>array(0=>0,1=>-1,2=>0,3=>2),
+                        'index_last'=>array(0=>3,1=>-2,2=>1,3=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -464,7 +464,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
     
-    function data_for_test_backrefquantified() {
+    function data_for_test_backref_quantified() {
         $test1 = array( 'str'=>'ababcdababcdababcdababcd',
                         'is_match'=>true,
                         'full'=>true,

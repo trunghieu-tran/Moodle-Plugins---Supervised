@@ -55,13 +55,9 @@ class nfa_state
 
     public $next = array();                 // an array of objects of nfa_transition
 
-    public $previous = array();
+    //public $previous = array();
 
     public $id;                             // id of the state, debug variable
-
-    public function append_previous(&$transition) {
-
-    }
 
     /**
      * appends a next possible state
@@ -88,9 +84,9 @@ class nfa_state
         }
         if (!$exists) {
             array_push($this->next, $transition_copy);
-            $transition_copy = $transition_copy->get_clone();
+            /*$transition_copy = $transition_copy->get_clone();
             $transition_copy->state =& $this;
-            array_push($transition->state->previous, $transition_copy);
+            array_push($transition->state->previous, $transition_copy);*/
             if ($transition->loops) {
                 $this->startsinfinitequant = true;
             }
@@ -105,11 +101,11 @@ class nfa_state
         foreach($this->next as $key=>$curnext) {
             if ($curnext->pregleaf == $transition->pregleaf && $curnext->state === $transition->state) {
                 // delete an element from $curnext->state->previous
-                foreach ($curnext->state->previous as $keyprev=>$curprev) {
+                /*foreach ($curnext->state->previous as $keyprev=>$curprev) {
                     if ($curprev->pregleaf == $transition->pregleaf && $curprev->state === $this) {
                         unset($curnext->state->previous[$keyprev]);
                     }
-                }
+                }*/
                 unset($this->next[$key]);
             }
         }
@@ -126,11 +122,11 @@ class nfa_state
                 $curnext->state = $newref;
             }
         }
-        foreach($this->previous as $curprev) {
+        /*foreach($this->previous as $curprev) {
             if ($curprev->state === $oldref) {
                 $curprev->state = $newref;
             }
-        }
+        }*/
     }
 
     /**
@@ -139,7 +135,7 @@ class nfa_state
      */
     public function merge(&$with) {
         $this->next = array_merge($this->next, $with->next);
-        $this->previous = array_merge($this->previous, $with->previous);
+        //$this->previous = array_merge($this->previous, $with->previous);
         $this->startsinfinitequant = $this->startsinfinitequant || $with->startsinfinitequant;
     }
 
@@ -193,7 +189,7 @@ class nfa {
     /**
      * replaces all eps-transitions with next non-eps transitions
      */
-    public function replace_eps_transitions() {
+    /*public function replace_eps_transitions() {
         foreach ($this->states as $keystate=>$curstate) {
             do {    // iterate until all transitions aren't replaceable
                 foreach ($curstate->next as $keynext=>$curnext) {
@@ -213,9 +209,9 @@ class nfa {
             } while ($replaceable_cnt);
 
         }
-    }
+    }*/
 
-    public function merge_simple_assertions() {
+    /*public function merge_simple_assertions() {
         $i=0;
         $this->draw_nfa("C:/dotfile/dotcode.dot", "C:/dotfile/0.jpg");
         foreach ($this->states as $keystate=>$curstate) {
@@ -257,12 +253,12 @@ class nfa {
             } while ($assertcnt > 0);
 
         }
-    }
+    }*/
 
     /**
      * there are unreachable states after merging simple assertions. this function deletes them
      */
-    public function delete_unreachable_states() {
+    /*public function delete_unreachable_states() {
         $curstates = array();    // states which the automaton is in
         $reachedstates = array();
         array_push($curstates, $this->startstate);
@@ -295,7 +291,7 @@ class nfa {
                 $this->remove_state($state);
             }
         }
-    }
+    }*/
 
     /**
      * appends the state to the automaton
@@ -414,13 +410,32 @@ abstract class nfa_preg_node {
     public function accept() {
         return true; // accepting anything by default
     }
+    
+    /**
+     * increases size of an nfa
+     * @param matcher - a reference to the matcher
+     * @param ds - number of states to add
+     * @param dt - number of transitions to add
+     * @param statecount - current number of states in automaton
+     * @param transitioncount - current number of transitions in automaton
+     * @return - true if size successfully enlarged and we can keep building fa, false otherwise
+     */
+    public function inc_fa_size(&$matcher, $ds, $dt, &$statecount, &$transitioncount) {
+        $statecount += $ds;
+        $transitioncount += $dt;
+        return !($statecount > $matcher->statelimit || $transitioncount > $matcher->transitionlimit);
+    }
 
     /**
      * creates an automaton corresponding to this node
+     * @param matcher - a reference to the matcher
      * @param stackofautomatons - a stack which operators pop automatons off and operands push automatons onto
      * @param issubpattern - true if epsilon transitions are needed at the beginning and at the end of the automaton
+     * @param statecount - current number of states in automaton
+     * @param transitioncount - current number of transitions in automaton
+     * @return - this node if building failed due to the nfa size, null otherwise
      */
-    abstract public function create_automaton(&$stackofautomatons);
+    abstract public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount);
 
     public function __construct(&$node, &$matcher) {
         $this->pregnode = $node;
@@ -434,8 +449,11 @@ abstract class nfa_preg_node {
 */
 class nfa_preg_leaf extends nfa_preg_node {
 
-    public function create_automaton(&$stackofautomatons) {
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create start and end states of the resulting automaton
+        if (!$this->inc_fa_size($matcher, 2, 1, $statecount, $transitioncount)) {
+            return $this;
+        }
         $start = new nfa_state;
         $end = new nfa_state;
         $start->append_transition(new nfa_transition($this->pregnode, $end, false, $this->pregnode->subtype == preg_leaf_meta::SUBTYPE_EMPTY));
@@ -445,6 +463,7 @@ class nfa_preg_leaf extends nfa_preg_node {
         $res->startstate = $start;
         $res->endstate = $end;
         array_push($stackofautomatons, $res);
+        return null;
     }
 
 }
@@ -470,10 +489,16 @@ abstract class nfa_preg_operator extends nfa_preg_node {
 */
 class nfa_preg_node_concat extends nfa_preg_operator {
 
-    public function create_automaton(&$stackofautomatons) {
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // first, operands create their automatons
-        $this->operands[0]->create_automaton(&$stackofautomatons);
-        $this->operands[1]->create_automaton(&$stackofautomatons);
+        $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
+        $err = $this->operands[1]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
         // take automata and concatenate them
         $second = array_pop($stackofautomatons);
         $first = array_pop($stackofautomatons);
@@ -485,6 +510,7 @@ class nfa_preg_node_concat extends nfa_preg_operator {
         $first->endstate = $second->endstate;
         $first->move_states($second);
         array_push($stackofautomatons, $first);
+        return null;
     }
 
 }
@@ -494,10 +520,16 @@ class nfa_preg_node_concat extends nfa_preg_operator {
 */
 class nfa_preg_node_alt extends nfa_preg_operator {
 
-    public function create_automaton(&$stackofautomatons) {
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // first, operands create their automatons
-        $this->operands[0]->create_automaton(&$stackofautomatons);
-        $this->operands[1]->create_automaton(&$stackofautomatons);
+        $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
+        $err = $this->operands[1]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
         // take automata and alternate them
         $second = array_pop($stackofautomatons);
         $first = array_pop($stackofautomatons);
@@ -513,6 +545,9 @@ class nfa_preg_node_alt extends nfa_preg_operator {
                 }
             }
             if ($endlooped) {
+                if (!$this->inc_fa_size($matcher, 1, 1, $statecount, $transitioncount)) {
+                    return $this;
+                }
                 $endstate = new nfa_state;
                 $cur->append_state($endstate);
                 $cur->endstate->append_transition(new nfa_transition($epsleaf, $endstate, false, true));
@@ -528,6 +563,7 @@ class nfa_preg_node_alt extends nfa_preg_operator {
         $second->remove_state($second->endstate);
         $first->move_states($second);
         array_push($stackofautomatons, $first);
+        return null;
     }
 
 }
@@ -540,9 +576,15 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
     /**
      * creates an automaton for * or {0,} quantifier
      */
-    private function create_aster(&$stackofautomatons) {
-        $this->operands[0]->create_automaton(&$stackofautomatons);
+    private function create_aster(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
+        $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
         $body = array_pop($stackofautomatons);
+        if (!$this->inc_fa_size($matcher, 0, count($body->startstate->next) + 1, $statecount, $transitioncount)) {
+            return $this;
+        }
         foreach ($body->startstate->next as $curnext) {
             $body->endstate->append_transition(new nfa_transition($curnext->pregleaf, $curnext->state, true));
         }
@@ -550,16 +592,20 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false, true));
         array_push($stackofautomatons, $body);
+        return null;
     }
 
     /**
      * creates an automaton for {m,} quantifier
      */
-    private function create_brace(&$stackofautomatons) {
+    private function create_brace(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create an automaton for body ($leftborder + 1) times
         $leftborder = $this->pregnode->leftborder;
         for ($i = 0; $i < $leftborder + 1; $i++) {
-            $this->operands[0]->create_automaton(&$stackofautomatons);
+            $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+            if ($err != null) {
+                return $err;
+            }
         }
         $res = null;    // the resulting automaton
         // linking automatons to the resulting one
@@ -569,6 +615,9 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                 $cur->remove_subpatterns();
                 // the last block is repeated
                 if ($i == $leftborder) {
+                    if (!$this->inc_fa_size($matcher, 0, count($cur->startstate->next) + 1, $statecount, $transitioncount)) {
+                        return $this;
+                    }
                     foreach ($cur->startstate->next as $curnext) {
                         $cur->endstate->append_transition(new nfa_transition($curnext->pregleaf, $curnext->state, true));
                     }
@@ -587,13 +636,14 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
             }
         }
         array_push($stackofautomatons, $res);
+        return null;
     }
 
-    public function create_automaton(&$stackofautomatons) {
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         if ($this->pregnode->leftborder == 0) {
-            $this->create_aster(&$stackofautomatons);
+            return $this->create_aster($matcher, $stackofautomatons, $statecount, $transitioncount);
         } else {
-            $this->create_brace(&$stackofautomatons);
+            return $this->create_brace($matcher, $stackofautomatons, $statecount, $transitioncount);
         }
     }
 
@@ -607,24 +657,37 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
     /**
      * creates an automaton for ? quantifier
      */
-    private function create_qu(&$stackofautomatons) {
-        $this->operands[0]->create_automaton(&$stackofautomatons);
+    private function create_qu(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
+        $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
+        if (!$this->inc_fa_size($matcher, 0, 1, $statecount, $transitioncount)) {
+            return $this;
+        }
         $body = array_pop($stackofautomatons);
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body->startstate->append_transition(new nfa_transition($epsleaf, $body->endstate, false, true));
         array_push($stackofautomatons, $body);
+        return null;
     }
 
     /**
      * creates an automaton for {m, n} quantifier
      */
-    private function create_brace(&$stackofautomatons) {
+    private function create_brace(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create an automaton for body ($leftborder + 1) times
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
         for ($i = 0; $i < $rightborder; $i++) {
-            $this->operands[0]->create_automaton(&$stackofautomatons);
+            $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+            if ($err != null) {
+                return $err;
+            }
+        }
+        if (!$this->inc_fa_size($matcher, 0, $rightborder - $leftborder, $statecount, $transitioncount)) {
+            return $this;
         }
         $res = null;        // the resulting automaton
         $endstate = null;   // temporary variable, required if $leftborder != $rightborder
@@ -656,13 +719,14 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
             $res->endstate->merge($endstate);
         }
         array_push($stackofautomatons, $res);
+        return null;
     }
 
-    public function create_automaton(&$stackofautomatons) {
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
-            $this->create_qu(&$stackofautomatons);
+            return $this->create_qu($matcher, $stackofautomatons, $statecount, $transitioncount);
         } else {
-            $this->create_brace(&$stackofautomatons);
+            return $this->create_brace($matcher, $stackofautomatons, $statecount, $transitioncount);
         }
     }
 
@@ -673,8 +737,11 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 */
 class nfa_preg_node_subpatt extends nfa_preg_operator {
 
-    public function create_automaton(&$stackofautomatons) {
-        $this->operands[0]->create_automaton(&$stackofautomatons);
+    public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
+        $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
+        if ($err != null) {
+            return $err;
+        }
         $body = array_pop($stackofautomatons);
         foreach ($body->startstate->next as $next) {
             $next->subpatt_start[$this->pregnode->number] = true;
@@ -688,6 +755,7 @@ class nfa_preg_node_subpatt extends nfa_preg_operator {
             }
         }
         array_push($stackofautomatons, $body);
+        return null;
     }
 
 }

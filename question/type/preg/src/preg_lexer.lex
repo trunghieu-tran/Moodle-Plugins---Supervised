@@ -9,6 +9,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %state CHARCLASS
 %{
     protected $errors = array();
+    protected $maxsubpatt = 0;
 
     //A reference to the matcher object to be passed to some nodes
     public $matcher = null;
@@ -20,6 +21,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
     public function get_errors() {
         return $this->errors;
+    }
+
+    public function get_max_subpattern() {
+        return $this->maxsubpatt;
     }
 
     protected function form_node($name, $subtype = null, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
@@ -163,7 +168,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node::TYPE_NODE_SUBPATT, $this->yychar, $this->yychar));
+    $this->maxsubpatt++;
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \) {
@@ -171,7 +177,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \(\?> {
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $this->maxsubpatt++;
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?: {
