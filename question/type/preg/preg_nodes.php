@@ -27,6 +27,19 @@ class preg_lexem {
     }
 }
 
+/*
+* Class for plain subpattern lexems
+*/
+class preg_lexem_subpatt extends preg_lexem {
+	//Number of subpattern
+    public $number;
+
+    public function __construct($subtype, $indfirst, $indlast, $number) {
+        parent::__construct($subtype, $indfirst, $indlast);
+        $this->number = $number;
+    }
+}
+
 /**
 * Generic node class
 */
@@ -34,42 +47,38 @@ abstract class preg_node {
 
     //////Class constants used to define type
     //Abstract node class, not representing real things
-    const TYPE_ABSTRACT = 0;
+    const TYPE_ABSTRACT = 'abstract';
     //Character or character class
-    const TYPE_LEAF_CHARSET = 1;
+    const TYPE_LEAF_CHARSET = 'leaf_charset';
     //Meta-character or escape sequence matching with a set of characters that couldn't be enumerated
-    const TYPE_LEAF_META = 2;
+    const TYPE_LEAF_META = 'leaf_meta';
     //Simple assert: ^ $ or escape-sequence
-    const TYPE_LEAF_ASSERT = 3;
+    const TYPE_LEAF_ASSERT = 'leaf_assert';
     //Back reference to subpattern
-    const TYPE_LEAF_BACKREF = 4;
+    const TYPE_LEAF_BACKREF = 'leaf_backref';
     //Recursive match
-    const TYPE_LEAF_RECURSION = 5;
+    const TYPE_LEAF_RECURSION = 'leaf_recursion';
     //Option set
-    const TYPE_LEAF_OPTIONS = 6;
+    const TYPE_LEAF_OPTIONS = 'leaf_options';
     //Combination of few leaf
-    const TYPE_LEAF_COMBO = 7;
-    //Highest possible leaf type
-    const TYPE_LEAF_MAX = 99;
+    const TYPE_LEAF_COMBO = 'leaf_combo';
 
-    //Lowest possible node type
-    const TYPE_NODE_MIN = 100;
     //Finite quantifier
-    const TYPE_NODE_FINITE_QUANT = 101;
+    const TYPE_NODE_FINITE_QUANT = 'node_finite_quant';
     //Infinite quantifier
-    const TYPE_NODE_INFINITE_QUANT = 102;
+    const TYPE_NODE_INFINITE_QUANT = 'node_infinite_quant';
     //Concatenation
-    const TYPE_NODE_CONCAT = 103;
+    const TYPE_NODE_CONCAT = 'node_concat';
     //Alternative
-    const TYPE_NODE_ALT = 104;
+    const TYPE_NODE_ALT = 'node_alt';
     //Assert with expression within
-    const TYPE_NODE_ASSERT = 105;
+    const TYPE_NODE_ASSERT = 'node_assert';
     //Subpattern
-    const TYPE_NODE_SUBPATT = 106;
+    const TYPE_NODE_SUBPATT = 'node_subpatt';
     //Conditional subpattern
-    const TYPE_NODE_COND_SUBPATT = 107;
+    const TYPE_NODE_COND_SUBPATT = 'node_cond_subpatt';
     //error node
-    const TYPE_NODE_ERROR = 108;
+    const TYPE_NODE_ERROR = 'node_error';
 
     //Member variables, common to all subclasses
     //Type, one of the class  - must return constants defined in this class
@@ -263,16 +272,16 @@ class preg_leaf_charset extends preg_leaf {
 class preg_leaf_meta extends preg_leaf {
 
     //. - any character except \n
-    const SUBTYPE_DOT = 1;
+    const SUBTYPE_DOT = 'dot_leaf_meta';
     //\p{L} or \pL
-    const SUBTYPE_UNICODE_PROP = 2;
+    const SUBTYPE_UNICODE_PROP = 'unicode_prop_leaf_meta';
     // \w 
     //Should be locale-aware, but not Unicode for PCRE-compatibility
-    const SUBTYPE_WORD_CHAR = 3;
+    const SUBTYPE_WORD_CHAR = 'word_char_leaf_meta';
     //Leaf with empty in alternative (something|)
-    const SUBTYPE_EMPTY = 4;
+    const SUBTYPE_EMPTY = 'empty_leaf_meta';
     //Service subtype - end of regex, but not end of string
-    const SUBTYPE_ENDREG = 5;
+    const SUBTYPE_ENDREG = 'endreg_leaf_meta';
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
 
@@ -378,17 +387,17 @@ class preg_leaf_meta extends preg_leaf {
 class preg_leaf_assert extends preg_leaf {
 
     //^
-    const SUBTYPE_CIRCUMFLEX = 1;
+    const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
     //$
-    const SUBTYPE_DOLLAR = 2;
+    const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
     // \b
-    const SUBTYPE_WORDBREAK = 3;
+    const SUBTYPE_WORDBREAK = 'wordbreak_leaf_assert';
     // \A
-    const SUBTYPE_ESC_A = 4;
+    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
     // \z
-    const SUBTYPE_ESC_Z = 5;
+    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
     // \G
-    const SUBTYPE_ESC_G = 6;
+    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
 
     //Reference to the matcher object to be able to query it for captured subpattern
     //Filled only to ESC_G subtype if it would be implemented in the future
@@ -500,9 +509,9 @@ class preg_leaf_assert extends preg_leaf {
 class preg_leaf_combo extends preg_leaf {
 
     //Unite of leafs
-    const SUBTYPE_UNITE = 1;
+    const SUBTYPE_UNITE = 'unite_leaf_combo';
     //Cross of leafs
-    const SUBTYPE_CROSS = 2;
+    const SUBTYPE_CROSS = 'cross_leaf_combo';
     
     var $childs;
     var $subtype;
@@ -671,7 +680,8 @@ class preg_leaf_backref extends preg_leaf {
 
     protected function match_inner($str, $pos, &$length, $cs) {
         $textlib = textlib_get_instance();
-        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $textlib->strlen($str)) {
+        $len = $textlib->strlen($str);
+        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $len) {
             $length = 0;
             return false;
         }
@@ -681,25 +691,22 @@ class preg_leaf_backref extends preg_leaf {
         if (!$cs) {
             $strcopy = $textlib->strtolower($strcopy);
         }
-        
         $start = $this->matcher->first_correct_character_index($this->number);
         $end = $this->matcher->last_correct_character_index($this->number);
         $matchlen = 0;
-
         $result = true;
         // check char by char
-        for ($i = $start; $result && $i <= $end; $i++) {
+        for ($i = $start; $result && $i <= $end && $i + $pos < $len; $i++) {
             $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
             if ($result) {
                 $matchlen++;
             }
         }
-
-        if ($result) {
-            $length = $matchlen;
-        } else {
-            $length = 0;
+        // if the string has not enough characters
+        if ($end + $pos >= $len) {
+            $result = false;
         }
+        $length = $matchlen;        
         return $result;
     }
     public function name() {
@@ -857,13 +864,13 @@ class preg_node_alt extends preg_operator {
 class preg_node_assert extends preg_operator {
 
     //Positive lookahead assert
-    const SUBTYPE_PLA = 1;
+    const SUBTYPE_PLA = 'pla_node_assert';
     //Negative lookahead assert
-    const SUBTYPE_NLA = 2;
+    const SUBTYPE_NLA = 'nla_node_assert';
     //Positive lookbehind assert
-    const SUBTYPE_PLB = 3;
+    const SUBTYPE_PLB = 'plb_node_assert';
     //Negative lookbehind assert
-    const SUBTYPE_NLB = 4;
+    const SUBTYPE_NLB = 'nlb_node_assert';
 
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_ASSERT;
@@ -886,9 +893,9 @@ class preg_node_assert extends preg_operator {
 class preg_node_subpatt extends preg_operator {
 
     //Subpattern
-    const SUBTYPE_SUBPATT = 1;
+    const SUBTYPE_SUBPATT = 'subpatt_node_subpatt';
     //Once-only subpattern
-    const SUBTYPE_ONCEONLY = 22;//for mismatching with SUBTYPE_NLA in parser
+    const SUBTYPE_ONCEONLY = 'onceonly_node_subpatt';
 
     //Subpattern number
     public $number = 0;
@@ -915,17 +922,17 @@ class preg_node_cond_subpatt extends preg_operator {
 
     //Subtypes define a type of condition for subpatern
     //Positive lookahead assert
-    const SUBTYPE_PLA = 1;
+    const SUBTYPE_PLA = 'pla_node_cond_subpatt';
     //Negative lookahead assert
-    const SUBTYPE_NLA = 2;
+    const SUBTYPE_NLA = 'nla_node_cond_subpatt';
     //Positive lookbehind assert
-    const SUBTYPE_PLB = 3;
+    const SUBTYPE_PLB = 'plb_node_cond_subpatt';
     //Negative lookbehind assert
-    const SUBTYPE_NLB = 4;
+    const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
     //Backreference 
-    const SUBTYPE_BACKREF = 5;
+    const SUBTYPE_BACKREF = 'backref_node_cond_subpatt';
     //Recursive
-    const SUBTYPE_RECURSIVE = 6;
+    const SUBTYPE_RECURSIVE = 'recursive_node_cond_subpatt';
 
     //Subpattern number
     public $number = 0;
@@ -950,19 +957,19 @@ class preg_node_error extends preg_node {
 
     //Subtypes define a type of error
     //Unknown parse error
-    const SUBTYPE_UNKNOWN_ERROR = 1;
+    const SUBTYPE_UNKNOWN_ERROR = 'unknown_error_node_error';
     //Too much top-level alternatives in conditional subpattern
-    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 2;
+    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 'consubpatt_too_much_alter_node_error';
     //Close paren without opening  xxx)
-    const SUBTYPE_WRONG_CLOSE_PAREN = 3;
+    const SUBTYPE_WRONG_CLOSE_PAREN = 'wrong_close_paren_node_error';
     //Open paren without closing  (xxx
-    const SUBTYPE_WRONG_OPEN_PAREN = 4;
+    const SUBTYPE_WRONG_OPEN_PAREN = 'wrong_open_paren_node_error';
     //Empty parens
-    const SUBTYPE_EMPTY_PARENS = 5;
+    const SUBTYPE_EMPTY_PARENS = 'empty_parens_node_error';
     //Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
-    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 6;
+    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
     //Unclosed square brackets in character class
-    const SUBTYPE_UNCLOSED_CHARCLASS = 7;
+    const SUBTYPE_UNCLOSED_CHARCLASS = 'unclosed_charclass_node_error';
 
     //Error strings name in qtype_preg.php lang file
     public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt', 

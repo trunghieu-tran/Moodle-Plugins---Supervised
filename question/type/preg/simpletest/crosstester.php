@@ -66,8 +66,9 @@ class preg_cross_tester extends UnitTestCase {
         if ($matcher->is_error_exists()) {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
-                if (is_a($error, 'preg_parsing_error') || is_a($error, 'preg_modifier_error')) {    // error messages are displayed for parse errors only
-                    echo $error->errormsg.'<br/>';
+                if (is_a($error, 'preg_parsing_error') /*|| is_a($error, 'preg_modifier_error')*/) {    // error messages are displayed for parsing errors only
+                    echo 'Regex incorrect: '.$error->errormsg.'<br/>';
+                    $this->assertTrue(false);
                 }
             }
             return true;
