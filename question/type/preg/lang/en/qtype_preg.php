@@ -33,9 +33,9 @@ you additional flexibility: you can specify some answer with low (or zero) grade
 comments on them. You still can specify exact matches for some of you regular expressions if you start them with ^ and end with $.';
 $string['gvpath'] = 'Path to dot.exe of GraphViz';
 $string['gvdescription'] = 'Graphviz will be used for debug printing DFA and syntax tree in human readable form.';
-$string['hintbutton'] = 'Hint';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with grade less then hint grade border won\'t used in hinting.';
+$string['hintnextchar'] = 'next correct character';
 $string['hintpenalty'] = 'Penalty for hint';
 $string['hintpenalty_help'] = 'Penalty for the pressing Hint button and getting one-character hint. Typically would be greater 
 than usual Moodle question penalty (which applies to any new attempt to answer question without hint). 
