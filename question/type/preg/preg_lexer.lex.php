@@ -16,13 +16,30 @@ class Yylex extends JLexBase  {
 	var $YY_EOF = 129;
 
     protected $errors = array();
+    protected $maxsubpatt = 0;
+    //A reference to the matcher object to be passed to some nodes
+    public $matcher = null;
+    //Global modifiers as a string - defined for entire expression
+    public $globalmodifiers = '';
+    //Local modifiers - turned on (or off) using options in the expression
+    //It's contains copy of a global modifiers at start, but could be changed later
+    public $localmodifiers ='';
     public function get_errors() {
         return $this->errors;
+    }
+    public function get_max_subpattern() {
+        return $this->maxsubpatt;
     }
     protected function form_node($name, $subtype = null, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
         if ($subtype !== null) {
             $result->subtype = $subtype;
+        }
+        //set i modifier for leafs
+        if (is_a($result, 'preg_leaf')) {
+            if(strpos($this->localmodifiers,'i')!==false) {
+                $result->caseinsensitive = true;
+            }
         }
         if ($name == 'preg_leaf_charset') {
             $result->charset = $charclass;
@@ -529,7 +546,8 @@ array(
 							break;
 						case 7:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node::TYPE_NODE_SUBPATT, $this->yychar, $this->yychar));
+    $this->maxsubpatt++;
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 						case -8:
@@ -603,6 +621,7 @@ array(
 						case 17:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -18:
@@ -710,7 +729,8 @@ array(
 							break;
 						case 31:
 							{
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $this->maxsubpatt++;
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
     return $res;
 }
 						case -32:
@@ -989,6 +1009,7 @@ array(
 						case 69:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -69:
@@ -1003,6 +1024,7 @@ array(
 						case 72:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -71:
@@ -1017,6 +1039,7 @@ array(
 						case 99:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
+    $res->value->matcher =& $this->matcher;
     return $res;
 }
 						case -73:

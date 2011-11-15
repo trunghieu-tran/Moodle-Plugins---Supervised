@@ -43,7 +43,7 @@ $string['hintpenalty_help'] = 'Penalty for the pressing Hint button and getting 
 than usual Moodle question penalty (which applies to any new attempt to answer question without hint). 
 These penalties are mutually exclusive.';
 $string['incorrectregex'] = 'Incorrect regular expression - syntax error!';
-$string['largedfa'] = 'Too large dfa';
+$string['largefa'] = 'Too large fa';
 $string['lazyquant'] = 'Lazy quantificators';
 $string['leaf_assert'] = 'Simple assertion';
 $string['leaf_backref'] = 'Backreference';
@@ -61,6 +61,7 @@ $string['node_infinite_quant'] = 'Infinite quantificator';
 $string['node_subpatt'] = 'Subpattern';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal hint grade border. This effectively disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
+$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from feedback or choose another engine.';
 $string['preg'] = 'Regular expression';
@@ -69,14 +70,14 @@ $string['preg_php_matcher'] = 'PHP preg extension';
 $string['pregsummary'] = 'Enter a string response from student that can be matched against several regular expressions (non-anchored matching is possible). Shows to the student the correct part of his response. In adaptive mode could give to the student hint by telling next correct character.';
 $string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand';
 $string['subpattern'] = 'Subpattern';
-$string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level alternative in conditional subpattern in position from {$a->firstindxs[0]} to {$a->indlast}. Use parenthesis if you want include alternatives in yes-expr on no-expr';
+$string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level alternative in conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parenthesis if you want include alternatives in yes-expr on no-expr';
 $string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missing for opening parenthesis in position {$a->indfirst}';
 $string['unclosedsqbrackets'] = 'Regex syntax error: closing brackets \']\' missing for character class starting at position {$a->indfirst}';
 $string['unopenedparen'] = 'Regex syntax error: opening parenthesis \'(\' missing for closing parenthesis in position {$a->indfirst}';
-$string['unsupported'] = '{$a->nodename} (starts at {$a->pos}) is unsupported';
+$string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by {$a->engine}';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by engine {$a->classname}.';
 $string['usehint'] = 'Use hint';
 $string['usehint_help'] = 'In adaptive mode show student Hint button allowing getting one-character hint with applying Hint penalty. Not all matching engines support hinting.';
-$string['toolargedfa'] = 'Too large dfa, because too complex regex. Building is too long.';
+$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to increase time and memory limits or simplify you regular expression.';
 ?>
 
