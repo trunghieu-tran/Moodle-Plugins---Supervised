@@ -318,6 +318,15 @@ class qtype_preg_question extends question_graded_automatically
 
     //////////Specific hints implementation part
 
+    //we need adaptive (TODO adaptivenopenalties and interactive) behavour to use hints
+     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
+        if ($preferredbehaviour == 'adaptive') {
+             question_engine::load_behaviour_class('adaptivewithhint');
+             return new qbehaviour_adaptivewithhint($qa, $preferredbehaviour);
+        }
+
+        parent::make_behaviour($qa, $preferredbehaviour);
+     }
     /**
     * returns an array of available specific hint types
     */
@@ -353,6 +362,7 @@ class qtype_preg_question extends question_graded_automatically
 
     /** 
      * returns penalty for using specific hint of given hint type (possibly for given response)
+     * $response could be null if we need to show possible penalty in advance
      */
     public function penalty_for_specific_hint($hinttype, $response) {
         switch($hinttype) {
