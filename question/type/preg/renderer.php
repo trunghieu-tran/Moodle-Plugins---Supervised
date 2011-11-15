@@ -42,6 +42,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         }
 
         //////Colored string
+        //TODO - make preg_renderer respect those options  (and other like $options->correctness for showing colored string 
         $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
         $answer = $bestfit['answer'];
         $matchresults = $bestfit['match'];
@@ -60,7 +61,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 $correctpart = html_writer::tag('span', htmlspecialchars(substr($currentanswer, $firstindex, $lastindex - $firstindex + 1)), array('class' => $this->feedback_class(1)));
             }
             $hintedcharacter = '';
-            if (/*isset($state->responses['hint']) &&*/ isset($matchresults['next'])) {//if hint requested and possible - TODO check if hint is requested using behavour...
+            if ($qa->get_last_step()->has_behaviour_var('hintnextcharbtn') && isset($matchresults['next'])) {//if hint requested and possible
                 $hintedcharacter = html_writer::tag('span', htmlspecialchars($matchresults['next']), array('class' => $this->feedback_class(0.5)));
             }
             $wrongtail = '';
