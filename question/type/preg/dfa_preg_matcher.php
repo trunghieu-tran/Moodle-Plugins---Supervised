@@ -78,29 +78,17 @@ class dfa_preg_matcher extends preg_matcher {
         }
         return false;
     }
-/*
-    protected function accept_node($node) {
-        switch ($node->type) {
-            case preg_node::TYPE_LEAF_BACKREF:
-            case preg_node::TYPE_NODE_COND_SUBPATT:
-                $this->flags[$node->name()] = true;
-                return false;
-            case preg_node::TYPE_LEAF_RECURSION:
-                $this->flags['leafrecursion'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            case preg_node::TYPE_LEAF_OPTIONS:
-                $this->flags['leafoptions'] = true;//TODO - add to parser, preg_nodes and strings file
-                return false;
-            default:
-                $unsupported = $node->not_supported();//TODO - check that there is a preg_node there (not dfa_preg_node) and convert accept_node to do this job by itself without not_supported()
-                if ($unsupported) {
-                    $this->flags[$unsupported] = true;
-                }
-                break;//?? why return after break?
-                return false;
+    
+    function is_node_acceptable($pregnode) {
+        switch ($pregnode->name()) {
+        case 'leaf_charset':
+        case 'leaf_meta':
+        case 'leaf_assert':
+            return true;
+            break;
         }
-        return true;
-    }*/
+        return false;
+    }
 
     /**
     *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
@@ -177,7 +165,7 @@ class dfa_preg_matcher extends preg_matcher {
                     }
                 }
                 if (($passcount > $this->maxpasscount || $statecount > $this->maxstatecount) && $this->maxstatecount != 0 && $this->maxpasscount != 0) {
-                    $this->errors[] = get_string('toolargedfa', 'qtype_preg');
+                    $this->errors[] = get_string('toolargefa', 'qtype_preg');
                     return;
                 }
             }
@@ -301,7 +289,7 @@ class dfa_preg_matcher extends preg_matcher {
             $wres = $this->wave($currentstate, $assertnumber);
             $key = $wres->nextkey;
             $result->left = $wres->left;
-            $result->next = $this->connection[$assertnumber][$key]->pregnode->character();
+            $result->next = $this->connection[$assertnumber][$key]->pregnode->next_character($string, $result->index);
         } else {
             $result->next = $next;
             $wres = $this->wave($currentstate, $assertnumber);
@@ -575,7 +563,7 @@ class dfa_preg_matcher extends preg_matcher {
                 $this->merge_fp_maps($key);
             }
         }
-        $this->buildfa();
+        $this->buildfa();	// TODO: check for dfa size!
         $this->built = true;
         return;
     }
@@ -770,7 +758,7 @@ class dfa_preg_matcher extends preg_matcher {
     /**
     * Returns prefix for engine specific classes
     */
-    protected function nodeprefix() {
+    protected function node_prefix() {
         return 'dfa';
     }
 

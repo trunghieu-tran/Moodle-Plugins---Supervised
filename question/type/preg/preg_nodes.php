@@ -27,6 +27,19 @@ class preg_lexem {
     }
 }
 
+/*
+* Class for plain subpattern lexems
+*/
+class preg_lexem_subpatt extends preg_lexem {
+	//Number of subpattern
+    public $number;
+
+    public function __construct($subtype, $indfirst, $indlast, $number) {
+        parent::__construct($subtype, $indfirst, $indlast);
+        $this->number = $number;
+    }
+}
+
 /**
 * Generic node class
 */
@@ -34,42 +47,38 @@ abstract class preg_node {
 
     //////Class constants used to define type
     //Abstract node class, not representing real things
-    const TYPE_ABSTRACT = 0;
+    const TYPE_ABSTRACT = 'abstract';
     //Character or character class
-    const TYPE_LEAF_CHARSET = 1;
+    const TYPE_LEAF_CHARSET = 'leaf_charset';
     //Meta-character or escape sequence matching with a set of characters that couldn't be enumerated
-    const TYPE_LEAF_META = 2;
+    const TYPE_LEAF_META = 'leaf_meta';
     //Simple assert: ^ $ or escape-sequence
-    const TYPE_LEAF_ASSERT = 3;
+    const TYPE_LEAF_ASSERT = 'leaf_assert';
     //Back reference to subpattern
-    const TYPE_LEAF_BACKREF = 4;
+    const TYPE_LEAF_BACKREF = 'leaf_backref';
     //Recursive match
-    const TYPE_LEAF_RECURSION = 5;
+    const TYPE_LEAF_RECURSION = 'leaf_recursion';
     //Option set
-    const TYPE_LEAF_OPTIONS = 6;
-	//Combination of few leaf
-	const TYPE_LEAF_COMBO = 7;
-    //Highest possible leaf type
-    const TYPE_LEAF_MAX = 99;
+    const TYPE_LEAF_OPTIONS = 'leaf_options';
+    //Combination of few leaf
+    const TYPE_LEAF_COMBO = 'leaf_combo';
 
-    //Lowest possible node type
-    const TYPE_NODE_MIN = 100;
     //Finite quantifier
-    const TYPE_NODE_FINITE_QUANT = 101;
+    const TYPE_NODE_FINITE_QUANT = 'node_finite_quant';
     //Infinite quantifier
-    const TYPE_NODE_INFINITE_QUANT = 102;
+    const TYPE_NODE_INFINITE_QUANT = 'node_infinite_quant';
     //Concatenation
-    const TYPE_NODE_CONCAT = 103;
+    const TYPE_NODE_CONCAT = 'node_concat';
     //Alternative
-    const TYPE_NODE_ALT = 104;
+    const TYPE_NODE_ALT = 'node_alt';
     //Assert with expression within
-    const TYPE_NODE_ASSERT = 105;
+    const TYPE_NODE_ASSERT = 'node_assert';
     //Subpattern
-    const TYPE_NODE_SUBPATT = 106;
+    const TYPE_NODE_SUBPATT = 'node_subpatt';
     //Conditional subpattern
-    const TYPE_NODE_COND_SUBPATT = 107;
+    const TYPE_NODE_COND_SUBPATT = 'node_cond_subpatt';
     //error node
-    const TYPE_NODE_ERROR = 108;
+    const TYPE_NODE_ERROR = 'node_error';
 
     //Member variables, common to all subclasses
     //Type, one of the class  - must return constants defined in this class
@@ -111,27 +120,67 @@ abstract class preg_leaf extends preg_node {
     public $caseinsensitive = false;
     //Is leaf negative?
     public $negative = false;
+    //Assertions, merged into this node (preg_leaf_assert objects)
+    public $mergedassertions = array();
 
     /*
-    * Returns true if the leaf consume character from the string during matching, false if it is an assertion
+    * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
     */
     public function consumes() {
-        return true;
+        return 1;
+    }
+    
+    /*
+    * Returns a clone of the leaf including merged assertions
+    */
+    public function &get_clone() {
+        $res = clone $this;
+        $res->mergedassertions = array();
+        foreach ($this->mergedassertions as $assert)
+            $res->mergedassertions[] = $assert->get_clone();
+        return $res;
     }
 
     /*
     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
-    * Default implementation is good for simple consuming classes
+    * Contains universal code to deal with merged assertions. Overload match_inner to define you leaf type matching
     * @param str string with which matching is supporting
     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
     * @param length the length of match (for backreference or recursion), can be 0 for asserts
+    * @param cs case sensitivity of the match
     */
-    abstract public function match($str, $pos, &$length, $cs);
+    public function match($str, $pos, &$length, $cs)
+    {
+        $result = true;
+        //Check merged assertions
+        foreach($this->mergedassertions as $assert) {
+            $result = $result && $assert->match($str, $pos, $length, $cs);
+        }
+        //Now check this leaf
+        if ($result) {
+            $result = $this->match_inner($str, $pos, $length, $cs);
+        }
+
+        return $result;
+    }
+
+    /*
+    * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
+    * Implement details of particular leaf matching
+    * @param str string with which matching is supporting
+    * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
+    * @param length the length of match (for backreference or recursion), can be 0 for asserts
+    * @param cs case sensitivity of the match
+    */
+    abstract protected function match_inner($str, $pos, &$length, $cs);
     
     /*
-    *Returns one of characters which contains in this leaf
+    * Returns a character suitable for both this leaf and merged assertions and previous character
+    * @param str string already matched
+    * @param pos position of the last matched character in the string
+    * @param length number of characters matched in case of partial backreference match
     */
-    abstract public function character();
+    abstract public function next_character($str, $pos, $length = 0);
     
     /**
     * function gives leaf in human readable form
@@ -166,15 +215,14 @@ class preg_leaf_charset extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    public function match($str, $pos, &$length, $cs) {
-
-        if ($pos>=strlen($str)) {
+    protected function match_inner($str, $pos, &$length, $cs) {
+        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
+        if ($pos>=$textlib->strlen($str)) {
             $length = 0;
             return false;
         }
         $charsetcopy = $this->charset;
         $strcopy = $str;
-        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
 
         if (!$cs) {
             $charsetcopy = $textlib->strtolower($charsetcopy);
@@ -194,7 +242,7 @@ class preg_leaf_charset extends preg_leaf {
         return $result;
     }
     
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         if ($this->negative) {
             $i = ord(' ');
             while (strchr(chr($i), $this->charset) !== false) {
@@ -206,6 +254,7 @@ class preg_leaf_charset extends preg_leaf {
             return $this->charset[0];
         }
     }
+
     public function tohr() {
         if ($this->negative) {
             $direction = '^';
@@ -223,16 +272,16 @@ class preg_leaf_charset extends preg_leaf {
 class preg_leaf_meta extends preg_leaf {
 
     //. - any character except \n
-    const SUBTYPE_DOT = 1;
+    const SUBTYPE_DOT = 'dot_leaf_meta';
     //\p{L} or \pL
-    const SUBTYPE_UNICODE_PROP = 2;
+    const SUBTYPE_UNICODE_PROP = 'unicode_prop_leaf_meta';
     // \w 
     //Should be locale-aware, but not Unicode for PCRE-compatibility
-    const SUBTYPE_WORD_CHAR = 3;
+    const SUBTYPE_WORD_CHAR = 'word_char_leaf_meta';
     //Leaf with empty in alternative (something|)
-    const SUBTYPE_EMPTY = 4;
+    const SUBTYPE_EMPTY = 'empty_leaf_meta';
     //Service subtype - end of regex, but not end of string
-    const SUBTYPE_ENDREG = 5;
+    const SUBTYPE_ENDREG = 'endreg_leaf_meta';
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
 
@@ -244,8 +293,15 @@ class preg_leaf_meta extends preg_leaf {
     }
 
     //TODO - ui_nodename()
+    
+    public function consumes() {
+        if ($this->subtype = preg_leaf_meta::SUBTYPE_EMPTY) {
+            return 0;
+        }
+        return 1;
+    }
 
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $result = 'D';
@@ -261,14 +317,15 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
-    public function match($str, $pos, &$length, $cs) {
-        if ($pos>=strlen($str)) {
+    protected function match_inner($str, $pos, &$length, $cs) {
+        $textlib = textlib_get_instance();
+        if ($pos >= $textlib->strlen($str) && $this->subtype != preg_leaf_meta::SUBTYPE_EMPTY) {
             $length = 0;
             return false;
         }
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
-                if ($pos<strlen($str) && $str[$pos] != "\n") {
+                if ($pos < $textlib->strlen($str) && $str[$pos] != "\n") {
                     $length = 1;
                     return true;
                 } else {
@@ -283,6 +340,10 @@ class preg_leaf_meta extends preg_leaf {
                 } else {
                     $result =  false;
                 }
+                break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $length = 0;
+                return true;
                 break;
         }
         if ($this->negative) {
@@ -311,6 +372,9 @@ class preg_leaf_meta extends preg_leaf {
             case preg_leaf_meta::SUBTYPE_ENDREG:
                 $type = 'ENDREG';
                 break;
+            case preg_leaf_meta::SUBTYPE_EMPTY:
+                $type = 'eps';
+                break;
         };
         $result = "$direction"."meta$type";
         return $result;
@@ -323,24 +387,28 @@ class preg_leaf_meta extends preg_leaf {
 class preg_leaf_assert extends preg_leaf {
 
     //^
-    const SUBTYPE_CIRCUMFLEX = 1;
+    const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
     //$
-    const SUBTYPE_DOLLAR = 2;
+    const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
     // \b
-    const SUBTYPE_WORDBREAK = 3;
+    const SUBTYPE_WORDBREAK = 'wordbreak_leaf_assert';
     // \A
-    const SUBTYPE_ESC_A = 4;
+    const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
     // \z
-    const SUBTYPE_ESC_Z = 5;
+    const SUBTYPE_ESC_Z = 'esc_z_leaf_assert';
     // \G
-    const SUBTYPE_ESC_G = 6;
+    const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
+
+    //Reference to the matcher object to be able to query it for captured subpattern
+    //Filled only to ESC_G subtype if it would be implemented in the future
+    public $matcher;
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_ASSERT;
     }
 
     public function consumes() {
-        return false;
+        return 0;
     }
 
     public function name() {
@@ -348,11 +416,12 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    public function match($str, $pos, &$length, $cs) {
-
+    protected function match_inner($str, $pos, &$length, $cs) {
+        $textlib = textlib_get_instance();
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_ESC_G://there are no repetitive matching for now, so \G is equvivalent to \A
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if($pos == 0) {
                     $result = true;
@@ -362,7 +431,7 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($pos == strlen($str)) {
+                if ($pos == $textlib->strlen($str)) {
                     $result = true;
                 } else {
                     $result = false;
@@ -370,7 +439,7 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
-                $end = $pos==strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
+                $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
                 if (!$end) {
                     $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
                     $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
@@ -381,17 +450,13 @@ class preg_leaf_assert extends preg_leaf {
                     $result = false;
                 }
                 break;
-            /*case preg_leaf_assert::SUBTYPE_ESC_G:
-                TODO: matching with SUBTYPE_ESC_G
-                trouble, because this function has not information about offset!
-                break;*/
         }
         if ($this->negative) {
             $result = !$result;
         }
         return $result;
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
@@ -444,12 +509,12 @@ class preg_leaf_assert extends preg_leaf {
 class preg_leaf_combo extends preg_leaf {
 
     //Unite of leafs
-    const SUBTYPE_UNITE = 1;
+    const SUBTYPE_UNITE = 'unite_leaf_combo';
     //Cross of leafs
-    const SUBTYPE_CROSS = 2;
-	
-	var $childs;
-	var $subtype;
+    const SUBTYPE_CROSS = 'cross_leaf_combo';
+    
+    var $childs;
+    var $subtype;
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_COMBO;
@@ -457,160 +522,201 @@ class preg_leaf_combo extends preg_leaf {
 
     public function consumes() {//TODO: fix it!
         if (is_array($this->childs)) {
-			return $this->childs[0]->consumes() || $this->childs[0]->consumes();
-		} else {
-			return true;
-		}
+            return $this->childs[0]->consumes() + $this->childs[0]->consumes();
+        } else {
+            return true;
+        }
     }
 
     public function name() {
         return 'leaf_combo';
     }
 
-    public function match($str, $pos, &$length, $cs) {
-		$match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
-		$match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
-		if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
-			if ($match0 && $match1) {
-				$length = max($length0, $length1);
-			} elseif ($match0) {
-				$length = $length0;
-			} elseif ($match1) {
-				$length = $length1;
-			} else {
-				$length = 0;
-			}
-			$result = $match0 || $match1;
-		} elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
-			$result = $match0 && $match1;
-			if ($result) {
-				$length = max($length0, $length1);
-			} else {
-				$length = 0;
-			}
-		}
-		return $result;
+    protected function match_inner($str, $pos, &$length, $cs) {
+        $match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
+        $match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
+        if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
+            if ($match0 && $match1) {
+                $length = max($length0, $length1);
+            } elseif ($match0) {
+                $length = $length0;
+            } elseif ($match1) {
+                $length = $length1;
+            } else {
+                $length = 0;
+            }
+            $result = $match0 || $match1;
+        } elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
+            $result = $match0 && $match1;
+            if ($result) {
+                $length = max($length0, $length1);
+            } else {
+                $length = 0;
+            }
+        }
+        return $result;
     }
-    public function character() {
-		if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
-			if (is_array($this->childs)) {
-				return $this->childs[0]->character();
-		} else {
-			return 'ERROR: combo of nothing!';
-		}
-		} elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
-			die('Implement preg_leaf_combo::character() for crossing of leaf, before use it!');
-		}
+    public function next_character($str, $pos, $length = 0) {
+        if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
+            if (is_array($this->childs)) {
+                return $this->childs[0]->next_character($str, $pos, $length);
+        } else {
+            return 'ERROR: combo of nothing!';
+        }
+        } elseif ($this->subtype == preg_leaf_combo::SUBTYPE_CROSS) {
+            die('Implement preg_leaf_combo::next_character($str, $pos, $length) for crossing of leaf, before use it!');
+        }
     }
     public function tohr() {
-		if (is_array($this->childs)) {
-			return $this->childs[0]->tohr().$this->childs[1]->tohr();
-		} else {
-			return 'ERROR: combo of nothing!';
-		}
+        if (is_array($this->childs)) {
+            return $this->childs[0]->tohr().$this->childs[1]->tohr();
+        } else {
+            return 'ERROR: combo of nothing!';
+        }
     }
-	static public function get_unite($leaf0, $leaf1) {
-		if ($leaf0->type == preg_node::TYPE_LEAF_CHARSET && $leaf1->type == preg_node::TYPE_LEAF_CHARSET) {
-			$result = new preg_leaf_charset;
-			if ($leaf0->negative && $leaf1->negative) {
-				$result->negative = true;
-				$result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
-			} elseif ($leaf0->negative) {
-				$result->negative = true;
-				$result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
-			} elseif ($leaf1->negative) {
-				$result->negative = true;
-				$result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
-			} else {
-				$result->negative = false;
-				$result->charset =  self::unite_charsets($leaf0->charset, $leaf1->charset);
-			}
+    static public function get_unite($leaf0, $leaf1) {
+        if ($leaf0->type == preg_node::TYPE_LEAF_CHARSET && $leaf1->type == preg_node::TYPE_LEAF_CHARSET) {
+            $result = new preg_leaf_charset;
+            if ($leaf0->negative && $leaf1->negative) {
+                $result->negative = true;
+                $result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
+            } elseif ($leaf0->negative) {
+                $result->negative = true;
+                $result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
+            } elseif ($leaf1->negative) {
+                $result->negative = true;
+                $result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
+            } else {
+                $result->negative = false;
+                $result->charset =  self::unite_charsets($leaf0->charset, $leaf1->charset);
+            }
         } else if ($leaf0->type == preg_node::TYPE_LEAF_META && $leaf0->subtype == preg_leaf_meta::SUBTYPE_DOT) {
             $result = $leaf1;
         } else if ($leaf1->type == preg_node::TYPE_LEAF_META && $leaf1->subtype == preg_leaf_meta::SUBTYPE_DOT) {
             $result = $leaf1;
-		} else {
-			$result = new preg_leaf_combo;
-			$result->subtype = preg_leaf_combo::SUBTYPE_UNITE;
-			$result->childs[0] = $leaf0;
-			$result->childs[1] = $leaf1;
-		}
-		return $result;
-	}
-	static public function get_cross($leaf0, $leaf1) {
+        } else {
+            $result = new preg_leaf_combo;
+            $result->subtype = preg_leaf_combo::SUBTYPE_UNITE;
+            $result->childs[0] = $leaf0;
+            $result->childs[1] = $leaf1;
+        }
+        return $result;
+    }
+    static public function get_cross($leaf0, $leaf1) {
         if ($leaf0->type == preg_node::TYPE_LEAF_CHARSET && $leaf1->type == preg_node::TYPE_LEAF_CHARSET) {
-			$result = new preg_leaf_charset;
-			if ($leaf0->negative && $leaf1->negative) {
-				$result->negative = true;
-				$result->charset = self::unite_charsets($leaf0->charset, $leaf1->charset);
-			} elseif ($leaf0->negative) {
-				$result->negative = false;
-				$result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
-			} elseif ($leaf1->negative) {
-				$result->negative = false;
-				$result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
-			} else {
-				$result->negative = false;
-				$result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
-			}
-		} else if ($leaf0->type == preg_node::TYPE_LEAF_META && $leaf0->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+            $result = new preg_leaf_charset;
+            if ($leaf0->negative && $leaf1->negative) {
+                $result->negative = true;
+                $result->charset = self::unite_charsets($leaf0->charset, $leaf1->charset);
+            } elseif ($leaf0->negative) {
+                $result->negative = false;
+                $result->charset = self::sub_charsets($leaf1->charset, $leaf0->charset);
+            } elseif ($leaf1->negative) {
+                $result->negative = false;
+                $result->charset = self::sub_charsets($leaf0->charset, $leaf1->charset);
+            } else {
+                $result->negative = false;
+                $result->charset = self::cross_charsets($leaf0->charset, $leaf1->charset);
+            }
+        } else if ($leaf0->type == preg_node::TYPE_LEAF_META && $leaf0->subtype == preg_leaf_meta::SUBTYPE_DOT) {
             $result = $leaf1;
         } else if ($leaf1->type == preg_node::TYPE_LEAF_META && $leaf1->subtype == preg_leaf_meta::SUBTYPE_DOT) {
             $result = $leaf0;
         } else {
-			$result = new preg_leaf_combo;
-			$result->subtype = preg_leaf_combo::SUBTYPE_CROSS;
-			$result->childs[0] = $leaf0;
-			$result->childs[1] = $leaf1;
-		}
-		return $result;
-	}
-	static public function cross_charsets($charset0, $charset1) {
-		$result = '';
-		for ($i=0; $i<strlen($charset0); $i++) {
-			if (strpos($charset1, $charset0[$i])!==false) {
-				$result.=$charset0[$i];
-			}
-		}
-		return $result;
-	}
-	static public function sub_charsets($charset0, $charset1) {
-		$result = '';
-		for ($i=0; $i<strlen($charset0); $i++) {
-			if (strpos($charset1, $charset0[$i])===false) {
-				$result.=$charset0[$i];
-			}
-		}
-		return $result;
-	}
+            $result = new preg_leaf_combo;
+            $result->subtype = preg_leaf_combo::SUBTYPE_CROSS;
+            $result->childs[0] = $leaf0;
+            $result->childs[1] = $leaf1;
+        }
+        return $result;
+    }
+    static public function cross_charsets($charset0, $charset1) {
+        $result = '';
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])!==false) {
+                $result.=$charset0[$i];
+            }
+        }
+        return $result;
+    }
+    static public function sub_charsets($charset0, $charset1) {
+        $result = '';
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])===false) {
+                $result.=$charset0[$i];
+            }
+        }
+        return $result;
+    }
     static public function unite_charsets($charset0, $charset1) {
         $result = $charset1;
-		for ($i=0; $i<strlen($charset0); $i++) {
-			if (strpos($charset1, $charset0[$i])===false) {
-				$result.=$charset0[$i];
-			}
-		}
-		return $result;
+        $textlib = textlib_get_instance();
+        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
+            if ($textlib->strpos($charset1, $charset0[$i])===false) {
+                $result.=$charset0[$i];
+            }
+        }
+        return $result;
     }
 }
 
 class preg_leaf_backref extends preg_leaf {
     public $number;
-    
+    //Reference to the matcher object to be able to query it for captured subpattern
+    public $matcher;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
-    public function match($str, $pos, &$length, $cs) {
-        die ('TODO: implements abstract function match for preg_leaf_backref class before use it!');
+
+    public function consumes() {
+        if (!$this->matcher->is_subpattern_captured($this->number)) {
+            return 0;
+        }
+        return $this->matcher->last_correct_character_index($this->number) - $this->matcher->first_correct_character_index($this->number) + 1;
+    }
+
+    protected function match_inner($str, $pos, &$length, $cs) {
+        $textlib = textlib_get_instance();
+        $len = $textlib->strlen($str);
+        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $len) {
+            $length = 0;
+            return false;
+        }
+        $strcopy = $str;
+        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
+
+        if (!$cs) {
+            $strcopy = $textlib->strtolower($strcopy);
+        }
+        $start = $this->matcher->first_correct_character_index($this->number);
+        $end = $this->matcher->last_correct_character_index($this->number);
+        $matchlen = 0;
+        $result = true;
+        // check char by char
+        for ($i = $start; $result && $i <= $end && $i + $pos < $len; $i++) {
+            $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
+            if ($result) {
+                $matchlen++;
+            }
+        }
+        // if the string has not enough characters
+        if ($end + $pos >= $len) {
+            $result = false;
+        }
+        $length = $matchlen;        
+        return $result;
     }
     public function name() {
         return 'leaf_backref';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
     }
     public function tohr() {
-        return 'backref #'.$number;
+        return 'backref #'.$this->number;
     }
 }
 
@@ -621,13 +727,13 @@ class preg_leaf_option extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_OPTIONS;
     }
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_option class before use it!');
     }
     public function name() {
         return 'leaf_option';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0) {
         die ('TODO: implements abstract function character for preg_leaf_option class before use it!');
     }
     public function tohr() {
@@ -643,13 +749,13 @@ class preg_leaf_recursion extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_RECURSION;
     }
-    public function match($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs) {
         die ('TODO: implements abstract function match for preg_leaf_recursion class before use it!');
     }
     public function name() {
         return 'leaf_recursion';
     }
-    public function character() {
+    public function next_character($str, $pos, $length = 0){
         die ('TODO: implements abstract function character for preg_leaf_recursion class before use it!');
     }
     public function tohr() {
@@ -758,13 +864,13 @@ class preg_node_alt extends preg_operator {
 class preg_node_assert extends preg_operator {
 
     //Positive lookahead assert
-    const SUBTYPE_PLA = 1;
+    const SUBTYPE_PLA = 'pla_node_assert';
     //Negative lookahead assert
-    const SUBTYPE_NLA = 2;
+    const SUBTYPE_NLA = 'nla_node_assert';
     //Positive lookbehind assert
-    const SUBTYPE_PLB = 3;
+    const SUBTYPE_PLB = 'plb_node_assert';
     //Negative lookbehind assert
-    const SUBTYPE_NLB = 4;
+    const SUBTYPE_NLB = 'nlb_node_assert';
 
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_ASSERT;
@@ -773,10 +879,10 @@ class preg_node_assert extends preg_operator {
     public function name() {
         return 'node_assert';
     }
-	public function tohr() {
-		return 'node assert';
-	}
-	
+    public function tohr() {
+        return 'node assert';
+    }
+    
     //TODO - ui_nodename()
 }
 
@@ -787,9 +893,9 @@ class preg_node_assert extends preg_operator {
 class preg_node_subpatt extends preg_operator {
 
     //Subpattern
-    const SUBTYPE_SUBPATT = 1;
+    const SUBTYPE_SUBPATT = 'subpatt_node_subpatt';
     //Once-only subpattern
-    const SUBTYPE_ONCEONLY = 22;//for mismatching with SUBTYPE_NLA in parser
+    const SUBTYPE_ONCEONLY = 'onceonly_node_subpatt';
 
     //Subpattern number
     public $number = 0;
@@ -816,17 +922,17 @@ class preg_node_cond_subpatt extends preg_operator {
 
     //Subtypes define a type of condition for subpatern
     //Positive lookahead assert
-    const SUBTYPE_PLA = 1;
+    const SUBTYPE_PLA = 'pla_node_cond_subpatt';
     //Negative lookahead assert
-    const SUBTYPE_NLA = 2;
+    const SUBTYPE_NLA = 'nla_node_cond_subpatt';
     //Positive lookbehind assert
-    const SUBTYPE_PLB = 3;
+    const SUBTYPE_PLB = 'plb_node_cond_subpatt';
     //Negative lookbehind assert
-    const SUBTYPE_NLB = 4;
+    const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
     //Backreference 
-    const SUBTYPE_BACKREF = 5;
+    const SUBTYPE_BACKREF = 'backref_node_cond_subpatt';
     //Recursive
-    const SUBTYPE_RECURSIVE = 6;
+    const SUBTYPE_RECURSIVE = 'recursive_node_cond_subpatt';
 
     //Subpattern number
     public $number = 0;
@@ -851,19 +957,19 @@ class preg_node_error extends preg_node {
 
     //Subtypes define a type of error
     //Unknown parse error
-    const SUBTYPE_UNKNOWN_ERROR = 1;
+    const SUBTYPE_UNKNOWN_ERROR = 'unknown_error_node_error';
     //Too much top-level alternatives in conditional subpattern
-    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 2;
+    const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 'consubpatt_too_much_alter_node_error';
     //Close paren without opening  xxx)
-    const SUBTYPE_WRONG_CLOSE_PAREN = 3;
+    const SUBTYPE_WRONG_CLOSE_PAREN = 'wrong_close_paren_node_error';
     //Open paren without closing  (xxx
-    const SUBTYPE_WRONG_OPEN_PAREN = 4;
+    const SUBTYPE_WRONG_OPEN_PAREN = 'wrong_open_paren_node_error';
     //Empty parens
-    const SUBTYPE_EMPTY_PARENS = 5;
+    const SUBTYPE_EMPTY_PARENS = 'empty_parens_node_error';
     //Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
-    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 6;
+    const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
     //Unclosed square brackets in character class
-    const SUBTYPE_UNCLOSED_CHARCLASS = 7;
+    const SUBTYPE_UNCLOSED_CHARCLASS = 'unclosed_charclass_node_error';
 
     //Error strings name in qtype_preg.php lang file
     public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt', 

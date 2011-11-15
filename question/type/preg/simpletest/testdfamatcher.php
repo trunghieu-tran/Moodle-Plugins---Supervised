@@ -107,7 +107,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $result = $matcher->match('ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === '');
-	}
+    }
     function test_quantificator() {
         $matcher = new dfa_preg_matcher('^ab{15,35}c$');
         $result = $matcher->match('abbbbbc');
@@ -144,12 +144,12 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
-	function test_repeat_chars_with_assert() {
+    function test_repeat_chars_with_assert() {
         $matcher = new dfa_preg_matcher('(?:a|b|c|d)*(?=abb)(a|c)(b|d)(b|d)');
         $matcher->match('ab');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'a'|| $matcher->next_char() === 'b'));
-		$matcher->match('cdd');
+        $matcher->match('cdd');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 2 && ($matcher->next_char() === 'a'|| $matcher->next_char() === 'b'));
         $matcher->match('abb');
@@ -158,13 +158,13 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === '');
-	}
-	function test_repeat_chars_without_assert() {
+    }
+    function test_repeat_chars_without_assert() {
         $matcher = new dfa_preg_matcher('(?:a|b|c|d)*abb');
         $matcher->match('ab');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 1 && ($matcher->next_char() === 'a'|| $matcher->next_char() === 'b'|| $matcher->next_char() === 'c'|| $matcher->next_char() === 'd'));
-		$matcher->match('cdd');
+        $matcher->match('cdd');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 2 && ($matcher->next_char() === 'a'|| $matcher->next_char() === 'b'|| $matcher->next_char() === 'c'|| $matcher->next_char() === 'd'));
         $matcher->match('abb');
@@ -173,7 +173,7 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 75 && $matcher->next_char() === '');
-	}
+    }
     function test_start_on_assert() {
         $matcher = new dfa_preg_matcher('(?=[xcvnm]*b)[xcvbnm]*');
         $matcher->match('x');
@@ -272,12 +272,12 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $matcher->match('Abcd');
         $this->assertTrue($matcher->is_matching_complete());
     }
-	function test_match_not_from_string_start() {
-		$matcher = new dfa_preg_matcher('someregex');
-		$matcher->match('sometextwithoutmatchingandsomeregexwithmatchig');
-		$this->assertTrue($matcher->is_matching_complete());
-		$this->assertTrue($matcher->first_correct_character_index()==26);
-		$this->assertTrue($matcher->last_correct_character_index()==34);
-	}
+    function test_match_not_from_string_start() {
+        $matcher = new dfa_preg_matcher('someregex');
+        $matcher->match('sometextwithoutmatchingandsomeregexwithmatchig');
+        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->first_correct_character_index()==26);
+        $this->assertTrue($matcher->last_correct_character_index()==34);
+    }
 }
 ?>
