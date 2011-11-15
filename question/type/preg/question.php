@@ -39,6 +39,11 @@ interface question_with_specific_hints {
     public function available_specific_hint_types();
 
     /** 
+     * returns whether response allows for the hint to be done
+     */
+    public function hint_available($hinttype, $response);
+
+    /** 
      * returns specific hint value of given hint type for given response
      */
     public function specific_hint($hinttype, $response);
@@ -323,6 +328,16 @@ class qtype_preg_question extends question_graded_automatically
         }
 
         return null;
+    }
+
+    /** 
+     * returns whether response allows for the hint to be done
+     */
+    public function hint_available($hinttype, $response) {
+        switch($hinttype) {
+            case 'hintnextchar':
+            return true;// next character hint available anywhere - TODO check where answer is correct or no next character could be generated
+        }
     }
 
         /** 
