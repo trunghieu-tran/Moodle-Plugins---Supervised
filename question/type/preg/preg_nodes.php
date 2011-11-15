@@ -709,12 +709,24 @@ class preg_leaf_backref extends preg_leaf {
         $length = $matchlen;        
         return $result;
     }
+
     public function name() {
         return 'leaf_backref';
     }
+
     public function next_character($str, $pos, $length = 0) {
-        die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
+		// TODO: check for assertions in case of $length == 0
+		if (!$this->matcher->is_subpattern_captured($this->number)) {
+			return '';
+		}		
+		$start = $this->matcher->first_correct_character_index($this->number);
+		$textlib = textlib_get_instance();
+		if ($start + $length >= $textlib->strlen($str)) {
+			return '';
+		}
+		return $str[$start + $length];
     }
+
     public function tohr() {
         return 'backref #'.$this->number;
     }
