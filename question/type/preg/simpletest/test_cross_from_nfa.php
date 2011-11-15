@@ -1,4 +1,12 @@
 <?php
+/**
+ * Unit tests for matchers
+ *
+ * @copyright &copy; 2011  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
@@ -52,7 +60,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'t');
+                        'next'=>'');
 
         $test3 = array( 'str'=>'deff',
                         'is_match'=>true,
@@ -204,7 +212,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
                         'left'=>array(3),
-                        'next'=>'acdefghijklmnopqrstuvwxyz0123456789!?.,');
+                        'next'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
 
         $test2 = array( 'str'=>'axcd',
                         'is_match'=>true,
@@ -459,9 +467,25 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_last'=>array(0=>3,1=>-2,2=>1,3=>3),
                         'left'=>array(0),
                         'next'=>'');
+                        
+        $test3 = array( 'str'=>'aba',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
+                        'index_last'=>array(0=>2,1=>1,2=>-2,3=>-2),
+                        'left'=>array(1),
+                        'next'=>'b');
+                        
+        $test4 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
+                        'index_last'=>array(0=>1,1=>1,2=>-2,3=>-2),
+                        'left'=>array(2),
+                        'next'=>'a');
 
         return array('regex'=>'(?:(ab)|(cd))(\1|\2)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2, $test3, $test4));
     }
     
     function data_for_test_backref_quantified() {

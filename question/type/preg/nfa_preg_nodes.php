@@ -1,4 +1,12 @@
 <?php
+/**
+ * Defines NFA node classes
+ *
+ * @copyright &copy; 2011  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
