@@ -113,8 +113,8 @@ class preg_cross_tester extends UnitTestCase {
                                     $passed = $passed && $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0], "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
                                 }
                                 if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                                    $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false, "$matchername failed 'next' check on regex '$regex' and string '$str'");        // expected 'next' contains obtained 'next'
-                                }
+                                    $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || ($expected['next'] !== '' && $obtained['next'] !== '' && strstr($expected['next'], $obtained['next']) != false), "$matchername failed 'next' check on regex '$regex' and string '$str'");  // expected 'next' contains obtained 'next'
+								}
                                 if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
                                     $passed = $passed && $this->assertTrue(in_array($obtained['left'], $expected['left']), "$matchername failed 'left' check on regex '$regex' and string '$str'");
 								}
