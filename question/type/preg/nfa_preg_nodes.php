@@ -161,13 +161,19 @@ class nfa_state
  */
 class nfa {
 
+    private $graphvizpath;       // path to dot.exe of graphviz
     public $startstate;          // a reference to the start nfa_state of the automaton
-
     public $endstate;            // a reference to the end nfa_state of the automaton
-
     public $states = array();    // an array containing references to states of the automaton
 
-    var $graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';    // path to dot.exe of graphviz
+    public function __construct() {
+        global $CFG;
+        if (isset($CFG->dotpath)) {
+            $this->graphvizpath = $CFG->dotpath;
+        } else {
+            $this->graphvizpath = '';
+        }
+    }
 
     /**
      * clears $subpatt_start, $subpatt_end and $belongs_to_subpatt in every transition of the automaton
@@ -366,6 +372,10 @@ class nfa {
     * @param jpgfilename - name of the resulting jpg file
     */
     public function draw_nfa($dotfilename, $jpgfilename) {
+        if ($this->graphvizpath === '') {
+            echo 'dot.exe path not specified<br/>';
+            return;
+        }
         $dotfile = fopen($dotfilename, 'w');
         // numerate all states
         $tmp = 0;
@@ -431,7 +441,7 @@ abstract class nfa_preg_node {
     public function inc_fa_size(&$matcher, $ds, $dt, &$statecount, &$transitioncount) {
         $statecount += $ds;
         $transitioncount += $dt;
-        return !($statecount > $matcher->statelimit || $transitioncount > $matcher->transitionlimit);
+        return !($statecount > $matcher->get_state_limit() || $transitioncount > $matcher->get_transition_limit());
     }
 
     /**
