@@ -46,11 +46,17 @@ class processing_state {
 
 class nfa_preg_matcher extends preg_matcher {
 
-    public $statelimit = 250;
-    
-    public $transitionlimit = 250;
-
+    private $statelimit;
+    private $transitionlimit;
     public $automaton;    // an nfa corresponding to the given regex
+    
+    public function get_state_limit() {
+        return $this->statelimit;
+    }
+
+    public function get_transition_limit() {
+        return $this->transitionlimit;
+    }
 
     /**
     * returns prefix for engine specific classes
@@ -336,10 +342,22 @@ class nfa_preg_matcher extends preg_matcher {
     }
 
     public function __construct($regex = null, $modifiers = null) {
+        global $CFG;
         parent::__construct($regex, $modifiers);
         if (!isset($regex) || !empty($this->errors)) {
             return;
         }
+        if (isset($CFG->nfastatelimit)) {
+            $this->statelimit = $CFG->nfastatelimit;
+        } else {
+            $this->statelimit = 1;
+        }
+        if (isset($CFG->nfatransitionlimit)) {
+            $this->transitionlimit = $CFG->nfatransitionlimit;
+        } else {
+            $this->transitionlimit = 1;
+        }
+
         $stack = array();
         $statecount = 0;
         $transitioncount = 0;
