@@ -13,10 +13,13 @@ defined('MOODLE_INTERNAL') || die();
 class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer {
 
     public function controls(question_attempt $qa, question_display_options $options) {
+        $question = $qa->get_behaviour()->question;
         $output = parent::controls($qa, $options);//submit button
+        $output .= '  '.get_string('withpossiblepenalty', 'adaptivewithhint', format_float($question->penalty, $options->markdp));
+        $output .= html_writer::empty_tag('br');
 
         //hinting buttons  $qa->get_behaviour()
-         foreach ($qa->get_behaviour()->question->available_specific_hint_types() as $hintkey => $hintdescription) {
+         foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
             $attributes = array(
                 'type' => 'submit',
                 'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
@@ -28,6 +31,8 @@ class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer 
                 $attributes['disabled'] = 'disabled';
             }
             $output. = html_writer::empty_tag('input', $attributes);
+            $output .= '  '.get_string('withpenalty', 'adaptivewithhint', format_float($question->penalty_for_specific_hint($hintkey, null), $options->markdp));
+            $output .= html_writer::empty_tag('br');
             
             /*if (!$options->readonly) {
             $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',

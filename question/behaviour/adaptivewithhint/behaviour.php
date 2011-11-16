@@ -51,6 +51,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         parent::adjust_display_options($options);//there seems to nothing to be done until question_display_options will be passed to specific_feedback function of question renderer
     }
 
+    ////Summarise functions
     public function summarise_action(question_attempt_step $step) {
         //Summarise hint action
         foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
@@ -71,6 +72,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         return get_string('hintused', 'adaptivewithhint', $a);
     }
 
+    ////Process functions
     public function process_action(question_attempt_pending_step $pendingstep) {
         foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
