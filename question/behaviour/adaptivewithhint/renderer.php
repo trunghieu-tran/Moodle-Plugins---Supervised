@@ -10,12 +10,15 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2011 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+require_once($CFG->dirroot . '/question/behaviour/adaptive/renderer.php');
+
 class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer {
 
     public function controls(question_attempt $qa, question_display_options $options) {
-        $question = $qa->get_behaviour()->question;
+        $question = $qa->get_question();
         $output = parent::controls($qa, $options);//submit button
-        $output .= '  '.get_string('withpossiblepenalty', 'adaptivewithhint', format_float($question->penalty, $options->markdp));
+        $output .= '  '.get_string('withpossiblepenalty', 'qbehaviour_adaptivewithhint', format_float($question->penalty, $options->markdp));
         $output .= html_writer::empty_tag('br');
 
         //hinting buttons  $qa->get_behaviour()
@@ -24,14 +27,14 @@ class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer 
                 'type' => 'submit',
                 'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
                 'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'value' => get_string('hintbtn', 'adaptivewithhint', $hintdescription),
+                'value' => get_string('hintbtn', 'qbehaviour_adaptivewithhint', $hintdescription),
                 'class' => 'submit btn',
             );
             if ($options->readonly) {
                 $attributes['disabled'] = 'disabled';
             }
-            $output. = html_writer::empty_tag('input', $attributes);
-            $output .= '  '.get_string('withpenalty', 'adaptivewithhint', format_float($question->penalty_for_specific_hint($hintkey, null), $options->markdp));
+            $output .= html_writer::empty_tag('input', $attributes);
+            $output .= '  '.get_string('withpenalty', 'qbehaviour_adaptivewithhint', format_float($question->penalty_for_specific_hint($hintkey, null), $options->markdp));
             $output .= html_writer::empty_tag('br');
             
             /*if (!$options->readonly) {

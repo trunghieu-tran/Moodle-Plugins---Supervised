@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . 'question/behaviour/adaptive/behaviour.php');
+require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
 
 class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
     const IS_ARCHETYPAL = false;
@@ -69,7 +69,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);
         $a->penalty = $this->question->penalty_for_specific_hint($hintkey, $response);
-        return get_string('hintused', 'adaptivewithhint', $a);
+        return get_string('hintused', 'qbehaviour_adaptivewithhint', $a);
     }
 
     ////Process functions
@@ -115,8 +115,12 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         $pendingstep->set_behaviour_var('_penalty', $penalty);
         $newtotal = $prevtotal + $penalty;
         $pendingstep->set_behaviour_var('_totalpenalties', $newtotal);
+        $prevbest = $pendingstep->get_fraction();
+        if (is_null($prevbest)) {
+            $prevbest = 0;
+        }
         //fraction = rawfraction - totalpenalties (already collected)
-        $pendingstep->set_fraction($pendingstep->get_behaviour_var('_rawfraction') - $newtotal);
+        $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $newtotal));
 
         $pendingstep->set_new_response_summary($this->question->summarise_response($response));
 
@@ -127,10 +131,15 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
     public function process_submit(question_attempt_pending_step $pendingstep) {
         $status = parent::process_submit($pendingstep);
 
-         if (!$this->question->is_gradable_response($response) && $status == question_attempt::KEEP) {//state was graded
+        $response = $pendingstep->get_qt_data();
+        if ($this->question->is_gradable_response($response) && $status == question_attempt::KEEP) {//state was graded
             $prevtotal = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
+            $prevbest = $pendingstep->get_fraction();
+            if (is_null($prevbest)) {
+                $prevbest = 0;
+            }
             //fraction = rawfraction - totalpenalties (already collected)
-            $pendingstep->set_fraction($pendingstep->get_behaviour_var('_rawfraction') - $prevtotal);
+            $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $prevtotal));
             $pendingstep->set_behaviour_var('_totalpenalties', $prevtotal + $this->question->penalty);//for submit penalty is added after fraction is calculated
             $pendingstep->set_behaviour_var('_penalty', $this->question->penalty);
         }
@@ -141,15 +150,20 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
     public function process_finish(question_attempt_pending_step $pendingstep) {
         $status = parent::process_finish($pendingstep);
 
-        if ($pendingstep->get_state != question_state::$gaveup) {//state was graded
+        if ($pendingstep->get_state() != question_state::$gaveup) {//state was graded
             $laststep = $this->qa->get_last_step();
             $total = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
             if (!$laststep->has_behaviour_var('_try')) {//Submitting ( not previous grading) resulted in finishing, so need to apply penalty
                 $total += $this->question->penalty;
                 $pendingstep->set_behaviour_var('_penalty', $this->question->penalty);
             }
+            $prevbest = $this->qa->get_fraction();
+            if (is_null($prevbest)) {
+                $prevbest = 0;
+            }
             $pendingstep->set_behaviour_var('_totalpenalties', $total);
-            $pendingstep->set_fraction($pendingstep->get_behaviour_var('_rawfraction') - $total);
+            //Must substract by one submission penalty less , to account for one lawful submission
+            $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $total + $this->question->penalty));
         }
         return question_attempt::KEEP;
     }

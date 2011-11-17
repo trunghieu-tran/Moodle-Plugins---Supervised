@@ -62,7 +62,7 @@ interface question_with_specific_hints {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable question_with_specific_hints {
+        implements question_automatically_gradable, question_with_specific_hints {
 
     //Fields defining a question
     /** @var array of question_answer objects. */
@@ -104,7 +104,7 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     public function is_gradable_response(array $response) {
-        return $this->is_complete_response($response) || array_key_exists('hint', $response);
+        return $this->is_complete_response($response);
     }
 
     /**
@@ -212,22 +212,6 @@ class qtype_preg_question extends question_graded_automatically
 
         return array($grade, $state);
 
-        /* Old code - TODO - delete when penalties would be calculated
-        // Make sure we don't assign negative or too high marks.
-        $state->raw_grade = min(max((float) $state->raw_grade,
-                            0.0), 1.0) * $question->maxgrade;
-
-        // Update the penalty
-        if (isset($state->responses['hint'])) {
-            $state->penalty = $question->options->hintpenalty * $question->maxgrade;
-        } else {
-            $state->penalty = $question->penalty * $question->maxgrade;
-        }
-
-        // mark the state as graded
-        $state->event = ($state->event ==  QUESTION_EVENTCLOSE) ? QUESTION_EVENTCLOSEANDGRADE : QUESTION_EVENTGRADE;
-
-        return true;*/
     }
 
     /**
