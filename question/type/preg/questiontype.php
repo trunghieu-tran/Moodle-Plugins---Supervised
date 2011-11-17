@@ -66,30 +66,6 @@ class qtype_preg extends qtype_shortanswer {
         return $matcher->match($state->responses['']);
     }
 
-    /*
-    * Override compare responses for Hint button to work right after Submit without changing response
-    * This may not be needed if the best fit answer would be saved in DB in reponses - TODO - probably could wait before new question engine
-    */
-/*    function compare_responses($question, $state, $teststate) {
-        $result = parent::compare_responses($question, $state, $teststate);
-        //if hint requiested grade and apply penalty anyway, because if $teststate isn't direct predecessor of $state, than Hint won't work if the student entered exactly same response before
-        //Hinting needs grading to work for now
-        if ($result && isset($state->responses['hint'])) {
-            $result = false;
-        }
-        return $result;
-    }*/
-
-
-     function print_question_submit_buttons(&$question, &$state, $cmoptions, $options) {
-        parent::print_question_submit_buttons(&$question, &$state, $cmoptions, $options);
-        if (($cmoptions->optionflags & QUESTION_ADAPTIVE) and !$options->readonly and $question->options->usehint) {
-            echo '<input type="submit" name="', $question->name_prefix, 'hint" value="',
-                    get_string('hintbutton','qtype_preg'), '" class=" btn" onclick="',
-                    "form.action = form.action + '#q", $question->id, "'; return true;", '" />';
-        }
-    }
-
 }
 //// END OF CLASS ////
 ?>
