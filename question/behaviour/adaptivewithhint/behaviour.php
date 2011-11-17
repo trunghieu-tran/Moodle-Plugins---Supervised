@@ -129,15 +129,18 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
 
     //Overload process_submit to recalculate fraction and add _totalpenalties
     public function process_submit(question_attempt_pending_step $pendingstep) {
+
+        //Must find out prevbest before parent function get in it's fraction
+        $prevbest = $pendingstep->get_fraction();
+        if (is_null($prevbest)) {
+            $prevbest = 0;
+        }
+
         $status = parent::process_submit($pendingstep);
 
         $response = $pendingstep->get_qt_data();
         if ($this->question->is_gradable_response($response) && $status == question_attempt::KEEP) {//state was graded
             $prevtotal = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
-            $prevbest = $pendingstep->get_fraction();
-            if (is_null($prevbest)) {
-                $prevbest = 0;
-            }
             //fraction = rawfraction - totalpenalties (already collected)
             $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $prevtotal));
             $pendingstep->set_behaviour_var('_totalpenalties', $prevtotal + $this->question->penalty);//for submit penalty is added after fraction is calculated
@@ -148,6 +151,13 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
 
     //Overload process_finish to recalculate fraction and add _totalpenalties
     public function process_finish(question_attempt_pending_step $pendingstep) {
+
+        //Must find out prevbest before parent function get in it's fraction
+        $prevbest = $this->qa->get_fraction();
+        if (is_null($prevbest)) {
+            $prevbest = 0;
+        }
+
         $status = parent::process_finish($pendingstep);
 
         if ($pendingstep->get_state() != question_state::$gaveup) {//state was graded
@@ -156,10 +166,6 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
             if (!$laststep->has_behaviour_var('_try')) {//Submitting ( not previous grading) resulted in finishing, so need to apply penalty
                 $total += $this->question->penalty;
                 $pendingstep->set_behaviour_var('_penalty', $this->question->penalty);
-            }
-            $prevbest = $this->qa->get_fraction();
-            if (is_null($prevbest)) {
-                $prevbest = 0;
             }
             $pendingstep->set_behaviour_var('_totalpenalties', $total);
             //Must substract by one submission penalty less , to account for one lawful submission
