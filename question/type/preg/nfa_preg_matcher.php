@@ -183,12 +183,12 @@ class nfa_preg_matcher extends preg_matcher {
                             // save subpattern indexes
                             foreach ($next->subpatt_start as $key=>$subpatt) {
                                 if ($newstate->subpattern_indexes_first[$key] == -1) {
-                                    $newstate->subpattern_indexes_first[$key] = $currentstate->matchcnt + $length;    // saving to index_first for backreference capturing
+                                    $newstate->subpattern_indexes_first[$key] = $currentstate->matchcnt + $length - 1;    // saving to index_first for backreference capturing
                                 }
                             }
                             foreach ($next->subpatt_end as $key=>$subpatt) {
                                 if ($newstate->subpattern_indexes_last[$key] == -2) {
-                                    $newstate->subpattern_indexes_last[$key] = $currentstate->matchcnt + $length;    // saving to index_last
+                                    $newstate->subpattern_indexes_last[$key] = $currentstate->matchcnt + $length - 1;    // saving to index_last
                                 }
                             }
                             array_push($newstates, $newstate);
@@ -328,8 +328,10 @@ class nfa_preg_matcher extends preg_matcher {
         $this->is_match = ($result->matchcnt > 0);
         $this->full = $result->isfullmatch;
         foreach ($result->subpattern_indexes_last as $key=>$subpatt) {
-            $this->index_first[$key] = $result->subpattern_indexes_first[$key];
-            $this->index_last[$key] = $result->subpattern_indexes_last[$key];
+            if ($subpatt != -2) {
+                $this->index_first[$key] = $result->subpattern_indexes_first[$key];
+                $this->index_last[$key] = $result->subpattern_indexes_last[$key];
+            }
         }
         // generate a character
         if (!$result->isfullmatch) {
