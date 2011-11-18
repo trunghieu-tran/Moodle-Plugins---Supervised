@@ -269,13 +269,48 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /*
+    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedcharacter', 'wrongtail'
+    */
+    public function response_correctness_parts($response) {
+        $bestfit = $this->get_best_fit_answer($response);
+        $answer = $bestfit['answer'];
+        $matchresults = $bestfit['match'];
+        $currentanswer = $response['answer'];
+
+        if ($matchresults['is_match']) {
+            $firstindex = $matchresults['index_first'][0];
+            $lastindex = $matchresults['index_last'][0];
+
+            $wronghead = '';
+            if ($firstindex > 0) {//if there is wrong heading
+                $wronghead = substr($currentanswer, 0, $firstindex);
+            }
+            $correctpart = '';
+            if ($firstindex != -1) {//there were any match
+                $correctpart = substr($currentanswer, $firstindex, $lastindex - $firstindex + 1);
+            }
+            $hintedcharacter = '';
+            if (isset($matchresults['next'])) {//if hint possible
+                $hintedcharacter = $matchresults['next'];
+            }
+            $wrongtail = '';
+            if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
+                $wrongtail =  substr($currentanswer, $lastindex + 1, strlen($currentanswer) - $lastindex - 1);
+            }
+            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
+        }
+        //no match
+        return null;
+    }
+
+    /*
     * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
     @param subject string to insert subpatterns
     @param question question object to create matcher
     @param state state of the question attempt to get response
     @return changed string
     */
-    function insert_subpatterns($subject, $response) {
+    public function insert_subpatterns($subject, $response) {
 
         //To be sure best fit answer is calculated
         $this->get_best_fit_answer($response);
@@ -309,7 +344,7 @@ class qtype_preg_question extends question_graded_automatically
              return new qbehaviour_adaptivewithhint($qa, $preferredbehaviour);
         }
 
-        parent::make_behaviour($qa, $preferredbehaviour);
+        return parent::make_behaviour($qa, $preferredbehaviour);
      }
     /**
     * returns an array of available specific hint types

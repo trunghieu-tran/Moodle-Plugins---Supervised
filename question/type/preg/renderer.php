@@ -47,38 +47,36 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //TODO - decide exact conditions to show colored string. $options->correctness seems too tight - in adaptive mode it isn't shown until all is graded
         //if ($options->correctness == question_display_options::VISIBLE) {
         if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('hintnextcharbtn')) {//specific feedback is possible or hint is requested
-            $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
-            $answer = $bestfit['answer'];
-            $matchresults = $bestfit['match'];
             //Calculate strings for response coloring
-            if ($matchresults['is_match']) {
-                $firstindex = $matchresults['index_first'][0];
-                $lastindex = $matchresults['index_last'][0];
+            $parts = $question->response_correctness_parts(array('answer' => $currentanswer));
+            if ($parts !== null) {
 
                 $wronghead = '';
-                if ($firstindex > 0) {//if there is wrong heading
-                    $wronghead = html_writer::tag('span', htmlspecialchars(substr($currentanswer, 0, $firstindex)), array('class' => $this->feedback_class(0)));
-                }
-                $correctpart = '';
-                if ($firstindex != -1) {//there were any match
-                    $correctpart = html_writer::tag('span', htmlspecialchars(substr($currentanswer, $firstindex, $lastindex - $firstindex + 1)), array('class' => $this->feedback_class(1)));
-                }
-                $hintedcharacter = '';
-                if ($qa->get_last_step()->has_behaviour_var('hintnextcharbtn') && isset($matchresults['next'])) {//if hint requested and possible
-                    $hintedcharacter = html_writer::tag('span', htmlspecialchars($matchresults['next']), array('class' => $this->feedback_class(0.5)));
-                }
-                $wrongtail = '';
-                if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
-                    $wrongtail =  html_writer::tag('span', htmlspecialchars(substr($currentanswer, $lastindex + 1, strlen($currentanswer) - $lastindex - 1)), array('class' => $this->feedback_class(0)));
+                if ($parts['wronghead'] !== '') {//if there is wrong heading
+                    $wronghead = html_writer::tag('span', htmlspecialchars($parts['wronghead']), array('class' => $this->feedback_class(0)));
                 }
 
-                $hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail;
-                $hintmessage .= html_writer::empty_tag('br');
+                $correctpart = '';
+                if ($parts['correctpart'] != -1) {//there were any match
+                    $correctpart = html_writer::tag('span', htmlspecialchars($parts['correctpart']), array('class' => $this->feedback_class(1)));
+                }
+
+                $hintedcharacter = '';
+                if ($qa->get_last_step()->has_behaviour_var('hintnextcharbtn') && $parts['hintedcharacter'] !== '') {//if hint requested and possible
+                    $hintedcharacter = html_writer::tag('span', htmlspecialchars($parts['hintedcharacter']), array('class' => $this->feedback_class(0.5)));
+                }
+
+                $wrongtail = '';
+                if ($parts['wrongtail']) {//if there is wrong tail
+                    $wrongtail =  html_writer::tag('span', htmlspecialchars($parts['wrongtail']), array('class' => $this->feedback_class(0)));
+                }
+
+                $hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail.html_writer::empty_tag('br');
             }
         }
 
         /*TODO - find out how to define classes in plugins and add separate class for hint message*/
-        //$result = html_writer::tag('div', $hintmessage, array('class' => 'specificfeedback'));//TODO  - this may not be needed as rendererbase.php provides div on it's own
+        //$hintmessage = html_writer::tag('div', $hintmessage, array('class' => 'specificfeedback'));//TODO  - this may not be needed as rendererbase.php provides div on it's own
 
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
