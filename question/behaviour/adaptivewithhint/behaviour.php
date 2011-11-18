@@ -121,7 +121,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
             $prevbest = 0;
         }
         //fraction = rawfraction - totalpenalties (already collected)
-        $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $newtotal));
+        $pendingstep->set_fraction(max($prevbest, $this->adjusted_fraction($pendingstep->get_behaviour_var('_rawfraction'),  $newtotal)));
 
         $pendingstep->set_new_response_summary($this->question->summarise_response($response));
 
@@ -143,7 +143,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         if ($this->question->is_gradable_response($response) && $status == question_attempt::KEEP) {//state was graded
             $prevtotal = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
             //fraction = rawfraction - totalpenalties (already collected)
-            $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $prevtotal));
+            $pendingstep->set_fraction(max($prevbest, $this->adjusted_fraction($pendingstep->get_behaviour_var('_rawfraction'), $prevtotal)));
             $pendingstep->set_behaviour_var('_totalpenalties', $prevtotal + $this->question->penalty);//for submit penalty is added after fraction is calculated
             $pendingstep->set_behaviour_var('_penalty', $this->question->penalty);
         }
@@ -170,9 +170,14 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
             }
             $pendingstep->set_behaviour_var('_totalpenalties', $total);
             //Must substract by one submission penalty less , to account for one lawful submission
-            $pendingstep->set_fraction(max($prevbest, $pendingstep->get_behaviour_var('_rawfraction') - $total + $this->question->penalty));
+            $pendingstep->set_fraction(max($prevbest, $this->adjusted_fraction($pendingstep->get_behaviour_var('_rawfraction'), $total - $this->question->penalty)));
         }
         return question_attempt::KEEP;
+    }
+
+    //Overloading this to have easy 'no penalties' adaptive version
+    protected function adjusted_fraction($fraction, $penalty) {
+        return $fraction - $penalty;
     }
 
     //Overload get_graded_step since hinting changes grade too, we need to use last one with grade
