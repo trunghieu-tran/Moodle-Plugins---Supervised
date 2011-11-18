@@ -24,6 +24,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
+require_once($CFG->dirroot . '/question/type/preg/question.php');//Contains question_with_specific_hints interface for now
 
 class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
     const IS_ARCHETYPAL = false;
@@ -32,8 +33,8 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         return array('qbehaviour_adaptive');
     }
 
-    public function required_question_definition_type() {//TODO - it should also require question_with_specific_hints interface, but for now it is able to return only one type
-        return 'question_automatically_gradable';
+    public function is_compatible_question(question_definition $question) {//TODO - it should also require question_with_specific_hints interface, but for now it is able to return only one type
+        return ($question instanceof question_automatically_gradable) && ($question instanceof question_with_specific_hints);
     }
 
     public function get_expected_data() {
