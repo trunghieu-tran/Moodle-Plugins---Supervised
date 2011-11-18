@@ -344,6 +344,11 @@ class qtype_preg_question extends question_graded_automatically
              return new qbehaviour_adaptivewithhint($qa, $preferredbehaviour);
         }
 
+        if ($preferredbehaviour == 'adaptivenopenalty') {
+             question_engine::load_behaviour_class('adaptivehintnopenalties');
+             return new qbehaviour_adaptivehintnopenalties($qa, $preferredbehaviour);
+        }
+
         return parent::make_behaviour($qa, $preferredbehaviour);
      }
     /**

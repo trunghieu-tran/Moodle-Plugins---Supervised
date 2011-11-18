@@ -15,10 +15,17 @@ require_once($CFG->dirroot . '/question/behaviour/adaptive/renderer.php');
 
 class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer {
 
+     public function button_cost($str, $penalty) {
+        return '  '.get_string($str, 'qbehaviour_adaptivewithhint', format_float($penalty, $options->markdp));
+     }
+
     public function controls(question_attempt $qa, question_display_options $options) {
         $question = $qa->get_question();
         $output = parent::controls($qa, $options);//submit button
-        $output .= '  '.get_string('withpossiblepenalty', 'qbehaviour_adaptivewithhint', format_float($question->penalty, $options->markdp));
+        $penalty = $question->penalty;
+        if ($penalty != 0) {
+            $output .= $this->button_cost('withpossiblepenalty', $penalty);
+        }
         $output .= html_writer::empty_tag('br');
 
         //hinting buttons  $qa->get_behaviour()
@@ -34,7 +41,10 @@ class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer 
                 $attributes['disabled'] = 'disabled';
             }
             $output .= html_writer::empty_tag('input', $attributes);
-            $output .= '  '.get_string('withpenalty', 'qbehaviour_adaptivewithhint', format_float($question->penalty_for_specific_hint($hintkey, null), $options->markdp));
+            $penalty = $question->penalty_for_specific_hint($hintkey, null);
+            if ($penalty != 0) {
+                $output .= $this->button_cost('withpenalty', $penalty);
+            }
             $output .= html_writer::empty_tag('br');
             
             /*if (!$options->readonly) {
