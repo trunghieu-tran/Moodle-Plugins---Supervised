@@ -141,7 +141,7 @@ class nfa_preg_matcher extends preg_matcher {
      * @param laststate - the last state of the automaton, an object of processing_state
      * @return - number of characters left for matching
      */
-    public function characters_left($str, $startpos, $laststate) {
+    public function determine_characters_left($str, $startpos, $laststate) {
         $curstates = array();    // states which the automaton is in
         $results = array();      // different paths to the end state
         if ($laststate->backrefmatchlen == 0) {
@@ -335,7 +335,7 @@ class nfa_preg_matcher extends preg_matcher {
         }
         // generate a character
         if (!$result->isfullmatch) {
-            $path = $this->characters_left($str, $startpos, $result);
+            $path = $this->determine_characters_left($str, $startpos, $result);
             $result->next = $path->next;
             $result->left = $path->matchcnt - $result->matchcnt;
         }
