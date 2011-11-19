@@ -20,12 +20,24 @@ class qtype_preg extends qtype_shortanswer {
 
     /**
     * returns an array of engines
+    * key = engine indentifier, value = interface string with engine name
     */
     public function available_engines() {
-        return array('preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
+        return array(   'preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
                         'dfa_preg_matcher' => get_string('dfa_preg_matcher','qtype_preg'),
                         'nfa_preg_matcher' => get_string('nfa_preg_matcher','qtype_preg')/*,
-                        'backtracking_preg_matcher' => 'backtracking_preg_matcher'*/);
+                        'backtracking_preg_matcher' => 'backtracking_preg_matcher'*/
+                    );
+    }
+
+    /**
+    * returns an array of supported notations
+    * key = notation indentifier, value = interface string with notation name
+    */
+    public function available_notations() {
+        return array(   'native' => get_string('notation_native', 'qtype_preg'),
+                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg')
+                    );
     }
 
     //We are a child of shortanswer question
@@ -40,7 +52,7 @@ class qtype_preg extends qtype_shortanswer {
     function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'question_preg');
-        array_push($extraquestionfields, 'correctanswer', 'exactmatch','usehint','hintpenalty','hintgradeborder','engine');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');
         return $extraquestionfields;
     }
 

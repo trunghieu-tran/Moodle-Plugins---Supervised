@@ -25,6 +25,7 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
 /**
  * question which could return some specific hints and want to use *withhint behaviours should implement this
@@ -81,6 +82,8 @@ class qtype_preg_question extends question_graded_automatically
     public $hintgradeborder;
     /** @var matching engine to use. */
     public $engine;
+    /** @var notation, used to write answers. */
+    public $notation;
 
     //Other fields
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
@@ -139,7 +142,7 @@ class qtype_preg_question extends question_graded_automatically
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $this->hintgradeborder) {
                     $bestfitanswer = $answer;
-                    $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id);
+                    $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
                     $matcher->match($response['answer']);
                     $matchresult = $matcher->get_match_results();
                     if ($knowleftcharacters) {
@@ -154,7 +157,7 @@ class qtype_preg_question extends question_graded_automatically
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
         $full = false;
         foreach ($this->answers as $answer) {
-            $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id);
+            $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
             $full = $matcher->match($response['answer']);
 
             //check full match
@@ -221,25 +224,40 @@ class qtype_preg_question extends question_graded_automatically
     @param $exact bool exact macthing mode
     @param $usecase bool case sensitive mode
     @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
+    @param $notation notation, in which regex is written
     @return matcher object
     */
-    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null) {
+    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native') {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
             $matcher =& $this->matchers_cache[$answerid];
         } else {//create and store matcher object
+
+            $modifiers = null;
+            if (!$usecase) {
+                $modifiers = 'i';
+            }
+
+            //Convert to actually used notation if necessary
+            $queryengine = new $engine;
+            $usednotation = $queryengine->used_notation();
+            if ($notation !== null && $notation != $usednotation) {//Conversion is necessary
+                $notationclass = 'preg_notation_'.$notation;
+                $notationobj = new $notationclass($regex, $modifiers);
+                $regex = $notationobj->convert_regex($usednotation);
+                $modifiers = $notationobj->convert_modifiers($usednotation);
+            }
+
+            //Modify regex according with question properties
             $for_regexp=$regex;
             if ($exact) {
                 //Grouping is needed in case regexp contains top-level alternatives
                 //use non-capturing grouping to not mess-up with user subpattern capturing
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
-            $modifiers = null;
-            if (!$usecase) {
-                $modifiers = 'i';
-            }
+
             $matcher = new $engine($for_regexp, $modifiers);
             if ($answerid !== null) {
                 $this->matchers_cache[$answerid] =& $matcher;

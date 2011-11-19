@@ -21,11 +21,19 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         global $CFG;
 
         question_bank::load_question_definition_classes($this->qtype());
-        $qtype = new qtype_preg;
+        $qtypeclass = 'qtype_'.$this->qtype();
+        $qtype = new $qtypeclass;
+
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine','preg_php_matcher');
         $mform->addHelpButton('engine','engine','qtype_preg');
+
+        $notations = $qtype->available_notations();
+        $mform->addElement('select','notation', get_string('notation', 'qtype_preg'), $notations);
+        $mform->setDefault('notation', 'native');
+        $mform->addHelpButton('notation', 'notation', 'qtype_preg');
+
         $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
         $mform->setDefault('usehint',0);
         $mform->addHelpButton('usehint','usehint','qtype_preg');
@@ -37,9 +45,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
         $mform->setDefault('hintgradeborder',1);
         $mform->addHelpButton('hintgradeborder','hintgradeborder','qtype_preg');
+
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
         $mform->addHelpButton('exactmatch','exactmatch','qtype_preg');
         $mform->setDefault('exactmatch',1);
+
         $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
         $mform->addHelpButton('correctanswer','correctanswer','qtype_preg');
 
@@ -85,8 +95,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 question_bank::load_question_definition_classes($this->qtype());
-                $qtype = new qtype_preg_question;
-                $matcher =& $qtype->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i);
+                $questionobj = new qtype_preg_question;
+                $matcher =& $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';

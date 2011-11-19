@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/preg/db" VERSION="20100817" COMMENT="XMLDB file for Moodle question/type/preg"
+<XMLDB PATH="question/type/preg/db" VERSION="20111119" COMMENT="XMLDB file for Moodle question/type/preg"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -15,7 +15,8 @@
         <FIELD NAME="usehint" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Is hint mode available for this question" PREVIOUS="exactmatch" NEXT="hintpenalty"/>
         <FIELD NAME="hintpenalty" TYPE="float" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for the hint" PREVIOUS="usehint" NEXT="hintgradeborder"/>
         <FIELD NAME="hintgradeborder" TYPE="float" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" DECIMALS="2" COMMENT="Minimum fraction for the answers, that would be used for hinting purposes" PREVIOUS="hintpenalty" NEXT="engine"/>
-        <FIELD NAME="engine" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="preg_php_matcher" SEQUENCE="false" COMMENT="Class name of the matching engine" PREVIOUS="hintgradeborder"/>
+        <FIELD NAME="engine" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="preg_php_matcher" SEQUENCE="false" COMMENT="Class name of the matching engine" PREVIOUS="hintgradeborder" NEXT="notation"/>
+        <FIELD NAME="notation" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="native" SEQUENCE="false" COMMENT="Notation of regular expressions used to write answer" PREVIOUS="engine"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
