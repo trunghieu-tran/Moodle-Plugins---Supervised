@@ -98,7 +98,8 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     public function get_expected_data() {
-        return array('answer' => PARAM_RAW_TRIMMED);
+        //Note: not using PARAM_RAW_TRIMMED cause it'll interfere with next character hinting is most ungraceful way: disabling it just when you try to get a first letter of the next word
+        return array('answer' => PARAM_RAW);
     }
 
     public function is_complete_response(array $response) {
