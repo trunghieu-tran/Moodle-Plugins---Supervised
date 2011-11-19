@@ -8,6 +8,7 @@
  * @package questions
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
@@ -27,12 +28,19 @@ class preg_matcher {
     const SUBPATTERN_CAPTURING = 3;
 
     /**
-    *returns true for supported capabilities
-    @param capability the capability in question
-    @return bool is capability supported
+    * returns true for supported capabilities
+    * @param capability the capability in question
+    * @return bool is capability supported
     */
     public function is_supporting($capability) {
         return false;//abstract class supports nothing
+    }
+
+    /**
+    * returns notation, actually used by matcher
+    */
+    public function used_notation() {
+        return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
     }
 
     //////Initial data
@@ -96,10 +104,13 @@ class preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
-
+        $this->errors = array();
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
         $this->result_cache = array();
         //$this->error_flags = array();
-        $this->errors = array();
+        $this->is_match = false;
 
         if ($regex === null) {
             return;
@@ -131,7 +142,7 @@ class preg_matcher {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return 'i';//no modifiers support by default
+        return 'i';//any preg_matcher who intends to work with this question should support case insensitivity
     }
 
     /**
@@ -181,14 +192,6 @@ class preg_matcher {
             return $this->full;
         }
 
-        //Clear results members before matching
-        $this->full = false;
-        $this->index_last = array();
-        $this->index_first = array();
-        $this->next = '';
-        $this->left = -1;
-        $this->is_match = false;
-
         $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
@@ -196,9 +199,6 @@ class preg_matcher {
             $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
             $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
         } else {//do some sanity checks
-            if(!$this->is_supporting(preg_matcher::PARTIAL_MATCHING) && !$this->full) {//if no partial matching, than non full match = no match at all
-                $this->is_match = false;
-            }
             $subpattcnt = 0;
             foreach ($this->index_first as $key=>$value) {
                 if ($key != 0 && $this->index_last[$key] >= $value) {
