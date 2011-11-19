@@ -34,10 +34,10 @@ comments on them. You still can specify exact matches for some of you regular ex
 $string['gvpath'] = 'Path to dot.exe of GraphViz';
 $string['gvdescription'] = 'Graphviz will be used for debug printing DFA and syntax tree in human readable form.';
 $string['hintgradeborder'] = 'Hint grade border';
-$string['hintgradeborder_help'] = 'Answers with grade less then hint grade border won\'t used in hinting.';
+$string['hintgradeborder_help'] = 'Answers with grade less then hint grade border wouldn\'t be used in hinting.';
 $string['hintnextchar'] = 'next correct character';
-$string['hintpenalty'] = 'Penalty for hint';
-$string['hintpenalty_help'] = 'Penalty for the pressing Hint button and getting one-character hint. Typically would be greater 
+$string['hintpenalty'] = 'Penalty for next character hint';
+$string['hintpenalty_help'] = 'Penalty for getting one-character hint. Typically would be greater 
 than usual Moodle question penalty (which applies to any new attempt to answer question without hint). 
 These penalties are mutually exclusive.';
 $string['incorrectregex'] = 'Incorrect regular expression - syntax error!';
@@ -69,13 +69,13 @@ $string['pregsummary'] = 'Enter a string response from student that can be match
 $string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand';
 $string['subpattern'] = 'Subpattern';
 $string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level alternative in conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parenthesis if you want include alternatives in yes-expr on no-expr';
+$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to increase time and memory limits or simplify you regular expression.';
 $string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missing for opening parenthesis in position {$a->indfirst}';
 $string['unclosedsqbrackets'] = 'Regex syntax error: closing brackets \']\' missing for character class starting at position {$a->indfirst}';
 $string['unopenedparen'] = 'Regex syntax error: opening parenthesis \'(\' missing for closing parenthesis in position {$a->indfirst}';
 $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by {$a->engine}';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by engine {$a->classname}.';
-$string['usehint'] = 'Use hint';
-$string['usehint_help'] = 'In adaptive mode show student Hint button allowing getting one-character hint with applying Hint penalty. Not all matching engines support hinting.';
-$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to increase time and memory limits or simplify you regular expression.';
+$string['usehint'] = 'Allow next characters hinting';
+$string['usehint_help'] = 'In behaviours, which allows multiple tries (e.g. adaptive or interactive) show student Hint next character button allowing getting one-character hint with applying Hint next character penalty. Not all matching engines support hinting.';
 ?>
 
