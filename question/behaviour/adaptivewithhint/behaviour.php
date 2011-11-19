@@ -12,6 +12,7 @@ defined('MOODLE_INTERNAL') || die();
  * _rawfraction - fraction for the step without penalties (inherited from adaptive)
  * _hashint - there was hint requested in the step
  * _<hintname>count - count of hint named <hintname>
+ * _render_<hintname> - true if hint with hintname should be rendered when rendering question next time
  * _penalty - penalty added in this state (used for rendering and summarising mainly)
  * _totalpenalties - sum of all penalties already done
  *
@@ -116,6 +117,9 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         $pendingstep->set_behaviour_var('_penalty', $penalty);
         $newtotal = $prevtotal + $penalty;
         $pendingstep->set_behaviour_var('_totalpenalties', $newtotal);
+        $pendingstep->set_behaviour_var('_render_'.$hintkey, true);
+
+
         $prevbest = $pendingstep->get_fraction();
         if (is_null($prevbest)) {
             $prevbest = 0;

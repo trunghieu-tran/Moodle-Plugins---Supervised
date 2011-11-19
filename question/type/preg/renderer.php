@@ -46,7 +46,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $hintmessage = '';
         //TODO - decide exact conditions to show colored string. $options->correctness seems too tight - in adaptive mode it isn't shown until all is graded
         //if ($options->correctness == question_display_options::VISIBLE) {
-        if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('hintnextcharbtn')) {//specific feedback is possible or hint is requested
+        if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('_render_hintnextchar')) {//specific feedback is possible or hint is requested
             //Calculate strings for response coloring
             $parts = $question->response_correctness_parts(array('answer' => $currentanswer));
             if ($parts !== null) {
@@ -62,7 +62,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 }
 
                 $hintedcharacter = '';
-                if ($qa->get_last_step()->has_behaviour_var('hintnextcharbtn') && $parts['hintedcharacter'] !== '') {//if hint requested and possible
+                if ($qa->get_last_step()->has_behaviour_var('_render_hintnextchar') && $parts['hintedcharacter'] !== '') {//if hint requested and possible
                     $hintedcharacter = html_writer::tag('span', htmlspecialchars($parts['hintedcharacter']), array('class' => $this->feedback_class(0.5)));
                 }
 
