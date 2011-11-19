@@ -153,6 +153,8 @@ class qtype_preg_question extends question_graded_automatically
                     break;//anyone that fits border helps
                 }
             }
+        } else {
+            $matchresult = array('is_match' => false);
         }
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
         $full = false;
@@ -378,7 +380,7 @@ class qtype_preg_question extends question_graded_automatically
                     );
         }
 
-        return null;
+        return array();
     }
 
     /** 
