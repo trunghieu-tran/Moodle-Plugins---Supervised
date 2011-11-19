@@ -1,41 +1,45 @@
 <?php
-
 /**
-* Data-driven cross-tester of matchers. Test functions should be implemented in child classes.
-*
-*     A test function should:
-*     -be named "data_for_test_..."
-*     -return an array of input and output data as in the following example:
-*       array(
-*             'regex'=>'^[-.\w]+[a-z]{2,6}$',    // a regular expression
-*             'modifiers'=>'i',                  // modifiers. it's not necessary to define this element
-*             'tests'=>array($test1,...,$testn)  // array containing tests in the format described below. count of these tests is unlimited
-*             );
-*
-*    An array of expected results ($testi) should look like:
-*       array(
-*             'str'=>'sample string',            // a string to match
-*             'is_match'=>true,                  // is there a match?
-*             'full'=>true,                      // is it full?
-*             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
-*             'index_last'=>array(0=>2),         // indexes of last correct characters for subpatterns.
-*             'left'=>array(0),                  // number of characters left to complete match. different engines can return different results, that's why it is an array
-*             'next'=>'');                       // a string of possible next characters in case of not full match
-*
-*    Here's an example test function:
-*    function data_for_test_example() {
-*       $test1 = array( 'str'=>'match ME',
-*                       'is_match'=>true,
-*                       'full'=>true,
-*                       'index_first'=>array(0=>0),
-*                       'index_last'=>array(0=>7),
-*                       'left'=>array(0),
-*                       'next'=>'');
-*       return array('regex'=>'.* ME',
-*                    'modifiers'=>'i',
-*                    'tests'=>array($test1));
-*   }
-*/
+ * Data-driven cross-tester of matchers. Test functions should be implemented in child classes.
+ *
+ * @copyright &copy; 2011  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ *
+ *     A test function should:
+ *     -be named "data_for_test_..."
+ *     -return an array of input and output data as in the following example:
+ *       array(
+ *             'regex'=>'^[-.\w]+[a-z]{2,6}$',    // a regular expression
+ *             'modifiers'=>'i',                  // modifiers. it's not necessary to define this element
+ *             'tests'=>array($test1,...,$testn)  // array containing tests in the format described below. count of these tests is unlimited
+ *             );
+ *
+ *    An array of expected results ($testi) should look like:
+ *       array(
+ *             'str'=>'sample string',            // a string to match
+ *             'is_match'=>true,                  // is there a match?
+ *             'full'=>true,                      // is it full?
+ *             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
+ *             'index_last'=>array(0=>2),         // indexes of last correct characters for subpatterns.
+ *             'left'=>array(0),                  // number of characters left to complete match. different engines can return different results, that's why it is an array
+ *             'next'=>'');                       // a string of possible next characters in case of not full match
+ *
+ *    Here's an example test function:
+ *    function data_for_test_example() {
+ *       $test1 = array( 'str'=>'match ME',
+ *                       'is_match'=>true,
+ *                       'full'=>true,
+ *                       'index_first'=>array(0=>0),
+ *                       'index_last'=>array(0=>7),
+ *                       'left'=>array(0),
+ *                       'next'=>'');
+ *       return array('regex'=>'.* ME',
+ *                    'modifiers'=>'i',
+ *                    'tests'=>array($test1));
+ *   }
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
@@ -109,11 +113,11 @@ class preg_cross_tester extends UnitTestCase {
                                     $passed = $passed && $this->assertTrue($expected['index_last'][0] == $obtained['index_last'][0], "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
                                 }
                                 if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                                    $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || strstr($expected['next'], $obtained['next']) != false, "$matchername failed 'next' check on regex '$regex' and string '$str'");        // expected 'next' contains obtained 'next'
-                                }
+                                    $passed = $passed && $this->assertTrue(($expected['next'] === '' && $obtained['next'] === '') || ($expected['next'] !== '' && $obtained['next'] !== '' && strstr($expected['next'], $obtained['next']) != false), "$matchername failed 'next' check on regex '$regex' and string '$str'");  // expected 'next' contains obtained 'next'
+								}
                                 if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
                                     $passed = $passed && $this->assertTrue(in_array($obtained['left'], $expected['left']), "$matchername failed 'left' check on regex '$regex' and string '$str'");
-                                }
+								}
                             }
                         }
                     }

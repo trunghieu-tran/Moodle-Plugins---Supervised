@@ -440,7 +440,7 @@ class preg_leaf_assert extends preg_leaf {
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
                 $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
-                if (!$end) {
+                if (!$end && $pos > 0) {
                     $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
                     $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
                 }
@@ -709,12 +709,24 @@ class preg_leaf_backref extends preg_leaf {
         $length = $matchlen;        
         return $result;
     }
+
     public function name() {
         return 'leaf_backref';
     }
+
     public function next_character($str, $pos, $length = 0) {
-        die ('TODO: implements abstract function character for preg_leaf_backref class before use it!');
+		// TODO: check for assertions in case of $length == 0
+		if (!$this->matcher->is_subpattern_captured($this->number)) {
+			return '';
+		}		
+		$start = $this->matcher->first_correct_character_index($this->number);
+		$textlib = textlib_get_instance();
+		if ($start + $length >= $textlib->strlen($str)) {
+			return '';
+		}
+		return $str[$start + $length];
     }
+
     public function tohr() {
         return 'backref #'.$this->number;
     }
