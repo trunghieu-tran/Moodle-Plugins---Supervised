@@ -15,18 +15,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class nfa_transition
 {
-    public $loops = false;       // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
-
-    public $pregleaf;            // transition data, a reference to an object of preg_leaf
-
-    public $state;               // the state which this transition leads to, a reference to an object of nfa_state
-
-    public $replaceable;         // eps-transitions are replaced by next non-eps transitions for merging simple assertions
-
+    public $loops = false;                  // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
+    public $pregleaf;                       // transition data, a reference to an object of preg_leaf
+    public $state;                          // the state which this transition leads to, a reference to an object of nfa_state
+    public $replaceable;                    // eps-transitions are replaced by next non-eps transitions for merging simple assertions
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
-
     public $subpatt_end = array();          // an array of subpatterns which end in this transition
-
     public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false, $_subpatt_start = array(), $_subpatt_end = array(), $_belongs_to_subpatt = array()) {
@@ -60,11 +54,8 @@ class nfa_state
 {
 
     public $startsinfinitequant = false;    // true if this state starts an infinite quantifier either * or + or {m,}
-
     public $next = array();                 // an array of objects of nfa_transition
-
     //public $previous = array();
-
     public $id;                             // id of the state, debug variable
 
     /**
@@ -428,7 +419,7 @@ abstract class nfa_preg_node {
     public function accept() {
         return true; // accepting anything by default
     }
-    
+
     /**
      * increases size of an nfa
      * @param matcher - a reference to the matcher
