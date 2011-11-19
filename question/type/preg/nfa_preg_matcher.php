@@ -352,12 +352,12 @@ class nfa_preg_matcher extends preg_matcher {
         if (isset($CFG->nfastatelimit)) {
             $this->statelimit = $CFG->nfastatelimit;
         } else {
-            $this->statelimit = 1;
+            $this->statelimit = 250;
         }
         if (isset($CFG->nfatransitionlimit)) {
             $this->transitionlimit = $CFG->nfatransitionlimit;
         } else {
-            $this->transitionlimit = 1;
+            $this->transitionlimit = 250;
         }
 
         $stack = array();
