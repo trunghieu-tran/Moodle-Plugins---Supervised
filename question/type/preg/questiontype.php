@@ -15,6 +15,7 @@
 /// QUESTION TYPE CLASS //////////////////
 
 require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot.'/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
 
