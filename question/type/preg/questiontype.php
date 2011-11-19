@@ -57,6 +57,7 @@ class qtype_preg extends qtype_shortanswer {
     }
 
     function save_question_options($question) {
+        global $CFG;
         //Fill in some data that could be absent due to disabling form controls
         if (!isset($question->usehint)) {
             $question->usehint = false;
@@ -66,6 +67,13 @@ class qtype_preg extends qtype_shortanswer {
         }
         if (!isset($question->hintgradeborder)) {
             $question->hintgradeborder = 1;
+        }
+
+        //Sanity check for engine capabilities - disabling form controls works really strange...
+        require_once($CFG->dirroot . '/question/type/preg/'.$question->engine.'.php');
+        $querymatcher = new $question->engine;
+        if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+            $question->usehint = false;
         }
 
         parent::save_question_options($question);
