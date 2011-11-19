@@ -1,4 +1,12 @@
 <?php
+/**
+ * Defines NFA node classes
+ *
+ * @copyright &copy; 2011  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
@@ -7,18 +15,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
  */
 class nfa_transition
 {
-    public $loops = false;       // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
-
-    public $pregleaf;            // transition data, a reference to an object of preg_leaf
-
-    public $state;               // the state which this transition leads to, a reference to an object of nfa_state
-
-    public $replaceable;         // eps-transitions are replaced by next non-eps transitions for merging simple assertions
-
+    public $loops = false;                  // true if this transition makes a loop: for example, (...)* contains an epsilon-transition that makes a loop
+    public $pregleaf;                       // transition data, a reference to an object of preg_leaf
+    public $state;                          // the state which this transition leads to, a reference to an object of nfa_state
+    public $replaceable;                    // eps-transitions are replaced by next non-eps transitions for merging simple assertions
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
-
     public $subpatt_end = array();          // an array of subpatterns which end in this transition
-
     public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false, $_subpatt_start = array(), $_subpatt_end = array(), $_belongs_to_subpatt = array()) {
@@ -52,11 +54,8 @@ class nfa_state
 {
 
     public $startsinfinitequant = false;    // true if this state starts an infinite quantifier either * or + or {m,}
-
     public $next = array();                 // an array of objects of nfa_transition
-
     //public $previous = array();
-
     public $id;                             // id of the state, debug variable
 
     /**
@@ -153,13 +152,19 @@ class nfa_state
  */
 class nfa {
 
+    private $graphvizpath;       // path to dot.exe of graphviz
     public $startstate;          // a reference to the start nfa_state of the automaton
-
     public $endstate;            // a reference to the end nfa_state of the automaton
-
     public $states = array();    // an array containing references to states of the automaton
 
-    var $graphvizpath = 'C:\Program Files (x86)\Graphviz2.26.3\bin';    // path to dot.exe of graphviz
+    public function __construct() {
+        global $CFG;
+        if (isset($CFG->dotpath)) {
+            $this->graphvizpath = $CFG->dotpath;
+        } else {
+            $this->graphvizpath = '';
+        }
+    }
 
     /**
      * clears $subpatt_start, $subpatt_end and $belongs_to_subpatt in every transition of the automaton
@@ -358,6 +363,10 @@ class nfa {
     * @param jpgfilename - name of the resulting jpg file
     */
     public function draw_nfa($dotfilename, $jpgfilename) {
+        if ($this->graphvizpath === '') {
+            echo 'dot.exe path not specified<br/>';
+            return;
+        }
         $dotfile = fopen($dotfilename, 'w');
         // numerate all states
         $tmp = 0;
@@ -410,7 +419,7 @@ abstract class nfa_preg_node {
     public function accept() {
         return true; // accepting anything by default
     }
-    
+
     /**
      * increases size of an nfa
      * @param matcher - a reference to the matcher
@@ -423,7 +432,7 @@ abstract class nfa_preg_node {
     public function inc_fa_size(&$matcher, $ds, $dt, &$statecount, &$transitioncount) {
         $statecount += $ds;
         $transitioncount += $dt;
-        return !($statecount > $matcher->statelimit || $transitioncount > $matcher->transitionlimit);
+        return !($statecount > $matcher->get_state_limit() || $transitioncount > $matcher->get_transition_limit());
     }
 
     /**

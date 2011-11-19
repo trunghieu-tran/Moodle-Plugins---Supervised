@@ -37,7 +37,7 @@ Set this to Yes, if you write regular expressions for full student\'s answers. S
 you additional flexibility: you can specify some answer with low (or zero) grade to catch common errors and give
 comments on them. You still can specify exact matches for some of you regular expressions if you start them with ^ and end with $.';
 $string['gvpath'] = 'Path to dot.exe of GraphViz';
-$string['gvdescription'] = 'Graphviz will be used for debug printing DFA and syntax tree in human readable form.';
+$string['gvdescription'] = 'Graphviz is used for debug printing finite automata and syntax tree in human readable form';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with grade less then hint grade border wouldn\'t be used in hinting.';
 $string['hintnextchar'] = 'next correct character';
@@ -52,6 +52,9 @@ $string['leaf_assert'] = 'Simple assertion';
 $string['leaf_backref'] = 'Backreference';
 $string['leaf_charset'] = 'Character class';
 $string['leaf_meta'] = 'Meta-character or escape-sequence';
+$string['nfasizelimit'] = 'Maximum size of nfa';
+$string['nfastatelimitdescription'] = 'Maximum count of states in nfa';
+$string['nfatransitionlimitdescription'] = 'Maximum count of transitions in nfa';
 $string['noabstractaccept'] = 'Matching by abstract matcher';
 $string['nocorrectanswermatch'] = 'No maximum grade regular expression matches correct answer.';
 $string['node_alt'] = 'Alternative';
