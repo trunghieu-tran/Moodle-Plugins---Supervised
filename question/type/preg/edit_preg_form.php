@@ -56,10 +56,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($engines as $engine => $enginename) {
             $questionobj = new qtype_preg_question;
             $querymatcher = $questionobj->get_query_matcher($engine);
-            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING) || 
+                !$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)
+                ) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
-            }
-            if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
                 $mform->disabledIf('usehint','engine', 'eq', $engine);
                 $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
             }
