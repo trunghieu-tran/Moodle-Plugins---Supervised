@@ -18,7 +18,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @param MoodleQuickForm $mform the form being built.
      */
     function definition_inner(&$mform) {
-        global $CFG;
 
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
@@ -55,8 +54,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         //Set hint availability determined by engine capabilities
         foreach ($engines as $engine => $enginename) {
-            require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
-            $querymatcher = new $engine;
+            $questionobj = new qtype_preg_question;
+            $querymatcher = $questionobj->get_query_matcher($engine);
             if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
             }

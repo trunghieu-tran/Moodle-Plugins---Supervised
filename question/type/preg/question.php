@@ -125,14 +125,12 @@ class qtype_preg_question extends question_graded_automatically
     * @return array 'answer' => answer object, that best fit student's response, 'match' => array of matching results @see{preg_matcher}
     */
     public function get_best_fit_answer(array $response) {
-        global $CFG;
         //check cache for valid results
         if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array()) {
             return $this->bestfitanswer;
         }
 
-        require_once($CFG->dirroot . '/question/type/preg/'.$this->engine.'.php');
-        $querymatcher = new $this->engine;//this matcher will be used to query engine capabilities
+        $querymatcher = $this->get_query_matcher($this->engine);//this matcher will be used to query engine capabilities
         $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
         $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
         
@@ -267,6 +265,17 @@ class qtype_preg_question extends question_graded_automatically
             }
         }
         return $matcher;
+    }
+
+    /**
+     * Creates and return empty matcher object, that could be used to query engine capabilities, needed notation etc
+     * Created to collect 'require_once' code with file paths to the engines from all over the question, to make changing it easier
+     */
+    public function get_query_matcher($engine) {
+        global $CFG;
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
+
+        return new $engine;
     }
 
     public function get_correct_response() {
