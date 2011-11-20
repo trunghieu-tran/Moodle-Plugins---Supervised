@@ -206,8 +206,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
-                        'index_last'=>array(0=>2,1=>2,2=>0,3=>1,4=>2),
+                        'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
+                        'index_last'=>array(0=>2,1=>2,2=>2,3=>2,4=>2),
                         'left'=>array(0),
                         'next'=>'');
 
