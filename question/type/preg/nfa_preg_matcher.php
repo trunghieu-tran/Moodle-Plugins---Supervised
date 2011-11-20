@@ -335,8 +335,13 @@ class nfa_preg_matcher extends preg_matcher {
         // generate a character
         if (!$result->isfullmatch) {
             $path = $this->determine_characters_left($str, $startpos, $result);
-            $this->next = $path->next;
-            $this->left = $path->matchcnt - $result->matchcnt;
+            if ($path !== null) {
+                $this->next = $path->next;
+                $this->left = $path->matchcnt - $result->matchcnt;
+            } else {
+                $this->next = '';
+                $this->left = 10000000;    // the end state is unreachable
+            }
         } else {
             $this->next = '';
             $this->left = 0;
