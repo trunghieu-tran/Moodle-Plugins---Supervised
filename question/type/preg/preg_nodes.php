@@ -31,7 +31,7 @@ class preg_lexem {
 * Class for plain subpattern lexems
 */
 class preg_lexem_subpatt extends preg_lexem {
-	//Number of subpattern
+    //Number of subpattern
     public $number;
 
     public function __construct($subtype, $indfirst, $indlast, $number) {
@@ -693,20 +693,21 @@ class preg_leaf_backref extends preg_leaf {
         }
         $start = $this->matcher->first_correct_character_index($this->number);
         $end = $this->matcher->last_correct_character_index($this->number);
+        $subpattlen = $end - $start + 1;
         $matchlen = 0;
         $result = true;
         // check char by char
-        for ($i = $start; $result && $i <= $end && $i + $pos < $len; $i++) {
-            $result = $result && ($strcopy[$i] == $strcopy[$i + $pos]);
+        for ($i = $start; $result && $i <= $end && $matchlen + $pos < $len; $i++) {
+            $result = $result && ($strcopy[$i] === $strcopy[$pos + $matchlen]);
             if ($result) {
                 $matchlen++;
             }
         }
         // if the string has not enough characters
-        if ($end + $pos >= $len) {
+        if ($pos + $subpattlen - 1 >= $len) {
             $result = false;
         }
-        $length = $matchlen;        
+        $length = $matchlen;
         return $result;
     }
 
@@ -715,16 +716,16 @@ class preg_leaf_backref extends preg_leaf {
     }
 
     public function next_character($str, $pos, $length = 0) {
-		// TODO: check for assertions in case of $length == 0
-		if (!$this->matcher->is_subpattern_captured($this->number)) {
-			return '';
-		}		
-		$start = $this->matcher->first_correct_character_index($this->number);
-		$textlib = textlib_get_instance();
-		if ($start + $length >= $textlib->strlen($str)) {
-			return '';
-		}
-		return $str[$start + $length];
+        // TODO: check for assertions in case of $length == 0
+        if (!$this->matcher->is_subpattern_captured($this->number)) {
+            return '';
+        }
+        $start = $this->matcher->first_correct_character_index($this->number);
+        $textlib = textlib_get_instance();
+        if ($start + $length >= $textlib->strlen($str)) {
+            return '';
+        }
+        return $str[$start + $length];
     }
 
     public function tohr() {
