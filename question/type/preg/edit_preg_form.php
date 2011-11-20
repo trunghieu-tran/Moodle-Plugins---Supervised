@@ -11,20 +11,28 @@ require_once($CFG->dirroot.'/question/type/shortanswer/edit_shortanswer_form.php
 /**
  * preg editing form definition.
  */
-class question_edit_preg_form extends question_edit_shortanswer_form {
+class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
      * Add question-type specific form fields.
      *
      * @param MoodleQuickForm $mform the form being built.
      */
     function definition_inner(&$mform) {
-        global $CFG;
-        global $QTYPES;
 
-        $engines = $QTYPES[$this->qtype()]->available_engines();
+        question_bank::load_question_definition_classes($this->qtype());
+        $qtypeclass = 'qtype_'.$this->qtype();
+        $qtype = new $qtypeclass;
+
+        $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine','preg_php_matcher');
         $mform->addHelpButton('engine','engine','qtype_preg');
+
+        $notations = $qtype->available_notations();
+        $mform->addElement('select','notation', get_string('notation', 'qtype_preg'), $notations);
+        $mform->setDefault('notation', 'native');
+        $mform->addHelpButton('notation', 'notation', 'qtype_preg');
+
         $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
         $mform->setDefault('usehint',0);
         $mform->addHelpButton('usehint','usehint','qtype_preg');
@@ -36,20 +44,22 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
         $mform->setDefault('hintgradeborder',1);
         $mform->addHelpButton('hintgradeborder','hintgradeborder','qtype_preg');
+
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
         $mform->addHelpButton('exactmatch','exactmatch','qtype_preg');
         $mform->setDefault('exactmatch',1);
+
         $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
         $mform->addHelpButton('correctanswer','correctanswer','qtype_preg');
 
         //Set hint availability determined by engine capabilities
         foreach ($engines as $engine => $enginename) {
-            require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
-            $querymatcher = new $engine;
-            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+            $questionobj = new qtype_preg_question;
+            $querymatcher = $questionobj->get_query_matcher($engine);
+            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING) || 
+                !$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)
+                ) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
-            }
-            if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
                 $mform->disabledIf('usehint','engine', 'eq', $engine);
                 $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
             }
@@ -63,7 +73,6 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
     }
 
     function validation($data, $files) {
-        global $QTYPES;
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
@@ -84,7 +93,9 @@ class question_edit_preg_form extends question_edit_shortanswer_form {
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                $matcher =& $QTYPES[$this->qtype()]->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i);
+                question_bank::load_question_definition_classes($this->qtype());
+                $questionobj = new qtype_preg_question;
+                $matcher =& $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';

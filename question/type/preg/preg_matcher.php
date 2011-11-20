@@ -8,6 +8,7 @@
  * @package questions
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
@@ -27,12 +28,19 @@ class preg_matcher {
     const SUBPATTERN_CAPTURING = 3;
 
     /**
-    *returns true for supported capabilities
-    @param capability the capability in question
-    @return bool is capability supported
+    * returns true for supported capabilities
+    * @param capability the capability in question
+    * @return bool is capability supported
     */
     public function is_supporting($capability) {
         return false;//abstract class supports nothing
+    }
+
+    /**
+    * returns notation, actually used by matcher
+    */
+    public function used_notation() {
+        return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
     }
 
     //////Initial data
@@ -134,7 +142,7 @@ class preg_matcher {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return 'i';//no modifiers support by default
+        return 'i';//any preg_matcher who intends to work with this question should support case insensitivity
     }
 
     /**
