@@ -158,18 +158,18 @@ class preg_regex_handler {
         }
         $lexerrors = $lexer->get_errors();
         $this->maxsubpatt = $lexer->get_max_subpattern();
-        foreach ($lexerrors as $errstring) {
-            $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
+        foreach ($lexerrors as $lexerror) {
+            $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
         }
         $parser->doParse(0, 0);
         if ($parser->get_error()) {
             $errornodes = $parser->get_error_nodes();
-            $errormsgs = array();
+            $parseerrors = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
-                $errormsgs[] = new preg_parsing_error($regex, $node);
+                $parseerrors[] = new preg_parsing_error($regex, $node);
             }
-            $this->errors = array_merge($this->errors, $errormsgs);
+            $this->errors = array_merge($this->errors, $parseerrors);
         } else {
             $this->ast_root = $parser->get_root();
         }
