@@ -21,7 +21,7 @@ class nfa_transition
     public $replaceable;                    // eps-transitions are replaced by next non-eps transitions for merging simple assertions
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
     public $subpatt_end = array();          // an array of subpatterns which end in this transition
-    public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
+    //public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false) {
         $this->pregleaf = $_pregleaf->get_clone();    // the leaf should be unique
@@ -39,9 +39,9 @@ class nfa_transition
         foreach ($this->subpatt_end as $key=>$subpatt) {
             $res->subpatt_end[$key] = $subpatt;
         }
-        foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
+        /*foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
             $res->belongs_to_subpatt[$key] = $subpatt;
-        }
+        }*/
         return $res;
     }
 
@@ -751,7 +751,7 @@ class nfa_preg_node_subpatt extends nfa_preg_operator {
         }
         foreach ($body->states as $state) {
             foreach ($state->next as $next) {
-                $next->belongs_to_subpatt[$this->pregnode->number] = true;
+                //$next->belongs_to_subpatt[$this->pregnode->number] = true;
                 if ($next->state === $body->endstate) {
                     $next->subpatt_end[$this->pregnode->number] = true;
                 }
