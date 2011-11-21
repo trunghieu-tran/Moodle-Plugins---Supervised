@@ -68,14 +68,6 @@ class preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-            if (!$this->is_error_exists()) {
-                $this->dst_root = $this->from_preg_node($this->ast_root);
-                //Add error messages for unsupported nodes
-                //foreach ($this->error_flags as $key => $value) {
-                    //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
-                //}
-                $this->look_for_anchors();
-            }
         } else {
             $this->ast_root = null;
         }
@@ -156,8 +148,9 @@ class preg_regex_handler {
         while ($token = $lexer->nextToken()) {
             $parser->doParse($token->type, $token->value);
         }
-        $lexerrors = $lexer->get_errors();
+
         $this->maxsubpatt = $lexer->get_max_subpattern();
+        $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
         }
@@ -172,6 +165,12 @@ class preg_regex_handler {
             $this->errors = array_merge($this->errors, $parseerrors);
         } else {
             $this->ast_root = $parser->get_root();
+            $this->dst_root = $this->from_preg_node($this->ast_root);
+            //Add error messages for unsupported nodes
+            //foreach ($this->error_flags as $key => $value) {
+                //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
+            //}
+            $this->look_for_anchors();
         }
         fclose($pseudofile);
     }
