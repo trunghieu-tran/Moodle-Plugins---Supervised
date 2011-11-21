@@ -277,6 +277,7 @@ class nfa_preg_matcher extends preg_matcher {
                                     $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
                                 }
                                 $newstate->subpatt_index_first[$key] = $startpos + $pos;
+								$newstate->subpatt_index_last[$key] = -2;
                             }
                             // set end indexes of subpatterns
                             foreach ($transition->subpatt_end as $key=>$subpatt) {
