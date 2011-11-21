@@ -288,13 +288,13 @@ class nfa_preg_matcher extends preg_matcher {
                                 }
                             }
                             // if we are out of a subpattern, then stop matching it and rewrite old results of subpattern capturing
-                            foreach ($newstate->subpatt_index_last as $key=>$subpatt) {
+                            /*foreach ($newstate->subpatt_index_last as $key=>$subpatt) {
                                 // do it for matched subpatterns only
                                 if ($subpatt >= -1 && !array_key_exists($key, $transition->belongs_to_subpatt)) {
                                     $newstate->subpatt_index_first_old[$key] = $newstate->subpatt_index_first[$key];
                                     $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
                                 }
-                            }
+                            }*/
                             // save the state
                             array_push($newstates, $newstate);
                         } else if ($length > 0) {    // (length > 0) equals to (transition->pregleaf is a backreference)
