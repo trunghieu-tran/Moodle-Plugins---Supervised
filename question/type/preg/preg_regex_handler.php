@@ -68,7 +68,14 @@ class preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-            $this->look_for_anchors();
+            if (!$this->is_error_exists()) {
+                $this->dst_root = $this->from_preg_node($this->ast_root);
+                //Add error messages for unsupported nodes
+                //foreach ($this->error_flags as $key => $value) {
+                    //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
+                //}
+                $this->look_for_anchors();
+            }
         } else {
             $this->ast_root = null;
         }
@@ -165,13 +172,35 @@ class preg_regex_handler {
             $this->errors = array_merge($this->errors, $errormsgs);
         } else {
             $this->ast_root = $parser->get_root();
-            $this->dst_root = $this->from_preg_node($this->ast_root);
-            //Add error messages for unsupported nodes
-            //foreach ($this->error_flags as $key => $value) {
-                //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
-            //}
         }
         fclose($pseudofile);
+    }
+
+    /**
+     * Copy Abstract Syntax Tree from another preg_regex_handler class and build DST on it
+     *
+     * Create handler with no parameters, than call this function to avoid re-parsing if you have
+     *   two handlers working on one regex.
+     */
+    public function get_tree_from_another_handler($handler) {
+        $this->errors = $handler->get_error_objects();
+        if (!$this->is_error_exists()) {
+            $this->ast_root = $this->copy_preg_node($handler->get_ast_root());
+            $this->dst_root = $this->from_preg_node($this->ast_root);
+                //Add error messages for unsupported nodes
+                //foreach ($this->error_flags as $key => $value) {
+                    //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
+                //}
+            $this->look_for_anchors();
+        }
+    }
+
+    /*
+    * Access function to AST root.
+    * Used mainly for unit-testing and avoiding re-parsing
+    */
+    public function get_ast_root() {
+        return $this->ast_root;
     }
 
     /**
