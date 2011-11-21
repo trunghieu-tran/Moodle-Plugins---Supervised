@@ -783,7 +783,15 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
-        $test5 = array( 'str'=>'',
+        $test5 = array( 'str'=>'ababbabbbabbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>6),
+                        'index_last'=>array(0=>9,1=>9),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test6 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>-1,1=>-2),
@@ -792,7 +800,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         return array('regex'=>'(a|b\1)+',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
     function data_for_test_empty_match() {

@@ -266,7 +266,6 @@ class nfa_preg_matcher extends preg_matcher {
                         $length = 0;
                         if ($transition->pregleaf->match($str, $startpos + $pos, &$length, !$transition->pregleaf->caseinsensitive)) {
                             // create a new state
-
                             $newstate = new processing_state($transition->state, $pos + $length, true, false, '',
                                                              $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
                                                              null, null, 0);
@@ -277,7 +276,7 @@ class nfa_preg_matcher extends preg_matcher {
                                     $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
                                 }
                                 $newstate->subpatt_index_first[$key] = $startpos + $pos;
-								$newstate->subpatt_index_last[$key] = -2;
+                                $newstate->subpatt_index_last[$key] = -2;
                             }
                             // set end indexes of subpatterns
                             foreach ($transition->subpatt_end as $key=>$subpatt) {
