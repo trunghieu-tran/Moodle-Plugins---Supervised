@@ -358,7 +358,7 @@ class qtype_preg_question extends question_graded_automatically
         foreach ($matchresults['index_first'] as $i => $startindex) {
             $search = '{$'.$i.'}';
             $endindex = $matchresults['index_last'][$i];
-            $replace = substr($response, $startindex, $endindex - $startindex + 1);
+            $replace = substr($answer, $startindex, $endindex - $startindex + 1);
             $subject = str_replace($search, $replace, $subject);
         }
 
