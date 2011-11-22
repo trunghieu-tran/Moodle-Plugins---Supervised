@@ -153,7 +153,7 @@ class qtype_preg_question extends question_graded_automatically
                 }
             }
         } else {
-            $matchresult = array('is_match' => false);
+            $matchresult = array('is_match' => false, 'full' => false);
         }
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
         $full = false;
@@ -209,7 +209,7 @@ class qtype_preg_question extends question_graded_automatically
         $bestfitanswer = $this->get_best_fit_answer($response);
         $grade = 0;
         $state = question_state::$gradedwrong;
-        if ($bestfitanswer['match']['full']) {//TODO - implement partial grades for partially correct answers
+        if ($bestfitanswer['match']['is_match'] && $bestfitanswer['match']['full']) {//TODO - implement partial grades for partially correct answers
             $grade = $bestfitanswer['answer']->fraction;
             $state = question_state::graded_state_for_fraction($bestfitanswer['answer']->fraction);
         }
