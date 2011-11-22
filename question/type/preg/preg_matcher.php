@@ -132,6 +132,7 @@ class preg_matcher extends preg_regex_handler {
         if (!$this->is_match) {
             $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
             $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
+            $this->full = false;
         } else {//do some sanity checks
             $subpattcnt = 0;
             foreach ($this->index_first as $key=>$value) {
