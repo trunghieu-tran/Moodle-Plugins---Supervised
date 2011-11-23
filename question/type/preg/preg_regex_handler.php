@@ -30,7 +30,7 @@ class preg_regex_handler {
     protected $ast_root;
     //The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name
     protected $dst_root;
-    //The error messages array
+    //The error objects array
     protected $errors;
     //Array with flags for unsupported node types
     //protected $error_flags;
@@ -70,7 +70,14 @@ class preg_regex_handler {
             $this->build_tree($regex);
         } else {
             $this->ast_root = null;
+            //In case with no parsing we should stick to accepting whole regex, not nodes
+            $this->accept_regex();
         }
+    }
+
+    protected function accept_regex() {
+        //Accept anything by default
+        return true;
     }
 
     /**

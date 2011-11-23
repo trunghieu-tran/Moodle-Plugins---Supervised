@@ -47,7 +47,7 @@ $string['hintpenalty'] = 'Penalty for next character hint';
 $string['hintpenalty_help'] = 'Penalty for getting one-character hint. Typically would be greater 
 than usual Moodle question penalty (which applies to any new attempt to answer question without hint). 
 These penalties are mutually exclusive.';
-$string['incorrectregex'] = 'Incorrect regular expression - syntax error!';
+$string['PCREincorrectregex'] = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['largefa'] = 'Too large fa';
 $string['lazyquant'] = 'Lazy quantificators';
 $string['leaf_assert'] = 'Simple assertion';
@@ -70,7 +70,7 @@ $string['node_subpatt'] = 'Subpattern';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal hint grade border. This effectively disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
 $string['notation'] = 'Regular expression notation';
-$string['notation_help'] = 'You could choose notation to enter reguler expression with. If you just want to write regular expression, please use default, <b>Regular expression</b> notation which is very close to PCRE, but has additional error-proof capabilities. <br />
+$string['notation_help'] = 'You could choose notation to enter regular expression with. If you just want to write regular expression, please use default, <b>Regular expression</b> notation which is very close to PCRE, but has additional error-proof capabilities. <br />
 <b>Moodle shortanswer</b> notation allows you to use preg as usual Moodle shortanswer question with hinting capability - with no need to understand regular expressions at all. Just copy you answers from shortanswer question. \'*\' wildcard is supported.';
 $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
