@@ -21,7 +21,7 @@ class nfa_transition
     public $replaceable;                    // eps-transitions are replaced by next non-eps transitions for merging simple assertions
     public $subpatt_start = array();        // an array of subpatterns which start in this transition
     public $subpatt_end = array();          // an array of subpatterns which end in this transition
-    public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
+    //public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false) {
         $this->pregleaf = $_pregleaf->get_clone();    // the leaf should be unique
@@ -39,9 +39,9 @@ class nfa_transition
         foreach ($this->subpatt_end as $key=>$subpatt) {
             $res->subpatt_end[$key] = $subpatt;
         }
-        foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
+        /*foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
             $res->belongs_to_subpatt[$key] = $subpatt;
-        }
+        }*/
         return $res;
     }
 
@@ -442,11 +442,19 @@ abstract class nfa_preg_node {
 
 }
 
-
 /**
 * class for nfa transitions
 */
 class nfa_preg_leaf extends nfa_preg_node {
+
+    public function accept() {
+        if ($this->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
+            $this->rejectmsg = '\G';
+            return false;
+        }
+        return true;
+
+    }
 
     public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create start and end states of the resulting automaton
@@ -571,6 +579,14 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 * defines infinite quantifiers * + {m,}
 */
 class nfa_preg_node_infinite_quant extends nfa_preg_operator {
+
+    public function accept() {
+        if (!$this->pregnode->greed) {
+            $this->rejectmsg = get_string('lazyquant', 'qtype_preg');
+            return false;
+        }
+        return true;
+    }
 
     /**
      * creates an automaton for * or {0,} quantifier
@@ -751,7 +767,7 @@ class nfa_preg_node_subpatt extends nfa_preg_operator {
         }
         foreach ($body->states as $state) {
             foreach ($state->next as $next) {
-                $next->belongs_to_subpatt[$this->pregnode->number] = true;
+                //$next->belongs_to_subpatt[$this->pregnode->number] = true;
                 if ($next->state === $body->endstate) {
                     $next->subpatt_end[$this->pregnode->number] = true;
                 }

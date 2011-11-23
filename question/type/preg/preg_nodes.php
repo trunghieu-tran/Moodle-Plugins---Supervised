@@ -318,8 +318,12 @@ class preg_leaf_meta extends preg_leaf {
         return $result;
     }
     protected function match_inner($str, $pos, &$length, $cs) {
+        if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+            $length = 0;
+            return true;
+        }
         $textlib = textlib_get_instance();
-        if ($pos >= $textlib->strlen($str) && $this->subtype != preg_leaf_meta::SUBTYPE_EMPTY) {
+        if ($pos>=$textlib->strlen($str)) {
             $length = 0;
             return false;
         }
