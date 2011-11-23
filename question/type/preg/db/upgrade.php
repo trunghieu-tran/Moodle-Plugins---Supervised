@@ -73,6 +73,21 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2010081600, 'qtype', 'preg');
     }
 
+    if ($oldversion < 2011111900) {
+
+        // Define field notation to be added to question_preg
+        $table = new xmldb_table('question_preg');
+        $field = new xmldb_field('notation', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'native', 'engine');
+
+        // Conditionally launch add field notation
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2011111900, 'qtype', 'preg');
+    }
+
     return true;
 
 }
