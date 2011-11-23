@@ -86,7 +86,6 @@ class nfa_preg_matcher extends preg_matcher {
         case 'leaf_meta':
         case 'leaf_assert':
         case 'leaf_backref':
-        case 'node_assert':
             return 'nfa_preg_leaf';
             break;
         }

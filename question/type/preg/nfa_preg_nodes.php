@@ -442,11 +442,19 @@ abstract class nfa_preg_node {
 
 }
 
-
 /**
 * class for nfa transitions
 */
 class nfa_preg_leaf extends nfa_preg_node {
+
+    public function accept() {
+        if ($this->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
+            $this->rejectmsg = '\G';
+            return false;
+        }
+        return true;
+
+    }
 
     public function create_automaton(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create start and end states of the resulting automaton
@@ -571,6 +579,14 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 * defines infinite quantifiers * + {m,}
 */
 class nfa_preg_node_infinite_quant extends nfa_preg_operator {
+
+    public function accept() {
+        if (!$this->pregnode->greed) {
+            $this->rejectmsg = get_string('lazyquant', 'qtype_preg');
+            return false;
+        }
+        return true;
+    }
 
     /**
      * creates an automaton for * or {0,} quantifier
