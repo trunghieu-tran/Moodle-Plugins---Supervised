@@ -838,5 +838,32 @@ class test_cross_from_nfa extends preg_cross_tester {
         return array('regex'=>'ab+[a-z]*bacd',
                      'tests'=>array($test1));
     }
+
+    function data_for_test_node_assert() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>1),
+                        'left'=>0,
+                        'next'=>'');
+
+        return array('regex'=>'ab(?=cd)',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_node_cond_subpatt() {
+        $test1 = array( 'str'=>'11-aaa-11',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>8),
+                        'left'=>0,
+                        'next'=>'');
+
+        return array('regex'=>'(?(?=[^a-z]*[a-z])\d{2}-[a-z]{3}-\d{2}|\d{2}-\d{2}-\d{2})',
+                     'tests'=>array($test1));
+    }
+
 }
 ?>
