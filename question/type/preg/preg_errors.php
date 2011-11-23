@@ -13,6 +13,15 @@ class preg_error {
         return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
     }
 
+     public function __construct($errormsg, $regex='', $index_first=-2, $index_last=-2) {
+        $this->index_first = $index_first;
+        $this->index_last = $index_last;
+        if ($index_first != -2) {
+            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
+        } else {
+            $this->errormsg = $errormsg;
+        }
+     }
 }
 
 // A syntax error occured while parsing a regex

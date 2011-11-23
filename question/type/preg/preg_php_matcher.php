@@ -45,10 +45,9 @@ class preg_php_matcher extends preg_matcher {
 
     /**
     *check regular expression for errors
-    @param node root of the tree
     @return bool is tree accepted
     */
-    protected function accept_regex($node) {
+    protected function accept_regex() {
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes
             $for_regexp = implode('\/',explode('/',$for_regexp));
@@ -56,7 +55,7 @@ class preg_php_matcher extends preg_matcher {
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp,'test') === false) {
-            $this->errors[] = get_string('incorrectregex','qtype_preg');
+            $this->errors[] = new preg_error(get_string('PCREincorrectregex','qtype_preg'));
             return false;
         }
 
