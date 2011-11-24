@@ -520,8 +520,8 @@ class dfa_preg_matcher extends preg_matcher {
     function __construct($regex = null, $modifiers = null) {
         global $CFG;
         $this->picnum=0;
-        if (isset($CFG->dotpath)) {
-            $this->graphvizpath = $CFG->dotpath;//in few unit tests dfa_preg_matcher objects create without regex,
+        if (isset($CFG->qtype_preg_graphvizpath)) {
+            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;//in few unit tests dfa_preg_matcher objects create without regex,
                                                   //but dfa will be build later and need for drawing dfa may be
         } else {
             $this->graphvizpath = 1;

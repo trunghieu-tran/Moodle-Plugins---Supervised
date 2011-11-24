@@ -2,19 +2,24 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$qtypepregdefultgvpath = get_string('gvpath', 'qtype_preg');
-$qtypepreggvdescription = get_string('gvdescription', 'qtype_preg');
-$settings->add(new admin_setting_configtext('dotpath', get_string('gvpath', 'qtype_preg'), $qtypepreggvdescription, 'C:\\Program Files\\GraphViz\\bin\\'));
+if($ADMIN->fulltree) {
+$settings->add(new admin_setting_configtext('qtype_preg_maxerrorsshown', get_string('maxerrorsshownlabel', 'qtype_preg'),
+                                                get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
 
-$qtypepregdefaultmaxdfasize = get_string('maxdfasize', 'qtype_preg');
-$qtypepregmaxdfastatecountdesription = get_string('dfastatecountdescription', 'qtype_preg');
-$qtypepregmaxdfapassagecountdesription = get_string('dfapassagecountdescription', 'qtype_preg');
-$settings->add(new admin_setting_configtext('statecount', $qtypepregdefaultmaxdfasize, $qtypepregmaxdfastatecountdesription, '250'));
-$settings->add(new admin_setting_configtext('passcount', $qtypepregdefaultmaxdfasize, $qtypepregmaxdfapassagecountdesription, '250'));
+$settings->add(new admin_setting_heading('dfaheading', get_string('dfaheading', 'qtype_preg'), get_string('engineheadingdescriptions', 'qtype_preg')));
+$settings->add(new admin_setting_configtext('qtype_preg_dfastatecount', get_string('maxfasizestates', 'qtype_preg'),
+                                                get_string('dfalimitsdescription', 'qtype_preg'), 250, PARAM_INT));
+$settings->add(new admin_setting_configtext('qtype_preg_dfapasscount', get_string('maxfasizetransitions', 'qtype_preg'),
+                                                get_string('dfalimitsdescription', 'qtype_preg'), 250, PARAM_INT));
 
-$qtypepregdefaultnfasizelimit = get_string('nfasizelimit', 'qtype_preg');
-$qtypepregnfastatelimitdescription = get_string('nfastatelimitdescription', 'qtype_preg');
-$qtypepregnfatransitionlimitdescription = get_string('nfatransitionlimitdescription', 'qtype_preg');
-$settings->add(new admin_setting_configtext('nfastatelimit', $qtypepregdefaultnfasizelimit, $qtypepregnfastatelimitdescription, '250'));
-$settings->add(new admin_setting_configtext('nfatransitionlimit', $qtypepregdefaultnfasizelimit, $qtypepregnfatransitionlimitdescription, '250'));
+$settings->add(new admin_setting_heading('nfaheading', get_string('nfaheading', 'qtype_preg'), get_string('engineheadingdescriptions', 'qtype_preg')));
+$settings->add(new admin_setting_configtext('qtype_preg_nfastatelimit', get_string('maxfasizestates', 'qtype_preg'),
+                                                get_string('nfalimitsdescription', 'qtype_preg'), 250, PARAM_INT));
+$settings->add(new admin_setting_configtext('qtype_preg_nfatransitionlimit', get_string('maxfasizetransitions', 'qtype_preg'),
+                                                get_string('nfalimitsdescription', 'qtype_preg'), 250, PARAM_INT));
+
+$settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));
+$settings->add(new admin_setting_configtext('qtype_preg_graphvizpath', get_string('gvpath', 'qtype_preg'),
+                                                get_string('gvdescription', 'qtype_preg'), 'C:\\Program Files\\GraphViz\\bin\\', PARAM_RAW_TRIMMED));
+}
 ?>
