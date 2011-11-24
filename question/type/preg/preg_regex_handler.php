@@ -255,16 +255,11 @@ class preg_regex_handler {
     * Function copy node with subtree, no reference
     * @param node node for copying
     * @return copy of node(and subtree)
+    *
+    * @deprecated since Preg 2.1 - just clone preg_node object instead
     */
-    protected function &copy_preg_node($node) {
+    public function &copy_preg_node($node) {
         $result = clone $node;
-        /*if (is_a($node, 'preg_operator')) { //TODO - it's still unclear, whether 'clone' is sufficient or not
-            foreach ($node->operands as $key=>$operand) {
-                if (is_a($operand, 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $result->operands[$key] = &$this->copy_preg_node($operand);
-                }
-            }
-        }*/
         return $result;
     }
 }
