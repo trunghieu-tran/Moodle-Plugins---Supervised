@@ -91,10 +91,10 @@ $string['preg_help'] = '<p> Regular expression is a form of writing a pattern to
 <p>You could also use this question as advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions at all! Just select <b>Moodle shortanswer</b> as notation for you questions.</p>';
 $string['preg_php_matcher'] = 'PHP preg extension';
 $string['pregsummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. In behaviours with multiple tries could give hint by telling next correct character. <br /> You could use it without knowing regular expression to get hinting using \'Moodle shortanswer\' notation.';
-$string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand';
+$string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand - nothing to repeat';
 $string['subpattern'] = 'Subpattern';
 $string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level alternative in conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parenthesis if you want include alternatives in yes-expr on no-expr';
-$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to increase time and memory limits or simplify you regular expression.';
+$string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="'.$CFG->wwwroot.'/admin/settings.php?section=qtypesettingpreg">increase time and memory limits</a> or simplify you regular expression.';
 $string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missing for opening parenthesis in position {$a->indfirst}';
 $string['unclosedsqbrackets'] = 'Regex syntax error: closing brackets \']\' missing for character class starting at position {$a->indfirst}';
 $string['unopenedparen'] = 'Regex syntax error: opening parenthesis \'(\' missing for closing parenthesis in position {$a->indfirst}';
