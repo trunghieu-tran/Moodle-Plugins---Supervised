@@ -14,9 +14,10 @@ $string['assertfb'] = 'Negative lookbehind assert';
 $string['escg'] = 'Escape G';
 $string['correctanswer'] = 'Correct answer';
 $string['correctanswer_help'] = 'Enter one of the correct answer in user-readable form to be shown to the student.';
+$string['debugheading'] = 'Debug settings';
 $string['dfa_preg_matcher'] = 'Deterministic finite state automata';
-$string['dfapassagecountdescription'] = 'Maximum count of passages in dfa.';
-$string['dfastatecountdescription'] = 'Maximum count of states in dfa.';
+$string['dfaheading'] = 'Deterministic finite state automata engine settings';
+$string['dfalimitsdescription'] = 'Allows you to tune time and memory limits for DFA engine to use when matching complex regexes.';
 $string['editingpreg'] = 'Editing regular expression question';
 $string['emptyparens'] = 'Regex syntax error: empty parenthesis in position from {$a->indfirst} to {$a->indlast}';
 $string['engine'] = 'Matching engine';
@@ -32,14 +33,15 @@ wide but finite limits like a{2,2000} - they generates too much edges on the DFA
 doesn\'t support subpattern extraction. </p>
 <p><b>NFA matching engine</b> is similar to DFA, but allows to support subpattern extraction along with hinting.
  It also supports backreferences.</p>';
+$string['engineheadingdescriptions'] = 'Matching regular expressions could be a time and memory consuming. These settings allows you to control limits of time and memory usage by matching engine. Increase them when you get messages that regular expression is too complex, but mind you server performance (you may also wish to increase PHP time and memory limits). Decrease them if you get blank page when saving or trying a preg question.';
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching return true if there is at least one match 
 for the regular expression in given string (answer). Exact matching means match must be an entire string.</p>
 <p>Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives
 you additional flexibility: you can specify some answer with low (or zero) grade to catch common errors and give
 comments on them. You still can specify exact matches for some of you regular expressions if you start them with ^ and end with $.</p>';
-$string['gvpath'] = 'Path to dot.exe of GraphViz';
-$string['gvdescription'] = 'Graphviz is used for debug printing finite automata and syntax tree in human readable form';
+$string['gvpath'] = 'Path to the bin folder of GraphViz installation';
+$string['gvdescription'] = 'Graphviz is used for debug output of finite automatas and syntax trees in human readable form';
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with grade less then hint grade border wouldn\'t be used in hinting.';
 $string['hintnextchar'] = 'next correct character';
@@ -54,7 +56,13 @@ $string['leaf_assert'] = 'Simple assertion';
 $string['leaf_backref'] = 'Backreference';
 $string['leaf_charset'] = 'Character class';
 $string['leaf_meta'] = 'Meta-character or escape-sequence';
-$string['maxdfasize'] = 'Maximum size of dfa.';
+$string['maxfasizestates'] = 'Automata size limit: states';
+$string['maxfasizetransitions'] = 'Automata size limit: transitions';
+$string['maxerrorsshownlabel'] = 'Maximum number of errors shown';
+$string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression on question editing form';
+$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
+$string['nfaheading'] = 'Nondeterministic finite state automata engine settings';
+$string['nfalimitsdescription'] = 'Allows you to tune time and memory limits for NFA engine to use when matching complex regexes.';
 $string['nfasizelimit'] = 'Maximum size of nfa';
 $string['nfastatelimitdescription'] = 'Maximum count of states in nfa';
 $string['nfatransitionlimitdescription'] = 'Maximum count of transitions in nfa';
@@ -74,7 +82,6 @@ $string['notation_help'] = '<p>You could choose notation to enter regular expres
 <p><b>Moodle shortanswer</b> notation allows you to use preg as usual Moodle shortanswer question with hinting capability - with no need to understand regular expressions at all. Just copy you answers from shortanswer question. \'*\' wildcard is supported.</p>';
 $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
-$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from feedback or choose another engine.';
 $string['pluginname'] = 'Regular expression';
