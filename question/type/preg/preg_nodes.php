@@ -132,13 +132,10 @@ abstract class preg_leaf extends preg_node {
     
     /*
     * Returns a clone of the leaf including merged assertions
+    * @deprecated since Preg 2.1  Just clone preg_leaf instead
     */
     public function &get_clone() {
         $res = clone $this;
-        $res->mergedassertions = array();
-        foreach ($this->mergedassertions as $assert)
-            $res->mergedassertions[] = $assert->get_clone();
-        return $res;
     }
 
     /*
@@ -187,6 +184,15 @@ abstract class preg_leaf extends preg_node {
     * @return human readable form of leaf
     */
     abstract public function tohr();
+
+    /**
+    * When clonning a leaf we want a copy of the merged assertions
+    */
+    public function __clone() {
+        foreach ($this->mergedassertions as $i => $mergedassertion) {
+            $this->mergedassertions[$i] = clone $mergedassertion;
+        }
+    }
 }
 
 /**
