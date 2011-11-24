@@ -839,9 +839,23 @@ class test_cross_from_nfa extends preg_cross_tester {
                                               'left'=>array(4),
                                               'next'=>'b')
                                         ));
+        $test2 = array('str'=>'ababac',
+                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>2),
+                                              'left'=>array(4),
+                                              'next'=>'b'),
+                                        array('is_match'=>true,    // result for fa engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>5),
+                                              'left'=>array(1),
+                                              'next'=>'d')
+                                        ));
 
         return array('regex'=>'ab+[a-z]*bacd',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_node_assert() {
@@ -867,6 +881,19 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         return array('regex'=>'(?(?=[^a-z]*[a-z])\d{2}-[a-z]{3}-\d{2}|\d{2}-\d{2}-\d{2})',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_shortanswer_notation() {
+        $test1 = array( 'str'=>'/+fghjhj4587abc*',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>15),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
     }
 

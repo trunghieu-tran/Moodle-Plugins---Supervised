@@ -31,6 +31,10 @@
  *    Remark: different matching engines may give different results, especially when matching quantifiers. For that situations it's possible to define different acceptable results.
  *    In this case the 'str' field remains the same, but the second field would be an array of possible match results and defined by the 'results' key:
  *    'results' => array(array('is_match'=>true, ...), array('is_match'=>false),...).
+ *    This situation appears when a character may lead to continuing matching both quantifier and the rest of the regex, for example:
+ *    the regex is '[a-z]*bacd' and the string is 'abacd'. The character is underlined.
+ *                                                  ^
+ *    
  *    A test is passed if engine returns a result which matches one element of this array.
  *
  *    Here's an example test function for the only possible match result:
