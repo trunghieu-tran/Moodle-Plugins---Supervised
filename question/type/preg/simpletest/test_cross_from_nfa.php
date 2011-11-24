@@ -22,7 +22,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>16),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'_the matcher works',
@@ -30,7 +30,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>18),
                         'index_last'=>array(0=>17),
-                        'left'=>17,
+                        'left'=>array(17),
                         'next'=>'t');
 
         $test3 = array( 'str'=>'the matcher',
@@ -38,7 +38,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>10),
-                        'left'=>6,
+                        'left'=>array(6),
                         'next'=>' ');
 
         $test4 = array( 'str'=>'',
@@ -46,7 +46,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
-                        'left'=>17,
+                        'left'=>array(17),
                         'next'=>'t');
 
         return array('regex'=>'^the matcher works',
@@ -59,7 +59,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'def',
@@ -67,7 +67,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'deff',
@@ -75,7 +75,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^abc|def$',
@@ -88,7 +88,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>' 9bc',
@@ -96,7 +96,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'  b',
@@ -104,7 +104,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'abcdefghijklmnopqrstuvwxyz');
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
@@ -117,7 +117,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abcaa',
@@ -125,7 +125,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>1,
+                        'left'=>array(1),
                         'next'=>'');    // can't generate a character
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
@@ -138,7 +138,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'[prefix] a',
@@ -146,7 +146,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>8),
                         'index_last'=>array(0=>9),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^*[a-z 0-9](?:\b)+a${1,}',
@@ -159,7 +159,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1,2=>3,3=>4),
                         'index_last'=>array(0=>5,1=>4,2=>4,3=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'ad',
@@ -167,7 +167,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1,2=>-1,3=>-1),    // the quantifier is outside subpatterns 2 and 3 so they are not matched!
                         'index_last'=>array(0=>1,1=>0,2=>-2,3=>-2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^a((b(c))*)d$',
@@ -180,7 +180,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>1,1=>1,2=>3,3=>5),
                         'index_last'=>array(0=>6,1=>2,2=>4,3=>6),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'[prefix] abef',
@@ -188,7 +188,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>9,1=>9,2=>-1,3=>11),
                         'index_last'=>array(0=>12,1=>10,2=>-2,3=>12),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(ab)(cd)?(ef)',
@@ -201,7 +201,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>-1,4=>-1),
                         'index_last'=>array(0=>1,1=>1,2=>1,3=>-2,4=>-2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'((ab)|(cd)|(efgh))',
@@ -214,7 +214,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>4,1=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(a*)',
@@ -227,7 +227,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),
                         'index_last'=>array(0=>4,1=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(a)*',
@@ -240,7 +240,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
                         'index_last'=>array(0=>2,1=>2,2=>2,3=>2,4=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(([a*]|\b)([b*]|\b)([c*]|\b))+',
@@ -253,7 +253,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abc',
@@ -261,7 +261,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'abbc',
@@ -269,7 +269,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>1,
+                        'left'=>array(1),
                         'next'=>'c');
 
         return array('regex'=>'^ab?c$',
@@ -282,7 +282,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>3,
+                        'left'=>array(3),
                         'next'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
 
         $test2 = array( 'str'=>'axcd',
@@ -290,7 +290,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'aacde',
@@ -298,7 +298,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^a[^b]cd$',
@@ -311,7 +311,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'cdi',
@@ -319,7 +319,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'efi',
@@ -327,7 +327,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test4 = array( 'str'=>'ghi',
@@ -335,7 +335,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test5 = array( 'str'=>'yzi',
@@ -343,7 +343,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>3),
                         'index_last'=>array(0=>2),
-                        'left'=>3,
+                        'left'=>array(3),
                         'next'=>'aceg');
 
         return array('regex'=>'^(?:ab|cd|ef|gh)i$',
@@ -356,7 +356,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>1,    // !!!
+                        'left'=>array(1),    // !!!
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
@@ -364,7 +364,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'...ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
@@ -372,7 +372,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>3),
                         'index_last'=>array(0=>78),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(?:a|b)*abb$',
@@ -385,7 +385,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>5),
-                        'left'=>11,
+                        'left'=>array(11),
                         'next'=>'b');
 
         $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
@@ -393,7 +393,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>26),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
@@ -401,7 +401,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>35),
-                        'left'=>1,
+                        'left'=>array(1),
                         'next'=>'c');
 
         return array('regex'=>'^ab{15,35}c$',
@@ -414,7 +414,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>5),
-                        'left'=>11,
+                        'left'=>array(11),
                         'next'=>'b');
 
         $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
@@ -422,7 +422,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>26),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
@@ -430,7 +430,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>103),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^ab{15,}c$',
@@ -443,7 +443,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'b');
 
         $test2 = array( 'str'=>'abc',
@@ -451,7 +451,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
@@ -459,7 +459,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>100),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^ab+c$',
@@ -472,7 +472,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>29),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abcabcabcabcabcabcabcabcabcab',
@@ -480,7 +480,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>26),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'ab',
@@ -488,7 +488,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>2),
                         'index_last'=>array(0=>1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test4 = array( 'str'=>'',
@@ -496,7 +496,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(?:abc)*',
@@ -509,7 +509,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>3,
+                        'left'=>array(3),
                         'next'=>'B');
 
         $test2 = array( 'str'=>'aBC',
@@ -517,7 +517,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'c');
 
         return array('regex'=>'aBcD',
@@ -530,7 +530,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'aBcD',
@@ -544,7 +544,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abc',
@@ -552,7 +552,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>3,
+                        'left'=>array(3),
                         'next'=>' ');
 
         $test3 = array( 'str'=>'a',
@@ -560,7 +560,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>4,
+                        'left'=>array(4),
                         'next'=>'b');
 
         $test4 = array( 'str'=>'',
@@ -568,7 +568,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>-1),
                         'index_last'=>array(0=>-2),
-                        'left'=>5,
+                        'left'=>array(5),
                         'next'=>'a');
 
         return array('regex'=>'ab\b cd',
@@ -581,7 +581,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>2),
                         'index_last'=>array(0=>4,1=>4),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'ab',
@@ -589,7 +589,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
                         'index_last'=>array(0=>1,1=>-2),
-                        'left'=>1,
+                        'left'=>array(1),
                         'next'=>'h');
 
         $test3 = array( 'str'=>'abe',
@@ -597,7 +597,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
                         'index_last'=>array(0=>2,1=>-2),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'f');
 
         return array('regex'=>'ab(cd|efg|h)',
@@ -610,7 +610,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'index_last'=>array(0=>11,1=>5,2=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abcabc',
@@ -618,7 +618,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'index_last'=>array(0=>5,1=>5,2=>2),
-                        'left'=>6,
+                        'left'=>array(6),
                         'next'=>'a');    // backref #1 not captured at all
 
         $test3 = array( 'str'=>'abcabcab',
@@ -626,7 +626,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'index_last'=>array(0=>7,1=>5,2=>2),
-                        'left'=>4,
+                        'left'=>array(4),
                         'next'=>'c');    // backref #1 captured partially
 
         return array('regex'=>'((abc)\2)\1',
@@ -639,7 +639,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>2),
                         'index_last'=>array(0=>3,1=>1,2=>-2,3=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'cdcd',
@@ -647,7 +647,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1,2=>0,3=>2),
                         'index_last'=>array(0=>3,1=>-2,2=>1,3=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'aba',
@@ -655,7 +655,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
                         'index_last'=>array(0=>2,1=>1,2=>-2,3=>-2),
-                        'left'=>1,
+                        'left'=>array(1),
                         'next'=>'b');
 
         $test4 = array( 'str'=>'abc',
@@ -663,7 +663,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
                         'index_last'=>array(0=>1,1=>1,2=>-2,3=>-2),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'a');
 
         return array('regex'=>'(?:(ab)|(cd))(\1|\2)',
@@ -676,7 +676,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>12,2=>12),
                         'index_last'=>array(0=>23,1=>17,2=>13),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'cdcd',
@@ -684,7 +684,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>4,1=>-1,2=>-1),
                         'index_last'=>array(0=>3,1=>-2,2=>-2),
-                        'left'=>10000000,                    // TODO: standardize this value
+                        'left'=>array(10000000),                    // TODO: standardize this value
                         'next'=>'');
 
         return array('regex'=>'((ab)\2cd)*\1',
@@ -697,7 +697,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>7,1=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'abcdab',
@@ -705,7 +705,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>5,1=>3),
-                        'left'=>2,
+                        'left'=>array(2),
                         'next'=>'c');
 
         $test3 = array( 'str'=>'abcd',
@@ -713,7 +713,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>3,1=>3),
-                        'left'=>4,
+                        'left'=>array(4),
                         'next'=>'a');
 
         $test4 = array( 'str'=>'abc',
@@ -721,7 +721,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
                         'index_last'=>array(0=>2,1=>-2),
-                        'left'=>5,
+                        'left'=>array(5),
                         'next'=>'d');
 
         return array('regex'=>'(abcd)\1',
@@ -734,7 +734,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>2,2=>0),
                         'index_last'=>array(0=>4,1=>4,2=>1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'xabxab',
@@ -742,7 +742,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>1,1=>3,2=>1),
                         'index_last'=>array(0=>5,1=>5,2=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(x\2|(ab))+',
@@ -755,7 +755,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>2),
                         'index_last'=>array(0=>2,1=>2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'ababba',
@@ -763,7 +763,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),
                         'index_last'=>array(0=>5,1=>5),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test3 = array( 'str'=>'ababbabbba',
@@ -771,7 +771,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>6),
                         'index_last'=>array(0=>9,1=>9),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
 
@@ -780,7 +780,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>10),
                         'index_last'=>array(0=>14,1=>14),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test5 = array( 'str'=>'ababbabbbabbbb',
@@ -788,7 +788,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>6),
                         'index_last'=>array(0=>9,1=>9),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test6 = array( 'str'=>'',
@@ -796,7 +796,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>-1,1=>-2),
                         'index_last'=>array(0=>-1,1=>-2),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(a|b\1)+',
@@ -809,7 +809,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>3,1=>3),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         $test2 = array( 'str'=>'',
@@ -817,7 +817,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
                         'index_last'=>array(0=>-1,1=>-1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(abcd|)',
@@ -825,18 +825,37 @@ class test_cross_from_nfa extends preg_cross_tester {
     }
 
     function data_for_test_quant_greedy() {
-        $test1 = array( 'str'=>'abacd',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(array(0=>0),
-                                             array(0=>0)),
-                        'index_last'=>array(array(0=>2),
-                                            array(0=>4)),
-                        'left'=>array(4, 4),
-                        'next'=>array('b', 'b'));
+        $test1 = array('str'=>'abacd',
+                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>2),
+                                              'left'=>array(4),
+                                              'next'=>'b'),
+                                        array('is_match'=>true,    // result for fa engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>4),
+                                              'left'=>array(4),
+                                              'next'=>'b')
+                                        ));
+        $test2 = array('str'=>'ababac',
+                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>2),
+                                              'left'=>array(4),
+                                              'next'=>'b'),
+                                        array('is_match'=>true,    // result for fa engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>5),
+                                              'left'=>array(1),
+                                              'next'=>'d')
+                                        ));
 
         return array('regex'=>'ab+[a-z]*bacd',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_node_assert() {
@@ -845,7 +864,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'ab(?=cd)',
@@ -858,10 +877,23 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>8),
-                        'left'=>0,
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(?(?=[^a-z]*[a-z])\d{2}-[a-z]{3}-\d{2}|\d{2}-\d{2}-\d{2})',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_shortanswer_notation() {
+        $test1 = array( 'str'=>'/+fghjhj4587abc*',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>15),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
     }
 
