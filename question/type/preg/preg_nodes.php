@@ -136,6 +136,7 @@ abstract class preg_leaf extends preg_node {
     */
     public function &get_clone() {
         $res = clone $this;
+        return $res;
     }
 
     /*
