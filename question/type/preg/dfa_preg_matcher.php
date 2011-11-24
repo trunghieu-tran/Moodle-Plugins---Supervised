@@ -524,12 +524,12 @@ class dfa_preg_matcher extends preg_matcher {
             $this->graphvizpath = 1;
         }
 		if (isset($CFG->statecount)) {
-			$this->maxstatecount = $CFG->statecount;
+			$this->maxstatecount = $CFG->qtype_preg_dfastatecount;
 		} else {
 			$this->maxstatecount = 1;
 		}
 		if (isset($CFG->passcount)) {
-			$this->maxpasscount = $CFG->passcount;
+			$this->maxpasscount = $CFG->qtype_preg_dfapasscount;
 		} else {
 			$this->maxpasscount = 1;
 		}
