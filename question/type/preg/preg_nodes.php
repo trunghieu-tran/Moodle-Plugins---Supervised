@@ -789,6 +789,15 @@ abstract class preg_operator extends preg_node {
     //An array of operands
     public $operands = array();
 
+    /**
+    * When clonning an operator we want a copy of the whole subtree, not the references to the operands
+    */
+    public function __clone() {
+        foreach ($this->operands as $i => $operand) {
+            $this->operands[$i] = clone $operand;
+        }
+    }
+
 }
 
 
