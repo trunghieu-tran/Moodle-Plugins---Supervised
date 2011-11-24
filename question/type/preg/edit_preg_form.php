@@ -99,8 +99,19 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';
+                    $i=0;
+                    $maxerrors = 5;
+                    if (isset($CFG->qtype_preg_maxerrorsshown)) {//show no more than max errors
+                        $maxerrors = $CFG->qtype_preg_maxerrorsshown;
+                    }
                     foreach ($regexerrors as $regexerror) {
-                        $errors['answer['.$key.']'] .= $regexerror.'<br/>';
+                        if ($i < $maxerrors) {
+                            $errors['answer['.$key.']'] .= $regexerror.'<br />';
+                        }
+                        $i++;
+                    }
+                    if ($i > $maxerrors) {
+                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors).'<br />';
                     }
                 } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)) {
                     $correctanswermatch=true;
