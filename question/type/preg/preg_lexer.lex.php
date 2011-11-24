@@ -99,7 +99,7 @@ class Yylex extends JLexBase  {
 		if (false === $this->yy_eof_done) {
 
         if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
-            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, 0);
+            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar-1);
             $this->cc = null;
         }
 		}
