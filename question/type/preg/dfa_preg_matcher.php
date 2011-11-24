@@ -15,11 +15,6 @@
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_nodes.php');
 
-define('MAX_STATE_COUNT', 250);      //    if you put large constant here, than big dfa will be
-define('MAX_PASSAGE_COUNT', 250);    //    correct, but big dfa will be build slow, if you small
-                                     //    constant here dfa will must small, but complexy regex
-                                     //    will be get error on validation
-
 class finite_automate_state {//finite automate state
     var $asserts;
     var $passages;//contain numbers of state which can go from this
@@ -58,6 +53,8 @@ class dfa_preg_matcher extends preg_matcher {
     var $result;
     var $picnum;//number of last picture
     protected $map;//map of symbol's following
+	protected $maxstatecount;
+	protected $maxpasscount;
     
     var $graphvizpath;//path to dot.exe of graphviz, used only for debugging
     
@@ -141,11 +138,13 @@ class dfa_preg_matcher extends preg_matcher {
             //form not marked state for each passage of current state
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new finite_automate_state;
+				$statecount++;
                 $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow<dfa_preg_node_assert::ASSERT_MIN_NUM) {
                         //if number less then dfa_preg_node_assert::ASSERT_MIN_NUM constant than this is character class, to passages it.
                         $newstate->passages[$follow] = -2;
+						$passcount++;
                     }
                 }
                 if ($this->connection[$index][$num]->pregnode->type === preg_node::TYPE_LEAF_META && 
@@ -160,14 +159,12 @@ class dfa_preg_matcher extends preg_matcher {
                         array_push($this->finiteautomates[$index], $newstate);//add it to fa's array
                         end($this->finiteautomates[$index]);
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
-                        $statecount++;
                     } else {
                         //else do passage point to state, which has in fa already
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 }
-                $passcount++;
-                if (($passcount > MAX_PASSAGE_COUNT || $statecount > MAX_STATE_COUNT) && MAX_STATE_COUNT != 0 && MAX_PASSAGE_COUNT != 0) {
+                if (($passcount > $this->maxpasscount || $statecount > $this->maxstatecount) && $this->maxstatecount != 0 && $this->maxpasscount != 0) {
                     $this->errors[] = get_string('toolargefa', 'qtype_preg');
                     return;
                 }
@@ -526,6 +523,16 @@ class dfa_preg_matcher extends preg_matcher {
         } else {
             $this->graphvizpath = 1;
         }
+		if (isset($CFG->statecount)) {
+			$this->maxstatecount = $CFG->statecount;
+		} else {
+			$this->maxstatecount = 1;
+		}
+		if (isset($CFG->passcount)) {
+			$this->maxpasscount = $CFG->passcount;
+		} else {
+			$this->maxpasscount = 1;
+		}
         if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
