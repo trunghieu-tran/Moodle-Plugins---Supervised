@@ -191,7 +191,8 @@ class preg_regex_handler {
     public function get_tree_from_another_handler($handler) {
         $this->errors = $handler->get_error_objects();
         if (!$this->is_error_exists()) {
-            $this->ast_root = $this->copy_preg_node($handler->get_ast_root());
+            $srcroot = $handler->get_ast_root();
+            $this->ast_root = clone $srcroot;
             $this->dst_root = $this->from_preg_node($this->ast_root);
                 //Add error messages for unsupported nodes
                 //foreach ($this->error_flags as $key => $value) {
