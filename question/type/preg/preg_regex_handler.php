@@ -130,6 +130,8 @@ class preg_regex_handler {
 
     /**
     * Is a preg_node_... or a preg_leaf_... supported by the engine?
+    * Returns true if node is supported or user interface string describing 
+    *   what properties of node isn't supported.
     */
     protected function is_node_acceptable($pregnode) {
         return false;    // Should be overloaded by child classes
@@ -209,13 +211,15 @@ class preg_regex_handler {
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenode->rejectmsg] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                $acceptresult = $enginenode->accept();
+                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
+                    $this->errors[$enginenodename] = new preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             } else {
                 $enginenode = $pregnode;
-                if (!$this->is_node_acceptable($pregnode)) {
-                    $this->errors[] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                $acceptresult = $this->is_node_acceptable($pregnode);
+                if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
+                    $this->errors[$enginenodename] = new preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             }
             return $enginenode;
