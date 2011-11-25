@@ -151,8 +151,8 @@ class nfa {
 
     public function __construct() {
         global $CFG;
-        if (isset($CFG->dotpath)) {
-            $this->graphvizpath = $CFG->dotpath;
+        if (isset($CFG->qtype_preg_graphvizpath)) {
+            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;
         } else {
             $this->graphvizpath = '';
         }

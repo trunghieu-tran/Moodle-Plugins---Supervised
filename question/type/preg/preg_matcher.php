@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines abstract class of matcher, extend it to create a new mathcing engine
+ * Defines abstract class of regular expression matcher, extend it to create a new matching engine
  *
  * @copyright &copy; 2010  Oleg Sychev
  * @author Oleg Sychev, Volgograd State Technical University
@@ -8,12 +8,11 @@
  * @package questions
  */
 
-require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
-require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
+defined('MOODLE_INTERNAL') || die();
 
-class preg_matcher {
+require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+
+class preg_matcher extends preg_regex_handler {
 
 
     //Constants for the capabilities which could (or could not) be supported by matching engine
@@ -27,33 +26,13 @@ class preg_matcher {
     const SUBPATTERN_CAPTURING = 3;
 
     /**
-    *returns true for supported capabilities
-    @param capability the capability in question
-    @return bool is capability supported
+    * returns true for supported capabilities
+    * @param capability the capability in question
+    * @return bool is capability supported
     */
     public function is_supporting($capability) {
         return false;//abstract class supports nothing
     }
-
-    //////Initial data
-    //Regular expression as string
-    protected $regex;
-    //Modifiers for regular expression
-    protected $modifiers;
-    //Max number of a subpattern available in regular expression
-    protected $maxsubpatt;
-
-
-    //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
-    protected $ast_root;
-    //The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name
-    protected $dst_root;
-    //The error messages array
-    protected $errors;
-    //Array with flags for unsupported node types
-    //protected $error_flags;
-    //Anchoring - object,  with 'start' and 'end' logical fields, which are true if all regex is anchored
-    protected $anchor;
 
     //Matching results
     //String with which match is performed
@@ -73,9 +52,28 @@ class preg_matcher {
     //Cache of the matching results,  string for matching is the key
     protected $result_cache;
 
-
     public function name() {
         return 'preg_matcher';
+    }
+
+    /**
+    *parse regex and do all necessary preprocessing
+    @param regex - regular expression for which will be build finite automate
+    @param modifiers - modifiers of regular expression
+    */
+    public function __construct($regex = null, $modifiers = null) {
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
+        $this->result_cache = array();
+        $this->is_match = false;
+
+        parent::__construct($regex, $modifiers);
+        if ($regex === null) {
+            return;
+        }
+
+        $this->reset_subpattern_indexes();
     }
 
     /**
@@ -88,62 +86,6 @@ class preg_matcher {
             $this->index_first[$i] = -1;
             $this->index_last[$i] = -2;
         }
-    }
-
-    /**
-    *parse regex and do all necessary preprocessing
-    @param regex - regular expression for which will be build finite automate
-    @param modifiers - modifiers of regular expression
-    */
-    public function __construct($regex = null, $modifiers = null) {
-        $this->errors = array();
-        $this->full = false;
-        $this->next = '';
-        $this->left = -1;
-        $this->result_cache = array();
-        //$this->error_flags = array();
-        $this->is_match = false;
-
-        if ($regex === null) {
-            return;
-        }
-
-        //Are passed modifiers supported?
-        if (is_string($modifiers)) {
-            $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i=0; $i < strlen($modifiers); $i++) {
-                if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = new preg_error_unsupported_modifier($this, $modifiers[$i]);
-                }
-            }
-        }
-
-        $this->regex = $regex;
-        $this->modifiers = $modifiers;
-        //do parsing
-        if ($this->is_parsing_needed()) {
-            $this->build_tree($regex);
-            $this->look_for_anchors();
-        } else {
-            $this->ast_root = null;
-        }
-        $this->reset_subpattern_indexes();
-    }
-
-    /**
-    * returns string of regular expression modifiers supported by this engine
-    */
-    public function get_supported_modifiers() {
-        return 'i';//no modifiers support by default
-    }
-
-    /**
-    * is this engine need a parsing of regular expression?
-    @return bool if parsing needed
-    */
-    protected function is_parsing_needed() {
-        //most engines will need parsing
-        return true;
     }
 
     /**
@@ -190,6 +132,7 @@ class preg_matcher {
         if (!$this->is_match) {
             $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
             $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
+            $this->full = false;
         } else {//do some sanity checks
             $subpattcnt = 0;
             foreach ($this->index_first as $key=>$value) {
@@ -340,135 +283,5 @@ class preg_matcher {
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports counting of the remaining characters');
     }
 
-    /**
-    * Are errors in regex?
-    @return bool  errors exists
-    */
-    public function is_error_exists() {
-        return (!empty($this->errors));
-    }
-
-    /**
-    * returns errors for regex
-    @return array of errors
-    */
-    public function get_errors() {
-        $res = array();
-        foreach($this->errors as $error) {
-            $res[] = $error->errormsg;
-        }
-        return $res;
-    }
-
-    public function get_error_objects() {
-        return $this->errors;
-    }
-
-    /**
-    * Is a preg_node_... or a preg_leaf_... supported by the engine?
-    */
-    protected function is_node_acceptable($pregnode) {
-        return false;    // Should be overloaded by child classes
-    }
-
-    /**
-    * Function does lexical and syntaxical analysis of regex and builds tree, root saving in $this->ast_root
-    @param $regex - regular expression for building tree
-    */
-    protected function build_tree($regex) {
-
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
-        $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
-        $lexer->globalmodifiers = $this->modifiers;
-        $lexer->localmodifiers = $this->modifiers;
-        $parser = new preg_parser_yyParser;
-        while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
-        }
-        $lexerrors = $lexer->get_errors();
-        $this->maxsubpatt = $lexer->get_max_subpattern();
-        foreach ($lexerrors as $errstring) {
-            $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
-        }
-        $parser->doParse(0, 0);
-        if ($parser->get_error()) {
-            $errornodes = $parser->get_error_nodes();
-            $errormsgs = array();
-            //Generate parser error messages
-            foreach($errornodes as $node) {
-                $errormsgs[] = new preg_parsing_error($regex, $node);
-            }
-            $this->errors = array_merge($this->errors, $errormsgs);
-        } else {
-            $this->ast_root = $parser->get_root();
-            $this->dst_root = $this->from_preg_node($this->ast_root);
-            //Add error messages for unsupported nodes
-            //foreach ($this->error_flags as $key => $value) {
-                //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
-            //}
-        }
-        fclose($pseudofile);
-    }
-
-    /**
-    * DST node factory
-    * @param pregnode preg_node child class instance
-    * @return corresponding xxx_preg_node child class instance
-    */
-    public function &from_preg_node($pregnode) {
-        if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
-            $enginenodename = $this->get_engine_node_name($pregnode->name());
-            if (class_exists($enginenodename)) {
-                $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->errors/*error_flags*/)) {//highlighting first occurence of unaccepted node
-                    //$this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
-                    $this->errors[$enginenode->rejectmsg] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                }
-            } else {
-                $enginenode = $pregnode;
-                if (!$this->is_node_acceptable($pregnode)) {
-                    $this->errors[] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                    //$this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
-                }
-            }
-            return $enginenode;
-        } else {
-            return $pregnode;
-        }
-    }
-
-    /**
-    * Returns engine node name by preg node name
-    * Overload in case of sophisticated node name schemes
-    */
-    protected function get_engine_node_name($pregname) {
-        return $this->node_prefix().'_preg_'.$pregname;
-    }
-
-    /**
-    * Returns prefix for engine specific classes
-    */
-    protected function node_prefix() {
-        return null;
-    }
-
-    /**
-    * Function copy node with subtree, no reference
-    * @param node node for copying
-    * @return copy of node(and subtree)
-    */
-    protected function &copy_preg_node($node) {
-        $result = clone $node;
-        /*if (is_a($node, 'preg_operator')) {
-            foreach ($node->operands as $key=>$operand) {
-                if (is_a($operand, 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $result->operands[$key] = &$this->copy_preg_node($operand);
-                }
-            }
-        }*/
-        return $result;
-    }
 }
 ?>
