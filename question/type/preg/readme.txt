@@ -2,8 +2,9 @@ Perl-compatible regular expression question
 -------------------------------------------
 
 Authors:
-1. Idea, design, question type code - Oleg Sychev
+1. Idea, design, question type code, error reporting, hinting behaviours - Oleg Sychev
 2. Parsing regular expression, DFA regular expression matching engine - Dmitriy Kolesov
+3. NFA regular expression matching engine, backreferences, matchers cross-testing - Valeriy Streltsov
 
 1. Description
 The question intended to allow the use of php perl-compatible regular expressions in short answer
@@ -16,7 +17,7 @@ You can find some links to the descriptions of regular expression syntax in help
 Just copy preg directory in the question/type and enjoy!
 
 3. Hinting
-DFA matching engine supports hinting for partial matching. It there is no full match in the response,
+DFA and NFA matching engines supports hinting for partial matching. It there is no full match in the response,
 question chooses the partial match that has less characters to complete matching. It could also show
 a next character that lead to shortest part to complete matching as a hint (with adding hint penalty)
 in adaptive mode. Only answers with grade greater or equal hint grade border are used in hinting.
