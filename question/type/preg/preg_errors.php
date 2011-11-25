@@ -54,10 +54,10 @@ class preg_accepting_error extends preg_error {
 // There's an unsupported modifier in a regex
 class preg_modifier_error extends preg_error {
 
-    public function __construct($matcher, $modifier) {
+    public function __construct($matchername, $modifier) {
         $a = new stdClass;
         $a->modifier = $modifier;
-        $a->classname = $matcher->name();
+        $a->classname = $matchername;
         $this->errormsg = get_string('unsupportedmodifier','qtype_preg',$a);
     }
 

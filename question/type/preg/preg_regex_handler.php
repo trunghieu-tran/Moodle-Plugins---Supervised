@@ -55,7 +55,7 @@ class preg_regex_handler {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = new preg_error_unsupported_modifier($this, $modifiers[$i]);
+                    $this->errors[] = new preg_error_unsupported_modifier($this->name(), $modifiers[$i]);
                 }
             }
         }
