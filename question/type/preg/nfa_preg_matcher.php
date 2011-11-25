@@ -385,13 +385,13 @@ class nfa_preg_matcher extends preg_matcher {
         if (!isset($regex) || !empty($this->errors)) {
             return;
         }
-        if (isset($CFG->nfastatelimit)) {
-            $this->statelimit = $CFG->nfastatelimit;
+        if (isset($CFG->qtype_preg_nfastatelimit)) {
+            $this->statelimit = $CFG->qtype_preg_nfastatelimit;
         } else {
             $this->statelimit = 250;
         }
-        if (isset($CFG->nfatransitionlimit)) {
-            $this->transitionlimit = $CFG->nfatransitionlimit;
+        if (isset($CFG->qtype_preg_nfatransitionlimit)) {
+            $this->transitionlimit = $CFG->qtype_preg_nfatransitionlimit;
         } else {
             $this->transitionlimit = 250;
         }
