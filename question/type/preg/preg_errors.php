@@ -38,12 +38,12 @@ class preg_parsing_error extends preg_error {
 // There's an unacceptable node in a regex
 class preg_accepting_error extends preg_error {
 
-    public function __construct($regex, $matcher, $nodename, $indexes) {
+    public function __construct($regex, $matchername, $nodename, $indexes) {
         $a = new stdClass;
         $a->nodename = $nodename;
         $a->indfirst = $indexes['start'];
         $a->indlast = $indexes['end'];
-        $a->engine = get_string($matcher->name(), 'qtype_preg');
+        $a->engine = get_string($matchername, 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported','qtype_preg',$a);
