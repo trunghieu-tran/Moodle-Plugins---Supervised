@@ -328,7 +328,6 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
 	}
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
-	
     public function accept() {
         if ($this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
             $this->rejectmsg = '\G';

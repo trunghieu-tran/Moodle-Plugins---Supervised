@@ -279,5 +279,15 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->first_correct_character_index()==26);
         $this->assertTrue($matcher->last_correct_character_index()==34);
     }
+	function test_partial_match_charsets() {
+	global $QWERTY;
+	$QWERTY = true;
+		$matcher = new dfa_preg_matcher('[ab]*abb');
+		$matcher->match('aabbbabb');
+		$this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->first_correct_character_index()==0);echo $matcher->first_correct_character_index();
+        $this->assertTrue($matcher->last_correct_character_index()==7);echo $matcher->last_correct_character_index();//$matcher->draw(0, 'fp'); $matcher->print_connection(0);
+		$QWERTY = false;
+	}
 }
 ?>
