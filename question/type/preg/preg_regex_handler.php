@@ -133,7 +133,7 @@ class preg_regex_handler {
     * Returns true if node is supported or user interface string describing 
     *   what properties of node isn't supported.
     */
-    protected function is_node_acceptable($pregnode) {
+    protected function is_preg_node_acceptable($pregnode) {
         return false;    // Should be overloaded by child classes
     }
 
@@ -217,7 +217,7 @@ class preg_regex_handler {
                 }
             } else {
                 $enginenode = $pregnode;
-                $acceptresult = $this->is_node_acceptable($pregnode);
+                $acceptresult = $this->is_preg_node_acceptable($pregnode);
                 if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
                     $this->errors[$enginenodename] = new preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }

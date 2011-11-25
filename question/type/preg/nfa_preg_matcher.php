@@ -110,7 +110,7 @@ class nfa_preg_matcher extends preg_matcher {
         return false;
     }
 
-    function is_node_acceptable($pregnode) {
+    protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->name()) {
         case 'leaf_charset':
         case 'leaf_meta':
