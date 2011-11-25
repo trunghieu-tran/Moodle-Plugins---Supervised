@@ -91,7 +91,7 @@ class preg_cross_tester extends UnitTestCase {
     var $engines = array();   // an array of available engines
 
     public function __construct() {
-        $question = new question_preg_qtype();
+        $question = new qtype_preg();
         $this->engines = $question->available_engines();
         unset($this->engines['preg_php_matcher']);
         $this->engines = array_keys($this->engines);
