@@ -32,8 +32,6 @@ class preg_regex_handler {
     protected $dst_root;
     //The error objects array
     protected $errors;
-    //Array with flags for unsupported node types
-    //protected $error_flags;
     //Anchoring - object,  with 'start' and 'end' logical fields, which are true if all regex is anchored
     protected $anchor;
 
@@ -48,7 +46,6 @@ class preg_regex_handler {
     */
     public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
-        //$this->error_flags = array();
         if ($regex === null) {
             return;
         }
@@ -173,10 +170,6 @@ class preg_regex_handler {
         } else {
             $this->ast_root = $parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
-            //Add error messages for unsupported nodes
-            //foreach ($this->error_flags as $key => $value) {
-                //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
-            //}
             $this->look_for_anchors();
         }
         fclose($pseudofile);
@@ -194,10 +187,6 @@ class preg_regex_handler {
             $srcroot = $handler->get_ast_root();
             $this->ast_root = clone $srcroot;
             $this->dst_root = $this->from_preg_node($this->ast_root);
-                //Add error messages for unsupported nodes
-                //foreach ($this->error_flags as $key => $value) {
-                    //$this->errors[] = new preg_accepting_error($regex, $this, $key, $value);
-                //}
             $this->look_for_anchors();
         }
     }
@@ -220,15 +209,13 @@ class preg_regex_handler {
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);
-                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->errors/*error_flags*/)) {//highlighting first occurence of unaccepted node
-                    //$this->error_flags[$enginenode->rejectmsg] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
+                if (!$enginenode->accept() && !array_key_exists($enginenode->rejectmsg,  $this->errors)) {//highlighting first occurence of unaccepted node
                     $this->errors[$enginenode->rejectmsg] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             } else {
                 $enginenode = $pregnode;
                 if (!$this->is_node_acceptable($pregnode)) {
                     $this->errors[] = new preg_accepting_error($this->regex, $this, $enginenodename, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
-                    //$this->error_flags[$pregnode->name()] = array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast);
                 }
             }
             return $enginenode;
