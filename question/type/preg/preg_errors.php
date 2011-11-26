@@ -39,8 +39,11 @@ class preg_parsing_error extends preg_error {
 class preg_accepting_error extends preg_error {
 
     public function __construct($regex, $matchername, $nodename, $indexes) {
+        $textlib = textlib_get_instance();
+        $firstchar = $textlib->strtoupper($textlib->substr($nodename, 0, 1));
+        $rest = $textlib->substr($nodename, 1, $textlib->strlen($nodename));
         $a = new stdClass;
-        $a->nodename = $nodename;
+        $a->nodename = $firstchar.$rest;
         $a->indfirst = $indexes['start'];
         $a->indlast = $indexes['end'];
         $a->engine = get_string($matchername, 'qtype_preg');
