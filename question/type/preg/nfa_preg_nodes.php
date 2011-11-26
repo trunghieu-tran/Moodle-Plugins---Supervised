@@ -581,7 +581,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 
     public function accept() {
         if (!$this->pregnode->greed) {
-            return get_string('lazyquant', 'qtype_preg');
+            return get_string('ungreedyquant', 'qtype_preg');
         }
         return true;
     }

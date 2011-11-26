@@ -28,7 +28,7 @@ partial matches - so no hinting. Also, due to backtracking algorithm problems it
 on some regular expression like a?NaN (see http://swtch.com/~rsc/regexp/regexp1.html) - NFA engine are
 best for this type of regexes. It\'s almost 100% debugged. </p>
 <p> <b>DFA matching engine</b> support hinting and could tell us shortest path to complete a match. However, it 
-by nature can\'t support backreferences in regular expressions. It also doesn\'t handle well quantificators with
+by nature can\'t support backreferences in regular expressions. It also doesn\'t handle well quantifiers with
 wide but finite limits like a{2,2000} - they generates too much edges on the DFA graph. DFA matching engine also
 doesn\'t support subpattern extraction. </p>
 <p><b>NFA matching engine</b> is similar to DFA, but allows to support subpattern extraction along with hinting.
@@ -51,7 +51,7 @@ than usual Moodle question penalty (which applies to any new attempt to answer q
 These penalties are mutually exclusive.';
 $string['PCREincorrectregex'] = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['largefa'] = 'Too large fa';
-$string['lazyquant'] = 'Lazy quantificators';
+$string['ungreedyquant'] = 'Ungreedy quantifiers';
 $string['leaf_assert'] = 'Simple assertion';
 $string['leaf_backref'] = 'Backreference';
 $string['leaf_charset'] = 'Character class';
@@ -72,8 +72,8 @@ $string['node_alt'] = 'Alternative';
 $string['node_assert'] = 'Assertion';
 $string['node_concat'] = 'Concatenation';
 $string['node_cond_subpatt'] = 'Conditional subpattern';
-$string['node_finite_quant'] = 'Finite quantificator';
-$string['node_infinite_quant'] = 'Infinite quantificator';
+$string['node_finite_quant'] = 'Finite quantifier';
+$string['node_infinite_quant'] = 'Infinite quantifier';
 $string['node_subpatt'] = 'Subpattern';
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal hint grade border. This effectively disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
