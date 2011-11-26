@@ -87,9 +87,7 @@ class dfa_preg_matcher extends preg_matcher {
             return true;
             break;
         }
-        $nodedesc = get_string($pregnode->name(), 'qtype_preg');
-        $enginedesc = get_string('nfa_preg_matcher', 'qtype_preg');
-        return "$nodedesc is not supported by $enginedesc";
+        return $pregnode->name();
     }
 
     /**
