@@ -1,8 +1,14 @@
 <?php
 
 defined('MOODLE_INTERNAL') || die;
+require_once($CFG->dirroot.'/question/type/preg/questiontype.php');
 
 if($ADMIN->fulltree) {
+$settings->add(new admin_setting_heading('questioneditingheading', get_string('questioneditingheading', 'qtype_preg'), ''));
+$qtypeobj = new qtype_preg;
+$engines = $qtypeobj->available_engines();
+$settings->add(new admin_setting_configselect('qtype_preg_defaultengine', get_string('defaultenginelabel', 'qtype_preg'),
+                                                get_string('defaultenginedescription', 'qtype_preg'), 'nfa_preg_matcher', $engines));
 $settings->add(new admin_setting_configtext('qtype_preg_maxerrorsshown', get_string('maxerrorsshownlabel', 'qtype_preg'),
                                                 get_string('maxerrorsshowndescription', 'qtype_preg'), 5, PARAM_INT));
 
