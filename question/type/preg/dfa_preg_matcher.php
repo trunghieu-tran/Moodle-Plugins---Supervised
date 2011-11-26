@@ -87,7 +87,7 @@ class dfa_preg_matcher extends preg_matcher {
             return true;
             break;
         }
-        return $pregnode->name();
+        return get_string($pregnode->name(), 'qtype_preg');
     }
 
     /**
