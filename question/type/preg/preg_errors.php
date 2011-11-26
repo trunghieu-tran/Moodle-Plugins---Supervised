@@ -38,12 +38,19 @@ class preg_parsing_error extends preg_error {
 // There's an unacceptable node in a regex
 class preg_accepting_error extends preg_error {
 
-    public function __construct($regex, $matchername, $nodename, $indexes) {
+    /*
+     * Returns a string with first character converted to upper case.
+     */
+    public function uppercase_first_letter($str) {
         $textlib = textlib_get_instance();
-        $firstchar = $textlib->strtoupper($textlib->substr($nodename, 0, 1));
-        $rest = $textlib->substr($nodename, 1, $textlib->strlen($nodename));
+        $firstchar = $textlib->strtoupper($textlib->substr($str, 0, 1));
+        $rest = $textlib->substr($str, 1, $textlib->strlen($str));
+        return $firstchar.$rest;
+    }
+
+    public function __construct($regex, $matchername, $nodename, $indexes) {
         $a = new stdClass;
-        $a->nodename = $firstchar.$rest;
+        $a->nodename = $this->uppercase_first_letter($nodename);
         $a->indfirst = $indexes['start'];
         $a->indlast = $indexes['end'];
         $a->engine = get_string($matchername, 'qtype_preg');
