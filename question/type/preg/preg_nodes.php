@@ -129,15 +129,6 @@ abstract class preg_leaf extends preg_node {
     public function consumes() {
         return 1;
     }
-    
-    /*
-    * Returns a clone of the leaf including merged assertions
-    * @deprecated since Preg 2.1  Just clone preg_leaf instead
-    */
-    public function &get_clone() {
-        $res = clone $this;
-        return $res;
-    }
 
     /*
     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
