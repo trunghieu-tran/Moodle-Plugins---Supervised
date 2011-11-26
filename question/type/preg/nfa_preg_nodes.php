@@ -35,15 +35,6 @@ class nfa_transition
     */
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;
-        /*foreach ($this->subpatt_start as $key=>$subpatt) {
-            $res->subpatt_start[$key] = $subpatt;
-        }
-        foreach ($this->subpatt_end as $key=>$subpatt) {
-            $res->subpatt_end[$key] = $subpatt;
-        }*/
-        /*foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
-            $res->belongs_to_subpatt[$key] = $subpatt;
-        }*/
     }
 }
 
