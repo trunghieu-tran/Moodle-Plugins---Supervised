@@ -15,6 +15,18 @@ class nfa_building_test extends UnitTestCase {
     function tearDown() {
     }
 
+    function test_transition_cloning() {
+        $leaf = new preg_leaf_charset();
+        $state = new nfa_state();
+        $tr = new nfa_transition($leaf, $state, false);
+        $clone = clone $tr;
+        $this->assertFalse($tr === $clone);
+        $this->assertFalse($tr->pregleaf === $clone->pregleaf);
+        $this->assertTrue($tr->state === $clone->state);
+        $tr->subpatt_start[] = 4;
+        $this->assertFalse($tr->subpatt_start == $clone->subpatt_start);
+    }
+
     function test_build_concat() {
         $matcher = new nfa_preg_matcher('^abc$');
         if (!$matcher->is_error_exists()) {
