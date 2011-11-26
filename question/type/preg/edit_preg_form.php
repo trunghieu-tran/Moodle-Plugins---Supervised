@@ -31,7 +31,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         $notations = $qtype->available_notations();
         $mform->addElement('select','notation', get_string('notation', 'qtype_preg'), $notations);
-        $mform->setDefault('notation', 'native');
+        $mform->setDefault('notation', $CFG->qtype_preg_defaultnotation);
         $mform->addHelpButton('notation', 'notation', 'qtype_preg');
 
         $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
