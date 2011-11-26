@@ -23,13 +23,9 @@ abstract class dfa_preg_node {
     public $firstpos;
     public $lastpos;
     public $number;
-	//data for debug print
-	public $dotnumber;
-	public $color;
-    /**
-    * Message with UI node name describing the reason for rejection
-    */
-    public $rejectmsg;
+    //data for debug print
+    public $dotnumber;
+    public $color;
 
     public function __construct($node, &$matcher) {
         $this->pregnode = $node;
@@ -44,8 +40,7 @@ abstract class dfa_preg_node {
     }
 
     /**
-    * Returns true if engine support the node, false otherwise
-    * When returning false should also set rejectmsg field
+    * returns true if engine support the node, rejection string otherwise
     */
     public function accept() {
         return true; //accepting anything by default, overload function in case of partial accepting or total rejection
@@ -331,8 +326,8 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
 	
     public function accept() {
         if ($this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
-            $this->rejectmsg = '\G';
-            return false;
+            $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
+            return $leafdesc . ' \G';
         }
         return true;
 
@@ -551,8 +546,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
                 $res = 'assertfb';
                 break;
             }
-            $this->rejectmsg = get_string($res, 'qtype_preg');
-            return false;
+            return get_string($res, 'qtype_preg');
         }
         return true;
     }
@@ -625,8 +619,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
 	
     public function accept() {
         if (!$this->pregnode->greed) {
-            $this->rejectmsg = get_string('lazyquant', 'qtype_preg');
-            return false;
+            return get_string('lazyquant', 'qtype_preg');
         }
         return true;
     }
