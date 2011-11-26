@@ -18,6 +18,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      * @param MoodleQuickForm $mform the form being built.
      */
     function definition_inner(&$mform) {
+        global $CFG;
 
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
@@ -25,7 +26,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
-        $mform->setDefault('engine','preg_php_matcher');
+        $mform->setDefault('engine',$CFG->qtype_preg_defaultengine);
         $mform->addHelpButton('engine','engine','qtype_preg');
 
         $notations = $qtype->available_notations();
