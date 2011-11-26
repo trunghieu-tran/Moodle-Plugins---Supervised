@@ -45,6 +45,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
         $mform->setDefault('hintgradeborder',1);
         $mform->addHelpButton('hintgradeborder','hintgradeborder','qtype_preg');
+        $mform->setAdvanced('hintgradeborder');
 
         $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
         $mform->addHelpButton('exactmatch','exactmatch','qtype_preg');
