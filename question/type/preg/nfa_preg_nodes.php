@@ -24,27 +24,27 @@ class nfa_transition
     //public $belongs_to_subpatt = array();   // an array of subpatterns which this transition belongs to
 
     public function __construct(&$_pregleaf, &$_state, $_loops, $_replaceable = false) {
-        $this->pregleaf = $_pregleaf->get_clone();    // the leaf should be unique
+        $this->pregleaf = clone $_pregleaf;    // the leaf should be unique
         $this->state = $_state;
         $this->loops = $_loops;
         $this->replaceable = $_replaceable;
     }
 
-    public function &get_clone() {
-        $res = clone $this;
-        $res->pregleaf = $this->pregleaf->get_clone();
-        foreach ($this->subpatt_start as $key=>$subpatt) {
+    /**
+    * When clonning a transition we want a copy of its pregleaf
+    */
+    public function __clone() {
+        $this->pregleaf = clone $this->pregleaf;
+        /*foreach ($this->subpatt_start as $key=>$subpatt) {
             $res->subpatt_start[$key] = $subpatt;
         }
         foreach ($this->subpatt_end as $key=>$subpatt) {
             $res->subpatt_end[$key] = $subpatt;
-        }
+        }*/
         /*foreach ($this->belongs_to_subpatt as $key=>$subpatt) {
             $res->belongs_to_subpatt[$key] = $subpatt;
         }*/
-        return $res;
     }
-
 }
 
 /**
@@ -77,7 +77,7 @@ class nfa_state
             }
         }
         if (!$exists) {
-            array_push($this->next, $transition->get_clone());
+            array_push($this->next, clone $transition);
             if ($transition->loops) {
                 $this->startsinfinitequant = true;
             }
@@ -403,8 +403,7 @@ abstract class nfa_preg_node {
     public $pregnode;    // a reference to the corresponding preg_node
 
     /**
-    * returns true if engine support the node, false otherwise
-    * when returning false should also set rejectmsg field
+    * returns true if engine support the node, rejection string otherwise
     */
     public function accept() {
         return true; // accepting anything by default
@@ -449,8 +448,8 @@ class nfa_preg_leaf extends nfa_preg_node {
 
     public function accept() {
         if ($this->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
-            $this->rejectmsg = '\G';
-            return false;
+            $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
+            return $leafdesc . ' \G';
         }
         return true;
 
@@ -582,8 +581,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 
     public function accept() {
         if (!$this->pregnode->greed) {
-            $this->rejectmsg = get_string('lazyquant', 'qtype_preg');
-            return false;
+            return get_string('lazyquant', 'qtype_preg');
         }
         return true;
     }
@@ -601,7 +599,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
             return $this;
         }
         foreach ($body->startstate->next as $curnext) {
-            $clone = $curnext->get_clone();
+            $clone = clone $curnext;
             $clone->loops = true;
             $body->endstate->append_transition($clone);
         }
@@ -635,7 +633,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                         return $this;
                     }
                     foreach ($cur->startstate->next as $curnext) {
-                        $clone = $curnext->get_clone();
+                        $clone = clone $curnext;
                         $clone->loops = true;
                         $cur->endstate->append_transition($clone);
                     }
