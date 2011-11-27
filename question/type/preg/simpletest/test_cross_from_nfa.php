@@ -728,6 +728,43 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
+    function data_for_test_backref_noway() {
+        $test1 = array( 'str'=>'abxyabab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'index_last'=>array(0=>7,1=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'abxycd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'index_last'=>array(0=>5,1=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>'cdxyabab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>5,1=>-2),
+                        'left'=>array(10000000),
+                        'next'=>'');
+
+        $test4 = array( 'str'=>'cdxycd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>5,1=>-2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(?:(ab)|cd)xy(?:ab\1|cd)',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
     function data_for_test_backref_tricky_1() {
         $test1 = array( 'str'=>'abxab',
                         'is_match'=>true,

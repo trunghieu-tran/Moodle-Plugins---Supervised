@@ -63,7 +63,7 @@ class preg_backreferences_test extends UnitTestCase {
         // Matching at the end of the string.
         $res = $backref->match('abc', 3, &$length, false);
         $ch = $backref->next_character('abc', 2, $length);
-        $this->assertEqual($res, false);
+        $this->assertFalse($res);
         $this->assertEqual($length, 0);
         $this->assertEqual($ch, 'a');
         // The string doesn't match with backref at all.
@@ -86,7 +86,7 @@ class preg_backreferences_test extends UnitTestCase {
         // Reaching the end of the string.
         $res = $backref->match('abcab', 3, &$length, false);
         $ch = $backref->next_character('abc', 2, $length);
-        $this->assertEqual($res, false);
+        $this->assertFalse($res);
         $this->assertEqual($length, 2);
         $this->assertEqual($ch, 'c');
         // The string matches backref partially.
@@ -128,6 +128,28 @@ class preg_backreferences_test extends UnitTestCase {
         $this->assertTrue($res);
         $this->assertEqual($length, 0);
         $this->assertEqual($ch, '');
+    }
+
+    function test_alt_match() {
+        $regex = '(ab|cd|)';
+        $length = 0;
+        $matcher = new nfa_preg_matcher($regex);
+        $matcher->match('ab');
+        $backref = new preg_leaf_backref();
+        $backref->number = 1;
+        $backref->matcher = $matcher;
+
+        // 2 characters matched
+        $res = $backref->match('aba', 2, &$length, false);
+        $ch = $backref->next_character('abc', 2, $length);
+        $this->assertFalse($res);
+        $this->assertEqual($length, 1);
+        $this->assertEqual($ch, 'b');
+        // Emptiness matched.
+        $matcher->match('xyz');
+        $res = $backref->match('xyz', 0, &$length, false);
+        $this->assertTrue($res);
+        $this->assertEqual($length, 0);
     }
 }
 ?>
