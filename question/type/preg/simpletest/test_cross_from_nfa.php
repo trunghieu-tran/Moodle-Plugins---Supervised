@@ -91,7 +91,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(2),
                         'next'=>'abcdefghijklmnopqrstuvwxyz');
 
-        return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
+        return array('regex'=>'^*[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
     }
 	

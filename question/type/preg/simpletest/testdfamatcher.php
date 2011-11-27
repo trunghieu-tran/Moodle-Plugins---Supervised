@@ -280,14 +280,30 @@ class dfa_preg_matcher_complex_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index()==34);
     }
 	function test_partial_match_charsets() {
-	global $QWERTY;
-	$QWERTY = true;
 		$matcher = new dfa_preg_matcher('[ab]*abb');
 		$matcher->match('aabbbabb');
 		$this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->first_correct_character_index()==0);echo $matcher->first_correct_character_index();
-        $this->assertTrue($matcher->last_correct_character_index()==7);echo $matcher->last_correct_character_index();//$matcher->draw(0, 'fp'); $matcher->print_connection(0);
-		$QWERTY = false;
+        $this->assertTrue($matcher->first_correct_character_index()==0);
+        $this->assertTrue($matcher->last_correct_character_index()==7);
+		$matcher = new dfa_preg_matcher('[ab]*[ac]bb');
+		$matcher->match('aabbbabb');
+		$this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->first_correct_character_index()==0);
+        $this->assertTrue($matcher->last_correct_character_index()==7);
+	}
+	function test_partial_match_meta_meta() {
+		$matcher = new dfa_preg_matcher('.*\wbb');
+		$matcher->match('@W#G%9bb');
+		$this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->first_correct_character_index()==0);
+        $this->assertTrue($matcher->last_correct_character_index()==7);
+	}
+	function test_partial_match_charset_meta() {
+		$matcher = new dfa_preg_matcher('(?:\w)*a');
+		$matcher->match('aaa_aaa');
+		$this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->first_correct_character_index()==0);
+        $this->assertTrue($matcher->last_correct_character_index()==6);
 	}
 }
 ?>
