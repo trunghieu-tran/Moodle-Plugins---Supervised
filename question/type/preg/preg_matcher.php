@@ -62,11 +62,12 @@ class preg_matcher extends preg_regex_handler {
     @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
+        $this->is_match = false;
         $this->full = false;
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
-        $this->is_match = false;
+
 
         parent::__construct($regex, $modifiers);
         if ($regex === null) {
@@ -126,6 +127,11 @@ class preg_matcher extends preg_regex_handler {
             return $this->full;
         }
 
+        //Reset match data and perform matching.
+        $this->is_match = false;
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
         $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
