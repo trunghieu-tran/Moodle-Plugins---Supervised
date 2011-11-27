@@ -627,8 +627,8 @@ class preg_leaf_combo extends preg_leaf {
         } else {
             $result = new preg_leaf_combo;
             $result->subtype = preg_leaf_combo::SUBTYPE_CROSS;
-            $result->childs[0] = $leaf0;
-            $result->childs[1] = $leaf1;
+            $result->childs[0] = $leaf0->get_clone();
+            $result->childs[1] = $leaf1->get_clone();
         }
         return $result;
     }
