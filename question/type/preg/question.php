@@ -329,8 +329,8 @@ class qtype_preg_question extends question_graded_automatically
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
         }
-        //no match
-        return null;
+        //no match - all is wrong
+        return array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
     }
 
     /*
