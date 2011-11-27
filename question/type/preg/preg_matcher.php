@@ -223,7 +223,7 @@ class preg_matcher extends preg_regex_handler {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
-        return ($this->index_last[$subpattern] >= 0);
+        return ($this->index_last[$subpattern] >= -1);
     }
 
     /**
