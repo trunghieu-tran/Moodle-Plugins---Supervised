@@ -134,7 +134,7 @@ class qtype_preg_question extends question_graded_automatically
         $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
         $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
         
-        //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border
+        //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
         if ($ispartialmatching) {
@@ -155,30 +155,30 @@ class qtype_preg_question extends question_graded_automatically
         } else {
             $matchresult = array('is_match' => false, 'full' => false);
         }
-        //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness
+        //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
         $full = false;
         foreach ($this->answers as $answer) {
             $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
             $full = $matcher->match($response['answer']);
 
-            //check full match
-            if ($full) {//don't need to look more if we find full match
+            //Check full match.
+            if ($full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $matchresult = $matcher->get_match_results();
                 $fitness = strlen($response['answer']);
                 break;
             }
 
-            //when hinting we should use only answers within hint border except full matching case and there is some match at all
-            //if engine doesn't support hinting we shoudn't bother with fitness too
+            //When hinting we should use only answers within hint border except full matching case and there is some match at all.
+            //If engine doesn't support hinting we shoudn't bother with fitness too.
             if (!$ispartialmatching || !$matcher->match_found() || $answer->fraction < $this->hintgradeborder) {
                 continue;
             }
 
-            //calculate fitness now
-            if ($knowleftcharacters) {//engine could tell us how many characters left to complete response, this is the best fitness possible
+            //Calculate fitness.
+            if ($knowleftcharacters) {//Engine could tell us how many characters left to complete response, this is the best fitness possible.
                 $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
-            } else {//we should rely on the length of correct response part
+            } else {//We should rely on the length of correct response part.
                 $fitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
             }
 
@@ -189,7 +189,7 @@ class qtype_preg_question extends question_graded_automatically
             }
         }
 
-        //save best fitted answer for further uses
+        //Save best fitted answer for further uses.
         $this->bestfitanswer['answer'] = $bestfitanswer;
         $this->bestfitanswer['match'] = $matchresult;
         $this->responseforbestfit = $response['answer'];
@@ -198,7 +198,7 @@ class qtype_preg_question extends question_graded_automatically
 
     public function get_matching_answer(array $response) {
         $bestfit = $this->get_best_fit_answer($response);
-        if ($bestfit['match']['full']) {
+        if ($bestfit['match']['is_match'] && $bestfit['match']['full']) {
             return $bestfit['answer'];
         }
         return array();
@@ -367,7 +367,7 @@ class qtype_preg_question extends question_graded_automatically
 
     //////////Specific hints implementation part
 
-    //we need adaptive (TODO adaptivenopenalties and interactive) behavour to use hints
+    //we need adaptive (TODO interactive) behavour to use hints
      public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         if ($preferredbehaviour == 'adaptive') {
              question_engine::load_behaviour_class('adaptivewithhint');
