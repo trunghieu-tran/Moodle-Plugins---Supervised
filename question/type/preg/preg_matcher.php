@@ -160,7 +160,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    *do real matching, should be implemented in child classes, set properties full, index, next and left
+    *Do real matching, should be implemented in child classes, set properties full, index, next and left.
     @param str a string to match
     */
     protected function match_inner($str) {
@@ -168,7 +168,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /** 
-    * return an associative array of match results, helper method
+    * Returns an associative array of match results, helper method.
     */
     public function get_match_results() {
         $res = array('is_match' => $this->is_match);
@@ -184,6 +184,15 @@ class preg_matcher extends preg_regex_handler {
             }
         } else {
             $res['full'] = false;
+            //We could still hint first possible character if there was no match at all.
+            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $res['next'] = $this->next;
+            }
+            //If there is no match at all, we have all length of regex to fulfill - but it do exists.
+            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+                $res['left'] = $this->left;
+            }
+
         }
         return $res;
     }

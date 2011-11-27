@@ -329,8 +329,12 @@ class qtype_preg_question extends question_graded_automatically
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
         }
-        //no match - all is wrong
-        return array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
+        //No match - all response is wrong, but we could hint the very first character still
+        $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
+        if (isset($matchresults['next'])) {//if hint possible
+            $result['hintedcharacter'] = $matchresults['next'];
+        }
+        return $result;
     }
 
     /*
