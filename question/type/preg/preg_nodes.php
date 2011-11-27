@@ -683,21 +683,27 @@ class preg_leaf_backref extends preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $cs) {
-        $textlib = textlib_get_instance();
-        $len = $textlib->strlen($str);
-        if (!$this->matcher->is_subpattern_captured($this->number) || $pos >= $len) {
+        if (!$this->matcher->is_subpattern_captured($this->number)) {
             $length = 0;
             return false;
         }
-        $strcopy = $str;
-        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
-
-        if (!$cs) {
-            $strcopy = $textlib->strtolower($strcopy);
-        }
+        $textlib = textlib_get_instance();
+        $len = $textlib->strlen($str);
         $start = $this->matcher->first_correct_character_index($this->number);
         $end = $this->matcher->last_correct_character_index($this->number);
         $subpattlen = $end - $start + 1;
+        if ($subpattlen > 0 && $pos >= $len) {
+            $length = 0;
+            return false;
+        } else if ($subpattlen == 0) {
+            $length = 0;
+            return true;
+        }
+        
+        $strcopy = $str;
+        if (!$cs) {
+            $strcopy = $textlib->strtolower($strcopy);
+        }
         $matchlen = 0;
         $result = true;
         // check char by char
