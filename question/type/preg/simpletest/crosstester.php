@@ -122,7 +122,7 @@ class preg_cross_tester extends UnitTestCase {
         $ismatchpassed = ($expected['is_match'] == $obtained['is_match']);
         $fullpassed = ($expected['full'] == $obtained['full']);
         $result = $ismatchpassed && $fullpassed;
-        if ($obtained['is_match'] && $expected['is_match']) {
+        if ($obtained['is_match'] && $expected['is_match']) {   // TODO - what if we need a character with no match?
             // checking indexes
             if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
                 $indexfirstpassed = ($expected['index_first'] == $obtained['index_first']);
