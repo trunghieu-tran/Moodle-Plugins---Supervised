@@ -12,4 +12,4 @@ $string['hintbtn'] = 'Hint {$a}';
 $string['hintused'] = 'Looked for hint: {$a->hint} for response {$a->response} with penalty {$a->penalty}.';
 $string['pluginname'] = 'Adaptive mode with hinting';
 $string['withpenalty'] = ' with penalty of {$a}';
-$string['withpossiblepenalty'] = ' with possible penalty of {$a}';
+$string['withpossiblepenalty'] = ' with possible penalty of {$a} for incorrect answer';
