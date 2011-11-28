@@ -853,8 +853,16 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
+        $test3 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>1),
+                        'index_last'=>array(0=>3,1=>2),
+                        'left'=>array(6),
+                        'next'=>'b');
+
         return array('regex'=>'(a|b\1)+x\1',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2, $test3));
     }
 
     function data_for_test_backref_tricky_1() {
