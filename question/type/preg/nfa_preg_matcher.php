@@ -171,7 +171,7 @@ class nfa_preg_matcher extends preg_matcher {
                         $skip = false;
                         if (is_a($next->pregleaf, 'preg_leaf_backref')) {
                             // only generated subpatterns can be passed
-                            if ($curstate->subpatt_index_last[$next->pregleaf->number] > -2) {
+                            if (array_key_exists($next->pregleaf->number, $curstate->subpatt_index_last) && $curstate->subpatt_index_last[$next->pregleaf->number] > -2) {
                                 $length = $curstate->subpatt_index_last[$next->pregleaf->number] - $curstate->subpatt_index_first[$next->pregleaf->number] + 1;
                             } else {
                                 $skip = true;
@@ -190,7 +190,7 @@ class nfa_preg_matcher extends preg_matcher {
                             // save subpattern indexes
                             foreach ($next->subpatt_start as $key=>$subpatt) {
                                 if ($newstate->subpatt_index_first[$key] == -1) {
-                                    $newstate->subpatt_index_first[$key] = $curstate->matchcnt + $length - 1;    // saving to index_first for backreference capturing
+                                    $newstate->subpatt_index_first[$key] = $curstate->matchcnt;    // saving to index_first for backreference capturing
                                 }
                             }
                             foreach ($next->subpatt_end as $key=>$subpatt) {
