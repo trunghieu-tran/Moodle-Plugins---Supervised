@@ -765,6 +765,27 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
+    function data_for_test_backref_alt_in_subpatt() {
+        $test1 = array( 'str'=>'Do hats eat cats?',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>2,1=>-2),
+                        'left'=>array(12),
+                        'next'=>'cbr');
+
+        $test2 = array( 'str'=>'Do cats',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>6),
+                        'index_last'=>array(0=>6,1=>6),
+                        'left'=>array(10),
+                        'next'=>' ');
+
+        return array('regex'=>'Do (?:[cbr]at(s|)) eat (?:[cbr]at\1)\?',
+                     'tests'=>array($test1, $test2));
+    }
+
     function data_for_test_backref_tricky_1() {
         $test1 = array( 'str'=>'abxab',
                         'is_match'=>true,
