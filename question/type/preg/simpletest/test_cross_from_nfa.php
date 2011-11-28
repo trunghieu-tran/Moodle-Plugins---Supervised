@@ -765,7 +765,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_backref_alt_in_subpatt() {
+    function data_for_test_backref_alt_in_subpatt1() {
         $test1 = array( 'str'=>'Do hats eat cats?',
                         'is_match'=>true,
                         'full'=>false,
@@ -783,6 +783,77 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>' ');
 
         return array('regex'=>'Do (?:[cbr]at(s|)) eat (?:[cbr]at\1)\?',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_backref_alt_in_subpatt2() {
+        $test1 = array( 'str'=>'0x',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>0,1=>-2),
+                        'left'=>array(9),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'0as',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>1,1=>-2),
+                        'left'=>array(8),
+                        'next'=>'b');
+
+        $test3 = array( 'str'=>'0defab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>3,1=>-2),
+                        'left'=>array(12),
+                        'next'=>'g');
+
+        return array('regex'=>'0(abc|defghx)[0-9]{3}\1',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_backref_quant_in_subpatt() {
+        $test1 = array( 'str'=>'0x',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>-1),
+                        'index_last'=>array(0=>0,1=>-2),
+                        'left'=>array(13),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'0aaaaaaz',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>1),
+                        'index_last'=>array(0=>6,1=>6),
+                        'left'=>array(9),
+                        'next'=>'0123456789');
+
+        return array('regex'=>'0(a{5,10})[0-9]{3}\1',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_backref_subpatt_modifying() {
+        $test1 = array( 'str'=>'ababba',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>3),
+                        'index_last'=>array(0=>5,1=>5),
+                        'left'=>array(4),
+                        'next'=>'x');
+
+        $test2 = array( 'str'=>'ababbaxbba',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>3),
+                        'index_last'=>array(0=>9,1=>5),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(a|b\1)+x\1',
                      'tests'=>array($test1, $test2));
     }
 
