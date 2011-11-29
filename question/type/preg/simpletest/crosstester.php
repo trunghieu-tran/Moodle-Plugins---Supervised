@@ -145,6 +145,11 @@ class preg_cross_tester extends UnitTestCase {
                 $leftpassed = true;
             }
             $result = $result && $indexfirstpassed && $indexlastpassed && $nextpassed && $leftpassed;
+        } else {
+            $indexfirstpassed = true;
+            $indexlastpassed = true;
+            $nextpassed = true;
+            $leftpassed = true;
         }
         return $result;
     }
