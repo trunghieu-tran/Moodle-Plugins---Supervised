@@ -174,6 +174,27 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_subpatt_quant_nested() {
+        $test1 = array( 'str'=>'12',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>1,2=>-1),
+                        'index_last'=>array(0=>1,1=>1,2=>-2),
+                        'left'=>array(2),
+                        'next'=>'.');
+
+        $test2 = array( 'str'=>'1',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0,2=>-1),    // the quantifier is outside subpatterns 2 and 3 so they are not matched!
+                        'index_last'=>array(0=>0,1=>0,2=>-2),
+                        'left'=>array(2),
+                        'next'=>'.');
+
+        return array('regex'=>'[+\-]?([0-9]+)?\.([0-9]+)',
+                     'tests'=>array($test1, $test2));
+    }
+
     function data_for_test_subpatterns_concatenated() {
         $test1 = array( 'str'=>'_abcdef',
                         'is_match'=>true,
