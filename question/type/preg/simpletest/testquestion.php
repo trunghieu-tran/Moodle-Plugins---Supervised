@@ -18,11 +18,13 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 class qtype_preg_question_test extends UnitTestCase {
 
     protected $testquestion;
+    protected $subpattquestion;
 
     /**
      * Creates a number of questions for testing
      */
     public function setUp() {
+
         //Normal question with hinting on and several answers with different grades
         $regular = new qtype_preg_question;
         $regular->usecase = false;
@@ -72,6 +74,44 @@ class qtype_preg_question_test extends UnitTestCase {
 
         $regular->answers = array($answer100, $answer90, $answer50, $answer0, $answer00);
         $this->testquestion = $regular;
+
+        //Special question to test subpattern capturing and inserting
+        $subpatt = new qtype_preg_question;
+        $subpatt->usecase = false;
+        $subpatt->correctanswer = 'cdefgh';
+        $subpatt->exactmatch = true;
+        $subpatt->usehint = true;
+        $subpatt->penalty = 0.1;
+        $subpatt->hintpenalty = 0.2;
+        $subpatt->hintgradeborder = 0.6;
+        $subpatt->engine = 'nfa_preg_matcher';
+        $subpatt->notation = 'native';
+
+        //Answer where it is possible to not match last subpattern
+        $answer1 = new stdClass;
+        $answer1->id = 200;
+        $answer1->answer = '(ab|cd(ef))gh';
+        $answer1->fraction = 100;
+        $answer1->feedback = '{$0}|{$1}|{$2}';
+
+        //Answer where it is possible to not match first subpattern
+        $answer2 = new stdClass;
+        $answer2->id = 201;
+        $answer2->answer = '(12)|34(56)gh';
+        $answer2->fraction = 100;
+        $answer2->feedback = '{$0}|{$1}|{$2}';
+
+        //Answer where it is possible to not match middle subpattern
+        $answer3 = new stdClass;
+        $answer3->id = 202;
+        $answer3->answer = '(z|y(x))(w)';
+        $answer3->fraction = 100;
+        $answer3->feedback = '{$0}|{$1}|{$2}|{$3}';
+
+        $subpatt->answers = array($answer1, $answer2, $answer3);
+        $this->subpattquestion = $subpatt;
+
+
     }
 
     function test_get_best_fit_answer() {
@@ -123,11 +163,9 @@ class qtype_preg_question_test extends UnitTestCase {
     $this->assertTrue($bestfit['answer']->fraction == 0.5);
     $this->assertTrue($bestfit['match']['is_match'] === true);
     $this->assertTrue($bestfit['match']['full'] === false);
-    //Partial match ends so early there is no difference between 100% and 90%
-    //TODO - The problem is - how left would be calculated for backreference if subpattern wasn't yet matched.... - TODO choose 0.9 or 1 should actually fit there
+    //Partial match ends so early there is no difference between 100% and 90%, 100% should be selected as first
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do hats eat cats?'));
-    //ECHO 'Fraction = '.$bestfit['answer']->fraction.'</br>';
-    $this->assertTrue($bestfit['answer']->fraction == 1 || $bestfit['answer']->fraction == 0.9);
+    $this->assertTrue($bestfit['answer']->fraction == 1);
     $this->assertTrue($bestfit['match']['is_match'] === true);
     $this->assertTrue($bestfit['match']['full'] === false);
 
@@ -209,6 +247,7 @@ class qtype_preg_question_test extends UnitTestCase {
     function test_insert_subpatterns() {
         $testquestion = clone $this->testquestion;
 
+        //All subpattern is matched, or not matched by partial match
         //Test inserting all subpatterns - anything is matched with some string
         $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'Do cats eat bats?'));
         $this->assertTrue($replaced == 'Do cats eat bats?|cats|s|bats');
@@ -218,6 +257,43 @@ class qtype_preg_question_test extends UnitTestCase {
         //Second subpattern doesn't matched at all
         $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'Do frogs eat mice?'));
         $this->assertTrue($replaced == 'Do frogs eat mice?|frogs||mice');
+
+        //////Some subpatterns not matched while full match
+        ////Engine using custom parser
+        $customengine = clone $this->subpattquestion;
+        //Last subpattern isn't captured
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => 'abgh'));
+        $this->assertTrue($replaced == 'abgh|ab|');
+        //First subpattern isn't captured
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '3456gh'));
+        $this->assertTrue($replaced == '3456gh||56');
+        //Middle subpattern isn't captured
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'zw'));
+        $this->assertTrue($replaced == 'zw|z||w');
+        //No match at all - then no string returned
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '*&^%&^'));
+        //ECHO $replaced.'</br>';
+        $this->assertTrue($replaced == '');
+
+        ////Engine using PHP preg_match function
+        $phpengine = clone $this->subpattquestion;
+        $phpengine->engine = 'preg_php_matcher';
+        //Last subpattern isn't captured
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => 'abgh'));
+        ECHO $replaced.'</br>';
+        $this->assertTrue($replaced == 'abgh|ab|');
+        //First subpattern isn't captured
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '3456gh'));
+        $this->assertTrue($replaced == '3456gh||56');
+        //Middle subpattern isn't captured
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'zw'));
+        $this->assertTrue($replaced == 'zw|z||w');
+        //No match at all - then no string returned
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '*&^%&^'));
+        $this->assertTrue($replaced == '');
+        //'(ab|cd(ef))gh'
+        //'(12)|34(56)gh'
+        //'(z|y(x))(w)'
     }
 
 }
