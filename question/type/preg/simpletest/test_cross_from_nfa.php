@@ -178,7 +178,7 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test1 = array( 'str'=>'12',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>1,2=>-1),
+                        'index_first'=>array(0=>0,1=>0,2=>-1),
                         'index_last'=>array(0=>1,1=>1,2=>-2),
                         'left'=>array(2),
                         'next'=>'.');
