@@ -94,7 +94,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
         $feedback = '';
         //If best fit answer is found and there is at least partial match
-        if (isset($bestfit['answer']) && $bestfit['match']['is_match']) {
+        if (isset($bestfit['answer']) && $bestfit['match']['is_match'] && $bestfit['match']['full']) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
                 $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
