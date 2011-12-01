@@ -81,7 +81,7 @@ class test_cross_from_nfa extends preg_cross_tester {
         return array('regex'=>'^abc|def$',
                      'tests'=>array($test1, $test2, $test3));
     }
-
+	
     function data_for_test_assertions_simple_1() {
         $test1 = array( 'str'=>' abc',
                         'is_match'=>true,
@@ -107,10 +107,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(2),
                         'next'=>'abcdefghijklmnopqrstuvwxyz');
 
-        return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
+        return array('regex'=>'^*[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
     }
-
+	
     function data_for_test_assertions_simple_2() {
         $test1 = array( 'str'=>'abc?z',
                         'is_match'=>true,
