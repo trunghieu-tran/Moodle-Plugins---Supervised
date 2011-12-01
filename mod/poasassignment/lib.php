@@ -45,6 +45,12 @@ define('POASASSIGNMENT_UNIQUENESS_GROUPS', 1);
 define('POASASSIGNMENT_UNIQUENESS_GROUPINGS', 2);
 define('POASASSIGNMENT_UNIQUENESS_COURSE', 3);
 
+define('POASASSIGNMENT_CRITERION_OK', 1);
+define('POASASSIGNMENT_CRITERION_CANT_BE_DELETED', 2);
+define('POASASSIGNMENT_CRITERION_CANT_BE_CHANGED', 3);
+define('POASASSIGNMENT_CRITERION_CANT_BE_CREATED', 4);
+
+
 
 require_once(dirname(dirname(dirname(__FILE__))).'/lib/navigationlib.php');
 require_once('model.php');
@@ -60,12 +66,12 @@ require_once('model.php');
  */
 function poasassignment_add_instance($poasassignment) {
     global $DB;
-    $poasassignment->timecreated = time();    
+    $poasassignment->timecreated = time();
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     $poasassignment->id = $poasmodel->add_instance();
     poasassignment_grade_item_update($poasassignment);
     return $poasassignment->id;
-    
+
     $poasmodel = poasassignment_model::get_instance_by_id();
 }
 
@@ -78,9 +84,9 @@ function poasassignment_add_instance($poasassignment) {
  * @return boolean Success/Fail
  */
 function poasassignment_update_instance($poasassignment) {
-    global $DB;    
+    global $DB;
     $poasassignment->timemodified = time();
-    $poasassignment->id = $poasassignment->instance;    
+    $poasassignment->id = $poasassignment->instance;
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     $id = $poasmodel->update_instance();
     poasassignment_grade_item_update($poasassignment);
@@ -97,7 +103,7 @@ function poasassignment_update_instance($poasassignment) {
  */
 function poasassignment_delete_instance($id) {
     global $DB;
-    $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));    
+    $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     poasassignment_grade_item_delete($poasassignment);
     return $poasmodel->delete_instance($id);
@@ -249,7 +255,7 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
-    
+
     require_course_login($course, true, $cm);
 
     /* if ($filearea !== 'content') {
@@ -286,7 +292,7 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
     }
     $file = $fs->get_file_by_hash(sha1($fullpath));
     /* if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-        
+
         $resource = $DB->get_record('resource', array('id'=>$cminfo->instance), 'id, legacyfiles', MUST_EXIST);
        // if ($resource->legacyfiles != RESOURCELIB_LEGACYFILES_ACTIVE) {
            // return false;
@@ -322,7 +328,7 @@ function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
 
     $poasmodel = poasassignment_model::get_instance($poasassignment);
     return($poasmodel->grade_item_update($grades));
-     
+
 }
 
 /**
@@ -352,7 +358,7 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
         $lastattempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
         return $lastattempt->rating;
     }
-    
+
 }
 
 
@@ -363,7 +369,7 @@ function poasassignment_get_user_grades($poasassignment, $userid=0) {
  * @param navigation_node $poasassignmentnode The node to add module settings to
  */
 function poasassignment_extend_settings_navigation(settings_navigation $settings, navigation_node $poasassignmentnode) {
-    
+
 }
 function poasassignment_comment_permissions($comment_param) {
     $return = array('post'=>true, 'view'=>true);
@@ -378,14 +384,14 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
     $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance));
     if($poasassignment) {
         poasassignment_model::get_instance()->cash_instance($poasassignment->id);
-        
+
         foreach (poasassignment_model::$extpages as $pagename => $pagepath) {
             require_once($pagepath);
             $pagetype = $pagename.'_page';
             // If user has ability to view $pagepath - add page on panel
-            //$poasassignment  = $DB->get_record('poasassignment', 
-            //                                   array('id' => $cm->instance), 
-            //                                   '*', 
+            //$poasassignment  = $DB->get_record('poasassignment',
+            //                                   array('id' => $cm->instance),
+            //                                   '*',
             //                                   MUST_EXIST);
             if(!$pagetype::display_in_navbar()) {
                 continue;
@@ -394,7 +400,7 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
             if ($pageinstance->has_ability_to_view()) {
                 $navigation->add(get_string($pagename,'poasassignment'),
                                  new moodle_url('/mod/poasassignment/view.php',
-                                                array('id' => $cm->id, 
+                                                array('id' => $cm->id,
                                                       'page' => $pagename)));
             }
         }

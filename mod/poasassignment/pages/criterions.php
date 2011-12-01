@@ -18,8 +18,18 @@ class criterions_page extends abstract_page {
             $this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
             if($this->mform->get_data()) {
                     $data = $this->mform->get_data();
-                    $poasmodel->save_criterion($data);
-                    redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+                    $result = $poasmodel->save_criterion($data);
+                    if ($result == POASASSIGNMENT_CRITERION_OK) {
+                        //redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+                    }
+                    else {
+                        redirect(new moodle_url('view.php',
+                                                array('id' => $id,
+                                                      'page' => 'criterion_problem',
+                                                      'code' => $result)),
+                                 null,
+                                 0);
+                    }
             }
         }
     }

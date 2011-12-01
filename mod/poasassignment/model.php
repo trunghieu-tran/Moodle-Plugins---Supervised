@@ -530,7 +530,13 @@ class poasassignment_model {
 
     /**
      * Saves criterions into DB
+     *
      * @param $data data from criterions moodleform
+     * @return int POASASSIGNMENT_CRITERION_OK if there was no problem
+     * while saving criterions, else
+     * POASASSIGNMENT_CRITERION_CANT_BE_DELETED or
+     * POASASSIGNMENT_CRITERION_CANT_BE_CHANGED or
+     * POASASSIGNMENT_CRITERION_CANT_BE_CREATED
      */
     function save_criterion($data) {
         global $DB;
@@ -552,22 +558,28 @@ class poasassignment_model {
             $recordisempty = $rec->name == '';
             $recordisempty = $recordisempty && $rec->description == '';
             $recordisempty = $recordisempty && $rec->weight == '';
-
             if ($recordisempty) {
                 if ($data->criterionid[$i] !== -1)
                     $DB->delete_records('poasassignment_criterions',
                                         array('id' => $data->criterionid[$i]));
             }
             else {
-                if ($data->criterionid[$i] === -1) {
-                    $DB->insert_record('poasassignment_criterions', $rec);
+                if ($data->criterionid[$i] == -1) {
+                    if ($this->instance_has_rated_attempts()) {
+                        return POASASSIGNMENT_CRITERION_CANT_BE_CREATED;
+                    }
+                    else {
+                        $DB->insert_record('poasassignment_criterions', $rec);
+                    }
                 }
                 else {
                     $rec->id = $data->criterionid[$i];
                     $DB->update_record('poasassignment_criterions', $rec);
                 }
             }
+
         }
+        return POASASSIGNMENT_CRITERION_OK;
     }
 
     function get_rating_data($assigneeid) {
@@ -1467,5 +1479,35 @@ class poasassignment_model {
 		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? AND ratingdate > 0 ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
 		return $rec;
 	}
+
+    /**
+     * Looks for any rated attempt
+     *
+     * @return boolean true, if instance has no rated attempts, else false
+     */
+    public function instance_has_rated_attempts() {
+        global $DB;
+        $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
+        if ($assignees) {
+            foreach ($assignees as $assignee) {
+                $attempts = $DB->get_records('poasassignment_attempts',array('assigneeid' => $assignee->id));
+                if ($attempts)
+                {
+                    foreach ($attempts as $attempt) {
+                        if ($DB->get_records('poasassignment_rating_values',array('attemptid' => $attempt->id))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        else {
+            return false;
+        }
+    }
 }
 
