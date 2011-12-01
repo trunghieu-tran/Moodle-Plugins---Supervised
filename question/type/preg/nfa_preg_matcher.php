@@ -136,17 +136,29 @@ class nfa_preg_matcher extends preg_matcher {
      * checks if new result is better than old result
      * @param oldres - old result, an object of preg_nfa_processing_state
      * @param newres - new result, an object of preg_nfa_processing_state
+     * @param strict - if true, old result is replaced by a new result with the same match length
      * @return - true if new result is more suitable
      */
-    public function is_new_result_more_suitable(&$oldres, &$newres) {
-        if (($newres->isfullmatch && !$oldres->isfullmatch) ||                                             // new match is full
-            ($oldres->isfullmatch == $newres->isfullmatch && $newres->matchcnt > $oldres->matchcnt) ||     // both of results have the same 'fullness' but new match is longer
-            ($oldres->isfullmatch == $newres->isfullmatch && $newres->matchcnt == $oldres->matchcnt && $this->count_subpattends_captured($newres) >= $this->count_subpattends_captured($oldres)) /*|| // same length but more subpatterns captured
-            ($newres->isfullmatch && $oldres->isfullmatch && $newres->matchcnt >= $oldres->matchcnt)*/) {    // new match is full and longer
-            return true;
+    public function is_new_result_more_suitable(&$oldres, &$newres, $strict = true) {
+        $result = $newres->ismatch && !$oldres->ismatch;
+        $result |= $newres->isfullmatch && !$oldres->isfullmatch;
+        if ($strict) {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // both of results have the same 'fullness' but new match is longer
+                        $newres->matchcnt > $oldres->matchcnt);    
         } else {
-            return false;
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&
+                        $newres->matchcnt >= $oldres->matchcnt);    
         }
+        if ($strict) {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // same length but more subpatterns captured
+                        $newres->matchcnt == $oldres->matchcnt &&
+                        $this->count_subpattends_captured($newres) > $this->count_subpattends_captured($oldres));
+        } else {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // same length but more subpatterns captured
+                        $newres->matchcnt == $oldres->matchcnt &&
+                        $this->count_subpattends_captured($newres) >= $this->count_subpattends_captured($oldres));
+        }
+        return $result;
     }
 
     /**
@@ -158,7 +170,7 @@ class nfa_preg_matcher extends preg_matcher {
      */
     public function determine_characters_left($str, $startpos, $laststate) {
         $curstates = array();    // states which the automaton is in
-        $results = array();      // different paths to the end state
+        $result = null;
         if ($laststate->backrefmatchlen == 0) {
             array_push($curstates, $laststate);
         } else {
@@ -174,8 +186,8 @@ class nfa_preg_matcher extends preg_matcher {
             $newstates = array();
             while (count($curstates) != 0) {
                 $curstate = array_pop($curstates);
-                if ($curstate->state === $this->automaton->endstate) {
-                    $results[] = $curstate;
+                if ($curstate->state === $this->automaton->endstate && $curstate->next !== '' && ($result === null || ($result !== null && $result->matchcnt > $curstate->matchcnt))) {
+                    $result = $curstate;
                 } else {
                     foreach ($curstate->state->next as $next) {
                         if (!$next->loops) {
@@ -190,10 +202,17 @@ class nfa_preg_matcher extends preg_matcher {
                             } else {
                                 $length = $next->pregleaf->consumes();
                             }
+                            // check for length
                             if (!$skip) {
                                 $newstate = new preg_nfa_processing_state($next->state, $curstate->matchcnt + $length, $curstate->ismatch, false, $curstate->next,
-                                                                 $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
-                                                                 $curstate->firsttransition, null, 0);
+                                                                     $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
+                                                                     $curstate->firsttransition, null, 0);
+                                if ($result !== null && $newstate->matchcnt > $result->matchcnt) {
+                                    $skip = true;
+                                }
+                            }
+                            if (!$skip) {
+                                // generate a next character
                                 if ($newstate->firsttransition == null && ($next->pregleaf->consumes() || is_a($next->pregleaf, 'preg_leaf_backref'))) {
                                     $newstate->firsttransition = $next;
                                     $newstate->next = $newstate->firsttransition->pregleaf->next_character($str, $startpos + $laststate->matchcnt, $laststate->backrefmatchlen);
@@ -227,12 +246,6 @@ class nfa_preg_matcher extends preg_matcher {
             }
             $newstates = array();
         }
-        $result = null;
-        foreach ($results as $curres) {
-            if ($result === null || $result->matchcnt > $curres->matchcnt || ($result->next ==='' && $curres->next !== '')) {
-                $result = $curres;
-            }
-        }
         return $result;
     }
 
@@ -260,6 +273,7 @@ class nfa_preg_matcher extends preg_matcher {
                 // get the current state
                 $curstate = array_pop($curstates);
                 // saving the result
+                $curstate->ismatch |= $curstate->state !== $this->automaton->startstate;
                 if ($curstate->state === $this->automaton->endstate) {
                     $curstate->isfullmatch = true;
                 }
@@ -368,7 +382,7 @@ class nfa_preg_matcher extends preg_matcher {
         // match from all indexes
         for ($j = 0; $j <= $len && !$result->isfullmatch; $j++) {
             $tmp = $this->match_from_pos($str, $j);
-            if ($this->is_new_result_more_suitable(&$result, &$tmp)) {
+            if ($this->is_new_result_more_suitable(&$result, &$tmp, false)) {
                 $result = $tmp;
                 $startpos = $j;
             }
