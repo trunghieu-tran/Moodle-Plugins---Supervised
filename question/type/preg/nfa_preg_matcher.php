@@ -273,7 +273,9 @@ class nfa_preg_matcher extends preg_matcher {
                 // get the current state
                 $curstate = array_pop($curstates);
                 // saving the result
-                $curstate->ismatch |= $curstate->state !== $this->automaton->startstate;
+                if ($curstate->state !== $this->automaton->startstate) {
+                    $curstate->ismatch = true;
+                }
                 if ($curstate->state === $this->automaton->endstate) {
                     $curstate->isfullmatch = true;
                 }
