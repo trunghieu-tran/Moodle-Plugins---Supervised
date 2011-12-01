@@ -155,7 +155,7 @@ $string['gradedate'] = 'Grade date';
 $string['attemptnumber'] = 'Attempt number';
 $string['oldfeedback'] = 'Not actual';
 $string['outdated'] = 'Outdated';
-$string['view_help'] = 'On this page you can see the most important information about your task. 
+$string['view_help'] = 'On this page you can see the most important information about your task.
 You can see critical dates.';
 $string['submissions_help'] = 'On this page you can grade student works';
 $string['tasks_help'] = 'On this page you can manage assignment tasks';
@@ -268,3 +268,5 @@ $string['attempthaspenalty'] = 'Attempt has penalty';
 $string['attempttotalpenalty'] = 'Penalty for the attempt';
 $string['noattemptsshort'] = 'No attempts';
 $string['leavecomment'] = 'Leave comment';
+$string['errornoweightnumeric'] = 'Must be numeric';
+$string['nocriterions'] = 'No criterions';

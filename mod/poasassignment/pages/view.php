@@ -21,7 +21,7 @@ class view_page extends abstract_page {
         // Show submission statistics if user has capability
         if (has_capability('mod/poasassignment:grade', $this->context))
             echo '<div align="right">'.$poasmodel->get_statistics().'</div>';
-        
+
         // Show poasassignment intro
         $this->view_intro();
 
@@ -35,7 +35,7 @@ class view_page extends abstract_page {
         $this->view_testresult();
         $this->view_answer_block();
     }
-    
+
     /** Show task status
      *
      *  Draws box with information about student task only if individual tasks
@@ -60,12 +60,12 @@ class view_page extends abstract_page {
                     echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
                     // Show link to the task
-                    $taskurl = new moodle_url('view.php', 
-											  array('page' => 'taskview', 
-													'taskid' => $assignee->taskid, 
+                    $taskurl = new moodle_url('view.php',
+											  array('page' => 'taskview',
+													'taskid' => $assignee->taskid,
 													'id' => $this->cm->id,
-													'from' => 'view'), 
-											  'v', 
+													'from' => 'view'),
+											  'v',
 											  'get');
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
@@ -82,10 +82,10 @@ class view_page extends abstract_page {
                     }
                     if(!empty($this->poasassignment->deadline)) {
                         echo '<br><br>';
-                        echo '<b>' . 
-                        get_string('timetocompletetask', 'poasassignment') . 
+                        echo '<b>' .
+                        get_string('timetocompletetask', 'poasassignment') .
                         ': ' .
-                        format_time(time() - $this->poasassignment->deadline) . 
+                        poasassignment_model::time_difference($this->poasassignment->deadline) .
                         '</b>';
                     }
                 }
@@ -97,10 +97,10 @@ class view_page extends abstract_page {
                 echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
                 if(!empty($this->poasassignment->choicedate) && time() < $this->poasassignment->choicedate) {
                     echo '<br><br>';
-                    echo '<b>' . 
-                        get_string('timetochoosetask', 'poasassignment') . 
+                    echo '<b>' .
+                        get_string('timetochoosetask', 'poasassignment') .
                         ': ' .
-                        format_time(time() - $this->poasassignment->choicedate) . 
+                        poasassignment_model::time_difference($this->poasassignment->choicedate) .
                         '</b>';
                 }
             }
@@ -130,7 +130,7 @@ class view_page extends abstract_page {
             }
             if (!empty($this->poasassignment->choicedate)) {
                 echo '<tr><td class="c0">'.get_string('selectbefore','poasassignment').'</td>';
-                echo '<td class="c1">' 
+                echo '<td class="c1">'
 						. userdate($this->poasassignment->choicedate)
 						. ' ('
 						. poasassignment_model::time_difference($this->poasassignment->choicedate)
@@ -138,11 +138,11 @@ class view_page extends abstract_page {
             }
             if (!empty($this->poasassignment->deadline)) {
                 echo '<tr><td class="c0">'.get_string('deadline','poasassignment').'</td>';
-				echo '<td class="c1">' 
+				echo '<td class="c1">'
 						. userdate($this->poasassignment->deadline)
 						. ' ('
 						. poasassignment_model::time_difference($this->poasassignment->deadline)
-						. ')</td></tr>';				
+						. ')</td></tr>';
             }
             echo '</table>';
             echo $OUTPUT->box_end();
@@ -153,7 +153,7 @@ class view_page extends abstract_page {
         if($assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
                                                                         'userid'=>$USER->id))) {
             if($lastattempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid))) {
-                
+
             }
         }
     }
@@ -162,15 +162,15 @@ class view_page extends abstract_page {
     function view_feedback() {
         //$this->view_feedback_optimized();
         //return;
-        
+
         global $OUTPUT,$DB,$USER;
-        
+
         if(!$assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
                                                                             'userid'=>$USER->id)))
-            return;        
+            return;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
-        
-        
+
+
         $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
         $plugins=$poasmodel->get_plugins();
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
@@ -180,7 +180,7 @@ class view_page extends abstract_page {
         foreach($attempts as $attempt) {
             if(!$attempt->ratingdate) {
                 continue;
-            }			
+            }
 			echo $OUTPUT->box_start();
 			echo $OUTPUT->heading(get_string('lastgraded','poasassignment'));
 			$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
@@ -189,9 +189,9 @@ class view_page extends abstract_page {
 			attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
             echo $OUTPUT->box_end();
             break;
-        }                      
+        }
     }
-    
+
     function view_testresult() {
         global $DB, $OUTPUT, $USER;
         $poasmodel = poasassignment_model::get_instance();
@@ -200,9 +200,9 @@ class view_page extends abstract_page {
         if(!$assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
                                                                             'userid'=>$USER->id)))
             return;
-        
+
         $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
-        
+
         foreach ($attempts as $attempt) {
             // ask grader if student have test results
             if(!$poasmodel->have_test_results($attempt)) {
@@ -217,7 +217,7 @@ class view_page extends abstract_page {
                 break;
             }
         }
-        
+
     }
     function view_answer_block() {
 		$poasmodel=poasassignment_model::get_instance();
@@ -238,7 +238,7 @@ class view_page extends abstract_page {
 					$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
 					echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
 					echo attempts_page::show_attempt($attempt, $hascap);
-                    
+
                     /* If student has several attempts and hasn't final grade */
                     if($this->poasassignment->flags&SEVERAL_ATTEMPTS && $poasmodel->assignee->finalized!=1) {
                         if(!$attempt->final || ($attempt->final  && $attempt->rating!=null ))
@@ -280,7 +280,7 @@ class view_page extends abstract_page {
                 echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$this->cm->id, 'page' => 'submission')),get_string('addsubmission','poasassignment'));
                 echo '</div>';
             }
-            
+
         }
     }
 }

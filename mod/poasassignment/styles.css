@@ -10,10 +10,14 @@
 .poasassignment-table .header { background: none repeat scroll 0 0 #f6f6f6; font-weight:bold;}
 .poasassignment-table .header,
 .poasassignment-table td{border: 1px solid #ddd;}
-.poasassignment-table .critical {color:red};
+.poasassignment-table .critical {color:red}
+
 #citerions-table td {border: 1px solid #ddd;}
 #criterions-table .c0 {text-align:right; font-weight:bold; background: #f6f6f6;}
 
+p.no-info-message {text-align: center;}
+
+#page-mod-poasassignment-view input[type=submit] {padding: 2px 4px}
 /*#page-mod-poasassignment-view .region-content .no-overflow {overflow:inherit;}*/
 
 /*.buttons .singlebutton{}
