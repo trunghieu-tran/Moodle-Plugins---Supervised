@@ -75,7 +75,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>array(0),
+                        'left'=>array(10000000),
                         'next'=>'');
 
         return array('regex'=>'^abc|def$',
@@ -259,13 +259,21 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
-                        'index_last'=>array(0=>2,1=>2,2=>2,3=>2,4=>2),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
+                        'index_last'=>array(0=>2,1=>2,2=>0,3=>1,4=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'abcabc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>3,2=>3,3=>4,4=>5),
+                        'index_last'=>array(0=>5,1=>5,2=>3,3=>4,4=>5),
                         'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(([a*]|\b)([b*]|\b)([c*]|\b))+',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_questquant() {
@@ -319,7 +327,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>array(0),
+                        'left'=>array(10000000),
                         'next'=>'');
 
         return array('regex'=>'^a[^b]cd$',
@@ -377,7 +385,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>array(1),    // !!!
+                        'left'=>array(3),    // greedy quantifier
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
