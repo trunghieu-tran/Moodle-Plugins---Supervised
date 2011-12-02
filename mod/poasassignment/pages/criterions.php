@@ -20,12 +20,12 @@ class criterions_page extends abstract_page {
                     $data = $this->mform->get_data();
                     $result = $poasmodel->save_criterion($data);
                     if ($result == POASASSIGNMENT_CRITERION_OK) {
-                        //redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+                        redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
                     }
                     else {
                         redirect(new moodle_url('view.php',
                                                 array('id' => $id,
-                                                      'page' => 'criterion_problem',
+                                                      'page' => 'criterionproblem',
                                                       'code' => $result)),
                                  null,
                                  0);

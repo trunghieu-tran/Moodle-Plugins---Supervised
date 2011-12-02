@@ -65,7 +65,7 @@ class poasassignment_tabbed_page {
         $pagetype = $this->currentpage . "_page";
         $model = poasassignment_model::get_instance();
 		
-		// Ïğîâåğêà ñòàíäàğòíîé capability íà ïğîñìîòğ ìîäóëÿ
+		// ĞŸÑ€Ğ¾Ğ²ĞµÑ€ĞºĞ° ÑÑ‚Ğ°Ğ½Ğ´Ğ°Ñ€Ñ‚Ğ½Ğ¾Ğ¹ capability Ğ½Ğ° Ğ¿Ñ€Ğ¾ÑĞ¼Ğ¾Ñ‚Ñ€ Ğ¼Ğ¾Ğ´ÑƒĞ»Ñ
         require_capability('mod/poasassignment:view', $model->get_context());
 		
         // Check available date or students
