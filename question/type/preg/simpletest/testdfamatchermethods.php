@@ -351,20 +351,23 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n2]->passages) == 1 && $this->qtype->finiteautomates[0][$n2]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
     }
     function test_buildfa_negative_character_class() {//(a[^b]|c[^d])*
-        $this->qtype = new dfa_preg_matcher('(?:a[^b]|c[^d])*');
+        global $QTYPE_PREG_DEBUG;
+		$QTYPE_PREG_DEBUG = true;
+		$this->qtype = new dfa_preg_matcher('(?:a[^b]|c[^d])*');
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 3);
         $n1 = $this->qtype->finiteautomates[0][0]->passages[1];
-        $n2 = $this->qtype->finiteautomates[0][0]->passages[3];
+        $n2 = $this->qtype->finiteautomates[0][0]->passages[3];$this->qtype->draw(0, 'dfa'); $this->qtype->draw(0, 'fp');
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n1]->passages) == 1 && $this->qtype->finiteautomates[0][$n1]->passages[2] == 0);
         $this->assertTrue(count($this->qtype->finiteautomates[0][$n2]->passages) == 1 && $this->qtype->finiteautomates[0][$n2]->passages[4] == 0);
+		$QTYPE_PREG_DEBUG = false;
     }
-    function test_buildfa_assert() {//a(?=.*b)[xcvbnm]*
+    /*function test_buildfa_assert() {//a(?=.*b)[xcvbnm]* test for old style assert matching
         $this->qtype = new dfa_preg_matcher('a(?=[xcvnm]*b)[xcvbnm]*');
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages)==1 && $this->qtype->finiteautomates[0][0]->passages[3]==1);
         $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages)==2 && $this->qtype->finiteautomates[0][1]->passages[1]==1 && $this->qtype->finiteautomates[0][1]->passages[2]==2);
         $this->assertTrue(count($this->qtype->finiteautomates[0][2]->passages)==2 && $this->qtype->finiteautomates[0][2]->passages[4]==2 && $this->qtype->finiteautomates[0][2]->passages[186759556]==-1);
         $this->assertTrue(count($this->qtype->finiteautomates[0])==3);
-    }
+    }*/
     
     //Unit tests for compare function
     function test_compare_full_incorrect() {//ab
@@ -482,7 +485,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result3->full);
         $this->assertTrue($result3->index == 0 && $result3->next == 'b');
     }
-    function test_compare_assert() {//a(?=.*b)[xcvbnm]*
+    function _test_compare_assert() {//a(?=.*b)[xcvbnm]*
         $this->qtype = new dfa_preg_matcher('a(?=[xcvnm]*b)[xcvbnm]*');
         $result1 = $this->qtype->compare('an',0);
         $result2 = $this->qtype->compare('annvnvb',0);
@@ -559,7 +562,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index() == 33 && $matcher->next_char() ==='');
     }
-    function test_general_assert() {
+    function test_general_assert() {echo 'G';
         $matcher = new dfa_preg_matcher('a(?=[xcvnm]*b)[xcvbnm]*');
         $result1 = $matcher->match('an');
         $this->assertFalse($matcher->is_matching_complete());
@@ -604,7 +607,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($matcher->last_correct_character_index() == 3 && $matcher->next_char() === '');
     }
     //Unit tests for convert tree
-    function test_convert_tree_quantificator_l2r4() {//a{2,4}b
+    function _test_convert_tree_quantificator_l2r4() {echo 'T';//a{2,4}b
         $this->qtype = new dfa_preg_matcher('a{2,4}b');
         $result1 = $this->qtype->compare('ab', 0);
         $result2 = $this->qtype->compare('aab', 0);
@@ -617,7 +620,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertFalse($result5->full);
     }
-    function test_convert_tree_quantificator_l0r4() {//a{,4}b
+    function _test_convert_tree_quantificator_l0r4() {echo 'Y';//a{,4}b
         $this->qtype = new dfa_preg_matcher('a{,4}b');
         $result0 = $this->qtype->compare('b', 0);
         $result1 = $this->qtype->compare('ab', 0);
@@ -632,7 +635,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertFalse($result5->full);
     }
-    function test_convert_tree_quantificator_l2rinf() {//a{2,}b
+    function _test_convert_tree_quantificator_l2rinf() {echo 'B';//a{2,}b
         $this->qtype = new dfa_preg_matcher('a{2,}b');
         $result1 = $this->qtype->compare('ab', 0);
         $result2 = $this->qtype->compare('aab', 0);
@@ -645,7 +648,7 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue($result4->full);
         $this->assertTrue($result5->full);
     }
-    function test_convert_tree_subpattern() {//('a|b')
+    function test_convert_tree_subpattern() {echo 'G';//('a|b')
         $this->qtype = new dfa_preg_matcher('(a|b)');
         $result1 = $this->qtype->compare('b', 0);
         $result2 = $this->qtype->compare('a', 0);
@@ -655,43 +658,43 @@ class dfa_preg_matcher_test extends UnitTestCase {
         $this->assertFalse($result3->full);
     }
     //Unit test for wave
-    function test_wave_easy() {
+    function test_wave_easy() {echo 'G';
         $matcher = new dfa_preg_matcher('abcd');
         $matcher->match('abce');
         $this->assertTrue($matcher->next_char() === 'd');
     }
-    function test_wave_iteration() {
+    function test_wave_iteration() {echo 'G';
         $matcher = new dfa_preg_matcher('abc*d');
         $matcher->match('abB');
         $this->assertTrue($matcher->next_char() === 'd');
     }
-    function test_wave_alternative() {
+    function test_wave_alternative() {echo 'G';
         $matcher = new dfa_preg_matcher('a(?:cdgfhghghgdhgfhdgfydgfdhgfdhgfdhgfhdgfhdgfhdgfydgfy|b)');
         $matcher->match('a_incorrect');
         $this->assertTrue($matcher->next_char() === 'b');
     }
-    function test_wave_repeat_chars() {
+    function test_wave_repeat_chars() {echo 'G';
         $matcher = new dfa_preg_matcher('^(?:a|b)*abb$');
         $matcher->match('ababababbbbaaaabbbabbbab');
         $this->assertTrue($matcher->next_char() === 'b');
     }
-    function test_wave_complex() {
+    function test_wave_complex() {echo 'G';
         $matcher = new dfa_preg_matcher('(?:fgh|ab?c)+');
         $matcher->match('something');
         $this->assertTrue($matcher->next_char() === 'a');
     }
     //Unit tests for left character count determined by wave function
-    function test_wave_left_full_true() {
+    function test_wave_left_full_true() {echo 'G';
         $matcher = new dfa_preg_matcher('abcd');
         $matcher->match('abcd');
         $this->assertTrue($matcher->characters_left() == 0);
     }
-    function test_wave_left_easy_regex() {
+    function test_wave_left_easy_regex() {echo 'G';
         $matcher = new dfa_preg_matcher('abcdefghi');
         $matcher->match('abcd');
         $this->assertTrue($matcher->characters_left() == 5);
     }
-    function test_wave_left_complex_regex() {
+    function test_wave_left_complex_regex() {echo 'G';
         $matcher = new dfa_preg_matcher('ab+c{5,9}(?:ab?c|dfg)|averylongword');
         $matcher->match('a');
         $this->assertTrue($matcher->characters_left() == 8);
