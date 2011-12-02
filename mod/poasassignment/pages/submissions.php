@@ -150,7 +150,7 @@ class submissions_page extends abstract_page {
 						}
 					}
 					else {
-						// Если нет оценки но есть дата - это был черновик
+						// Р•СЃР»Рё РЅРµС‚ РѕС†РµРЅРєРё РЅРѕ РµСЃС‚СЊ РґР°С‚Р° - СЌС‚Рѕ Р±С‹Р» С‡РµСЂРЅРѕРІРёРє
 						$row[] = get_string('draft','poasassignment') 
 								 . ' ' 
 								 . html_writer::link($gradeurl, get_string('leavecomment', 'poasassignment'));

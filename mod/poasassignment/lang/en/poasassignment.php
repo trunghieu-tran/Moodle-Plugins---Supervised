@@ -270,3 +270,16 @@ $string['noattemptsshort'] = 'No attempts';
 $string['leavecomment'] = 'Leave comment';
 $string['errornoweightnumeric'] = 'Must be numeric';
 $string['nocriterions'] = 'No criterions';
+$string['criterionproblem'] = 'Resolving problems with criterions';
+$string['criterionproblem_help'] = 'On the page you can resolve problems with criterions:
+
+* creating new criterion
+* deleting existing criterion
+* changing weight of the criterion';
+$string['criterioncantbecreated'] = 'Criterion can\'t be created, because following students have grades';
+$string['unknowncriterionerror'] = 'Unknown critreion managing error';
+$string['putzero'] = 'Put 0';
+$string['putmax'] = 'Put 100';
+$string['puttotal'] = 'Put total';
+$string['putcustom'] = 'Put custom';
+$string['createcriterions'] = 'Create criterions';

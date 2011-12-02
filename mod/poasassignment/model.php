@@ -64,7 +64,8 @@ class poasassignment_model {
                                     'submission' => 'pages/submission.php',
                                     'taskfieldedit' => 'pages/taskfieldedit.php',
                                     'categoryedit' => 'pages/categoryedit.php',
-                                    'taskedit' => 'pages/taskedit.php'
+                                    'taskedit' => 'pages/taskedit.php',
+                                    'criterionproblem' => 'pages/criterionproblem.php'
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
@@ -1509,5 +1510,24 @@ class poasassignment_model {
             return false;
         }
     }
-}
 
+    /**
+     * Get students with graded attempts in the instance
+     *
+     * @return array of students or null
+     */
+    public function get_criterion_problem_students() {
+        global $DB;
+        $id = $this->poasassignment->id;
+        $sql = "SELECT st.id, st.userid, att.id, att.rating
+                FROM {poasassignment_assignee} st
+                JOIN {poasassignment_attempts} att
+                    ON  att.id = st.lastattemptid
+                WHERE   st.poasassignmentid = $id";
+        $students = $DB->get_records_sql($sql);
+        if ($students)
+            return $students;
+        else
+            return null;
+    }
+}
