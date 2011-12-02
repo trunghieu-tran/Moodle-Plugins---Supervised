@@ -189,6 +189,7 @@ class dfa_preg_matcher extends preg_matcher {
     *   1)index - index of last matching character (integer)
     *   2)full  - fullnes of matching (boolean)
     *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
+	*   If matching is impossible, return bool(false)
     */
     function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
@@ -202,6 +203,7 @@ class dfa_preg_matcher extends preg_matcher {
         $substringmatch->full = false;
         $substringmatch->index = -1;
         $acceptedcharcount = -1;
+		$laststates = array();//array of states without changing index
         if (strpos($this->modifiers, 'i') === false) {
             $casesens=true;
         } else {
@@ -214,6 +216,8 @@ class dfa_preg_matcher extends preg_matcher {
         */
             $maybeend = false;
             $found = false;//current character no accepted to fa yet
+			$afound = false;
+			$akey = false;
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             //finding leaf with this character
@@ -225,10 +229,19 @@ class dfa_preg_matcher extends preg_matcher {
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
                     $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length, $casesens);
                 }
+				if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+					$afound = true;
+					$akey = $key;
+					$found  = false;
+				}
                 if (!$found) {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 }
             }
+			if (!$found && $afound) {
+				$found = true;
+				$key = $akey;
+			}
             if ($found) {
                 $foundkey = $key;
             }
@@ -254,6 +267,16 @@ class dfa_preg_matcher extends preg_matcher {
             if ($found) { //if finite automate did accept this character
                 $correct = true;
                 if ($foundkey != dfa_preg_leaf_meta::ENDREG) {// if finite automate go to not end state
+					if ($length == 0) {
+						foreach ($laststates as $state) {
+							if ($state == $currentstate) {
+								return false;
+							}
+						}
+						$laststates[] = $currentstate;
+					} else {
+						$laststates = array();
+					}
                     $currentstate = $this->finiteautomates[$assertnumber][$currentstate]->passages[$key];
                     $end = false;
                 } else { 
@@ -309,7 +332,15 @@ class dfa_preg_matcher extends preg_matcher {
         $i = 0;
         $left = 1;
         foreach ($this->finiteautomates[$assertnum][$current]->passages as $key => $passage) {
-            if ($passage == -1) {
+            $endafterassert = false;
+			if ($this->connection[$assertnum][$key]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+				foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
+					if ($secondpass == -1) {
+						$endafterassert = true;
+					}
+				}
+			}
+			if ($passage == -1 || $endafterassert) {
                 $res = new stdClass;
                 $res->nextkey = $key;
                 $res->left = 0;
@@ -318,21 +349,45 @@ class dfa_preg_matcher extends preg_matcher {
             $front[$i] = new stdClass;
             $front[$i]->charnum = $key;
             $front[$i]->currentstep[] = $passage;
+			$front[$i]->assertinpath = 0;
             $i++;
         }
         $found = false;
+		$counter = 0;
         while (!$found) {//while not found way to end state
             foreach ($front as $i => $curr) {//for each start char and it's subfront
+				if ($counter > 10000) {
+					//TODO set wave error flag!
+					$res = new stdClass;
+					$res->nextkey = 1;
+					$res->left = 0;
+					return $res;
+					return new stdClass;
+				} else {
+					$counter++;
+				}
                 foreach ($curr->currentstep as $step) {//for all state if current subfront
-                    foreach ($this->finiteautomates[$assertnum][$step]->passages as $passage) {//for all passage in this state
-                        if ($passage != $step) {//if passage not to self
-                            if ($passage == -1) {//if passage to end state
-                                $found = true;
-                                $result = new stdClass;
-                                $result->left = $left;
-                                $result->nextkey = $front[$i]->charnum;
+                    foreach ($this->finiteautomates[$assertnum][$step]->passages as $passkey => $passage) {//for all passage in this state
+						if ($passage != $step) {//if passage not to self
+							$endafterassert = false;
+							if ($this->connection[$assertnum][$passkey]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+								foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
+									if ($secondpass == -1) {
+										$endafterassert = true;
+									}
+								}
+							}
+                            if ($passage == -1 || $endafterassert) {//if passage to end state
+								$found = true;
+								$result = new stdClass;
+								$result->left = $left - $front[$i]->assertinpath;
+								$result->nextkey = $front[$i]->charnum;
                                 return $result;
-                            } else {
+                            } else if ($this->connection[$assertnum][$passkey]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+								foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
+									$front[$i]->nextstep[] = $secondpass;
+								}
+							} else {
                                 $front[$i]->nextstep[] = $passage;
                             }
                         }
@@ -472,7 +527,22 @@ class dfa_preg_matcher extends preg_matcher {
                     array_push($equnum, $num);
                 }
             }
-        }
+        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
+			foreach ($this->connection[$index] as $num => $cc) {
+				$cmpop = true;
+				if ($cc->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
+					if ($cc->pregnode->childs[0]->type != $this->connection[$index][$number]->pregnode->childs[1]->type ||
+						$cc->pregnode->childs[0]->subtype != $this->connection[$index][$number]->pregnode->childs[1]->subtype ||
+						$cc->pregnode->childs[0]->negative != $this->connection[$index][$number]->pregnode->childs[1]->negative ||
+						$cc->pregnode->childs[0]->type == preg_node::TYPE_LEAF_CHARSET && $cc->pregnode->childs[0]->charset != $this->connection[$index][$number]->pregnode->childs[1]->charset) {
+							$cmpop = false;
+					}
+				}
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_COMBO && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
+                    array_push($equnum, $num);
+                }
+            }
+		}
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
             dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
@@ -549,6 +619,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->roots[0]->firstpos();
         $this->roots[0]->lastpos();
         $this->roots[0]->followpos($this->map[0]);
+		$this->split_leafs(0);
         $this->roots[0]->find_asserts($this->roots);
         foreach ($this->roots as $key => $value) {
             if ($key!=0) {
@@ -560,6 +631,7 @@ class dfa_preg_matcher extends preg_matcher {
                 $this->roots[$key]->firstpos();
                 $this->roots[$key]->lastpos();
                 $this->roots[$key]->followpos($this->map[$key]);
+				$this->split_leafs($key);
                 $this->merge_fp_maps($key);
             }
         }
@@ -567,6 +639,301 @@ class dfa_preg_matcher extends preg_matcher {
         $this->built = true;
         return;
     }
+	/**
+	* Function merge simple assert in map of character following
+	* @param $num number of map for merging simple asserts
+	*/
+	protected function split_leafs($num) {
+		foreach ($this->map[$num] as $prev => $arrnext) {
+			foreach ($arrnext as $i => $first) {
+				foreach ($arrnext as $j => $second) {
+					if (self::is_leafs_part_match($this->connection[$num][$first], $this->connection[$num][$second]) && isset($this->map[$num][$first]) && isset($this->map[$num][$second])) {
+						$arrres = $this->get_unequ_leafs($this->connection[$num][$first], $this->connection[$num][$second]);//get unique or equivalent leaf, but not partial equivalent with diff
+						$firstnexts = $this->map[$num][$first];
+						$secondnexts = $this->map[$num][$second];
+						unset ($this->map[$num][$i]);
+						unset ($this->map[$num][$j]);
+						foreach ($arrres as $key => $newleaf) {
+							$arrresnumbers[$key] = $this->save_new_leaf($num, $newleaf);
+						}
+						$this->map[$num][$arrresnumbers[0]] = $firstnexts;
+						$this->map[$num][$arrresnumbers[1]] = $firstnexts;
+						$this->map[$num][$arrresnumbers[2]] = $secondnexts;
+						$this->map[$num][$arrresnumbers[3]] = $secondnexts;
+						$this->replace_num_in_map($num, $first, $arrresnumbers[0], $arrresnumbers[1]);
+						$this->replace_num_in_map($num, $second, $arrresnumbers[2], $arrresnumbers[3]);
+					}
+				}
+			}
+		}
+		foreach ($this->map[$num] as $prev => $arrnext) {
+			if (!is_array($arrnext))
+				$this->map[$num][$prev] = array();
+		}
+	}
+	/**
+	* Function verify is two leaf partial match
+	* partial match mean, that not equivalent, but can match with one character
+	* @param $first first leaf
+	* @param $second second leaf
+	* @return is partial match
+	*/
+	static protected function is_leafs_part_match($first, $second) {
+		if ($first->pregnode->type == preg_node::TYPE_LEAF_ASSERT || $second->pregnode->type == preg_node::TYPE_LEAF_ASSERT ||
+			$first->pregnode->type == preg_node::TYPE_NODE_ASSERT || $second->pregnode->type == preg_node::TYPE_NODE_ASSERT) {
+			return false;
+		} elseif ($first->pregnode->type == preg_node::TYPE_LEAF_META && $second->pregnode->type == preg_node::TYPE_LEAF_META) {
+			return $first->pregnode->subtype != $second->pregnode->subtype;
+		} elseif ($first->pregnode->type == preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+			if ($first->pregnode->negative && $second->pregnode->negative) {
+				return $first->pregnode->charset != $second->pregnode->charset;
+			} elseif (!$first->pregnode->negative && !$second->pregnode->negative) {
+				$flag = false;
+				for ($i=0; $i<strlen($first->pregnode->charset); $i++) {
+					for ($j=0; $j<strlen($second->pregnode->charset); $j++) {
+						if ($first->pregnode->charset[$i] == $second->pregnode->charset[$j]) {
+							$flag = true;
+						}
+					}
+				}
+				return $flag && $first->pregnode->charset != $second->pregnode->charset;
+			} else {
+				return false;
+			}
+		} else {//meta and charset
+			if ($second->pregnode->type == preg_node::TYPE_LEAF_META) {
+				$tmp = $first;
+				$first = $second;
+				$second = $tmp;
+			}
+			//first is meta, second is charset
+			if ($first->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
+				return false;//ENDREG not partial match with any other operand
+			}
+			for ($j=0; $j<strlen($second->pregnode->charset); $j++) {
+				if ($first->pregnode->match($second->pregnode->charset, $j, $trash, false)) {
+					return true;// \w \W or . can't be equivalent to enumerable charset
+				}
+			}
+			return $second->pregnode->negative;
+		}
+	}
+	/**
+	* Function split two leaf to four UNique and EQUivalen leafs
+	* @param $first first leaf
+	* @param $second second leaf
+	* @return unique and equivalent leafs array
+	*/
+	protected function get_unequ_leafs($first, $second) {
+		if ($first->pregnode->type == preg_node::TYPE_LEAF_META && $second->pregnode->type == preg_node::TYPE_LEAF_META) {
+		//two meta leafs
+			$result[0] = $this->cross_meta_leafs(clone $first, clone $second, false, true);
+			$result[1] = $this->cross_meta_leafs(clone $first, clone $second, false, false);
+			$result[2] = $this->cross_meta_leafs(clone $first, clone $second, false, false);
+			$result[3] = $this->cross_meta_leafs(clone $first, clone $second, true, false);
+		} elseif ($first->pregnode->type == preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+		//two charset leafs
+			$result[0] = $this->cross_charsets(clone $first, clone $second, false, true);
+			$result[1] = $this->cross_charsets(clone $first, clone $second, false, false);
+			$result[2] = $this->cross_charsets(clone $first, clone $second, false, false);
+			$result[3] = $this->cross_charsets(clone $first, clone $second, true, false);
+		} else {
+		//meta and charset
+			$fixindex1 = 0;
+			$fixindex2 = 2;
+			if ($second->pregnode->type == preg_node::TYPE_LEAF_META) {
+				$tmp = $first;
+				$first = $second;
+				$second = $tmp;
+				$fixindex1 = 2;
+				$fixindex2 = 0;
+			}
+			//first is meta, second is charset
+			$result[$fixindex1] = $this->cross_meta_charset(clone $first, clone $second, false, true);
+			$result[$fixindex1+1] = $this->cross_meta_charset(clone $first, clone $second, false, false);
+			$result[$fixindex2] = $this->cross_meta_charset(clone $first, clone $second, false, false);
+			$result[$fixindex2+1] = $this->cross_meta_charset(clone $first, clone $second, true, false);
+		}
+		if ($result[0] === false) {
+			$result[0] = $result[1];
+		}
+		if ($result[1] === false) {
+			$result[1] = $result[0];
+		}
+		if ($result[2] === false) {
+			$result[2] = $result[3];
+		}
+		if ($result[3] === false) {
+			$result[3] = $result[2];
+		}
+		return $result;
+	}
+	protected function cross_charsets($leaf1, $leaf2, $invert1, $invert2) {
+		$result = new preg_leaf_charset;
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		$str = '';
+		if (!$leaf1->pregnode->negative && !$leaf2->pregnode->negative) {//++
+			for ($i=0; $i<strlen($leaf1->pregnode->charset); $i++) {
+				if (strchr($leaf2->pregnode->charset, $leaf1->pregnode->charset[$i]) !== false) {
+					$str .= $leaf1->pregnode->charset[$i];
+				}
+			}
+		} else if (!$leaf1->pregnode->negative && $leaf2->pregnode->negative) {//+-
+			for ($i=0; $i<strlen($leaf1->pregnode->charset); $i++) {
+				if (strchr($leaf2->pregnode->charset, $leaf1->pregnode->charset[$i]) === false) {
+					$str .= $leaf1->pregnode->charset[$i];
+				}
+			}
+		} else if ($leaf1->pregnode->negative && !$leaf2->pregnode->negative) {//-+
+			for ($i=0; $i<strlen($leaf2->pregnode->charset); $i++) {
+				if (strchr($leaf1->pregnode->charset, $leaf2->pregnode->charset[$i]) === false) {
+					$str .= $leaf2->pregnode->charset[$i];
+				}
+			}
+		} else {//--
+			$str = $leaf2->pregnode->charset . $leaf1->pregnode->charset;
+			$result->negative = true;
+		}
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		if ($str=='') {
+			return false;
+		}
+		$result->charset = $str;
+		$result = $this->from_preg_node($result);
+		return $result;
+	}
+	protected function cross_meta_leafs($leaf1, $leaf2, $invert1, $invert2) {
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		//one of leaf is \w, other is metadot
+		$flag = false;
+		if ($leaf1->pregnode->subtype == preg_leaf_meta::SUBTYPE_WORD_CHAR) {
+			$tmp = $leaf1;
+			$leaf1 = $leaf2;
+			$second = $tmp;
+			$flag = true;
+		}
+		//now first is meta dot, second is wordchar
+		if ($leaf1->pregnode->negative) {
+			$result =  false;//impossible to match
+		} else {
+			$result = new preg_leaf_meta;
+			$result->negative = $leaf2->pregnode->negative;
+			$result->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+			$result = $this->from_preg_node($result);
+		}
+		if ($flag) {
+			$tmp = $leaf1;
+			$leaf1 = $leaf2;
+			$second = $tmp;
+		}
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		return $result;
+	}
+	protected function cross_meta_charset($leaf1, $leaf2, $invert1, $invert2) {
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		$flag = false;
+		if ($leaf1->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+			$tmp = $leaf1;
+			$leaf1 = $leaf2;
+			$second = $tmp;
+			$flag = true;
+		}
+		//now leaf1 is meta and leaf2 is charset
+		if ($leaf1->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+			if ($leaf1->pregnode->negative) {
+				$result =  false;//impossible to match
+			} else {
+				$result = new preg_leaf_charset;
+				$result->negative = $leaf2->pregnode->negative;
+				$result->charset = $leaf2->pregnode->charset;
+				$result = $this->from_preg_node($result);
+			}
+		} else {//leaf1 is word char
+			if ($leaf2->pregnode->negative) {
+				$result = preg_leaf_combo::get_cross($leaf1->pregnode, $leaf2->pregnode);
+				$result = $this->from_preg_node($result);
+			} else {
+				$result = new preg_leaf_charset;
+				$result->negative = $leaf2->pregnode->negative;
+				$result->charset = '';
+				for ($i=0; $i < strlen($leaf2->pregnode->charset); $i++) {
+					if ($leaf1->pregnode->match($leaf2->pregnode->charset, $i, $l, false)) {
+						$result->charset .= $leaf2->pregnode->charset[$i];
+					}
+				}
+				$result = $this->from_preg_node($result);
+				if ($result->pregnode->charset == '') {
+					return false;
+				}
+			}
+		}
+		if ($flag) {
+			$tmp = $leaf1;
+			$leaf1 = $leaf2;
+			$second = $tmp;
+		}
+		if ($invert1) {
+			$leaf1->pregnode->negative = !$leaf1->pregnode->negative;
+		}
+		if ($invert2) {
+			$leaf2->pregnode->negative = !$leaf2->pregnode->negative;
+		}
+		return $result;
+	}
+	protected function save_new_leaf($num, $leaf) {
+		$index = 0;
+		foreach ($this->connection[$num] as $key => $val) {
+			if ($key > $index && $val->pregnode->type != preg_node::TYPE_NODE_ASSERT && $key < 186759556) {
+				$index = $key;
+			}
+		}
+		$this->connection[$num][++$index] = $leaf;
+		return $index;
+	}
+	protected function replace_num_in_map($num, $old, $new1, $new2) {
+		foreach ($this->map[$num] as $cur => $arrnext) {
+			if (is_array($arrnext)) {
+				foreach ($arrnext as $i => $leafnum) {
+					if ($leafnum == $old) {
+						$this->map[$num][$cur][$i] = $new1;
+						$this->map[$num][$cur][] = $new2;
+						break;
+					}
+				}
+			}
+		}
+		foreach ($this->roots[$num]->firstpos as $key => $val) {
+			if ($val == $old) {
+				$this->roots[$num]->firstpos[$key] = $new1;
+				$this->roots[$num]->firstpos[] = $new2;
+			}
+		}
+	}
     /**
     * Function merge map of symbol's following, first operand $this->map[0], second operand $this->map[$num]
     * and put result in $this->map[0]
@@ -847,20 +1214,24 @@ class dfa_preg_matcher extends preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        if ($this->anchor->start) {
+        /*if ($this->anchor->start && false) {
             $result = $this->compare($response, 0, 0, $this->anchor->end);
-        } else {
+        } else {*/
             $result = new stdClass;
             $result->full = false;
             $result->index = -1;
             $result->left = 999999;
             for ($i=0; $i<strlen($response) && !$result->full; $i++) {
                 $tmpres = $this->compare($response, 0, $i, $this->anchor->end);
-                if ($tmpres->full || $tmpres->left < $result->left || !isset($result->next)) {
-                    $result = $tmpres;
-                }
+				if ($tmpres !== false) {	
+					if ($tmpres->full || $tmpres->left < $result->left || !isset($result->next)&&false) {
+						$result = $tmpres;
+					}
+				} else {
+					//TODO: error message about zero length loop
+				}
             }
-        }
+        /*}*/
 
         $this->is_match =  ($result->index > -1);
         $this->full = $result->full;
@@ -918,7 +1289,7 @@ class dfa_preg_matcher extends preg_matcher {
             echo '<br>ERROR: Missed path to GraphViz!<br>Can\'t draw '.$subject.'.';
             return;
         }
-        $tempfolder = 'W:\\home\\moodle.local\\www\\question\\type\\preg\\temp\\';
+        $tempfolder = $CFG->dirroot . '\\question\\type\\preg\\temp\\';
         $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
         $dotfile = fopen($tempfolder.'dotcode.dot', 'w');
         foreach ($dotcode as $dotstring) {

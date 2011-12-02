@@ -442,12 +442,12 @@ class preg_leaf_assert extends preg_leaf {
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
                 $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
-                $wW = false;
-                $Ww = false;
-                if (!$end && $pos < $textlib->strlen($str) && $pos > 0) {
-                    $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
-                    $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
-                }
+                if ($pos>0 && $pos < $textlib->strlen($str)) {
+					$wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
+					$Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+				} else {
+					$wW = $Ww = false;
+				}
                 if ($start||$end||$wW||$Ww) {
                     $result = true;
                 } else {
@@ -629,8 +629,8 @@ class preg_leaf_combo extends preg_leaf {
         } else {
             $result = new preg_leaf_combo;
             $result->subtype = preg_leaf_combo::SUBTYPE_CROSS;
-            $result->childs[0] = $leaf0;
-            $result->childs[1] = $leaf1;
+            $result->childs[0] = clone $leaf0;
+            $result->childs[1] = clone $leaf1;
         }
         return $result;
     }

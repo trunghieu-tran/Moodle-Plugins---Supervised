@@ -16,6 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
 class test_cross_from_nfa extends preg_cross_tester {
 
+    //-----------------------------------------------------------------------tests for general cases----------------------------------------------------------//
     function data_for_test_concat() {
         $test1 = array( 'str'=>'the matcher works',
                         'is_match'=>true,
@@ -53,7 +54,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_alt() {
+    function data_for_test_alt_1() {
         $test1 = array( 'str'=>'abcf',
                         'is_match'=>true,
                         'full'=>true,
@@ -75,11 +76,56 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>array(0),
+                        'left'=>array(10000000),
                         'next'=>'');
 
         return array('regex'=>'^abc|def$',
                      'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_alt_2() {
+        $test1 = array( 'str'=>'abi',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'cdi',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>'efi',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test4 = array( 'str'=>'ghi',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test5 = array( 'str'=>'yzi',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>3),
+                        'index_last'=>array(0=>2),
+                        'left'=>array(3),
+                        'next'=>'aceg');
+
+        return array('regex'=>'^(?:ab|cd|ef|gh)i$',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
     function data_for_test_assertions_simple_1() {
@@ -153,7 +199,93 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpatterns_nested() {
+    function data_for_test_negative_charset() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>0),
+                        'left'=>array(3),
+                        'next'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
+
+        $test2 = array( 'str'=>'axcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>'aacde',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>3),
+                        'left'=>array(10000000),
+                        'next'=>'');
+
+        return array('regex'=>'^a[^b]cd$',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_case_sensitive() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>0),
+                        'left'=>array(3),
+                        'next'=>'B');
+
+        $test2 = array( 'str'=>'aBC',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>1),
+                        'left'=>array(2),
+                        'next'=>'c');
+
+        return array('regex'=>'aBcD',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_case_insensitive() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'aBcD',
+                     'modifiers'=>'i',
+                     'tests'=>array($test1));
+    }
+
+    //-----------------------------------------------tests for cases with ambiguity - subpatterns, quantifiers and backreferences-----------------------------//
+    function data_for_test_empty_match() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'index_last'=>array(0=>3,1=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'index_last'=>array(0=>-1,1=>-1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(abcd|)',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_subpatt_nested() {
         $test1 = array( 'str'=>'abcbcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -174,11 +306,11 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpatt_quant_nested() {
+    function data_for_test_subpatt_with_quant_nested() {
         $test1 = array( 'str'=>'12',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>1,2=>-1),
+                        'index_first'=>array(0=>0,1=>0,2=>-1),
                         'index_last'=>array(0=>1,1=>1,2=>-2),
                         'left'=>array(2),
                         'next'=>'.');
@@ -195,7 +327,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpatterns_concatenated() {
+    function data_for_test_subpatt_concatenated() {
         $test1 = array( 'str'=>'_abcdef',
                         'is_match'=>true,
                         'full'=>true,
@@ -216,7 +348,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpatterns_alternated() {
+    function data_for_test_subpatt_alternated() {
         $test1 = array( 'str'=>'abcdefgh',
                         'is_match'=>true,
                         'full'=>true,
@@ -229,7 +361,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_quantifier_inside() {
+    function data_for_test_subpatt_quantifier_inside() {
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -242,7 +374,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_quantifier_outside() {
+    function data_for_test_subpatt_quantifier_outside() {
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -255,20 +387,28 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_tricky() {
+    function data_for_test_subpatt_tricky() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
-                        'index_last'=>array(0=>2,1=>2,2=>2,3=>2,4=>2),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
+                        'index_last'=>array(0=>2,1=>2,2=>0,3=>1,4=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'abcabc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>3,2=>3,3=>4,4=>5),
+                        'index_last'=>array(0=>5,1=>5,2=>3,3=>4,4=>5),
                         'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'(([a*]|\b)([b*]|\b)([c*]|\b))+',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_questquant() {
+    function data_for_test_quant_qu() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -297,87 +437,13 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_negative_charset() {
-        $test1 = array( 'str'=>'abcd',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>0),
-                        'left'=>array(3),
-                        'next'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
-
-        $test2 = array( 'str'=>'axcd',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>3),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test3 = array( 'str'=>'aacde',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>3),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        return array('regex'=>'^a[^b]cd$',
-                     'tests'=>array($test1, $test2, $test3));
-    }
-
-    function data_for_test_many_alternatives() {
-        $test1 = array( 'str'=>'abi',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test2 = array( 'str'=>'cdi',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test3 = array( 'str'=>'efi',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test4 = array( 'str'=>'ghi',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test5 = array( 'str'=>'yzi',
-                        'is_match'=>false,
-                        'full'=>false,
-                        'index_first'=>array(0=>3),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(3),
-                        'next'=>'aceg');
-
-        return array('regex'=>'^(?:ab|cd|ef|gh)i$',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
-    }
-
-    function data_for_test_repeated_chars() {
+    function data_for_test_quant_aster_1() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>array(1),    // !!!
+                        'left'=>array(3),    // greedy quantifier
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
@@ -400,94 +466,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_brace_finite() {
-        $test1 = array( 'str'=>'abbbbbc',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>5),
-                        'left'=>array(11),
-                        'next'=>'b');
-
-        $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>26),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>35),
-                        'left'=>array(1),
-                        'next'=>'c');
-
-        return array('regex'=>'^ab{15,35}c$',
-                     'tests'=>array($test1, $test2, $test3));
-    }
-
-    function data_for_test_brace_infinite() {
-        $test1 = array( 'str'=>'abbbbbc',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>5),
-                        'left'=>array(11),
-                        'next'=>'b');
-
-        $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>26),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>103),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        return array('regex'=>'^ab{15,}c$',
-                     'tests'=>array($test1, $test2, $test3));
-    }
-
-    function data_for_test_plus() {
-        $test1 = array( 'str'=>'ac',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>0),
-                        'left'=>array(2),
-                        'next'=>'b');
-
-        $test2 = array( 'str'=>'abc',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>100),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        return array('regex'=>'^ab+c$',
-                     'tests'=>array($test1, $test2, $test3));
-    }
-
-    function data_for_test_aster() {
+    function data_for_test_quant_aster_2() {
         $test1 = array( 'str'=>'abcabcabcabcabcabcabcabcabcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -524,39 +503,125 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_cs() {
-        $test1 = array( 'str'=>'abcd',
+    function data_for_test_quant_plus() {
+        $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
-                        'left'=>array(3),
-                        'next'=>'B');
-
-        $test2 = array( 'str'=>'aBC',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'c');
+                        'next'=>'b');
 
-        return array('regex'=>'aBcD',
-                     'tests'=>array($test1, $test2));
-    }
-
-    function data_for_test_cins() {
-        $test1 = array( 'str'=>'abcd',
+        $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>3),
+                        'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
 
-        return array('regex'=>'aBcD',
-                     'modifiers'=>'i',
-                     'tests'=>array($test1));
+        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>100),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'^ab+c$',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_quant_brace_finite() {
+        $test1 = array( 'str'=>'abbbbbc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>5),
+                        'left'=>array(11),
+                        'next'=>'b');
+
+        $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>26),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>35),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        return array('regex'=>'^ab{15,35}c$',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_quant_brace_infinite() {
+        $test1 = array( 'str'=>'abbbbbc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>5),
+                        'left'=>array(11),
+                        'next'=>'b');
+
+        $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>26),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>103),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'^ab{15,}c$',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_quant_greedy() {
+        $test1 = array('str'=>'abacd',
+                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>2),
+                                              'left'=>array(4),
+                                              'next'=>'b'),
+                                        array('is_match'=>true,    // result for fa engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>4),
+                                              'left'=>array(4),
+                                              'next'=>'b')
+                                        ));
+        $test2 = array('str'=>'ababac',
+                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>2),
+                                              'left'=>array(4),
+                                              'next'=>'b'),
+                                        array('is_match'=>true,    // result for fa engine
+                                              'full'=>false,
+                                              'index_first'=>array(0=>0),
+                                              'index_last'=>array(0=>5),
+                                              'left'=>array(1),
+                                              'next'=>'d')
+                                        ));
+
+        return array('regex'=>'ab+[a-z]*bacd',
+                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_characters_left_simple() {
@@ -625,7 +690,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_backref_simple() {
+    function data_for_test_backrefs_simple() {
         $test1 = array( 'str'=>'abcabcabcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -654,7 +719,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_alternated_backrefs() {
+    function data_for_test_backrefs_alternated() {
         $test1 = array( 'str'=>'abab',
                         'is_match'=>true,
                         'full'=>true,
@@ -691,7 +756,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_backref_quantified() {
+    function data_for_test_backrefs_quantified() {
         $test1 = array( 'str'=>'ababcdababcdababcdababcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -712,7 +777,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_backref_full_and_partial() {
+    function data_for_test_backrefs_full_and_partial() {
         $test1 = array( 'str'=>'abcdabcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -749,7 +814,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_backref_noway() {
+    function data_for_test_backrefs_noway() {
         $test1 = array( 'str'=>'abxyabab',
                         'is_match'=>true,
                         'full'=>true,
@@ -786,7 +851,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_backref_alt_in_subpatt1() {
+    function data_for_test_backrefs_alt_in_subpatt_1() {
         $test1 = array( 'str'=>'Do hats eat cats?',
                         'is_match'=>true,
                         'full'=>false,
@@ -807,7 +872,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_backref_alt_in_subpatt2() {
+    function data_for_test_backrefs_alt_in_subpatt2() {
         $test1 = array( 'str'=>'0x',
                         'is_match'=>true,
                         'full'=>false,
@@ -836,7 +901,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_backref_quant_in_subpatt() {
+    function data_for_test_backrefs_quant_in_subpatt() {
         $test1 = array( 'str'=>'0x',
                         'is_match'=>true,
                         'full'=>false,
@@ -857,7 +922,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_backref_subpatt_modifying() {
+    function data_for_test_backrefs_subpatt_modifying() {
         $test1 = array( 'str'=>'ababba',
                         'is_match'=>true,
                         'full'=>false,
@@ -886,7 +951,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_backref_tricky_1() {
+    function data_for_test_backrefs_tricky_1() {
         $test1 = array( 'str'=>'abxab',
                         'is_match'=>true,
                         'full'=>true,
@@ -907,7 +972,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_backref_tricky_2() {
+    function data_for_test_backrefs_tricky_2() {
         $test1 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -961,61 +1026,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_empty_match() {
-        $test1 = array( 'str'=>'abcd',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>3,1=>3),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test2 = array( 'str'=>'',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        return array('regex'=>'(abcd|)',
-                     'tests'=>array($test1, $test2));
-    }
-
-    function data_for_test_quant_greedy() {
-        $test1 = array('str'=>'abacd',
-                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0),
-                                              'index_last'=>array(0=>2),
-                                              'left'=>array(4),
-                                              'next'=>'b'),
-                                        array('is_match'=>true,    // result for fa engine
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0),
-                                              'index_last'=>array(0=>4),
-                                              'left'=>array(4),
-                                              'next'=>'b')
-                                        ));
-        $test2 = array('str'=>'ababac',
-                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0),
-                                              'index_last'=>array(0=>2),
-                                              'left'=>array(4),
-                                              'next'=>'b'),
-                                        array('is_match'=>true,    // result for fa engine
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0),
-                                              'index_last'=>array(0=>5),
-                                              'left'=>array(1),
-                                              'next'=>'d')
-                                        ));
-
-        return array('regex'=>'ab+[a-z]*bacd',
-                     'tests'=>array($test1, $test2));
-    }
-
+    //-----------------------------------------------------------------tests for acceptance-------------------------------------------------------------------//
     function data_for_test_node_assert() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
