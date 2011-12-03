@@ -15,7 +15,7 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
  * defines a state of an automaton when running
  * used when matching a string
  */
-class processing_state {
+class preg_nfa_processing_state {
     public $state;                             // a reference to the state which automaton is in
     public $matchcnt;                          // the number of characters matched
     public $ismatch;                           // is there a match?
@@ -23,8 +23,8 @@ class processing_state {
     public $next;                              // the next possible character
     public $subpatt_index_first = array();     // key = subpattern number
     public $subpatt_index_last = array();      // key = subpattern number
-    public $subpatt_index_first_old = array(); // for matching quantified subpatterns like (...)*
-    public $subpatt_index_last_old = array();  // for matching quantified subpatterns like (...)*
+    public $subpatt_index_first_old = array(); // indexes of subpatterns defenetly captured. it's used, for example, when matching quantified subpatterns like (...)*
+    public $subpatt_index_last_old = array();  // same as previous field
     public $firsttransition;                   // the first transition of a path
     public $backreftransition;                 // != null if the last transition matched is a backreference
     public $backrefmatchlen;                   // length of the last match
@@ -122,38 +122,61 @@ class nfa_preg_matcher extends preg_matcher {
         return get_string($pregnode->name(), 'qtype_preg');
     }
 
+    public function count_subpattends_captured($procstate) {
+        $cnt = 0;
+        foreach ($procstate->subpatt_index_last_old as $index) {
+            if ($index >= -1) {
+                $cnt++;
+            }
+        }
+        return $cnt;
+    }
+
     /**
      * checks if new result is better than old result
-     * @param oldres - old result, an object of processing_state
-     * @param newres - new result, an object of processing_state
+     * @param oldres - old result, an object of preg_nfa_processing_state
+     * @param newres - new result, an object of preg_nfa_processing_state
+     * @param strict - if true, old result is replaced by a new result with the same match length
      * @return - true if new result is more suitable
      */
-    public function is_new_result_more_suitable(&$oldres, &$newres) {
-        if (($oldres->state != $this->automaton->endstate && $newres->matchcnt >= $oldres->matchcnt) ||                                                    // new match is longer
-            ($newres->state == $this->automaton->endstate && $oldres->state != $this->automaton->endstate) ||                                              // new match is full
-            ($newres->state == $this->automaton->endstate && $oldres->state == $this->automaton->endstate && $newres->matchcnt >= $oldres->matchcnt)) {    // new match is full and longer
-            return true;
+    public function is_new_result_more_suitable(&$oldres, &$newres, $strict = true) {
+        $result = $newres->ismatch && !$oldres->ismatch;
+        $result |= $newres->isfullmatch && !$oldres->isfullmatch;
+        if ($strict) {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // both of results have the same 'fullness' but new match is longer
+                        $newres->matchcnt > $oldres->matchcnt);    
         } else {
-            return false;
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&
+                        $newres->matchcnt >= $oldres->matchcnt);    
         }
+        if ($strict) {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // same length but more subpatterns captured
+                        $newres->matchcnt == $oldres->matchcnt &&
+                        $this->count_subpattends_captured($newres) > $this->count_subpattends_captured($oldres));
+        } else {
+            $result |= ($oldres->isfullmatch == $newres->isfullmatch &&    // same length but more subpatterns captured
+                        $newres->matchcnt == $oldres->matchcnt &&
+                        $this->count_subpattends_captured($newres) >= $this->count_subpattends_captured($oldres));
+        }
+        return $result;
     }
 
     /**
      * returns the minimal number of characters left for matching
      * @param str - string being matched
      * @param startpos - start position of matching
-     * @param laststate - the last state of the automaton, an object of processing_state
+     * @param laststate - the last state of the automaton, an object of preg_nfa_processing_state
      * @return - number of characters left for matching
      */
     public function determine_characters_left($str, $startpos, $laststate) {
         $curstates = array();    // states which the automaton is in
-        $results = array();      // different paths to the end state
+        $result = null;
         if ($laststate->backrefmatchlen == 0) {
             array_push($curstates, $laststate);
         } else {
             $transition = $laststate->backreftransition;
             $length = $laststate->subpatt_index_last[$transition->pregleaf->number] - $laststate->subpatt_index_first[$transition->pregleaf->number] + 1 - $laststate->backrefmatchlen;
-            $newstate = new processing_state($transition->state, $laststate->matchcnt + $length, $laststate->ismatch, false, '',
+            $newstate = new preg_nfa_processing_state($transition->state, $laststate->matchcnt + $length, $laststate->ismatch, false, '',
                                              $laststate->subpatt_index_first, $laststate->subpatt_index_last, $laststate->subpatt_index_first_old, $laststate->subpatt_index_last_old,
                                              $transition, null, 0);
             $newstate->next = $newstate->firsttransition->pregleaf->next_character($str, $startpos + $laststate->matchcnt, $laststate->backrefmatchlen);
@@ -163,42 +186,57 @@ class nfa_preg_matcher extends preg_matcher {
             $newstates = array();
             while (count($curstates) != 0) {
                 $curstate = array_pop($curstates);
-                if (count($curstate->state->next) == 0) {
-                    $results[] = $curstate;
-                }
-                foreach ($curstate->state->next as $next) {
-                    if (!$next->loops) {
-                        $skip = false;
-                        if (is_a($next->pregleaf, 'preg_leaf_backref')) {
-                            // only generated subpatterns can be passed
-                            if ($curstate->subpatt_index_last[$next->pregleaf->number] > -2) {
-                                $length = $curstate->subpatt_index_last[$next->pregleaf->number] - $curstate->subpatt_index_first[$next->pregleaf->number] + 1;
+                if ($curstate->state === $this->automaton->endstate && $curstate->next !== '' && ($result === null || ($result !== null && $result->matchcnt > $curstate->matchcnt))) {
+                    $result = $curstate;
+                } else {
+                    foreach ($curstate->state->next as $next) {
+                        if (!$next->loops) {
+                            $skip = false;
+                            if (is_a($next->pregleaf, 'preg_leaf_backref')) {
+                                // only generated subpatterns can be passed
+                                if (array_key_exists($next->pregleaf->number, $curstate->subpatt_index_last_old) && $curstate->subpatt_index_last_old[$next->pregleaf->number] > -2) {
+                                    $length = $curstate->subpatt_index_last_old[$next->pregleaf->number] - $curstate->subpatt_index_first_old[$next->pregleaf->number] + 1;
+                                } else {
+                                    $skip = true;
+                                }
                             } else {
-                                $skip = true;
+                                $length = $next->pregleaf->consumes();
                             }
-                        } else {
-                            $length = $next->pregleaf->consumes();
-                        }
-                        if (!$skip) {
-                            $newstate = new processing_state($next->state, $curstate->matchcnt + $length, $curstate->ismatch, false, $curstate->next,
-                                                             $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
-                                                             $curstate->firsttransition, null, 0);
-                            if ($newstate->firsttransition == null && ($next->pregleaf->consumes() || is_a($next->pregleaf, 'preg_leaf_backref'))) {
-                                $newstate->firsttransition = $next;
-                                $newstate->next = $newstate->firsttransition->pregleaf->next_character($str, $startpos + $laststate->matchcnt, $laststate->backrefmatchlen);
-                            }
-                            // save subpattern indexes
-                            foreach ($next->subpatt_start as $key=>$subpatt) {
-                                if ($newstate->subpatt_index_first[$key] == -1) {
-                                    $newstate->subpatt_index_first[$key] = $curstate->matchcnt + $length - 1;    // saving to index_first for backreference capturing
+                            // check for length
+                            if (!$skip) {
+                                $newstate = new preg_nfa_processing_state($next->state, $curstate->matchcnt + $length, $curstate->ismatch, false, $curstate->next,
+                                                                     $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
+                                                                     $curstate->firsttransition, null, 0);
+                                if ($result !== null && $newstate->matchcnt > $result->matchcnt) {
+                                    $skip = true;
                                 }
                             }
-                            foreach ($next->subpatt_end as $key=>$subpatt) {
-                                if ($newstate->subpatt_index_last[$key] == -2) {
-                                    $newstate->subpatt_index_last[$key] = $curstate->matchcnt + $length - 1;    // saving to index_last
+                            if (!$skip) {
+                                // generate a next character
+                                if ($newstate->firsttransition == null && ($next->pregleaf->consumes() || is_a($next->pregleaf, 'preg_leaf_backref'))) {
+                                    $newstate->firsttransition = $next;
+                                    $newstate->next = $newstate->firsttransition->pregleaf->next_character($str, $startpos + $laststate->matchcnt, $laststate->backrefmatchlen);
                                 }
+                                // save subpattern indexes for backreference capturing
+                                foreach ($next->subpatt_start as $key=>$subpatt) {
+                                    // if this subpattern was captured, save it to be on the safe side
+                                    if ($newstate->subpatt_index_last[$key] >= -1) {
+                                        $newstate->subpatt_index_first_old[$key] = $newstate->subpatt_index_first[$key];
+                                        $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
+                                    }
+                                    $newstate->subpatt_index_first[$key] = $curstate->matchcnt;
+                                    $newstate->subpatt_index_last[$key] = -2;
+                                }
+                                foreach ($next->subpatt_end as $key=>$subpatt) {
+                                    if ($newstate->subpatt_index_first[$key] >= 0) {
+                                        $newstate->subpatt_index_last[$key] = $curstate->matchcnt + $length - 1;
+                                        // rewrite old results of subpattern capturing
+                                        $newstate->subpatt_index_first_old[$key] = $newstate->subpatt_index_first[$key];
+                                        $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
+                                    }
+                                }
+                                array_push($newstates, $newstate);
                             }
-                            array_push($newstates, $newstate);
                         }
                     }
                 }
@@ -207,12 +245,6 @@ class nfa_preg_matcher extends preg_matcher {
                 array_push($curstates, $state);
             }
             $newstates = array();
-        }
-        $result = null;
-        foreach ($results as $curres) {
-            if ($result === null || $result->matchcnt > $curres->matchcnt || ($result->next ==='' && $curres->next !== '')) {
-                $result = $curres;
-            }
         }
         return $result;
     }
@@ -230,7 +262,7 @@ class nfa_preg_matcher extends preg_matcher {
 
         $this->reset_subpattern_indexes();
         // initial state with nothing captured
-        $result = new processing_state($this->automaton->startstate, 0, false, false, '',
+        $result = new preg_nfa_processing_state($this->automaton->startstate, 0, false, false, '',
                                        $this->index_first, $this->index_last, $this->index_first, $this->index_last,
                                        null, null, 0);
         array_push($curstates, $result);
@@ -241,6 +273,12 @@ class nfa_preg_matcher extends preg_matcher {
                 // get the current state
                 $curstate = array_pop($curstates);
                 // saving the result
+                if ($curstate->state !== $this->automaton->startstate) {
+                    $curstate->ismatch = true;
+                }
+                if ($curstate->state === $this->automaton->endstate) {
+                    $curstate->isfullmatch = true;
+                }
                 if ($this->is_new_result_more_suitable(&$result, &$curstate)) {
                     $result = $curstate;
                 }
@@ -249,7 +287,9 @@ class nfa_preg_matcher extends preg_matcher {
                 if ($curstate->state->startsinfinitequant) {
                     // skipstates is sorted by matchcnt because transitions add characters
                     for ($i = count($skipstates) - 1; $i >= 0 && !$skip && $curstate->matchcnt <= $skipstates[$i]->matchcnt; $i--)
-                        if ($skipstates[$i]->state === $curstate->state && $skipstates[$i]->matchcnt == $curstate->matchcnt) {
+                        if ($skipstates[$i]->state === $curstate->state && $skipstates[$i]->matchcnt == $curstate->matchcnt /*&&
+                            $skipstates[$i]->subpatt_index_last_old == $curstate->subpatt_index_last_old &&
+                            $skipstates[$i]->subpatt_index_first_old == $curstate->subpatt_index_first_old*/) {
                             $skip = true;
                         }
                     if (!$skip) {
@@ -265,11 +305,12 @@ class nfa_preg_matcher extends preg_matcher {
                         $length = 0;
                         if ($transition->pregleaf->match($str, $startpos + $pos, &$length, !$transition->pregleaf->caseinsensitive)) {
                             // create a new state
-                            $newstate = new processing_state($transition->state, $pos + $length, true, false, '',
+                            $newstate = new preg_nfa_processing_state($transition->state, $pos + $length, true, false, '',
                                                              $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
                                                              null, null, 0);
                             // set start indexes of subpatterns
                             foreach ($transition->subpatt_start as $key=>$subpatt) {
+                                // if this subpattern was captured, save it to be on the safe side
                                 if ($newstate->subpatt_index_last[$key] >= -1) {
                                     $newstate->subpatt_index_first_old[$key] = $newstate->subpatt_index_first[$key];
                                     $newstate->subpatt_index_last_old[$key] = $newstate->subpatt_index_last[$key];
@@ -315,15 +356,7 @@ class nfa_preg_matcher extends preg_matcher {
             }
             $newstates = array();
         }
-        // if we new attempt of subpattern capturing was failed, restore previous results
-        foreach ($result->subpatt_index_last_old as $key=>$subpatt) {
-            if ($subpatt >= -1 && $result->subpatt_index_last[$key] == -2) {
-                $result->subpatt_index_first[$key] = $result->subpatt_index_first_old[$key];
-                $result->subpatt_index_last[$key] = $result->subpatt_index_last_old[$key];
-            }
-        }
-        // set other results
-        $result->isfullmatch = ($result->state == $this->automaton->endstate);
+        // set the results
         if ($result->matchcnt > 0) {
             $result->subpatt_index_first[0] = $startpos;
             $result->subpatt_index_last[0] = $startpos + $result->matchcnt - 1;
@@ -332,6 +365,8 @@ class nfa_preg_matcher extends preg_matcher {
             $result->subpatt_index_first[0] = $textlib->strlen($str);
             $result->subpatt_index_last[0] = $result->subpatt_index_first[0] - 1;
         }
+        $result->subpatt_index_first_old[0] = $result->subpatt_index_first[0];
+        $result->subpatt_index_last_old[0] = $result->subpatt_index_last[0];
         return $result;
     }
 
@@ -340,7 +375,7 @@ class nfa_preg_matcher extends preg_matcher {
     * @param str a string to match
     */
     function match_inner($str) {
-        $result = new processing_state($this->automaton->startstate, 0, false, false, '',
+        $result = new preg_nfa_processing_state($this->automaton->startstate, 0, false, false, '',
                                        $this->index_first, $this->index_last, $this->index_first, $this->index_last,
                                        null, null, 0);
         $startpos = 0;
@@ -349,7 +384,7 @@ class nfa_preg_matcher extends preg_matcher {
         // match from all indexes
         for ($j = 0; $j <= $len && !$result->isfullmatch; $j++) {
             $tmp = $this->match_from_pos($str, $j);
-            if ($this->is_new_result_more_suitable(&$result, &$tmp)) {
+            if ($this->is_new_result_more_suitable(&$result, &$tmp, false)) {
                 $result = $tmp;
                 $startpos = $j;
             }
@@ -357,10 +392,10 @@ class nfa_preg_matcher extends preg_matcher {
         // save the result
         $this->is_match = $result->ismatch;
         $this->full = $result->isfullmatch;
-        foreach ($result->subpatt_index_last as $key=>$subpatt) {
+        foreach ($result->subpatt_index_last_old as $key=>$subpatt) {
             if ($subpatt >= -1) {
-                $this->index_first[$key] = $result->subpatt_index_first[$key];
-                $this->index_last[$key] = $result->subpatt_index_last[$key];
+                $this->index_first[$key] = $result->subpatt_index_first_old[$key];
+                $this->index_last[$key] = $result->subpatt_index_last_old[$key];
             }
         }
         // generate a character

@@ -62,11 +62,12 @@ class preg_matcher extends preg_regex_handler {
     @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
+        $this->is_match = false;
         $this->full = false;
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
-        $this->is_match = false;
+
 
         parent::__construct($regex, $modifiers);
         if ($regex === null) {
@@ -126,6 +127,11 @@ class preg_matcher extends preg_regex_handler {
             return $this->full;
         }
 
+        //Reset match data and perform matching.
+        $this->is_match = false;
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
         $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
@@ -154,7 +160,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    *do real matching, should be implemented in child classes, set properties full, index, next and left
+    *Do real matching, should be implemented in child classes, set properties full, index, next and left.
     @param str a string to match
     */
     protected function match_inner($str) {
@@ -162,7 +168,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /** 
-    * return an associative array of match results, helper method
+    * Returns an associative array of match results, helper method.
     */
     public function get_match_results() {
         $res = array('is_match' => $this->is_match);
@@ -178,6 +184,15 @@ class preg_matcher extends preg_regex_handler {
             }
         } else {
             $res['full'] = false;
+            //We could still hint first possible character if there was no match at all.
+            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $res['next'] = $this->next;
+            }
+            //If there is no match at all, we have all length of regex to fulfill - but it do exists.
+            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+                $res['left'] = $this->left;
+            }
+
         }
         return $res;
     }
@@ -223,7 +238,7 @@ class preg_matcher extends preg_regex_handler {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
         }
-        return ($this->index_last[$subpattern] >= 0);
+        return ($this->index_last[$subpattern] >= -1);
     }
 
     /**
