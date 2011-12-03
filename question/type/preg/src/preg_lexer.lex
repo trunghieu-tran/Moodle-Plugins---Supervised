@@ -304,7 +304,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
-<YYINITIAL> \(\?[imsxUXJ]*(-[imsxUXJ]*)?\) {
+<YYINITIAL> \(\?(i|-i)\) {
     $text = $this->yytext();
     $leaf = $this->form_node('preg_leaf_option', null, $text);
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
@@ -313,6 +313,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 <YYINITIAL> \(\?(R|[0-9]+)\) {
     $text = $this->yytext();
     $leaf = $this->form_node('preg_leaf_recursion', null, $text);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
+    return $res;
+}
+<YYINITIAL> \\[^0-9a-zA-Z] {
+	$text = $this->yytext();
+    $leaf = $this->form_node('preg_leaf_charset', null, $text[1]);
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
