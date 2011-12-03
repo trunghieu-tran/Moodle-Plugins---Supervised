@@ -365,7 +365,7 @@ class lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->number==14);
     }
 	function test_lexer_options() {
-        $regex = 'a(?i)b(c(?-i)d)e(?-)(?i-i)';
+        $regex = 'a(?i)b(c(?-i)d)e';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
@@ -396,20 +396,6 @@ class lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'e');
 		$this->assertTrue($token->value->caseinsensitive);
-		$flag = false;
-		try {
-			$token = $lexer->nextToken();//(?-)
-		} catch(Exception $exep) {
-			$flag = true;
-		}
-		$this->assertTrue($flag);//(?-) must not match
-		$flag = false;
-		try {
-			$token = $lexer->nextToken();//(?i-i)
-		} catch(Exception $exep) {
-			$flag = true;
-		}
-		$this->assertTrue($flag);//(?i-i) must not match
 	}
     function test_lexer_index() {
         $regex = 'ab{12,57}[abc]';
