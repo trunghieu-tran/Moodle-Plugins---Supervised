@@ -17,6 +17,8 @@ class Yylex extends JLexBase  {
 
     protected $errors = array();
     protected $maxsubpatt = 0;
+	protected $optstack;
+	protected $optcount;
     //A reference to the matcher object to be passed to some nodes
     public $matcher = null;
     //Global modifiers as a string - defined for entire expression
@@ -37,9 +39,13 @@ class Yylex extends JLexBase  {
         }
         //set i modifier for leafs
         if (is_a($result, 'preg_leaf')) {
-            if(strpos($this->localmodifiers,'i')!==false) {
+            /*old style local modifier handling
+			if(strpos($this->localmodifiers,'i')!==false) {
                 $result->caseinsensitive = true;
-            }
+            }*/
+			if ($this->optstack[$this->optcount-1]->i) {
+				 $result->caseinsensitive = true;
+			}
         }
         if ($name == 'preg_leaf_charset') {
             $result->charset = $charclass;
@@ -88,11 +94,31 @@ class Yylex extends JLexBase  {
             $cc->error = 1;
         }
     }
+	protected function push_opt_lvl() {
+		$this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
+		$this->optcount++;
+	}
+	protected function pop_opt_lvl() {
+		if ($this->optcount>0)
+			$this->optcount--;
+	}
+	protected function mod_top_opt($options) {
+		if ($options == '(?i)') {
+			$this->optstack[$this->optcount-1]->i = true;
+		} else if ($options == '(?-i)') {
+			$this->optstack[$this->optcount-1]->i = false;
+		}
+	}
 	protected $yy_count_chars = true;
 
 	function __construct($stream) {
 		parent::__construct($stream);
 		$this->yy_lexical_state = self::YYINITIAL;
+
+	$this->optstack = array();
+	$this->optstack[0] = new stdClass;
+	$this->optstack[0]->i = false;
+	$this->optcount = 1;
 	}
 
 	private function yy_do_eof () {
@@ -502,6 +528,7 @@ array(
 							break;
 						case 7:
 							{
+	$this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
@@ -510,6 +537,7 @@ array(
 							break;
 						case 8:
 							{
+	$this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
@@ -685,6 +713,7 @@ array(
 							break;
 						case 31:
 							{
+	$this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
     return $res;
@@ -693,6 +722,7 @@ array(
 							break;
 						case 32:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -700,6 +730,7 @@ array(
 							break;
 						case 33:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -707,6 +738,7 @@ array(
 							break;
 						case 34:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -747,6 +779,7 @@ array(
 							break;
 						case 39:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -754,6 +787,7 @@ array(
 							break;
 						case 40:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -762,9 +796,7 @@ array(
 						case 41:
 							{
     $text = $this->yytext();
-    $leaf = $this->form_node('preg_leaf_option', null, $text);
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
-    return $res;
+    $this->mod_top_opt($text);
 }
 						case -42:
 							break;
@@ -801,6 +833,7 @@ array(
 							break;
 						case 46:
 							{
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -808,6 +841,8 @@ array(
 							break;
 						case 47:
 							{
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -823,6 +858,8 @@ array(
 							break;
 						case 49:
 							{
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -830,6 +867,8 @@ array(
 							break;
 						case 50:
 							{
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
