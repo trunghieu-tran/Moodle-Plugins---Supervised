@@ -355,8 +355,8 @@ class test_cross_from_backtracking extends preg_cross_tester {
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>10),
-                                              'left'=>array(2),
-                                              'next'=>'a')    // not a mistake, the loop must be completed
+                                              'left'=>array(1),
+                                              'next'=>'b')
                                         ));
 
         $test1 = array('str'=>'aaaaaaaaaab',
@@ -689,7 +689,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>7),
                                               'left'=>array(1),
-                                              'next'=>' ')
+                                              'next'=>' 012345')
                                         ));
 
         return array('regex'=>'[A-Z0-5 ]+\b[0-5A-R ]+',
@@ -772,7 +772,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0,1=>0),
-                       'index_last'=>array(0=>4,1=>1),
+                       'index_last'=>array(0=>3,1=>1),
                        'left'=>array(0),
                        'next'=>'');
 
