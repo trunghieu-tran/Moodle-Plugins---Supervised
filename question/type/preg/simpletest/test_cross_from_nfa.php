@@ -443,7 +443,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>array(3),    // greedy quantifier
+                        'left'=>array(1),    // 'left' takes priority
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
