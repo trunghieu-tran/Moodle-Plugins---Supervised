@@ -62,11 +62,12 @@ class preg_matcher extends preg_regex_handler {
     @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
+        $this->is_match = false;
         $this->full = false;
         $this->next = '';
         $this->left = -1;
         $this->result_cache = array();
-        $this->is_match = false;
+
 
         parent::__construct($regex, $modifiers);
         if ($regex === null) {
@@ -74,18 +75,6 @@ class preg_matcher extends preg_regex_handler {
         }
 
         $this->reset_subpattern_indexes();
-    }
-
-    /**
-    *resets first and last indexes to -1 and -2 for all subpatterns
-    */
-    protected function reset_subpattern_indexes() {
-        $this->index_last = array();
-        $this->index_first = array();
-        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
-            $this->index_first[$i] = -1;
-            $this->index_last[$i] = -2;
-        }
     }
 
     /**
@@ -126,6 +115,11 @@ class preg_matcher extends preg_regex_handler {
             return $this->full;
         }
 
+        //Reset match data and perform matching.
+        $this->is_match = false;
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
         $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
@@ -154,7 +148,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    *do real matching, should be implemented in child classes, set properties full, index, next and left
+    *Do real matching, should be implemented in child classes, set properties full, index, next and left.
     @param str a string to match
     */
     protected function match_inner($str) {
@@ -162,7 +156,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /** 
-    * return an associative array of match results, helper method
+    * Returns an associative array of match results, helper method.
     */
     public function get_match_results() {
         $res = array('is_match' => $this->is_match);
@@ -178,6 +172,15 @@ class preg_matcher extends preg_regex_handler {
             }
         } else {
             $res['full'] = false;
+            //We could still hint first possible character if there was no match at all.
+            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+                $res['next'] = $this->next;
+            }
+            //If there is no match at all, we have all length of regex to fulfill - but it do exists.
+            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+                $res['left'] = $this->left;
+            }
+
         }
         return $res;
     }
@@ -196,12 +199,6 @@ class preg_matcher extends preg_regex_handler {
         return $this->full;
     }
 
-    /**
-    returns the number of subpatterns (except full match) in the match
-    */
-    public function count_subpatterns() {
-        return count($this->index_first) - 1;//-1 to not include full match
-    }
 
     /**
     * Calculate last character index from first index (should be in $this->index_first) and length
@@ -216,14 +213,41 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
+     * Returns the number of subpatterns existing in regular expression.
+     * It is equal to the last subpattern number
+     */
+    public function count_subpatterns() {
+        return $this->maxsubpatt;
+    }
+
+    /**
+     * Returns the number of captured subpatterns (except full match) in the match
+     */
+    public function count_matched_subpatterns() {
+        return count($this->index_first) - 1;//-1 to not include full match
+    }
+
+    /**
     @param subpattern subpattern number
     *returns true if subpattern is captured
     */
     public function is_subpattern_captured($subpattern) {
         if ($subpattern > $this->maxsubpatt) {
-            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return ($this->index_last[$subpattern] >= 0);
+        return ($this->index_last[$subpattern] >= -1);
+    }
+
+    /**
+    * Resets first and last indexes to -1 and -2 for all subpatterns
+    */
+    protected function reset_subpattern_indexes() {
+        $this->index_last = array();
+        $this->index_first = array();
+        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
+            $this->index_first[$i] = -1;
+            $this->index_last[$i] = -2;
+        }
     }
 
     /**
@@ -232,7 +256,7 @@ class preg_matcher extends preg_regex_handler {
     */
     public function first_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
-            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
         return $this->index_first[$subpattern];
     }
@@ -244,7 +268,7 @@ class preg_matcher extends preg_regex_handler {
     */
     public function last_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
-            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
         return $this->index_last[$subpattern];
     }
@@ -255,8 +279,8 @@ class preg_matcher extends preg_regex_handler {
     public function matched_part($subpattern = 0) {
         if(array_key_exists($subpattern, $this->index_first)) {
             return substr($this->str, $this->index_first[$subpattern], $this->index_last[$subpattern] - $this->index_first[$subpattern] + 1);
-        } else if ($subpattern > $this->count_subpatterns()) {
-            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->count_subpatterns().' available');
+        } else if ($subpattern > $this->maxsubpatt) {
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         } else {
             return '';
         }

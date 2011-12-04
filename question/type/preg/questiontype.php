@@ -19,6 +19,10 @@ require_once($CFG->dirroot.'/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
 
+    /*public function questionid_column_name() {
+        return 'questionid';
+    }*/
+
     /**
     * returns an array of engines
     * key = engine indentifier, value = interface string with engine name
@@ -50,7 +54,7 @@ class qtype_preg extends qtype_shortanswer {
         return 'preg';
     }
 
-    function extra_question_fields() {
+    public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'question_preg');
         array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');

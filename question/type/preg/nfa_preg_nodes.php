@@ -607,7 +607,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
     private function create_brace(&$matcher, &$stackofautomatons, &$statecount, &$transitioncount) {
         // create an automaton for body ($leftborder + 1) times
         $leftborder = $this->pregnode->leftborder;
-        for ($i = 0; $i < $leftborder + 1; $i++) {
+        for ($i = 0; $i < $leftborder; $i++) {
             $err = $this->operands[0]->create_automaton($matcher, $stackofautomatons, $statecount, $transitioncount);
             if ($err != null) {
                 return $err;
@@ -615,31 +615,31 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         }
         $res = null;    // the resulting automaton
         // linking automatons to the resulting one
-        for ($i = 0; $i < $leftborder + 1; $i++) {
+        for ($i = 0; $i < $leftborder; $i++) {
             $cur = array_pop($stackofautomatons);
-            if ($i > 0) {
-                // the last block is repeated
-                if ($i == $leftborder) {
-                    if (!$this->inc_fa_size($matcher, 0, count($cur->startstate->next) + 1, $statecount, $transitioncount)) {
-                        return $this;
-                    }
-                    foreach ($cur->startstate->next as $curnext) {
-                        $clone = clone $curnext;
-                        $clone->loops = true;
-                        $cur->endstate->append_transition($clone);
-                    }
-                    $epsleaf = new preg_leaf_meta;
-                    $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
-                    $cur->startstate->append_transition(new nfa_transition($epsleaf, $cur->endstate, false, true));
+            $firststep = false;
+            if ($res === null) {
+                $res = $cur;
+                $firststep = true;
+            }
+            // the last block is repeated
+            if ($i == $leftborder - 1) {
+                if (!$this->inc_fa_size($matcher, 0, count($cur->startstate->next) + 1, $statecount, $transitioncount)) {
+                    return $this;
                 }
-                // merging
+                foreach ($cur->startstate->next as $curnext) {
+                    $clone = clone $curnext;
+                    $clone->loops = true;
+                    $cur->endstate->append_transition($clone);
+                }
+            }
+            // merging
+            if (!$firststep) {
                 $cur->update_state_references($cur->startstate, $res->endstate);
                 $res->endstate->merge($cur->startstate);
                 $cur->remove_state($cur->startstate);
                 $res->move_states($cur);
                 $res->endstate = $cur->endstate;
-            } else {
-                $res = $cur;
             }
         }
         array_push($stackofautomatons, $res);

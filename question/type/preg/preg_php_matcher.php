@@ -78,11 +78,12 @@ class preg_php_matcher extends preg_matcher {
         //Do matching
         $matches = array();
         //No need to find all matches since preg_match don't return partial matches, any full match is sufficient
-        $this->full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
+        $full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
         //$matches[0] - match with the whole regexp, $matches[1] - first subpattern etc
         //$matches[$i] format is array(0=> match, 1 => offset of this match)
-        if ($this->full) {
+        if ($full) {
             $this->is_match = true;
+            $this->full = true;
             foreach ($matches as $i => $match) {
                 $this->index_first[$i] = $match[1];
                 $this->index_last[$i] = $this->index_first[$i] + strlen($match[0]) - 1;

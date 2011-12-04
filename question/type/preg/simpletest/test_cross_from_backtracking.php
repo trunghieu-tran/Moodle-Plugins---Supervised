@@ -140,14 +140,14 @@ class test_cross_from_backtracking extends preg_cross_tester {
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>2),
-                                              'left'=>array(0),
-                                              'next'=>'nextchar'),
+                                              'left'=>array(1),
+                                              'next'=>'b'),
                                         array('is_match'=>true,            // results for fa engine
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>10),
-                                              'left'=>array(2),
-                                              'next'=>'a')    // not a mistake, the loop must be completed
+                                              'left'=>array(1),
+                                              'next'=>'b')
                                         ));
 
         $test1 = array('str'=>'aaaaaaaaaab',
@@ -548,7 +548,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'full'=>false,
                        'index_first'=>array(0=>0,1=>-1,2=>-1),
                        'index_last'=>array(0=>2,1=>-2,2=>-2),
-                       'left'=>array(0),
+                       'left'=>array(10000000),
                        'next'=>'');
 
         $test1 = array('str'=>'abc',
@@ -682,13 +682,13 @@ class test_cross_from_backtracking extends preg_cross_tester {
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>1),
-                                              'left'=>array(0),
-                                              'next'=>'nextchar'),
+                                              'left'=>array(1),
+                                              'next'=>' '),
                                         array('is_match'=>true,            // results for fa engine
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'index_last'=>array(0=>7),
-                                              'left'=>array(5),
+                                              'left'=>array(1),
                                               'next'=>' ')
                                         ));
 
@@ -841,7 +841,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'index_last'=>array(0=>2),
-                       'left'=>array(0),
+                       'left'=>array(10000000),
                        'next'=>'');
 
         return array('regex'=>'abc$',
@@ -854,7 +854,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'full'=>false,
                        'index_first'=>array(0=>0,1=>-1),
                        'index_last'=>array(0=>0,1=>-2),
-                       'left'=>array(0),
+                       'left'=>array(10000000),
                        'next'=>'');
 
         $test1 = array('str'=>'ac',
@@ -875,7 +875,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'full'=>false,
                        'index_first'=>array(0=>4),
                        'index_last'=>array(0=>3),
-                       'left'=>array(0),
+                       'left'=>array(10000000),
                        'next'=>'');
 
         return array('regex'=>'$abca',
@@ -888,7 +888,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'index_last'=>array(0=>2),
-                       'left'=>array(0),
+                       'left'=>array(10000000),
                        'next'=>'');
 
         return array('regex'=>'abc^',
