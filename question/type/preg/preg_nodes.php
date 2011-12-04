@@ -293,7 +293,7 @@ class preg_leaf_meta extends preg_leaf {
     //TODO - ui_nodename()
     
     public function consumes() {
-        if ($this->subtype = preg_leaf_meta::SUBTYPE_EMPTY) {
+        if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             return 0;
         }
         return 1;
