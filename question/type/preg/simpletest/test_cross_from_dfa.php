@@ -18,11 +18,11 @@ class test_cross_from_dfa extends preg_cross_tester {
 
     function data_for_test_easy() {
         $test1 = array( 'str'=>'fgh',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'index_last'=>array(0=>1),
-                        'left'=>array(3),
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>-1),
+                        'left'=>array(4),
                         'next'=>'a');
 
         $test2 = array( 'str'=>'abce',
@@ -44,9 +44,9 @@ class test_cross_from_dfa extends preg_cross_tester {
         return array('regex'=>'^abcd$',
                      'tests'=>array($test1, $test2, $test3));
     }
-	
-	function data_for_test_alternative() {
-		$test1 = array( 'str'=>'ad',
+
+    function data_for_test_alternative() {
+        $test1 = array( 'str'=>'ad',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>-1),
@@ -69,13 +69,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>1, 1=>1),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^(ab|cd)$',
+
+        return array('regex'=>'^(ab|cd)$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_iteration() {
-		$test1 = array( 'str'=>'ac',
+    }
+
+    function data_for_test_iteration() {
+        $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -98,13 +98,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>46),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^ab*c$',
+
+        return array('regex'=>'^ab*c$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_questquant() {
-		$test1 = array( 'str'=>'ac',
+    }
+
+    function data_for_test_questquant() {
+        $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -127,26 +127,26 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>1),
                         'left'=>array(1),
                         'next'=>'c');
-						
-		return array('regex'=>'^ab?c$',
+
+        return array('regex'=>'^ab?c$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_metacharacter_dot() {
-		$test1 = array( 'str'=>'afc',
+    }
+
+    function data_for_test_metacharacter_dot() {
+        $test1 = array( 'str'=>'afc',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^a.c$',
+
+        return array('regex'=>'^a.c$',
                      'tests'=>array($test1));
-	}
-	
-	function data_for_test_negative_character_class() {
-		$test1 = array( 'str'=>'abcd',
+    }
+
+    function data_for_test_negative_character_class() {
+        $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -161,13 +161,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>3),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^a[^b]cd$',
+
+        return array('regex'=>'^a[^b]cd$',
                      'tests'=>array($test1, $test2));
-	}
-	
-	function data_for_test_many_alternatives() {
-		$test1 = array( 'str'=>'abi',
+    }
+
+    function data_for_test_many_alternatives() {
+        $test1 = array( 'str'=>'abi',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -182,66 +182,66 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'efi',
+
+        $test3 = array( 'str'=>'efi',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test4 = array( 'str'=>'ghi',
+
+        $test4 = array( 'str'=>'ghi',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-		
-		$test5 = array( 'str'=>'yzi',
-                        'is_match'=>false,
+
+        $test5 = array( 'str'=>'yzi',
+                        'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
                         'left'=>array(3),
                         'next'=>'aceg');
-						
-		return array('regex'=>'^(?:ab|cd|ef|gh)i$',
+
+        return array('regex'=>'^(?:ab|cd|ef|gh)i$',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
-	}
-	
-	function data_for_test_repeat_chars() {//TODO: subpattern and correct result for dfa and nfa
-		$test1 = array( 'str'=>'ab',
+    }
+
+    function data_for_test_repeat_chars() {
+        $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>-1),
+                        'index_last'=>array(0=>1, 1=>-2),
                         'left'=>array(1),
                         'next'=>'b');
 
         $test2 = array( 'str'=>'abb',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>2),
+                        'index_first'=>array(0=>0, 1=>-1),
+                        'index_last'=>array(0=>2, 1=>-2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
+
+        $test3 = array( 'str'=>'ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'index_first'=>array(0=>0, 1=>72),
                         'index_last'=>array(0=>75, 1=>72),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^(a|b)*abb$',
+
+        return array('regex'=>'^(a|b)*abb$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_quantificator() {
-		$test1 = array( 'str'=>'abbbbbc',
+    }
+
+    function data_for_test_quantificator() {
+        $test1 = array( 'str'=>'abbbbbc',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -256,20 +256,20 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>26),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
+
+        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>35),
                         'left'=>array(1),
                         'next'=>'c');
-						
-		return array('regex'=>'^ab{15,35}c$',
+
+        return array('regex'=>'^ab{15,35}c$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	function data_for_test_plusquant() {
-		$test1 = array( 'str'=>'ac',
+    }
+    function data_for_test_plusquant() {
+        $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -284,21 +284,21 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
+
+        $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>100),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^ab+c$',
+
+        return array('regex'=>'^ab+c$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_assert() {
-		$test1 = array( 'str'=>'ax',
+    }
+
+    function data_for_test_assert() {
+        $test1 = array( 'str'=>'ax',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -313,21 +313,21 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>4),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'avbv',
+
+        $test3 = array( 'str'=>'avbv',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'a(?=[xcvnm]*b)[xcvbnm]*',
+
+        return array('regex'=>'a(?=[xcvnm]*b)[xcvbnm]*',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_repeat_chars_with_assert() {
-		$test1 = array( 'str'=>'ab',
+    }
+
+    function data_for_test_repeat_chars_with_assert() {
+        $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -342,29 +342,29 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>2),
                         'left'=>array(3),
                         'next'=>'a');
-						
-		$test3 = array( 'str'=>'abb',
+
+        $test3 = array( 'str'=>'abb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test4 = array( 'str'=>'adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
+
+        $test4 = array( 'str'=>'adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>75),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'(?:a|b|c|d)*(?=abb)(?:a|c)(?:b|d)(?:b|d)',
+
+        return array('regex'=>'(?:a|b|c|d)*(?=abb)(?:a|c)(?:b|d)(?:b|d)',
                      'tests'=>array($test1, $test2, $test3, $test4));
-	}
-	
-	function data_for_test_repeat_chars_without_assert() {
-		$test1 = array( 'str'=>'ab',
+    }
+
+    function data_for_test_repeat_chars_without_assert() {
+        $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -379,29 +379,29 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>2),
                         'left'=>array(3),
                         'next'=>'ab');
-						
-		$test3 = array( 'str'=>'abb',
+
+        $test3 = array( 'str'=>'abb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test4 = array( 'str'=>'adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
+
+        $test4 = array( 'str'=>'adcdcbabadcbababcdcbbabababaabcccccbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>75),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'(?:a|b|c|d)*abb',
+
+        return array('regex'=>'(?:a|b|c|d)*abb',
                      'tests'=>array($test1, $test2, $test3, $test4));
-	}
-	
-	function data_for_test_start_on_assert() {
-		$test1 = array( 'str'=>'x',
+    }
+
+    function data_for_test_start_on_assert() {
+        $test1 = array( 'str'=>'x',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -416,21 +416,21 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>3),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test3 = array( 'str'=>'vbv',
+
+        $test3 = array( 'str'=>'vbv',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'(?=[xcvnm]*b)[xcvbnm]*',
+
+        return array('regex'=>'(?=[xcvnm]*b)[xcvbnm]*',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_loop_assert() {
-		$test1 = array( 'str'=>'axcv',
+    }
+
+    function data_for_test_loop_assert() {
+        $test1 = array( 'str'=>'axcv',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -445,29 +445,29 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>0),
                         'left'=>array(1),
                         'next'=>'xcvnm');
-						
-		$test3 = array( 'str'=>'axacav',
+
+        $test3 = array( 'str'=>'axacav',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>5),
                         'left'=>array(0),
                         'next'=>'');
-						
-		$test4 = array( 'str'=>'ab',
+
+        $test4 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>0),
                         'left'=>array(1),
                         'next'=>'xcvnm');
-						
-		return array('regex'=>'a(?:(?=[^b])[xcvbnm])+',
+
+        return array('regex'=>'a(?:(?=[^b])[xcvbnm])+',
                      'tests'=>array($test1, $test2, $test3, $test4));
-	}
-	
-	function data_for_test_no_anchor() {
-		$test1 = array( 'str'=>'OabO',
+    }
+
+    function data_for_test_no_anchor() {
+        $test1 = array( 'str'=>'OabO',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>1),
@@ -482,13 +482,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>1),
                         'left'=>array(1),
                         'next'=>'b');
-						
-		return array('regex'=>'ab',
+
+        return array('regex'=>'ab',
                      'tests'=>array($test1, $test2));
-	}
-	
-	function data_for_test_left_anchor() {
-		$test1 = array( 'str'=>'abO',
+    }
+
+    function data_for_test_left_anchor() {
+        $test1 = array( 'str'=>'abO',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -497,18 +497,19 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'OabO',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
-                        'left'=>array(1),
+                        'left'=>array(2),
                         'next'=>'a');
-						
-		return array('regex'=>'^ab',
+
+        return array('regex'=>'^ab',
                      'tests'=>array($test1, $test2));
-	}
-	function data_for_test_right_anchor() {
-		$test1 = array( 'str'=>'Oab',
+    }
+
+    function data_for_test_right_anchor() {
+        $test1 = array( 'str'=>'Oab',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>1),
@@ -523,13 +524,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'ab$',
+
+        return array('regex'=>'ab$',
                      'tests'=>array($test1, $test2));
-	}
-	
-	function data_for_test_full_anchor() {
-		$test1 = array( 'str'=>'ab',
+    }
+
+    function data_for_test_full_anchor() {
+        $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -538,27 +539,27 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'Oab',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'index_last'=>array(0=>1),
-                        'left'=>array(0),
-                        'next'=>'');
-						
-		$test3 = array( 'str'=>'abO',
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>-1),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'abO',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'^ab$',
+
+        return array('regex'=>'^ab$',
                      'tests'=>array($test1, $test2, $test3));
-	}
-	
-	function data_for_test_digit() {
-		$test1 = array( 'str'=>'273x',
+    }
+
+    function data_for_test_digit() {
+        $test1 = array( 'str'=>'273x',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>2),
@@ -573,13 +574,13 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>-1, 1=>-2),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'(\d)+x',
+
+        return array('regex'=>'(\d)+x',
                      'tests'=>array($test1, $test2));
-	}
-	
-	function data_for_test_wordchar() {
-		$test1 = array( 'str'=>'a_a',
+    }
+
+    function data_for_test_wordchar() {
+        $test1 = array( 'str'=>'a_a',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -594,39 +595,26 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'index_last'=>array(0=>0),
                         'left'=>array(2),
                         'next'=>'abcdefghijklomnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_');
-						
-		return array('regex'=>'a\wa',
+
+        return array('regex'=>'a\wa',
                      'tests'=>array($test1, $test2));
-	}
-	
-	function data_for_test_match_not_from_string_start() {
-		$test1 = array( 'str'=>'sometextwithoutmatchingandsomeregexwithmatchig',
+    }
+
+    function data_for_test_match_not_from_string_start() {
+        $test1 = array( 'str'=>'sometextwithoutmatchingandsomeregexwithmatchig',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>26),
                         'index_last'=>array(0=>34),
                         'left'=>array(0),
                         'next'=>'');
-						
-		return array('regex'=>'someregex',
+
+        return array('regex'=>'someregex',
                      'tests'=>array($test1));
-	}
-	
-	function data_for_test_partial_match_charsets_1() {
-		$test1 = array( 'str'=>'aabbbabb',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>7),
-                        'left'=>array(0),
-                        'next'=>'');
-						
-		return array('regex'=>'[ab]*abb',
-                     'tests'=>array($test1));
-	}
-	
-	function data_for_test_partial_match_charsets_2() {
-		$test1 = array( 'str'=>'aabbbabb',
+    }
+
+    function data_for_test_partial_match_charsets_1() {
+        $test1 = array( 'str'=>'aabbbabb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -634,12 +622,12 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
-		return array('regex'=>'[ab]*[ac]bb',
+        return array('regex'=>'[ab]*abb',
                      'tests'=>array($test1));
-	}
-	
-	function data_for_test_partial_match_meta_meta() {
-		$test1 = array( 'str'=>'@W#G%9bb',
+    }
+
+    function data_for_test_partial_match_charsets_2() {
+        $test1 = array( 'str'=>'aabbbabb',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -647,12 +635,25 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
-		return array('regex'=>'.*\wbb',
+        return array('regex'=>'[ab]*[ac]bb',
                      'tests'=>array($test1));
-	}
-	
-	function data_for_test_partial_match_charset_meta() {
-		$test1 = array( 'str'=>'aaa_aaa',
+    }
+
+    function data_for_test_partial_match_meta_meta() {
+        $test1 = array( 'str'=>'@W#G%9bb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>7),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'.*\wbb',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_partial_match_charset_meta() {
+        $test1 = array( 'str'=>'aaa_aaa',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -660,7 +661,7 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
-		return array('regex'=>'(?:\w)*a',
+        return array('regex'=>'(?:\w)*a',
                      'tests'=>array($test1));
-	}
+    }
 }
