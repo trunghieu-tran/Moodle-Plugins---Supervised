@@ -7,9 +7,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %function nextToken
 %char
 %state CHARCLASS
+%init{
+	$this->optstack = array();
+	$this->optstack[0] = new stdClass;
+	$this->optstack[0]->i = false;
+	$this->optcount = 1;
+%init}
 %{
     protected $errors = array();
     protected $maxsubpatt = 0;
+	protected $optstack;
+	protected $optcount;
 
     //A reference to the matcher object to be passed to some nodes
     public $matcher = null;
@@ -34,9 +42,13 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         }
         //set i modifier for leafs
         if (is_a($result, 'preg_leaf')) {
-            if(strpos($this->localmodifiers,'i')!==false) {
+            /*old style local modifier handling
+			if(strpos($this->localmodifiers,'i')!==false) {
                 $result->caseinsensitive = true;
-            }
+            }*/
+			if ($this->optstack[$this->optcount-1]->i) {
+				 $result->caseinsensitive = true;
+			}
         }
         if ($name == 'preg_leaf_charset') {
             $result->charset = $charclass;
@@ -87,6 +99,21 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
             $cc->error = 1;
         }
     }
+	protected function push_opt_lvl() {
+		$this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
+		$this->optcount++;
+	}
+	protected function pop_opt_lvl() {
+		if ($this->optcount>0)
+			$this->optcount--;
+	}
+	protected function mod_top_opt($options) {
+		if ($options == '(?i)') {
+			$this->optstack[$this->optcount-1]->i = true;
+		} else if ($options == '(?-i)') {
+			$this->optstack[$this->optcount-1]->i = false;
+		}
+	}
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
@@ -168,52 +195,67 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
+	$this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \) {
+	$this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
 <YYINITIAL> \(\?> {
+	$this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?: {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?! {
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<= {
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<! {
+	$this->push_opt_lvl();
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?= {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?! {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<= {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<! {
+	$this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -304,15 +346,19 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
-<YYINITIAL> \(\?[imsxUXJ]*(-[imsxUXJ]*)?\) {
+<YYINITIAL> \(\?(i|-i)\) {
     $text = $this->yytext();
-    $leaf = $this->form_node('preg_leaf_option', null, $text);
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
-    return $res;
+    $this->mod_top_opt($text);
 }
 <YYINITIAL> \(\?(R|[0-9]+)\) {
     $text = $this->yytext();
     $leaf = $this->form_node('preg_leaf_recursion', null, $text);
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
+    return $res;
+}
+<YYINITIAL> \\[^0-9a-zA-Z] {
+	$text = $this->yytext();
+    $leaf = $this->form_node('preg_leaf_charset', null, $text[1]);
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
