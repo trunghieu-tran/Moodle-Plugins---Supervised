@@ -95,8 +95,11 @@ class Yylex extends JLexBase  {
         }
     }
 	protected function push_opt_lvl() {
-		$this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
-		$this->optcount++;
+		if ($this->optcount > 0) {
+			$this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
+			$this->optcount++;
+		} /*else 
+			error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
 	}
 	protected function pop_opt_lvl() {
 		if ($this->optcount>0)
