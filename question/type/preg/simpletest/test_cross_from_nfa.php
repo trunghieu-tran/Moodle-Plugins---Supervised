@@ -27,10 +27,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'_the matcher works',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>18),
-                        'index_last'=>array(0=>17),
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>-1),
                         'left'=>array(17),
                         'next'=>'t');
 
@@ -76,7 +76,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>2),
-                        'left'=>array(10000000),
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^abc|def$',
@@ -117,10 +117,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         $test5 = array( 'str'=>'yzi',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>3),
-                        'index_last'=>array(0=>2),
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>-1),
                         'left'=>array(3),
                         'next'=>'aceg');
 
@@ -155,27 +155,6 @@ class test_cross_from_nfa extends preg_cross_tester {
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
-    }
-
-    function data_for_test_assertions_simple_2() {
-        $test1 = array( 'str'=>'abc?z',
-                        'is_match'=>true,
-                        'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>4),
-                        'left'=>array(0),
-                        'next'=>'');
-
-        $test2 = array( 'str'=>'abcaa',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>3),
-                        'left'=>array(1),
-                        'next'=>'');    // can't generate a character
-
-        return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
-                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_zero_length_loop() {
@@ -221,7 +200,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>3),
-                        'left'=>array(10000000),
+                        'left'=>array(0),
                         'next'=>'');
 
         return array('regex'=>'^a[^b]cd$',
@@ -443,7 +422,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>1),
-                        'left'=>array(3),    // greedy quantifier
+                        'left'=>array(1),    // 'left' takes priority
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
@@ -486,8 +465,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test3 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>2),
-                        'index_last'=>array(0=>1),
+                        'index_first'=>array(0=>0),
+                        'index_last'=>array(0=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -768,8 +747,8 @@ class test_cross_from_nfa extends preg_cross_tester {
         $test2 = array( 'str'=>'cdcd',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>4,1=>-1,2=>-1),
-                        'index_last'=>array(0=>3,1=>-2,2=>-2),
+                        'index_first'=>array(0=>0,1=>-1,2=>-1),
+                        'index_last'=>array(0=>-1,1=>-2,2=>-2),
                         'left'=>array(10000000),                    // TODO: standardize this value
                         'next'=>'');
 
