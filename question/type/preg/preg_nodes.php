@@ -1002,12 +1002,14 @@ class preg_node_error extends preg_node {
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
     //Unclosed square brackets in character class
     const SUBTYPE_UNCLOSED_CHARCLASS = 'unclosed_charclass_node_error';
+	//Set and unset same modifier at ther same time
+	const SUBTYPE_SET_UNSET_MODIFIER = 'set_and_unset_same_modifier_at_the_same_time_node_error';
 
     //Error strings name in qtype_preg.php lang file
     public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt', 
                                     preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN => 'unopenedparen', preg_node_error::SUBTYPE_WRONG_OPEN_PAREN => 'unclosedparen', 
                                     preg_node_error::SUBTYPE_EMPTY_PARENS => 'emptyparens', preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart',
-                                    preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS => 'unclosedsqbrackets');
+                                    preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS => 'unclosedsqbrackets', preg_node_error::SUBTYPE_SET_UNSET_MODIFIER =>'setunsetmod');
 
     //Arrays of indexes in regex string describing error to highlight to the user (and include in message) - first and last
     public $firstindxs;
