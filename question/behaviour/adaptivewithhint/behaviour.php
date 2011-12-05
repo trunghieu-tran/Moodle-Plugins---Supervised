@@ -11,7 +11,6 @@ defined('MOODLE_INTERNAL') || die();
  * _try - number of submissions (inherited from adaptive)
  * _rawfraction - fraction for the step without penalties (inherited from adaptive)
  * _hashint - there was hint requested in the step
- * _<hintname>count - count of hint named <hintname>
  * _render_<hintname> - true if hint with hintname should be rendered when rendering question next time
  * _penalty - penalty added in this state (used for rendering and summarising mainly)
  * _totalpenalties - sum of all penalties already done
@@ -51,6 +50,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
 
     public function adjust_display_options(question_display_options $options) {
         parent::adjust_display_options($options);//there seems to nothing to be done until question_display_options will be passed to specific_feedback function of question renderer
+        //maybe add correctness if there were a response there
     }
 
     ////Summarise functions
@@ -110,8 +110,6 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
 
         //Set hint variables
         $pendingstep->set_behaviour_var('_hashint',true);
-        $prevhintcount = $this->qa->get_last_behaviour_var('_'.$hintkey.'count', 0);
-        $pendingstep->set_behaviour_var('_'.$hintkey.'count', $prevhintcount + 1);
         $prevtotal = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
         $penalty = $this->question->penalty_for_specific_hint($hintkey, $response);
         $pendingstep->set_behaviour_var('_penalty', $penalty);

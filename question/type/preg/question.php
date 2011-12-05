@@ -350,20 +350,27 @@ class qtype_preg_question extends question_graded_automatically
         $this->get_best_fit_answer($response);
 
         //Sanity check 
-        if (strpos($subject,'{$') === false || strpos($subject,'}') === false 
-            || $this->bestfitanswer==array()) {
-            //there are no placeholders for sure or no match found 
+        if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
+            //There are no placeholders for sure 
             return $subject;
         }
 
         $answer = $response['answer'];
         $matchresults = $this->bestfitanswer['match'];
+        //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
+        // c.f. failed test in simpletest/testquestion.php
 
-        foreach ($matchresults['index_first'] as $i => $startindex) {
-            $search = '{$'.$i.'}';
-            $endindex = $matchresults['index_last'][$i];
-            $replace = substr($answer, $startindex, $endindex - $startindex + 1);
-            $subject = str_replace($search, $replace, $subject);
+        if ($matchresults['is_match']) {
+            foreach ($matchresults['index_first'] as $i => $startindex) {
+                $search = '{$'.$i.'}';
+                $endindex = $matchresults['index_last'][$i];
+                $replace = substr($answer, $startindex, $endindex - $startindex + 1);
+                $subject = str_replace($search, $replace, $subject);
+            }
+        } else {
+            //No match, so no feedback should be shown.
+            //It is possible to have best fit answer with no match to hint first character from first answer for which hint is possible.
+            $subject = '';
         }
 
         return $subject;
