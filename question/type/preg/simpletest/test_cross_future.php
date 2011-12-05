@@ -9,7 +9,7 @@ require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 class test_cross_future extends preg_cross_tester {
 
     // from nfa    
-	function data_for_test_assertions_simple_2() {
+    function data_for_test_assertions_simple_2() {
         $test1 = array( 'str'=>'abc?z',
                         'is_match'=>true,
                         'full'=>true,

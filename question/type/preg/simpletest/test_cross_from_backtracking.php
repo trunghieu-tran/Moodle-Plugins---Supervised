@@ -849,7 +849,7 @@ class test_cross_from_backtracking extends preg_cross_tester {
     }
 
     function data_for_test_ASSERT_ETEST_3() {
-        $test0 = array('str'=>'bc',                                  // test fails at the moment
+        $test0 = array('str'=>'bc',
                        'is_match'=>true,
                        'full'=>false,
                        'index_first'=>array(0=>0,1=>-1),
@@ -870,8 +870,8 @@ class test_cross_from_backtracking extends preg_cross_tester {
     }
 
     function data_for_test_ASSERT_ETEST_5() {
-        $test0 = array('str'=>'abca',                                  // test fails at the moment
-                       'is_match'=>true,
+        $test0 = array('str'=>'abca',
+                       'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(0=>4),
                        'index_last'=>array(0=>3),

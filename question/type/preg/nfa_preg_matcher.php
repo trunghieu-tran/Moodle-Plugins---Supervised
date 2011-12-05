@@ -199,6 +199,14 @@ class nfa_preg_matcher extends preg_matcher {
         $curstates = array();    // states which the automaton is in
         $result = null;
         if ($laststate->backrefmatchlen == 0) {
+            // check if an asserion $ failed the match
+            foreach ($laststate->state->next as $next) {
+                if ($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_DOLLAR && $next->state === $this->automaton->endstate) {
+                    $laststate->next = '';
+                    $laststate->left = 0;
+                    return $laststate;
+                }
+            }
             array_push($curstates, $laststate);
         } else {
             $transition = $laststate->backreftransition;
@@ -215,19 +223,28 @@ class nfa_preg_matcher extends preg_matcher {
                 $curstate = array_pop($curstates);
                 if ($curstate->state === $this->automaton->endstate && $curstate->next !== '' && ($result === null || ($result !== null && $result->matchcnt > $curstate->matchcnt))) {
                     $result = $curstate;
+                    $result->left = $result->matchcnt - $laststate->matchcnt;
                 } else {
                     foreach ($curstate->state->next as $next) {
                         if (!$next->loops) {
                             $skip = false;
-                            if (is_a($next->pregleaf, 'preg_leaf_backref')) {
-                                // only generated subpatterns can be passed
-                                if (array_key_exists($next->pregleaf->number, $curstate->subpatt_index_last_old) && $curstate->subpatt_index_last_old[$next->pregleaf->number] > -2) {
-                                    $length = $curstate->subpatt_index_last_old[$next->pregleaf->number] - $curstate->subpatt_index_first_old[$next->pregleaf->number] + 1;
-                                } else {
+                            // check for anchors
+                            
+                            if (($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX && $curstate->ismatch) ||        // ^ in the middle
+                                ($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_DOLLAR && $next->state !== $this->automaton->endstate)) {    // $ in the middle
                                     $skip = true;
+                            }
+                            if (!$skip) {
+                                if (is_a($next->pregleaf, 'preg_leaf_backref')) {
+                                    // only generated subpatterns can be passed
+                                    if (array_key_exists($next->pregleaf->number, $curstate->subpatt_index_last_old) && $curstate->subpatt_index_last_old[$next->pregleaf->number] > -2) {
+                                        $length = $curstate->subpatt_index_last_old[$next->pregleaf->number] - $curstate->subpatt_index_first_old[$next->pregleaf->number] + 1;
+                                    } else {
+                                        $skip = true;
+                                    }
+                                } else {
+                                    $length = $next->pregleaf->consumes();
                                 }
-                            } else {
-                                $length = $next->pregleaf->consumes();
                             }
                             // check for length
                             if (!$skip) {
@@ -378,7 +395,7 @@ class nfa_preg_matcher extends preg_matcher {
                             $path = $this->determine_characters_left($str, $startpos, $curstate);
                             if ($path !== null) {
                                 $curstate->next = $path->next;
-                                $curstate->left = $path->matchcnt - $curstate->matchcnt;
+                                $curstate->left = $path->left;
                             }
                             // finally, save the possible partial match
                             array_push($results, $curstate);
@@ -425,7 +442,11 @@ class nfa_preg_matcher extends preg_matcher {
         $textlib = textlib_get_instance();
         $len = $textlib->strlen($str);
         // match from all indexes
-        for ($j = 0; $j <= $len && !$result->isfullmatch; $j++) {
+        $rightborder = $len;
+        if ($str === '') {
+            $rightborder = 1;
+        }
+        for ($j = 0; $j < $rightborder && !$result->isfullmatch; $j++) {
             $tmp = $this->match_from_pos($str, $j);
             if ($this->is_new_result_more_suitable(&$result, &$tmp)) {
                 $result = $tmp;
