@@ -148,8 +148,10 @@ class preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
-        $lexer->globalmodifiers = $this->modifiers;
-        $lexer->localmodifiers = $this->modifiers;
+        /*old-style modifier support
+		$lexer->globalmodifiers = $this->modifiers;
+        $lexer->localmodifiers = $this->modifiers;*/
+		$lexer->mod_top_opt($this->modifiers, '');
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
             $parser->doParse($token->type, $token->value);
