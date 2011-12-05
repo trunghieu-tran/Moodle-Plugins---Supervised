@@ -104,6 +104,7 @@ $string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missin
 $string['unclosedsqbrackets'] = 'Regex syntax error: closing brackets \']\' missing for character class starting at position {$a->indfirst}';
 $string['ungreedyquant'] = 'ungreedy quantifiers';
 $string['unopenedparen'] = 'Regex syntax error: opening parenthesis \'(\' missing for closing parenthesis in position {$a->indfirst}';
+$string['setunsetmod'] = 'Regex syntax error: set and unset same modifier between {$a->indfirst} {$a->indlast}';
 $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by {$a->engine}';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by engine {$a->classname}.';
 $string['usehint'] = 'Allow next characters hinting';
