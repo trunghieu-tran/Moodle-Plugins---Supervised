@@ -7,6 +7,9 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
 
+// TODO - set desired values for indexes using regex-submatch.pdf page 7
+// Don't trust these test right now!
+
 class test_cross_quantifiers extends preg_cross_tester {
 
     public $quants = array('{2,5}', '{2,}', '{,5}', '*');
