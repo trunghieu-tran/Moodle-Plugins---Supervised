@@ -62,58 +62,6 @@ class restore_qtype_preg_plugin extends restore_qtype_plugin {
     }
 
     /**
-     * Add to $paths the restore_path_elements needed
-     * to handle question_numerical_units for a given question
-     * Used by various qtypes (calculated, numerical)
-     */
-    protected function add_question_numerical_units(&$paths) {
-        // Check $paths is one array
-        if (!is_array($paths)) {
-            throw new restore_step_exception('paths_must_be_array', $paths);
-        }
-
-        $elename = 'question_numerical_unit';
-        $elepath = $this->get_pathfor('/numerical_units/numerical_unit'); // we used get_recommended_name() so this works
-        $paths[] = new restore_path_element($elename, $elepath);
-    }
-
-    /**
-     * Add to $paths the restore_path_elements needed
-     * to handle question_numerical_options for a given question
-     * Used by various qtypes (calculated, numerical)
-     */
-    protected function add_question_numerical_options(&$paths) {
-        // Check $paths is one array
-        if (!is_array($paths)) {
-            throw new restore_step_exception('paths_must_be_array', $paths);
-        }
-
-        $elename = 'question_numerical_option';
-        $elepath = $this->get_pathfor('/numerical_options/numerical_option'); // we used get_recommended_name() so this works
-        $paths[] = new restore_path_element($elename, $elepath);
-    }
-
-    /**
-     * Add to $paths the restore_path_elements needed
-     * to handle question_datasets (defs and items) for a given question
-     * Used by various qtypes (calculated, numerical)
-     */
-    protected function add_question_datasets(&$paths) {
-        // Check $paths is one array
-        if (!is_array($paths)) {
-            throw new restore_step_exception('paths_must_be_array', $paths);
-        }
-
-        $elename = 'question_dataset_definition';
-        $elepath = $this->get_pathfor('/dataset_definitions/dataset_definition'); // we used get_recommended_name() so this works
-        $paths[] = new restore_path_element($elename, $elepath);
-
-        $elename = 'question_dataset_item';
-        $elepath = $this->get_pathfor('/dataset_definitions/dataset_definition/dataset_items/dataset_item');
-        $paths[] = new restore_path_element($elename, $elepath);
-    }
-
-    /**
      * Processes the answer element (question answers). Common for various qtypes.
      * It handles both creation (if the question is being created) and mapping
      * (if the question already existed and is being reused)
