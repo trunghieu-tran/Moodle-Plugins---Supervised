@@ -10,6 +10,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %init{
 	$this->optstack = array();
 	$this->optstack[0] = new stdClass;
+	//set false all modifiers' fields, it must be set to correct values before initializing lexer and lexical aniliz
 	$this->optstack[0]->i = false;
 	$this->optcount = 1;
 %init}
@@ -110,11 +111,20 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 		if ($this->optcount>0)
 			$this->optcount--;
 	}
-	protected function mod_top_opt($options) {
-		if ($options == '(?i)') {
-			$this->optstack[$this->optcount-1]->i = true;
-		} else if ($options == '(?-i)') {
-			$this->optstack[$this->optcount-1]->i = false;
+	public function mod_top_opt($set, $unset) {
+		for ($i=0; $i<strlen($set); $i++) {
+			if (strpos($unset, $set[$i])) {//set and unset modifier at the same time is error
+				$text = $this->yytext;
+				$this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar-strlen($text), $this->yychar-1);
+				return;
+			}
+		}
+		//if error not exist, set and unset local modifier
+		for ($i=0; $i<strlen($set); $i++) {
+			$this->optstack[$this->optcount-1]->$set[$i] = true;
+		}
+		for ($i=0; $i<strlen($unset); $i++) {
+			$this->optstack[$this->optcount-1]->$unset[$i] = false;
 		}
 	}
 %}
@@ -349,9 +359,27 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
-<YYINITIAL> \(\?(i|-i)\) {
+<YYINITIAL> \(\?i\) {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
-    $this->mod_top_opt($text);
+    $this->mod_top_opt('i', '');
+}
+<YYINITIAL> \(\?-i\) {/*TODO: refactor this rule at adding support other modifier*/
+    $text = $this->yytext();
+    $this->mod_top_opt('', 'i');
+}
+<YYINITIAL> \(\?i: {/*TODO: refactor this rule at adding support other modifier*/
+    $text = $this->yytext();
+	$this->push_opt_lvl();
+	$this->mod_top_opt('i', '');
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    return $res;
+}
+<YYINITIAL> \(\?-i: {/*TODO: refactor this rule at adding support other modifier*/
+    $text = $this->yytext();
+	$this->push_opt_lvl();
+	$this->mod_top_opt('', '-i');
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    return $res;
 }
 <YYINITIAL> \(\?(R|[0-9]+)\) {
     $text = $this->yytext();
