@@ -334,7 +334,7 @@ class restore_qtype_preg_plugin extends restore_qtype_plugin {
         $qtype = question_bank::get_qtype($pluginname);
         $extraquestionfields = $qtype->extra_question_fields();
         $extraquestiontable = array_shift($extraquestionfields);
-        $questionfield = $qtype->questionid_column_name();
+        $questionfield = 'question';    //$qtype->questionid_column_name();        TODO use questionid_column_name()
         $data = (object)$data;
         $oldid = $data->id;
 
