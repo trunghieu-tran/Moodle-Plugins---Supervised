@@ -55,13 +55,9 @@ class qtype_correctwriting_token_base {
     protected $isanswer;
 
     /**
-     * Next four vars used to determine tokens location in
-     * the original string
+     * Token position - c.g. qtype_correctwriting_node_position class
      */
-    protected $linestart;
-    protected $lineend;
-    protected $colstart;
-    protected $colend;
+    protected $position;
 
     /**
      * Basic lexeme constructor.
@@ -70,14 +66,11 @@ class qtype_correctwriting_token_base {
      * @param string $value - semantic value of lexeme
      * @return base_token
      */
-    public function __construct($type, $value, $isanswer, $linestart, $lineend, $colstart, $colend) {
+    public function __construct($type, $value, $isanswer, $position) {
         $this->type = $type;
         $this->value = $value;
         $this->isanswer = $isanswer;
-        $this->linestart = $linestart;
-        $this->lineend = $lineend;
-        $this->colstart = $colstart;
-        $this->colend = $colend;
+        $this->position = $position;
     }
 
     /**
@@ -161,5 +154,29 @@ class qtype_correctwriting_matched_tokens_pair {
      * @var integer
      */
     public $mistakeweight;
+}
+
+class qtype_correctwriting_node_position {
+    protected $linestart;
+    protected $lineend;
+    protected $colstart;
+    protected $colend;
+
+    public function __construct($linestart, $lineend, $colstart, $colend) {
+        $this->linestart = $linestart;
+        $this->lineend = $lineend;
+        $this->colstart = $colstart;
+        $this->colend = $colend;
+    }
+
+    /**
+     * Summ positions of array of nodes into one position
+     *
+     * Resulting position is defined from minimum to maximum postion of nodes
+     *
+     * @param array $nodepositions positions of adjanced nodes
+     */
+    public function summ($nodepositions) {//Pashaev
+    }
 }
 ?>
