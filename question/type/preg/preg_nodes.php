@@ -443,11 +443,11 @@ class preg_leaf_assert extends preg_leaf {
                 $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
                 $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
                 if ($pos>0 && $pos < $textlib->strlen($str)) {
-					$wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
-					$Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
-				} else {
-					$wW = $Ww = false;
-				}
+                    $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                    $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                } else {
+                    $wW = $Ww = false;
+                }
                 if ($start||$end||$wW||$Ww) {
                     $result = true;
                 } else {
@@ -1002,8 +1002,8 @@ class preg_node_error extends preg_node {
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
     //Unclosed square brackets in character class
     const SUBTYPE_UNCLOSED_CHARCLASS = 'unclosed_charclass_node_error';
-	//Set and unset same modifier at ther same time
-	const SUBTYPE_SET_UNSET_MODIFIER = 'set_and_unset_same_modifier_at_the_same_time_node_error';
+    //Set and unset same modifier at ther same time
+    const SUBTYPE_SET_UNSET_MODIFIER = 'set_and_unset_same_modifier_at_the_same_time_node_error';
 
     //Error strings name in qtype_preg.php lang file
     public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt', 

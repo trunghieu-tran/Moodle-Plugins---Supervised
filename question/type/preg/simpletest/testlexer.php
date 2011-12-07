@@ -157,28 +157,28 @@ class lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($token->value->subtype == preg_leaf_assert::SUBTYPE_WORDBREAK);
         $this->assertTrue($token->value->negative);
-		$token = $lexer->nextToken();//\>
+        $token = $lexer->nextToken();//\>
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertFalse($token->value->negative);
-		$this->assertTrue($token->value->charset == '>');
-		$token = $lexer->nextToken();//\<
+        $this->assertTrue($token->value->charset == '>');
+        $token = $lexer->nextToken();//\<
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertFalse($token->value->negative);
-		$this->assertTrue($token->value->charset == '<');
-		$token = $lexer->nextToken();//\%
+        $this->assertTrue($token->value->charset == '<');
+        $token = $lexer->nextToken();//\%
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertFalse($token->value->negative);
-		$this->assertTrue($token->value->charset == '%');
-		$flag = false;
-		try {
-			$token = $lexer->nextToken();//\a
-		} catch(Exception $exep) {
-			$flag = true;
-		}
-		$this->assertTrue($flag);//\a mst not match
+        $this->assertTrue($token->value->charset == '%');
+        $flag = false;
+        try {
+            $token = $lexer->nextToken();//\a
+        } catch(Exception $exep) {
+            $flag = true;
+        }
+        $this->assertTrue($flag);//\a mst not match
     }
     function test_lexer_charclass() {
         //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
@@ -303,7 +303,7 @@ class lexer_test extends UnitTestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
-		$this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === 'grouping');
@@ -323,7 +323,7 @@ class lexer_test extends UnitTestCase {
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
         $this->assertTrue($token->value->subtype === preg_node_cond_subpatt::SUBTYPE_NLB);
     }
-	function test_lexer_subpatterns_nested() {
+    function test_lexer_subpatterns_nested() {
         $regex = '((?:(?>()(';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
@@ -331,24 +331,24 @@ class lexer_test extends UnitTestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
-		$this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === 'grouping');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY);
-		$this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);		
-		$this->assertTrue($token->value->number === 3);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);        
+        $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
-		$this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token->value->number === 4);
     }
     function test_lexer_recursion() {
         $regex = '(?R)(?14)';
@@ -364,73 +364,73 @@ class lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type==preg_node::TYPE_LEAF_RECURSION);
         $this->assertTrue($token->value->number==14);
     }
-	function test_lexer_options() {
+    function test_lexer_options() {
         $regex = 'a(?i)b(c(?-i)d)e';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
-		$token = $lexer->nextToken();//a
+        $token = $lexer->nextToken();//a
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'a');
-		$this->assertFalse($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//b
+        $this->assertFalse($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//b
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'b');
-		$this->assertTrue($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//(
-		$token = $lexer->nextToken();//c
+        $this->assertTrue($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//(
+        $token = $lexer->nextToken();//c
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'c');
-		$this->assertTrue($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//d
+        $this->assertTrue($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//d
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'd');
-		$this->assertFalse($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//)
-		$token = $lexer->nextToken();//e
+        $this->assertFalse($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//)
+        $token = $lexer->nextToken();//e
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'e');
-		$this->assertTrue($token->value->caseinsensitive);
-	}
-	function test_lexer_global_options() {
+        $this->assertTrue($token->value->caseinsensitive);
+    }
+    function test_lexer_global_options() {
         $regex = 'ab(?-i:cd)e';
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
-		$lexer->mod_top_opt('i', '');
-		$token = $lexer->nextToken();//a
+        $lexer->mod_top_opt('i', '');
+        $token = $lexer->nextToken();//a
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'a');
-		$this->assertTrue($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//b
+        $this->assertTrue($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//b
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'b');
-		$this->assertTrue($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//(
-		$token = $lexer->nextToken();//c
+        $this->assertTrue($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//(
+        $token = $lexer->nextToken();//c
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'c');
-		$this->assertFalse($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//d
+        $this->assertFalse($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//d
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'd');
-		$this->assertFalse($token->value->caseinsensitive);
-		$token = $lexer->nextToken();//)
-		$token = $lexer->nextToken();//e
+        $this->assertFalse($token->value->caseinsensitive);
+        $token = $lexer->nextToken();//)
+        $token = $lexer->nextToken();//e
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->charset == 'e');
-		$this->assertTrue($token->value->caseinsensitive);
-	}
+        $this->assertTrue($token->value->caseinsensitive);
+    }
     function test_lexer_index() {
         $regex = 'ab{12,57}[abc]';
         StringStreamController::createRef('regex', $regex);
