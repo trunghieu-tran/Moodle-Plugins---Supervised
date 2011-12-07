@@ -223,8 +223,8 @@ class File_ChessPGN_Lexer
     function yy_error ($code,$fatal)
     {
         if (method_exists($this,'raiseError')) { 
- 	    return $this->raiseError($code, $this->yy_error_string[$code], $fatal); 
- 	}
+         return $this->raiseError($code, $this->yy_error_string[$code], $fatal); 
+     }
         echo $this->yy_error_string[$code];
         if ($fatal) {
             exit;

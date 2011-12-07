@@ -69,50 +69,50 @@ abstract class dfa_preg_node {
     */
     abstract public function print_self($indent);
 
-	
-	/**
-	*Function append dotcode for subtree with root in this node
-	*@param $dotcode array for dotcode
-	*@param $maxnum service param, starting of number for nodes and leafs
-	*/
-	abstract public function generate_dot_code(&$dotcode, &$maxnum);
-	
-	/**
-	*Function generate node description at language
-	*@return string with node description
-	*/
-	public function write_self_to_dotcode() {
-		if (isset($this->nullable)) {
-			if ($this->nullable) {
-				$nullable = 'true';
-			} else {
-				$nullable = 'false';
-			}
-		} else {
-			$nullable = 'NULL';
-		}
-		if (isset($this->firstpos)) {
-			$firstpos = '';
-			foreach ($this->firstpos as $pos) {
-				$firstpos .= $pos.';';
-			}
-			$firstpos = substr($firstpos, 0, strlen($firstpos)-1);
-		} else {
-			$firstpos = 'NULL';
-		}
-		if (isset($this->lastpos)) {
-			$lastpos = '';
-			foreach ($this->lastpos as $pos) {
-				$lastpos .= $pos.';';
-			}
-			$lastpos = substr($lastpos, 0, strlen($lastpos)-1);
-		} else {
-			$lastpos = 'NULL';
-		}
-		$str = $this->dotnumber.' [shape=record,style=filled,color='.$this->color.',fillcolor='.$this->color.',label="{nullable: '.$nullable.'|firstpos: '.$firstpos .
-				'|lastpos: '.$lastpos;
-		return $str;
-	}
+    
+    /**
+    *Function append dotcode for subtree with root in this node
+    *@param $dotcode array for dotcode
+    *@param $maxnum service param, starting of number for nodes and leafs
+    */
+    abstract public function generate_dot_code(&$dotcode, &$maxnum);
+    
+    /**
+    *Function generate node description at language
+    *@return string with node description
+    */
+    public function write_self_to_dotcode() {
+        if (isset($this->nullable)) {
+            if ($this->nullable) {
+                $nullable = 'true';
+            } else {
+                $nullable = 'false';
+            }
+        } else {
+            $nullable = 'NULL';
+        }
+        if (isset($this->firstpos)) {
+            $firstpos = '';
+            foreach ($this->firstpos as $pos) {
+                $firstpos .= $pos.';';
+            }
+            $firstpos = substr($firstpos, 0, strlen($firstpos)-1);
+        } else {
+            $firstpos = 'NULL';
+        }
+        if (isset($this->lastpos)) {
+            $lastpos = '';
+            foreach ($this->lastpos as $pos) {
+                $lastpos .= $pos.';';
+            }
+            $lastpos = substr($lastpos, 0, strlen($lastpos)-1);
+        } else {
+            $lastpos = 'NULL';
+        }
+        $str = $this->dotnumber.' [shape=record,style=filled,color='.$this->color.',fillcolor='.$this->color.',label="{nullable: '.$nullable.'|firstpos: '.$firstpos .
+                '|lastpos: '.$lastpos;
+        return $str;
+    }
 
 
     //DFA functions
@@ -168,10 +168,10 @@ abstract class dfa_preg_node {
 }
 
 abstract class dfa_preg_leaf extends dfa_preg_node {
-	public function __construct($node, &$matcher) {
-		parent::__construct($node, $matcher);
-		$this->color = 'greenyellow';
-	}
+    public function __construct($node, &$matcher) {
+        parent::__construct($node, $matcher);
+        $this->color = 'greenyellow';
+    }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum;
         $connection[$maxnum] = &$this;
@@ -221,13 +221,13 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
             echo '<br>';
         }
     }
-	public function generate_dot_code(&$dotcode, &$maxnum) {
-		$this->dotnumber = ++$maxnum;
-		$dotcode[] = $this->write_self_to_dotcode();
-	}
+    public function generate_dot_code(&$dotcode, &$maxnum) {
+        $this->dotnumber = ++$maxnum;
+        $dotcode[] = $this->write_self_to_dotcode();
+    }
 }
 class dfa_preg_leaf_charset extends dfa_preg_leaf {
-	
+    
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: leaf charset ';
@@ -241,19 +241,19 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
         echo 'charset: ', $this->pregnode->charset, '<br/>';
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		if ($this->pregnode->negative) {
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        if ($this->pregnode->negative) {
             $direction = 'negative';
         } else {
             $direction = 'positive';
         }
-		$str .= '|CHARSET|charset: '.$this->pregnode->charset.'|'.$direction.'}"];';
-		return $str;
-	}
+        $str .= '|CHARSET|charset: '.$this->pregnode->charset.'|'.$direction.'}"];';
+        return $str;
+    }
 }
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
-	
+    
     const ENDREG = 186759556;
     public function number(&$connection, &$maxnum) {
         if ($this->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
@@ -294,14 +294,14 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
         echo 'subtype: ', $subtype, '<br/>';
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		if ($this->pregnode->negative) {
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        if ($this->pregnode->negative) {
             $direction = 'negative';
         } else {
             $direction = 'positive';
         }
-		switch ($this->pregnode->subtype) {
+        switch ($this->pregnode->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $subtype = 'dot';
                 break;
@@ -318,9 +318,9 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
                 $subtype = 'endreg';
                 break;
         }
-		$str .= '|METACHARACTER|subtype: '.$subtype.'|'.$direction.'}"];';
-		return $str;
-	}
+        $str .= '|METACHARACTER|subtype: '.$subtype.'|'.$direction.'}"];';
+        return $str;
+    }
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
     public function accept() {
@@ -361,14 +361,14 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         echo 'subtype: ', $subtype, '<br/>';
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		if ($this->pregnode->negative) {
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        if ($this->pregnode->negative) {
             $direction = 'negative';
         } else {
             $direction = 'positive';
         }
-		switch ($this->pregnode->subtype) {
+        switch ($this->pregnode->subtype) {
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $subtype = 'circumflex';
                 break;
@@ -385,9 +385,9 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
                 $subtype = '\\Z';
                 break;
         }
-		$str .= '|LEAF ASSERT|subtype: '.$subtype.'|'.$direction.'}"];';
-		return $str;
-	}
+        $str .= '|LEAF ASSERT|subtype: '.$subtype.'|'.$direction.'}"];';
+        return $str;
+    }
 }
 class dfa_preg_leaf_combo extends dfa_preg_leaf {
 
@@ -396,10 +396,10 @@ class dfa_preg_leaf_combo extends dfa_preg_leaf {
     }
 }
 abstract class dfa_preg_operator extends dfa_preg_node {
-	public function __construct($node, &$matcher) {
-		parent::__construct($node, $matcher);
-		$this->color = 'saddlebrown';
-	}
+    public function __construct($node, &$matcher) {
+        parent::__construct($node, $matcher);
+        $this->color = 'saddlebrown';
+    }
     public function number(&$connection, &$maxnum) {
         foreach ($this->pregnode->operands as $key => $operand) {
             $this->pregnode->operands[$key]->number($connection, $maxnum);
@@ -447,20 +447,20 @@ abstract class dfa_preg_operator extends dfa_preg_node {
             }
             echo '<br>';
         }
-	}
-	public function generate_dot_code(&$dotcode, &$maxnum) {
-		$this->dotnumber = ++$maxnum;
-		foreach ($this->pregnode->operands as $key=>$value) {
-			$this->pregnode->operands[$key]->generate_dot_code($dotcode, $maxnum);
-		}
-		$dotcode[] = $this->write_self_to_dotcode();
-		foreach ($this->pregnode->operands as $key=>$value) {
-			$dotcode[] = $this->dotnumber.'->'.$this->pregnode->operands[$key]->dotnumber.'[label="'.$key.'"];';
-		}
-	}
+    }
+    public function generate_dot_code(&$dotcode, &$maxnum) {
+        $this->dotnumber = ++$maxnum;
+        foreach ($this->pregnode->operands as $key=>$value) {
+            $this->pregnode->operands[$key]->generate_dot_code($dotcode, $maxnum);
+        }
+        $dotcode[] = $this->write_self_to_dotcode();
+        foreach ($this->pregnode->operands as $key=>$value) {
+            $dotcode[] = $this->dotnumber.'->'.$this->pregnode->operands[$key]->dotnumber.'[label="'.$key.'"];';
+        }
+    }
 }
 class dfa_preg_node_concat extends dfa_preg_operator {
-	
+    
     public function nullable() {
         $secnull = $this->pregnode->operands[1]->nullable();
         $this->nullable = $this->pregnode->operands[0]->nullable() && $secnull;
@@ -496,14 +496,14 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         echo 'type: node concatenation<br/>';
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		$str .= '|CONCATENATION}"];';
-		return $str;
-	}
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        $str .= '|CONCATENATION}"];';
+        return $str;
+    }
 }
 class dfa_preg_node_alt extends dfa_preg_operator {
-	
+    
     public function nullable() {
         $firnull = $this->pregnode->operands[0]->nullable();
         $this->nullable = $firnull || $this->pregnode->operands[1]->nullable();
@@ -523,11 +523,11 @@ class dfa_preg_node_alt extends dfa_preg_operator {
         echo 'type: node alternative<br/>';
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		$str .= '|ALTERNATIVE}"];';
-		return $str;
-	}
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        $str .= '|ALTERNATIVE}"];';
+        return $str;
+    }
 }
 class dfa_preg_node_assert extends dfa_preg_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
@@ -594,9 +594,9 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         echo 'number: ', $this->number, '<br/>';
         parent::print_self();
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		switch ($this->pregnode->subtype) {
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        switch ($this->pregnode->subtype) {
             case preg_node_assert::SUBTYPE_PLA:
                 $subtype = 'PLA';
                 break;
@@ -610,12 +610,12 @@ class dfa_preg_node_assert extends dfa_preg_operator {
                 $subtype = 'NLB';
                 break;
         }
-		$str .= '|ASSERT|subtype: '.$subtype.'}"];';
-		return $str;
-	}
+        $str .= '|ASSERT|subtype: '.$subtype.'}"];';
+        return $str;
+    }
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_operator {
-	
+    
     public function accept() {
         if (!$this->pregnode->greed) {
             return get_string('ungreedyquant', 'qtype_preg');
@@ -661,27 +661,27 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
         }
         parent::print_self($indent);
     }
-	public function write_self_to_dotcode() {
-		$str = dfa_preg_node::write_self_to_dotcode();
-		if ($this->pregnode->greed) {
-			$greedness = 'greed';
-		} else {
-			$greedness = 'lazy';
-		}
-		if (isset($this->pregnode->rightborder)) {
-			$rightbordertext = '|rightborder: '.$this->pregnode->rightborder;
-			$name = 'FIN QUANT';
-		} else {
-			$rightbordertext = '';
-			$name = 'INF QUANT';
-		}
-		$str .= '|'.$name.'|'.$greedness.'|leftborder: '.$this->pregnode->leftborder.$rightbordertext.'}"];';
-		return $str;
-	}
+    public function write_self_to_dotcode() {
+        $str = dfa_preg_node::write_self_to_dotcode();
+        if ($this->pregnode->greed) {
+            $greedness = 'greed';
+        } else {
+            $greedness = 'lazy';
+        }
+        if (isset($this->pregnode->rightborder)) {
+            $rightbordertext = '|rightborder: '.$this->pregnode->rightborder;
+            $name = 'FIN QUANT';
+        } else {
+            $rightbordertext = '';
+            $name = 'INF QUANT';
+        }
+        $str .= '|'.$name.'|'.$greedness.'|leftborder: '.$this->pregnode->leftborder.$rightbordertext.'}"];';
+        return $str;
+    }
 }
 class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
 
-	
+    
     public function followpos(&$fpmap) {
         dfa_preg_operator::followpos(&$fpmap);
     }

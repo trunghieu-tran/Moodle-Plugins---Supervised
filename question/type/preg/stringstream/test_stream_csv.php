@@ -24,7 +24,7 @@ StringStreamController::createRef('csv',$data);
 
 $file = fopen('string://csv','r');
 while($csv = fgetcsv($file)) {
-	print_r($csv); echo '<br />';
+    print_r($csv); echo '<br />';
 }
 fclose($file);
 
