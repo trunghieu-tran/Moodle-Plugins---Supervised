@@ -47,7 +47,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 			if(strpos($this->localmodifiers,'i')!==false) {
                 $result->caseinsensitive = true;
             }*/
-			if ($this->optstack[$this->optcount-1]->i) {
+			if ($this->optcount>0 && $this->optstack[$this->optcount-1]->i) {
 				 $result->caseinsensitive = true;
 			}
         }

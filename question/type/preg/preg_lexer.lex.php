@@ -43,7 +43,7 @@ class Yylex extends JLexBase  {
 			if(strpos($this->localmodifiers,'i')!==false) {
                 $result->caseinsensitive = true;
             }*/
-			if ($this->optstack[$this->optcount-1]->i) {
+			if ($this->optcount>0 && $this->optstack[$this->optcount-1]->i) {
 				 $result->caseinsensitive = true;
 			}
         }
