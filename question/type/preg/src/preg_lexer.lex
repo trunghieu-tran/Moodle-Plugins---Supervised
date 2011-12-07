@@ -8,17 +8,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %char
 %state CHARCLASS
 %init{
-	$this->optstack = array();
-	$this->optstack[0] = new stdClass;
-	//set false all modifiers' fields, it must be set to correct values before initializing lexer and lexical aniliz
-	$this->optstack[0]->i = false;
-	$this->optcount = 1;
+    $this->optstack = array();
+    $this->optstack[0] = new stdClass;
+    //set false all modifiers' fields, it must be set to correct values before initializing lexer and lexical aniliz
+    $this->optstack[0]->i = false;
+    $this->optcount = 1;
 %init}
 %{
     protected $errors = array();
     protected $maxsubpatt = 0;
-	protected $optstack;
-	protected $optcount;
+    protected $optstack;
+    protected $optcount;
 
     //A reference to the matcher object to be passed to some nodes
     public $matcher = null;
@@ -44,12 +44,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         //set i modifier for leafs
         if (is_a($result, 'preg_leaf')) {
             /*old style local modifier handling
-			if(strpos($this->localmodifiers,'i')!==false) {
+            if(strpos($this->localmodifiers,'i')!==false) {
                 $result->caseinsensitive = true;
             }*/
-			if ($this->optcount>0 && $this->optstack[$this->optcount-1]->i) {
-				 $result->caseinsensitive = true;
-			}
+            if ($this->optcount>0 && $this->optstack[$this->optcount-1]->i) {
+                 $result->caseinsensitive = true;
+            }
         }
         if ($name == 'preg_leaf_charset') {
             $result->charset = $charclass;
@@ -100,33 +100,33 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
             $cc->error = 1;
         }
     }
-	protected function push_opt_lvl() {
-		if ($this->optcount > 0) {
-			$this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
-			$this->optcount++;
-		} /*else 
-			error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
-	}
-	protected function pop_opt_lvl() {
-		if ($this->optcount>0)
-			$this->optcount--;
-	}
-	public function mod_top_opt($set, $unset) {
-		for ($i=0; $i<strlen($set); $i++) {
-			if (strpos($unset, $set[$i])) {//set and unset modifier at the same time is error
-				$text = $this->yytext;
-				$this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar-strlen($text), $this->yychar-1);
-				return;
-			}
-		}
-		//if error not exist, set and unset local modifier
-		for ($i=0; $i<strlen($set); $i++) {
-			$this->optstack[$this->optcount-1]->$set[$i] = true;
-		}
-		for ($i=0; $i<strlen($unset); $i++) {
-			$this->optstack[$this->optcount-1]->$unset[$i] = false;
-		}
-	}
+    protected function push_opt_lvl() {
+        if ($this->optcount > 0) {
+            $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
+            $this->optcount++;
+        } /*else 
+            error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
+    }
+    protected function pop_opt_lvl() {
+        if ($this->optcount>0)
+            $this->optcount--;
+    }
+    public function mod_top_opt($set, $unset) {
+        for ($i=0; $i<strlen($set); $i++) {
+            if (strpos($unset, $set[$i])) {//set and unset modifier at the same time is error
+                $text = $this->yytext;
+                $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar-strlen($text), $this->yychar-1);
+                return;
+            }
+        }
+        //if error not exist, set and unset local modifier
+        for ($i=0; $i<strlen($set); $i++) {
+            $this->optstack[$this->optcount-1]->$set[$i] = true;
+        }
+        for ($i=0; $i<strlen($unset); $i++) {
+            $this->optstack[$this->optcount-1]->$unset[$i] = false;
+        }
+    }
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
@@ -208,67 +208,67 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->yybegin(self::CHARCLASS);
 }
 <YYINITIAL> \( {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \) {
-	$this->pop_opt_lvl();
+    $this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
 <YYINITIAL> \(\?> {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $this->maxsubpatt++;
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?: {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?! {
-	$this->push_opt_lvl();
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<= {
-	$this->push_opt_lvl();
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<! {
-	$this->push_opt_lvl();
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?= {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?! {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<= {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?<! {
-	$this->push_opt_lvl();
+    $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -369,15 +369,15 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \(\?i: {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
-	$this->push_opt_lvl();
-	$this->mod_top_opt('i', '');
+    $this->push_opt_lvl();
+    $this->mod_top_opt('i', '');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?-i: {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
-	$this->push_opt_lvl();
-	$this->mod_top_opt('', '-i');
+    $this->push_opt_lvl();
+    $this->mod_top_opt('', '-i');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -388,7 +388,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \\[^0-9a-zA-Z] {
-	$text = $this->yytext();
+    $text = $this->yytext();
     $leaf = $this->form_node('preg_leaf_charset', null, $text[1]);
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
