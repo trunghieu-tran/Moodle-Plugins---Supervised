@@ -149,9 +149,9 @@ class preg_regex_handler {
         $lexer = new Yylex($pseudofile);
         $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
         /*old-style modifier support
-		$lexer->globalmodifiers = $this->modifiers;
+        $lexer->globalmodifiers = $this->modifiers;
         $lexer->localmodifiers = $this->modifiers;*/
-		$lexer->mod_top_opt($this->modifiers, '');
+        $lexer->mod_top_opt($this->modifiers, '');
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
             $parser->doParse($token->type, $token->value);
