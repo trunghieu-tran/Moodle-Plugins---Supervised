@@ -86,19 +86,21 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
 
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
-        if(!$currentanswer) {
+        if (!$currentanswer) {
             return '';
         }
 
         //////Teacher-defined feedback text for that answer
         $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
-        $answer = $bestfit['answer'];
-        $matchresults = $bestfit['match'];
         $feedback = '';
-        if($answer->feedback) {
-            $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
-            $feedback = $question->format_text($feedbacktext, $answer->feedbackformat,
-                $qa, 'question', 'answerfeedback', $answer->id);
+        //If best fit answer is found and there is at least partial match
+        if (isset($bestfit['answer']) && $bestfit['match']['is_match'] && $bestfit['match']['full']) {
+            $answer = $bestfit['answer'];
+            if ($answer->feedback) {
+                $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
+                $feedback = $question->format_text($feedbacktext, $answer->feedbackformat,
+                    $qa, 'question', 'answerfeedback', $answer->id);
+            }
         }
 
         return $feedback;
