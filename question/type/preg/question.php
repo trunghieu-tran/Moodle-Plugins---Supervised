@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Short answer question definition class.
+ * Perl-compatible regular expression question definition class.
  *
  * @package    qtype
  * @subpackage preg
