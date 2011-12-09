@@ -1120,7 +1120,22 @@ class dfa_preg_matcher extends preg_matcher {
             //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
             case 'node_subpatt':
                 $pregnode =& $pregnode->operands[0];
+                return $this->from_preg_node($pregnode);
                 break;
+            case 'node_alt':
+                if ($pregnode->operands[1]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[1]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+                    $tmp =& $pregnode->operands[0];
+                    $pregnode = new preg_node_finite_quant;
+                    $pregnode->leftborder = 0;
+                    $pregnode->rightborder = 1;
+                    $pregnode->operands[0] =& $tmp;
+                } else if ($pregnode->operands[0]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[0]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+                    $tmp =& $pregnode->operands[1];
+                    $pregnode = new preg_node_finite_quant;
+                    $pregnode->leftborder = 0;
+                    $pregnode->rightborder = 1;
+                    $pregnode->operands[0] =& $tmp;
+                }
         }
         return parent::from_preg_node($pregnode);
     }
@@ -1217,29 +1232,19 @@ class dfa_preg_matcher extends preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        if ($response == '') {
-            if ($this->roots[0]->pregnode->operands[0]->nullable) {
-                $this->is_match = true;
-                $this->full = true;
-                $this->index_first[0] = 0;
-                $this->index_last[0] = 0;
-                $this->next = '';
-                $this->left = 0;
-            } else {
-                $this->is_match = false;
-                $this->full = false;
-                $this->index_first[0] = -1;
-                $this->index_last[0] = -2;
-                $waveres = $this->wave(0, 0);
-                $this->next = $this->connection[0][$waveres->nextkey];
-                $this->left = $waveres->left;
-            }
+        if ($response == '' && $this->roots[0]->pregnode->operands[0]->nullable) {
+            $this->is_match = true;
+            $this->full = true;
+            $this->index_first[0] = 0;
+            $this->index_last[0] = -1;
+            $this->next = '';
+            $this->left = 0;
         } else {
             $result = new stdClass;
             $result->full = false;
             $result->index = -1;
             $result->left = 999999;
-            for ($i=0; $i<strlen($response) && !$result->full; $i++) {
+            for ($i=0; $i<=strlen($response) && !$result->full; $i++) {
                 $tmpres = $this->compare($response, 0, $i, $this->anchor->end);
                 if ($tmpres !== false) { 
                     if ($tmpres->full || $tmpres->left < $result->left || !isset($result->next)&&false) {
