@@ -337,7 +337,14 @@ class nfa {
             echo 'dot.exe path not specified<br/>';
             return;
         }
-        $dotfile = fopen($dotfilename, 'w');
+        global $CFG;
+        $dir = $CFG->dataroot.'/temp/preg/nfa/';
+        $dotfn = $dir.$dotfilename;
+        $jpgfn = $dir.$jpgfilename;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $dotfile = fopen($dotfn, 'w');
         // numerate all states
         $tmp = 0;
         foreach ($this->states as $curstate)
@@ -378,10 +385,10 @@ class nfa {
         }
         fprintf($dotfile, "};");
         chdir($this->graphvizpath);
-        exec("dot.exe -Tjpg -o\"$jpgfilename\" -Kdot $dotfilename");
-        echo "<IMG src=\"$jpgfilename\" width=\"90%\">";
+        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfn");
+        echo "<IMG src=\"$jpgfn\" width=\"90%\">";
         fclose($dotfile);
-        unlink($dotfilename);
+        unlink($dotfn);
     }
 
 }
