@@ -7,9 +7,6 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
 
-// TODO - set desired values for indexes using regex-submatch.pdf page 7
-// Don't trust these test right now!
-
 class test_cross_quantifiers extends preg_cross_tester {
 
     public $quants = array('{2,5}', '{2,}', '{,5}', '*');
@@ -24,12 +21,12 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>3),
-                        'index_last'=>array(0=>3,1=>2,2=>3),
+                        'index_first'=>array(0=>0,1=>0,2=>-1),
+                        'index_last'=>array(0=>3,1=>3,2=>-2),
                         'left'=>array(0),
                         'next'=>'');
 
-        return array('regex'=>'(a+)(a+)',
+        return array('regex'=>'(a*)(a*)',
                      'tests'=>array($test1));
     }
 
@@ -69,7 +66,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aa + (aaaa)
+                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -106,7 +103,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aa + (aaa)
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -114,7 +111,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3),    // aaa + (aaa)
+                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -159,7 +156,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aa + (aaaa)
+                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -204,7 +201,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3),    // aaa + (aaa)
+                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -241,7 +238,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aaa + (aa)
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -286,7 +283,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aaa + (aa)
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -421,7 +418,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // '' + (aaaaa)
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -429,7 +426,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),    // a + (aaaaa)
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -479,7 +476,7 @@ class test_cross_quantifiers extends preg_cross_tester {
                         'left'=>array(0),
                         'next'=>'');
 
-        return array('regex'=>'(a'.$this->quants[2].')'.$this->quants[1],    // (a{,5}){,2}
+        return array('regex'=>'(a'.$this->quants[2].')'.$this->quants[1],    // (a{,5}){2,}
                      'tests'=>array($test0, $test1, $test2, $test3, $test4));
     }
 
@@ -519,7 +516,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),    // a + (aaaaa)
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -585,7 +582,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // '' + (a)
+                        'index_first'=>array(0=>0,1=>1),    // a + ('')
                         'index_last'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>'');
@@ -593,7 +590,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),    // a + (aa)
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
                         'index_last'=>array(0=>2,1=>2),
                         'left'=>array(0),
                         'next'=>'');
@@ -601,7 +598,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>4),    // aaaa + (a)
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -609,7 +606,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -638,7 +635,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>2),    // aa + (a)
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
                         'index_last'=>array(0=>2,1=>2),
                         'left'=>array(0),
                         'next'=>'');
@@ -646,7 +643,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>4),    // aaaa + (a)
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -654,7 +651,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
@@ -691,7 +688,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>4),    // aaaa + (a)
+                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
                         'index_last'=>array(0=>4,1=>4),
                         'left'=>array(0),
                         'next'=>'');
@@ -699,7 +696,7 @@ class test_cross_quantifiers extends preg_cross_tester {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
+                        'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
                         'index_last'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
