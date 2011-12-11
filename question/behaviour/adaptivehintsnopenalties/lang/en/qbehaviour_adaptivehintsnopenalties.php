@@ -1,6 +1,6 @@
 <?php
 /**
- * Strings for component 'qbehaviour_adaptivehintnopenalties', language 'en'.
+ * Strings for component 'qbehaviour_adaptivehintsnopenalties', language 'en'.
  *
  * @package    qbehaviour
  * @subpackage adaptivehintnopenalties

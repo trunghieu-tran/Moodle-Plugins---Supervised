@@ -13,10 +13,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/behaviour/adaptive/renderer.php');
 
-class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer {
+class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
 
      public function button_cost($str, $penalty, $options) {
-        return '  '.get_string($str, 'qbehaviour_adaptivewithhint', format_float($penalty, $options->markdp));
+        return '  '.get_string($str, 'qbehaviour_adaptivehints', format_float($penalty, $options->markdp));
      }
 
     public function controls(question_attempt $qa, question_display_options $options) {
@@ -34,7 +34,7 @@ class qbehaviour_adaptivewithhint_renderer extends qbehaviour_adaptive_renderer 
                 'type' => 'submit',
                 'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
                 'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'value' => get_string('hintbtn', 'qbehaviour_adaptivewithhint', $hintdescription),
+                'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
                 'class' => 'submit btn',
             );
             if ($options->readonly) {

@@ -23,9 +23,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/question/behaviour/adaptivewithhint/behaviour.php');
+require_once($CFG->dirroot . '/question/behaviour/adaptivehints/behaviour.php');
 
-class qbehaviour_adaptivehintnopenalties extends qbehaviour_adaptivewithhint {
+class qbehaviour_adaptivehintsnopenalties extends qbehaviour_adaptivehints {
     const IS_ARCHETYPAL = false;
 
     public function summarise_hint(question_attempt_step $step, $hintkey, $hintdescription) {
@@ -33,7 +33,7 @@ class qbehaviour_adaptivehintnopenalties extends qbehaviour_adaptivewithhint {
         $a = new stdClass();
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);
-        return get_string('hintused', 'qbehaviour_adaptivehintnopenalties', $a);
+        return get_string('hintused', 'qbehaviour_adaptivehintsnopenalties', $a);
     }
 
     //Overloading this to have easy 'no penalties' adaptive version

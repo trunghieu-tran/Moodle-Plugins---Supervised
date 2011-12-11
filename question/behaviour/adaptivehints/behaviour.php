@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');//Contains question_with_specific_hints interface for now
 
-class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
+class qbehaviour_adaptivehints extends qbehaviour_adaptive {
     const IS_ARCHETYPAL = false;
 
     public static function get_required_behaviours() {
@@ -71,7 +71,7 @@ class qbehaviour_adaptivewithhint extends qbehaviour_adaptive {
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);
         $a->penalty = $this->question->penalty_for_specific_hint($hintkey, $response);
-        return get_string('hintused', 'qbehaviour_adaptivewithhint', $a);
+        return get_string('hintused', 'qbehaviour_adaptivehints', $a);
     }
 
     ////Process functions
