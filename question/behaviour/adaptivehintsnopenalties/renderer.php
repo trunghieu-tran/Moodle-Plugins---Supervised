@@ -11,9 +11,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/question/behaviour/adaptivewithhint/renderer.php');
+require_once($CFG->dirroot . '/question/behaviour/adaptivehints/renderer.php');
 
-class qbehaviour_adaptivehintnopenalties_renderer extends qbehaviour_adaptivewithhint_renderer {
+class qbehaviour_adaptivehintsnopenalties_renderer extends qbehaviour_adaptivehints_renderer {
 
     protected function penalty_info(question_attempt $qa, $mark,
             question_display_options $options) {
