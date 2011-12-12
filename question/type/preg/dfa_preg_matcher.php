@@ -413,9 +413,11 @@ class dfa_preg_matcher extends preg_matcher {
         if (!is_array($arr1)) {
             $arr1 = array();
         }
-        foreach ($arr2 as $value) {
-            if (!in_array($value, $arr1)) {
-                $arr1[] = $value;
+        if (is_array($arr2)) {//TODO: why at some time $arr2 isn't array?
+            foreach ($arr2 as $value) {
+                if (!in_array($value, $arr1)) {
+                    $arr1[] = $value;
+                }
             }
         }
     }
@@ -530,7 +532,7 @@ class dfa_preg_matcher extends preg_matcher {
                     array_push($equnum, $num);
                 }
             }
-        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
+        }/* elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
             foreach ($this->connection[$index] as $num => $cc) {
                 $cmpop = true;
                 if ($cc->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
@@ -545,7 +547,7 @@ class dfa_preg_matcher extends preg_matcher {
                     array_push($equnum, $num);
                 }
             }
-        }
+        }*/
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
             dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
@@ -567,7 +569,9 @@ class dfa_preg_matcher extends preg_matcher {
             if ($passcount != count($this->finiteautomates[$index][$i]->passages)) {
                 $flag = false;
             }
-            reset($state);
+            if(is_array($state)) {//TODO: why at some time state==null?
+                reset($state);
+            }
             reset($this->finiteautomates[$index][$i]->passages);
             for ($j=0; $flag && $j < $passcount; $j++) {
                 if (key($state) != key($this->finiteautomates[$index][$i]->passages)) {
@@ -622,7 +626,7 @@ class dfa_preg_matcher extends preg_matcher {
         $this->roots[0]->firstpos();
         $this->roots[0]->lastpos();
         $this->roots[0]->followpos($this->map[0]);
-        $this->split_leafs(0);
+        //$this->split_leafs(0);
         $this->roots[0]->find_asserts($this->roots);
         foreach ($this->roots as $key => $value) {
             if ($key!=0) {
@@ -634,11 +638,11 @@ class dfa_preg_matcher extends preg_matcher {
                 $this->roots[$key]->firstpos();
                 $this->roots[$key]->lastpos();
                 $this->roots[$key]->followpos($this->map[$key]);
-    $this->split_leafs($key);
+                //$this->split_leafs($key);
                 $this->merge_fp_maps($key);
             }
         }
-        $this->buildfa(); // TODO: check for dfa size!
+        $this->buildfa();
         $this->built = true;
         return;
     }
