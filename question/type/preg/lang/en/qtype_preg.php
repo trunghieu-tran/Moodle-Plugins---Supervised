@@ -25,18 +25,17 @@ $string['dfalimitsdescription'] = 'Allows you to tune time and memory limits for
 $string['editingpreg'] = 'Editing regular expression question';
 $string['emptyparens'] = 'Regex syntax error: empty parenthesis in position from {$a->indfirst} to {$a->indlast}';
 $string['engine'] = 'Matching engine';
-$string['engine_help'] = '<p>There is no \'best\' matching enginge, so you could choose best fit for every question. </p>
-<p> <b>Native PHP preg matching engine</b> works using preg_match() function from PHP langugage (internally calling PCRE
-library, which uses backtracking method). It supports full regular expression syntax, but don\'t allow
-partial matches - so no hinting. Also, due to backtracking algorithm problems it could give wrong answers
-on some regular expression like a?NaN (see http://swtch.com/~rsc/regexp/regexp1.html) - NFA engine are
-best for this type of regexes. It\'s almost 100% debugged. </p>
-<p> <b>DFA matching engine</b> support hinting and could tell us shortest path to complete a match. However, it 
-by nature can\'t support backreferences in regular expressions. It also doesn\'t handle well quantifiers with
-wide but finite limits like a{2,2000} - they generates too much edges on the DFA graph. DFA matching engine also
-doesn\'t support subpattern extraction. </p>
-<p><b>NFA matching engine</b> is similar to DFA, but allows to support subpattern extraction along with hinting.
- It also supports backreferences.</p>';
+$string['engine_help'] = '<p>There is no \'best\' matching enginge, so you could choose engine that best fits particular question. </p>
+<p> Native <b>PHP preg matching engine</b> works using preg_match() function from PHP langugage (internally calling PCRE
+library, which uses backtracking method). It\'s almost 100% bug-free and able to work with full PCRE syntax,
+but can\'t support advanced features like showing partial matches and hinting. </p>
+<p><b>NFA matching engine</b> and <b>DFA matching engine</b> are engines using custom matching code.
+They support partial matching and hinting, but don\'t support full PCRE syntax (you\'ll be notified when
+trying to saving question with unsupported expressions) and potentially may contain bugs (different for each engine^ 
+regular expression matching is still a very complex thing).</p>
+<p> If difference between engines is too hard to you, just try them all to see how their capabilities suit
+you needs, than if one fails in particular question try another engines to see if they could handle it better.</p>
+<p> Avoid using DFA engine for Moodle shortanswer notation for now thought.</p>';
 $string['engineheadingdescriptions'] = 'Matching regular expressions could be a time and memory consuming. These settings allows you to control limits of time and memory usage by matching engine. Increase them when you get messages that regular expression is too complex, but mind you server performance (you may also wish to increase PHP time and memory limits). Decrease them if you get blank page when saving or trying a preg question.';
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching return true if there is at least one match 
