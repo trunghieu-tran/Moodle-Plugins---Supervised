@@ -88,6 +88,20 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011111900, 'qtype', 'preg');
     }
 
+    if ($oldversion < 2011121200) {
+
+        // Define field notation to be added to question_preg
+        $table = new xmldb_table('question_preg');
+
+        // Launch rename table for quiz_reports
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'qtype_preg');
+        }
+
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2011121200, 'qtype', 'preg');
+    }
+
     return true;
 
 }
