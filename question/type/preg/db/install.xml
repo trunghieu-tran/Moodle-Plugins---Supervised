@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/preg/db" VERSION="20111119" COMMENT="XMLDB file for Moodle question/type/preg"
+<XMLDB PATH="question/type/preg/db" VERSION="20111212" COMMENT="XMLDB file for Moodle question/type/preg"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="question_preg" COMMENT="Options for regular expression questions">
+    <TABLE NAME="qtype_preg" COMMENT="Options for perl-compatible regular expression questions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="question"/>
         <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="answers"/>

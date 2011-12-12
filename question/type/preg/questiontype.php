@@ -56,7 +56,7 @@ class qtype_preg extends qtype_shortanswer {
 
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
-        array_splice($extraquestionfields, 0, 1, 'question_preg');
+        array_splice($extraquestionfields, 0, 1, 'qtype_preg');
         array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');
         return $extraquestionfields;
     }
