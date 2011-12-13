@@ -329,10 +329,16 @@ class qtype_preg_question extends question_graded_automatically
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
         }
+
         //No match - all response is wrong, but we could hint the very first character still
-        $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-        if (isset($matchresults['next'])) {//if hint possible
-            $result['hintedcharacter'] = $matchresults['next'];
+        $queryengine = $this->get_query_matcher($this->engine);
+        if ($queryengine->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
+            if (isset($matchresults['next'])) {//if hint possible
+                $result['hintedcharacter'] = $matchresults['next'];
+            }
+        } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
+            $result = null;
         }
         return $result;
     }

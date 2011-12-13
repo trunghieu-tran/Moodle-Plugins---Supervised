@@ -237,11 +237,27 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($parts['correctpart'] == 'Do cats eat rats?');
         $this->assertTrue($parts['hintedcharacter'] == '');
         $this->assertTrue($parts['wrongtail'] == '');
-        //No correct part - so no guess
+        //No correct part - so no guess except hinting
         $parts = $testquestion->response_correctness_parts(array('answer' => '!@#$^%&'));
         $this->assertTrue($parts['wronghead'].$parts['wrongtail'] == '!@#$^%&');
         $this->assertTrue($parts['correctpart'] == '');
         $this->assertTrue(strstr('D', $parts['hintedcharacter']));
+
+        ////Engine without partial matching support should show colored parts only when there is a match
+        $testquestion1 = clone $this->testquestion;
+        $testquestion1->exactmatch = false;//Disable exact matching to be able to have wrong head and tail
+        $testquestion1->engine = 'preg_php_matcher';
+
+        //Full match with wrong head a tail - there is colored string
+        $parts = $testquestion1->response_correctness_parts(array('answer' => 'Oh! Do cats eat rats? Really?'));
+        $this->assertTrue($parts['wronghead'] == 'Oh! ');
+        $this->assertTrue($parts['correctpart'] == 'Do cats eat rats?');
+        $this->assertTrue($parts['hintedcharacter'] == '');
+        $this->assertTrue($parts['wrongtail'] == ' Really?');
+
+        //Partial match but no colored string since engine don't supports partial matching
+        $parts = $testquestion1->response_correctness_parts(array('answer' => 'Oh! Do cats eat hats? Really?'));
+        $this->assertTrue($parts === null);
     }
 
     function test_insert_subpatterns() {
