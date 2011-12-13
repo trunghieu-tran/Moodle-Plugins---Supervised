@@ -46,6 +46,7 @@ class preg_regex_handler {
     */
     public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
+        $this->maxsubpatt = 0;
         if ($regex === null) {
             return;
         }
