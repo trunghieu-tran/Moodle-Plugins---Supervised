@@ -57,7 +57,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 }
 
                 $correctpart = '';
-                if ($parts['correctpart'] != -1) {//there were any match
+                if ($parts['correctpart'] != '') {//there were any match
                     $correctpart = html_writer::tag('span', htmlspecialchars($parts['correctpart']), array('class' => $this->feedback_class(1)));
                 }
 
