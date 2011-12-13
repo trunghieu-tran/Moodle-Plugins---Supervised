@@ -2,5 +2,6 @@
 
 $plugin->version  = 2011121200;
 $plugin->requires = 2011070100;
-
+$plugin->release = 'Preg 2.1';
+$plugin->maturity = MATURITY_STABLE;
 ?>
