@@ -386,12 +386,14 @@ class qtype_preg_question extends question_graded_automatically
 
     //we need adaptive (TODO interactive) behavour to use hints
      public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
-        if ($preferredbehaviour == 'adaptive') {
+        global $CFG;
+
+        if ($preferredbehaviour == 'adaptive' && file_exists($CFG->dirroot.'/question/behaviour/adaptivehints/')) {
              question_engine::load_behaviour_class('adaptivehints');
              return new qbehaviour_adaptivehints($qa, $preferredbehaviour);
         }
 
-        if ($preferredbehaviour == 'adaptivenopenalty') {
+        if ($preferredbehaviour == 'adaptivenopenalty' && file_exists($CFG->dirroot.'/question/behaviour/adaptivehintsnopenalties/')) {
              question_engine::load_behaviour_class('adaptivehintsnopenalties');
              return new qbehaviour_adaptivehintsnopenalties($qa, $preferredbehaviour);
         }
