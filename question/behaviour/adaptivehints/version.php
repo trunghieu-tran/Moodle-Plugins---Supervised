@@ -2,5 +2,6 @@
 
 $plugin->version  = 2011111902;
 $plugin->requires = 2011070100;
-
+$plugin->release = 'Adaptive with hints behaviour 2.1';
+$plugin->maturity = MATURITY_STABLE;
 ?>
