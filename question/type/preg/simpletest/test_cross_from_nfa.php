@@ -27,10 +27,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'_the matcher works',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>-1),
+                        'index_first'=>array(0=>18),
+                        'index_last'=>array(0=>17),
                         'left'=>array(17),
                         'next'=>'t');
 
@@ -43,7 +43,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>' ');
 
         $test4 = array( 'str'=>'',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
@@ -117,10 +117,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         $test5 = array( 'str'=>'yzi',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>-1),
+                        'index_first'=>array(0=>3),
+                        'index_last'=>array(0=>2),
                         'left'=>array(3),
                         'next'=>'aceg');
 
@@ -766,10 +766,10 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'cdcd',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>-1,2=>-1),
-                        'index_last'=>array(0=>-1,1=>-2,2=>-2),
+                        'index_first'=>array(0=>4,1=>-1,2=>-1),
+                        'index_last'=>array(0=>3,1=>-2,2=>-2),
                         'left'=>array(10000000),                    // TODO: standardize this value
                         'next'=>'');
 
