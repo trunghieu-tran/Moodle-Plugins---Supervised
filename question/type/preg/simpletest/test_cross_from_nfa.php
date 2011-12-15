@@ -387,6 +387,27 @@ class test_cross_from_nfa extends preg_cross_tester {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_subpatt_nested_and_concatenated() {
+        $test1 = array( 'str'=>'zw',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>-1, 3=>1),
+                        'index_last'=>array(0=>1, 1=>0, 2=>-2, 3=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'*&^%&^',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>2, 1=>-1, 2=>-1, 3=>-1),
+                        'index_last'=>array(0=>1, 1=>-2, 2=>-2, 3=>-2),
+                        'left'=>array(2),
+                        'next'=>'z');
+
+        return array('regex'=>'(z|y(x))(w)',
+                     'tests'=>array($test1, $test2));
+    }
+
     function data_for_test_quant_qu() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
@@ -847,8 +868,16 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'left'=>array(10),
                         'next'=>' ');
 
+        $test3 = array( 'str'=>'bat eat fat?',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>12,1=>-1),
+                        'index_last'=>array(0=>11,1=>-2),
+                        'left'=>array(10),
+                        'next'=>'D');
+
         return array('regex'=>'Do (?:[cbr]at(s|)) eat (?:[cbr]at\1)\?',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2, $test3));
     }
 
     function data_for_test_backrefs_alt_in_subpatt2() {
@@ -1040,7 +1069,7 @@ class test_cross_from_nfa extends preg_cross_tester {
                         'index_last'=>array(0=>15),
                         'left'=>array(0),
                         'next'=>'');
-                        
+
         return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
     }
