@@ -1,8 +1,8 @@
 <?php
 global $CFG;
 require_once('abstract_page.php');
-require_once(dirname(dirname(__FILE__)) . '\model.php');   
-require_once($CFG->libdir . '\formslib.php');
+require_once(dirname(dirname(__FILE__)) . '/model.php');   
+require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;

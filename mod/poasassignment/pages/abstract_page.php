@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '\model.php');
+require_once(dirname(dirname(__FILE__)) . '/model.php');
 class abstract_page {
     //var $cm;
     var $lasterror;

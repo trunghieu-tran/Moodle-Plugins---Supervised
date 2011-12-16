@@ -1,6 +1,6 @@
 <?php
 require_once('abstract_page.php');
-require_once(dirname(dirname(__FILE__)) . '\model.php');
+require_once(dirname(dirname(__FILE__)) . '/model.php');
 class grade_page extends abstract_page{
     private $assigneeid;
     private $assignee;

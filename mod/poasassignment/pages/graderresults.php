@@ -1,7 +1,7 @@
 <?php
 global $CFG;
 require_once('abstract_page.php');
-require_once(dirname(dirname(__FILE__)) . '\model.php');
+require_once(dirname(dirname(__FILE__)) . '/model.php');
 class graderresults_page extends abstract_page {
     private $attemptid;
     private $assigneeid;

@@ -1,6 +1,6 @@
 <?php
 require_once('abstract_page.php');
-require_once(dirname(dirname(__FILE__)) . '\model.php');
+require_once(dirname(dirname(__FILE__)) . '/model.php');
 class taskgiversettings_page extends abstract_page {
     //var $poasassignment;
     
@@ -26,7 +26,7 @@ class taskgiversettings_page extends abstract_page {
         else {
             $tg = $DB->get_record('poasassignment_taskgivers', array('id' => $tgid));
             $tgname = $tg->name;
-            require_once(dirname(dirname(__FILE__)) . '\\' . $tg->path);
+            require_once(dirname(dirname(__FILE__)) . '/' . $tg->path);
             if (!$tgname::has_settings()) {
                 $this->lasterror = 'errorthistghasntsettings';
                 return false;

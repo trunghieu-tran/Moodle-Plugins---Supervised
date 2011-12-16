@@ -1,6 +1,6 @@
 <?php
 global $CFG;
-require_once dirname(dirname(__FILE__)).'\taskgiver.php';
+require_once dirname(dirname(__FILE__)).'/taskgiver.php';
 require_once($CFG->libdir.'/formslib.php');
 class studentschoice extends taskgiver {
 //    function print_before_tasks() {
