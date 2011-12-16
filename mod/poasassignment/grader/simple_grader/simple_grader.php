@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'\grader\grader.php');
+require_once(dirname(dirname(__FILE__)).'/grader/grader.php');
 
 class simple_grader extends grader{
     

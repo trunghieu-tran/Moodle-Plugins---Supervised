@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'\answer.php');
+require_once(dirname(dirname(__FILE__)).'/answer.php');
 
 // require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class answer_text extends poasassignment_answer {

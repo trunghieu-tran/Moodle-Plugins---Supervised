@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'\answer.php');
+require_once(dirname(dirname(__FILE__)).'/answer.php');
 //require_once('answer.php');
 
 class answer_file extends poasassignment_answer {

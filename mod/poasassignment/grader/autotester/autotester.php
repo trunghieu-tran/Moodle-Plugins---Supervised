@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)).'\grader\grader.php');
+require_once(dirname(dirname(__FILE__)).'/grader/grader.php');
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/comment/lib.php');
 class autotester extends grader{
     
