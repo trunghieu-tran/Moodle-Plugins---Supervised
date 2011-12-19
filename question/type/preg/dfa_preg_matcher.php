@@ -219,6 +219,8 @@ class dfa_preg_matcher extends preg_matcher {
             $found = false;//current character no accepted to fa yet
             $afound = false;
             $akey = false;
+            $mfound = false;
+            $mkey = false;
             reset($this->finiteautomates[$assertnumber][$currentstate]->passages);
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////
             //finding leaf with this character
@@ -230,6 +232,11 @@ class dfa_preg_matcher extends preg_matcher {
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
                     $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length, $casesens);
                 }
+                if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_META) {
+                    $mfound = true;
+                    $mkey = $key;
+                    $found  = false;
+                }
                 if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
                     $afound = true;
                     $akey = $key;
@@ -239,9 +246,15 @@ class dfa_preg_matcher extends preg_matcher {
                     next($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 }
             }
+            if (!$found && $mfound) {
+                $found = true;
+                $key = $mkey;
+                $length = 1;
+            }
             if (!$found && $afound) {
                 $found = true;
                 $key = $akey;
+                $length = 0;
             }
             if ($found) {
                 $foundkey = $key;
@@ -518,36 +531,25 @@ class dfa_preg_matcher extends preg_matcher {
                     if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
                         array_push($equnum, $num);
                     }
+                } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
+                    array_push($equnum, $num);
                 }
             }
         } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
             foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
+                    array_push($equnum, $num);
+                } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
                 }
             }
-        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {//if this leaf is metacharacter
+        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {//if this leaf is assert
             foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
+                if ($cc->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
                 }
             }
-        }/* elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
-            foreach ($this->connection[$index] as $num => $cc) {
-                $cmpop = true;
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_COMBO) {
-                    if ($cc->pregnode->childs[0]->type != $this->connection[$index][$number]->pregnode->childs[1]->type ||
-                        $cc->pregnode->childs[0]->subtype != $this->connection[$index][$number]->pregnode->childs[1]->subtype ||
-                        $cc->pregnode->childs[0]->negative != $this->connection[$index][$number]->pregnode->childs[1]->negative ||
-                        $cc->pregnode->childs[0]->type == preg_node::TYPE_LEAF_CHARSET && $cc->pregnode->childs[0]->charset != $this->connection[$index][$number]->pregnode->childs[1]->charset) {
-                        $cmpop = false;
-                    }
-                }
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_COMBO && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype) {
-                    array_push($equnum, $num);
-                }
-            }
-        }*/
+        }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
             dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
