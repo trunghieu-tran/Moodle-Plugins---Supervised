@@ -18,6 +18,16 @@ require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
+    private $graphvizpath = '';    // path to dot.exe of graphviz
+    
+    public function __construct() {
+        global $CFG;
+        if (isset($CFG->qtype_preg_graphvizpath)) {
+            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;
+        } else {
+            $this->graphvizpath = '';
+        }
+    }
 
     /*public function questionid_column_name() {
         return 'questionid';
@@ -88,6 +98,41 @@ class qtype_preg extends qtype_shortanswer {
         $state->responses[''] = trim($state->responses['']);
         $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
         return $matcher->match($state->responses['']);
+    }
+
+    public function get_temp_dir($componentname) {
+        global $CFG;
+        $dir = $CFG->dataroot.'/temp/preg/'.$componentname.'/';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        return $dir;
+    }
+
+    public function is_dot_installed() {
+        if ($this->graphvizpath === '') {
+            return false;
+        }
+        $dotexefilename = $this->graphvizpath.'/dot.exe';
+        if (!file_exists($dotexefilename)) {
+            return false;
+        }
+        return true;
+    }
+
+    public function execute_dot($dotfilename, $jpegfilename = null) {
+        if (!$this->is_dot_installed()) {
+            return;
+        }
+        $jpgpath = pathinfo($dotfilename, PATHINFO_DIRNAME);
+        if ($jpegfilename === null) {            
+            $filename = pathinfo($dotfilename, PATHINFO_FILENAME);
+            $jpgfn = $jpgpath.'/'.$filename.'.jpg';
+        } else {
+            $jpgfn = $jpgpath.'/'.$jpegfilename;
+        }
+        chdir($this->graphvizpath);
+        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
     }
 
 }

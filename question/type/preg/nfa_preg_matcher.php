@@ -319,10 +319,11 @@ class nfa_preg_matcher extends preg_matcher {
                 // get the current state
                 $curstate = array_pop($curstates);
                 // saving the current result
-                if ($curstate->state !== $this->automaton->startstate) {
+                if ($curstate->matchcnt > 0 /*$curstate->state !== $this->automaton->startstate*/) {
                     $curstate->ismatch = true;
                 }
                 if ($curstate->state === $this->automaton->endstate) {
+                    $curstate->ismatch = true;
                     $curstate->isfullmatch = true;
                     $curstate->left = 0;
                     $fullmatchfound = true;
@@ -351,7 +352,7 @@ class nfa_preg_matcher extends preg_matcher {
                         $length = 0;
                         if ($transition->pregleaf->match($str, $startpos + $pos, &$length, !$transition->pregleaf->caseinsensitive)) {
                             // create a new state
-                            $newstate = new preg_nfa_processing_state($transition->state, $pos + $length, true, false, '', 10000000,
+                            $newstate = new preg_nfa_processing_state($transition->state, $pos + $length, false, false, '', 10000000,
                                                              $curstate->subpatt_index_first, $curstate->subpatt_index_last, $curstate->subpatt_index_first_old, $curstate->subpatt_index_last_old,
                                                              null, null, 0);
                             // set start indexes of subpatterns
@@ -417,7 +418,7 @@ class nfa_preg_matcher extends preg_matcher {
             }
         }
         // set the results
-        if ($result->ismatch > 0) {
+        if ($result->ismatch) {
             $result->subpatt_index_first[0] = $startpos;
             $result->subpatt_index_last[0] = $startpos + $result->matchcnt - 1;
         } else {

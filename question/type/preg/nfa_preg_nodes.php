@@ -8,6 +8,7 @@
  * @package questions
  */
 
+require_once($CFG->dirroot.'/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
@@ -135,19 +136,9 @@ class nfa_state
  */
 class nfa {
 
-    private $graphvizpath;       // path to dot.exe of graphviz
     public $startstate;          // a reference to the start nfa_state of the automaton
     public $endstate;            // a reference to the end nfa_state of the automaton
     public $states = array();    // an array containing references to states of the automaton
-
-    public function __construct() {
-        global $CFG;
-        if (isset($CFG->qtype_preg_graphvizpath)) {
-            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;
-        } else {
-            $this->graphvizpath = '';
-        }
-    }
 
     /**
      * appends an eps-transition to the end for merging simple assertions
@@ -333,17 +324,9 @@ class nfa {
     * @param jpgfilename - name of the resulting jpg file
     */
     public function draw_nfa($dotfilename, $jpgfilename) {
-        if ($this->graphvizpath === '') {
-            echo 'dot.exe path not specified<br/>';
-            return;
-        }
-        global $CFG;
-        $dir = $CFG->dataroot.'/temp/preg/nfa/';
+        $qtypeobj = new qtype_preg();
+        $dir = $qtypeobj->get_temp_dir('nfa');
         $dotfn = $dir.$dotfilename;
-        $jpgfn = $dir.$jpgfilename;
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
         $dotfile = fopen($dotfn, 'w');
         // numerate all states
         $tmp = 0;
@@ -384,10 +367,8 @@ class nfa {
                 }
         }
         fprintf($dotfile, "};");
-        chdir($this->graphvizpath);
-        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfn");
-        echo "<IMG src=\"$jpgfn\" width=\"90%\">";
         fclose($dotfile);
+        $qtypeobj->execute_dot($dotfn, $jpgfilename);        
         unlink($dotfn);
     }
 

@@ -41,5 +41,18 @@ class test_cross_special_cases extends preg_cross_tester {
         return array('regex'=>'(?:(ab)|(cd))\2',
                      'tests'=>array($test1));
     }
+
+    function data_for_test_circumflex_should_not_be_matched() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>1),
+                        'index_last'=>array(0=>0),
+                        'left'=>array(1),
+                        'next'=>'a');
+
+        return array('regex'=>'^a',
+                     'tests'=>array($test1));
+    }
 }
 ?>
