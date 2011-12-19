@@ -1260,7 +1260,7 @@ class dfa_preg_matcher extends preg_matcher {
             }
         
 
-            $this->is_match =  $result->ismatch;
+            $this->is_match =  $result->full || $result->index >= 0;
             $this->full = $result->full;
             $this->index_first[0] = $result->offset;
             $this->index_last[0] = $result->index+$result->offset;

@@ -18,7 +18,7 @@ class test_cross_from_dfa extends preg_cross_tester {
 
     function data_for_test_easy() {
         $test1 = array( 'str'=>'fgh',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
@@ -200,7 +200,7 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'next'=>'');
 
         $test5 = array( 'str'=>'yzi',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
@@ -497,7 +497,7 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'OabO',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
@@ -539,7 +539,7 @@ class test_cross_from_dfa extends preg_cross_tester {
                         'next'=>'');
 
         $test2 = array( 'str'=>'Oab',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'index_last'=>array(0=>-1),
