@@ -11,7 +11,7 @@
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
-* Abstract class for dfa nodes. 
+* Abstract class for dfa nodes.
 * Declare any necessary for every node function as absract there, optional - with empty body
 */
 abstract class dfa_preg_node {
@@ -69,14 +69,14 @@ abstract class dfa_preg_node {
     */
     abstract public function print_self($indent);
 
-    
+
     /**
     *Function append dotcode for subtree with root in this node
     *@param $dotcode array for dotcode
     *@param $maxnum service param, starting of number for nodes and leafs
     */
     abstract public function generate_dot_code(&$dotcode, &$maxnum);
-    
+
     /**
     *Function generate node description at language
     *@return string with node description
@@ -148,7 +148,7 @@ abstract class dfa_preg_node {
     *@param node - current nod for recursive search
     */
     abstract public function find_asserts(&$roots);
-    
+
     //Service DFA function
     /**
     *function append array2 to array1, non unique values not add
@@ -198,7 +198,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
         $this->print_indent($indent);
         echo 'number: ', $this->number, '<br/>';
         $this->print_indent($indent);
-        if ($this->nullable) {    
+        if ($this->nullable) {
             echo 'nullable: true<br>';
         } else {
             echo 'nullable: false<br>';
@@ -227,7 +227,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     }
 }
 class dfa_preg_leaf_charset extends dfa_preg_leaf {
-    
+
     public function print_self($indent) {
         $this->print_indent($indent);
         echo 'type: leaf charset ';
@@ -253,7 +253,7 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
     }
 }
 class dfa_preg_leaf_meta extends dfa_preg_leaf {
-    
+
     const ENDREG = 186759556;
     public function number(&$connection, &$maxnum) {
         if ($this->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
@@ -426,7 +426,7 @@ abstract class dfa_preg_operator extends dfa_preg_node {
     }
     public function print_self($indent) {
         $this->print_indent($indent);
-        if ($this->nullable) {    
+        if ($this->nullable) {
             echo 'nullable: true<br>';
         } else {
             echo 'nullable: false<br>';
@@ -460,7 +460,7 @@ abstract class dfa_preg_operator extends dfa_preg_node {
     }
 }
 class dfa_preg_node_concat extends dfa_preg_operator {
-    
+
     public function nullable() {
         $secnull = $this->pregnode->operands[1]->nullable();
         $this->nullable = $this->pregnode->operands[0]->nullable() && $secnull;
@@ -488,7 +488,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         parent::followpos(&$fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $key) {
             dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
-        }        
+        }
     }
 
     public function print_self($indent) {
@@ -503,7 +503,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_alt extends dfa_preg_operator {
-    
+
     public function nullable() {
         $firnull = $this->pregnode->operands[0]->nullable();
         $this->nullable = $firnull || $this->pregnode->operands[1]->nullable();
@@ -615,7 +615,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     }
 }
 class dfa_preg_node_infinite_quant extends dfa_preg_operator {
-    
+
     public function accept() {
         if (!$this->pregnode->greed) {
             return get_string('ungreedyquant', 'qtype_preg');
@@ -655,7 +655,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
         }
         $this->print_indent($indent);
         echo 'left border: ', $this->pregnode->leftborder, '<br/>';
-        if (is_a($this, 'dfa_preg_node_finite_quant')) {    
+        if (is_a($this, 'dfa_preg_node_finite_quant')) {
             $this->print_indent($indent);
             echo 'right border: ', $this->pregnode->rightborder, '<br/>';
         }
@@ -681,7 +681,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
 }
 class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
 
-    
+
     public function followpos(&$fpmap) {
         dfa_preg_operator::followpos(&$fpmap);
     }
