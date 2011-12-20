@@ -121,6 +121,17 @@ class qtype_correctwriting_token_base {
     public function look_for_matches($other, $threshold) {
         // TODO: generic mistakes handling
     }
+    
+    
+    /**
+     * Tests, whether other lexeme is the same as this lexeme
+     *  
+     * @param qtype_correctwriting_token_base $other other lexeme
+     * @return boolean - if the same lexeme
+     */
+    public function is_same($other) {
+       //TODO: Just verify fields.
+    }
 }
 
 /**

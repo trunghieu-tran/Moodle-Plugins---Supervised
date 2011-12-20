@@ -21,6 +21,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/tokens_base.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
+
 //Other necessary requires
 
 class  qtype_correctwriting_sequence_analyzer {
