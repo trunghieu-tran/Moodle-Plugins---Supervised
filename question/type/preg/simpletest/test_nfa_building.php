@@ -4,8 +4,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher/nfa_preg_matcher.php');
 
 class nfa_building_test extends UnitTestCase {
 
