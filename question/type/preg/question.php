@@ -352,7 +352,9 @@ class qtype_preg_question extends question_graded_automatically
         $feedback = '';
         //If best fit answer is found and there is a full match
         //We should not show feedback for partial matches while question still active since student still don't get his answer correct
-        if (isset($bestfit['answer']) && ($bestfit['match']->full /* || $bestfit['match']->is_match && TODO question is closed and just reviewed*/)) {
+        //But if the question is finished there is no harm in showing feedback for partial matching
+        $state = $qa->get_state();
+        if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match && $state->is_finished()) ) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
                 $feedbacktext = $this->insert_subpatterns($answer->feedback, $response);
