@@ -14,7 +14,6 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
 
 class regex_handler_test extends UnitTestCase {
 

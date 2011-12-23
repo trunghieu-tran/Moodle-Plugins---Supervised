@@ -18,8 +18,6 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
-
 class lexer_test extends UnitTestCase {
 
     //Unit test for lexer
