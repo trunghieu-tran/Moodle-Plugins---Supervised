@@ -122,28 +122,28 @@ class preg_cross_tester extends UnitTestCase {
     * compares obtained results with expected and writes all flags
     */
     function compare_results(&$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$indexlastpassed, &$nextpassed, &$leftpassed) {
-        $ismatchpassed = ($expected['is_match'] == $obtained['is_match']);
-        $fullpassed = ($expected['full'] == $obtained['full']);
+        $ismatchpassed = ($expected['is_match'] == $obtained->is_match);
+        $fullpassed = ($expected['full'] == $obtained->full);
         $result = $ismatchpassed && $fullpassed;
-        if ($obtained['is_match'] && $expected['is_match']) {   // TODO - what if we need a character with no match?
+        if ($obtained->is_match && $expected->is_match) {   // TODO - what if we need a character with no match?
             // checking indexes
             if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
-                $indexfirstpassed = ($expected['index_first'] == $obtained['index_first']);
-                $indexlastpassed = ($expected['index_last'] == $obtained['index_last']);
+                $indexfirstpassed = ($expected['index_first'] == $obtained->index_first);
+                $indexlastpassed = ($expected['index_last'] == $obtained->index_last);
             } else {
-                $indexfirstpassed = ($expected['index_first'][0] == $obtained['index_first'][0]);
-                $indexlastpassed = ($expected['index_last'][0] == $obtained['index_last'][0]);
+                $indexfirstpassed = ($expected['index_first'][0] == $obtained->index_first[0]);
+                $indexlastpassed = ($expected['index_last'][0] == $obtained->index_last[0]);
             }
             // checking next possible character
             if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $nextpassed = (($expected['next'] === '' && $obtained['next'] === '') ||                                                            // both results are empty
-                               ($expected['next'] !== '' && $obtained['next'] !== '' && strstr($expected['next'], $obtained['next']) != false));    // expected 'next' contains obtained 'next'
+                $nextpassed = (($expected['next'] === '' && $obtained->next === '') ||                                                            // both results are empty
+                               ($expected['next'] !== '' && $obtained->next !== '' && strpos($expected['next'], $obtained->next) !== false));    // expected 'next' contains obtained 'next'
             } else {
                 $nextpassed = true;
             }
             // checking number of characters left
             if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $leftpassed = in_array($obtained['left'], $expected['left']);
+                $leftpassed = in_array($obtained->left, $expected['left']);
             } else {
                 $leftpassed = true;
             }
@@ -163,36 +163,32 @@ class preg_cross_tester extends UnitTestCase {
     function do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, $assertionstrue = false) {
         $this->assertTrue($assertionstrue || $ismatchpassed, "$matchername failed 'is_match' check on regex '$regex' and string '$str'");
         if (!$ismatchpassed) {
-            echo 'obtained result ' . $obtained['is_match'] . ' for \'is_match\' is incorrect<br/>';
+            echo 'obtained result ' . $obtained->is_match . ' for \'is_match\' is incorrect<br/>';
         }
         $this->assertTrue($assertionstrue || $fullpassed, "$matchername failed 'full' check on regex '$regex' and string '$str'");
         if (!$fullpassed) {
-            echo 'obtained result ' . $obtained['full'] . ' for \'full\' is incorrect<br/>';
+            echo 'obtained result ' . $obtained->full . ' for \'full\' is incorrect<br/>';
         }
-        if (array_key_exists('index_first', $obtained)) {
-            $this->assertTrue($assertionstrue || $indexfirstpassed, "$matchername failed 'index_first' check on regex '$regex' and string '$str'");
-            if (!$indexfirstpassed) {
-                echo 'obtained result '; print_r($obtained['index_first']); echo ' for \'index_first\' is incorrect<br/>';
-            }
+        $this->assertTrue($assertionstrue || $indexfirstpassed, "$matchername failed 'index_first' check on regex '$regex' and string '$str'");
+        if (!$indexfirstpassed) {
+            echo 'obtained result '; print_r($obtained->index_first); echo ' for \'index_first\' is incorrect<br/>';
         }
-        if (array_key_exists('index_last', $obtained)) {
-            $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
-            if (!$indexlastpassed) {
-                echo 'obtained result '; print_r($obtained['index_last']); echo ' for \'index_last\' is incorrect<br/>';
-            }
+
+        $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
+        if (!$indexlastpassed) {
+            echo 'obtained result '; print_r($obtained->index_last); echo ' for \'index_last\' is incorrect<br/>';
         }
-        if (array_key_exists('next', $obtained)) {
-            $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'");
-            if (!$nextpassed) {
-                echo 'obtained result \'' . $obtained['next'] . '\' for \'next\' is incorrect<br/>';
-            }
+
+        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'");
+        if (!$nextpassed) {
+            echo 'obtained result \'' . $obtained->next . '\' for \'next\' is incorrect<br/>';
         }
-        if (array_key_exists('left', $obtained)) {
-            $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'");
-            if (!$leftpassed) {
-                echo 'obtained result \'' . $obtained['left'] . '\' for \'left\' is incorrect<br/>';
-            }
+
+        $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'");
+        if (!$leftpassed) {
+            echo 'obtained result \'' . $obtained->left . '\' for \'left\' is incorrect<br/>';
         }
+
     }
 
     /**
@@ -266,20 +262,12 @@ class preg_cross_tester extends UnitTestCase {
                                     // if indexes were not matched at all - just print the obtained result
                                     if (count($indexmatch) == 0) {
                                         echo "Indexes not matched at all. Obtained result is:<br/>";
-                                        echo 'is_match = ' . $obtained['is_match']; echo '<br/>';
-                                        echo 'full = ' . $obtained['full']; echo '<br/>';
-                                        if (array_key_exists('index_first', $obtained)) {
-                                            echo 'index_first = '; print_r($obtained['index_first']); echo '<br/>';
-                                        }
-                                        if (array_key_exists('index_last', $obtained)) {
-                                            echo 'index_last = '; print_r($obtained['index_last']); echo '<br/>';
-                                        }
-                                        if (array_key_exists('next', $obtained)) {
-                                            echo 'next = ' . $obtained['next'] . '<br/>';
-                                        }
-                                        if (array_key_exists('left', $obtained)) {
-                                            echo 'left = ' . $obtained['left'] . '<br/>';
-                                        }
+                                        echo 'is_match = ' . $obtained->is_match; echo '<br/>';
+                                        echo 'full = ' . $obtained->full; echo '<br/>';
+                                        echo 'index_first = '; print_r($obtained->index_first); echo '<br/>';
+                                        echo 'index_last = '; print_r($obtained->index_last); echo '<br/>';
+                                        echo 'next = ' . $obtained->next . '<br/>';
+                                        echo 'left = ' . $obtained->left . '<br/>';
                                     }
                                 }
                             }

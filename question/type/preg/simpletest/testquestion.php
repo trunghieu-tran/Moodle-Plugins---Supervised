@@ -121,53 +121,53 @@ class qtype_preg_question_test extends UnitTestCase {
     //100% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bats eat cats?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100% partial match, 90% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do rats eat bat?'));
     $this->assertTrue($bestfit['answer']->fraction == 0.9);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100% and 90% partial match, 50% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'bats eat cats'));
     $this->assertTrue($bestfit['answer']->fraction == 0.5);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100%, 90%, 50% partial matches, 0% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'bats'));
     $this->assertTrue($bestfit['answer']->fraction == 0);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
 
     ////Partial match testing
     //100% is closest partial match by characters left, thought 90% is just as good - first should win!
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bat eat fat?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === false);
     //Now 90% is better because it allows to omit second 's' even if first is present
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bats eat fat?'));
     $this->assertTrue($bestfit['answer']->fraction == 0.9);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === false);
     //50% is better, but it isn't within hint grade border, while all answer within border have no matches
     //So 100% is choosen as first answer within border with no match at all
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'bat eat fat?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === false);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === false);
+    $this->assertTrue($bestfit['match']->full === false);
     //If we lower hint grade border, 50% should have partial match
     $testquestion1 = clone $this->testquestion;
     $testquestion1->hintgradeborder = 0.4;
     $bestfit = $testquestion1->get_best_fit_answer(array('answer' => 'bat eat fat?'));
     $this->assertTrue($bestfit['answer']->fraction == 0.5);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === false);
     //Partial match ends so early there is no difference between 100% and 90%, 100% should be selected as first
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do hats eat cats?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === false);
 
 
     //////Question with engine that doesn't allow partial matching (php_preg_matcher)
@@ -177,28 +177,28 @@ class qtype_preg_question_test extends UnitTestCase {
     //100% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bats eat cats?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100% partial match, 90% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do rats eat bat?'));
     $this->assertTrue($bestfit['answer']->fraction == 0.9);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100% and 90% partial match, 50% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'bats eat cats'));
     $this->assertTrue($bestfit['answer']->fraction == 0.5);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     //100%, 90%, 50% partial matches, 0% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'bats'));
     $this->assertTrue($bestfit['answer']->fraction == 0);
-    $this->assertTrue($bestfit['match']['is_match'] === true);
-    $this->assertTrue($bestfit['match']['full'] === true);
+    $this->assertTrue($bestfit['match']->is_match === true);
+    $this->assertTrue($bestfit['match']->full === true);
     ////Partial match testing - no partial matching, so we should get no match at all
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bat eat fat?'));
     $this->assertTrue($bestfit['answer']->fraction == 1);
-    $this->assertTrue($bestfit['match']['is_match'] === false);
-    $this->assertTrue($bestfit['match']['full'] === false);
+    $this->assertTrue($bestfit['match']->is_match === false);
+    $this->assertTrue($bestfit['match']->full === false);
 
     //////TODO question with engine which supports partial matching, but not characters left - when we would have such engine - like backtracking
     }
