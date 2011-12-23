@@ -5,7 +5,6 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
 
 class test_cross_quantifiers extends preg_cross_tester {
 
