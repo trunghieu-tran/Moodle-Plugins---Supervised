@@ -122,10 +122,10 @@ class qtype_preg_question extends question_graded_automatically
     /**
     * Calculates and fill $this->bestfitanswer if necessary.
     * @param $response response to find best fit answer
-    * @return array 'answer' => answer object, that best fit student's response, 'match' => array of matching results @see{preg_matcher}
+    * @return array 'answer' => answer object, best fitting student's response, 'match' => matching results object @see{qtype_preg_matching_results}
     */
     public function get_best_fit_answer(array $response) {
-        //check cache for valid results
+        //Check cache for valid results
         if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array()) {
             return $this->bestfitanswer;
         }
@@ -137,6 +137,7 @@ class qtype_preg_question extends question_graded_automatically
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
+        $matchresult = new qtype_preg_matching_results();
         if ($ispartialmatching) {
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $this->hintgradeborder) {
@@ -149,12 +150,11 @@ class qtype_preg_question extends question_graded_automatically
                     } else {
                         $maxfitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
                     }
-                    break;//anyone that fits border helps
+                    break;//Any one that fits border helps
                 }
             }
-        } else {
-            $matchresult = array('is_match' => false, 'full' => false);
         }
+
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
         $full = false;
         foreach ($this->answers as $answer) {
@@ -198,7 +198,7 @@ class qtype_preg_question extends question_graded_automatically
 
     public function get_matching_answer(array $response) {
         $bestfit = $this->get_best_fit_answer($response);
-        if ($bestfit['match']['is_match'] && $bestfit['match']['full']) {
+        if ($bestfit['match']->full) {
             return $bestfit['answer'];
         }
         return array();
@@ -209,7 +209,7 @@ class qtype_preg_question extends question_graded_automatically
         $bestfitanswer = $this->get_best_fit_answer($response);
         $grade = 0;
         $state = question_state::$gradedwrong;
-        if ($bestfitanswer['match']['is_match'] && $bestfitanswer['match']['full']) {//TODO - implement partial grades for partially correct answers
+        if ($bestfitanswer['match']->is_match && $bestfitanswer['match']->full) {//TODO - implement partial grades for partially correct answers
             $grade = $bestfitanswer['answer']->fraction;
             $state = question_state::graded_state_for_fraction($bestfitanswer['answer']->fraction);
         }
@@ -307,9 +307,9 @@ class qtype_preg_question extends question_graded_automatically
         $matchresults = $bestfit['match'];
         $currentanswer = $response['answer'];
 
-        if ($matchresults['is_match']) {
-            $firstindex = $matchresults['index_first'][0];
-            $lastindex = $matchresults['index_last'][0];
+        if ($matchresults->is_match) {
+            $firstindex = $matchresults->index_first[0];
+            $lastindex = $matchresults->index_last[0];
 
             $wronghead = '';
             if ($firstindex > 0) {//if there is wrong heading
@@ -320,8 +320,8 @@ class qtype_preg_question extends question_graded_automatically
                 $correctpart = substr($currentanswer, $firstindex, $lastindex - $firstindex + 1);
             }
             $hintedcharacter = '';
-            if (isset($matchresults['next'])) {//if hint possible
-                $hintedcharacter = $matchresults['next'];
+            if (isset($matchresults->next)) {//if hint possible
+                $hintedcharacter = $matchresults->next;
             }
             $wrongtail = '';
             if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
@@ -334,8 +334,8 @@ class qtype_preg_question extends question_graded_automatically
         $queryengine = $this->get_query_matcher($this->engine);
         if ($queryengine->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
             $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-            if (isset($matchresults['next'])) {//if hint possible
-                $result['hintedcharacter'] = $matchresults['next'];
+            if (isset($matchresults->next)) {//if hint possible
+                $result['hintedcharacter'] = $matchresults->next;
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
             $result = null;
@@ -352,24 +352,24 @@ class qtype_preg_question extends question_graded_automatically
     */
     public function insert_subpatterns($subject, $response) {
 
-        //To be sure best fit answer is calculated
-        $this->get_best_fit_answer($response);
-
         //Sanity check 
         if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
             //There are no placeholders for sure 
             return $subject;
         }
 
+        //To be sure best fit answer is calculated
+        $this->get_best_fit_answer($response);
+
         $answer = $response['answer'];
         $matchresults = $this->bestfitanswer['match'];
         //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
         // c.f. failed test in simpletest/testquestion.php
 
-        if ($matchresults['is_match']) {
-            foreach ($matchresults['index_first'] as $i => $startindex) {
+        if ($matchresults->is_match) {
+            foreach ($matchresults->index_first as $i => $startindex) {
                 $search = '{$'.$i.'}';
-                $endindex = $matchresults['index_last'][$i];
+                $endindex = $matchresults->index_last[$i];
                 $replace = substr($answer, $startindex, $endindex - $startindex + 1);
                 $subject = str_replace($search, $replace, $subject);
             }
@@ -429,7 +429,7 @@ class qtype_preg_question extends question_graded_automatically
         switch($hinttype) {
             case 'hintnextchar':
                 $bestfitanswer = $this->get_best_fit_answer($response);
-                return $bestfitanswer['match']['next'];
+                return $bestfitanswer['match']->next;
         }
     }
 

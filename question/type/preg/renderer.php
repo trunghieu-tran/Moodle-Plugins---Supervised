@@ -92,9 +92,10 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
 
         //////Teacher-defined feedback text for that answer
         $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
-        $feedback = '';
-        //If best fit answer is found and there is at least partial match
-        if (isset($bestfit['answer']) && $bestfit['match']['is_match'] && $bestfit['match']['full']) {
+        $feedback = '';//TODO - question->get_feedback_text()
+        //If best fit answer is found and there is a full match
+        //We should not show feedback for partial matches while question still active since student still don't get his answer correct
+        if (isset($bestfit['answer']) && ($bestfit['match']->full /* || TODO question is closed and just reviewed*/)) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
                 $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
