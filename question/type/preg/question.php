@@ -343,7 +343,29 @@ class qtype_preg_question extends question_graded_automatically
         return $result;
     }
 
-    /*
+    /**
+     * Returns formatted feedback text to show to the user, or null if no feedback should be shown
+     */
+    public function get_feedback_for_response($response, $qa) {
+    
+        $bestfit = $this->get_best_fit_answer($response);
+        $feedback = '';
+        //If best fit answer is found and there is a full match
+        //We should not show feedback for partial matches while question still active since student still don't get his answer correct
+        if (isset($bestfit['answer']) && ($bestfit['match']->full /* || $bestfit['match']->is_match && TODO question is closed and just reviewed*/)) {
+            $answer = $bestfit['answer'];
+            if ($answer->feedback) {
+                $feedbacktext = $this->insert_subpatterns($answer->feedback, $response);
+                $feedback = $this->format_text($feedbacktext, $answer->feedbackformat,
+                    $qa, 'question', 'answerfeedback', $answer->id);
+            }
+        }
+
+        return $feedback;
+
+    }
+
+    /**
     * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
     @param subject string to insert subpatterns
     @param question question object to create matcher
