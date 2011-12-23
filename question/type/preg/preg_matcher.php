@@ -1,6 +1,9 @@
 <?php
 /**
- * Defines abstract class of regular expression matcher, extend it to create a new matching engine
+ * Defines abstract class of regular expression matcher, extend it to create a new matching engine.
+ *
+ * A matcher is a particulary important type of regex handlers, that allows the question to work at all.
+ * The file also define a class to store matching results.
  *
  * @copyright &copy; 2010  Oleg Sychev
  * @author Oleg Sychev, Volgograd State Technical University
@@ -12,8 +15,91 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
-class preg_matcher extends preg_regex_handler {
+class qtype_preg_matching_results {
 
+    /** @var boolean Any match found? 
+    *
+    *The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
+    */
+    public $is_match;
+    /** @var boolean Is match full or partial? */
+    public $full;
+    /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
+    public $index_first;
+    /** @var array Indexes of last matched character - array where 0 => full match, 1=> first subpattern etc. */
+    public $index_last;
+    /** @var character Possible next character. 
+    * 
+    * Should be empty string if there is no possible next character in this location.
+    */
+    public $next;
+    /** @var integer The number of characters left to complete matching. */
+    public $left;
+
+    public function __construct($is_match = false, $full = false, $index_first = array(), $index_last = array(), $next = '', $left = -1) {
+        $this->is_match = $is_match;
+        $this->full = $full;
+        $this->index_first = $index_first;
+        $this->index_last = $index_last;
+        $this->next = $next;
+        $this->left = $left;
+    }
+
+    /**
+    * Invalidates match by setting all data to no match values
+    */
+    public function invalidate_match($subpattcount = 0) {
+        $this->is_match = false;
+        $this->full = false;
+        $this->next = '';
+        $this->left = -1;
+        $this->index_last = array();
+        $this->index_first = array();
+        //Having both indexes as -1 allows to consider all string as the wrong tail
+        for ($i = 0; $i <= $subpattcount; $i++) {
+            $this->index_first[$i] = -1;
+            $this->index_last[$i] = -1;
+        }
+    }
+
+    /**
+    * Returns the count of matched subpatterns
+    */
+    public function matched_subpatterns_count() {
+        $subpattcount = 0;
+        foreach ($this->index_first as $key=>$value) {
+            if ($key != 0 && $this->matchresults->index_last[$key] >= -1) {//-1 == no match for this subpattern
+                $subpattcount++;
+            }
+        }
+        return $subpattcount;
+    }
+
+    /**
+    * Throws exception if match results contain obvious abnormalities
+    */
+    public function validate() {
+        if ($this->is_match) {//Match found
+            if (!isset($this->index_first[0]) || !isset($this->index_last[0])) {
+                throw new qtype_preg_exception('Error: match was found but no match information returned');
+            }
+        }
+    }
+
+    /**
+    * Calculate last character index from first index (should be in $this->index_first) and length
+    * Use to adopt you engine in case it finds length instead of character index
+    * Results is set in $this->index_last
+    * @param length array of lengths of matches with (sub)patterns
+    */
+    public function from_length_to_last_index($length) {
+        foreach($length as $num=>$len) {
+            $this->index_last[$num] = $this->index_first[$num] + $len - 1;
+        }
+    }
+}
+
+class preg_matcher extends preg_regex_handler {
 
     //Constants for the capabilities which could (or could not) be supported by matching engine
     //Partial matching (returning the index of last matched character)
@@ -26,7 +112,7 @@ class preg_matcher extends preg_regex_handler {
     const SUBPATTERN_CAPTURING = 3;
 
     /**
-    * returns true for supported capabilities
+    * Returns true for supported capabilities
     * @param capability the capability in question
     * @return bool is capability supported
     */
@@ -34,48 +120,36 @@ class preg_matcher extends preg_regex_handler {
         return false;//abstract class supports nothing
     }
 
-    //Matching results
     //String with which match is performed
     protected $str;
-    //Is any match found?
-    //The match is found if at least one character is matched or there is full match of zero length (regex with just asserts)
-    protected $is_match;
-    //Is match full or partial?
-    protected $full;
-    //Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc
-    protected $index_first;
-    //Indexes of the last matched character - array where 0 => full match, 1=> first subpattern etc
-    protected $index_last;
-    //Possible next character
-    protected $next;
-    //The number of characters left for matching
-    protected $left;
+    //Matching results as qtype_preg_matching_results object
+    protected $matchresults;
     //Cache of the matching results,  string for matching is the key
-    protected $result_cache;
+    protected $resultcache;
 
     public function name() {
         return 'preg_matcher';
     }
 
     /**
-    *parse regex and do all necessary preprocessing
-    @param regex - regular expression for which will be build finite automate
-    @param modifiers - modifiers of regular expression
+    * Parse regex and do all necessary preprocessing.
+    *
+    * @param regex - regular expression for which will be build finite automate
+    * @param modifiers - modifiers of regular expression
     */
     public function __construct($regex = null, $modifiers = null) {
-        $this->is_match = false;
-        $this->full = false;
-        $this->next = '';
-        $this->left = -1;
-        $this->result_cache = array();
+        //Set matching data empty
+        $this->matchresults = new qtype_preg_matching_results();
+        $this->resultcache = array();
 
-
+        //Do parsing
         parent::__construct($regex, $modifiers);
         if ($regex === null) {
             return;
         }
 
-        $this->reset_subpattern_indexes();
+        //Invalidate match called later to allow parser to count subpatterns
+        $this->matchresults->invalidate_match($this->maxsubpatt);
     }
 
     /**
@@ -92,9 +166,9 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    match regular expression with given string, calls match_inner from a child class to do the real matching
-    @param str a string to match
-    @return bool true for complete match, false otherwise
+    * Match regular expression with given string, calls match_inner from a child class to do the real matching
+    * @param str a string to match
+    * @return bool true for complete match, false otherwise
     */
     public function match($str) {
 
@@ -105,53 +179,44 @@ class preg_matcher extends preg_regex_handler {
 
         $this->str = $str;
         //Are results cached already?
-        if (array_key_exists($str,$this->result_cache)) {
-            $result = $this->result_cache[$str];
-            $this->full = $result['full'];
-            $this->index_last = $result['index_last'];
-            $this->index_first = $result['index_first'];
-            $this->next = $result['next'];
-            $this->left = $result['left'];
-            $this->is_match = $result['is_match'];
-            return $this->full;
+        if (array_key_exists($str,$this->resultcache)) {
+            $this->matchresults = $this->resultcache[$str];
+            return $this->matchresults->full;
         }
 
         //Reset match data and perform matching.
-        $this->is_match = false;
-        $this->full = false;
-        $this->reset_subpattern_indexes();
-        $this->next = '';
-        $this->left = -1;
+        $this->matchresults = new qtype_preg_matching_results();
+        $this->matchresults->invalidate_match($this->maxsubpatt);
         $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
-        if (!$this->is_match) {
-            $this->index_first[0] = strlen($str);//first correct character is outside the string, so all string is the wrong heading
-            $this->index_last[0] = $this->index_first[0] - 1 ;//there are no correct characters
-            $this->full = false;
+        if (!$this->matchresults->is_match) {
+            $this->matchresults->invalidate_match($this->maxsubpatt);
         } else {//do some sanity checks
-            $subpattcnt = 0;
-            foreach ($this->index_first as $key=>$value) {
-                if ($key != 0 && $this->index_last[$key] >= $value) {
-                    $subpattcnt++;
-                }
-            }
+
+            //Check that engine have correct capabilities
+            $subpattcnt = $this->matchresults->matched_subpatterns_count();
             if(!$this->is_supporting(preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
-            if(!isset($this->index_first[0]) || !isset($this->index_last[0])) {
-                throw new qtype_preg_exception('Error: match was found but no match information returned');
+            if(!$this->is_supporting(preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== '') {
+                throw new qtype_preg_exception('Error: next character returned while engine '.$this->name().' doesn\'t support next character generation');
             }
+            if(!$this->is_supporting(preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != -1) {
+                throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
+            }
+
+            $this->matchresults->validate();
         }
 
         //Save results to the cache
-        $this->result_cache[$str] = array('full' => $this->full, 'index_last' => $this->index_last, 'index_first' => $this->index_first, 'next' => $this->next, 'left' => $this->left, 'is_match' => $this->is_match);
-        return $this->full;
+        $this->resultcache[$str] = $this->matchresults;
+        return $this->matchresults->full;
     }
 
     /**
-    *Do real matching, should be implemented in child classes, set properties full, index, next and left.
-    @param str a string to match
+    * Do real matching, should be implemented in child classes, set matchresults property.
+    * @param str a string to match
     */
     protected function match_inner($str) {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
@@ -161,59 +226,21 @@ class preg_matcher extends preg_regex_handler {
     * Returns an associative array of match results, helper method.
     */
     public function get_match_results() {
-        $res = array('is_match' => $this->is_match);
-        if ($this->is_match) {
-            $res['full'] = $this->full;
-            $res['index_first'] = $this->index_first;
-            $res['index_last'] = $this->index_last;
-            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $res['next'] = $this->next;
-            }
-            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $res['left'] = $this->left;
-            }
-        } else {
-            $res['full'] = false;
-            $res['index_first'] = array();
-            $res['index_last'] = array();
-            //We could still hint first possible character if there was no match at all.
-            if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-                $res['next'] = $this->next;
-            }
-            //If there is no match at all, we have all length of regex to fulfill - but it do exists.
-            if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-                $res['left'] = $this->left;
-            }
-
-        }
-        return $res;
+        return $this->matchresults;
     }
 
     /**
-    * is there a matching at all?
+    * Is there a matching at all?
     */
     public function match_found() {
-        return $this->is_match;
+        return $this->matchresults->is_match;
     }
 
     /**
-    *returns true if there is a complete match, false otherwise - any matching engine should support at least that
+    * Returns true if there is a complete match, false otherwise - any matching engine should support at least that
     */
     public function is_matching_complete() {
-        return $this->full;
-    }
-
-
-    /**
-    * Calculate last character index from first index (should be in $this->index_first) and length
-    * Use to adopt you engine in case it finds length instead of character index
-    * Results is set in $this->index_last
-    @param length array of lengths of matches with (sub)patterns
-    */
-    protected function from_length_to_last_index($length) {
-        foreach($length as $num=>$len) {
-            $this->index_last[$num] = $this->index_first[$num] + $len - 1;
-        }
+        return $this->matchresults->full;
     }
 
     /**
@@ -225,64 +252,45 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-     * Returns the number of captured subpatterns (except full match) in the match
-     */
-    public function count_matched_subpatterns() {
-        return count($this->index_first) - 1;//-1 to not include full match
-    }
-
-    /**
-    @param subpattern subpattern number
-    *returns true if subpattern is captured
+    * Returns true if subpattern is captured
+    * @param subpattern subpattern number
     */
     public function is_subpattern_captured($subpattern) {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return ($this->index_last[$subpattern] >= -1);
+        return ($this->matchresults->index_first[$subpattern] > -1 || $this->matchresults->index_last[$subpattern] > -1);
     }
 
     /**
-    * Resets first and last indexes to -1 and -2 for all subpatterns
-    */
-    protected function reset_subpattern_indexes() {
-        $this->index_last = array();
-        $this->index_first = array();
-        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
-            $this->index_first[$i] = -1;
-            $this->index_last[$i] = -2;
-        }
-    }
-
-    /**
-    @param subpattern subpattern number, 0 for the whole match
-    *returns first correct character index
+    * Returns first correct character index
+    * @param subpattern subpattern number, 0 for the whole match
     */
     public function first_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return $this->index_first[$subpattern];
+        return $this->matchresults->index_first[$subpattern];
     }
 
     /**
-    *returns the index of last correct character if engine supports partial matching
-    @param subpattern subpattern number, 0 for the whole match
-    @return the index of last correct character
+    * Returns the index of last correct character if engine supports partial matching
+    * @param subpattern subpattern number, 0 for the whole match
+    * @return the index of last correct character
     */
     public function last_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return $this->index_last[$subpattern];
+        return $this->matchresults->index_last[$subpattern];
     }
 
     /**
-    * returns (partialy) matched portion of string
+    * Returns (partialy) matched portion of string
     */
     public function matched_part($subpattern = 0) {
-        if(array_key_exists($subpattern, $this->index_first)) {
-            return substr($this->str, $this->index_first[$subpattern], $this->index_last[$subpattern] - $this->index_first[$subpattern] + 1);
+        if(array_key_exists($subpattern, $this->matchresults->index_first)) {
+            return substr($this->str, $this->matchresults->index_first[$subpattern], $this->matchresults->index_last[$subpattern] - $this->matchresults->index_first[$subpattern] + 1);
         } else if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         } else {
@@ -291,22 +299,22 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    *returns next possible character (to hint)
+    * Returns next possible character (to hint) or empty string if there is no one possible
     */
     public function next_char() {
         if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-            return $this->next;
+            return $this->matchresults->next;
 
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports hinting');
     }
 
     /**
-    *returns how many characters left to closest possible match
+    * Returns how many characters left to closest possible match
     */
     public function characters_left() {
         if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
-            return $this->left;
+            return $this->matchresults->left;
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports counting of the remaining characters');
     }
