@@ -14,7 +14,7 @@
 
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_nodes.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;

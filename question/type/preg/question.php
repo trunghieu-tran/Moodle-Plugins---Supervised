@@ -230,7 +230,7 @@ class qtype_preg_question extends question_graded_automatically
     */
     public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native') {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
             $matcher =& $this->matchers_cache[$answerid];
@@ -273,7 +273,7 @@ class qtype_preg_question extends question_graded_automatically
      */
     public function get_query_matcher($engine) {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
         return new $engine;
     }

@@ -9,7 +9,7 @@
  */
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher/nfa_preg_nodes.php');
 
 /**
  * defines a state of an automaton when running
