@@ -38,6 +38,7 @@ class preg_matcher extends preg_regex_handler {
     //String with which match is performed
     protected $str;
     //Is any match found?
+    //The match is found if at least one character is matched or there is full match of zero length (regex with just asserts)
     protected $is_match;
     //Is match full or partial?
     protected $full;
