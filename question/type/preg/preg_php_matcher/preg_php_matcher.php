@@ -28,15 +28,15 @@ class preg_php_matcher extends preg_matcher {
     }
 
     /**
-    * returns string of regular expression modifiers supported by this engine
+    * Returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
         return 'imsxeADSUX';
     }
 
     /**
-    * is this engine need a parsing of regular expression?
-    @return bool if parsing needed
+    * Does this engine need a parsing of regular expression?
+    * @return bool if parsing needed
     */
     protected function is_parsing_needed() {
         //no parsing needed
@@ -44,8 +44,8 @@ class preg_php_matcher extends preg_matcher {
     }
 
     /**
-    *check regular expression for errors
-    @return bool is tree accepted
+    * Check regular expression for errors
+    * @return bool is tree accepted
     */
     protected function accept_regex() {
         $for_regexp = $this->regex;
@@ -54,7 +54,7 @@ class preg_php_matcher extends preg_matcher {
         }
         $for_regexp = '/'.$for_regexp.'/u';
 
-        if (preg_match($for_regexp,'test') === false) {
+        if (preg_match($for_regexp,'test') === false) {//preg_match returns false when regular expression contains error
             $this->errors[] = new preg_error(get_string('PCREincorrectregex','qtype_preg'));
             return false;
         }
@@ -63,8 +63,8 @@ class preg_php_matcher extends preg_matcher {
     }
 
     /**
-    *do real matching
-    @param str a string to match
+    * Do real matching
+    * @param str a string to match
     */
     protected function match_inner($str) {
         //Preparing regexp
@@ -82,11 +82,11 @@ class preg_php_matcher extends preg_matcher {
         //$matches[0] - match with the whole regexp, $matches[1] - first subpattern etc
         //$matches[$i] format is array(0=> match, 1 => offset of this match)
         if ($full) {
-            $this->is_match = true;
-            $this->full = true;
+            $this->matchresults->is_match = true;
+            $this->matchresults->full = true;//No partial matching from preg_match
             foreach ($matches as $i => $match) {
-                $this->index_first[$i] = $match[1];
-                $this->index_last[$i] = $this->index_first[$i] + strlen($match[0]) - 1;
+                $this->matchresults->index_first[$i] = $match[1];
+                $this->matchresults->index_last[$i] = $this->matchresults->index_first[$i] + strlen($match[0]) - 1;
             }
         }
 
