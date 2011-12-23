@@ -185,9 +185,7 @@ class preg_matcher extends preg_regex_handler {
         }
 
         //Reset match data and perform matching.
-        $this->matchresults = new qtype_preg_matching_results();
-        $this->matchresults->invalidate_match($this->maxsubpatt);
-        $this->match_inner($str);
+        $this->matchresults = $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match) {
@@ -215,7 +213,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
-    * Do real matching, should be implemented in child classes, set matchresults property.
+    * Do real matching, should be implemented in child classes, returns qtype_preg_matching_results object.
     * @param str a string to match
     */
     protected function match_inner($str) {
@@ -223,7 +221,7 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /** 
-    * Returns an associative array of match results, helper method.
+    * Returns an object of match results, helper method.
     */
     public function get_match_results() {
         return $this->matchresults;
