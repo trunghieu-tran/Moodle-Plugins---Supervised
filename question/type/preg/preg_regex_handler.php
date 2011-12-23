@@ -246,16 +246,5 @@ class preg_regex_handler {
         return null;
     }
 
-    /**
-    * Function copy node with subtree, no reference
-    * @param node node for copying
-    * @return copy of node(and subtree)
-    *
-    * @deprecated since Preg 2.1 - just clone preg_node object instead
-    */
-    public function &copy_preg_node($node) {
-        $result = clone $node;
-        return $result;
-    }
 }
 ?>
