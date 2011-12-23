@@ -81,8 +81,6 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot . '/lib/questionlib.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 
 class preg_cross_tester extends UnitTestCase {
@@ -91,10 +89,15 @@ class preg_cross_tester extends UnitTestCase {
     var $engines = array();   // an array of available engines
 
     public function __construct() {
+        global $CFG;
+
         $question = new qtype_preg();
         $this->engines = $question->available_engines();
         unset($this->engines['preg_php_matcher']);
         $this->engines = array_keys($this->engines);
+        foreach ($this->engines as $enginename) {
+            require_once($CFG->dirroot . '/question/type/preg/'.$enginename.'/'.$enginename.'.php');
+        }
     }
 
     /**
