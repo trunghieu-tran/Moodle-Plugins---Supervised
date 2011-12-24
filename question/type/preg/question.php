@@ -148,7 +148,7 @@ class qtype_preg_question extends question_graded_automatically
                     if ($knowleftcharacters) {
                         $maxfitness = (-1)*$matcher->characters_left();
                     } else {
-                        $maxfitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
+                        $maxfitness = $matcher->match_length();
                     }
                     break;//Any one that fits border helps
                 }
@@ -179,7 +179,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($knowleftcharacters) {//Engine could tell us how many characters left to complete response, this is the best fitness possible.
                 $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
             } else {//We should rely on the length of correct response part.
-                $fitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
+                $fitness = $matcher->match_length();
             }
 
             if ($fitness > $maxfitness) {
@@ -309,23 +309,29 @@ class qtype_preg_question extends question_graded_automatically
 
         if ($matchresults->is_match) {
             $firstindex = $matchresults->index_first[0];
-            $lastindex = $matchresults->index_last[0];
+            $length = $matchresults->length[0];
+
+            //For pure-assert expression full matching no colored string should be shown
+            //It is usually a case when match means there is NO something in the student's answer
+            if ($length == 0) {
+                return null;//TODO - add unit-test when engines will be restored
+            }
 
             $wronghead = '';
             if ($firstindex > 0) {//if there is wrong heading
                 $wronghead = substr($currentanswer, 0, $firstindex);
             }
             $correctpart = '';
-            if ($firstindex != -1) {//there were any match
-                $correctpart = substr($currentanswer, $firstindex, $lastindex - $firstindex + 1);
+            if ($firstindex > -1) {//there were any matched characters
+                $correctpart = substr($currentanswer, $firstindex, $length);
             }
             $hintedcharacter = '';
             if (isset($matchresults->next)) {//if hint possible
                 $hintedcharacter = $matchresults->next;
             }
             $wrongtail = '';
-            if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
-                $wrongtail =  substr($currentanswer, $lastindex + 1, strlen($currentanswer) - $lastindex - 1);
+            if ($firstindex + $length < strlen($currentanswer)) {//if there is wrong tail
+                $wrongtail =  substr($currentanswer, $firstindex + $length, strlen($currentanswer) - $firstindex - $length);
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
         }
@@ -393,8 +399,8 @@ class qtype_preg_question extends question_graded_automatically
         if ($matchresults->is_match) {
             foreach ($matchresults->index_first as $i => $startindex) {
                 $search = '{$'.$i.'}';
-                $endindex = $matchresults->index_last[$i];
-                $replace = substr($answer, $startindex, $endindex - $startindex + 1);
+                $length = $matchresults->length[$i];
+                $replace = substr($answer, $startindex, $length);
                 $subject = str_replace($search, $replace, $subject);
             }
         } else {

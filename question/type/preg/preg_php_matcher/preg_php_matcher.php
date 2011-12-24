@@ -90,7 +90,7 @@ class preg_php_matcher extends preg_matcher {
             $matchresults->full = true;//No partial matching from preg_match
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
-                $matchresults->index_last[$i] = $matchresults->index_first[$i] + strlen($match[0]) - 1;
+                $matchresults->length[$i] = strlen($match[0]);
             }
         }
 

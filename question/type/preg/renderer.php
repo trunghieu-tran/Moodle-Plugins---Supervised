@@ -27,9 +27,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $currentanswer = $qa->get_last_qt_var('answer');
         $result = parent::formulation_and_controls($qa,$options);
 
-        //Show colored string if appropriable (i.e. any answer is given)
-        //We must show colored string along with specific_feedback if after student answered wrong specific feedback is shown, but general feedback is not
-        //If all feedback is shown alike, colored string should be shown there
         return $result;
     }
 
