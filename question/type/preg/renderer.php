@@ -72,9 +72,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             }
         }
 
-        /*TODO - find out how to define classes in plugins and add separate class for hint message*/
-        //$hintmessage = html_writer::tag('div', $hintmessage, array('class' => 'specificfeedback'));//TODO  - this may not be needed as rendererbase.php provides div on it's own
-
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
     }

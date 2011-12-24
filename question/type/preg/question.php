@@ -26,35 +26,82 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 /**
- * question which could return some specific hints and want to use *withhint behaviours should implement this
+ * Question which could return some specific hints and want to use *withhint behaviours should implement this
+ *
+ * @copyright  2011 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface question_with_specific_hints {
+interface question_with_qtype_specific_hints {
 
     /**
-     * returns an array of available specific hint types depending on question settings
-     * the keys are hint type indentifiers, unique for the qtype
-     * the values are interface strings with the hint description (without "hint" word!)
+     * Returns an array of available specific hint types depending on question settings
+     *
+     * The keys are hint type indentifiers, unique for the qtype
+     * The values are interface strings with the hint description (without "hint" word!)
      */
     public function available_specific_hint_types();
 
-    /** 
-     * returns whether response allows for the hint to be done
+    /**
+     * Hint object factory
+     *
+     * Returns a hint object for given type
      */
-    public function hint_available($hinttype, $response);
-
-    /** 
-     * returns specific hint value of given hint type for given response
-     */
-    public function specific_hint($hinttype, $response);
-
-    /** 
-     * returns penalty for using specific hint of given hint type (possibly for given response)
-     */
-    public function penalty_for_specific_hint($hinttype, $response);
+    public function hint_object($hintkey);
 }
 
+/**
+ * Base class for question-type specific hints
+ *
+ * @copyright  2011 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+abstract class qtype_specific_hint {
+
+    /** @var object Question object, created this hint*/
+    protected $question;
+
+    /**
+     * Constructs hint object, remember question to use
+     */
+    public function __construct($question) {
+        $this->question = $question;
+    }
+
+    /**
+     * Is hint based on response or not?
+     *
+     * @return boolean true if response is used to calculate hint (and, possibly, penalty)
+     */
+    abstract public function hint_response_based();
+
+    /** 
+     * Returns whether question and response allows for the hint to be done
+     */
+    abstract public function hint_available($response = null);
+
+    /** 
+     * Returns specific hint value for given response
+     */
+    abstract public function specific_hint($response = null);
+
+    /**
+     * Returns whether response is used to calculate penalty (cost) for the hint
+     */
+    public function penalty_response_based() {
+        return false;//Most hint have fixed penalty (cost)
+    }
+
+    /** 
+     * Returns penalty (cost) for using specific hint of given hint type (possibly for given response)
+     *
+     * Even if response is used to calculate penalty, hint object should still return an approximation to show to the student if $response is null
+     */
+    abstract public function penalty_for_specific_hint($response = null);
+
+}
 
 /**
  * Represents a preg question.
@@ -63,26 +110,26 @@ interface question_with_specific_hints {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable, question_with_specific_hints {
+        implements question_automatically_gradable, question_with_qtype_specific_hints {
 
     //Fields defining a question
     /** @var array of question_answer objects. */
     public $answers = array();
     /** @var boolean whether answers should be graded case-sensitively. */
     public $usecase;
-    /** @var correct answer in user-readable form. */
+    /** @var string correct answer in user-readable form. */
     public $correctanswer;
-    /** @var should the match be exact or any match within answer is ok. */
+    /** @var boolean should the match be exact or any match within answer is ok. */
     public $exactmatch;
-    /** @var availability of hints in behavours with multiple attempts. */
+    /** @var boolean availability of hints in behavours with multiple attempts. */
     public $usehint;
-    /** @var penalty for a hint. */
+    /** @var number penalty for a hint. */
     public $hintpenalty;
-    /** @var only answers with fraction >= hintgradeborder would be used for hinting. */
+    /** @var number only answers with fraction >= hintgradeborder would be used for hinting. */
     public $hintgradeborder;
-    /** @var matching engine to use. */
+    /** @var string matching engine to use. */
     public $engine;
-    /** @var notation, used to write answers. */
+    /** @var string notation, used to write answers. */
     public $notation;
 
     //Other fields
@@ -414,7 +461,7 @@ class qtype_preg_question extends question_graded_automatically
 
     //////////Specific hints implementation part
 
-    //we need adaptive (TODO interactive) behavour to use hints
+    //We need adaptive (TODO interactive) behaviour to use hints
      public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         global $CFG;
 
@@ -431,47 +478,24 @@ class qtype_preg_question extends question_graded_automatically
         return parent::make_behaviour($qa, $preferredbehaviour);
      }
     /**
-    * returns an array of available specific hint types
+    * Returns an array of available specific hint types
     */
     public function available_specific_hint_types() {
+        $hinttypes = array();
         if ($this->usehint) {
-        return array('hintnextchar' => get_string('hintnextchar','qtype_preg')
-                    );
+            $hinttypes['hintnextchar'] = get_string('hintnextchar','qtype_preg');
         }
-
-        return array();
+        return $hinttypes;
     }
 
-    /** 
-     * returns whether response allows for the hint to be done
+    /**
+     * Hint object factory
+     *
+     * Returns a hint object for given type
      */
-    public function hint_available($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-            return true;// next character hint available anywhere - TODO check where answer is correct or no next character could be generated
-        }
+    public function hint_object($hintkey) {
+        $hintclass = 'qtype_preg_'.$hintkey;
+        return new $hintclass($this);
     }
 
-        /** 
-     * returns specific hint value of given hint type for given response
-     */
-    public function specific_hint($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-                $bestfitanswer = $this->get_best_fit_answer($response);
-                return $bestfitanswer['match']->next;
-        }
-    }
-
-    /** 
-     * returns penalty for using specific hint of given hint type (possibly for given response)
-     * $response could be null if we need to show possible penalty in advance
-     */
-    public function penalty_for_specific_hint($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-                return $this->hintpenalty;
-        }
-        return 0;
-    }
 }

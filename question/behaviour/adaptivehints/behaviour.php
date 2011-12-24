@@ -33,8 +33,8 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         return array('qbehaviour_adaptive');
     }
 
-    public function is_compatible_question(question_definition $question) {//TODO - it should also require question_with_specific_hints interface, but for now it is able to return only one type
-        return ($question instanceof question_automatically_gradable) && ($question instanceof question_with_specific_hints);
+    public function is_compatible_question(question_definition $question) {
+        return ($question instanceof question_automatically_gradable) && ($question instanceof question_with_qtype_specific_hints);
     }
 
     public function get_expected_data() {
@@ -67,10 +67,11 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     public function summarise_hint(question_attempt_step $step, $hintkey, $hintdescription) {
         $response = $step->get_qt_data();
+        $hintobj = $this->question->hint_object($hintkey);
         $a = new stdClass();
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);
-        $a->penalty = $this->question->penalty_for_specific_hint($hintkey, $response);
+        $a->penalty = $hintobj->penalty_for_specific_hint($response);
         return get_string('hintused', 'qbehaviour_adaptivehints', $a);
     }
 
@@ -89,7 +90,8 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $status = $this->process_save($pendingstep);
 
         $response = $pendingstep->get_qt_data();
-        if (!$this->question->hint_available($hintkey, $response)) {//Couldn't compute hint for such response
+        $hintobj = $this->question->hint_object($hintkey);
+        if (!$hintobj->hint_available($response)) {//Couldn't compute hint for such response
             return question_attempt::DISCARD;
         }
 
@@ -111,7 +113,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         //Set hint variables
         $pendingstep->set_behaviour_var('_hashint',true);
         $prevtotal = $this->qa->get_last_behaviour_var('_totalpenalties', 0);
-        $penalty = $this->question->penalty_for_specific_hint($hintkey, $response);
+        $penalty = $hintobj->penalty_for_specific_hint($response);
         $pendingstep->set_behaviour_var('_penalty', $penalty);
         $newtotal = $prevtotal + $penalty;
         $pendingstep->set_behaviour_var('_totalpenalties', $newtotal);
