@@ -26,8 +26,8 @@ class qtype_preg_matching_results {
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
     public $index_first;
-    /** @var array Indexes of last matched character - array where 0 => full match, 1=> first subpattern etc. */
-    public $index_last;
+    /** @var array Length of the matches - array where 0 => full match, 1=> first subpattern etc. */
+    public $length;
     /** @var character Possible next character. 
     * 
     * Should be empty string if there is no possible next character in this location.
@@ -36,11 +36,11 @@ class qtype_preg_matching_results {
     /** @var integer The number of characters left to complete matching. */
     public $left;
 
-    public function __construct($is_match = false, $full = false, $index_first = array(), $index_last = array(), $next = '', $left = -1) {
+    public function __construct($is_match = false, $full = false, $index_first = array(), $length = array(), $next = '', $left = -1) {
         $this->is_match = $is_match;
         $this->full = $full;
         $this->index_first = $index_first;
-        $this->index_last = $index_last;
+        $this->length = $length;
         $this->next = $next;
         $this->left = $left;
     }
@@ -53,12 +53,13 @@ class qtype_preg_matching_results {
         $this->full = false;
         $this->next = '';
         $this->left = -1;
-        $this->index_last = array();
         $this->index_first = array();
-        //Having both indexes as -1 allows to consider all string as the wrong tail
+        $this->length = array();
+        //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
+        //Use negative values for no match at all
         for ($i = 0; $i <= $subpattcount; $i++) {
             $this->index_first[$i] = -1;
-            $this->index_last[$i] = -1;
+            $this->length[$i] = -1;
         }
     }
 
@@ -68,7 +69,7 @@ class qtype_preg_matching_results {
     public function matched_subpatterns_count() {
         $subpattcount = 0;
         foreach ($this->index_first as $key=>$value) {
-            if ($key != 0 && $this->matchresults->index_last[$key] >= -1) {//-1 == no match for this subpattern
+            if ($key != 0 && $this->matchresults->length[$key] >= -1) {//-1 == no match for this subpattern
                 $subpattcount++;
             }
         }
@@ -80,22 +81,24 @@ class qtype_preg_matching_results {
     */
     public function validate() {
         if ($this->is_match) {//Match found
-            if (!isset($this->index_first[0]) || !isset($this->index_last[0])) {
+            if (!isset($this->index_first[0]) || !isset($this->length[0])) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
         }
     }
 
     /**
-    * Calculate last character index from first index (should be in $this->index_first) and length
-    * Use to adopt you engine in case it finds length instead of character index
-    * Results is set in $this->index_last
-    * @param length array of lengths of matches with (sub)patterns
+    * Calculates and returns last character index from first index and length
+    * Use to adopt in case something can't be easily converted to using length
+    * @return array of last matched character indexes of matches with (sub)patterns
+    * @deprecated since 2.2 - would be removed in the future
     */
-    public function from_length_to_last_index($length) {
-        foreach($length as $num=>$len) {
-            $this->index_last[$num] = $this->index_first[$num] + $len - 1;
+    public function from_length_to_last_index() {
+        $index_last = array();
+        foreach ($this->length as $num => $len) {
+            $index_last[$num] = $this->index_first[$num] + $len - 1;
         }
+        return $index_last;
     }
 }
 
@@ -272,6 +275,17 @@ class preg_matcher extends preg_regex_handler {
     }
 
     /**
+    * Returns length of the match
+    * @param subpattern subpattern number, 0 for the whole match
+    */
+    public function match_length($subpattern = 0) {
+        if ($subpattern > $this->maxsubpatt) {
+            throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
+        }
+        return $this->matchresults->length[$subpattern];
+    }
+
+    /**
     * Returns the index of last correct character if engine supports partial matching
     * @param subpattern subpattern number, 0 for the whole match
     * @return the index of last correct character
@@ -280,7 +294,8 @@ class preg_matcher extends preg_regex_handler {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return $this->matchresults->index_last[$subpattern];
+        $index_last = $this->matchresults->from_length_to_last_index();
+        return $index_last[$subpattern];
     }
 
     /**
@@ -288,7 +303,7 @@ class preg_matcher extends preg_regex_handler {
     */
     public function matched_part($subpattern = 0) {
         if(array_key_exists($subpattern, $this->matchresults->index_first)) {
-            return substr($this->str, $this->matchresults->index_first[$subpattern], $this->matchresults->index_last[$subpattern] - $this->matchresults->index_first[$subpattern] + 1);
+            return substr($this->str, $this->matchresults->index_first[$subpattern], $this->matchresults->length[$subpattern]);
         } else if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         } else {
