@@ -28,7 +28,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         }
         $output .= html_writer::empty_tag('br');
 
-        //hinting buttons  $qa->get_behaviour()
+        //hinting buttons
          foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
             $attributes = array(
                 'type' => 'submit',
@@ -41,9 +41,24 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                 $attributes['disabled'] = 'disabled';
             }
             $output .= html_writer::empty_tag('input', $attributes);
-            $penalty = $question->penalty_for_specific_hint($hintkey, null);
-            if ($penalty != 0) {
-                $output .= $this->button_cost('withpenalty', $penalty, $options);
+
+            //Cost message
+            $hintobj = $question->->hint_object($hintkey);
+            if ($hintobj->penalty_response_based()) {//if penalty is response-based
+                //try to get last response
+                $response = $qa->get_last_qt_data();
+                if (empty($response)) {
+                    $response = null;
+                }
+                $penalty = $hintobj->penalty_for_specific_hint($response);
+                if ($penalty != 0) {
+                    $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//note that reported penalty is approximation since user could change response in adaptive
+                }
+            } else {
+                $penalty = $hintobj->penalty_for_specific_hint(null);
+                if ($penalty != 0) {
+                    $output .= $this->button_cost('withpenalty', $penalty, $options);
+                }
             }
             $output .= html_writer::empty_tag('br');
             
