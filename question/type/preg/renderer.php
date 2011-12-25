@@ -14,7 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
 
 /**
- * Generates the output for short answer questions.
+ * Generates the output for preg questions.
  *
  * @copyright  2011 Oleg Sychev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
