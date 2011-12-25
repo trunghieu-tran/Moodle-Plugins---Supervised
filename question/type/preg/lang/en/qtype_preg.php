@@ -4,8 +4,8 @@ $string['addingpreg'] = 'Adding regular expression question';
 $string['addmoreanswerblanks'] = 'Adding regular expression options';
 $string['answersinstruct'] = '<p>Enter a regular expression in choosen notation as an answer. You should enter at least one expression.
  If correct answer is given, it should match at least one regular expression with 100% grade. </p>
-<p>You could use placeholders like {0} in feedback to insert captured parts of student response there. {0} will be replaced by the whole match,
-{1} with first subpattern match etc. If choosed engine doesn\'t support subpatterns extraction (like DFA) you should use only {0} thought.</p>.';
+<p>You could use placeholders like {$0} in feedback to insert captured parts of student response there. {$0} will be replaced by the whole match,
+{$1} with first subpattern match etc. If choosed engine doesn\'t support subpatterns extraction (like DFA) you should use only {$0} thought.</p>.';
 $string['answerno'] = 'Answer {$a}';
 $string['asserttf'] = 'Positive lookahead assert';
 $string['assertff'] = 'Negative lookahead assert';

@@ -6,7 +6,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
-class test_cross_quantifiers extends preg_cross_tester {
+class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
 
     public $quants = array('{2,5}', '{2,}', '{,5}', '*');
 

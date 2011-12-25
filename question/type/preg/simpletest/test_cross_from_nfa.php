@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
-class test_cross_from_nfa extends preg_cross_tester {
+class qtype_test_cross_from_nfa extends qtype_preg_cross_tester {
 
     //-----------------------------------------------------------------------tests for general cases----------------------------------------------------------//
     function data_for_test_concat() {

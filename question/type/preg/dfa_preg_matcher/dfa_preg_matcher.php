@@ -41,7 +41,7 @@ class fptab {//member of follow's map table, use on merge time only
     }
 }
 
-class dfa_preg_matcher extends preg_matcher {
+class qtype_dfa_preg_matcher extends qtype_preg_matcher {
 
 
 
@@ -69,9 +69,9 @@ class dfa_preg_matcher extends preg_matcher {
     */
     public function is_supporting($capability) {
         switch($capability) {
-        case preg_matcher::PARTIAL_MATCHING :
-        case preg_matcher::NEXT_CHARACTER :
-        case preg_matcher::CHARACTERS_LEFT :
+        case qtype_preg_matcher::PARTIAL_MATCHING :
+        case qtype_preg_matcher::NEXT_CHARACTER :
+        case qtype_preg_matcher::CHARACTERS_LEFT :
             return true;
             break;
         }
@@ -527,7 +527,7 @@ class dfa_preg_matcher extends preg_matcher {
                 if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
                     $str2 = $cc->pregnode->charset;
                     $equdirection = $cc->pregnode->negative === $this->connection[$index][$number]->pregnode->negative;
-                    if (dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
+                    if (qtype_dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
                         array_push($equnum, $num);
                     }
                 } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
@@ -551,7 +551,7 @@ class dfa_preg_matcher extends preg_matcher {
         }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
-            dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
+            qtype_dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
         }
         return $followU;
     }
@@ -1309,7 +1309,7 @@ class dfa_preg_matcher extends preg_matcher {
     public function draw($number, $subject) {
         $qtypeobj = new qtype_preg();
         $dir = $qtypeobj->get_temp_dir('dfa');
-        $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
+        $dotcode = call_user_func(array('qtype_dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
         $dotfn = $dir.'/dotcode.dot';
         $dotfile = fopen($dotfn, 'w');
         foreach ($dotcode as $dotstring) {

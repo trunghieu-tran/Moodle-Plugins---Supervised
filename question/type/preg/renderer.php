@@ -23,8 +23,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
-        $question = $qa->get_question();
-        $currentanswer = $qa->get_last_qt_var('answer');
         $result = parent::formulation_and_controls($qa,$options);
 
         return $result;

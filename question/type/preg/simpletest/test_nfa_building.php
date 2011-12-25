@@ -6,7 +6,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher/nfa_preg_matcher.php');
 
-class nfa_building_test extends UnitTestCase {
+class qtype_nfa_building_test extends UnitTestCase {
 
     function setUp() {
     }
@@ -27,7 +27,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_concat() {
-        $matcher = new nfa_preg_matcher('^abc$');
+        $matcher = new qtype_nfa_preg_matcher('^abc$');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_concat.jpg');
         } else {
@@ -36,7 +36,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_alt() {
-        $matcher = new nfa_preg_matcher('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|');
+        $matcher = new qtype_nfa_preg_matcher('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_alt.jpg');
         } else {
@@ -45,7 +45,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_qu() {
-        $matcher = new nfa_preg_matcher('a?');
+        $matcher = new qtype_nfa_preg_matcher('a?');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_qu.jpg');
         } else {
@@ -54,7 +54,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_aster() {
-        $matcher = new nfa_preg_matcher('a*');
+        $matcher = new qtype_nfa_preg_matcher('a*');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_aster.jpg');
         } else {
@@ -63,7 +63,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_plus() {
-        $matcher = new nfa_preg_matcher('a+');
+        $matcher = new qtype_nfa_preg_matcher('a+');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_plus.jpg');
         } else {
@@ -72,7 +72,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_brace_infinite() {
-        $matcher = new nfa_preg_matcher('a{3,}');
+        $matcher = new qtype_nfa_preg_matcher('a{3,}');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_brace_infinite.jpg');
         } else {
@@ -81,7 +81,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_brace_finite() {
-        $matcher = new nfa_preg_matcher('a{3,6}');
+        $matcher = new qtype_nfa_preg_matcher('a{3,6}');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_brace_finite.jpg');
         } else {
@@ -90,7 +90,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt() {
-        $matcher = new nfa_preg_matcher('(a|b|cd|)');
+        $matcher = new qtype_nfa_preg_matcher('(a|b|cd|)');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt.jpg');
         } else {
@@ -99,7 +99,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_complex() {
-        $matcher = new nfa_preg_matcher('^[-.\w]+@(?:[a-z\d](a|b|cd|)[-a-z\d]+\.)+[a-z]{2,6}$');
+        $matcher = new qtype_nfa_preg_matcher('^[-.\w]+@(?:[a-z\d](a|b|cd|)[-a-z\d]+\.)+[a-z]{2,6}$');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_complex.jpg');
         } else {
@@ -108,7 +108,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_concat() {
-        $matcher = new nfa_preg_matcher('ab(cd)(ef)g');
+        $matcher = new qtype_nfa_preg_matcher('ab(cd)(ef)g');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_concat.jpg');
         } else {
@@ -117,7 +117,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_alt() {
-        $matcher = new nfa_preg_matcher('a|(bc)|(de)|f');
+        $matcher = new qtype_nfa_preg_matcher('a|(bc)|(de)|f');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_alt.jpg');
         } else {
@@ -126,7 +126,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_brace_finite() {
-        $matcher = new nfa_preg_matcher('(a){3,6}');
+        $matcher = new qtype_nfa_preg_matcher('(a){3,6}');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_brace_finite.jpg');
         } else {
@@ -135,7 +135,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_brace_infinite() {
-        $matcher = new nfa_preg_matcher('(a){3,}');
+        $matcher = new qtype_nfa_preg_matcher('(a){3,}');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_brace_infinite.jpg');
         } else {
@@ -144,7 +144,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_aster() {
-        $matcher = new nfa_preg_matcher('(a*)*');
+        $matcher = new qtype_nfa_preg_matcher('(a*)*');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_aster.jpg');
         } else {
@@ -153,7 +153,7 @@ class nfa_building_test extends UnitTestCase {
     }
 
     function test_build_subpatt_uncounted() {
-        $matcher = new nfa_preg_matcher('(?:ab)+');
+        $matcher = new qtype_nfa_preg_matcher('(?:ab)+');
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_uncounted.jpg');
         } else {

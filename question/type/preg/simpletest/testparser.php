@@ -19,7 +19,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 
-class parser_test extends UnitTestCase {
+class qtype_parser_test extends UnitTestCase {
 
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
@@ -79,7 +79,7 @@ class parser_test extends UnitTestCase {
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
         $parser =& $this->run_parser('(?:a|b)*abb');
-        $matcher = new dfa_preg_matcher;
+        $matcher = new qtype_dfa_preg_matcher;
         $matcher->roots[0] = $parser->get_root();
         $matcher->append_end(0);
         $matcher->buildfa(0);
