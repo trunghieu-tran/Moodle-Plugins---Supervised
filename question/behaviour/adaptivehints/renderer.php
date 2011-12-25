@@ -43,7 +43,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
             $output .= html_writer::empty_tag('input', $attributes);
 
             //Cost message
-            $hintobj = $question->->hint_object($hintkey);
+            $hintobj = $question->hint_object($hintkey);
             if ($hintobj->penalty_response_based()) {//if penalty is response-based
                 //try to get last response
                 $response = $qa->get_last_qt_data();
