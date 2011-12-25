@@ -5,7 +5,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
-class test_cross_from_backtracking extends preg_cross_tester {
+class tqtype_est_cross_from_backtracking extends qtype_preg_cross_tester {
 
     function data_for_test_Q_INF_1() {
         $test0 = array('str'=>'abbbbbacd',

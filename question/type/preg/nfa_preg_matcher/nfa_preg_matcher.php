@@ -50,7 +50,7 @@ class preg_nfa_processing_state {
     }
 }
 
-class nfa_preg_matcher extends preg_matcher {
+class qtype_nfa_preg_matcher extends qtype_preg_matcher {
 
     private $statelimit;
     private $transitionlimit;
@@ -102,10 +102,10 @@ class nfa_preg_matcher extends preg_matcher {
     */
     public function is_supporting($capability) {
         switch($capability) {
-        case preg_matcher::PARTIAL_MATCHING:
-        case preg_matcher::NEXT_CHARACTER:
-        case preg_matcher::CHARACTERS_LEFT:
-        case preg_matcher::SUBPATTERN_CAPTURING:
+        case qtype_preg_matcher::PARTIAL_MATCHING:
+        case qtype_preg_matcher::NEXT_CHARACTER:
+        case qtype_preg_matcher::CHARACTERS_LEFT:
+        case qtype_preg_matcher::SUBPATTERN_CAPTURING:
             return true;
             break;
         }
@@ -489,7 +489,7 @@ class nfa_preg_matcher extends preg_matcher {
         $transitioncount = 0;
         $errornode = $this->dst_root->create_automaton(&$this, &$stack, &$statecount, &$transitioncount);
         if ($errornode != null) {
-            $this->errors[] = new preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
+            $this->errors[] = new qtype_preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
             return;
         }
         $this->automaton = array_pop($stack);

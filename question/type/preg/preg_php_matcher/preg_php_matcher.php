@@ -12,11 +12,11 @@
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-class preg_php_matcher extends preg_matcher {
+class qtype_preg_php_matcher extends qtype_preg_matcher {
 
     public function is_supporting($capability) {
         switch ($capability) {
-        case preg_matcher::SUBPATTERN_CAPTURING :
+        case qtype_preg_matcher::SUBPATTERN_CAPTURING :
             return true;
             break;
         }
@@ -55,7 +55,7 @@ class preg_php_matcher extends preg_matcher {
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp,'test') === false) {//preg_match returns false when regular expression contains error
-            $this->errors[] = new preg_error(get_string('PCREincorrectregex','qtype_preg'));
+            $this->errors[] = new qtype_preg_error(get_string('PCREincorrectregex','qtype_preg'));
             return false;
         }
 

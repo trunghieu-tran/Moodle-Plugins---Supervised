@@ -15,7 +15,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
-class regex_handler_test extends UnitTestCase {
+class qtype_regex_handler_test extends UnitTestCase {
 
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
@@ -53,7 +53,7 @@ class preg_backreferences_test extends UnitTestCase {
     function test_no_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new nfa_preg_matcher($regex);
+        $matcher = new qtype_nfa_preg_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -76,7 +76,7 @@ class preg_backreferences_test extends UnitTestCase {
     function test_partial_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new nfa_preg_matcher($regex);
+        $matcher = new qtype_nfa_preg_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -99,7 +99,7 @@ class preg_backreferences_test extends UnitTestCase {
     function test_full_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new nfa_preg_matcher($regex);
+        $matcher = new qtype_nfa_preg_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -115,7 +115,7 @@ class preg_backreferences_test extends UnitTestCase {
     function test_empty_match() {
         $regex = '(^$)';
         $length = 0;
-        $matcher = new nfa_preg_matcher($regex);
+        $matcher = new qtype_nfa_preg_matcher($regex);
         $matcher->match('');
         $this->assertTrue($matcher->is_matching_complete());
         $backref = new preg_leaf_backref();
@@ -132,7 +132,7 @@ class preg_backreferences_test extends UnitTestCase {
     function test_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
-        $matcher = new nfa_preg_matcher($regex);
+        $matcher = new qtype_nfa_preg_matcher($regex);
         $matcher->match('ab');
         $backref = new preg_leaf_backref();
         $backref->number = 1;

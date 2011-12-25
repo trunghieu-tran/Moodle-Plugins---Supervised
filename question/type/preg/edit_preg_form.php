@@ -58,8 +58,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($engines as $engine => $enginename) {
             $questionobj = new qtype_preg_question;
             $querymatcher = $questionobj->get_query_matcher($engine);
-            if (!$querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING) || 
-                !$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)
+            if (!$querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING) || 
+                !$querymatcher->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)
                 ) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
                 $mform->disabledIf('usehint','engine', 'eq', $engine);
@@ -92,11 +92,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         $i = 0;
+        question_bank::load_question_definition_classes($this->qtype());
+        $questionobj = new qtype_preg_question;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                question_bank::load_question_definition_classes($this->qtype());
-                $questionobj = new qtype_preg_question;
                 $matcher =& $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
@@ -133,9 +133,9 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $errors['hintgradeborder']=get_string('nohintgradeborderpass','qtype_preg');
         }
 
-        $querymatcher = new $data['engine'];
+        $querymatcher = $questionobj->get_query_matcher($data['engine']);
         //If engine doesn't support subpattern capturing, than no placeholders should be in feedback
-        if (!$querymatcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
+        if (!$querymatcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
             $feedbacks = $data['feedback'];
             foreach ($feedbacks as $key => $feedback) {
                 if (is_array($feedback)) {//On some servers feedback is HTMLEditor, on another it is simple text area

@@ -102,7 +102,7 @@ class qtype_preg_matching_results {
     }
 }
 
-class preg_matcher extends preg_regex_handler {
+class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     //Constants for the capabilities which could (or could not) be supported by matching engine
     //Partial matching (returning the index of last matched character)
@@ -197,13 +197,13 @@ class preg_matcher extends preg_regex_handler {
 
             //Check that engine have correct capabilities
             $subpattcnt = $this->matchresults->matched_subpatterns_count();
-            if(!$this->is_supporting(preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
+            if(!$this->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
-            if(!$this->is_supporting(preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== '') {
+            if(!$this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== '') {
                 throw new qtype_preg_exception('Error: next character returned while engine '.$this->name().' doesn\'t support next character generation');
             }
-            if(!$this->is_supporting(preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != -1) {
+            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != -1) {
                 throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
             }
 
@@ -315,7 +315,7 @@ class preg_matcher extends preg_regex_handler {
     * Returns next possible character (to hint) or empty string if there is no one possible
     */
     public function next_char() {
-        if ($this->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+        if ($this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
             return $this->matchresults->next;
 
         }
@@ -326,7 +326,7 @@ class preg_matcher extends preg_regex_handler {
     * Returns how many characters left to closest possible match
     */
     public function characters_left() {
-        if ($this->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+        if ($this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
             return $this->matchresults->left;
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports counting of the remaining characters');

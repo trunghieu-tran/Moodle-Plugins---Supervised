@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php'
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
-class preg_regex_handler {
+class qtype_preg_regex_handler {
 
     //////Initial data
     //Regular expression as string
@@ -56,7 +56,7 @@ class preg_regex_handler {
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i=0; $i < strlen($modifiers); $i++) {
                 if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = new preg_error_unsupported_modifier($this->name(), $modifiers[$i]);
+                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $modifiers[$i]);
                 }
             }
         }
@@ -89,7 +89,7 @@ class preg_regex_handler {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return 'i';//any preg_matcher who intends to work with this question should support case insensitivity
+        return 'i';//any qtype_preg_matcher who intends to work with this question should support case insensitivity
     }
 
     /**
@@ -169,7 +169,7 @@ class preg_regex_handler {
             $parseerrors = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
-                $parseerrors[] = new preg_parsing_error($regex, $node);
+                $parseerrors[] = new qtype_preg_parsing_error($regex, $node);
             }
             $this->errors = array_merge($this->errors, $parseerrors);
         } else {
@@ -181,7 +181,7 @@ class preg_regex_handler {
     }
 
     /**
-     * Copy Abstract Syntax Tree from another preg_regex_handler class and build DST on it
+     * Copy Abstract Syntax Tree from another qtype_preg_regex_handler class and build DST on it
      *
      * Create handler with no parameters, than call this function to avoid re-parsing if you have
      *   two handlers working on one regex.
@@ -216,13 +216,13 @@ class preg_regex_handler {
                 $enginenode = new $enginenodename($pregnode, $this);
                 $acceptresult = $enginenode->accept();
                 if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             } else {
                 $enginenode = $pregnode;
                 $acceptresult = $this->is_preg_node_acceptable($pregnode);
                 if ($acceptresult !== true && !array_key_exists($enginenodename,  $this->errors)) {//highlighting first occurence of unaccepted node
-                    $this->errors[$enginenodename] = new preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
+                    $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, array('start' => $pregnode->indfirst, 'end' => $pregnode->indlast));
                 }
             }
             return $enginenode;

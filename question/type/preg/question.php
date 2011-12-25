@@ -178,8 +178,8 @@ class qtype_preg_question extends question_graded_automatically
         }
 
         $querymatcher = $this->get_query_matcher($this->engine);//this matcher will be used to query engine capabilities
-        $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
-        $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
+        $knowleftcharacters = $querymatcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT);
+        $ispartialmatching = $querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING);
         
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
@@ -289,10 +289,11 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             //Convert to actually used notation if necessary
-            $queryengine = new $engine;
+            $engineclass = 'qtype_'.$engine;
+            $queryengine = new $engineclass;
             $usednotation = $queryengine->used_notation();
             if ($notation !== null && $notation != $usednotation) {//Conversion is necessary
-                $notationclass = 'preg_notation_'.$notation;
+                $notationclass = 'qtype_preg_notation_'.$notation;
                 $notationobj = new $notationclass($regex, $modifiers);
                 $regex = $notationobj->convert_regex($usednotation);
                 $modifiers = $notationobj->convert_modifiers($usednotation);
@@ -306,7 +307,8 @@ class qtype_preg_question extends question_graded_automatically
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
-            $matcher = new $engine($for_regexp, $modifiers);
+            $engineclass = 'qtype_'.$engine;
+            $matcher = new $engineclass($for_regexp, $modifiers);
             if ($answerid !== null) {
                 $this->matchers_cache[$answerid] =& $matcher;
             }
@@ -322,7 +324,8 @@ class qtype_preg_question extends question_graded_automatically
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
-        return new $engine;
+        $engineclass = 'qtype_'.$engine;
+        return new $engineclass;
     }
 
     public function get_correct_response() {
@@ -385,7 +388,7 @@ class qtype_preg_question extends question_graded_automatically
 
         //No match - all response is wrong, but we could hint the very first character still
         $queryengine = $this->get_query_matcher($this->engine);
-        if ($queryengine->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
+        if ($queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
             $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
             if (isset($matchresults->next)) {//if hint possible
                 $result['hintedcharacter'] = $matchresults->next;

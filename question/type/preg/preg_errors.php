@@ -1,6 +1,6 @@
 <?php
 
-class preg_error {
+class qtype_preg_error {
 
     //Human-understandable error message
     public $errormsg;
@@ -25,7 +25,7 @@ class preg_error {
 }
 
 // A syntax error occured while parsing a regex
-class preg_parsing_error extends preg_error {
+class qtype_preg_parsing_error extends qtype_preg_error {
 
     public function __construct($regex, $parsernode) {
         $this->index_first = $parsernode->firstindxs[0];
@@ -36,7 +36,7 @@ class preg_parsing_error extends preg_error {
 }
 
 // There's an unacceptable node in a regex
-class preg_accepting_error extends preg_error {
+class qtype_reg_accepting_error extends qtype_preg_error {
 
     /*
      * Returns a string with first character converted to upper case.
@@ -62,7 +62,7 @@ class preg_accepting_error extends preg_error {
 }
 
 // There's an unsupported modifier in a regex
-class preg_modifier_error extends preg_error {
+class qtype_preg_modifier_error extends qtype_preg_error {
 
     public function __construct($matchername, $modifier) {
         $a = new stdClass;
@@ -74,7 +74,7 @@ class preg_modifier_error extends preg_error {
 }
 
 // FA is too large
-class preg_too_complex_error extends preg_error {
+class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
         $a = new stdClass;

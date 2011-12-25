@@ -14,7 +14,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 /**
  * Abstract notation class
  */
-abstract class preg_notation {
+abstract class qtype_preg_notation {
 
     //Regular expression in this notation
     public $regex;
@@ -53,7 +53,7 @@ abstract class preg_notation {
  * Native notation, supported by internal regular expression parser and used by any regular expression handlers that using this parser.
  * You would usually convert other regexes to it with notable exception of preg_php_extension engine, that wants PCRE strict notation.
  */
-class preg_notation_native extends preg_notation {
+class qtype_preg_notation_native extends qtype_preg_notation {
 
     public function name() {
         return 'native';
@@ -66,7 +66,7 @@ class preg_notation_native extends preg_notation {
  * Moodle shortanswer notation is basically a string to match with '*' wildcard for any number of any characters
  * Easily converts to both native and PCRE strict notations
  */
-class preg_notation_mdlshortanswer extends preg_notation {
+class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
 
     public function name() {
         return 'mdlshortanswer';

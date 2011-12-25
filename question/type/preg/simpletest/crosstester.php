@@ -83,7 +83,7 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once($CFG->dirroot . '/lib/questionlib.php');
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 
-class preg_cross_tester extends UnitTestCase {
+class qtype_preg_cross_tester extends UnitTestCase {
 
     var $question;            // an object of question_preg_qtype
     var $engines = array();   // an array of available engines
@@ -108,7 +108,7 @@ class preg_cross_tester extends UnitTestCase {
         if ($matcher->is_error_exists()) {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
-                if (is_a($error, 'preg_parsing_error')) {    // error messages are displayed for parsing errors only
+                if (is_a($error, 'qtype_preg_parsing_error')) {    // error messages are displayed for parsing errors only
                     echo 'Regex incorrect: '.$error->errormsg.'<br/>';
                     $this->assertTrue(false);
                 }
@@ -127,7 +127,7 @@ class preg_cross_tester extends UnitTestCase {
         $result = $ismatchpassed && $fullpassed;
         if ($obtained->is_match && $expected->is_match) {   // TODO - what if we need a character with no match?
             // checking indexes
-            if ($matcher->is_supporting(preg_matcher::SUBPATTERN_CAPTURING)) {
+            if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
                 $indexfirstpassed = ($expected['index_first'] == $obtained->index_first);
                 $indexlastpassed = ($expected['index_last'] == $obtained->index_last);
             } else {
@@ -135,14 +135,14 @@ class preg_cross_tester extends UnitTestCase {
                 $indexlastpassed = ($expected['index_last'][0] == $obtained->index_last[0]);
             }
             // checking next possible character
-            if ($matcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
+            if ($matcher->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
                 $nextpassed = (($expected['next'] === '' && $obtained->next === '') ||                                                            // both results are empty
                                ($expected['next'] !== '' && $obtained->next !== '' && strpos($expected['next'], $obtained->next) !== false));    // expected 'next' contains obtained 'next'
             } else {
                 $nextpassed = true;
             }
             // checking number of characters left
-            if ($matcher->is_supporting(preg_matcher::CHARACTERS_LEFT)) {
+            if ($matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
                 $leftpassed = in_array($obtained->left, $expected['left']);
             } else {
                 $leftpassed = true;
@@ -208,7 +208,8 @@ class preg_cross_tester extends UnitTestCase {
                 }
                 // iterate over available engines
                 foreach ($this->engines as $enginename) {
-                    $matcher = new $enginename($regex, $modifiers);
+                    $engineclass = 'qtype_'.$enginename;
+                    $matcher = new $engineclass($regex, $modifiers);
                     if (!$this->check_for_errors($matcher)) {
                         // iterate over all tests
                         foreach ($data['tests'] as $expected) {
