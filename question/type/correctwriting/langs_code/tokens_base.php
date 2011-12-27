@@ -1,22 +1,6 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-
 /**
- * Defines generic token class.
+ * Defines generic token and node classes.
  *
  * @package    qtype
  * @subpackage correctwriting
@@ -24,6 +8,157 @@
  * @author     Oleg Sychev, Sergey Pashaev, Maria Birukova
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+
+class qtype_correctwriting_ast {
+
+    /**
+     * AST root node.
+     * @var object of 
+     */
+    private $root;
+
+    /**
+     * Basic lexer constructor.
+     *
+     * @param array $patterns - array of object of a pattern class
+     * @param array $conditions - array of strings/conditions
+     * @param string $text - input text
+     * @param array $options - hash table of options
+     * @param string $condition - initial condition
+     */
+    public function __construct() {
+        
+    }
+
+    private function print_node($node, $args = NULL) {
+        printf('Node number: %d\n', $node->number());
+        printf('Node type: %s\n', $node->type());
+        printf('Node position: [%d, %d, %d, %d]\n',
+               $node->position()->linestart(),
+               $node->position()->colstart(),
+               $node->position()->lineend(),
+               $node->position()->colend());
+        printf('Node description: %s\n', $node->description());
+    }
+
+    public function print_tree() {
+        traverse($root, 'print_node');
+    }
+    
+    public function traverse($node, $callback) {
+        // entering node
+        if ($node->is_leaf()) {
+            // leaf action
+            $callback($node, $args);        
+        }
+
+        foreach($node->childs as $child) {
+            traverse($child, $callback);
+        }
+    }
+}
+
+
+class qtype_correctwriting_ast_node_base {
+    /**
+     * Is this token from correct answer or response.
+     * @var boolean
+     */
+    protected $isanswer;
+    
+    /**
+     * Type of node.
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * Token position - c.g. qtype_correctwriting_node_position class
+     */
+    protected $position;
+
+    /**
+     * Node number in a tree.
+     * @var integer
+     */
+    protected $number;
+
+    /**
+     * Child nodes.
+     * @var array of ast_node_base
+     */
+    public $childs;
+
+    /**
+     * Node description.
+     * @var string
+     */
+    protected $description;
+
+    public function __construct($type, $value, $position, $number, $isanswer) {
+        $this->number = $number;
+        $this->type = $type;
+        $this->value = $value;
+        $this->position = $position;
+        $this->isanswer = $isanswer;
+
+        $this->childs = array();
+        $this->description = '';
+    }
+
+    /**
+     * Returns actual type of the token.
+     *
+     * Usually will be overloaded in child classes to return constant string.
+     */
+    public function type() {
+        return $this->type;
+    }
+
+    public function number() {
+        return $this->number;
+    }
+
+    public function position() {
+        return $this->position;
+    }
+
+    public function description() {
+        if ('' == $this->description) {
+            // TODO: calc description
+            return $this->description;
+        } else {
+            return $this->description;
+        }
+    }
+
+    public function is_answer() {
+        return $this->isanswer;
+    }
+
+    public function set_description($str) {
+        $this->description = $str;
+    }
+
+    public function childs() {
+        return $this->childs;
+    }
+    
+    public function set_childs($childs) {
+        $this->childs = $childs;
+    }
+
+    public function add_child($node) {
+        array_push($this->childs, $node);
+    }
+
+    public function is_leaf() {
+        if (0 == count($this->childs)) {
+            return true;
+        }
+        return false;
+    }
+}
 
 /**
  * Class for base tokens.
@@ -34,30 +169,18 @@
  * @copyright &copy; 2011 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License 
  */
-class qtype_correctwriting_token_base {
+class qtype_correctwriting_token_base extends qtype_correctwriting_ast_node_base {
 
     /**
-     * Type of token.
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * Semantic value of token.
+     * Semantic value of node.
      * @var string
      */
     protected $value;
 
-    /**
-     * Is this token from correct answer or response.
-     * @var boolean
-     */
-    protected $isanswer;
-
-    /**
-     * Token position - c.g. qtype_correctwriting_node_position class
-     */
-    protected $position;
+    
+    public function value() {
+        return $this->value;
+    }
 
     /**
      * Basic lexeme constructor.
@@ -66,20 +189,12 @@ class qtype_correctwriting_token_base {
      * @param string $value - semantic value of lexeme
      * @return base_token
      */
-    public function __construct($type, $value, $isanswer, $position) {
+    public function __construct($number, $type, $value, $isanswer, $position) {
+        $this->if = $number;
         $this->type = $type;
         $this->value = $value;
         $this->isanswer = $isanswer;
         $this->position = $position;
-    }
-
-    /**
-     * Returns actual type of the token.
-     *
-     * Usually will be overloaded in child classes to return constant string.
-     */
-    public function token_type() {
-        return $this->type;
     }
 
     /**
@@ -162,6 +277,22 @@ class qtype_correctwriting_node_position {
     protected $colstart;
     protected $colend;
 
+    public function linestart(){
+        return $this->linestart;
+    }
+
+    public function lineend(){
+        return $this->lineend;
+    }
+    
+    public function colstart(){
+        return $this->colstart;
+    }
+    
+    public function colend(){
+        return $this->colend;
+    }
+    
     public function __construct($linestart, $lineend, $colstart, $colend) {
         $this->linestart = $linestart;
         $this->lineend = $lineend;
@@ -176,7 +307,24 @@ class qtype_correctwriting_node_position {
      *
      * @param array $nodepositions positions of adjanced nodes
      */
-    public function summ($nodepositions) {//Pashaev
+    public function summ($nodepositions) {
+        $minlinestart = $nodepositions[0]->linestart;
+        $maxlineend = $nodepositions[0]->lineend;
+        $mincolstart = $nodepositions[0]->colstart;
+        $maxcolend = $nodepositions[0]->colend;
+
+        foreach ($nodepositions as $node) {
+            if ($node->linestart < $minlinestart)
+                $minlinestart = $node->linestart;
+            if ($node->colstart < $mincolstart)
+                $mincolstart = $node->colstart;
+            if ($node->lineend > $maxlineend)
+                $maxlineend = $node->lineend;
+            if ($node->colend > $maxcolend)
+                $maxcolend = $node->colend;
+        }
+
+        return new qtype_correctwriting_node_position($minlinestart, $maxlinened, $mincolstart, $maxcolend);
     }
 }
 ?>
