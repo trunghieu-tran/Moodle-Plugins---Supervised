@@ -11,16 +11,16 @@
 abstract class qtype_correctwriting_abstract_language {
 
     /**
-     * Language name. For user.
-     * @var string
+     * Id in language table.
+     * @var integer
      */
-    private $name;
+    private $id;
 
     /**
-     * Technical name. For developer.
-     * @var string
+     * Language version (for user-defined languages mainly).
+     * @var integer
      */
-    private $techname;
+    private $version;
 
     /**
      * Object of lexer class.
@@ -33,75 +33,64 @@ abstract class qtype_correctwriting_abstract_language {
      * @var object of parser
      */
     public $parser;
+    
+    //TODO - errors array (for scanning and parser errors) and access method for it
 
     /**
-     * Comment string.
-     * @var string
-     */
-    private $comment;
-
-    /**
-     * If from language table.
-     * @var integer
-     */
-    private $id;
-
-    /**
-     * Language version.
-     * @var integer
-     */
-    private $version;
-
-    /**
-     * True if parser enabled, false otherwise.
-     * @var boolean.
-     */
-    private $isparserenabled;
-
-    /**
-     * True language is predefined, false otherwise.
-     * @var boolean.
-     */
-    private $ispredefined;
-
-    /**
-     * Returns true if this language has predefined lexer and parser
-     * (not generated).
+     * Returns true if this language has predefined (hardcoded) lexer and parser.
      *
      * @return boolean
      */
-    public function is_predefined() {
-        return $this->ispredefined;
-    }
+    abstract public function is_predefined();
 
     /**
-     * Returns true if this language has  parser enabled.
+     * Returns technical name of the language.
+     */
+    abstract public function name();
+
+    /**
+     * User-visible name of the language
+     *
+     * The rules for it are different for predefined and user-defined languages
+     */
+    abstract public function ui_name();
+
+    /**
+     * User description (help) for the language
+     */
+    abstract public function description();
+
+    /**
+     * Returns true if this language has parser enabled.
      *
      * @return boolean
      */
-    public function is_parser_enabled() {
-        return $this->isparserenabled;
+    public function could_parse() {
+        return false;//A language must openly declare it support parsing
     }
 
     /**
      * Returns array of tokens.
      *
+     * Add errors for answer scanning
      * @param $text - input text.
      * @param $isanswer - this flag indicates passed text as student
      * response, otherwise - teacher answer.
      * @return array of tokens
      */
-    public function tokenize($text, $isanswer) {
+    public function scan($text, $isanswer) {
         $this->scaner->tokenize($text, $isanswer);
     }
     
     /**
      * Returns Abstract Syntax Tree.
      *
+     * Add errors for answer parsing
      * @param $tokens - input array of tokens
-     * @return object of ast.
+     * @param $isanswer boolean true if we need to reduce to start symbol (answer parsing), false if not (response parts parsing)
+     * @return array of objects of ast (or tree roots) - should contain one element for answer parsing
      */
-    public function parse($tokens) {
+    public function parse($tokens, $isanswer) {
         $this->parser->parse($tokens);
     }
 
@@ -109,21 +98,20 @@ abstract class qtype_correctwriting_abstract_language {
      * Returns object of language created by id from lang_table.
      *
      * @param $id language id in lang_table
+     * @param $version language version in lang_table
      * @return object of custom or predefined language class
      */
-    public static function factory($id) {
-        // TODO: get via DB $techname, $ispredefined.
+    public static function factory($id, $version=1) {
+        //TODO: get via DB $techname, $ispredefined.
+        //TODO - implement version support
 
-        if ($ispredefined) {
-            if (include_once 'langs_code/predefined/' . $techname . '.php') {
-                $classname = 'qtype_correctwriting_predefined_' . $techname . '_language';
-                return new $classname($id);
-            } else {
-                throw new Exception('Language not found');
-            }
-        } else {
-            $classname = 'qtype_correctwriting_customized_language';
+        if ($this->ispredefined) {
+            require_once('langs_code/predefined/' . $this->name() . '.php');
+            $classname = 'qtype_correctwriting_predefined_' . $this->name() . '_language';
             return new $classname($id);
+        } else {
+            $classname = 'qtype_correctwriting_userdefined_language';
+            return new $classname($id, $version);
         }
     }
 
@@ -132,43 +120,11 @@ abstract class qtype_correctwriting_abstract_language {
      *
      * @return integer
      */
-    public function descriptions_count() {
-        if (is_parser_enabled()) {
-            return $this->parser->descriptions_count();
+    public function nodes_requiring_description_count() {//TODO - name
+        if ($this->could_parse()) {
+            return $this->parser->nodes_requiring_description_count();
         } else {
             return $this->scaner->tokens_count();
-        }
-    }
-
-    /**
-     * Returns description string for passed node.
-     *
-     * @param $node object of node
-     * @return string - description of node
-     */
-    public function get_description($node, $answerid) {
-        // TODO:
-        // connect moodle DB
-        // SELECT description FROM moodle_descriptions_table
-        // AS mtul WHERE mtut.langid == $this->id AND mtut.number
-        // == $node->id AND mtut.answerid == $this->answerid;
-        $desc = '';
-        return $desc;
-    }
-
-    /**
-     * Returns list of node descriptions.
-     *
-     * @param $answer - moodle answer object
-     * @return array of strings
-     */
-    public function descriptions_list($answer) {
-        // connect moodle DB by answerid
-        if (is_parser_enabled()) {
-            $result = $this->scaner->token_name_list();
-            return concatenate_arrays($result, $this->parser->nonterminal_name_list());
-        } else {
-            return $this->scaner->token_name_list();
         }
     }
 
@@ -181,13 +137,52 @@ abstract class qtype_correctwriting_abstract_language {
     public function nodes_requiring_description_list($answer) {
         // TODO: return node objects
         // connect moodle DB by answerid
-        if (is_parser_enabled()) {
-            $result = $this->scaner->token_list();
+        if ($this->could_parse()) {
+            /*$result = $this->scaner->token_list();
             return concatenate_arrays($result, $this->parser->nonterminal_list());
+            */ // TODO - get only nodes requiring user-defined description from the parser
         } else {
             return $this->scaner->token_list();
         }
     }
+
+    /**
+     * Returns description string for passed node.
+     *
+     * @param $nodenumber number of node
+     * @return string - description of node
+     */
+    public function node_description($nodenumber, $answerid) {
+        // TODO:
+        // connect moodle DB
+        // SELECT description FROM moodle_descriptions_table
+        // AS mtul WHERE mtut.langid == $this->id AND mtut.number
+        // == $node->id AND mtut.answerid == $this->answerid;
+        //cache descriptions
+        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
+        $desc = '';
+        return $desc;
+    }
+
+    /**
+     * Returns list of node descriptions.
+     *
+     * @param $answer - moodle answer object
+     * @return array of strings, keys are node numbers
+     */
+    public function node_descriptions_list($answer) {
+        // connect moodle DB by answerid
+        //cache descriptions
+        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
+        //TODO - should the function return only nodes with user-defined description or descpriptions for all nodes? Probably first...
+        if (is_parser_enabled()) {
+            $result = $this->scaner->token_name_list();
+            return concatenate_arrays($result, $this->parser->nonterminal_name_list());
+        } else {
+            return $this->scaner->token_name_list();
+        }
+    }
+
 }
 
 /**
@@ -196,7 +191,7 @@ abstract class qtype_correctwriting_abstract_language {
  * @copyright  &copy; 2011 Sergey Pashaev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class qtype_correctwriting_predefined_language extends qtype_correctwriting_abstract_language {
+abstract class qtype_correctwriting_predefined_language extends qtype_correctwriting_abstract_language {
 
     public function __construct($id, $langdbrecord = NULL) {
         $this->id = $id;
@@ -207,12 +202,35 @@ class qtype_correctwriting_predefined_language extends qtype_correctwriting_abst
             // TODO: via DB get $name, $techname, $isparserenabled, $version
         }
 
-        $scanerclass = 'qtype_correctwriting_predefined_' . $techname . '_scaner';
+        $scanerclass = 'qtype_correctwriting_predefined_' . $this->name() . '_scaner';
         $this->scaner = new $scanerclass();
-        if ($isparserenabled) {
-            $parserclass = 'qtype_correctwriting_predefined_' . $techname . '_parser';
+        if ($this->could_parse()) {
+            $parserclass = 'qtype_correctwriting_predefined_' . $this->name() . '_parser';
             $this->parser = new $parserclass();
         }
+    }
+
+    /**
+     * Returns true if this language has predefined (hardcoded) lexer and parser.
+     *
+     * @return boolean
+     */
+    public function is_predefined() {
+        return true;
+    }
+
+    /**
+     * User-visible name of the language
+     */
+    public function ui_name() {
+        return get_string('lang_' . $this->name() , 'qtype_correctwriting');
+    }
+
+    /**
+     * User description (help) for the language
+     */
+    public function description() {
+        return get_string('lang_' . $this->name() . '_help' , 'qtype_correctwriting');
     }
 }
 
@@ -223,9 +241,35 @@ class qtype_correctwriting_predefined_language extends qtype_correctwriting_abst
  * @copyright  &copy; 2011 Sergey Pashaev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-class qtype_correctwriting_customized_language extends qtype_correctwriting_abstract_language {
+class qtype_correctwriting_userdefined_language extends qtype_correctwriting_abstract_language {
 
-    public function __construct($id, $langdbrecord = NULL) {
+    /**
+     * Technical name. 
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
+     * User-visible name. 
+     *
+     * @var string
+     */
+    private $uiname;
+
+    /**
+     * Description string.
+     * @var string
+     */
+    private $description;
+
+    /**
+     * True if parser enabled, false otherwise.
+     * @var boolean.
+     */
+    private $couldparse;//TODO - overload could_parse() function only when syntax_analyzer class would be written
+
+    public function __construct($id, $version=1, $langdbrecord = NULL) {
 
         $this->id = $id;
 
@@ -246,8 +290,39 @@ class qtype_correctwriting_customized_language extends qtype_correctwriting_abst
         // TODO:parserpatternstext = get via DB and by lang
 
         $this->scaner = new qtype_correctwriting_custom_scaner($patterns, $conditions);
-        if ($isparserenabled) {
+        if ($this->could_parse()) {
             $this->parser = new qtype_correctwriting_custom_parser($rules);
         }
     }
+
+    /**
+     * Returns true if this language has predefined (hardcoded) lexer and parser.
+     *
+     * @return boolean
+     */
+    public function is_predefined() {
+        return false;
+    }
+
+    /**
+     * Returns technical name of the language.
+     */
+    public function name() {
+        return $this->name;
+    }
+
+    /**
+     * User-visible name of the language
+     */
+    public function ui_name() {
+        return $this->uiname;
+    }
+
+    /**
+     * User description (help) for the language
+     */
+    public function description() {
+        return $this->description;
+    }
+
 }
