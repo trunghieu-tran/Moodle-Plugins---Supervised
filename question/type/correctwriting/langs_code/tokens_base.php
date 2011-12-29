@@ -30,7 +30,7 @@ class qtype_correctwriting_ast {
         
     }
 
-    private function print_node($node, $args = NULL) {
+    private function print_node($node, $args = NULL) {//TODO - normal printing, maybe using dot
         printf('Node number: %d\n', $node->number());
         printf('Node type: %s\n', $node->type());
         printf('Node position: [%d, %d, %d, %d]\n',
@@ -49,10 +49,10 @@ class qtype_correctwriting_ast {
         // entering node
         if ($node->is_leaf()) {
             // leaf action
-            $callback($node, $args);        
+            $callback($node, $args);//TODO - what is args?
         }
 
-        foreach($node->childs as $child) {
+        foreach($node->childs as $child) {//TODO - why no callback for non-leaf nodes?
             traverse($child, $callback);
         }
     }
@@ -60,8 +60,9 @@ class qtype_correctwriting_ast {
 
 
 class qtype_correctwriting_ast_node_base {
+
     /**
-     * Is this token from correct answer or response.
+     * Is this node from correct answer or response.
      * @var boolean
      */
     protected $isanswer;
@@ -73,7 +74,7 @@ class qtype_correctwriting_ast_node_base {
     protected $type;
 
     /**
-     * Token position - c.g. qtype_correctwriting_node_position class
+     * Node position - c.g. qtype_correctwriting_node_position object
      */
     protected $position;
 
