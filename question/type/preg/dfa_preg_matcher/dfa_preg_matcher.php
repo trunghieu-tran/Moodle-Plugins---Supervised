@@ -1155,13 +1155,13 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
         if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
             $tmp = $node->operands[0];
             $subroot = new preg_node_concat;
-            $subroot->operands[0] = $this->copy_preg_node($tmp);
-            $subroot->operands[1] = $this->copy_preg_node($tmp);
+            $subroot->operands[0] = clone $tmp;
+            $subroot->operands[1] = clone $tmp;
             $count = $node->leftborder;
             for ($i=2; $i<$count; $i++) {
                 $newsubroot = new preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] = $this->copy_preg_node($tmp);
+                $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
             }
             $tmp = new preg_node_finite_quant;
@@ -1170,11 +1170,11 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
             $tmp->greed = $node->greed;
             $tmp->operands[0] = $node->operands[0];
             if ($node->leftborder == 0) {
-                $subroot->operands[0] =& $this->copy_preg_node($tmp);
-                $subroot->operands[1] =& $this->copy_preg_node($tmp);
+                $subroot->operands[0] = clone $tmp;
+                $subroot->operands[1] = clone $tmp;
                 $count = $node->rightborder - 2;
             } else if ($node->leftborder == 1) {
-                $subroot->operands[1] =& $this->copy_preg_node($tmp);
+                $subroot->operands[1] = clone $tmp;
                 $count = $node->rightborder - 2;
             } else {
                 $count = $node->rightborder - $node->leftborder;
@@ -1182,7 +1182,7 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
             for ($i=0; $i<$count; $i++) {
                 $newsubroot = new preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] =& $this->copy_preg_node($tmp);
+                $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
             }
             return $subroot;
@@ -1201,24 +1201,24 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
         } else if ($node->leftborder == 1) {
             $tmp = $node->operands[0];
             $subroot = new preg_node_concat;
-            $subroot->operands[0] =& $this->copy_preg_node($tmp);
-            $subroot->operands[1] =& $this->copy_preg_node($node);
+            $subroot->operands[0] = clone $tmp;
+            $subroot->operands[1] = clone $node;
             $subroot->operands[1]->leftborder = 0;
         } else {
             $tmp = $node->operands[0];
             $subroot = new preg_node_concat;
-            $subroot->operands[0] =& $this->copy_preg_node($tmp);
-            $subroot->operands[1] =& $this->copy_preg_node($tmp);
+            $subroot->operands[0] = clone $tmp;;
+            $subroot->operands[1] = clone $tmp;
             $count = $node->leftborder;
             for ($i=2; $i<$count; $i++) {
                 $newsubroot = new preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
-                $newsubroot->operands[1] =& $this->copy_preg_node($tmp);
+                $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
             }
             $newsubroot = new preg_node_concat;
-            $newsubroot->operands[0] =& $this->copy_preg_node($subroot);
-            $newsubroot->operands[1] =& $this->copy_preg_node($node);
+            $newsubroot->operands[0] = clone $subroot;
+            $newsubroot->operands[1] = clone $node;
             $newsubroot->operands[1]->leftborder = 0;
             $subroot = $newsubroot;
         }
@@ -1232,12 +1232,13 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
     */
     function match_inner($response) {
         if ($response == '' && $this->roots[0]->pregnode->operands[0]->nullable) {
-            $this->is_match = true;
+            /*$this->is_match = true;
             $this->full = true;
             $this->index_first[0] = 0;
             $this->index_last[0] = -1;
             $this->next = '';
-            $this->left = 0;
+            $this->left = 0;*/
+            $matchresult = new qtype_preg_matching_results(true, true, array(0), array(0), '', 0);
         } else {
             $result = new stdClass;
             $result->full = false;
@@ -1254,7 +1255,7 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
                 }
             }
 
-
+            /*
             $this->is_match =  $result->full || $result->index >= 0;
             $this->full = $result->full;
             $this->index_first[0] = $result->offset;
@@ -1267,9 +1268,15 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
             } else {
                 $this->next = $result->next;
             }
-            $this->left = $result->left;
+            $this->left = $result->left;*/
+            if ($result->next === 0) {
+                $next = '';
+            } else {
+                $next = $result->next;
+            }
+            $matchresult = new qtype_preg_matching_results($result->full || $result->index >= 0, $result->full, array($result->offset), array($result->index+1), $result->next, $result->left);
         }
-        return;
+        return $matchresult;
     }
     /**
     *@return list of supported operation as array of string
