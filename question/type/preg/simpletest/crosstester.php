@@ -24,7 +24,7 @@
  *             'is_match'=>true,                  // is there a match?
  *             'full'=>true,                      // is it full?
  *             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
- *             'index_last'=>array(0=>2),         // indexes of last correct characters for subpatterns
+ *             'length'=>array(0=>2),             // length of the i-subpattern
  *             'left'=>0,                         // number of characters left to complete match
  *             'next'=>'');                       // a string of possible next characters in case of not full match
  *
@@ -43,7 +43,7 @@
  *                       'is_match'=>true,
  *                       'full'=>true,
  *                       'index_first'=>array(0=>0),
- *                       'index_last'=>array(0=>7),
+ *                       'length'=>array(0=>8),
  *                       'left'=>0,
  *                       'next'=>'');
  *
@@ -58,13 +58,13 @@
  *                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
  *                                              'full'=>false,
  *                                              'index_first'=>array(0=>0),
- *                                              'index_last'=>array(0=>2),
+ *                                              'length'=>array(0=>3),
  *                                              'left'=>array(4),
  *                                              'next'=>'b'),
  *                                        array('is_match'=>true,    // result for fa engine
  *                                              'full'=>false,
  *                                              'index_first'=>array(0=>0),
- *                                              'index_last'=>array(0=>4),
+ *                                              'length'=>array(0=>5),
  *                                              'left'=>array(4),
  *                                              'next'=>'b')
  *                                        ));
@@ -94,6 +94,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $question = new qtype_preg();
         $this->engines = $question->available_engines();
         unset($this->engines['preg_php_matcher']);
+		unset($this->engines['dfa_preg_matcher']);
         $this->engines = array_keys($this->engines);
         foreach ($this->engines as $enginename) {
             require_once($CFG->dirroot . '/question/type/preg/'.$enginename.'/'.$enginename.'.php');
@@ -125,14 +126,14 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $ismatchpassed = ($expected['is_match'] == $obtained->is_match);
         $fullpassed = ($expected['full'] == $obtained->full);
         $result = $ismatchpassed && $fullpassed;
-        if ($obtained->is_match && $expected->is_match) {   // TODO - what if we need a character with no match?
+        if ($obtained->is_match && $expected['is_match']) {   // TODO - what if we need a character with no match?
             // checking indexes
             if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
                 $indexfirstpassed = ($expected['index_first'] == $obtained->index_first);
-                $indexlastpassed = ($expected['index_last'] == $obtained->index_last);
+                $indexlastpassed = ($expected['length'] == $obtained->length);
             } else {
                 $indexfirstpassed = ($expected['index_first'][0] == $obtained->index_first[0]);
-                $indexlastpassed = ($expected['index_last'][0] == $obtained->index_last[0]);
+                $indexlastpassed = ($expected['length'][0] == $obtained->length[0]);
             }
             // checking next possible character
             if ($matcher->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
@@ -174,9 +175,9 @@ class qtype_preg_cross_tester extends UnitTestCase {
             echo 'obtained result '; print_r($obtained->index_first); echo ' for \'index_first\' is incorrect<br/>';
         }
 
-        $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'index_last' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'length' check on regex '$regex' and string '$str'");
         if (!$indexlastpassed) {
-            echo 'obtained result '; print_r($obtained->index_last); echo ' for \'index_last\' is incorrect<br/>';
+            echo 'obtained result '; print_r($obtained->length); echo ' for \'length\' is incorrect<br/>';
         }
 
         $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'");
@@ -217,7 +218,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                             $matcher->match($str);
                             $matchername = $matcher->name();
                             $obtained = $matcher->get_match_results();
-                            // not the results are obtained, let us check them!
+                            // now the results are obtained, let us check them!
                             if (array_key_exists('is_match', $expected)) {
                                 // compare with single result
                                 $ismatchpassed = false;

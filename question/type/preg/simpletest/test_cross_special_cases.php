@@ -20,9 +20,9 @@ class qtype_test_cross_special_cases extends qtype_preg_cross_tester {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>-1),
-                        'left'=>array(1),
+                        'index_first'=>array(0=>-1),
+                        'length'=>array(0=>0),
+                        'left'=>array(3),
                         'next'=>'a');
 
         return array('regex'=>'abc',
@@ -34,8 +34,8 @@ class qtype_test_cross_special_cases extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>-1),
-                        'index_last'=>array(0=>1,1=>1,2=>-2),
-                        'left'=>array(10000000),
+                        'length'=>array(0=>2,1=>2,2=>-1),
+                        'left'=>array(-1),
                         'next'=>'');
 
         return array('regex'=>'(?:(ab)|(cd))\2',
@@ -47,7 +47,7 @@ class qtype_test_cross_special_cases extends qtype_preg_cross_tester {
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>1),
-                        'index_last'=>array(0=>0),
+                        'length'=>array(0=>0),
                         'left'=>array(1),
                         'next'=>'a');
 
