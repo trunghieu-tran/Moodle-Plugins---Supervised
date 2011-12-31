@@ -17,7 +17,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_matching_results {
 
-    /** @var boolean Any match found? 
+    /** @var boolean Any match found?
     *
     *The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
     */
@@ -28,8 +28,8 @@ class qtype_preg_matching_results {
     public $index_first;
     /** @var array Length of the matches - array where 0 => full match, 1=> first subpattern etc. */
     public $length;
-    /** @var character Possible next character. 
-    * 
+    /** @var character Possible next character.
+    *
     * Should be empty string if there is no possible next character in this location.
     */
     public $next;
@@ -61,6 +61,7 @@ class qtype_preg_matching_results {
             $this->index_first[$i] = -1;
             $this->length[$i] = -1;
         }
+        $this->length[0] = 0;
     }
 
     /**
@@ -69,7 +70,7 @@ class qtype_preg_matching_results {
     public function matched_subpatterns_count() {
         $subpattcount = 0;
         foreach ($this->index_first as $key=>$value) {
-            if ($key != 0 && $this->matchresults->length[$key] >= -1) {//-1 == no match for this subpattern
+            if ($key != 0 && $this->length[$key] >= -1) {//-1 == no match for this subpattern
                 $subpattcount++;
             }
         }
@@ -223,7 +224,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
     }
 
-    /** 
+    /**
     * Returns an object of match results, helper method.
     */
     public function get_match_results() {
@@ -260,7 +261,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return ($this->matchresults->index_first[$subpattern] > -1 || $this->matchresults->index_last[$subpattern] > -1);
+        return ($this->matchresults->length[$subpattern] > -1);
     }
 
     /**
