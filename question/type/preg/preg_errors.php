@@ -36,7 +36,7 @@ class qtype_preg_parsing_error extends qtype_preg_error {
 }
 
 // There's an unacceptable node in a regex
-class qtype_reg_accepting_error extends qtype_preg_error {
+class qtype_preg_accepting_error extends qtype_preg_error {
 
     /*
      * Returns a string with first character converted to upper case.
