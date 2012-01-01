@@ -237,7 +237,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                 $indexlastpassed = array();
                                 $nextpassed = array();
                                 $leftpassed = array();
-                                $indexmatch = array(); // index of $expecter['results'] which match obtained $index_first and $index_last
+                                $indexmatch = array(); // index of $expected['results'] which match obtained $index_first and $length
                                 $passed = false;
                                 foreach ($expected['results'] as $key=>$curexpected) {
                                     $ismatchpassed[$key] = false;
@@ -267,7 +267,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                         echo 'is_match = ' . $obtained->is_match; echo '<br/>';
                                         echo 'full = ' . $obtained->full; echo '<br/>';
                                         echo 'index_first = '; print_r($obtained->index_first); echo '<br/>';
-                                        echo 'index_last = '; print_r($obtained->index_last); echo '<br/>';
+                                        echo 'length = '; print_r($obtained->length); echo '<br/>';
                                         echo 'next = ' . $obtained->next . '<br/>';
                                         echo 'left = ' . $obtained->left . '<br/>';
                                     }

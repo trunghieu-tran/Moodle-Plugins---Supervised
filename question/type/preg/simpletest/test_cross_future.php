@@ -14,7 +14,7 @@ class qtype_test_cross_future extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>4),
+                        'length'=>array(0=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -22,7 +22,7 @@ class qtype_test_cross_future extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'index_last'=>array(0=>3),
+                        'length'=>array(0=>4),
                         'left'=>array(1),
                         'next'=>'');    // can't generate a character
 
