@@ -21,7 +21,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>-1),
-                        'index_last'=>array(0=>3,1=>3,2=>-2),
+                        'length'=>array(0=>4,1=>4,2=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -34,7 +34,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(4),
                         'next'=>'a');
 
@@ -42,7 +42,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(3),
                         'next'=>'a');
 
@@ -50,7 +50,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(1),
                         'next'=>'a');
 
@@ -58,7 +58,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -66,7 +66,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -79,7 +79,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(4),
                         'next'=>'a');
 
@@ -87,7 +87,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(3),
                         'next'=>'a');
 
@@ -95,7 +95,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(1),
                         'next'=>'a');
 
@@ -103,7 +103,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -111,7 +111,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -124,7 +124,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -132,7 +132,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -140,7 +140,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -148,7 +148,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -156,7 +156,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -169,7 +169,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -177,7 +177,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -185,7 +185,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -193,7 +193,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -201,7 +201,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -214,7 +214,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(4),
                         'next'=>'a');
 
@@ -222,7 +222,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(3),
                         'next'=>'a');
 
@@ -230,7 +230,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(1),
                         'next'=>'a');
 
@@ -238,7 +238,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -246,7 +246,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -259,7 +259,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(4),
                         'next'=>'a');
 
@@ -267,7 +267,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(3),
                         'next'=>'a');
 
@@ -275,7 +275,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>1),
+                        'length'=>array(0=>3,1=>1),
                         'left'=>array(1),
                         'next'=>'a');
 
@@ -283,7 +283,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -291,7 +291,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -304,7 +304,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -312,7 +312,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -320,7 +320,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -328,7 +328,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -336,7 +336,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -349,7 +349,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>-1,1=>-2),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -357,7 +357,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>-1),
-                        'index_last'=>array(0=>0,1=>-2),
+                        'length'=>array(0=>1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -365,7 +365,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -373,7 +373,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -381,7 +381,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>6),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -394,7 +394,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -402,7 +402,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1),    // a + ('')
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -410,7 +410,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1),    // a + (aa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -418,7 +418,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -426,7 +426,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -439,7 +439,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -447,7 +447,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -455,7 +455,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -463,7 +463,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // (aaaaa) + ''
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -471,7 +471,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -484,7 +484,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -492,7 +492,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -500,7 +500,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -508,7 +508,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -516,7 +516,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -529,7 +529,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -537,7 +537,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -545,7 +545,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -553,7 +553,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -561,7 +561,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -574,7 +574,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -582,7 +582,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1),    // a + ('')
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -590,7 +590,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + ('')
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -598,7 +598,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -606,7 +606,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -619,7 +619,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -627,7 +627,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>1),    // a + ('')
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -635,7 +635,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>3),    // aaa + ('')
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -643,7 +643,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -651,7 +651,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -664,7 +664,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -672,7 +672,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (a)
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -680,7 +680,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -688,7 +688,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -696,7 +696,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>6),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -709,7 +709,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'index_last'=>array(0=>-1,1=>-1),
+                        'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -717,7 +717,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (a)
-                        'index_last'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -725,7 +725,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'index_last'=>array(0=>2,1=>2),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -733,7 +733,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'index_last'=>array(0=>4,1=>4),
+                        'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
                         'next'=>'');
 
@@ -741,7 +741,7 @@ class qtype_test_cross_quantifiers extends qtype_preg_cross_tester {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'index_last'=>array(0=>5,1=>5),
+                        'length'=>array(0=>6,1=>6),
                         'left'=>array(0),
                         'next'=>'');
 
