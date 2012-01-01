@@ -94,7 +94,6 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $question = new qtype_preg();
         $this->engines = $question->available_engines();
         unset($this->engines['preg_php_matcher']);
-		unset($this->engines['dfa_preg_matcher']);
         $this->engines = array_keys($this->engines);
         foreach ($this->engines as $enginename) {
             require_once($CFG->dirroot . '/question/type/preg/'.$enginename.'/'.$enginename.'.php');
@@ -162,13 +161,14 @@ class qtype_preg_cross_tester extends UnitTestCase {
     * does assertions for every field. if assertionstrue == true then error messages displayed only
     */
     function do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, $assertionstrue = false) {
+        $boolstr = array(false=>'FALSE', true=>'TRUE');
         $this->assertTrue($assertionstrue || $ismatchpassed, "$matchername failed 'is_match' check on regex '$regex' and string '$str'");
         if (!$ismatchpassed) {
-            echo 'obtained result ' . $obtained->is_match . ' for \'is_match\' is incorrect<br/>';
+            echo 'obtained result ' . $boolstr[$obtained->is_match] . ' for \'is_match\' is incorrect<br/>';
         }
         $this->assertTrue($assertionstrue || $fullpassed, "$matchername failed 'full' check on regex '$regex' and string '$str'");
         if (!$fullpassed) {
-            echo 'obtained result ' . $obtained->full . ' for \'full\' is incorrect<br/>';
+            echo 'obtained result ' . $boolstr[$obtained->full] . ' for \'full\' is incorrect<br/>';
         }
         $this->assertTrue($assertionstrue || $indexfirstpassed, "$matchername failed 'index_first' check on regex '$regex' and string '$str'");
         if (!$indexfirstpassed) {

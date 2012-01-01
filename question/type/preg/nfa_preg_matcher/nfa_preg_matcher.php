@@ -291,6 +291,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         $fullmatchfound = false;
 
         $this->matchresults->invalidate_match($this->maxsubpatt);
+        $this->matchresults->length[0] = 0;
         // initial state with nothing captured
         $initialstate = new qtype_preg_nfa_processing_state(false, false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, '', -1,
                                                             $this->automaton->startstate, null, null, 0);
@@ -376,6 +377,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                         }
                     }
                     $this->matchresults->invalidate_match($this->maxsubpatt);
+                    $this->matchresults->length[0] = 0;
                 }
             }
             // replace curstates with newstates

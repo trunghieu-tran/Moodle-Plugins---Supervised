@@ -61,7 +61,6 @@ class qtype_preg_matching_results {
             $this->index_first[$i] = -1;
             $this->length[$i] = -1;
         }
-        $this->length[0] = 0;
     }
 
     /**
