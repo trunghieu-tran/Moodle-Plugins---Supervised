@@ -24,9 +24,8 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
     public $backref_transition;        // != null if the last transition matched is a backreference
     public $backref_match_len;         // length of the last match
 
-    public function __construct($is_match, $full, $index_first, $length, $index_first_old, $length_old, $next = '', $left = -1,
+    public function __construct($full, $index_first, $length, $index_first_old, $length_old, $next = '', $left = -1,
                                 &$state, $first_transition, $backref_transition, $backref_match_len) {
-        $this->is_match = $is_match;
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
@@ -137,7 +136,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         $result = $newres->full && !$oldres->full;
         // the second is match existance
         if (!$result) {
-            $result = $newres->is_match && !$oldres->is_match;
+            $result = ($newres->length[0] > 0) && ($oldres->length[0] <= 0);
         }
         // the third is match length
         if (!$result) {
@@ -201,7 +200,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         } else {
             $transition = $laststate->backref_transition;
             $length = $laststate->length[$transition->pregleaf->number] - $laststate->backref_match_len;
-            $newstate = new qtype_preg_nfa_processing_state($laststate->is_match, false, $laststate->index_first, $laststate->length, $laststate->index_first_old, $laststate->length_old, '', -1,
+            $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_old, $laststate->length_old, '', -1,
                                                             $transition->state, $transition, null, 0);
             $newstate->length[0] += $length;
             $newstate->next = $newstate->first_transition->pregleaf->next_character($str, $startpos + $laststate->length[0], $laststate->backref_match_len);
@@ -219,7 +218,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                         if (!$next->loops) {
                             $skip = false;
                             // check for anchors
-                            if (($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX && $curstate->is_match) ||        // ^ in the middle
+                            if (($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX && $curstate->length[0] > 0) ||        // ^ in the middle
                                 ($next->pregleaf->subtype == preg_leaf_assert::SUBTYPE_DOLLAR && $next->state !== $this->automaton->endstate)) {    // $ in the middle
                                     $skip = true;
                             }
@@ -237,7 +236,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                             }
                             // check for length
                             if (!$skip) {
-                                $newstate = new qtype_preg_nfa_processing_state($curstate->is_match, false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, $curstate->next, -1,
+                                $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, $curstate->next, -1,
                                                                                 $next->state, $curstate->first_transition, null, 0);
                                 $newstate->length[0] += $length;
                                 if ($result !== null && $newstate->length[0] > $result->length[0]) {
@@ -293,7 +292,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         $this->matchresults->invalidate_match($this->maxsubpatt);
         $this->matchresults->length[0] = 0;
         // initial state with nothing captured
-        $initialstate = new qtype_preg_nfa_processing_state(false, false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, '', -1,
+        $initialstate = new qtype_preg_nfa_processing_state(false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, '', -1,
                                                             $this->automaton->startstate, null, null, 0);
         array_push($curstates, $initialstate);
         while (count($curstates) != 0) {
@@ -303,11 +302,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                 // get the current state
                 $curstate = array_pop($curstates);
                 // saving the current result
-                if ($curstate->length[0] > 0) {
-                    $curstate->is_match = true;
-                }
                 if ($curstate->state === $this->automaton->endstate) {
-                    $curstate->is_match = true;
                     $curstate->full = true;
                     $curstate->left = 0;
                     $fullmatchfound = true;
@@ -338,7 +333,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                         $length = 0;
                         if ($transition->pregleaf->match($str, $startpos + $curlen, &$length, !$transition->pregleaf->caseinsensitive)) {
                             // create a new state
-                            $newstate = new qtype_preg_nfa_processing_state(false, false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, '', -1,
+                            $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, '', -1,
                                                                             $transition->state, null, null, 0);
                             $newstate->length[0] += $length;
                             $newstate->length_old[0] = $newstate->length[0];
@@ -361,8 +356,8 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                         } else if (!$fullmatchfound) {    // transition not matched, save the partial match
                             // if a backreference matched partially - set corresponding fields
                             if ($length > 0) {
-                                $curstate->is_match = true;
                                 $curstate->length[0] += $length;
+                                $curstate->length_old[0] = $curstate->length[0];
                                 $curstate->backref_transition = $transition;
                                 $curstate->backref_match_len = $length;
                             }
@@ -388,16 +383,13 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         }
         $result = null;
         foreach ($results as $curresult) {
-            if ($result == null || ($this->is_new_result_more_suitable(&$result, &$curresult))) {
+            if ($result == null || $this->is_new_result_more_suitable(&$result, &$curresult)) {
                 $result = $curresult;
             }
         }
-        if ($result !== null) {
-            if ($result->is_match) {
-                $result->index_first[0] = $startpos;
-            }
+        if ($result !== null && ($result->length[0] > 0 || $result->full)) {
+            $result->index_first[0] = $startpos;
             $result->index_first_old[0] = $result->index_first[0];
-            $result->length_old[0] = $result->length[0];
         }
         return $result;
     }
@@ -407,9 +399,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
     * @param str a string to match
     */
     function match_inner($str) {
-        $result = new qtype_preg_nfa_processing_state(false, false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, '', -1,
-                                                      $this->automaton->startstate, null, null, 0);
-        $startpos = 0;
+        $result = null;
         $textlib = textlib_get_instance();
         $len = $textlib->strlen($str);
         // match from all indexes
@@ -417,27 +407,13 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         if ($str === '') {
             $rightborder = 1;
         }
-        for ($j = 0; $j < $rightborder && !$result->full; $j++) {
+        for ($j = 0; $j < $rightborder && !($result !== null && $result->full); $j++) {
             $tmp = $this->match_from_pos($str, $j);
-            if ($this->is_new_result_more_suitable(&$result, &$tmp)) {
+            if ($result === null || $this->is_new_result_more_suitable(&$result, &$tmp)) {
                 $result = $tmp;
-                $startpos = $j;
             }
         }
-        // save the result
-        /*$this->is_match = $result->is_match;
-        $this->full = $result->full;
-        foreach ($result->length_old as $key=>$subpatt) {
-            if ($subpatt >= -1) {
-                $this->index_first[$key] = $result->index_first_old[$key];
-                $this->index_last[$key] = $result->length_old[$key];
-            }
-        }
-        $this->next = $result->next;
-        $this->left = $result->left;*/
-
-        $retval = new qtype_preg_matching_results($result->is_match, $result->full, $result->index_first_old, $result->length_old, $result->next, $result->left);
-        return $retval;
+        return new qtype_preg_matching_results($result->full, $result->index_first_old, $result->length_old, $result->next, $result->left);
     }
 
     public function __construct($regex = null, $modifiers = null) {
