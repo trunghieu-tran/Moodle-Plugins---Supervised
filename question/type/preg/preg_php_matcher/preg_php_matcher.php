@@ -86,7 +86,6 @@ class qtype_preg_php_matcher extends qtype_preg_matcher {
         //$matches[0] - match with the whole regexp, $matches[1] - first subpattern etc
         //$matches[$i] format is array(0=> match, 1 => offset of this match)
         if ($full) {
-            $matchresults->is_match = true;
             $matchresults->full = true;//No partial matching from preg_match
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
