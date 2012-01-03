@@ -1231,7 +1231,7 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
     *@return result of compring, see compare function for format of result
     */
     function match_inner($response) {
-        if ($response == '' && $this->roots[0]->pregnode->operands[0]->nullable) {
+        if ($response === '' && $this->roots[0]->pregnode->operands[0]->nullable) {
             /*$this->is_match = true;
             $this->full = true;
             $this->index_first[0] = 0;
