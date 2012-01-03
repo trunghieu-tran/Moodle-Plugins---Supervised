@@ -18,7 +18,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-class qtype_lexer_test extends UnitTestCase {
+class qtype_preg_lexer_test extends UnitTestCase {
 
     //Unit test for lexer
     function test_lexer_quantificators() {

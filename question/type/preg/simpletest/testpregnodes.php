@@ -15,7 +15,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
-class qtype_regex_handler_test extends UnitTestCase {
+class qtype_preg_regex_handler_test extends UnitTestCase {
 
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
@@ -49,7 +49,7 @@ class qtype_regex_handler_test extends UnitTestCase {
  *
  * @author Valeriy Streltsov
  */
-class preg_backreferences_test extends UnitTestCase {
+class qtype_preg_backreferences_test extends UnitTestCase {
     function test_no_match() {
         $regex = '(abc)';
         $length = 0;

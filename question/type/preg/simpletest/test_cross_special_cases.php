@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
 
-class qtype_test_cross_special_cases extends qtype_preg_cross_tester {
+class qtype_preg_test_cross_special_cases extends qtype_preg_cross_tester {
 
     function data_for_test_empty_string() {
         $test1 = array( 'str'=>'',
