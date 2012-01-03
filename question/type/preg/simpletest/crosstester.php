@@ -34,7 +34,7 @@
  *    This situation appears when a character may lead to continuing matching both quantifier and the rest of the regex, for example:
  *    the regex is '[a-z]*bacd' and the string is 'abacd'. The character is underlined.
  *                                                  ^
- *    
+ *
  *    A test is passed if engine returns a result which matches one element of this array.
  *
  *    Here's an example test function for the only possible match result:
@@ -122,10 +122,10 @@ class qtype_preg_cross_tester extends UnitTestCase {
     * compares obtained results with expected and writes all flags
     */
     function compare_results(&$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$indexlastpassed, &$nextpassed, &$leftpassed) {
-        $ismatchpassed = ($expected['is_match'] == $obtained->is_match);
+        $ismatchpassed = ($expected['is_match'] == $obtained->is_match());
         $fullpassed = ($expected['full'] == $obtained->full);
         $result = $ismatchpassed && $fullpassed;
-        if ($obtained->is_match && $expected['is_match']) {   // TODO - what if we need a character with no match?
+        if ($obtained->is_match() && $expected['is_match']) {   // TODO - what if we need a character with no match?
             // checking indexes
             if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
                 $indexfirstpassed = ($expected['index_first'] == $obtained->index_first);
@@ -164,7 +164,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $boolstr = array(false=>'FALSE', true=>'TRUE');
         $this->assertTrue($assertionstrue || $ismatchpassed, "$matchername failed 'is_match' check on regex '$regex' and string '$str'");
         if (!$ismatchpassed) {
-            echo 'obtained result ' . $boolstr[$obtained->is_match] . ' for \'is_match\' is incorrect<br/>';
+            echo 'obtained result ' . $boolstr[$obtained->is_match()] . ' for \'is_match\' is incorrect<br/>';
         }
         $this->assertTrue($assertionstrue || $fullpassed, "$matchername failed 'full' check on regex '$regex' and string '$str'");
         if (!$fullpassed) {
@@ -264,7 +264,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                     // if indexes were not matched at all - just print the obtained result
                                     if (count($indexmatch) == 0) {
                                         echo "Indexes not matched at all. Obtained result is:<br/>";
-                                        echo 'is_match = ' . $obtained->is_match; echo '<br/>';
+                                        echo 'is_match = ' . $obtained->is_match(); echo '<br/>';
                                         echo 'full = ' . $obtained->full; echo '<br/>';
                                         echo 'index_first = '; print_r($obtained->index_first); echo '<br/>';
                                         echo 'length = '; print_r($obtained->length); echo '<br/>';
