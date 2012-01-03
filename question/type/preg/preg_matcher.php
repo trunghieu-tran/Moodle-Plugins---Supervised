@@ -17,11 +17,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_matching_results {
 
-    /** @var boolean Any match found?
-    *
-    *The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
-    */
-    public $is_match;
+
     /** @var boolean Is match full or partial? */
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
@@ -36,8 +32,7 @@ class qtype_preg_matching_results {
     /** @var integer The number of characters left to complete matching. */
     public $left;
 
-    public function __construct($is_match = false, $full = false, $index_first = array(), $length = array(), $next = '', $left = -1) {
-        $this->is_match = $is_match;
+    public function __construct($full = false, $index_first = array(), $length = array(), $next = '', $left = -1) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
@@ -46,10 +41,20 @@ class qtype_preg_matching_results {
     }
 
     /**
+    * Any match found?
+    *The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
+    */
+    public function is_match() {
+        if (array_key_exists(0, $this->length)) {
+            return $this->full || ($this->length[0] > 0);
+        } else {//no matching resutls at all
+            return false;
+        }
+    }
+    /**
     * Invalidates match by setting all data to no match values
     */
     public function invalidate_match($subpattcount = 0) {
-        $this->is_match = false;
         $this->full = false;
         $this->next = '';
         $this->left = -1;
@@ -80,7 +85,7 @@ class qtype_preg_matching_results {
     * Throws exception if match results contain obvious abnormalities
     */
     public function validate() {
-        if ($this->is_match) {//Match found
+        if ($this->is_match()) {//Match found
             if (!isset($this->index_first[0]) || !isset($this->length[0])) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
@@ -191,7 +196,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->matchresults = $this->match_inner($str);
 
         //Set all string as incorrect if there were no matching
-        if (!$this->matchresults->is_match) {
+        if (!$this->matchresults->is_match()) {
             $this->matchresults->invalidate_match($this->maxsubpatt);
         } else {//do some sanity checks
 
@@ -234,7 +239,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     * Is there a matching at all?
     */
     public function match_found() {
-        return $this->matchresults->is_match;
+        return $this->matchresults->is_match();
     }
 
     /**

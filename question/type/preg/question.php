@@ -256,7 +256,7 @@ class qtype_preg_question extends question_graded_automatically
         $bestfitanswer = $this->get_best_fit_answer($response);
         $grade = 0;
         $state = question_state::$gradedwrong;
-        if ($bestfitanswer['match']->is_match && $bestfitanswer['match']->full) {//TODO - implement partial grades for partially correct answers
+        if ($bestfitanswer['match']->is_match() && $bestfitanswer['match']->full) {//TODO - implement partial grades for partially correct answers
             $grade = $bestfitanswer['answer']->fraction;
             $state = question_state::graded_state_for_fraction($bestfitanswer['answer']->fraction);
         }
@@ -357,7 +357,7 @@ class qtype_preg_question extends question_graded_automatically
         $matchresults = $bestfit['match'];
         $currentanswer = $response['answer'];
 
-        if ($matchresults->is_match) {
+        if ($matchresults->is_match()) {
             $firstindex = $matchresults->index_first[0];
             $length = $matchresults->length[0];
 
@@ -410,7 +410,7 @@ class qtype_preg_question extends question_graded_automatically
         //We should not show feedback for partial matches while question still active since student still don't get his answer correct
         //But if the question is finished there is no harm in showing feedback for partial matching
         $state = $qa->get_state();
-        if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match && $state->is_finished()) ) {
+        if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match() && $state->is_finished()) ) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
                 $feedbacktext = $this->insert_subpatterns($answer->feedback, $response);
@@ -446,7 +446,7 @@ class qtype_preg_question extends question_graded_automatically
         //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
         // c.f. failed test in simpletest/testquestion.php
 
-        if ($matchresults->is_match) {
+        if ($matchresults->is_match()) {
             foreach ($matchresults->index_first as $i => $startindex) {
                 $search = '{$'.$i.'}';
                 $length = $matchresults->length[$i];
