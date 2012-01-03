@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_matcher.php');
 //see carefully commented example of test on lines 617-644
-class qtype_dfa_future_test extends UnitTestCase {
+class qtype_preg_dfa_future_test extends UnitTestCase {
     var $qtype;
     
     function setUp() {

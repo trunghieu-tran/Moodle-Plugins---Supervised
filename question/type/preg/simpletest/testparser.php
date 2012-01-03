@@ -19,7 +19,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 
-class qtype_parser_test extends UnitTestCase {
+class qtype_preg_parser_test extends UnitTestCase {
 
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
