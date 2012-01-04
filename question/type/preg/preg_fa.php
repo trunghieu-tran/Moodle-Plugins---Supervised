@@ -14,6 +14,93 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+* Class for finite automaton transition (without subpatterns information)
+*
+* As NFA and DFA have different ways to store subpatterns information, they should both subclass this class to add necessary fields
+*/
+class qtype_preg_fa_transition {
+
+    //public $from;//TODO does we need this really - state from where transition starts?
+    /** @var object  of preg_leaf class - condition for this transition*/
+    public $pregleaf;
+    /** @var object of qtype_preg_fa_state class - state to which transition leads*/
+    public $to;
+};
+
+/**
+* Class for finite automaton state
+*/
+class qtype_preg_fa_state {
+
+    /** @var object reference to the qtype_preg_finite_automaton object this state belongs to
+    *
+    * We are violating principle "child shoudn't know the parent" there, but the state need to signal important information back to automaton during it's construction: becoming non-deterministic, having eps or pure-assert transitions etc
+    */
+    protected $FA;
+    /** @var integer index of this state in $this->FA*/
+    protected $index;
+
+    /** @var array of qtype_preg_fa_transition child objects, indexed*/
+    protected $outtransitions;
+    /** @var whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions*/
+    protected $deterministic;
+
+    public function __construct() {
+        $this->FA = null;
+        $this->index = null;
+        $this->outtransitions = array();
+        $this->deterministic = true;
+    }
+
+    public function set_FA($FA, $index) {
+        $this->FA = &$FA;
+        $this->index = $index;
+    }
+
+    /**
+    * Adds a transtition to the state
+    *
+    * @param transtion object of child class of qtype_preg_fa_transition
+    */
+    public function add_transition($transition) {
+        $this->outtransitions[] = $transition;
+        //TODO - check whether it makes a node non-deterministic
+        //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
+
+        if ($transition->pregleaf->subtype === preg_leaf_meta::SUBTYPE_EMPTY) {
+            $this->FA->epsilon_transtion_added();
+        }
+
+        if ($transition->pregleaf->type === preg_node::TYPE_LEAF_ASSERT) {
+            $this->FA->assertion_transition_added();
+        }
+
+        $this->FA->transition_added();
+    }
+
+    public function outgoing_transitions() {
+        return $this->outtransitions;
+    }
+
+    /**
+    * Returns an array of transitions which is possible with current string and position.
+    */
+    public function possible_transitions($str, $pos) {
+        //TODO - use pregnode->match from transitions
+    }
+
+    /**
+    * Returns true if this is accepting end state
+    *
+    * End state doesn't have outgoing transitions
+    */
+    public function is_end_state() {
+        return empty($this->outtransitions);
+    }
+};
+
+
+/**
 * Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa
 */
 abstract class qtype_preg_finite_automaton {
@@ -34,13 +121,31 @@ abstract class qtype_preg_finite_automaton {
     /** @var boolean whether automaton has simple assertion transtions*/
     protected $hasassertiontransitions;
 
+    
+    protected $statelimit;
+    protected $statecount;
+
+    protected $transitionlimit;
+    protected $transitioncount;
+    
+
     public function __contruct() {
         $this->states = array();
         $this->startstate = 0;
         $this->deterministic = true;
         $this->haseps = false;
         $this->hasassertiontransitions = false;
+        $this->statecount = 0;
+        $this->transitioncount = 0;
+        $this->set_limits();
     }
+
+    /**
+    * For now, DFA and NFA have different size limits in $CFG, so let them have separate implementation of this function
+    *
+    * The function should set $this->statelimit and $this->transitionlimit properties using $CFG
+    */
+    abstract protected function set_limits();
 
     /**
     * Returns, whether automaton really deterministic or not
@@ -48,6 +153,16 @@ abstract class qtype_preg_finite_automaton {
     public function is_deterministic() {
         return $this->deterministic;
     }
+
+    /**
+    * Used from qype_preg_fa_state class to signal that automaton become non-deterministic
+    *
+    * Note that only methods of automaton could make it deterministic and set property to true
+    */
+    public function make_nondeterministic() {
+        $this->deterministic = false;
+    }
+
     /**
     * Returns whether this implementation support DFA or NFA
     */
@@ -89,8 +204,26 @@ abstract class qtype_preg_finite_automaton {
         return $this->haseps;
     }
 
+    /**
+    * Used from qype_preg_fa_state class to signal that epsilon-transition was added to the automaton
+    *
+    * Note that only methods of automaton could delete all epsilon-transitions and make property false
+    */
+    public function epsilon_transtion_added() {
+        $this->haseps = true;
+    }
+
     public function has_assertion_transitions() {
         return $this->hasassertiontransitions;
+    }
+
+    /**
+    * Used from qype_preg_fa_state class to signal that assert-transition was added to the automaton
+    *
+    * Note that only methods of automaton could merge all assert-transitions and make property false
+    */
+    public function assertion_transition_added() {
+        $this->hasassertiontransitions = false;
     }
 
     /**
@@ -99,8 +232,20 @@ abstract class qtype_preg_finite_automaton {
     * @param state object of qtype_preg_fa_state class
     */
     public function add_state($state) {
-        $state->FA =& $this;
+        
         //TODO - add to $this->states and return given index
+        //$state->set_FA(& $this, $index);
+        $this->statecount++;
+        if ($this->statecount > $this->statelimit) {
+            //TODO - too many states handling, throw exception
+        }
+    }
+
+    public function transition_added() {
+        $this->transitioncount++;
+        if ($this->transitioncount > $this->transitionlimit) {
+            //TODO - too many transitions handling, throw exception
+        }
     }
 
     //TODO - does we really need function returning state for index? I'd prefer to avoid it. It could be useful only when construction automaton
@@ -179,7 +324,7 @@ abstract class qtype_preg_finite_automaton {
     *
     * Used to get negation
     */
-    abstract public function substract_fa($anotherfa);
+    abstract public function substract_fa($anotherfa);//TODO - functions that could be implemented only for DFA should be moved to DFA class
 
     /**
     * Return inversion of fa
