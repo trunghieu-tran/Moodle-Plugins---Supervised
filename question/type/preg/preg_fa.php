@@ -5,7 +5,7 @@
  * The class is intended for use by FA-based matching engines (DFA and NFA), and maybe other regex handlers.
  * Main purpose of the class is to enchance testability, code reuse and standartisation between FA-based matching engines.
  *
- * @copyright &copy; 2010  Oleg Sychev
+ * @copyright &copy; 2012  Oleg Sychev
  * @author Oleg Sychev, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -34,6 +34,13 @@ abstract class qtype_preg_finite_automaton {
     /** @var boolean whether automaton has simple assertion transtions*/
     protected $hasassertiontransitions;
 
+    public function __contruct() {
+        $this->states = array();
+        $this->startstate = 0;
+        $this->deterministic = true;
+        $this->haseps = false;
+        $this->hasassertiontransitions = false;
+    }
 
     /**
     * Returns, whether automaton really deterministic or not
@@ -150,7 +157,7 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-    * Changes automaton to not contain wordbreak  simple assertions (\n and \B)
+    * Changes automaton to not contain wordbreak  simple assertions (\b and \B)
     */
     public function avoid_wordbreaks() {
     //TODO - delete \b and \B
@@ -178,4 +185,11 @@ abstract class qtype_preg_finite_automaton {
     * Return inversion of fa
     */
     abstract public function invert_fa();
+
+    abstract public function match($str, $pos);
+    abstract public function next_character();//TODO - define arguments
+    /**
+    * Finds shortest possible string, completing partial given match
+    */
+    abstract public function complete_match();//TODO - define arguments
 };
