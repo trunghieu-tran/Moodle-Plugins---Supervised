@@ -237,14 +237,14 @@ abstract class qtype_preg_finite_automaton {
         //$state->set_FA(& $this, $index);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
-            //TODO - too many states handling, throw exception
+            throw new qtype_preg_toolargefa_exception('');
         }
     }
 
     public function transition_added() {
         $this->transitioncount++;
         if ($this->transitioncount > $this->transitionlimit) {
-            //TODO - too many transitions handling, throw exception
+            throw new qtype_preg_toolargefa_exception('');
         }
     }
 
