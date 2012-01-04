@@ -339,4 +339,10 @@ abstract class qtype_preg_finite_automaton {
     * Finds shortest possible string, completing partial given match
     */
     abstract public function complete_match();//TODO - define arguments
+
+    public function __clone() {
+        //TODO - clone automaton
+    }
+
+
 };
