@@ -243,6 +243,16 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
+    /**
+    * Includes another automaton in this 
+    * 
+    * @param automaton to include
+    * @param state index (s)  - state which should be linked with automaton
+    * @param the way to link the automaton??
+    */
+    //public function add_automaton TODO  - define arguments
+    //TODO - copy states, set new FA and index fields for them, link with existing state(s)
+
     public function transition_added() {
         $this->transitioncount++;
         if ($this->transitioncount > $this->transitionlimit) {
