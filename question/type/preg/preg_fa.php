@@ -20,7 +20,8 @@ defined('MOODLE_INTERNAL') || die();
 */
 class qtype_preg_fa_transition {
 
-    //public $from;//TODO does we need this really - state from where transition starts?
+    /** @var object of qtype_preg_fa_state class - state from which transition starts*/
+    public $from;
     /** @var object  of preg_leaf class - condition for this transition*/
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state to which transition leads*/
@@ -63,6 +64,7 @@ class qtype_preg_fa_state {
     * @param transtion object of child class of qtype_preg_fa_transition
     */
     public function add_transition($transition) {
+        $transition->from =& $this;
         $this->outtransitions[] = $transition;
         //TODO - check whether it makes a node non-deterministic
         //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
