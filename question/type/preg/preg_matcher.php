@@ -296,12 +296,21 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $result = new qtype_preg_matching_results();
         $result->invalidate_match($this->maxsubpatt);
 
-        $textlib = textlib_get_instance();
-        $len = $textlib->strlen($str);
-        // match from all indexes
-        $rightborder = $len;
-        if ($str === '') {
+        
+        if ($this->anchor->start) {
+            //The regex is anchored from start, so we really should check only one offset.
+            //Results for other offsets would be same.
             $rightborder = 1;
+        } else {
+            //Use textlib to be sure under Unicode
+            $textlib = textlib_get_instance();
+            $len = $textlib->strlen($str);
+            // Match from all indexes
+            $rightborder = $len;
+            //Try matching an empty string at least once
+            if ($str === '') {
+                $rightborder = 1;
+            }
         }
 
         //Starting positions loop
