@@ -17,7 +17,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_matching_results {
 
-
     /** @var boolean Is match full or partial? */
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
@@ -51,6 +50,65 @@ class qtype_preg_matching_results {
             return false;
         }
     }
+
+    /**
+    * Returns true if there could be no better matching result, so we could stop loop looking for best match
+    *
+    * For now the first (leftmost) full match is enought
+    */
+    public function best() {
+        return $this->full;
+    }
+
+    /**
+    * Compares two matching results and returns true if this result is worse than passed by argument
+    *
+    * @param other object of qtype_preg_matching_results
+    * @param orequal make it worse-or-equal function
+    * @return whether @this is worse than $other
+    */
+    public function worse_than($other, $orequal = false) {
+
+        //1. Full match
+        if (!$this->full && $other->full) {
+            return true;
+        } elseif ($this->full && !$other->full) {
+            return false;
+        }
+
+        //2. Match have non-zero length (TODO - dubious?)
+        if (!($this->length[0] > 0) && $other->length[0] > 0) {
+            return true;
+        } elseif ($this->length[0] > 0 && !($other->length[0] > 0)) {
+            return false;
+        }
+
+        //3. Less characters left 
+        if ($other->left < $this->left) {
+            return true;
+        } elseif ($this->left < $other->left) {
+            return false;
+        }
+
+        //4. Longest match - TODO - this and 3. may change places due to choosen strategy
+        if ($other->length[0] > $this->length[0]) {
+            return true;
+        } elseif ($this->length[0] > $other->length[0]) {
+            return false;
+        }
+
+        //5. More subpatterns captured - TODO - dubious, it may be needed by NFA, but have not much use comparing matches from different positions
+        $thissubpatt = $this->captured_subpatterns_count();
+        $othersubpatt = $other->captured_subpatterns_count();
+        if ($othersubpatt > $thissubpatt) {
+            return true;
+        } elseif ($thissubpatt > $othersubpatt) {
+            return false;
+        }
+
+        return $orequal;//results are equal
+    }
+
     /**
     * Invalidates match by setting all data to no match values
     */
@@ -71,7 +129,7 @@ class qtype_preg_matching_results {
     /**
     * Returns the count of matched subpatterns
     */
-    public function matched_subpatterns_count() {
+    public function captured_subpatterns_count() {
         $subpattcount = 0;
         foreach ($this->index_first as $key=>$value) {
             if ($key != 0 && $this->length[$key] >= -1) {//-1 == no match for this subpattern
@@ -201,7 +259,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         } else {//do some sanity checks
 
             //Check that engine have correct capabilities
-            $subpattcnt = $this->matchresults->matched_subpatterns_count();
+            $subpattcnt = $this->matchresults->captured_subpatterns_count();
             if(!$this->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
@@ -221,10 +279,61 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-    * Do real matching, should be implemented in child classes, returns qtype_preg_matching_results object.
+    * Do real matching
+    *
+    * This function should be re-implemented in child classes using standard matching functions
+    * that already contains starting positions loop inside. Implement match_from_pos otherwise.
     * @param str a string to match
+    * @return qtype_preg_matching_results object
     */
     protected function match_inner($str) {
+
+        $result = $this->match_preprocess($str);
+        if (is_a($result, 'qtype_preg_matching_results')) {
+            return $result;
+        }
+
+        $result = new qtype_preg_matching_results();
+        $result->invalidate_match($this->maxsubpatt);
+
+        $textlib = textlib_get_instance();
+        $len = $textlib->strlen($str);
+        // match from all indexes
+        $rightborder = $len;
+        if ($str === '') {
+            $rightborder = 1;
+        }
+
+        //Starting positions loop
+        for ($j = 0; $j < $rightborder && !$result->best(); $j++) {
+            $tmp = $this->match_from_pos($str, $j);
+            if ($result->worse_than($tmp)) {
+                $result = $tmp;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+    * Do a necessary preprocessing before matching loop.
+    *
+    * If a @see{qtype_preg_matching_results} object is returned, it is treated as if match was decided during preprocessing
+    * and no actual matching needed.
+    */
+    protected function match_preprocess($str) {
+        return false;
+    }
+
+    /**
+    * Perform a match of string from specified offset
+    *
+    * Should be implemented by child classes that use custom matching algorithms
+    * @param str a string to match
+    * @param offset position from where to match
+    * @return qtype_preg_matching_results object
+    */
+    public function match_from_pos($str, $offset) {
         throw new qtype_preg_exception('Error: matching has not been implemented for '.$this->name().' class');
     }
 

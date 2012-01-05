@@ -387,31 +387,9 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                 $result = $curresult;
             }
         }
-        if ($result !== null && ($result->length[0] > 0 || $result->full)) {
+        if ($result !== null && ($result->length[0] > 0 || $result->full)) {//TODO - change to use qtype_preg_matching_results->is_match() instead, this code is unstable and should be in one place
             $result->index_first[0] = $startpos;
             $result->index_first_old[0] = $result->index_first[0];
-        }
-        return $result;
-    }
-
-    /**
-    * do real matching
-    * @param str a string to match
-    */
-    function match_inner($str) {
-        $result = null;
-        $textlib = textlib_get_instance();
-        $len = $textlib->strlen($str);
-        // match from all indexes
-        $rightborder = $len;
-        if ($str === '') {
-            $rightborder = 1;
-        }
-        for ($j = 0; $j < $rightborder && !($result !== null && $result->full); $j++) {
-            $tmp = $this->match_from_pos($str, $j);
-            if ($result === null || $this->is_new_result_more_suitable(&$result, &$tmp)) {
-                $result = $tmp;
-            }
         }
         return new qtype_preg_matching_results($result->full, $result->index_first_old, $result->length_old, $result->next, $result->left);
     }
