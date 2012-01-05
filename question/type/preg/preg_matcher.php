@@ -32,7 +32,7 @@ class qtype_preg_matching_results {
     /** @var integer The number of characters left to complete matching. */
     public $left;
 
-    public function __construct($full = false, $index_first = array(), $length = array(), $next = '', $left = -1) {
+    public function __construct($full = false, $index_first = array(), $length = array(), $next = '', $left = 999999999) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
@@ -208,7 +208,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             if(!$this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== '') {
                 throw new qtype_preg_exception('Error: next character returned while engine '.$this->name().' doesn\'t support next character generation');
             }
-            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != -1) {
+            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != 999999999) {
                 throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
             }
 
