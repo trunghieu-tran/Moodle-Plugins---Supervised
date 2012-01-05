@@ -56,8 +56,8 @@ class qtype_preg_matching_results {
     */
     public function invalidate_match($subpattcount = 0) {
         $this->full = false;
-        $this->next = '';
-        $this->left = -1;
+        //$this->next = '';
+        //$this->left = 999999999;
         $this->index_first = array();
         $this->length = array();
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
