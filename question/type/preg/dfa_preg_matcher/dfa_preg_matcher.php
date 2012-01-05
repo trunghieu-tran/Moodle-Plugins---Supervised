@@ -177,6 +177,12 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
             $this->unite_parallel($this->finiteautomates[$index][$key]->passages, $index);
         }*/
     }
+
+    public function match_from_pos($str, $offset) {
+        $result = $this->compare($str, 0, $offset, false);
+        return new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->next, $result->left);
+    }
+
     /**
     *function compare regex and string, with using of finite automate builded of buildfa function
     *and determine match or not match string with regex, lenght of matching substring and character which can be on next position in string
@@ -1230,14 +1236,8 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
     *@param response - string which will be compared with regex
     *@return result of compring, see compare function for format of result
     */
-    function match_inner($response) {
+/*    function match_inner($response) {
         if ($response === '' && $this->roots[0]->pregnode->operands[0]->nullable) {
-            /*$this->is_match = true;
-            $this->full = true;
-            $this->index_first[0] = 0;
-            $this->index_last[0] = -1;
-            $this->next = '';
-            $this->left = 0;*/
             $matchresult = new qtype_preg_matching_results(true, true, array(0), array(0), '', 0);
         } else {
             $result = new stdClass;
@@ -1255,29 +1255,24 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
                 }
             }
 
-            /*
-            $this->is_match =  $result->full || $result->index >= 0;
-            $this->full = $result->full;
-            $this->index_first[0] = $result->offset;
-            $this->index_last[0] = $result->index+$result->offset;
-            if ($result->index==-1) {
-                $this->index_last[0]=-1;
-            }
-            if ($result->next === 0) {
-                $this->next = '';
-            } else {
-                $this->next = $result->next;
-            }
-            $this->left = $result->left;*/
             if ($result->next === 0) {
                 $next = '';
             } else {
                 $next = $result->next;
             }
-            $matchresult = new qtype_preg_matching_results($result->full || $result->index >= 0, $result->full, array($result->offset), array($result->index+1), $result->next, $result->left);
+            $matchresult = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->next, $result->left);
         }
         return $matchresult;
     }
+    */
+
+    protected function match_preprocess($str) {
+        if ($str === '' && $this->roots[0]->pregnode->operands[0]->nullable) {//TODO - why operands[0] instead of root itself?
+            return new qtype_preg_matching_results(true, array(0), array(0), '', 0);
+        }
+        return false;
+    }
+
     /**
     *@return list of supported operation as array of string
     */
