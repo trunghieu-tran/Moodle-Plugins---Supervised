@@ -67,7 +67,7 @@ class qtype_preg_matching_results {
     * @param orequal make it worse-or-equal function
     * @return whether @this is worse than $other
     */
-    public function worse_than($other, $orequal = false) {
+    /*public function worse_than($other, $orequal = false) {
 
         //1. Full match
         if (!$this->full && $other->full) {
@@ -83,7 +83,7 @@ class qtype_preg_matching_results {
             return false;
         }
 
-        //3. Less characters left 
+        //3. Less characters left
         if ($other->left < $this->left) {
             return true;
         } elseif ($this->left < $other->left) {
@@ -107,6 +107,52 @@ class qtype_preg_matching_results {
         }
 
         return $orequal;//results are equal
+    }*/
+
+    public function worse_than($other, $orequal = true) {
+        // check the fields decreasing their priority, the first is 'fullness'
+        $result = $other->full && !$this->full;
+        // the second is match existance
+        if (!$result) {
+            $result = ($other->length[0] > 0) && ($this->length[0] <= 0);
+        }
+        // the third is match length
+        if (!$result) {
+            if ($orequal) {
+                $result = ($this->full == $other->full &&    // both of results have the same 'fullness' but new match is longer
+                           $other->length[0] > $this->length[0]);
+            } else {
+                $result = ($this->full == $other->full &&
+                           $other->length[0] >= $this->length[0]);
+            }
+        }
+        // the fourth is characters left to complete match
+        if (!$result) {
+            if ($orequal) {
+                $result = ($this->full == $other->full &&    // both of results have the same 'fullness' but new match is longer
+                           $other->length[0] == $this->length[0] &&
+                           $other->left < $this->left);
+            } else {
+                $result = ($this->full == $other->full &&
+                           $other->length[0] == $this->length[0] &&
+                           $other->left <= $this->left);
+            }
+        }
+        // the last is number of subpatterns captured
+        if (!$result) {
+            if ($orequal) {
+                $result = ($this->full == $other->full &&    // same length but more subpatterns captured
+                           $other->length[0] == $this->length[0] &&
+                           $other->left == $this->left &&
+                           $other->captured_subpatterns_count() > $this->captured_subpatterns_count());
+            } else {
+                $result = ($this->full == $other->full &&    // same length but more subpatterns captured
+                           $other->length[0] == $this->length[0] &&
+                           $other->left == $this->left &&
+                           $other->captured_subpatterns_count() >= $this->captured_subpatterns_count());
+            }
+        }
+        return $result;
     }
 
     /**
@@ -131,8 +177,8 @@ class qtype_preg_matching_results {
     */
     public function captured_subpatterns_count() {
         $subpattcount = 0;
-        foreach ($this->index_first as $key=>$value) {
-            if ($key != 0 && $this->length[$key] >= -1) {//-1 == no match for this subpattern
+        foreach ($this->length as $key=>$length) {
+            if ($key != 0 && $length >= 0) {//-1 == no match for this subpattern
                 $subpattcount++;
             }
         }
@@ -296,7 +342,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $result = new qtype_preg_matching_results();
         $result->invalidate_match($this->maxsubpatt);
 
-        
+
         if ($this->anchor->start) {
             //The regex is anchored from start, so we really should check only one offset.
             //Results for other offsets would be same.
