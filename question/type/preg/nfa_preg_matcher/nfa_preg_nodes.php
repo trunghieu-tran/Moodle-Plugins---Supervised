@@ -8,7 +8,7 @@
  * @package questions
  */
 
-require_once($CFG->dirroot.'/question/type/preg/questiontype.php');
+require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
@@ -324,8 +324,8 @@ class nfa {
     * @param jpgfilename - name of the resulting jpg file
     */
     public function draw_nfa($dotfilename, $jpgfilename) {
-        $qtypeobj = new qtype_preg();
-        $dir = $qtypeobj->get_temp_dir('nfa');
+        $regexhandler = new qtype_preg_regex_handler();
+        $dir = $regexhandler->get_temp_dir('nfa');
         $dotfn = $dir.$dotfilename;
         $dotfile = fopen($dotfn, 'w');
         // numerate all states
@@ -368,7 +368,7 @@ class nfa {
         }
         fprintf($dotfile, "};");
         fclose($dotfile);
-        $qtypeobj->execute_dot($dotfn, $jpgfilename);        
+        $regexhandler->execute_dot($dotfn, $jpgfilename);
         unlink($dotfn);
     }
 

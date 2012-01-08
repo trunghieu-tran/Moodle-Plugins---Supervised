@@ -1309,9 +1309,8 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
     * @param $subject type of drawing, may be: 'dfa', 'tree', 'fp'
     */
     public function draw($number, $subject) {
-        $qtypeobj = new qtype_preg();
-        $dir = $qtypeobj->get_temp_dir('dfa');
-        $dotcode = call_user_func(array('qtype_dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
+        $dir = $this->get_temp_dir('dfa');
+        $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
         $dotfn = $dir.'/dotcode.dot';
         $dotfile = fopen($dotfn, 'w');
         foreach ($dotcode as $dotstring) {
@@ -1319,7 +1318,7 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
         }
         fclose($dotfile);
         $jpgfilename = $subject.$this->picnum.'.jpg';
-        $qtypeobj->execute_dot($dotfn, $jpgfilename);
+        $this->execute_dot($dotfn, $jpgfilename);
         unlink($dotfn);
         //exec('dot.exe -Tjpg -o"'.$tempfolder..'.jpg" -Kdot "'.$tempfolder.'dotcode.dot"');
         //echo '<IMG src="/question/type/preg/temp/'.$subject.$this->picnum.'.jpg" alt="Can\'t display '.$subject.' #'.$this->picnum.' graph.">';
