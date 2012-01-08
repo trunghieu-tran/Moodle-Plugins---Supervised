@@ -94,6 +94,8 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $question = new qtype_preg();
         $this->engines = $question->available_engines();
         unset($this->engines['preg_php_matcher']);
+        //unset($this->engines['nfa_preg_matcher']);
+        //unset($this->engines['dfa_preg_matcher']);
         $this->engines = array_keys($this->engines);
         foreach ($this->engines as $enginename) {
             require_once($CFG->dirroot . '/question/type/preg/'.$enginename.'/'.$enginename.'.php');

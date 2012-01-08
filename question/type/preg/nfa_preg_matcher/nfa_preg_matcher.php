@@ -114,69 +114,6 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         return get_string($pregnode->name(), 'qtype_preg');
     }
 
-    public function count_subpattends_captured($procstate) {
-        $cnt = 0;
-        foreach ($procstate->length as $key=>$length) {
-            if ($key != 0 && $length >= 0) {
-                $cnt++;
-            }
-        }
-        return $cnt;
-    }
-
-    /**
-     * checks if new result is better than old result
-     * @param oldres - old result, an object of qtype_preg_nfa_processing_state
-     * @param newres - new result, an object of qtype_preg_nfa_processing_state
-     * @param strict - if true, old result is replaced by a new result with the same match length
-     * @return - true if new result is more suitable
-     */
-    public function is_new_result_more_suitable(&$oldres, &$newres, $strict = true) {
-        // check the fields decreasing their priority, the first is 'fullness'
-        $result = $newres->full && !$oldres->full;
-        // the second is match existance
-        if (!$result) {
-            $result = ($newres->length[0] > 0) && ($oldres->length[0] <= 0);
-        }
-        // the third is match length
-        if (!$result) {
-            if ($strict) {
-                $result = ($oldres->full == $newres->full &&    // both of results have the same 'fullness' but new match is longer
-                           $newres->length[0] > $oldres->length[0]);
-            } else {
-                $result = ($oldres->full == $newres->full &&
-                           $newres->length[0] >= $oldres->length[0]);
-            }
-        }
-        // the fourth is characters left to complete match
-        if (!$result) {
-            if ($strict) {
-                $result = ($oldres->full == $newres->full &&    // both of results have the same 'fullness' but new match is longer
-                           $newres->length[0] == $oldres->length[0] &&
-                           $newres->left < $oldres->left);
-            } else {
-                $result = ($oldres->full == $newres->full &&
-                           $newres->length[0] == $oldres->length[0] &&
-                           $newres->left <= $oldres->left);
-            }
-        }
-        // the last is number of subpatterns captured
-        if (!$result) {
-            if ($strict) {
-                $result = ($oldres->full == $newres->full &&    // same length but more subpatterns captured
-                           $newres->length[0] == $oldres->length[0] &&
-                           $newres->left == $oldres->left &&
-                           $this->count_subpattends_captured($newres) > $this->count_subpattends_captured($oldres));
-            } else {
-                $result = ($oldres->full == $newres->full &&    // same length but more subpatterns captured
-                           $newres->length[0] == $oldres->length[0] &&
-                           $newres->left == $oldres->left &&
-                           $this->count_subpattends_captured($newres) >= $this->count_subpattends_captured($oldres));
-            }
-        }
-        return $result;
-    }
-
     /**
      * returns the minimal number of characters left for matching
      * @param str - string being matched
@@ -383,11 +320,11 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         }
         $result = null;
         foreach ($results as $curresult) {
-            if ($result == null || $this->is_new_result_more_suitable(&$result, &$curresult)) {
+            if ($result == null || $result->worse_than($curresult)) {
                 $result = $curresult;
             }
         }
-        if ($result !== null && ($result->length[0] > 0 || $result->full)) {//TODO - change to use qtype_preg_matching_results->is_match() instead, this code is unstable and should be in one place
+        if ($result !== null && $result->is_match()) {
             $result->index_first[0] = $startpos;
             $result->index_first_old[0] = $result->index_first[0];
         }
