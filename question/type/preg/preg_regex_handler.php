@@ -131,7 +131,7 @@ class qtype_preg_regex_handler {
 
     /**
     * Is a preg_node_... or a preg_leaf_... supported by the engine?
-    * Returns true if node is supported or user interface string describing 
+    * Returns true if node is supported or user interface string describing
     *   what properties of node isn't supported.
     */
     protected function is_preg_node_acceptable($pregnode) {
@@ -244,6 +244,52 @@ class qtype_preg_regex_handler {
     */
     protected function node_prefix() {
         return null;
+    }
+
+    /**
+    * Returns path to the temporary directory for given component
+    */
+    public function get_temp_dir($componentname) {
+        global $CFG;
+        $dir = $CFG->dataroot.'/temp/preg/'.$componentname.'/';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        return $dir;
+    }
+
+    /**
+    * Checks if dot.exe of graphviz exists
+    */
+    public function is_dot_installed() {
+        global $CFG;
+        if (!isset($CFG->qtype_preg_graphvizpath)) {
+            return false;
+        }
+        $dotexefilename = $CFG->qtype_preg_graphvizpath.'/dot.exe';
+        if (!file_exists($dotexefilename)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+    * Runs dot.exe of graphviz on the given .dot file
+    */
+    public function execute_dot($dotfilename, $jpegfilename = null) {
+        global $CFG;
+        if (!$this->is_dot_installed()) {
+            return;
+        }
+        $jpgpath = pathinfo($dotfilename, PATHINFO_DIRNAME);
+        if ($jpegfilename === null) {
+            $filename = pathinfo($dotfilename, PATHINFO_FILENAME);
+            $jpgfn = $jpgpath.'/'.$filename.'.jpg';
+        } else {
+            $jpgfn = $jpgpath.'/'.$jpegfilename;
+        }
+        chdir($CFG->qtype_preg_graphvizpath);
+        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
     }
 
 }
