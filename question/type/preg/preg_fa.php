@@ -26,6 +26,8 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state to which transition leads*/
     public $to;
+    /** @var integer priority of this transitions over other - 0 means the highest priority*/
+    public $priority;
 };
 
 /**
