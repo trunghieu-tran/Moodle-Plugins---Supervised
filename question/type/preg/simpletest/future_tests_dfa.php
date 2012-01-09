@@ -16,15 +16,15 @@ require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_matc
 //see carefully commented example of test on lines 617-644
 class qtype_preg_dfa_future_test extends UnitTestCase {
     var $qtype;
-    
+
     function setUp() {
     }
-    
+
     function tearDown() {
     }
 
     function test_assert_nesting() {
-        $matcher = new qtype_dfa_preg_matcher('g(?=[bcd]*(?=[cd]*b)a)[abcd]*');
+        $matcher = new qtype_preg_dfa_preg_matcher('g(?=[bcd]*(?=[cd]*b)a)[abcd]*');
         $matcher->match('gccbadcdcd');
         $this->assertTrue($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index()==10);
@@ -39,7 +39,7 @@ class qtype_preg_dfa_future_test extends UnitTestCase {
         $this->assertTrue($matcher->next_char()=='b');
     }
     function test_next_character() {
-        $matcher = new qtype_dfa_preg_matcher('a(?=[%asd])\W');
+        $matcher = new qtype_preg_dfa_preg_matcher('a(?=[%asd])\W');
         $matcher->match('aa');
         $this->assertFalse($matcher->is_matching_complete());
         $this->assertTrue($matcher->last_correct_character_index()==0);

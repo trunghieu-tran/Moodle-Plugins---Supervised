@@ -14,15 +14,15 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_matcher.php');
 //see carefully commented example of test on lines 617-644
-class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
+class qtype_dfa_preg_matcher_test extends UnitTestCase {
     var $qtype;
-    
+
     function setUp() {
         $this->qtype = new qtype_dfa_preg_matcher();
     }
-    
+
     function tearDown() {
-        $this->qtype = null;   
+        $this->qtype = null;
     }
 
     function test_name() {
@@ -168,7 +168,7 @@ class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
         $this->qtype->roots[0]->pregnode->operands[0]->nullable();
         $this->qtype->roots[0]->pregnode->operands[0]->firstpos();
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos) == 1 && 
+        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos) == 1 &&
                             $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->firstpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }
     //Unit test for lastpos function
@@ -260,7 +260,7 @@ class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
         $this->qtype->roots[0]->pregnode->operands[0]->number($connection, $maxnum);
         $this->qtype->roots[0]->pregnode->operands[0]->nullable();
         $this->qtype->roots[0]->pregnode->operands[0]->lastpos();
-        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos) && 
+        $this->assertTrue(count($this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos) &&
                             $this->qtype->roots[0]->pregnode->operands[0]->pregnode->operands[0]->pregnode->operands[1]->lastpos[0]>dfa_preg_node_assert::ASSERT_MIN_NUM);
     }
     //Unit tests for followpos function
@@ -331,7 +331,7 @@ class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
     function test_buildfa_alternative_and_iteration() {//(a|b)c*
         $this->qtype = new qtype_dfa_preg_matcher('(?:a|b)c*');
         $this->assertTrue(count($this->qtype->finiteautomates[0][0]->passages) == 2);
-        $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 2 && $this->qtype->finiteautomates[0][1]->passages[3] == 1 && 
+        $this->assertTrue(count($this->qtype->finiteautomates[0][1]->passages) == 2 && $this->qtype->finiteautomates[0][1]->passages[3] == 1 &&
                             $this->qtype->finiteautomates[0][1]->passages[dfa_preg_leaf_meta::ENDREG] == -1);
     }
     function test_buildfa_nesting_alternative_and_iteration() {//(ab|cd)*
@@ -368,7 +368,7 @@ class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
         $this->assertTrue(count($this->qtype->finiteautomates[0][2]->passages)==2 && $this->qtype->finiteautomates[0][2]->passages[4]==2 && $this->qtype->finiteautomates[0][2]->passages[186759556]==-1);
         $this->assertTrue(count($this->qtype->finiteautomates[0])==3);
     }*/
-    
+
     //Unit tests for compare function
     function test_compare_full_incorrect() {//ab
         $this->qtype = new qtype_dfa_preg_matcher('ab');
@@ -585,7 +585,7 @@ class qtype_preg_dfa_preg_matcher_test extends UnitTestCase {
     */
     function _test_general_two_asserts() {
         $matcher = new qtype_dfa_preg_matcher('^a(?=b)(?=[xvbnm]*c)[xcvbnm]*$');//put regular expirience in constructor for building dfa.
-        /*  
+        /*
         *   call match method for matching string with regex, string is argument, regex was got in constructor,
         *   results of matching get with method
         *   1)index - last_correct_character_index()

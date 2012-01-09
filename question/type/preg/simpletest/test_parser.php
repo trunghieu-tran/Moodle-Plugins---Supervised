@@ -13,7 +13,7 @@
 *   Need test for next operations:
 *nothing
 */
- 
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -79,7 +79,7 @@ class qtype_preg_parser_test extends UnitTestCase {
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
         $parser =& $this->run_parser('(?:a|b)*abb');
-        $matcher = new qtype_dfa_preg_matcher;
+        $matcher = new qtype_preg_dfa_preg_matcher;
         $matcher->roots[0] = $parser->get_root();
         $matcher->append_end(0);
         $matcher->buildfa(0);
@@ -98,7 +98,7 @@ class qtype_preg_parser_test extends UnitTestCase {
         $res = $matcher->compare('abababababababababababababababbabababbababababbbbbaaaabbabb', 0);
         $this->assertTrue($res->full);
         $this->assertTrue($res->index == 58);
-        $this->assertTrue($res->next == 0);  
+        $this->assertTrue($res->next == 0);
     }
     function test_parser_two_anchors() {
         $parser =& $this->run_parser('^a$');
@@ -336,7 +336,7 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($errornodes[0]->firstindxs[0] == 2);
         $this->assertTrue($errornodes[0]->lastindxs[0] == 6);
         }
-    /** 
+    /**
     *Service function to run parser on regex
     *@param regex Regular expression to parse
     *@return parser object

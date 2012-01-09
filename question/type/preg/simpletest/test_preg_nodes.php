@@ -9,7 +9,7 @@
  * @package question
  */
 
- 
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -70,7 +70,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $ch = $backref->next_character('abcdef', 2, $length);
         $this->assertFalse($res);
         $this->assertEqual($length, 0);
-        $this->assertEqual($ch, 'a');        
+        $this->assertEqual($ch, 'a');
     }
 
     function test_partial_match() {
@@ -93,7 +93,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $ch = $backref->next_character('abcdef', 2, $length);
         $this->assertFalse($res);
         $this->assertEqual($length, 1);
-        $this->assertEqual($ch, 'b');        
+        $this->assertEqual($ch, 'b');
     }
 
     function test_full_match() {
@@ -109,7 +109,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $ch = $backref->next_character('abc', 3, $length);
         $this->assertTrue($res);
         $this->assertEqual($length, 3);
-        $this->assertEqual($ch, '');     
+        $this->assertEqual($ch, '');
     }
 
     function test_empty_match() {

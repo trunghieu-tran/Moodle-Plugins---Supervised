@@ -2,7 +2,7 @@
 /**
  * Data-driven cross-tester of matchers. Test functions should be implemented in child classes.
  *
- * @copyright &copy; 2011  Valeriy Streltsov
+ * @copyright &copy; 2012  Valeriy Streltsov
  * @author Valeriy Streltsov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -80,25 +80,33 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/lib/questionlib.php');
-require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
-
 class qtype_preg_cross_tester extends UnitTestCase {
 
-    var $question;            // an object of question_preg_qtype
-    var $engines = array();   // an array of available engines
+    var $testdataobjects;    // objects with test data
+
+    /**
+    * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be re-implemented in child classes.
+    */
+    public function engine_name() {
+        return '';
+    }
 
     public function __construct() {
         global $CFG;
-
-        $question = new qtype_preg();
-        $this->engines = $question->available_engines();
-        unset($this->engines['preg_php_matcher']);
-        //unset($this->engines['nfa_preg_matcher']);
-        //unset($this->engines['dfa_preg_matcher']);
-        $this->engines = array_keys($this->engines);
-        foreach ($this->engines as $enginename) {
-            require_once($CFG->dirroot . '/question/type/preg/'.$enginename.'/'.$enginename.'.php');
+        $this->testdataobjects = array();
+        if ($this->engine_name() === '') {
+            return;
+        }
+        // find all available test files
+        if ($dh = opendir($CFG->dirroot . '/question/type/preg/simpletest')) {
+            while (($file = readdir($dh)) !== false) {
+                if (strpos($file, 'cross_tests_') === 0 && pathinfo($file, PATHINFO_EXTENSION) == 'php') {
+                    require_once($CFG->dirroot . '/question/type/preg/simpletest/' . $file);
+                    $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
+                    $this->testdataobjects[] = new $classname;
+                }
+            }
+            closedir($dh);
         }
     }
 
@@ -198,27 +206,31 @@ class qtype_preg_cross_tester extends UnitTestCase {
     * the main function - runs all matchers on test-data sets
     */
     function test() {
-        $testmethods = get_class_methods($this);
-        foreach ($testmethods as $curtestmethod) {
-            // filtering class methods by names. A test method name should start with 'data_for_test_'
-            $pos = strstr($curtestmethod, 'data_for_test_');
-            if ($pos != false && $pos == 0) {
-                $data = $this->$curtestmethod();
-                $regex = $data['regex'];
-                $modifiers = null;
-                if (array_key_exists('modifiers', $data)) {
-                    $modifiers = $data['modifiers'];
-                }
-                // iterate over available engines
-                foreach ($this->engines as $enginename) {
-                    $engineclass = 'qtype_'.$enginename;
-                    $matcher = new $engineclass($regex, $modifiers);
+        global $CFG;
+        $enginename = $this->engine_name();
+        if ($enginename === '') {
+            return;
+        }
+        require_once($CFG->dirroot . '/question/type/preg/' . $enginename . '/' . $enginename . '.php');    // matching engine
+        $enginename = 'qtype_' . $enginename;
+        foreach ($this->testdataobjects as $testdataobj) {
+            $testmethods = get_class_methods($testdataobj);
+            foreach ($testmethods as $curtestmethod) {
+                // filtering class methods by names. A test method name should start with 'data_for_test_'
+                if (strpos($curtestmethod, 'data_for_test_') === 0) {
+                    $data = $testdataobj->$curtestmethod();
+                    $regex = $data['regex'];
+                    $modifiers = null;
+                    if (array_key_exists('modifiers', $data)) {
+                        $modifiers = $data['modifiers'];
+                    }
+                    // iterate over available engines
+                    $matcher = new $enginename($regex, $modifiers);
                     if (!$this->check_for_errors($matcher)) {
                         // iterate over all tests
                         foreach ($data['tests'] as $expected) {
                             $str = $expected['str'];
                             $matcher->match($str);
-                            $matchername = $matcher->name();
                             $obtained = $matcher->get_match_results();
                             // now the results are obtained, let us check them!
                             if (array_key_exists('is_match', $expected)) {
@@ -230,7 +242,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                 $nextpassed = false;
                                 $leftpassed = false;
                                 $this->compare_results($matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
-                                $this->do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
+                                $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
                             } else {
                                 // compare with multiple results
                                 $ismatchpassed = array();
@@ -253,14 +265,14 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                         $indexmatch[] = $key;
                                     }
                                 }
-                                $this->assertTrue($passed, "$matchername failed on regex '$regex' and string '$str'");
+                                $this->assertTrue($passed, "$enginename failed on regex '$regex' and string '$str'");
                                 // if the test is not passed - display obtained results
                                 if (!$passed) {
                                     // if some indexes were matched - display other fields not matched
                                     foreach ($indexmatch as $key) {
                                         $number = $key + 1;
                                         echo "Results of comparison for the $number possible result:<br/>";
-                                        $this->do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], true);
+                                        $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], true);
                                         echo '<br/>';
                                     }
                                     // if indexes were not matched at all - just print the obtained result
