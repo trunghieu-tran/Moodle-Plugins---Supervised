@@ -17,6 +17,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_matching_results {
 
+    //No next character generated
+    const UNKNOWN_NEXT_CHARACTER = '';
+    //How many characters left is unknown
+    const UNKNOWN_CHARACTERS_LEFT = 999999999;
+
+
     /** @var boolean Is match full or partial? */
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
@@ -31,7 +37,8 @@ class qtype_preg_matching_results {
     /** @var integer The number of characters left to complete matching. */
     public $left;
 
-    public function __construct($full = false, $index_first = array(), $length = array(), $next = '', $left = 999999999) {
+    public function __construct($full = false, $index_first = array(), $length = array(), $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, 
+                                $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
@@ -160,8 +167,8 @@ class qtype_preg_matching_results {
     */
     public function invalidate_match($subpattcount = 0) {
         $this->full = false;
-        //$this->next = '';
-        //$this->left = 999999999;
+        //$this->next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
+        //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
@@ -309,10 +316,10 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             if(!$this->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
             }
-            if(!$this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== '') {
+            if(!$this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
                 throw new qtype_preg_exception('Error: next character returned while engine '.$this->name().' doesn\'t support next character generation');
             }
-            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != 999999999) {
+            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
                 throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
             }
 

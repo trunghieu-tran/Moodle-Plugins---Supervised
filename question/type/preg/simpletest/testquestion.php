@@ -265,47 +265,79 @@ class qtype_preg_question_test extends UnitTestCase {
 
         //All subpattern is matched, or not matched by partial match
         //Test inserting all subpatterns - anything is matched with some string
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'Do cats eat bats?'));
+        $response = array('answer' => 'Do cats eat bats?');
+        $bestfit = $testquestion->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do cats eat bats?|cats|s|bats');
         //Second subpattern is matched with empty string
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'Do cat eat bat?'));
+        $response = array('answer' => 'Do cat eat bat?');
+        $bestfit = $testquestion->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do cat eat bat?|cat||bat');
         //Second subpattern doesn't matched at all
-        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'Do frogs eat mice?'));
+        $response = array('answer' => 'Do frogs eat mice?');
+        $bestfit = $testquestion->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $testquestion->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'Do frogs eat mice?|frogs||mice');
 
         //////Some subpatterns not matched while full match
         ////Engine using custom parser
         $customengine = clone $this->subpattquestion;
         //Last subpattern isn't captured
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => 'abgh'));
+        $response = array('answer' => 'abgh');
+        $bestfit = $customengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == 'abgh|ab|');
         //First subpattern isn't captured
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '3456gh'));
+        $response = array('answer' => '3456gh');
+        $bestfit = $customengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '3456gh||56');
         //Middle subpattern isn't captured
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'zw'));
+        $response = array('answer' => 'zw');
+        $bestfit = $customengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'zw|z||w');
         //No match at all - then no string returned
-        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '*&^%&^'));
-        //ECHO $replaced.'</br>';
-        $this->assertTrue($replaced == '');
+        $response = array('answer' => '*&^%&^');
+        $bestfit = $customengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
+        $this->assertTrue($replaced === '');
 
         ////Engine using PHP preg_match function
         $phpengine = clone $this->subpattquestion;
         $phpengine->engine = 'preg_php_matcher';
         //Last subpattern isn't captured
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => 'abgh'));
+        $response = array('answer' => 'abgh');
+        $bestfit = $phpengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         ECHO $replaced.'</br>';
         $this->assertTrue($replaced == 'abgh|ab|');
         //First subpattern isn't captured
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '3456gh'));
+        $response = array('answer' => '3456gh');
+        $bestfit = $phpengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '3456gh||56');
         //Middle subpattern isn't captured
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', array('answer' => 'zw'));
+        $response = array('answer' => 'zw');
+        $bestfit = $phpengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}|{$3}', $response, $matchresults);
         $this->assertTrue($replaced == 'zw|z||w');
         //No match at all - then no string returned
-        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', array('answer' => '*&^%&^'));
+        $response = array('answer' => '*&^%&^');
+        $bestfit = $phpengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced == '');
         //'(ab|cd(ef))gh'
         //'(12)|34(56)gh'

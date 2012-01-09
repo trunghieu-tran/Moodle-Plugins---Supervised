@@ -376,7 +376,7 @@ class qtype_preg_question extends question_graded_automatically
                 $correctpart = substr($currentanswer, $firstindex, $length);
             }
             $hintedcharacter = '';
-            if (isset($matchresults->next)) {//if hint possible
+            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
                 $hintedcharacter = $matchresults->next;
             }
             $wrongtail = '';
@@ -390,7 +390,7 @@ class qtype_preg_question extends question_graded_automatically
         $queryengine = $this->get_query_matcher($this->engine);
         if ($queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
             $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-            if (isset($matchresults->next)) {//if hint possible
+            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
                 $result['hintedcharacter'] = $matchresults->next;
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
@@ -413,7 +413,7 @@ class qtype_preg_question extends question_graded_automatically
         if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match() && $state->is_finished()) ) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
-                $feedbacktext = $this->insert_subpatterns($answer->feedback, $response);
+                $feedbacktext = $this->insert_subpatterns($answer->feedback, $response, $bestfit['match']);
                 $feedback = $this->format_text($feedbacktext, $answer->feedbackformat,
                     $qa, 'question', 'answerfeedback', $answer->id);
             }
@@ -427,10 +427,10 @@ class qtype_preg_question extends question_graded_automatically
     * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
     @param subject string to insert subpatterns
     @param question question object to create matcher
-    @param state state of the question attempt to get response
+    @param matchresults matching results object from best fitting answer
     @return changed string
     */
-    public function insert_subpatterns($subject, $response) {
+    public function insert_subpatterns($subject, $response, $matchresults) {
 
         //Sanity check 
         if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
@@ -438,11 +438,8 @@ class qtype_preg_question extends question_graded_automatically
             return $subject;
         }
 
-        //To be sure best fit answer is calculated
-        $this->get_best_fit_answer($response);
-
         $answer = $response['answer'];
-        $matchresults = $this->bestfitanswer['match'];
+
         //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
         // c.f. failed test in simpletest/testquestion.php
 
