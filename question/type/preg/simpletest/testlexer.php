@@ -13,7 +13,7 @@
 *   Need test for next operations:
 *nothing
 */
- 
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
@@ -105,8 +105,8 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->rightborder == 5);
         $this->assertTrue(!$token->value->greed);
     }
-    function test_lexer_backslach() {
-        $regex = '\\\\\\*\\[\\23\\023\\x23\\d\\s\\t\\b\\B\\>\\<\\%\\a';//\\\*\[\23\023\x23\d\s\t\b\B\>\<\%\a
+    function test_lexer_backslash() {
+        $regex = '\\\\\\*\\[\\23\\9\\023\\x23\\d\\s\\t\\b\\B\\>\\<\\%\\a';//\\\*\[\23\023\x23\d\s\t\b\B\>\<\%\a
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
@@ -124,7 +124,10 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->charset == '[');
         $token = $lexer->nextToken();//\23
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);    // no subpatterns before this token
+        $token = $lexer->nextToken();//\9
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);    // backref to the 9th subpattern
         $token = $lexer->nextToken();//\023
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
@@ -339,7 +342,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);        
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);

@@ -981,6 +981,27 @@ class qtype_preg_test_cross_from_nfa extends qtype_preg_cross_tester {
     }
 
     function data_for_test_backrefs_tricky_2() {
+        $test1 = array( 'str'=>'abxab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>0),
+                        'length'=>array(0=>2,1=>2,2=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'xabxab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1,1=>1,2=>1),
+                        'length'=>array(0=>2,1=>2,2=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(x\58|(ab))+',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_backrefs_tricky_3() {
         $test1 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
