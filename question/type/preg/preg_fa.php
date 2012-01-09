@@ -40,8 +40,6 @@ class qtype_preg_fa_state {
     * We are violating principle "child shoudn't know the parent" there, but the state need to signal important information back to automaton during it's construction: becoming non-deterministic, having eps or pure-assert transitions etc
     */
     protected $FA;
-    /** @var integer index of this state in $this->FA*/
-    protected $index;
 
     /** @var array of qtype_preg_fa_transition child objects, indexed*/
     protected $outtransitions;
@@ -50,14 +48,12 @@ class qtype_preg_fa_state {
 
     public function __construct() {
         $this->FA = null;
-        $this->index = null;
         $this->outtransitions = array();
         $this->deterministic = true;
     }
 
-    public function set_FA($FA, $index) {
+    public function set_FA($FA) {
         $this->FA = &$FA;
-        $this->index = $index;
     }
 
     /**
@@ -111,7 +107,7 @@ abstract class qtype_preg_finite_automaton {
 
     /** @var array of qtype_preg_fa_state, indexed by state number */
     protected $states;
-    /** @var integer index of start state in the states array */
+    /** @var object of start state*/
     protected $startstate;
 
     /** @var boolean is automaton really deterministic - it could be even if it shoudn't 
@@ -176,7 +172,7 @@ abstract class qtype_preg_finite_automaton {
     * Returns start state for automaton
     */
     public function start_state() {
-        return $this->states[$this->startstate];
+        return $this->startstate;
     }
 
     /**
@@ -196,9 +192,9 @@ abstract class qtype_preg_finite_automaton {
     /**
     * Set start state of automaton to be the state with given index
     */
-    public function set_start_state($stateindex) {
-        if (array_key_exists($stateindex, $this->states)) {
-            $this->startstate = $stateindex;
+    public function set_start_state($state) {
+        if (in_array($state, $this->states)) {
+            $this->startstate =& $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
         }
@@ -237,23 +233,13 @@ abstract class qtype_preg_finite_automaton {
     */
     public function add_state($state) {
         
-        //TODO - add to $this->states and return given index
-        //$state->set_FA(& $this, $index);
+        $this->states[] =& $state;
+        $state->set_FA(& $this);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
         }
     }
-
-    /**
-    * Includes another automaton in this 
-    * 
-    * @param automaton to include
-    * @param state index (s)  - state which should be linked with automaton
-    * @param the way to link the automaton??
-    */
-    //public function add_automaton TODO  - define arguments
-    //TODO - copy states, set new FA and index fields for them, link with existing state(s)
 
     public function transition_added() {
         $this->transitioncount++;
@@ -262,8 +248,6 @@ abstract class qtype_preg_finite_automaton {
         }
     }
 
-    //TODO - does we really need function returning state for index? I'd prefer to avoid it. It could be useful only when construction automaton
-
     /**
     * Read and create FA from dot-like language
     *
@@ -271,6 +255,16 @@ abstract class qtype_preg_finite_automaton {
     */
     public function read_fa($dotstring) {
         //TODO - kolesov
+    }
+
+    /**
+    * Numerates FA states starting from 0 and trying to go from left to right (in a wawe)
+    *
+    * Useful mainly for outputting and cloning FA.
+    * @return array where states are values and states number - keys
+    */
+    public function numerate_states() {
+        //TODO
     }
 
     /**
