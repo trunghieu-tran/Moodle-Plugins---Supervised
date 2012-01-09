@@ -12,6 +12,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+
 class qtype_preg_cross_tests_from_nfa {
 
     //-----------------------------------------------------------------------tests for general cases----------------------------------------------------------//
@@ -834,8 +836,8 @@ class qtype_preg_cross_tests_from_nfa {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>6,1=>-1),
-                        'left'=>array(-1),
-                        'next'=>'');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'cdxycd',
                         'is_match'=>true,

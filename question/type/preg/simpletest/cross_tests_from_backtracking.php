@@ -3,6 +3,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+
 class qtype_preg_cross_tests_from_backtracking {
 
     function data_for_test_Q_INF_1() {
@@ -852,8 +854,8 @@ class qtype_preg_cross_tests_from_backtracking {
                        'full'=>false,
                        'index_first'=>array(0=>0,1=>-1),
                        'length'=>array(0=>1,1=>-1),
-                       'left'=>array(-1),
-                       'next'=>'');
+                       'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array('str'=>'ac',
                        'is_match'=>true,
@@ -873,8 +875,8 @@ class qtype_preg_cross_tests_from_backtracking {
                        'full'=>false,
                        'index_first'=>array(0=>4),
                        'length'=>array(0=>-1),
-                       'left'=>array(-1),
-                       'next'=>'');
+                       'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'$abca',
                      'tests'=>array($test0));
@@ -886,8 +888,8 @@ class qtype_preg_cross_tests_from_backtracking {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3),
-                       'left'=>array(-1),
-                       'next'=>'');
+                       'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'abc^',
                      'tests'=>array($test0));

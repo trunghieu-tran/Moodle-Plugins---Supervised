@@ -24,7 +24,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
     public $backref_transition;        // != null if the last transition matched is a backreference
     public $backref_match_len;         // length of the last match
 
-    public function __construct($full, $index_first, $length, $index_first_old, $length_old, $next = '', $left = -1,
+    public function __construct($full, $index_first, $length, $index_first_old, $length_old, $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 &$state, $first_transition, $backref_transition, $backref_match_len) {
         $this->full = $full;
         $this->index_first = $index_first;
@@ -137,7 +137,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         } else {
             $transition = $laststate->backref_transition;
             $length = $laststate->length[$transition->pregleaf->number] - $laststate->backref_match_len;
-            $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_old, $laststate->length_old, '', -1,
+            $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_old, $laststate->length_old, qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                                             $transition->state, $transition, null, 0);
             $newstate->length[0] += $length;
             $newstate->next = $newstate->first_transition->pregleaf->next_character($str, $startpos + $laststate->length[0], $laststate->backref_match_len);
@@ -173,7 +173,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                             }
                             // check for length
                             if (!$skip) {
-                                $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, $curstate->next, -1,
+                                $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, $curstate->next, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                                                                 $next->state, $curstate->first_transition, null, 0);
                                 $newstate->length[0] += $length;
                                 if ($result !== null && $newstate->length[0] > $result->length[0]) {
@@ -229,7 +229,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
         $this->matchresults->invalidate_match($this->maxsubpatt);
         $this->matchresults->length[0] = 0;
         // initial state with nothing captured
-        $initialstate = new qtype_preg_nfa_processing_state(false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, '', -1,
+        $initialstate = new qtype_preg_nfa_processing_state(false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                                             $this->automaton->startstate, null, null, 0);
         array_push($curstates, $initialstate);
         while (count($curstates) != 0) {
@@ -270,7 +270,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                         $length = 0;
                         if ($transition->pregleaf->match($str, $startpos + $curlen, &$length, !$transition->pregleaf->caseinsensitive)) {
                             // create a new state
-                            $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, '', -1,
+                            $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                                                             $transition->state, null, null, 0);
                             $newstate->length[0] += $length;
                             $newstate->length_old[0] = $newstate->length[0];
