@@ -109,6 +109,8 @@ abstract class qtype_preg_finite_automaton {
     protected $states;
     /** @var object of start state*/
     protected $startstate;
+    /** @var object of end state*/
+    protected $endstate;
 
     /** @var boolean is automaton really deterministic - it could be even if it shoudn't 
     *
@@ -131,7 +133,8 @@ abstract class qtype_preg_finite_automaton {
 
     public function __contruct() {
         $this->states = array();
-        $this->startstate = 0;
+        $this->startstate = null;
+        $this->endstate = null;
         $this->deterministic = true;
         $this->haseps = false;
         $this->hasassertiontransitions = false;
@@ -181,22 +184,28 @@ abstract class qtype_preg_finite_automaton {
     * TODO - determine, whether we could get automaton with several end states - then return array
     */
     public function end_state() {
-        foreach($this->states as $state) {
-            if ($state->is_end_state()) {
-                return $state;
-            }
-        }
-        return null;
+        return $this->endstate;
     }
 
     /**
-    * Set start state of automaton to be the state with given index
+    * Set start state of automaton to be given state
     */
     public function set_start_state($state) {
         if (in_array($state, $this->states)) {
             $this->startstate =& $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
+        }
+    }
+
+    /**
+    * Set end state of automaton to be given state
+    */
+    public function set_end_state($state) {
+        if (in_array($state, $this->states)) {
+            $this->endstate =& $state;
+        } else {
+            throw new qtype_preg_exception('set_end_state error: No state '.$stateindex.' in automaton');
         }
     }
 
