@@ -4,11 +4,9 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
+class qtype_preg_cross_tests_future {
 
-class qtype_preg_test_cross_future extends qtype_preg_cross_tester {
-
-    // from nfa    
+    // from nfa
     function data_for_test_assertions_simple_2() {
         $test1 = array( 'str'=>'abc?z',
                         'is_match'=>true,

@@ -2,7 +2,7 @@
 /**
  * Unit tests for matchers
  *
- * @copyright &copy; 2011  Dmitriy Kolesov
+ * @copyright &copy; 2012  Dmitriy Kolesov
  * @author Dmitriy Kolesov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -12,9 +12,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
-
-class qtype_preg_test_cross_from_dfa extends qtype_preg_cross_tester {
+class qtype_preg_cross_tests_from_dfa {
 
     function data_for_test_easy() {
         $test1 = array( 'str'=>'fgh',

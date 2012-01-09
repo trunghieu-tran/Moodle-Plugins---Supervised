@@ -3,9 +3,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
-
-class qtype_preg_test_cross_from_backtracking extends qtype_preg_cross_tester {
+class qtype_preg_cross_tests_from_backtracking {
 
     function data_for_test_Q_INF_1() {
         $test0 = array('str'=>'abbbbbacd',

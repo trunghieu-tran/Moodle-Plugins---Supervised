@@ -1,12 +1,18 @@
 <?php
+/**
+ * Unit tests for matchers
+ *
+ * @copyright &copy; 2012  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-require_once($CFG->dirroot . '/question/type/preg/simpletest/crosstester.php');
-
-class qtype_preg_test_cross_quantifiers extends qtype_preg_cross_tester {
+class qtype_preg_cross_tests_matching_strategy {
 
     public $quants = array('{2,5}', '{2,}', '{,5}', '*');
 
