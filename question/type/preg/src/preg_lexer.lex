@@ -8,6 +8,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 %char
 %state CHARCLASS
 %init{
+    $this->errors = array();
+    $this->maxsubpatt = 0;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
     //set false all modifiers' fields, it must be set to correct values before initializing lexer and lexical aniliz
@@ -15,8 +17,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->optcount = 1;
 %init}
 %{
-    protected $errors = array();
-    protected $maxsubpatt = 0;
+    protected $errors;
+    protected $maxsubpatt;
     protected $optstack;
     protected $optcount;
 
@@ -36,46 +38,45 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         return $this->maxsubpatt;
     }
 
-    protected function form_node($name, $subtype = null, $charclass = null, $leftborder = null, $rightborder = null, $greed = true) {
+    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
         if ($subtype !== null) {
             $result->subtype = $subtype;
         }
         //set i modifier for leafs
-        if (is_a($result, 'preg_leaf')) {
-            /*old style local modifier handling
-            if(strpos($this->localmodifiers,'i')!==false) {
-                $result->caseinsensitive = true;
-            }*/
-            if ($this->optcount>0 && $this->optstack[$this->optcount-1]->i) {
-                 $result->caseinsensitive = true;
-            }
+        if (is_a($result, 'preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+            $result->caseinsensitive = true;
         }
-        if ($name == 'preg_leaf_charset') {
-            $result->charset = $charclass;
-        } elseif ($name == 'preg_leaf_backref') {
-            $result->number = $charclass;//TODO: rename $charclass argument, because it may be number of backref
-        } elseif ($name == 'preg_node_finite_quant' || $name == 'preg_node_infinite_quant') {
+        switch($name) {
+        case 'preg_leaf_charset':
+            $result->charset = $data;
+            break;
+        case 'preg_leaf_backref':
+            $result->number = $data;
+            break;
+        case 'preg_node_finite_quant':
+            $result->rightborder = $rightborder;
+        case 'preg_node_infinite_quant':
             $result->greed = $greed;
             $result->leftborder = $leftborder;
-            if ($name == 'preg_node_finite_quant') {
-                $result->rightborder = $rightborder;
-            }
-        } elseif ($name == 'preg_leaf_option') {
-            $text = substr($charclass, 2, strlen($charclass)-3);
+            break;
+        case 'preg_leaf_option':
+            $text = substr($data, 2, strlen($data) - 3);
             $index = strpos($text, '-');
             if ($index === false) {
                 $result->posopt = $text;
             } else {
                 $result->posopt = substr($text, 0, $index);
-                $result->negopt = substr($text, $index+1);
+                $result->negopt = substr($text, $index + 1);
             }
-        } elseif ($name == 'preg_leaf_recursion') {
-            if ($charclass[2]=='R') {
-                $result->number=0;
+            break;
+        case 'preg_leaf_recursion':
+            if ($data[2] == 'R') {
+                $result->number = 0;
             } else {
-                $result->number = substr($charclass, 2, strlen($charclass)-3);
+                $result->number = substr($data, 2, strlen($data) - 3);
             }
+            break;
         }
         $result->indfirst = $this->yychar;
         $text = $this->yytext();
@@ -102,35 +103,35 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     }
     protected function push_opt_lvl() {
         if ($this->optcount > 0) {
-            $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
+            $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount - 1];
             $this->optcount++;
         } /*else
             error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
     }
     protected function pop_opt_lvl() {
-        if ($this->optcount>0)
+        if ($this->optcount > 0)
             $this->optcount--;
     }
     public function mod_top_opt($set, $unset) {
-        for ($i=0; $i<strlen($set); $i++) {
+        for ($i = 0; $i < strlen($set); $i++) {
             if (strpos($unset, $set[$i])) {//set and unset modifier at the same time is error
                 $text = $this->yytext;
-                $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar-strlen($text), $this->yychar-1);
+                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - strlen($text), $this->yychar - 1);
                 return;
             }
         }
-        //if error not exist, set and unset local modifier
-        for ($i=0; $i<strlen($set); $i++) {
-            $this->optstack[$this->optcount-1]->$set[$i] = true;
+        //if error does not exist, set and unset local modifier
+        for ($i = 0; $i < strlen($set); $i++) {
+            $this->optstack[$this->optcount - 1]->$set[$i] = true;
         }
-        for ($i=0; $i<strlen($unset); $i++) {
-            $this->optstack[$this->optcount-1]->$unset[$i] = false;
+        for ($i = 0; $i < strlen($unset); $i++) {
+            $this->optstack[$this->optcount - 1]->$unset[$i] = false;
         }
     }
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
-            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar-1);
+            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1);
             $this->cc = null;
         }
 %eof}
@@ -162,12 +163,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ','))));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, strpos($text, ',') + 1, strlen($text) - 2 - strpos($text, ','))));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') -1)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') - 1)));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\} {
@@ -177,17 +178,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \{[0-9]+\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, 1, strpos($text, ',') - 1)));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, strpos($text, ',')+1, strlen($text)-2-strpos($text, ',')), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, strpos($text, ',') + 1, strlen($text) - 2 - strpos($text, ',')), false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') -1), null, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), null, false));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\}\? {
@@ -197,7 +198,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \{[0-9]+\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') -1), substr($text, 1, strpos($text, ',') -1), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, 1, strpos($text, ',') - 1), false));
     return $res;
 }
 <YYINITIAL> \[ {
