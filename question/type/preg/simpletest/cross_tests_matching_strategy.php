@@ -12,6 +12,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+
 class qtype_preg_cross_tests_matching_strategy {
 
     public $quants = array('{2,5}', '{2,}', '{,5}', '*');
