@@ -302,6 +302,53 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     }
     return $res;
 }
+<YYINITIAL> \\g[0-9][0-9]? {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 2)));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \\g\{-?[0-9][0-9]?\} {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
+<YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {
+    $str = substr($this->yytext(), 4);
+    $str = substr($str, 0, strlen($str) - 1);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res->value->matcher =& $this->matcher;
+    return $res;
+}
 <YYINITIAL> \\0[0-9][0-9]?|[0-9][0-9][0-9] {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec(substr($this->yytext(), 1)))));
     return $res;
