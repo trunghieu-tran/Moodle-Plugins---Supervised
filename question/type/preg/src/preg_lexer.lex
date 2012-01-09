@@ -73,8 +73,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         } elseif ($name == 'preg_leaf_recursion') {
             if ($charclass[2]=='R') {
                 $result->number=0;
-            } else { 
-                $result->number = substr($charclass, 2, strlen($charclass)-3); 
+            } else {
+                $result->number = substr($charclass, 2, strlen($charclass)-3);
             }
         }
         $result->indfirst = $this->yychar;
@@ -104,7 +104,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         if ($this->optcount > 0) {
             $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount-1];
             $this->optcount++;
-        } /*else 
+        } /*else
             error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
     }
     protected function pop_opt_lvl() {
@@ -289,9 +289,17 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $text[1]));
     return $res;
 }
-<YYINITIAL> \\[0-9][0-9]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 1)));
-    $res->value->matcher =& $this->matcher;
+<YYINITIAL> \\[0-9][0-9]?[0-9]? {
+    $numstr = substr($this->yytext(), 1);
+    $numdec = intval($numstr, 10);
+    if ($numdec < 10 || ($numdec <= $this->maxsubpatt && $numdec < 100)) {
+        // return a backreference
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
+        $res->value->matcher =& $this->matcher;
+    } else {
+        // return a character
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($numstr))));
+    }
     return $res;
 }
 <YYINITIAL> \\0[0-9][0-9]?|[0-9][0-9][0-9] {
