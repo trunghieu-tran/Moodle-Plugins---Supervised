@@ -106,7 +106,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue(!$token->value->greed);
     }
     function test_lexer_backslash() {
-        $regex = '\\\\\\*\\[\\23\\9\\023\\x23\\d\\s\\t\\b\\B\\>\\<\\%\\a';//\\\*\[\23\023\x23\d\s\t\b\B\>\<\%\a
+        $regex = '\\\\\\*\\[\\23\\9\\023\\x23\\d\\s\\t\\b\\B\\>\\<\\%((((((((((((\\g15\\12\\g{15}\\g{-2}\\a';//\\\*\[\23\023\x23\d\s\t\b\B\>\<\%((((((((((((\g15\12\g{15}\g{-1}\a
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
@@ -173,6 +173,21 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertFalse($token->value->negative);
         $this->assertTrue($token->value->charset == '%');
+        for ($i = 0; $i < 12; $i++) {
+            $lexer->nextToken();// skip 12 subpatterns
+        }
+        $token = $lexer->nextToken();//\g15
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $token = $lexer->nextToken();//\12
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $token = $lexer->nextToken();//\g{15}
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $token = $lexer->nextToken();//\g{-1}
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
         $flag = false;
         try {
             $token = $lexer->nextToken();//\a
@@ -180,6 +195,18 @@ class qtype_preg_lexer_test extends UnitTestCase {
             $flag = true;
         }
         $this->assertTrue($flag);//\a mst not match
+    }
+    function test_lexer_named_backref() {
+        //\k<name_1>\k'name_2'\k{name_3}\g{name_4}(?P=name_5)
+        $regex = '\\k<name_1>\\k\'name_2\'\\k{name_3}\\g{name_4}(?P=name_5)';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        for ($i = 0; $i < 5; $i++) {
+            $token = $lexer->nextToken();
+            $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+            $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        }
     }
     function test_lexer_charclass() {
         //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
