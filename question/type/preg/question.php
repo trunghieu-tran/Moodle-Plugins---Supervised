@@ -376,7 +376,7 @@ class qtype_preg_question extends question_graded_automatically
                 $correctpart = substr($currentanswer, $firstindex, $length);
             }
             $hintedcharacter = '';
-            if (isset($matchresults->next)) {//if hint possible
+            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
                 $hintedcharacter = $matchresults->next;
             }
             $wrongtail = '';
@@ -390,7 +390,7 @@ class qtype_preg_question extends question_graded_automatically
         $queryengine = $this->get_query_matcher($this->engine);
         if ($queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
             $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-            if (isset($matchresults->next)) {//if hint possible
+            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
                 $result['hintedcharacter'] = $matchresults->next;
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
