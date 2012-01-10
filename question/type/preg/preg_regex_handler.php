@@ -155,7 +155,13 @@ class qtype_preg_regex_handler {
         $lexer->mod_top_opt($this->modifiers, '');
         $parser = new preg_parser_yyParser;
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            if (!is_array($token)) {
+                $parser->doParse($token->type, $token->value);
+            } else {
+                foreach ($token as $curtoken) {
+                    $parser->doParse($curtoken->type, $curtoken->value);
+                }
+            }
         }
 
         $this->maxsubpatt = $lexer->get_max_subpattern();
