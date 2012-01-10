@@ -162,7 +162,7 @@ class qtype_nfa_preg_matcher extends qtype_preg_matcher {
                             if (!$skip) {
                                 if (is_a($next->pregleaf, 'preg_leaf_backref')) {
                                     // only generated subpatterns can be passed
-                                    if (array_key_exists($next->pregleaf->number, $curstate->length_old) && $curstate->length_old[$next->pregleaf->number] > -2) {
+                                    if (array_key_exists($next->pregleaf->number, $curstate->length_old) && $curstate->length_old[$next->pregleaf->number] > -1) {
                                         $length = $curstate->length_old[$next->pregleaf->number];
                                     } else {
                                         $skip = true;
