@@ -54,5 +54,18 @@ class qtype_preg_cross_tests_special_cases {
         return array('regex'=>'^a',
                      'tests'=>array($test1));
     }
+
+    function data_for_test_unoubvious_backslash() {
+        $test1 = array( 'str'=>chr(octdec(37)).'8',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'\378',
+                     'tests'=>array($test1));
+    }
 }
 ?>

@@ -12,7 +12,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->maxsubpatt = 0;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
-    //set false all modifiers' fields, it must be set to correct values before initializing lexer and lexical aniliz
+    //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical anilysis
     $this->optstack[0]->i = false;
     $this->optcount = 1;
 %init}
@@ -290,7 +290,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $text[1]));
     return $res;
 }
-<YYINITIAL> \\[0-9][0-9]?[0-9]? {
+<YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $numstr = substr($this->yytext(), 1);
     $numdec = intval($numstr, 10);
     if ($numdec < 10 || ($numdec <= $this->maxsubpatt && $numdec < 100)) {
@@ -299,7 +299,31 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         $res->value->matcher =& $this->matcher;
     } else {
         // return a character
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($numstr))));
+        $octal = '';
+        $failed = false;
+        for ($i = 0; !$failed && $i < strlen($numstr); $i++) {
+            if (intval($numstr[$i]) < 8) {
+                $octal = $octal . $numstr[$i];
+            } else {
+                $failed = true;
+            }
+        }
+        if (strlen($octal) == 0) {    // if no octal digits found, it should be 0
+            $octal = '0';
+            $tail = $numstr;
+        } else {                                        // octal digits found
+            $tail = substr($numstr, strlen($octal));
+        }
+        // return a single lexem if all digits are octal, an array of lexems otherwise
+        if (strlen($tail) == 0) {
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($octal))));
+        } else {
+            $res = array();
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($octal))));
+            for ($i = 0; $i < strlen($tail); $i++) {
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $tail[$i]));
+            }
+        }
     }
     return $res;
 }
@@ -350,12 +374,27 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\0[0-9][0-9]?|[0-9][0-9][0-9] {
+<YYINITIAL> \\0[0-7]?[0-7]?|[0-7][0-7][0-7] {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec(substr($this->yytext(), 1)))));
     return $res;
 }
-<YYINITIAL> \\x[0-9][0-9] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(hexdec(substr($this->yytext(), 1)))));
+<YYINITIAL> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
+    $code = 0;
+    $str = $this->yytext();
+    if (strlen($str) > 1) {
+        $code = hexdec(substr($str, 1));
+    }
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr($code)));
+    return $res;
+}
+<YYINITIAL> \\x\{[0-9a-fA-F]*\} {
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    $code = 0;
+    if (strlen($str) > 1) {
+        $code = hexdec($str);
+    }
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr($code)));
     return $res;
 }
 <YYINITIAL> \\\\ {
