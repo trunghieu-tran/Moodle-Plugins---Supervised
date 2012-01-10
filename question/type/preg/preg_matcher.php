@@ -37,7 +37,7 @@ class qtype_preg_matching_results {
     /** @var integer The number of characters left to complete matching. */
     public $left;
 
-    public function __construct($full = false, $index_first = array(), $length = array(), $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, 
+    public function __construct($full = false, $index_first = array(), $length = array(), $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                                 $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
         $this->full = $full;
         $this->index_first = $index_first;
@@ -72,9 +72,10 @@ class qtype_preg_matching_results {
     *
     * @param other object of qtype_preg_matching_results
     * @param orequal make it worse-or-equal function
+    * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match
     * @return whether @this is worse than $other
     */
-    /*public function worse_than($other, $orequal = false) {
+    public function worse_than($other, $orequal = false, $longestmatch = false) {
 
         //1. Full match
         if (!$this->full && $other->full) {
@@ -90,18 +91,35 @@ class qtype_preg_matching_results {
             return false;
         }
 
-        //3. Less characters left
-        if ($other->left < $this->left) {
-            return true;
-        } elseif ($this->left < $other->left) {
-            return false;
-        }
+        if (!$longestmatch) {
+            //3. Less characters left
+            if ($other->left < $this->left) {
+                return true;
+            } elseif ($this->left < $other->left) {
+                return false;
+            }
 
-        //4. Longest match - TODO - this and 3. may change places due to choosen strategy
-        if ($other->length[0] > $this->length[0]) {
-            return true;
-        } elseif ($this->length[0] > $other->length[0]) {
-            return false;
+            //4. Longest match
+            if ($other->length[0] > $this->length[0]) {
+                return true;
+            } elseif ($this->length[0] > $other->length[0]) {
+                return false;
+            }
+        } else {
+            //3. Longest match
+            if ($other->length[0] > $this->length[0]) {
+                return true;
+            } elseif ($this->length[0] > $other->length[0]) {
+                return false;
+            }
+
+            //4. Less characters left
+            if ($other->left < $this->left) {
+                return true;
+            } elseif ($this->left < $other->left) {
+                return false;
+            }
+
         }
 
         //5. More subpatterns captured - TODO - dubious, it may be needed by NFA, but have not much use comparing matches from different positions
@@ -114,52 +132,6 @@ class qtype_preg_matching_results {
         }
 
         return $orequal;//results are equal
-    }*/
-
-    public function worse_than($other, $orequal = true) {
-        // check the fields decreasing their priority, the first is 'fullness'
-        $result = $other->full && !$this->full;
-        // the second is match existance
-        if (!$result) {
-            $result = ($other->length[0] > 0) && ($this->length[0] <= 0);
-        }
-        // the third is match length
-        if (!$result) {
-            if ($orequal) {
-                $result = ($this->full == $other->full &&    // both of results have the same 'fullness' but new match is longer
-                           $other->length[0] > $this->length[0]);
-            } else {
-                $result = ($this->full == $other->full &&
-                           $other->length[0] >= $this->length[0]);
-            }
-        }
-        // the fourth is characters left to complete match
-        if (!$result) {
-            if ($orequal) {
-                $result = ($this->full == $other->full &&    // both of results have the same 'fullness' but new match is longer
-                           $other->length[0] == $this->length[0] &&
-                           $other->left < $this->left);
-            } else {
-                $result = ($this->full == $other->full &&
-                           $other->length[0] == $this->length[0] &&
-                           $other->left <= $this->left);
-            }
-        }
-        // the last is number of subpatterns captured
-        if (!$result) {
-            if ($orequal) {
-                $result = ($this->full == $other->full &&    // same length but more subpatterns captured
-                           $other->length[0] == $this->length[0] &&
-                           $other->left == $this->left &&
-                           $other->captured_subpatterns_count() > $this->captured_subpatterns_count());
-            } else {
-                $result = ($this->full == $other->full &&    // same length but more subpatterns captured
-                           $other->length[0] == $this->length[0] &&
-                           $other->left == $this->left &&
-                           $other->captured_subpatterns_count() >= $this->captured_subpatterns_count());
-            }
-        }
-        return $result;
     }
 
     /**
