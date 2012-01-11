@@ -197,6 +197,16 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($root->operands[1]->indfirst == 9);
         $this->assertTrue($root->operands[1]->indlast == 15);
     }
+    function test_parser_array_of_tokens() {//\88
+        $parser =& $this->run_parser('\89');
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->charset == chr(0));
+        $this->assertTrue($root->operands[0]->operands[1]->charset == '8');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == '9');
+    }
     function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
         $parser =& $this->run_parser('ab(c|d)[fg\\]');
@@ -276,7 +286,6 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($errornodes[3]->firstindxs[0] == 15);
         $this->assertTrue($errornodes[3]->lastindxs[0] == 15);
     }
-
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
         $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
@@ -335,7 +344,7 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 2);
         $this->assertTrue($errornodes[0]->lastindxs[0] == 6);
-        }
+    }
     /**
     *Service function to run parser on regex
     *@param regex Regular expression to parse
@@ -347,7 +356,13 @@ class qtype_preg_parser_test extends UnitTestCase {
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new Yylex($pseudofile);
         while ($token = $lexer->nextToken()) {
-            $parser->doParse($token->type, $token->value);
+            if (!is_array($token)) {
+                $parser->doParse($token->type, $token->value);
+            } else {
+                 foreach ($token as $curtoken) {
+                    $parser->doParse($curtoken->type, $curtoken->value);
+                }
+            }
         }
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $errstring) {
