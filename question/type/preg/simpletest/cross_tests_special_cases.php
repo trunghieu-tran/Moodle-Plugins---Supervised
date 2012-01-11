@@ -55,7 +55,7 @@ class qtype_preg_cross_tests_special_cases {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_unoubvious_backslash() {
+    function data_for_test_unobvious_backslash() {
         $test1 = array( 'str'=>chr(octdec(37)).'8',
                         'is_match'=>true,
                         'full'=>true,

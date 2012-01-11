@@ -678,7 +678,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'left'=>array(1),
                         'next'=>'h');
 
-        $test3 = array('str'=>'abe',
+        $test3 = array('str'=>'abe',    // different strategies
                        'results'=>array(array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
@@ -839,7 +839,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'');
 
         $test3 = array('str'=>'cdxyabab',
-                       'results'=>array(array('is_match'=>true,
+                       'results'=>array(array('is_match'=>true,        // different strategies
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>6,1=>-1),
@@ -875,7 +875,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'cbr');
 
         $test2 = array('str'=>'Do cats',
-                       'results'=>array(array('is_match'=>true,
+                       'results'=>array(array('is_match'=>true,        // different strategies
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>7,1=>1),
@@ -918,7 +918,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'left'=>array(8),
                         'next'=>'b');
 
-        $test3 = array('str'=>'0defab',
+        $test3 = array('str'=>'0defab',        // different strategies
                        'results'=>array(array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
@@ -947,7 +947,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'a');
 
         $test2 = array('str'=>'0aaaaaaz',
-                       'results'=>array(array('is_match'=>true,
+                       'results'=>array(array('is_match'=>true,        // different strategies
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>7,1=>6),
@@ -967,7 +967,7 @@ class qtype_preg_cross_tests_from_nfa {
 
     function data_for_test_backrefs_subpatt_modifying() {
         $test1 = array('str'=>'ababba',
-                       'results'=>array(array('is_match'=>true,
+                       'results'=>array(array('is_match'=>true,        // different strategies
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>6,1=>3),
@@ -990,7 +990,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'');
 
         $test3 = array('str'=>'abab',
-                       'results'=>array(array('is_match'=>true,
+                       'results'=>array(array('is_match'=>true,        // different strategies
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>4,1=>2),
