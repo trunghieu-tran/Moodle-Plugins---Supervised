@@ -374,7 +374,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\0[0-7]?[0-7]?|[0-7][0-7][0-7] {
+<YYINITIAL> \\0[0-7]?[0-7]? {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec(substr($this->yytext(), 1)))));
     return $res;
 }
