@@ -533,7 +533,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
                     $str2 = $cc->pregnode->charset;
                     $equdirection = $cc->pregnode->negative === $this->connection[$index][$number]->pregnode->negative;
-                    if (qtype_dfa_preg_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
+                    if (qtype_preg_dfa_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
                         array_push($equnum, $num);
                     }
                 } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
@@ -557,7 +557,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
-            qtype_dfa_preg_matcher::push_unique($followU, $fpmap[$num]);
+            qtype_preg_dfa_matcher::push_unique($followU, $fpmap[$num]);
         }
         return $followU;
     }

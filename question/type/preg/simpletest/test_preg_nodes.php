@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher/nfa_preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 
 class qtype_preg_regex_handler_test extends UnitTestCase {
 
@@ -54,7 +54,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
     function test_no_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_nfa_preg_matcher($regex);
+        $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -77,7 +77,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
     function test_partial_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_nfa_preg_matcher($regex);
+        $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -100,7 +100,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
     function test_full_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_nfa_preg_matcher($regex);
+        $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
         $backref = new preg_leaf_backref();
         $backref->number = 1;
@@ -116,7 +116,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
     function test_empty_match() {
         $regex = '(^$)';
         $length = 0;
-        $matcher = new qtype_nfa_preg_matcher($regex);
+        $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('');
         $this->assertTrue($matcher->is_matching_complete());
         $backref = new preg_leaf_backref();
@@ -133,7 +133,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
     function test_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
-        $matcher = new qtype_nfa_preg_matcher($regex);
+        $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('ab');
         $backref = new preg_leaf_backref();
         $backref->number = 1;

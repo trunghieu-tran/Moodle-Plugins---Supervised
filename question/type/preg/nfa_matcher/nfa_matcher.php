@@ -62,7 +62,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     public function name() {
-        return 'nfa_preg_matcher';
+        return 'nfa_matcher';
     }
 
     protected function get_engine_node_name($pregname) {
