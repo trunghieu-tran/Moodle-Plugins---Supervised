@@ -9,7 +9,7 @@
  */
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/nfa_preg_matcher/nfa_preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 
 /**
  * defines a state of an automaton when running
@@ -40,7 +40,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
     }
 }
 
-class qtype_nfa_preg_matcher extends qtype_preg_matcher {
+class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     private $statelimit;
     private $transitionlimit;

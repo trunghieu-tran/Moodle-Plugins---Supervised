@@ -14,7 +14,7 @@
 
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_nodes.php');
 
 class finite_automate_state {//finite automate state
     var $asserts;
@@ -41,7 +41,7 @@ class fptab {//member of follow's map table, use on merge time only
     }
 }
 
-class qtype_dfa_preg_matcher extends qtype_preg_matcher {
+class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 
 
 
@@ -58,7 +58,7 @@ class qtype_dfa_preg_matcher extends qtype_preg_matcher {
     protected $maxpasscount;
 
     public function name() {
-        return 'dfa_preg_matcher';
+        return 'dfa_matcher';
     }
 
 

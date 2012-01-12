@@ -19,7 +19,7 @@ $string['defaultenginedescription'] = 'Matching engine, selected by default when
 $string['defaultenginelabel'] = 'Default matching engine';
 $string['defaultnotationdescription'] = 'Notation, selected by default when creating a new question';
 $string['defaultnotationlabel'] = 'Default notation';
-$string['dfa_preg_matcher'] = 'Deterministic finite state automata';
+$string['dfa_matcher'] = 'Deterministic finite state automata';
 $string['dfaheading'] = 'Deterministic finite state automata engine settings';
 $string['dfalimitsdescription'] = 'Allows you to tune time and memory limits for DFA engine to use when matching complex regexes.';
 $string['editingpreg'] = 'Editing regular expression question';
@@ -62,7 +62,7 @@ $string['maxfasizestates'] = 'Automata size limit: states';
 $string['maxfasizetransitions'] = 'Automata size limit: transitions';
 $string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression on question editing form';
 $string['maxerrorsshownlabel'] = 'Maximum number of errors shown';
-$string['nfa_preg_matcher'] = 'Nondeterministic finite state automata';
+$string['nfa_matcher'] = 'Nondeterministic finite state automata';
 $string['nfaheading'] = 'Nondeterministic finite state automata engine settings';
 $string['nfalimitsdescription'] = 'Allows you to tune time and memory limits for NFA engine to use when matching complex regexes.';
 $string['nfasizelimit'] = 'Maximum size of nfa';
@@ -91,7 +91,7 @@ $string['preg'] = 'Regular expression';
 $string['preg_help'] = '<p> Regular expression is a form of writing a pattern to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p>
 <p>This question use php perl-compatible regular expression syntax as default notation. There is many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression there: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p>
 <p>You could also use this question as advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions at all! Just select <b>Moodle shortanswer</b> as notation for you questions.</p>';
-$string['preg_php_matcher'] = 'PHP preg extension';
+$string['php_preg_matcher'] = 'PHP preg extension';
 $string['pregsummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. In behaviours with multiple tries could give hint by telling next correct character. <br /> You could use it without knowing regular expression to get hinting using \'Moodle shortanswer\' notation.';
 $string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand - nothing to repeat';
 $string['questioneditingheading'] = 'Question editing settings';

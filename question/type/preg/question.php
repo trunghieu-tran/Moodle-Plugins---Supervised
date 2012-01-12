@@ -289,7 +289,7 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             //Convert to actually used notation if necessary
-            $engineclass = 'qtype_'.$engine;
+            $engineclass = 'qtype_preg_'.$engine;
             $queryengine = new $engineclass;
             $usednotation = $queryengine->used_notation();
             if ($notation !== null && $notation != $usednotation) {//Conversion is necessary
@@ -324,7 +324,7 @@ class qtype_preg_question extends question_graded_automatically
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
-        $engineclass = 'qtype_'.$engine;
+        $engineclass = 'qtype_preg_'.$engine;
         return new $engineclass;
     }
 

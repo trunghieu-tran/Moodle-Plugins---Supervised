@@ -8,7 +8,7 @@ $settings->add(new admin_setting_heading('questioneditingheading', get_string('q
 $qtypeobj = new qtype_preg;
 $engines = $qtypeobj->available_engines();
 $settings->add(new admin_setting_configselect('qtype_preg_defaultengine', get_string('defaultenginelabel', 'qtype_preg'),
-                                                get_string('defaultenginedescription', 'qtype_preg'), 'nfa_preg_matcher', $engines));
+                                                get_string('defaultenginedescription', 'qtype_preg'), 'nfa_matcher', $engines));
 $notations = $qtypeobj->available_notations();
 $settings->add(new admin_setting_configselect('qtype_preg_defaultnotation', get_string('defaultnotationlabel', 'qtype_preg'),
                                                 get_string('defaultnotationdescription', 'qtype_preg'), 'native', $notations));
