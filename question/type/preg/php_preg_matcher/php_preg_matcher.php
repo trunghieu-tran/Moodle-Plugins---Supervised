@@ -12,7 +12,7 @@
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-class qtype_preg_php_matcher extends qtype_preg_matcher {
+class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
     public function is_supporting($capability) {
         switch ($capability) {
@@ -24,7 +24,7 @@ class qtype_preg_php_matcher extends qtype_preg_matcher {
     }
 
     public function name() {
-        return 'preg_php_matcher';
+        return 'php_preg_matcher';
     }
 
     /**

@@ -212,7 +212,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
             return;
         }
         require_once($CFG->dirroot . '/question/type/preg/' . $enginename . '/' . $enginename . '.php');    // matching engine
-        $enginename = 'qtype_' . $enginename;
+        $enginename = 'qtype_preg_' . $enginename;
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             foreach ($testmethods as $curtestmethod) {

@@ -34,7 +34,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $regular->penalty = 0.1;
         $regular->hintpenalty = 0.2;
         $regular->hintgradeborder = 0.6;
-        $regular->engine = 'nfa_preg_matcher';
+        $regular->engine = 'nfa_matcher';
         $regular->notation = 'native';
 
         //correct answer
@@ -84,7 +84,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $subpatt->penalty = 0.1;
         $subpatt->hintpenalty = 0.2;
         $subpatt->hintgradeborder = 0.6;
-        $subpatt->engine = 'nfa_preg_matcher';
+        $subpatt->engine = 'nfa_matcher';
         $subpatt->notation = 'native';
 
         //Answer where it is possible to not match last subpattern
@@ -172,7 +172,7 @@ class qtype_preg_question_test extends UnitTestCase {
 
     //////Question with engine that doesn't allow partial matching (php_preg_matcher)
     $testquestion = clone $this->testquestion;
-    $testquestion->engine = 'preg_php_matcher';
+    $testquestion->engine = 'php_preg_matcher';
     ////Full match testing
     //100% full match
     $bestfit = $testquestion->get_best_fit_answer(array('answer' => 'Do bats eat cats?'));
@@ -246,7 +246,7 @@ class qtype_preg_question_test extends UnitTestCase {
         ////Engine without partial matching support should show colored parts only when there is a match
         $testquestion1 = clone $this->testquestion;
         $testquestion1->exactmatch = false;//Disable exact matching to be able to have wrong head and tail
-        $testquestion1->engine = 'preg_php_matcher';
+        $testquestion1->engine = 'php_preg_matcher';
 
         //Full match with wrong head a tail - there is colored string
         $parts = $testquestion1->response_correctness_parts(array('answer' => 'Oh! Do cats eat rats? Really?'));
@@ -313,7 +313,7 @@ class qtype_preg_question_test extends UnitTestCase {
 
         ////Engine using PHP preg_match function
         $phpengine = clone $this->subpattquestion;
-        $phpengine->engine = 'preg_php_matcher';
+        $phpengine->engine = 'php_preg_matcher';
         //Last subpattern isn't captured
         $response = array('answer' => 'abgh');
         $bestfit = $phpengine->get_best_fit_answer($response);
