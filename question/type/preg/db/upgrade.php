@@ -1,6 +1,6 @@
 <?php  //$Id: upgrade.php,v 1.2.2.2 2009/08/31 16:37:52 arborrow Exp $
 
-// This file keeps track of upgrades to 
+// This file keeps track of upgrades to
 // the preg qtype plugin
 //
 // Sometimes, changes between versions involve
@@ -100,6 +100,21 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
 
         // preg savepoint reached
         upgrade_plugin_savepoint(true, 2011121200, 'qtype', 'preg');
+    }
+
+    if ($oldversion < 2012011300) {
+
+        // Rename fields
+        $queries = array("UPDATE {qtype_preg} SET engine='dfa_matcher' WHERE engine='dfa_preg_matcher'",
+                         "UPDATE {qtype_preg} SET engine='nfa_matcher' WHERE engine='nfa_preg_matcher'",
+                         "UPDATE {qtype_preg} SET engine='php_preg_matcher' WHERE engine='preg_php_matcher'");
+
+        foreach ($queries as $query) {
+            $DB->execute($query);
+        }
+
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2012011300, 'qtype', 'preg');
     }
 
     return true;
