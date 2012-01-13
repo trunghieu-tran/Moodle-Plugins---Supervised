@@ -25,6 +25,11 @@ class qtype_preg_regex_handler {
     protected $modifiers;
     //Max number of a subpattern available in regular expression
     protected $maxsubpatt;
+    //Keys for subpatterns:
+    // positive numbers for numbered subpatterns,
+    // negative numbers for lexems,
+    // strings for named subpatterns.
+    protected $subpatternkeys;
 
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
