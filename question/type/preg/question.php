@@ -307,7 +307,6 @@ class qtype_preg_question extends question_graded_automatically
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
-            $engineclass = 'qtype_preg_'.$engine;
             $matcher = new $engineclass($for_regexp, $modifiers);
             if ($answerid !== null) {
                 $this->matchers_cache[$answerid] =& $matcher;
