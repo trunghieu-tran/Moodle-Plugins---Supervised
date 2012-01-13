@@ -187,6 +187,18 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
+    function test_parser_duplicate_subpattern_numbers() {
+        $parser =& $this->run_parser('(?|a|b|c)');
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->charset == 'b');
+        $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->charset == 'c');
+    }
     function test_parser_index() {
         $parser =& $this->run_parser('abcdefgh|(abcd)*');
         $root = $parser->get_root();
