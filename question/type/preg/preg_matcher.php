@@ -84,12 +84,19 @@ class qtype_preg_matching_results {
             return false;
         }
 
-        //2. Match have non-zero length (TODO - dubious?)
-        if (!($this->length[0] > 0) && $other->length[0] > 0) {
+        //2. Match have non-zero length (TODO - use is_match instead?)
+        /*if (!($this->length[0] > 0) && $other->length[0] > 0) {
             return true;
         } elseif ($this->length[0] > 0 && !($other->length[0] > 0)) {
             return false;
+        }*/
+        //2. Is match
+        if (!$this->is_match() && $other->is_match()) {
+            return true;
+        } elseif ($this->is_match() && !$other->is_match()) {
+            return false;
         }
+
 
         if (!$longestmatch) {
             //3. Less characters left
