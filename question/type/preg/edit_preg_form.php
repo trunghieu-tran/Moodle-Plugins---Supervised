@@ -141,7 +141,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 if (is_array($feedback)) {//On some servers feedback is HTMLEditor, on another it is simple text area
                     $feedback = $feedback['text'];
                 }
-                if (!empty($feedback) && preg_match('/\{\$[1-9][0-9]*\}/', $feedback) == 1) {
+                if (!empty($feedback) && preg_match('/\{\$([1-9][0-9]*|\w+)\}/', $feedback) == 1) {
                     $errors['feedback['.$key.']'] = get_string('nosubpatterncapturing','qtype_preg',$querymatcher->name());
                 }
             }
