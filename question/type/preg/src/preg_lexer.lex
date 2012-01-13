@@ -230,6 +230,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
+<YYINITIAL> \(\?\| {
+    $this->push_opt_lvl();
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('duplicate', $this->yychar, $this->yychar + $this->yylength() - 1));
+    return $res;
+}
 <YYINITIAL> \(\?\(\?= {
     $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
