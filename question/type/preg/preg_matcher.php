@@ -17,6 +17,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_matching_results {
 
+    //No match captured
+    const NO_MATCH_FOUND = -1;
     //No next character generated
     const UNKNOWN_NEXT_CHARACTER = '';
     //How many characters left is unknown
@@ -153,8 +155,8 @@ class qtype_preg_matching_results {
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
         //Use negative values for no match at all
         for ($i = 0; $i <= $subpattcount; $i++) {
-            $this->index_first[$i] = -1;
-            $this->length[$i] = -1;
+            $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
     }
 
@@ -164,7 +166,7 @@ class qtype_preg_matching_results {
     public function captured_subpatterns_count() {
         $subpattcount = 0;
         foreach ($this->length as $key=>$length) {
-            if ($key != 0 && $length >= 0) {//-1 == no match for this subpattern
+            if ($key != 0 && $length != qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $subpattcount++;
             }
         }
@@ -415,7 +417,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         if ($subpattern > $this->maxsubpatt) {
             throw new qtype_preg_exception('Error: Asked for subpattern '.$subpattern.' while only '.$this->maxsubpatt.' available');
         }
-        return ($this->matchresults->length[$subpattern] > -1);
+        return ($this->matchresults->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
     }
 
     /**
