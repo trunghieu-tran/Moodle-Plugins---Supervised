@@ -18,6 +18,9 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
+require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 
 class qtype_preg_parser_test extends UnitTestCase {
 
