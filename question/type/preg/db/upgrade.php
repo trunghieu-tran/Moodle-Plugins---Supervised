@@ -107,7 +107,8 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // Rename fields
         $queries = array("UPDATE {qtype_preg} SET engine='dfa_matcher' WHERE engine='dfa_preg_matcher'",
                          "UPDATE {qtype_preg} SET engine='nfa_matcher' WHERE engine='nfa_preg_matcher'",
-                         "UPDATE {qtype_preg} SET engine='php_preg_matcher' WHERE engine='preg_php_matcher'");
+                         "UPDATE {qtype_preg} SET engine='php_preg_matcher' WHERE engine='preg_php_matcher'",
+                         "UPDATE {config} SET value='nfa_matcher' WHERE name='qtype_preg_defaultengine'");
 
         foreach ($queries as $query) {
             $DB->execute($query);
