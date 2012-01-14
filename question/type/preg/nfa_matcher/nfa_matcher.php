@@ -162,7 +162,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             if (!$skip) {
                                 if (is_a($next->pregleaf, 'preg_leaf_backref')) {
                                     // only generated subpatterns can be passed
-                                    if (array_key_exists($next->pregleaf->number, $curstate->length_old) && $curstate->length_old[$next->pregleaf->number] > -1) {
+                                    if (array_key_exists($next->pregleaf->number, $curstate->length_old) && $curstate->length_old[$next->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                                         $length = $curstate->length_old[$next->pregleaf->number];
                                     } else {
                                         $skip = true;
@@ -189,7 +189,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                 // save subpattern indexes for backreference capturing
                                 foreach ($next->subpatt_start as $key=>$subpatt) {
                                     $newstate->index_first[$key] = $startpos + $curstate->length[0];
-                                    $newstate->length[$key] = -1;
+                                    $newstate->length[$key] = qtype_preg_matching_results::NO_MATCH_FOUND;
                                 }
                                 foreach ($next->subpatt_end as $key=>$subpatt) {
                                     if ($newstate->index_first[$key] >= 0) {
@@ -277,7 +277,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             // set start indexes of subpatterns
                             foreach ($transition->subpatt_start as $key=>$subpatt) {
                                 $newstate->index_first[$key] = $startpos + $curlen;
-                                $newstate->length[$key] = -1;
+                                $newstate->length[$key] = qtype_preg_matching_results::NO_MATCH_FOUND;
                             }
                             // set end indexes of subpatterns
                             foreach ($transition->subpatt_end as $key=>$subpatt) {
