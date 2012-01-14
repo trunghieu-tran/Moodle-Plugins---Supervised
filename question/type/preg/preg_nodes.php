@@ -879,8 +879,12 @@ class preg_node_concat extends preg_operator {
 */
 class preg_node_alt extends preg_operator {
 
+    //Do top-level subpatterns have same numbers?
+    public $duplicatesubpatternnumbers;
+
     public function __construct() {
         $this->type = preg_node::TYPE_NODE_ALT;
+        $this->duplicatesubpatternnumbers = false;
     }
 
     public function name() {
