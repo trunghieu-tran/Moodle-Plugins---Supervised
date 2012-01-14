@@ -446,6 +446,25 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
         $this->assertTrue($token->value->number === 4);
     }
+	function test_lexer_duplicate_subpattern_numbers() {
+        $regex = '(?|a|b';
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new Yylex($pseudofile);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === 'duplicate');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->charset == 'a');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::ALT);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->charset == 'b');
+    }
     function test_lexer_recursion() {
         $regex = '(?R)(?14)';
         StringStreamController::createRef('regex', $regex);
