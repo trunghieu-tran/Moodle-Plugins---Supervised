@@ -170,34 +170,34 @@ class qtype_preg_cross_tester extends UnitTestCase {
     /**
     * does assertions for every field. if assertionstrue == true then error messages displayed only
     */
-    function do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, $assertionstrue = false) {
+    function do_assertions($matchername, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, $testdataclassname, $assertionstrue = false) {
         $boolstr = array(false=>'FALSE', true=>'TRUE');
-        $this->assertTrue($assertionstrue || $ismatchpassed, "$matchername failed 'is_match' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $ismatchpassed, "$matchername failed 'is_match' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$ismatchpassed) {
-            echo 'obtained result ' . $boolstr[$obtained->is_match()] . ' for \'is_match\' is incorrect<br/>';
+            echo 'obtained result ' . $boolstr[$obtained->is_match()] . " for 'is_match' is incorrect    (test from $testdataclassname)<br/>";
         }
-        $this->assertTrue($assertionstrue || $fullpassed, "$matchername failed 'full' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $fullpassed, "$matchername failed 'full' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$fullpassed) {
-            echo 'obtained result ' . $boolstr[$obtained->full] . ' for \'full\' is incorrect<br/>';
+            echo 'obtained result ' . $boolstr[$obtained->full] . " for 'full' is incorrect    (test from $testdataclassname)<br/>";
         }
-        $this->assertTrue($assertionstrue || $indexfirstpassed, "$matchername failed 'index_first' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $indexfirstpassed, "$matchername failed 'index_first' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$indexfirstpassed) {
-            echo 'obtained result '; print_r($obtained->index_first); echo ' for \'index_first\' is incorrect<br/>';
+            echo 'obtained result '; print_r($obtained->index_first); echo " for 'index_first' is incorrect    (test from $testdataclassname)<br/>";
         }
 
-        $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'length' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $indexlastpassed, "$matchername failed 'length' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$indexlastpassed) {
-            echo 'obtained result '; print_r($obtained->length); echo ' for \'length\' is incorrect<br/>';
+            echo 'obtained result '; print_r($obtained->length); echo " for 'length' is incorrect    (test from $testdataclassname)<br/>";
         }
 
-        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$nextpassed) {
-            echo 'obtained result \'' . $obtained->next . '\' for \'next\' is incorrect<br/>';
+            echo 'obtained result \'' . $obtained->next . "' for 'next' is incorrect    (test from $testdataclassname)<br/>";
         }
 
-        $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'");
+        $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$leftpassed) {
-            echo 'obtained result \'' . $obtained->left . '\' for \'left\' is incorrect<br/>';
+            echo 'obtained result \'' . $obtained->left . "' for 'left' is incorrect    (test from $testdataclassname)<br/>";
         }
 
     }
@@ -242,7 +242,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                 $nextpassed = false;
                                 $leftpassed = false;
                                 $this->compare_results($matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
-                                $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
+                                $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, get_class($testdataobj));
                             } else {
                                 // compare with multiple results
                                 $ismatchpassed = array();
@@ -272,7 +272,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                     foreach ($indexmatch as $key) {
                                         $number = $key + 1;
                                         echo "Results of comparison for the $number possible result:<br/>";
-                                        $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], true);
+                                        $this->do_assertions($enginename, $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], get_class($testdataobj), true);
                                         echo '<br/>';
                                     }
                                     // if indexes were not matched at all - just print the obtained result
