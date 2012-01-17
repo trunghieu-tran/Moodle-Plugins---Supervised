@@ -311,7 +311,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
     * Match regular expression with given string, calls match_inner from a child class to do the real matching
     * @param str a string to match
-    * @return bool true for complete match, false otherwise
+    * @return object of qtype_preg_matching_results class
     */
     public function match($str) {
 
@@ -324,7 +324,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         //Are results cached already?
         if (array_key_exists($str,$this->resultcache)) {
             $this->matchresults = $this->resultcache[$str];
-            return $this->matchresults->full;
+            return $this->matchresults;
         }
 
         //Reset match data and perform matching.
@@ -349,7 +349,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
         //Save results to the cache
         $this->resultcache[$str] = $this->matchresults;
-        return $this->matchresults->full;
+        return $this->matchresults;
     }
 
     /**
@@ -429,6 +429,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Is there a matching at all?
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function match_found() {
         return $this->matchresults->is_match();
@@ -436,6 +437,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns true if there is a complete match, false otherwise - any matching engine should support at least that
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function is_matching_complete() {
         return $this->matchresults->full;
@@ -452,6 +454,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
     * Returns true if subpattern is captured
     * @param subpattern subpattern number
+    * TODO - move to match results
     */
     public function is_subpattern_captured($subpattern) {
         if ($subpattern > $this->maxsubpatt) {
@@ -463,6 +466,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
     * Returns first correct character index
     * @param subpattern subpattern number, 0 for the whole match
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function first_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
@@ -474,6 +478,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
     * Returns length of the match
     * @param subpattern subpattern number, 0 for the whole match
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function match_length($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
@@ -486,6 +491,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     * Returns the index of last correct character if engine supports partial matching
     * @param subpattern subpattern number, 0 for the whole match
     * @return the index of last correct character
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function last_correct_character_index($subpattern = 0) {
         if ($subpattern > $this->maxsubpatt) {
@@ -497,6 +503,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns (partialy) matched portion of string
+    * TODO - move to match results
     */
     public function matched_part($subpattern = 0) {
         if(array_key_exists($subpattern, $this->matchresults->index_first)) {
@@ -523,6 +530,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns how many characters left to closest possible match
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function characters_left() {
         if ($this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {

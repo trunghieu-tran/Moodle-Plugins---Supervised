@@ -115,7 +115,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                     if ($i > $maxerrors) {
                         $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors).'<br />';
                     }
-                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)) {
+                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)->full) {
                     $correctanswermatch=true;
                 }
                 if ($fractions[$key] >= $data['hintgradeborder']) {

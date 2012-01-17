@@ -184,14 +184,13 @@ class qtype_preg_question extends question_graded_automatically
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
-        $matchresult = new qtype_preg_matching_results();
+        $bestmatchresult = new qtype_preg_matching_results();
         if ($ispartialmatching) {
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $this->hintgradeborder) {
                     $bestfitanswer = $answer;
                     $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
-                    $matcher->match($response['answer']);
-                    $matchresult = $matcher->get_match_results();
+                    $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
                         $maxfitness = (-1)*$matcher->characters_left();
                     } else {
@@ -206,39 +205,39 @@ class qtype_preg_question extends question_graded_automatically
         $full = false;
         foreach ($this->answers as $answer) {
             $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
-            $full = $matcher->match($response['answer']);
+            $matchresults = $matcher->match($response['answer']);
 
             //Check full match.
-            if ($full) {//Don't need to look more if we find full match.
+            if ($matchresults->full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
-                $matchresult = $matcher->get_match_results();
+                $bestmatchresult = $matchresults;
                 $fitness = strlen($response['answer']);
                 break;
             }
 
             //When hinting we should use only answers within hint border except full matching case and there is some match at all.
             //If engine doesn't support hinting we shoudn't bother with fitness too.
-            if (!$ispartialmatching || !$matcher->match_found() || $answer->fraction < $this->hintgradeborder) {
+            if (!$ispartialmatching || !$matchresults->is_match() || $answer->fraction < $this->hintgradeborder) {
                 continue;
             }
 
             //Calculate fitness.
             if ($knowleftcharacters) {//Engine could tell us how many characters left to complete response, this is the best fitness possible.
-                $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
+                $fitness = (-1)*$matchresults->left;//-1 cause the less we need to add the better
             } else {//We should rely on the length of correct response part.
-                $fitness = $matcher->match_length();
+                $fitness = $matchresults->length[0];
             }
 
             if ($fitness > $maxfitness) {
                 $maxfitness = $fitness;
                 $bestfitanswer = $answer;
-                $matchresult = $matcher->get_match_results();
+                $bestmatchresult = $matchresults;
             }
         }
 
         //Save best fitted answer for further uses.
         $this->bestfitanswer['answer'] = $bestfitanswer;
-        $this->bestfitanswer['match'] = $matchresult;
+        $this->bestfitanswer['match'] = $bestmatchresult;
         $this->responseforbestfit = $response['answer'];
         return $this->bestfitanswer;
     }
