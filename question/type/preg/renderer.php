@@ -39,7 +39,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
 
         //////Colored string
         $hintmessage = '';
-        //TODO - decide exact conditions to show colored string. $options->correctness seems too tight - in adaptive mode it isn't shown until all is graded
+        //TODO - decide exact conditions to show colored string. $options->correctness may be not best variant, because it associated with moodle 'hints' for questions like multichoice
         //if ($options->correctness == question_display_options::VISIBLE) {
         if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('_render_hintnextchar')) {//specific feedback is possible or hint is requested
             //Calculate strings for response coloring
@@ -56,17 +56,38 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                     $correctpart = html_writer::tag('span', htmlspecialchars($parts['correctpart']), array('class' => $this->feedback_class(1)));
                 }
 
-                $hintedcharacter = '';
-                if ($qa->get_last_step()->has_behaviour_var('_render_hintnextchar') && $parts['hintedcharacter'] !== '') {//if hint requested and possible
-                    $hintedcharacter = html_writer::tag('span', htmlspecialchars($parts['hintedcharacter']), array('class' => $this->feedback_class(0.5)));
+                $hintpart = '';
+                $correctbeforehint = '';
+                $tobecontinued = '';
+                //if hinting possible
+                if ($parts['hintedending'] !== '') {
+                    //Calculate correct part before hinting starts
+                    $beforehintlen = $parts['hintedendingstart'] - strlen($parts['wronghead']);
+                    $correctbeforehint = html_writer::tag('span',  htmlspecialchars(substr($parts['correctpart'], 0, $beforehintlen)), array('class' => $this->feedback_class(1)));
+
+                    //Next character hint was requested
+                    if ($qa->get_last_step()->has_behaviour_var('_render_hintnextchar')) {
+                        $hintpart = html_writer::tag('span', htmlspecialchars($parts['hintedending'][0]), array('class' => $this->feedback_class(0.5)));
+                        //For one-character hint the conditions are hinted ending have more than one character or incomplete
+                        if (strlen($parts['hintedending']) > 1 || $parts['hintedendingcomplete'] === false) {
+                            $tobecontinued = get_string('tobecontinued', 'qtype_preg', null);
+                        }
+                    }
                 }
+
 
                 $wrongtail = '';
                 if ($parts['wrongtail']) {//if there is wrong tail
                     $wrongtail =  html_writer::tag('span', htmlspecialchars($parts['wrongtail']), array('class' => $this->feedback_class(0)));
                 }
 
-                $hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail.html_writer::empty_tag('br');
+                if ($hintpart === '' || $parts['hintedendingstart'] == strlen($parts['wronghead']) + strlen($parts['correctpart'])) {
+                    //Correct ending starts from partial matching fail position, show hint after correct part
+                    $hintmessage = $wronghead.$correctpart.$hintpart.$tobecontinued.$wrongtail.html_writer::empty_tag('br');
+                } else {//Hints starts inside correct part, show hint on separate string
+                    $hintmessage = $wronghead.$correctpart.$wrongtail.html_writer::empty_tag('br');//correctness of response
+                    $hintmessage .= $wronghead.$correctbeforehint.$hintpart.$tobecontinued.html_writer::empty_tag('br');//hint on the separate string
+                }
             }
         }
 
@@ -88,6 +109,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
 
     public function correct_response(question_attempt $qa) {
 
+        //TODO - If there is complete correct ending for a student's response available, show $correctpart.$hintedending instead of teacher-entered correct answer
         $correctresponse = $qa->get_question()->get_correct_response(); 
         $answer = $correctresponse['answer'];
         if (!$answer) { //Correct answer isn't set by the teacher

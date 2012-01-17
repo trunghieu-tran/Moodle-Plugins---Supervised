@@ -32,26 +32,40 @@ class qtype_preg_matching_results {
     /** @var array Length of the matches - array where 0 => full match, 1=> first subpattern etc. */
     public $length;
     /** @var character Possible next character.
-    *
-    * Should be empty string if there is no possible next character in this location.
-    */
+     *
+     * @deprecated since 2.2, use correctending[0] instead
+     */
     public $next;
     /** @var integer The number of characters left to complete matching. */
     public $left;
+    /** @var integer Start index for the correct ending.
+     *
+     * May be less than index_first[0]+length[0] if there is no way to complete matching 
+     * from current point of fail due to assertions or another reasons.
+     */
+    public $correctendingstart;
+    /** @var string A string (shortest if possible), which, been added after partial match, would give a full match.*/
+    public $correctending;
+    /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
+    public $correctendingcomplete;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                                $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
+                                $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND,
+                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
         $this->next = $next;
         $this->left = $left;
+        $this->correctendingstart = $correctendingstart;
+        $this->correctending = $correctending;
+        $this->correctendingcomplete = $correctendingcomplete;
     }
 
     /**
-    * Any match found?
-    *The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
-    */
+     * Any match found?
+     * The match considered found if at least one character is matched or there is full match of zero length (regex with just asserts)
+     */
     public function is_match() {
         if (array_key_exists(0, $this->length)) {
             return $this->full || ($this->length[0] > 0);
@@ -79,19 +93,13 @@ class qtype_preg_matching_results {
     */
     public function worse_than($other, $orequal = false, $longestmatch = false) {
 
-        //1. Full match
-        if (!$this->full && $other->full) {
+        //1. The match is definitely best (full match)
+        if (!$this->best() && $other->best()) {
             return true;
-        } elseif ($this->full && !$other->full) {
+        } elseif ($this->best() && !$other->best()) {
             return false;
         }
 
-        //2. Match have non-zero length (TODO - use is_match instead?)
-        /*if (!($this->length[0] > 0) && $other->length[0] > 0) {
-            return true;
-        } elseif ($this->length[0] > 0 && !($other->length[0] > 0)) {
-            return false;
-        }*/
         //2. Is match
         if (!$this->is_match() && $other->is_match()) {
             return true;
@@ -158,6 +166,9 @@ class qtype_preg_matching_results {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
+        $this->correctendingstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+        $this->correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
+        $this->correctendingcomplete = false;
     }
 
     /**
@@ -175,12 +186,44 @@ class qtype_preg_matching_results {
 
     /**
     * Throws exception if match results contain obvious abnormalities
+    * Also feel some values with defaults if they are not supplied by matching engine
     */
     public function validate() {
         if ($this->is_match()) {//Match found
             if (!isset($this->index_first[0]) || !isset($this->length[0])) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
+        }
+
+        //Correct ending starts before matching start
+        if ($this->correctendingstart !== qtype_preg_matching_results::NO_MATCH_FOUND && $this->correctendingstart < $this->index_first[0]) {
+            throw new qtype_preg_exception('Error: correct ending starts at'.$this->correctendingstart.' before matching starts at'.$this->index_first[0]);
+        }
+
+        //Correct ending starts after partial match ending
+        if ($this->correctendingstart !== qtype_preg_matching_results::NO_MATCH_FOUND && $this->correctendingstart < $this->index_first[0] + $this->length[0]) {
+            throw new qtype_preg_exception('Error: correct ending ends at'.$this->correctendingstart.' while matching ends at'.($this->index_first[0] + $this->length[0]));
+        }
+        
+
+        //The matching engine didn't supply correct ending start, but supplied next character (and match isn't full).
+        //We could assume that correctendingstart==index_first[0]+length[0], i.e. right after matching fail position
+        if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND && 
+            (!$this->full && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
+            $this->correctendingstart = $this->index_first[0] + $this->length[0];
+        }
+
+        //Correct ending supplied, but next character isn't
+        //TODO - remove when next would be deleted
+        if ($this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
+            $this->next = $this->correctending[0];
+        }
+
+        //Produce one-character correct ending from next
+        //TODO - remove when next would be deleted
+        if ($this->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
+            $this->correctendingcomplete = false;
+            $this->correctending = $this->next;
         }
     }
 
@@ -205,7 +248,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     //Partial matching (returning the index of last matched character)
     const PARTIAL_MATCHING = 0;
     //Returning next possible character after partial match
-    const NEXT_CHARACTER = 1;
+    const CORRECT_ENDING = 1;
     //Returning the smallest number of characters that needed to complete partial match
     const CHARACTERS_LEFT = 2;
     //Subpattern capturing during matching
@@ -296,9 +339,6 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             $subpattcnt = $this->matchresults->captured_subpatterns_count();
             if(!$this->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
                 throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
-            }
-            if(!$this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER) && $this->matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
-                throw new qtype_preg_exception('Error: next character returned while engine '.$this->name().' doesn\'t support next character generation');
             }
             if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
                 throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
@@ -470,10 +510,12 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns next possible character (to hint) or empty string if there is no one possible
+    *
+    * @deprecated since 2.2 use match_results instead
     */
     public function next_char() {
-        if ($this->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
-            return $this->matchresults->next;
+        if ($this->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+            return $this->matchresults->correctending[0];
 
         }
         throw new qtype_preg_exception('Error:'.$this->name().' class doesn\'t supports hinting');

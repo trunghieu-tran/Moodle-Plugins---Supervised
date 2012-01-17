@@ -348,7 +348,7 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /*
-    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedcharacter', 'wrongtail'
+    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedending', 'wrongtail', 'hintedendingstart', 'hintedendingcomplete'
     */
     public function response_correctness_parts($response) {
         $bestfit = $this->get_best_fit_answer($response);
@@ -374,23 +374,26 @@ class qtype_preg_question extends question_graded_automatically
             if ($firstindex != qtype_preg_matching_results::NO_MATCH_FOUND) {//there were any matched characters
                 $correctpart = substr($currentanswer, $firstindex, $length);
             }
-            $hintedcharacter = '';
-            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
-                $hintedcharacter = $matchresults->next;
+            $hintedending = '';
+            if ($matchresults->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
+                $hintedending = $matchresults->correctending;
             }
             $wrongtail = '';
             if ($firstindex + $length < strlen($currentanswer)) {//if there is wrong tail
                 $wrongtail =  substr($currentanswer, $firstindex + $length, strlen($currentanswer) - $firstindex - $length);
             }
-            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
+            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedending' => $hintedending, 'wrongtail' => $wrongtail, 
+                            'hintedendingstart' => $matchresults->correctendingstart, 'hintedendingcomplete' => $matchresults->correctendingcomplete);
         }
 
         //No match - all response is wrong, but we could hint the very first character still
         $queryengine = $this->get_query_matcher($this->engine);
         if ($queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
-            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-            if ($matchresults->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
-                $result['hintedcharacter'] = $matchresults->next;
+            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedending' => '', 'wrongtail' => '');
+            if ($matchresults->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
+                $result['hintedending'] = $matchresults->correctending;
+                $result['hintedendingstart'] = $matchresults->correctendingstart;
+                $result['hintedendingcomplete'] = $matchresults->correctendingcomplete;
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
             $result = null;

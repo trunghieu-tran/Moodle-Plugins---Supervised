@@ -86,7 +86,7 @@ class qtype_preg extends qtype_shortanswer {
         //Sanity check for engine capabilities - disabling form controls works really strange...
         $questionobj = new qtype_preg_question;
         $querymatcher = $questionobj->get_query_matcher($question->engine);
-        if (!$querymatcher->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
+        if (!$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
             $question->usehint = false;
         }
 

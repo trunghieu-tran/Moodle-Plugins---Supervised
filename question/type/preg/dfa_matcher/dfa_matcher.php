@@ -70,7 +70,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     public function is_supporting($capability) {
         switch($capability) {
         case qtype_preg_matcher::PARTIAL_MATCHING :
-        case qtype_preg_matcher::NEXT_CHARACTER :
+        case qtype_preg_matcher::CORRECT_ENDING :
         case qtype_preg_matcher::CHARACTERS_LEFT :
             return true;
             break;
