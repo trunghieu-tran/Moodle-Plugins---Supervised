@@ -228,6 +228,17 @@ class qtype_preg_matching_results {
     }
 
     /**
+    * Returns true if subpattern is captured
+    * @param subpattern subpattern number
+    */
+    public function is_subpattern_captured($subpattern) {
+        if (!isset($this->length[$subpattern])) {
+            throw new qtype_preg_exception('Error: Asked for unexisting subpattern '.$subpattern);
+        }
+        return ($this->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    /**
     * Calculates and returns last character index from first index and length
     * Use to adopt in case something can't be easily converted to using length
     * @return array of last matched character indexes of matches with (sub)patterns
@@ -240,6 +251,7 @@ class qtype_preg_matching_results {
         }
         return $index_last;
     }
+
 }
 
 class qtype_preg_matcher extends qtype_preg_regex_handler {
@@ -454,7 +466,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     /**
     * Returns true if subpattern is captured
     * @param subpattern subpattern number
-    * TODO - move to match results
+    * @deprecated since 2.2, use get_match_results() instead
     */
     public function is_subpattern_captured($subpattern) {
         if ($subpattern > $this->maxsubpatt) {
@@ -503,7 +515,6 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns (partialy) matched portion of string
-    * TODO - move to match results
     */
     public function matched_part($subpattern = 0) {
         if(array_key_exists($subpattern, $this->matchresults->index_first)) {
@@ -517,8 +528,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     /**
     * Returns next possible character (to hint) or empty string if there is no one possible
-    *
-    * @deprecated since 2.2 use match_results instead
+    * @deprecated since 2.2 use get_match_results() instead
     */
     public function next_char() {
         if ($this->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
