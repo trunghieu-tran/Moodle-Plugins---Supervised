@@ -22,8 +22,7 @@
         $this->reducecount = 0;
         $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>',
                               preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
-                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!',
-                              'duplicate' => '(?|');
+                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
     }
 
     function get_root() {
@@ -118,13 +117,6 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
     if (B->subtype == 'grouping') {    //grouping node
         A = C;
-    } elseif (B->subtype == 'duplicate') {    // duplicate subpattern numbers
-        if (C->type == preg_node::TYPE_NODE_ALT) {    // operand should be an alternation node
-            A = C;
-            A->duplicatesubpatternnumbers = true;
-        } else {
-            A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(C->indlast+1));
-        }
     } else {
         if (B->subtype === preg_node_subpatt::SUBTYPE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             A = new preg_node_subpatt;
