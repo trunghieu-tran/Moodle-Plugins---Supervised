@@ -4,20 +4,25 @@ require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 %%
+%class qtype_preg_lexer
 %function nextToken
 %char
 %state CHARCLASS
 %init{
     $this->errors = array();
+    $this->lastsubpatt = 0;
     $this->maxsubpatt = 0;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
-    //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical anilysis
+    //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis
     $this->optstack[0]->i = false;
+    $this->optstack[0]->subpattnum = -1;
+    $this->optstack[0]->parennum = -1;
     $this->optcount = 1;
 %init}
 %{
     protected $errors;
+    protected $lastsubpatt;
     protected $maxsubpatt;
     protected $optstack;
     protected $optcount;
@@ -43,7 +48,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         if ($subtype !== null) {
             $result->subtype = $subtype;
         }
-        //set i modifier for leafs
+        //Set i modifier for leafs
         if (is_a($result, 'preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
             $result->caseinsensitive = true;
         }
@@ -101,26 +106,42 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
             $cc->error = 1;
         }
     }
-    protected function push_opt_lvl() {
+    protected function push_opt_lvl($subpattnum = -1) {
         if ($this->optcount > 0) {
             $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount - 1];
+
+            if ($subpattnum != -1) {
+                $this->optstack[$this->optcount]->subpattnum = $subpattnum;
+                $this->optstack[$this->optcount]->parennum = $this->optcount;
+            }
             $this->optcount++;
         } /*else
-            error will be found in parser, lexer do nothing for this error (close unopened bracket)*/
+            error will be found in parser, lexer does nothing for this error (close unopened bracket)*/
     }
     protected function pop_opt_lvl() {
-        if ($this->optcount > 0)
+        if ($this->optcount > 0) {
+            $item = $this->optstack[$this->optcount - 1];
             $this->optcount--;
+            //Is it a pair for (?|
+            if ($item->parennum == $this->optcount) {
+                //Are we out of a (?|...) block?
+                if ($this->optstack[$this->optcount - 1]->subpattnum != -1) {
+                    $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    //Reset subpattern numeration
+                } else {
+                    $this->lastsubpatt = $this->maxsubpatt;
+                }
+            }
+        }
     }
     public function mod_top_opt($set, $unset) {
         for ($i = 0; $i < strlen($set); $i++) {
-            if (strpos($unset, $set[$i])) {//set and unset modifier at the same time is error
+            if (strpos($unset, $set[$i])) {//Setting and unsetting modifier at the same time is error
                 $text = $this->yytext;
                 $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - strlen($text), $this->yychar - 1);
                 return;
             }
         }
-        //if error does not exist, set and unset local modifier
+        //If error does not exist, set and unset local modifiers
         for ($i = 0; $i < strlen($set); $i++) {
             $this->optstack[$this->optcount - 1]->$set[$i] = true;
         }
@@ -130,7 +151,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     }
 %}
 %eof{
-        if (isset($this->cc) && is_object($this->cc)) {//End of expression inside character class
+        if (isset($this->cc) && is_object($this->cc)) {//End of the expression inside a character class
             $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1);
             $this->cc = null;
         }
@@ -210,8 +231,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \( {
     $this->push_opt_lvl();
-    $this->maxsubpatt++;
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->maxsubpatt));
+    $this->lastsubpatt++;
+    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> \) {
@@ -221,8 +243,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \(\?> {
     $this->push_opt_lvl();
-    $this->maxsubpatt++;
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->maxsubpatt));
+    $this->lastsubpatt++;
+    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?: {
@@ -231,8 +254,8 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \(\?\| {
-    $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('duplicate', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $this->push_opt_lvl($this->lastsubpatt);    //Save the top-level subpattern number
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
@@ -287,6 +310,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \| {
+    //Reset subpattern numeration inside a (?|...) group
+    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
+        $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
+    }
     $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -299,11 +326,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $numstr = substr($this->yytext(), 1);
     $numdec = intval($numstr, 10);
     if ($numdec < 10 || ($numdec <= $this->maxsubpatt && $numdec < 100)) {
-        // return a backreference
+        //Return a backreference
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
     } else {
-        // return a character
+        //Return a character
         $octal = '';
         $failed = false;
         for ($i = 0; !$failed && $i < strlen($numstr); $i++) {
@@ -313,13 +340,13 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
                 $failed = true;
             }
         }
-        if (strlen($octal) == 0) {    // if no octal digits found, it should be 0
+        if (strlen($octal) == 0) {    //If no octal digits found, it should be 0
             $octal = '0';
             $tail = $numstr;
-        } else {                                        // octal digits found
+        } else {                      //Octal digits found
             $tail = substr($numstr, strlen($octal));
         }
-        // return a single lexem if all digits are octal, an array of lexems otherwise
+        //Return a single lexem if all digits are octal, an array of lexems otherwise
         if (strlen($tail) == 0) {
             $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($octal))));
         } else {
