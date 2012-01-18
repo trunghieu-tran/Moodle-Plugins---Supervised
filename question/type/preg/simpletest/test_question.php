@@ -211,37 +211,37 @@ class qtype_preg_question_test extends UnitTestCase {
         $parts = $testquestion->response_correctness_parts(array('answer' => 'Oh! Do cats eat hats?'));
         $this->assertTrue($parts['wronghead'] == 'Oh! ');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $parts['hintedcharacter']));
+        $this->assertTrue(strstr('crb', $parts['hintedending'][0]));
         $this->assertTrue($parts['wrongtail'] == 'hats?');
         //Matching breaks inside the word
         $parts = $testquestion->response_correctness_parts(array('answer' => 'Oh! Do cats eat bets?'));
         $this->assertTrue($parts['wronghead'] == 'Oh! ');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat b');
-        $this->assertTrue(strstr('a', $parts['hintedcharacter']));
+        $this->assertTrue(strstr('a', $parts['hintedending'][0]));
         $this->assertTrue($parts['wrongtail'] == 'ets?');
         //No wrong head
         $parts = $testquestion->response_correctness_parts(array('answer' => 'Do cats eat hats?'));
         $this->assertTrue($parts['wronghead'] == '');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $parts['hintedcharacter']));
+        $this->assertTrue(strstr('crb', $parts['hintedending'][0]));
         $this->assertTrue($parts['wrongtail'] == 'hats?');
         //No wrong tail
         $parts = $testquestion->response_correctness_parts(array('answer' => 'Oh! Do cats eat '));
         $this->assertTrue($parts['wronghead'] == 'Oh! ');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $parts['hintedcharacter']));
+        $this->assertTrue(strstr('crb', $parts['hintedending'][0]));
         $this->assertTrue($parts['wrongtail'] == '');
         //No wrong tail and hinted character
         $parts = $testquestion->response_correctness_parts(array('answer' => 'Oh! Do cats eat rats?'));
         $this->assertTrue($parts['wronghead'] == 'Oh! ');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat rats?');
-        $this->assertTrue($parts['hintedcharacter'] == '');
+        $this->assertTrue($parts['hintedending'] == '');
         $this->assertTrue($parts['wrongtail'] == '');
         //No correct part - so no guess except hinting
         $parts = $testquestion->response_correctness_parts(array('answer' => '!@#$^%&'));
         $this->assertTrue($parts['wronghead'].$parts['wrongtail'] == '!@#$^%&');
         $this->assertTrue($parts['correctpart'] == '');
-        $this->assertTrue(strstr('D', $parts['hintedcharacter']));
+        $this->assertTrue(strstr('D', $parts['hintedending'][0]));
 
         ////Engine without partial matching support should show colored parts only when there is a match
         $testquestion1 = clone $this->testquestion;
@@ -252,7 +252,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $parts = $testquestion1->response_correctness_parts(array('answer' => 'Oh! Do cats eat rats? Really?'));
         $this->assertTrue($parts['wronghead'] == 'Oh! ');
         $this->assertTrue($parts['correctpart'] == 'Do cats eat rats?');
-        $this->assertTrue($parts['hintedcharacter'] == '');
+        $this->assertTrue($parts['hintedending'] == '');
         $this->assertTrue($parts['wrongtail'] == ' Really?');
 
         //Partial match but no colored string since engine don't supports partial matching

@@ -163,6 +163,12 @@ class qtype_preg_matching_results {
         $this->full = false;
         //$this->next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
+        //Produce one-character correct ending from next
+        //TODO - remove when next would be deleted
+        if ($this->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
+            $this->correctendingcomplete = false;
+            $this->correctending = $this->next;
+        }
         $this->index_first = array();
         $this->length = array();
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
@@ -172,8 +178,6 @@ class qtype_preg_matching_results {
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         $this->correctendingstart = qtype_preg_matching_results::NO_MATCH_FOUND;
-        $this->correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
-        $this->correctendingcomplete = false;
     }
 
     /**
