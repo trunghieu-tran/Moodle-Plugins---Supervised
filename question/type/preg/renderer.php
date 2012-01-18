@@ -42,9 +42,17 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $hintmessage = '';
         //TODO - decide exact conditions to show colored string. $options->correctness may be not best variant, because it associated with moodle 'hints' for questions like multichoice
         //if ($options->correctness == question_display_options::VISIBLE) {
-        if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('_render_hintnextchar')) {//specific feedback is possible or hint is requested
+        $hintkey = '';
+        $hints = $question->available_specific_hint_types();
+        foreach ($hints as $key => $value) {
+            if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
+                $hintkey = $key;
+                break;//One hint per time for now - TODO - decide what to do with several hints per time - maybe make $parts['hintedending'] an array - and $hintkey too?
+            }
+        }
+        if ($options->feedback == question_display_options::VISIBLE || $hintkey !== '') {//specific feedback is possible or hint is requested
             //Calculate strings for response coloring
-            $parts = $question->response_correctness_parts(array('answer' => $currentanswer));
+            $parts = $question->response_correctness_parts(array('answer' => $currentanswer), $hintkey);
             if ($parts !== null) {
 
                 $wronghead = '';
@@ -61,16 +69,14 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                 $correctbeforehint = '';
                 $tobecontinued = '';
                 //if hinting possible
-                if ($parts['hintedending'] !== '') {
-                    //Calculate correct part before hinting starts
-                    $beforehintlen = $parts['hintedendingstart'] - strlen($parts['wronghead']);
-                    $correctbeforehint = html_writer::tag('span', htmlspecialchars(substr($parts['correctpart'], 0, $beforehintlen)), array('class' => $this->feedback_class(1)));
+                if ($parts['hintedpart'] !== null) {
+                    $correctbeforehint = html_writer::tag('span', htmlspecialchars($parts['correctbeforehint']), array('class' => $this->feedback_class(1)));
 
-                    //Next character hint was requested
-                    if ($qa->get_last_step()->has_behaviour_var('_render_hintnextchar') && $parts['hintedending'] !== qtype_preg_matching_results::DELETE_TAIL) {
-                        $hintpart = html_writer::tag('span', htmlspecialchars($parts['hintedending'][0]), array('class' => $this->feedback_class(0.5)));
+                    //Next character hint was requested 
+                    if (!$parts['deltail']) {
+                        $hintpart = html_writer::tag('span', htmlspecialchars($parts['hintedpart']->str), array('class' => $this->feedback_class(0.5)));
                         //For one-character hint the conditions are hinted ending have more than one character or incomplete
-                        if (strlen($parts['hintedending']) > 1 || $parts['hintedendingcomplete'] === false) {
+                        if ($parts['hintedpart']->tobecontinued) {
                             $tobecontinued = get_string('tobecontinued', 'qtype_preg', null);
                         }
                     }
@@ -82,10 +88,10 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
                     $wrongtail =  html_writer::tag('span', htmlspecialchars($parts['wrongtail']), array('class' => $this->feedback_class(0)));
                 }
 
-                if ($hintpart === '' || $parts['hintedendingstart'] == strlen($parts['wronghead']) + strlen($parts['correctpart'])) {
+                if ($hintpart === '' || $parts['correctbeforehint'] == $parts['correctpart']) {
                     //Correct ending starts from partial matching fail position, show hint after correct part
                     $hintmessage = $wronghead.$correctpart.$hintpart.$tobecontinued.$wrongtail.html_writer::empty_tag('br');
-                } elseif ($parts['hintedending'] === qtype_preg_matching_results::DELETE_TAIL) {//student must delete tail to complete matching
+                } elseif ($parts['deltail']) {//student must delete tail to complete matching
                     $hintmessage = $wronghead.$correctpart.html_writer::tag('del', $wrongtail).html_writer::empty_tag('br');
                 } else {//Hints starts inside correct part, show hint on separate string
                     $hintmessage = $wronghead.$correctpart.$wrongtail.html_writer::empty_tag('br');//correctness of response

@@ -34,6 +34,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_preg_hintnextchar extends qtype_specific_hint {
 
+    /** @var object Matching results to use*/
+    public $matchresults = null;
+
     /**
      * Is hint based on response or not?
      *
@@ -54,8 +57,21 @@ class qtype_preg_hintnextchar extends qtype_specific_hint {
      * Returns specific hint value of given hint type for given response
      */
     public function specific_hint($response = null) {
-            $bestfitanswer = $this->question->get_best_fit_answer($response);
-            return $bestfitanswer['match']->next;
+            if( $this->matchresults === null) {
+                $bestfit = $this->question->get_best_fit_answer($response);
+                $this->matchresults = $bestfit['match'];
+            }
+            if ($this->matchresults->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER || $this->matchresults->correctending === qtype_preg_matching_results::DELETE_TAIL) {
+                $hint = null;
+            } else {
+                $hint = new stdClass();
+                $hint->str = $this->matchresults->correctending[0];
+                $hint->tobecontinued = false;
+                if (strlen($this->matchresults->correctending) > 1 || $this->matchresults->correctendingcomplete === false) {
+                    $hint->tobecontinued = true;
+                }
+            }
+            return $hint;
     }
 
     /** 
