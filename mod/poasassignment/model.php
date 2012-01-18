@@ -499,7 +499,7 @@ class poasassignment_model {
         } 
         //TODO удалять попытки и оценки студента по этому заданию
     }
-
+    
     function get_task_values($taskid) {
         global $DB;
         $task = $DB->get_record('poasassignment_tasks',array('id'=>$taskid));

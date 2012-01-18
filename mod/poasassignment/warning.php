@@ -111,11 +111,13 @@ switch ($action) {
         echo $OUTPUT->box_start();
         echo get_string('taketaskconfirmation','poasassignment');
         echo $OUTPUT->box_end();
+        echo '<div class="poasassignment-confirmation-buttons">';
         echo $OUTPUT->single_button(new moodle_url('warning.php',
                                 array('id'=>$id,'taskid'=>$taskid,'userid'=>$userid,'action'=>'taketaskconfirmed')), 
                                 get_string('yes'),
                                 'post');
         echo $OUTPUT->single_button(new moodle_url('view.php',array('page'=> 'taskview', 'id'=>$id, 'taskid'=>$taskid)), get_string('no'),'get');
+        echo '</div>';
         echo $OUTPUT->footer();    
         break;
     case 'taketaskconfirmed':
@@ -145,13 +147,30 @@ switch ($action) {
         
     case 'deletetask':
     	require_capability('mod/poasassignment:managetasks', $context);
-    	//Get task id
+    	// Get task id
     	if (isset($_GET['taskid'])) {
     		$taskid = $_GET['taskid'];
     	}
+    	// Breadcrumbs
     	$PAGE->set_url(new moodle_url('/mod/poasassignment/warning.php',array('id'=>$id,'taskid'=>$taskid,'action'=>'deletetask')));
+    	$url = new moodle_url('view.php', array('id' => $id, 'page' => 'tasks')); 
+    	$PAGE->navbar->add(get_string('tasks','poasassignment'), $url);
+    	
+    	// Headers
     	echo $OUTPUT->header();
-    	echo $OUTPUT->heading($poasassignment->name);
+    	$task = $DB->get_record('poasassignment_tasks', array('id' => $taskid), 'name');
+    	
+    	echo $OUTPUT->heading(
+    		$poasassignment->name.
+    		' : '.
+    		get_string('deletingtask','poasassignment').
+    		' "'.
+    		$task->name.
+    		'" (id = '.
+    		$taskid.
+    		')'
+    	);
+    	
     	
     	
     	// Get owners of the task
@@ -172,6 +191,10 @@ switch ($action) {
     			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).'</li>';
     		}
     		echo '</ul>';
+    	}
+    	else {
+    		print_string('nooneownsthetask', 'poasassignment');
+    		echo '<br/><br/>';
     	}
     	
     	// Ask user to confirm delete
@@ -205,6 +228,7 @@ switch ($action) {
     	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
     	echo $OUTPUT->footer();
     	break;
+    	
     case 'deletetaskconfirmed':
     	// User confirmed task delete action
     	

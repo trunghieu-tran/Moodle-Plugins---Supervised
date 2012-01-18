@@ -41,6 +41,7 @@ p.no-info-message {text-align: center;}
 .poasassignment-confirmation-buttons input[type=submit] {
 	width:100px;
 	margin:0 10px;
+	padding:5px 0;
 }
 .poasassignment-critical {
 	color:red;
