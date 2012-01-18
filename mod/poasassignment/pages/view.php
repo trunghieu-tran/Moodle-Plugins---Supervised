@@ -69,7 +69,14 @@ class view_page extends abstract_page {
 											  'get');
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
-
+					echo 	'<br/>'.
+							get_string('taskwastakenat', 'poasassignment').
+							' - '.
+							userdate($assignee->timetaken).
+							' ('.
+							poasassignment_model::time_difference($assignee->timetaken).
+							')';
+							
                     // If user can cancel task - show cancel button
                     if($poasmodel->can_cancel_task($assignee->id, $this->context)) {
                     //if (has_capability('mod/poasassignment:managetasks', $this->context)) {
