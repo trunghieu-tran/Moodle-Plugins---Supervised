@@ -4,7 +4,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 
-class Yylex extends JLexBase  {
+class qtype_preg_lexer extends JLexBase  {
     const YY_BUFFER_SIZE = 512;
     const YY_F = -1;
     const YY_NO_STATE = -1;

@@ -369,7 +369,7 @@ class qtype_preg_parser_test extends UnitTestCase {
         $parser = new preg_parser_yyParser;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
+        $lexer = new qtype_preg_lexer($pseudofile);
         while ($token = $lexer->nextToken()) {
             if (!is_array($token)) {
                 $parser->doParse($token->type, $token->value);
