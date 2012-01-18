@@ -347,9 +347,9 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /*
-    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedending', 'wrongtail', 'hintedendingstart', 'hintedendingcomplete'
+    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedpart', 'wrongtail', 'deltail', 'correctbeforehint'
     */
-    public function response_correctness_parts($response) {
+    public function response_correctness_parts($response, $hintkey = '') {
         $bestfit = $this->get_best_fit_answer($response);
         $answer = $bestfit['answer'];
         $matchresults = $bestfit['match'];
@@ -369,30 +369,45 @@ class qtype_preg_question extends question_graded_automatically
             if ($firstindex > 0) {//if there is wrong heading
                 $wronghead = substr($currentanswer, 0, $firstindex);
             }
+
             $correctpart = '';
             if ($firstindex != qtype_preg_matching_results::NO_MATCH_FOUND) {//there were any matched characters
                 $correctpart = substr($currentanswer, $firstindex, $length);
             }
-            $hintedending = '';
-            if ($matchresults->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
-                $hintedending = $matchresults->correctending;
+
+            $correctbeforehint = $correctpart;
+            if ($correctbeforehint !== '' && $matchresults->correctendingstart != strlen($wronghead) + strlen($correctpart)) {//hint starts before match fail position
+                $correctbeforehint = substr($correctpart, 0, $matchresults->correctendingstart - strlen($wronghead));
             }
+
+            $hintedpart = null;
+            if ($hintkey !== '') {
+                $hintobj = $this->hint_object($hintkey);
+                $hintobj->matchresults = $matchresults;
+                $hintedpart = $hintobj->specific_hint();
+            }
+
+            $deltail = false;
+            if ($matchresults->correctending === qtype_preg_matching_results::DELETE_TAIL) {    
+                $deltail = true;
+            }
+
             $wrongtail = '';
             if ($firstindex + $length < strlen($currentanswer)) {//if there is wrong tail
                 $wrongtail =  substr($currentanswer, $firstindex + $length, strlen($currentanswer) - $firstindex - $length);
             }
-            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedending' => $hintedending, 'wrongtail' => $wrongtail, 
-                            'hintedendingstart' => $matchresults->correctendingstart, 'hintedendingcomplete' => $matchresults->correctendingcomplete);
+            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail, 
+                            'correctbeforehint' =>  $correctbeforehint, 'deltail' => $deltail);
         }
 
         //No match - all response is wrong, but we could hint the very first character still
         $queryengine = $this->get_query_matcher($this->engine);
         if ($queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
-            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedending' => '', 'wrongtail' => '');
+            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedending' => '', 'wrongtail' => '', 'correctbeforehint' => '', 'deltail' => false);
             if ($matchresults->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
-                $result['hintedending'] = $matchresults->correctending;
-                $result['hintedendingstart'] = $matchresults->correctendingstart;
-                $result['hintedendingcomplete'] = $matchresults->correctendingcomplete;
+                $hintobj = $this->hint_object($hintkey);
+                $hintobj->matchresults = $matchresults;
+                $result['hintedpart'] =  $hintobj->specific_hint();
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
             $result = null;
