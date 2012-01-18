@@ -128,8 +128,7 @@ class preg_parser_yyParser
         $this->reducecount = 0;
         $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>',
                               preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
-                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!',
-                              'duplicate' => '(?|');
+                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
     }
 
     function get_root() {
@@ -166,7 +165,7 @@ class preg_parser_yyParser
         $this->error = true;
         return $newnode;
     }
-#line 172 "../preg_parser.php"
+#line 171 "../preg_parser.php"
 
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
@@ -820,12 +819,12 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 78 "../preg_parser.y"
+#line 77 "../preg_parser.y"
     function yy_r0(){
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 832 "../preg_parser.php"
-#line 81 "../preg_parser.y"
+#line 831 "../preg_parser.php"
+#line 80 "../preg_parser.y"
     function yy_r1(){
     $this->_retvalue = new preg_node_concat;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -834,8 +833,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 842 "../preg_parser.php"
-#line 89 "../preg_parser.y"
+#line 841 "../preg_parser.php"
+#line 88 "../preg_parser.y"
     function yy_r2(){
     //ECHO 'ALT <br/>';
     $this->_retvalue = new preg_node_alt;
@@ -845,8 +844,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -2]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 853 "../preg_parser.php"
-#line 98 "../preg_parser.y"
+#line 852 "../preg_parser.php"
+#line 97 "../preg_parser.y"
     function yy_r3(){
     $this->_retvalue = new preg_node_alt;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -856,8 +855,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 864 "../preg_parser.php"
-#line 108 "../preg_parser.y"
+#line 863 "../preg_parser.php"
+#line 107 "../preg_parser.y"
     function yy_r4(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
@@ -865,19 +864,12 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 873 "../preg_parser.php"
-#line 116 "../preg_parser.y"
+#line 872 "../preg_parser.php"
+#line 115 "../preg_parser.y"
     function yy_r5(){
     //ECHO 'SUBPATT '.$this->parens[$this->yystack[$this->yyidx + -2]->minor].'<br/>';
     if ($this->yystack[$this->yyidx + -2]->minor->subtype == 'grouping') {    //grouping node
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
-    } elseif ($this->yystack[$this->yyidx + -2]->minor->subtype == 'duplicate') {    // duplicate subpattern numbers
-        if ($this->yystack[$this->yyidx + -1]->minor->type == preg_node::TYPE_NODE_ALT) {    // operand should be an alternation node
-            $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
-            $this->_retvalue->duplicatesubpatternnumbers = true;
-        } else {
-            $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + -2]->minor->indfirst),  array($this->yystack[$this->yyidx + -1]->minor->indlast+1));
-        }
     } else {
         if ($this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_SUBPATT || $this->yystack[$this->yyidx + -2]->minor->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
             $this->_retvalue = new preg_node_subpatt;
@@ -892,8 +884,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -2]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 900 "../preg_parser.php"
-#line 141 "../preg_parser.y"
+#line 892 "../preg_parser.php"
+#line 133 "../preg_parser.y"
     function yy_r6(){
     //ECHO  'CONDSUB TF <br/>';
     $this->_retvalue = new preg_node_cond_subpatt;
@@ -917,8 +909,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -4]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 925 "../preg_parser.php"
-#line 164 "../preg_parser.y"
+#line 917 "../preg_parser.php"
+#line 156 "../preg_parser.y"
     function yy_r7(){
     //ECHO 'LEAF <br/>';
     if ($this->yystack[$this->yyidx + 0]->minor->type != preg_node::TYPE_LEAF_CHARSET || !$this->yystack[$this->yyidx + 0]->minor->w && !$this->yystack[$this->yyidx + 0]->minor->W) {
@@ -939,14 +931,14 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 947 "../preg_parser.php"
-#line 184 "../preg_parser.y"
+#line 939 "../preg_parser.php"
+#line 176 "../preg_parser.y"
     function yy_r8(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->reducecount++;
     }
-#line 953 "../preg_parser.php"
-#line 189 "../preg_parser.y"
+#line 945 "../preg_parser.php"
+#line 181 "../preg_parser.y"
     function yy_r9(){
     //ECHO 'UNOPENPARENS <br/>';
     $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array($this->yystack[$this->yyidx + -1]->minor->indlast + 1), array($this->yystack[$this->yyidx + -1]->minor->indlast + 1));
@@ -954,8 +946,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
     }
-#line 962 "../preg_parser.php"
-#line 197 "../preg_parser.y"
+#line 954 "../preg_parser.php"
+#line 189 "../preg_parser.y"
     function yy_r10(){
     //ECHO 'CLOSEPARENATSTART <br/>';
     $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + 0]->minor->indfirst));
@@ -963,8 +955,8 @@ static public $yy_action = array(
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 971 "../preg_parser.php"
-#line 205 "../preg_parser.y"
+#line 963 "../preg_parser.php"
+#line 197 "../preg_parser.y"
     function yy_r11(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $emptyparens = false;
@@ -983,16 +975,16 @@ static public $yy_action = array(
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     }
-#line 991 "../preg_parser.php"
-#line 224 "../preg_parser.y"
+#line 983 "../preg_parser.php"
+#line 216 "../preg_parser.y"
     function yy_r12(){
     $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array($this->yystack[$this->yyidx + 0]->minor->indfirst),  array($this->yystack[$this->yyidx + 0]->minor->indlast), $this->parens[$this->yystack[$this->yyidx + 0]->minor->subtype]);
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 999 "../preg_parser.php"
-#line 231 "../preg_parser.y"
+#line 991 "../preg_parser.php"
+#line 223 "../preg_parser.y"
     function yy_r13(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     $emptyparens = false;
@@ -1011,8 +1003,8 @@ static public $yy_action = array(
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -3]->minor->indfirst;
     }
-#line 1019 "../preg_parser.php"
-#line 250 "../preg_parser.y"
+#line 1011 "../preg_parser.php"
+#line 242 "../preg_parser.y"
     function yy_r14(){
     //ECHO 'UNCLOSEDPARENS <br/>';
     //Two unclosed parens for conditional subpatterns
@@ -1033,23 +1025,23 @@ static public $yy_action = array(
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -1]->minor->indfirst;
     }
-#line 1041 "../preg_parser.php"
-#line 279 "../preg_parser.y"
+#line 1033 "../preg_parser.php"
+#line 271 "../preg_parser.y"
     function yy_r16(){
     $this->_retvalue = $this->create_error_node(preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, array($this->yystack[$this->yyidx + 0]->minor->indfirst),  array($this->yystack[$this->yyidx + 0]->minor->indlast));
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 1049 "../preg_parser.php"
-#line 286 "../preg_parser.y"
+#line 1041 "../preg_parser.php"
+#line 278 "../preg_parser.y"
     function yy_r17(){
     $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor->subtype, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + 0]->minor->indlast));
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;//NOTE - indexes may depends on $this->yystack[$this->yyidx + 0]->minor->subtype, take into account if another lexer error would be found
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;
     }
-#line 1057 "../preg_parser.php"
+#line 1049 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1148,13 +1140,13 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 63 "../preg_parser.y"
+#line 62 "../preg_parser.y"
 
     if (!$this->error) {
         $this->create_error_node(preg_node_error::SUBTYPE_UNKNOWN_ERROR);
         $this->error = true;
     }
-#line 1163 "../preg_parser.php"
+#line 1155 "../preg_parser.php"
     }
 
     /**

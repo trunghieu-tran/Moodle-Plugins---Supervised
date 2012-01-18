@@ -152,7 +152,7 @@ class qtype_preg_regex_handler {
 
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
-        $lexer = new Yylex($pseudofile);
+        $lexer = new qtype_preg_lexer($pseudofile);
         $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
         /*old-style modifier support
         $lexer->globalmodifiers = $this->modifiers;
