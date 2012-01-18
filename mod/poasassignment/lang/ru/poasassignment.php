@@ -178,3 +178,5 @@ $string['noattemptsshort'] = 'Нет попыток';
 $string['leavecomment'] = 'Комментировать';
 $string['ownersofthetask'] = 'Следующие студенты взяли это задание';
 $string['deletetaskconfirmation'] = 'Вы уверены что хотите удалить это задание?';
+$string['deletingtaskwillchangestudentsdata'] = 'Данные о задании будут так же удалены из профилей студентов. Удаленное задание будет исключено из статистики студента.';
+$string['taskhidden'] = 'Задание скрыто от студентов';

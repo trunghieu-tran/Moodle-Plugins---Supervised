@@ -17,12 +17,13 @@ global $OUTPUT,$DB,$PAGE;
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
+$context = get_context_instance(CONTEXT_MODULE, $cm->id);
 switch ($action) {
     case 'disablepenalty':
         $attemptid=optional_param('attemptid', -1, PARAM_INT);
         if(!isset($attemptid) || $attemptid < 1)
             print_error('invalidattemptid', 'poasassignment');
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        
         if(has_capability('mod/poasassignment:grade', $context)) {
             $attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid));
             $attempt->disablepenalty = 1;
@@ -34,7 +35,6 @@ switch ($action) {
         $attemptid=optional_param('attemptid',-1,PARAM_INT);
         if(!isset($attemptid) ||$attemptid<1)
             print_error('invalidattemptid','poasassignment');
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         if(has_capability('mod/poasassignment:grade',$context)) {
             $attempt=$DB->get_record('poasassignment_attempts',array('id'=>$attemptid));
             $attempt->disablepenalty=0;
@@ -46,8 +46,6 @@ switch ($action) {
         $assigneeid = optional_param('assigneeid', -1, PARAM_INT);
         if(!isset($assigneeid) ||$assigneeid<1)
             print_error('invalidassigneeid','poasassignment');
-        
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         if($poasmodel->can_cancel_task($assigneeid, $context)) {
         //if(has_capability('mod/poasassignment:managetasks',$context)) {
             $poasmodel->cancel_task($assigneeid);
@@ -61,7 +59,6 @@ switch ($action) {
             redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
         }
     case 'deletefield':
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
         require_capability('mod/poasassignment:managetasksfields',$context);
         $fieldid=optional_param('fieldid',-1,PARAM_INT);
         $PAGE->set_url('/mod/poasassignment/warning.php?id='.$cm->id.'&fieldid='.$fieldid.'&action=deletefield');
@@ -87,6 +84,7 @@ switch ($action) {
         echo $OUTPUT->footer();    
         break;
     case 'deletefieldconfirmed':
+    	require_capability('mod/poasassignment:managetasksfields',$context);
         if (isset($_POST['fieldid']))
             $fieldid = $_POST['fieldid'];
         if(!isset($fieldid) ||$fieldid<1)
@@ -146,6 +144,7 @@ switch ($action) {
         break;
         
     case 'deletetask':
+    	require_capability('mod/poasassignment:managetasks', $context);
     	//Get task id
     	if (isset($_GET['taskid'])) {
     		$taskid = $_GET['taskid'];
@@ -177,6 +176,11 @@ switch ($action) {
     	
     	// Ask user to confirm delete
     	print_string('deletetaskconfirmation', 'poasassignment');
+    	if (count($owners) > 0) {
+    		echo ' <span class="poasassignment-critical">(';
+    		print_string('deletingtaskwillchangestudentsdata', 'poasassignment');
+    		echo ')</span>';
+    	}
     	$yesbutton =  $OUTPUT->single_button(
 			    			new moodle_url(
 		    					'warning.php',
@@ -200,5 +204,16 @@ switch ($action) {
     				);
     	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
     	echo $OUTPUT->footer();
+    	break;
+    case 'deletetaskconfirmed':
+    	// User confirmed task delete action
+    	
+    	require_capability('mod/poasassignment:managetasks', $context);
+    	//Get task id
+    	if (isset($_POST['taskid'])) {
+    		$taskid = $_POST['taskid'];
+    	}
+    	$poasmodel->delete_task($taskid);
+    	redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')));
     	break;
 }
