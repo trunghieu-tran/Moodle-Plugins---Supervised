@@ -4,6 +4,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 %%
+%class qtype_preg_lexer
 %function nextToken
 %char
 %state CHARCLASS
