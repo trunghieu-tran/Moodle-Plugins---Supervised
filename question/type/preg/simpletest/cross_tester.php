@@ -145,9 +145,9 @@ class qtype_preg_cross_tester extends UnitTestCase {
                 $indexlastpassed = ($expected['length'][0] == $obtained->length[0]);
             }
             // checking next possible character
-            if ($matcher->is_supporting(qtype_preg_matcher::NEXT_CHARACTER)) {
-                $nextpassed = (($expected['next'] === '' && $obtained->next === '') ||                                                            // both results are empty
-                               ($expected['next'] !== '' && $obtained->next !== '' && strpos($expected['next'], $obtained->next) !== false));    // expected 'next' contains obtained 'next'
+            if ($matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+                $nextpassed = (($expected['next'] === '' && $obtained->next === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||                                                           // both results are empty
+                               ($expected['next'] !== '' && $obtained->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['next'], $obtained->next) !== false));    // expected 'next' contains obtained 'next'
             } else {
                 $nextpassed = true;
             }
