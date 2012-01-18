@@ -431,7 +431,7 @@ class poasassignment_model {
         return $taskid;
     }
 
-    function update_task($taskid,$task) {
+    function update_task($taskid, $task) {
         global $DB;
         $task->id=$taskid;
         $task->poasassignmentid=$this->poasassignment->id;
@@ -471,8 +471,7 @@ class poasassignment_model {
     }
 
     /**
-     * Delete task from DB, it's taskfield values,
-     * connected data from students
+     * Delete task from DB, it's taskfield values, connected data from students
      * @param int $taskid task id
      */
     function delete_task($taskid) {
@@ -492,11 +491,8 @@ class poasassignment_model {
         
         // Delete task from students
         $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), '', 'id, taskid, taskindex');
-        foreach ($assignees as $assignee) {
-        	$assignee->taskid = 0;
-        	$assignee->taskindex--;        	
-        	$DB->update_record('poasassignment_assignee', $assignee);
-        } 
+        $DB->delete_records('poasassignment_assignee', array('taskid' => $taskid));
+        
         //TODO удалять попытки и оценки студента по этому заданию
     }
     
@@ -933,14 +929,7 @@ class poasassignment_model {
         global $DB;
         if(!$DB->record_exists('poasassignment_assignee',
                 array('userid' => $userid, 'poasassignmentid' => $this->poasassignment->id))) {
-
-            $rec = new stdClass();
-            $rec->userid = $userid;
-            $rec->poasassignmentid = $this->poasassignment->id;
-            $rec->taskid = 0;
-            $rec->taskindex = 0;
-            $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
-
+			$rec = $this->create_assignee($userid);
         }
         else {
             $rec = $DB->get_record('poasassignment_assignee',
@@ -949,6 +938,24 @@ class poasassignment_model {
         $this->assignee->id = $rec->id;
 
         return $rec;
+    }
+    
+    /**
+     * Create assignee record for user
+     * 
+     * @access private
+     * @param int $userid user id
+     * @return object record
+     */
+    private function create_assignee($userid) {
+    	$rec = new stdClass();
+    	$rec->userid = $userid;
+    	$rec->poasassignmentid = $this->poasassignment->id;
+    	$rec->taskid = 0;
+    	$rec->taskindex = 0;
+    	$rec->timetaken = 0;
+    	$rec->id = $DB->insert_record('poasassignment_assignee', $rec);
+    	return $rec; 
     }
     // Runs after adding submission. Calls all graders, used in module.
     public function test_attempt($attemptid) {
@@ -1022,7 +1029,8 @@ class poasassignment_model {
         //$rec->userid=$userid;
         //$rec->poasassignmentid=$this->poasassignment->id;
         $rec->taskid = $taskid;
-        $rec->taskindex++;
+        $rec->taskindex++;        
+        $rec->timetaken = time();
         $DB->update_record('poasassignment_assignee', $rec);
         $this->assignee->id = $rec->id;
 

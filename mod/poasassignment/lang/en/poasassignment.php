@@ -288,3 +288,4 @@ $string['deletetaskconfirmation'] = 'Are you sure you want to delete this task?'
 $string['deletingtaskwillchangestudentsdata'] = 'Deleting the task will cause effect on students. Deleted task will be excluded from student\'s statistics';
 $string['deletingtask'] = 'Deleting task';
 $string['nooneownsthetask'] = 'Nobody owns this task';
+$string['taskwastakenat'] = 'Task was taken at';

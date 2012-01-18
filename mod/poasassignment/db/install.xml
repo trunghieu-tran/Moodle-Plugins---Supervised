@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/db" VERSION="20110619" COMMENT="XMLDB file for Moodle mod/poasassignment"
+<XMLDB PATH="mod/poasassignment/db" VERSION="20120118" COMMENT="XMLDB file for Moodle mod/poasassignment"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -117,10 +117,9 @@
     <TABLE NAME="poasassignment_assignee" COMMENT="Assignee = user + attempts + task" PREVIOUS="poasassignment_criterions" NEXT="poasassignment_submissions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="teacher"/>
-        <FIELD NAME="teacher" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="timemarked"/>
-        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="teacher" NEXT="poasassignmentid"/>
-        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemarked" NEXT="taskid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="timetaken"/>
+        <FIELD NAME="timetaken" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timetaken" NEXT="taskid"/>
         <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="finalized"/>
         <FIELD NAME="finalized" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid" NEXT="lastattemptid"/>
         <FIELD NAME="lastattemptid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="finalized" NEXT="taskindex"/>

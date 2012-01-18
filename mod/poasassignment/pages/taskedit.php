@@ -58,25 +58,23 @@ class taskedit_page extends abstract_page {
         $this->mform = new taskedit_form(null, array('id' => $model->get_cm()->id, 
                                        'taskid' => $this->taskid,
                                        'poasassignmentid' => $poasassignmentid));
+        // Cancel editing
         if ($this->mform->is_cancelled()) {
             redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 
                                                       'page' => 'tasks')), 
                                                       null, 
                                                       0);
         }
-        else {
-            if ($this->mform->get_data()) {
-                $data = $this->mform->get_data();
-                if ($this->taskid > 0) {
-                    $model->update_task($this->taskid,$data);            
-                }
-                else {
-                    $model->add_task($data);
-                }
-                redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
-            }
-            
+        // Add task if needed
+        if ($this->mform->get_data()) {
+        	$data = $this->mform->get_data();
+        	if ($this->taskid <= 0) {
+        		$model->add_task($data);
+        	}
+        	redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
         }
+        
+        // Get additional fields to the form
         if ($this->taskid > 0) {
             $data = $model->get_task_values($this->taskid);
             $data->id = $model->get_cm()->id;
@@ -85,7 +83,20 @@ class taskedit_page extends abstract_page {
     }
     
     function view() {
-       	$this->mform->display();
+    	$model = poasassignment_model::get_instance();
+    	if ($this->mform->get_data()) {
+			$data = $this->mform->get_data();
+    		if ($this->taskid > 0) {
+    			$model->update_task($this->taskid, $data);
+    		}
+    		else {
+    			$model->add_task($data);
+    		}
+    		redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
+    	}
+    	else {
+       		$this->mform->display();
+    	}
     }
     
     public static function display_in_navbar() {

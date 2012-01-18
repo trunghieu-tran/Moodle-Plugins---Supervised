@@ -182,3 +182,4 @@ $string['deletingtaskwillchangestudentsdata'] = 'Данные о задании 
 $string['taskhidden'] = 'Задание скрыто от студентов';
 $string['deletingtask'] = 'Удаление задания';
 $string['nooneownsthetask'] = 'Ни один студент не выбрал данное задание';
+$string['taskwastakenat'] = 'Задание было взято';
