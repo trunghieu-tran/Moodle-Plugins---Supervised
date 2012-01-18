@@ -144,8 +144,61 @@ switch ($action) {
         
         redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
         break;
+        
+    case 'deletetask':
+    	//Get task id
+    	if (isset($_GET['taskid'])) {
+    		$taskid = $_GET['taskid'];
+    	}
+    	$PAGE->set_url(new moodle_url('/mod/poasassignment/warning.php',array('id'=>$id,'taskid'=>$taskid,'action'=>'deletetask')));
+    	echo $OUTPUT->header();
+    	echo $OUTPUT->heading($poasassignment->name);
+    	
+    	
+    	// Get owners of the task
+    	if ($taskid > 0) {
+    		$owners = $poasmodel->get_task_owners($taskid);
+    	}
+    	else {
+    		print_error('invalidtaskid','poasassignment');
+    	}
+    	
+    	// If there are students, that own this task, show them
+    	if (count($owners) > 0) {
+    		$usersinfo = $poasmodel->get_users_info($owners);
+    		print_string('ownersofthetask', 'poasassignment');
+    		echo '<ul class="taskowners">';
+    		foreach ($usersinfo as $userinfo) {
+    			$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).'</li>';
+    		}
+    		echo '</ul>';
+    	}
+    	
+    	// Ask user to confirm delete
+    	print_string('deletetaskconfirmation', 'poasassignment');
+    	$yesbutton =  $OUTPUT->single_button(
+			    			new moodle_url(
+		    					'warning.php',
+				    			array(	'id' => $id,
+				    					'taskid' => $taskid,
+				    					'action' => 'deletetaskconfirmed'
+				    			)
+			    			),
+    						get_string('yes'),
+    						'post'
+    					);
+    	$nobutton =  $OUTPUT->single_button(
+    					new moodle_url(
+    							'view.php',
+				    			array(
+			    					'id' => $id,
+			    					'page' => 'tasks')
+				    			),
+    					get_string('no'),
+    					'get'
+    				);
+    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+    	echo $OUTPUT->footer();
+    	break;
 }
-//require_capability('mod/poasassignment:managetasks',get_context_instance(CONTEXT_MODULE,$cm->id));
-
-//add_to_log($course->id, 'poasassignment', 'view', "view.php?id=$cm->id&tab=$tab", $poasassignment->name, $cm->id);
-

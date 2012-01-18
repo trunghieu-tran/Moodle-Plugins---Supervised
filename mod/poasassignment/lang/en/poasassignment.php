@@ -283,3 +283,5 @@ $string['putmax'] = 'Put 100';
 $string['puttotal'] = 'Put total';
 $string['putcustom'] = 'Put custom';
 $string['createcriterions'] = 'Create criterions';
+$string['ownersofthetask'] = 'Students that own the task';
+$string['deletetaskconfirmation'] = 'Are you sure you want to delete this task?';

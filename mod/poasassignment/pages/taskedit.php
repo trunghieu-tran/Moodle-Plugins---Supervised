@@ -5,6 +5,7 @@ require_once(dirname(dirname(__FILE__)) . '/model.php');
 
 class taskedit_page extends abstract_page {
     private $taskid;
+    private $owners;
     
     function __construct() {
         global $DB;
@@ -52,15 +53,7 @@ class taskedit_page extends abstract_page {
             else
                 print_error('invalidtaskid','poasassignment');
         }
-        if ($this->mode == DELETE_MODE) {
-            if ($this->taskid > 0) {
-                //TODO delete task and task values & references from student's pagele
-                $model->delete_task($this->taskid);
-                redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
-            } 
-            else
-                print_error('invalidtaskid','poasassignment');
-        }
+        
         $poasassignmentid = $model->get_poasassignment()->id;
         $this->mform = new taskedit_form(null, array('id' => $model->get_cm()->id, 
                                        'taskid' => $this->taskid,
@@ -90,9 +83,11 @@ class taskedit_page extends abstract_page {
             $this->mform->set_data($data);
         }
     }
+    
     function view() {
-        $this->mform->display();
+       	$this->mform->display();
     }
+    
     public static function display_in_navbar() {
         return false;
     }

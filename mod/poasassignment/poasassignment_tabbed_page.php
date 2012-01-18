@@ -69,9 +69,18 @@ class poasassignment_tabbed_page {
         require_capability('mod/poasassignment:view', $model->get_context());
 		
         // Check available date or students
-		if (($error = $model->check_dates()) != null) {
-			print_error($error, 'poasassignment');
-		}
+        if (!$model->is_opened()) {
+        	print_error('thismoduleisntopenedyet', 
+        			'poasassignment',
+        			'', 
+        			null, 
+        			userdate(time()).'<'.userdate($model->get_poasassignment()->availabledate));
+        }
+        	
+        if ($error = $model->check_dates()) {
+        	print_error($error, 'poasassignment');
+        }
+        
         // Check abilities and execute page's logic
 		$poasassignmentpage = new $pagetype($model->get_cm(), 
 											$model->get_poasassignment());
