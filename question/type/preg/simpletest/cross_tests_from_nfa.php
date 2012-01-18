@@ -408,6 +408,48 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_subpatt_duplicate_simple() {
+        $test1 = array( 'str'=>'cat-cats',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>7),
+                        'length'=>array(0=>8,1=>3,2=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'dog-dogs',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>7),
+                        'length'=>array(0=>8,1=>3,2=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(?|(cat)|(dog))-\1(s)',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_subpatt_duplicate() {
+        $test1 = array( 'str'=>'abee',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1,3=>-1,4=>2),
+                        'length'=>array(0=>4,1=>1,2=>1,3=>-1,4=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test2 = array( 'str'=>'acdee',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1,3=>2,4=>3),
+                        'length'=>array(0=>5,1=>1,2=>1,3=>1,4=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(a)(?|(b)|(c)(d))(e)\4',
+                     'tests'=>array($test1, $test2));
+    }
+
     function data_for_test_quant_qu() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
