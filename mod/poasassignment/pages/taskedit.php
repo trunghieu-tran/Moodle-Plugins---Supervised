@@ -70,8 +70,8 @@ class taskedit_page extends abstract_page {
         	$data = $this->mform->get_data();
         	if ($this->taskid <= 0) {
         		$model->add_task($data);
-        	}
-        	redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
+        		redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
+        	}        	
         }
         
         // Get additional fields to the form
@@ -87,16 +87,26 @@ class taskedit_page extends abstract_page {
     	if ($this->mform->get_data()) {
 			$data = $this->mform->get_data();
     		if ($this->taskid > 0) {
-    			$model->update_task($this->taskid, $data);
+    			$this->confirm_update($data);
+    			//$model->update_task($this->taskid, $data);
     		}
-    		else {
-    			$model->add_task($data);
-    		}
-    		redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id, 'page' => 'tasks')), null, 0);
     	}
     	else {
        		$this->mform->display();
     	}
+    }
+    
+    /**
+     * Show confirm update screen
+     * 
+     * @access public
+     * @param mixed $data - updated task data
+     */
+    public function confirm_update($data) {
+    	$model = poasassignment_model::get_instance();
+    	$owners = $model->get_task_owners($this->taskid);
+    	
+    	print_r($owners);
     }
     
     public static function display_in_navbar() {
