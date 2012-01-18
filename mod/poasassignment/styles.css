@@ -42,3 +42,7 @@ p.no-info-message {text-align: center;}
 	width:100px;
 	margin:0 10px;
 }
+.poasassignment-critical {
+	color:red;
+	font-weight:bold;
+}

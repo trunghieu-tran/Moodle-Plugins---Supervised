@@ -470,9 +470,17 @@ class poasassignment_model {
         }
     }
 
+    /**
+     * Delete task from DB, it's taskfield values,
+     * connected data from students
+     * @param int $taskid task id
+     */
     function delete_task($taskid) {
         global $DB;
+        // Delete task record
         $DB->delete_records('poasassignment_tasks',array('id'=>$taskid));
+        
+        // Delete task values
         $taskvalues = $DB->get_records('poasassignment_task_values',array('taskid'=>$taskid));
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
         foreach ($taskvalues as $taskvalue) {
@@ -481,6 +489,15 @@ class poasassignment_model {
                 $this->delete_files($cm->id,'poasassignmenttaskfiles',$taskvalue->id);
         }
         $DB->delete_records('poasassignment_task_values',array('taskid'=>$taskid));
+        
+        // Delete task from students
+        $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), '', 'id, taskid, taskindex');
+        foreach ($assignees as $assignee) {
+        	$assignee->taskid = 0;
+        	$assignee->taskindex--;        	
+        	$DB->update_record('poasassignment_assignee', $assignee);
+        } 
+        //TODO удалять попытки и оценки студента по этому заданию
     }
 
     function get_task_values($taskid) {
