@@ -7,6 +7,9 @@
 	border: none;
 }
 /*.poasassignment-table {width:100%}*/
+.poasassignment-table {
+    margin: 0 auto;
+}
 .poasassignment-table .header,
 .poasassignment-table th { background: none repeat scroll 0 0 #f6f6f6; font-weight:bold;}
 .poasassignment-table .header,
@@ -28,3 +31,14 @@ p.no-info-message {text-align: center;}
 /*.buttons .singlebutton{}
 #page-mod-poasassignment-view .header { background: none repeat scroll 0 0 #f6f6f6; border-bottom-width: 2px; }
 #page-mod-poasassignment-view th {font-weight: normal;}*/
+
+.poasassignment-confirmation-buttons {
+	text-align: center;
+}
+.poasassignment-confirmation-buttons .singlebutton {
+	display: inline-block;
+}
+.poasassignment-confirmation-buttons input[type=submit] {
+	width:100px;
+	margin:0 10px;
+}

@@ -1296,6 +1296,13 @@ class poasassignment_model {
             }
         }
     }
+    
+    /**
+     * Get user's groups
+     * @param int $userid user id
+     * @param int $courseid course id
+     * @return array groups identoficators
+     */
     public function get_user_groups($userid, $courseid) {
         global $DB;
         $groupmembers = $DB->get_records('groups_members', array('userid' => $userid));
@@ -1402,18 +1409,21 @@ class poasassignment_model {
         }
 
     }
+    
+    /**
+     * Проверить право пользователя на просмотр задания (проверка даты открытия)
+     */
+    public function is_opened() {
+    	if ($this->get_poasassignment()->availabledate != 0) {
+    		if (time() < $this->get_poasassignment()->availabledate) {
+    			if (!has_capability('mod/poasassignment:managetasks', $this->get_context())) {
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
+    }
 	public function check_dates() {
-		// Проверка параметров, связанных с датой открытия задания
-		if ($this->get_poasassignment()->availabledate != 0) {
-			if (time() < $this->get_poasassignment()->availabledate) {
-				// TODO полный список capability, позволяющий заходить в задание до открытия
-				if (!has_capability('mod/poasassignment:managetasks', $this->get_context())) {
-					// Если у пользователя нет права на просмотр задания до открытия - сообщить
-					// об ошибке
-					return 'thismoduleisntopenedyet';
-				}
-			}
-		}
 		// Проверка параметров, связанных с датой выбора задания
 		if (has_capability('mod/poasassignment:havetask', $this->get_context())
 			&& $this->get_poasassignment()->choicedate != 0) {
@@ -1529,5 +1539,41 @@ class poasassignment_model {
             return $students;
         else
             return null;
+    }
+    
+    /**
+     *  Get owners of task
+     * @param int $taskid task id
+     * @return mixed array of students
+     */
+    public function get_task_owners($taskid) {
+    	global $DB;
+    	$assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), 'userid', 'userid, id');
+    	return $assignees;
+    }
+    
+    public function get_users_info(array $assignees) {
+    	global $DB;
+    	foreach ($assignees as $assignee) {
+    		$assignee->userinfo = $DB->get_record('user', array('id' => $assignee->userid), 'firstname, lastname');
+    		$assignee->usergroups = $this->get_user_groups_extended($assignee->userid);
+    	}
+    	return $assignees;
+    }
+    
+    /**
+     *  Get id, name and description of all user's groups
+     * @param int $userid user id
+     * @return array groups
+     */
+    public function get_user_groups_extended($userid) {
+    	global $DB;
+    	$sql = "SELECT gr.name, gr.description, gr.id
+		    	FROM {groups} gr
+		    	JOIN {groups_members} grmem
+		    	ON  grmem.groupid = gr.id
+		    	WHERE   grmem.userid = $userid";
+    	$groups = $DB->get_records_sql($sql);
+    	return $groups;
     }
 }

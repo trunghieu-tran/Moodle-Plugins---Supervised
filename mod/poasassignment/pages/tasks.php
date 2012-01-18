@@ -1,17 +1,17 @@
 <?php
 global $CFG;
 require_once('abstract_page.php');
-require_once(dirname(dirname(__FILE__)) . '/model.php');   
+require_once(dirname(dirname(__FILE__)) . '/model.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;
-    
+
     function tasks_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
     }
-    
+
     function has_satisfying_parameters() {
         global $DB,$USER;
         $flag = $this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS;
@@ -19,7 +19,7 @@ class tasks_page extends abstract_page {
             $this->lasterror='errorindtaskmodeisdisabled';
             return false;
         }
-        if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id, 'poasassignmentid'=>$this->poasassignment->id))) 
+        if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id, 'poasassignmentid'=>$this->poasassignment->id)))
             if (isset($assignee->taskid) && $assignee->taskid > 0) {
                 if (!has_capability('mod/poasassignment:managetasks',
                         get_context_instance(CONTEXT_MODULE,$this->cm->id))) {
@@ -27,12 +27,12 @@ class tasks_page extends abstract_page {
                     return false;
                 }
             }
-        
+
         return true;
     }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
-        
+
         $hascapmanage=has_capability('mod/poasassignment:managetasks',
                             get_context_instance(CONTEXT_MODULE, $this->cm->id));
 
@@ -41,20 +41,21 @@ class tasks_page extends abstract_page {
         $taskgivername = $tg->name;
         $taskgiver = new $taskgivername();
         $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
-        
-        
+
+
 
         if ($hascapmanage || $taskgivername::show_tasks()) {
             $this->view_table($hascapmanage, $taskgiver);
             $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
         }
+
         if ($hascapmanage) {
             $id = $this->cm->id;
             echo '<div align="center">';
-            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addbuttontext','poasassignment')); 
+            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addbuttontext','poasassignment'));
             echo '</div>';
         }
-        
+
     }
     private function view_table($hascapmanage, $taskgiver) {
         global $DB, $OUTPUT, $PAGE, $USER;
@@ -62,13 +63,13 @@ class tasks_page extends abstract_page {
         $table = new flexible_table('mod-poasassignment-tasks');
         $table->baseurl = $PAGE->url;
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid' => $this->poasassignment->id));
-        
-        
+
+
         $columns[]=get_string('taskname', 'poasassignment');
         $columns[]=get_string('taskdescription', 'poasassignment');
         $headers[]=get_string('taskname', 'poasassignment');
         $headers[]=get_string('taskdescription', 'poasassignment');
-        
+
         if (count($fields)) {
             foreach ($fields as $field) {
                 if ($field->showintable>0) {
@@ -94,7 +95,7 @@ class tasks_page extends abstract_page {
                           get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
             $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
         }
-        // Else show available for user tasks 
+        // Else show available for user tasks
         else {
             $tasks = $poasmodel->get_available_tasks($USER->id);
         }
@@ -115,12 +116,17 @@ class tasks_page extends abstract_page {
             $namecolumn.=$taskgiver->get_task_extra_string($task->id,$this->cm->id);
 
             if ($hascapmanage) {
-               
+
                 $updateurl = new moodle_url('view.php',
                                             array('taskid'=>$task->id,'id'=>$this->cm->id,'page' => 'taskedit'),'u','get');
-                $deleteurl = new moodle_url('view.php',
-                                            array('taskid'=>$task->id,'mode'=>DELETE_MODE,'id'=>$this->cm->id,'page' => 'taskedit'),'d','get');
-                
+                $deleteurl = new moodle_url('warning.php',
+                                            array('taskid'=>$task->id,
+                                            		'action'=>'deletetask',
+                                            		'id'=>$this->cm->id
+                                            		),
+                							'd',
+                							'get');
+
                 $showicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
                             '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
                 $hideicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
@@ -154,7 +160,7 @@ class tasks_page extends abstract_page {
                     $namecolumn .= $hideicon;
                 }
                 $namecolumn.=' '.$updateicon.' '.$deleteicon;
-                
+
             }
             if ($task->hidden)
                 $namecolumn.='</font>';
