@@ -23,6 +23,8 @@ class qtype_preg_matching_results {
     const UNKNOWN_NEXT_CHARACTER = '';
     //How many characters left is unknown
     const UNKNOWN_CHARACTERS_LEFT = 999999999;
+    //There is no next character: characters should be deleted to form correct match
+    const DELETE_TAIL = null;
 
 
     /** @var boolean Is match full or partial? */
@@ -44,7 +46,10 @@ class qtype_preg_matching_results {
      * from current point of fail due to assertions or another reasons.
      */
     public $correctendingstart;
-    /** @var string A string (shortest if possible), which, been added after partial match, would give a full match.*/
+    /** @var string A string (shortest if possible), which, been added after partial match, would give a full match.
+     *
+     * Should be UNKNOWN_NEXT_CHARACTER if undetermined by engine, DELETE_TAIL if there is nothing to append, but we should delete instead
+     */
     public $correctending;
     /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
     public $correctendingcomplete;
