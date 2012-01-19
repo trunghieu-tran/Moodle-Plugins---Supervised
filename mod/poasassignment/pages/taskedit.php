@@ -107,6 +107,48 @@ class taskedit_page extends abstract_page {
     	$owners = $model->get_task_owners($this->taskid);
     	
     	print_r($owners);
+    	echo '<br/>';
+    	
+    	// If there are students, that own this task, show them
+    	if (count($owners) > 0) {
+    		$usersinfo = $model->get_users_info($owners);
+    		print_string('ownersofthetask', 'poasassignment');
+    		echo '<ul class="taskowners">';
+    		foreach ($usersinfo as $userinfo) {
+    			$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).'</li>';
+    			// Show information about assignee's attempts and grades
+    			if ($attempt = $model->assignee_last_attempt($userinfo->id)) {
+    				print_string('hasattempts', 'poasassignment');
+    				// If assignee has an attempt(s), show information about his grade
+    				if ($attempt->rating != null) {
+    					// Show actual grade with penalty
+						echo '. ';
+						print_string('hasgrade', 'poasassignment');
+						echo ' (';
+						echo $attempt->rating;
+						echo ' - ';
+						echo '<span style="color:red;">'.$model->get_penalty($attempt->id).'</span>';
+						echo ' = ';
+						echo $attempt->rating - $model->get_penalty($attempt->id);
+						echo ')';
+    				}
+    				else {
+    					// Looks like assignee has no grade or outdated grade
+    				}
+    			}
+    			else {
+    				print_string('hasnoattempts', 'poasassignment');
+    				echo '. ';
+    				print_string('nograde', 'poasassignment');
+    			}
+    		}
+    		echo '</ul>';
+    	}
+    	else {
+    		print_string('nooneownsthetask', 'poasassignment');
+    		echo '<br/><br/>';
+    	}
     }
     
     public static function display_in_navbar() {
