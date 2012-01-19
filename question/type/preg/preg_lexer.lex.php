@@ -1167,7 +1167,12 @@ array(
                             {
     $str = substr($this->yytext(), 3);
     $str = substr($str, 0, strlen($str) - 1);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $numdec = intval($str, 10);
+    //Is it a relative backreference? Is so, convert it to an absolute one
+    if ($numdec < 0) {
+        $numdec = $this->lastsubpatt + $numdec;
+    }
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numdec));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
