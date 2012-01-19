@@ -82,11 +82,6 @@ abstract class qtype_specific_hint {
      */
     abstract public function hint_available($response = null);
 
-    /** 
-     * Returns specific hint value for given response
-     */
-    abstract public function specific_hint($response = null);
-
     /**
      * Returns whether response is used to calculate penalty (cost) for the hint
      */
@@ -348,6 +343,7 @@ class qtype_preg_question extends question_graded_automatically
 
     /*
     * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedpart', 'wrongtail', 'deltail', 'correctbeforehint'
+    * @deprecated since 2.2
     */
     public function response_correctness_parts($response, $hintkey = '') {
         $bestfit = $this->get_best_fit_answer($response);
@@ -384,7 +380,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($hintkey !== '') {
                 $hintobj = $this->hint_object($hintkey);
                 $hintobj->matchresults = $matchresults;
-                $hintedpart = $hintobj->specific_hint();
+                $hintedpart = '';//$hintobj->specific_hint();//No such function anymore
             }
 
             $deltail = false;
@@ -407,7 +403,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {//if hint possible
                 $hintobj = $this->hint_object($hintkey);
                 $hintobj->matchresults = $matchresults;
-                $result['hintedpart'] =  $hintobj->specific_hint();
+                $result['hintedpart'] =  '';//$hintobj->specific_hint();//No such function anymore
             }
         } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
             $result = null;
