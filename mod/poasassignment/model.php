@@ -1493,12 +1493,17 @@ class poasassignment_model {
 		}
 		return $result;
 	}
-	/*
-	 * @return attempt or null
-	 */
+	
+	 /**
+     * Get last attempt record of the assignee
+     * 
+     * @access public
+     * @param int $assigneeid assignee's id
+     * @return object attempt record or null
+     */
 	public function get_last_attempt($assigneeid) {
 		global $DB;
-		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
+		$rec = $DB->get_record_sql("SELECT id, attemptdate, rating FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY id DESC LIMIT 1;", array($assigneeid));
 		return $rec;
 	}
 	/**
@@ -1605,23 +1610,5 @@ class poasassignment_model {
     	$groups = $DB->get_records_sql($sql);
     	return $groups;
     }
-    
-    /**
-     * Get last attempt record of the assignee
-     * 
-     * @access public
-     * @param int $assigneeid assignee's id
-     * @return object attempt record or null
-     */
-    public function assignee_last_attempt($assigneeid) {
-		global $DB;
-		$attempts =  $DB->get_records(
-					'poasassignment_attempts', 
-					array('assigneeid' => $assigneeid), 
-					'id desc', 
-					'id, attemptdate, rating',
-					0,
-					1);
-		return array_pop($attempts);
-    }
+
 }

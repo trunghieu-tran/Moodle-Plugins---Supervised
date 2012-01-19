@@ -97,6 +97,24 @@ class taskedit_page extends abstract_page {
     }
     
     /**
+     * Get "rating - penaty = total" string 
+     *  
+     * @access private
+     * @param int $rating
+     * @param int $penalty
+     */
+    private function show_rating_methematics($rating, $penalty) {
+    	$string = '';
+    	
+    	$string .= $rating;
+		$string .= ' - ';
+		$string .= '<span style="color:red;">'.$penalty.'</span>';
+		$string .= ' = ';
+		$string .= $rating - $penalty;
+		
+		return $string;
+    }
+    /**
      * Show confirm update screen
      * 
      * @access public
@@ -106,42 +124,53 @@ class taskedit_page extends abstract_page {
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_task_owners($this->taskid);
     	
-    	print_r($owners);
-    	echo '<br/>';
-    	
     	// If there are students, that own this task, show them
     	if (count($owners) > 0) {
     		$usersinfo = $model->get_users_info($owners);
     		print_string('ownersofthetask', 'poasassignment');
     		echo '<ul class="taskowners">';
     		foreach ($usersinfo as $userinfo) {
+    			
+    			// Show student username and profile link
     			$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
-    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).'</li>';
+    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).' - ';
+    			
     			// Show information about assignee's attempts and grades
-    			if ($attempt = $model->assignee_last_attempt($userinfo->id)) {
-    				print_string('hasattempts', 'poasassignment');
+    			if ($attempt = $model->get_last_attempt($userinfo->id)) {
+    				print_string('hasattempts', 'poasassignment');    				
+    				echo '. ';
+    				
     				// If assignee has an attempt(s), show information about his grade
     				if ($attempt->rating != null) {
     					// Show actual grade with penalty
-						echo '. ';
 						print_string('hasgrade', 'poasassignment');
-						echo ' (';
-						echo $attempt->rating;
-						echo ' - ';
-						echo '<span style="color:red;">'.$model->get_penalty($attempt->id).'</span>';
-						echo ' = ';
-						echo $attempt->rating - $model->get_penalty($attempt->id);
-						echo ')';
+						echo ' ('.
+							$this->show_rating_methematics($attempt->rating,$model->get_penalty($attempt->id)).
+							')';
     				}
     				else {
-    					// Looks like assignee has no grade or outdated grade
+    					// Looks like assignee has no grade or outdated grade    	
+    					if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
+    						print_string('hasoutdatedgrade', 'poasassignment');
+    						echo '. ('.
+								$this->show_rating_methematics($lastgraded->rating,$model->get_penalty($lastgraded->id)).
+							')';
+    						
+    					}
+    					else {
+    						// There is no graded attempts, so show 'No grade'
+    						print_string('nograde', 'poasassignment');    						
+    						echo '.';
+    					}    									
     				}
     			}
     			else {
+    				// No attepts => no grade
     				print_string('hasnoattempts', 'poasassignment');
     				echo '. ';
     				print_string('nograde', 'poasassignment');
     			}
+    			echo '</li>';
     		}
     		echo '</ul>';
     	}
