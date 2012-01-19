@@ -199,7 +199,8 @@ class qtype_preg_matching_results {
     */
     public function validate() {
         if ($this->is_match()) {//Match found
-            if (!isset($this->index_first[0]) || !isset($this->length[0])) {
+            if (!isset($this->index_first[0]) || !isset($this->length[0])
+                || $this->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND || $this->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
         }
