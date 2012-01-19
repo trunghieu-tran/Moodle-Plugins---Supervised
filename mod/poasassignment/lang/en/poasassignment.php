@@ -293,4 +293,4 @@ $string['hasattempts'] = 'Has attempt(s)';
 $string['hasnoattempts'] = 'Has no attempts';
 $string['nograde'] = 'No grade';
 $string['hasgrade'] = 'Has actual grade';
-$string['hasoldgrade'] = 'Old grade';
+$string['hasoutdatedgrade'] = 'Outdated grade';
