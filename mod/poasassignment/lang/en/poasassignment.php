@@ -303,3 +303,5 @@ $string['changetaskwithprogress'] = 'Change task, drop progress';
 $string['changetaskwithprogress_help'] = 'Change task, drop current attempts and grades';
 $string['changetaskwithoutprogress_help'] = 'Change task, save student\'s attempts and grades';
 $string['leavehiddentask_help'] = 'Save old version of the task for the student, all changes will be applied to create new task. Old task will be hidden from students';
+$string['changetaskconfirmation'] = 'Are you sure you want to change the task?';
+$string['changingtaskwillchangestudentsdata'] = 'Changing the task will cause effect on students';
