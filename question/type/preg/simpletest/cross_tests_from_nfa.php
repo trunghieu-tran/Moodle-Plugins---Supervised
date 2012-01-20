@@ -768,6 +768,19 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1, $test2, $test3));
     }
 
+    function data_for_test_backrefs_relative() {
+        $test1 = array( 'str'=>'abcdefghidef',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>3),
+                        'length'=>array(0=>12,1=>9,2=>3),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        return array('regex'=>'(abc(def)ghi)\g{-1}',
+                     'tests'=>array($test1));
+    }
+
     function data_for_test_backrefs_alternated() {
         $test1 = array( 'str'=>'abab',
                         'is_match'=>true,
