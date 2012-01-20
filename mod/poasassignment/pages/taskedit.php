@@ -8,10 +8,12 @@ class taskedit_page extends abstract_page {
     private $taskid;
     private $owners;
     
-    function __construct() {
+    function __construct($cm,$poasassignment) {
         global $DB;
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
         $this->mode   = optional_param('mode', null, PARAM_INT);
+        $this->cm = $cm;
+        $this->poasassignment = $poasassignment;
     }
     function get_cap() {
         return 'mod/poasassignment:managetasks';
@@ -216,29 +218,79 @@ class taskedit_page extends abstract_page {
     	return $owner;
     }
     /**
-     * Show confirm update screen
+     * Show confirm update screen.
+     * If noone took the task, it seems like ordinary confirm screen 
+     * - are you sure? - yes/no.
+     * If someone took the task, page shows table 
+     * of taskowners and offer what to do with each student
      * 
      * @access public
      * @param mixed $data - updated task data
      */
-    public function confirm_update($data) {
+    public function confirm_update($data) {    	
+    	global $OUTPUT;
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_task_owners($this->taskid);
     	
+    	$nobutton =  $OUTPUT->single_button(
+    			new moodle_url(
+    					'view.php',
+    					array(
+    							'id' => $this->cm->id,
+    							'page' => 'tasks'
+    					)
+    			),
+    			get_string('no'),
+    			'get'
+    	);
+    	
+    	// Open form
+    	echo '<form action="view.php" method="post">';
+    	
     	// If there are students, that own this task, show them
     	if (count($owners) > 0) {
+    		// Show owners table
     		$usersinfo = $model->get_users_info($owners);
     		print_string('ownersofthetask', 'poasassignment');
     		$table = $this->prepare_flexible_table_owners();
     		foreach ($usersinfo as $userinfo) {
     			$table->add_data($this->get_owner($userinfo));
     		}
+    		$table->print_html();
+    		$yesbutton = '<input type="submit" value="'.get_string('yes').'"/>';
     	}
     	else {
     		print_string('nooneownsthetask', 'poasassignment');
-    		echo '<br/><br/>';
+    		$yesbutton = $OUTPUT->single_button(
+    				new moodle_url(
+    						'view.php',
+    						array(	'id' => $id,
+    								'taskid' => $taskid,
+    								'mode' => 'changeconfirmed'
+    						)
+    				),
+    				get_string('yes'),
+    				'post'
+    		);    		
+    		
     	}
-    	$table->print_html();
+    	// Ask user to confirm delete
+    	echo '<br/>';
+    	print_string('changetaskconfirmation', 'poasassignment');
+    	if (count($owners) > 0) {
+    		echo ' <span class="poasassignment-critical">(';
+    		print_string('changingtaskwillchangestudentsdata', 'poasassignment');
+    		echo ')</span>';
+    	}
+    	
+    	// Add updated task in hidden elements
+    	foreach ((array)$data as $name => $field) {
+    		echo '<br/>'.$name.'='.$field;
+    		echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
+    	}
+    	echo '<input type="hidden" name="mode" value="changeconfirmed"/>';
+    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+    	echo '</form>';
     }
     
     public static function display_in_navbar() {
