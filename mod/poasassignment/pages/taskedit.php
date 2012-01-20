@@ -56,6 +56,15 @@ class taskedit_page extends abstract_page {
             else
                 print_error('invalidtaskid','poasassignment');
         }
+        if ($this->mode == 'changeconfirmed') {
+        	$confirm = optional_param('confirm', get_string('no'), PARAM_TEXT);
+        	if ($confirm == get_string('no')) {
+        		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
+        	}
+        	else {
+        		$this->update_confirmed();	
+        	}
+        }
         
         $poasassignmentid = $model->get_poasassignment()->id;
         $this->mform = new taskedit_form(null, array('id' => $model->get_cm()->id, 
@@ -91,12 +100,18 @@ class taskedit_page extends abstract_page {
 			$data = $this->mform->get_data();
     		if ($this->taskid > 0) {
     			$this->confirm_update($data);
-    			//$model->update_task($this->taskid, $data);
     		}
     	}
     	else {
        		$this->mform->display();
     	}
+    }
+    
+    /**
+     * Updates task using settings, sent by POST
+     */
+    private function update_confirmed() {
+    	
     }
     /**
      * Prepare flexible table for using
@@ -121,11 +136,11 @@ class taskedit_page extends abstract_page {
     			get_string('usergroups', 'poasassignment'),
     			get_string('attemptstatus', 'poasassignment'),
     			get_string('gradestatus', 'poasassignment'),
-    			get_string('changetaskwithprogress', 'poasassignment').
+    			get_string('changetaskwithprogress', 'poasassignment').' '.
     				$OUTPUT->help_icon('changetaskwithprogress', 'poasassignment'),
-    			get_string('changetaskwithoutprogress', 'poasassignment').
+    			get_string('changetaskwithoutprogress', 'poasassignment').' '.
     				$OUTPUT->help_icon('changetaskwithoutprogress', 'poasassignment'),
-    			get_string('leavehiddentask', 'poasassignment').
+    			get_string('leavehiddentask', 'poasassignment').' '.
     				$OUTPUT->help_icon('leavehiddentask', 'poasassignment')
     	);
     	$table->define_columns($columns);
@@ -232,20 +247,8 @@ class taskedit_page extends abstract_page {
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_task_owners($this->taskid);
     	
-    	$nobutton =  $OUTPUT->single_button(
-    			new moodle_url(
-    					'view.php',
-    					array(
-    							'id' => $this->cm->id,
-    							'page' => 'tasks'
-    					)
-    			),
-    			get_string('no'),
-    			'get'
-    	);
-    	
     	// Open form
-    	echo '<form action="view.php" method="post">';
+    	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
     	
     	// If there are students, that own this task, show them
     	if (count($owners) > 0) {
@@ -257,22 +260,10 @@ class taskedit_page extends abstract_page {
     			$table->add_data($this->get_owner($userinfo));
     		}
     		$table->print_html();
-    		$yesbutton = '<input type="submit" value="'.get_string('yes').'"/>';
+    		
     	}
     	else {
     		print_string('nooneownsthetask', 'poasassignment');
-    		$yesbutton = $OUTPUT->single_button(
-    				new moodle_url(
-    						'view.php',
-    						array(	'id' => $id,
-    								'taskid' => $taskid,
-    								'mode' => 'changeconfirmed'
-    						)
-    				),
-    				get_string('yes'),
-    				'post'
-    		);    		
-    		
     	}
     	// Ask user to confirm delete
     	echo '<br/>';
@@ -288,6 +279,8 @@ class taskedit_page extends abstract_page {
     		echo '<br/>'.$name.'='.$field;
     		echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
     	}
+    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
     	echo '<input type="hidden" name="mode" value="changeconfirmed"/>';
     	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
     	echo '</form>';
