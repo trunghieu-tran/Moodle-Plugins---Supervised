@@ -151,7 +151,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
             if ($matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
                 $nextpassed = (($expected['correctending'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $obtained->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
                                ($expected['correctending'] === qtype_preg_matching_results::DELETE_TAIL && $obtained->correctending === qtype_preg_matching_results::DELETE_TAIL) ||
-                               ($expected['correctending'] !== '' && $obtained->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $obtained->correctending) !== false));    // expected 'correctending' contains obtained 'correctending'
+                               ($expected['correctending'] !== '' && $obtained->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $obtained->correctending[0]) !== false));    // expected 'correctending' contains obtained 'correctending'
             } else {
                 $nextpassed = true;
             }
