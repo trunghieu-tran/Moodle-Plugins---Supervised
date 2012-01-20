@@ -370,7 +370,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $numdec = intval($str, 10);
     //Is it a relative backreference? Is so, convert it to an absolute one
     if ($numdec < 0) {
-        $numdec = $this->lastsubpatt + $numdec;
+        $numdec = $this->lastsubpatt + $numdec + 1;
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numdec));
     $res->value->matcher =& $this->matcher;
