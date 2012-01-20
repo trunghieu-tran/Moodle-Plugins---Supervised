@@ -14,7 +14,7 @@ class qtype_preg_cross_tests_future {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>5),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abcaa',
                         'is_match'=>true,
@@ -22,7 +22,7 @@ class qtype_preg_cross_tests_future {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(1),
-                        'next'=>'');    // can't generate a character
+                        'correctending'=>'');    // can't generate a character
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2));

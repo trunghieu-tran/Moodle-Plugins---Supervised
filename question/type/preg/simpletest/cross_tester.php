@@ -9,16 +9,18 @@
  */
 
 /**
- *     A test function should:
- *     -be named "data_for_test_..."
- *     -return an array of input and output data as in the following example:
+ *    The cross-tester searches (not recursively!) for files named "cross_tests_<suffix>.php". A class with test data should be named the same as the corresponding file.
+ *    For example, a file named "cross_tests_example.php" should contain a class named "cross_test_example".
+ *    Next, those classes represent test data as a set of test functions. Those functions should:
+ *    -be named "data_for_test_..."
+ *    -return an array of input and output data as in the following example:
  *       array(
  *             'regex'=>'^[-.\w]+[a-z]{2,6}$',    // a regular expression
  *             'modifiers'=>'i',                  // modifiers. it's not necessary to define this element
  *             'tests'=>array($test1,...,$testn)  // array containing tests in the format described below. count of these tests is unlimited
  *             );
  *
- *    An array of expected results ($testi) should look like:
+ *    Finally, an array of expected results ($testi) should look like:
  *       array(
  *             'str'=>'sample string',            // a string to match
  *             'is_match'=>true,                  // is there a match?
@@ -26,14 +28,15 @@
  *             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
  *             'length'=>array(0=>2),             // length of the i-subpattern
  *             'left'=>0,                         // number of characters left to complete match
- *             'next'=>'');                       // a string of possible next characters in case of not full match
+ *             'correctending'=>'');              // a string of possible next characters in case of not full match
  *
- *    Remark: different matching engines may give different results, especially when matching quantifiers. For that situations it's possible to define different acceptable results.
- *    In this case the 'str' field remains the same, but the second field would be an array of possible match results and defined by the 'results' key:
- *    'results' => array(array('is_match'=>true, ...), array('is_match'=>false),...).
- *    This situation appears when a character may lead to continuing matching both quantifier and the rest of the regex, for example:
+ *    Remark: different matching engines may give different results, especially when matching quantifiers. This situation appears when a character may
+ *    lead to continuing matching both a quantifier and the rest of the regex, for example:
  *    the regex is '[a-z]*bacd' and the string is 'abacd'. The character is underlined.
  *                                                  ^
+ *    For this kind of situations it's possible to define different acceptable results.
+ *    In this case the 'str' field remains the same, but the second field would be an array of possible match results and defined by the 'results' key:
+ *    'results' => array(array('is_match'=>true, ...), array('is_match'=>false),...).
  *
  *    A test is passed if engine returns a result which matches one element of this array.
  *
@@ -45,7 +48,7 @@
  *                       'index_first'=>array(0=>0),
  *                       'length'=>array(0=>8),
  *                       'left'=>0,
- *                       'next'=>'');
+ *                       'correctending'=>'');
  *
  *       return array('regex'=>'.* ME',
  *                    'modifiers'=>'i',
@@ -60,13 +63,13 @@
  *                                              'index_first'=>array(0=>0),
  *                                              'length'=>array(0=>3),
  *                                              'left'=>array(4),
- *                                              'next'=>'b'),
+ *                                              'correctending'=>'b'),
  *                                        array('is_match'=>true,    // result for fa engine
  *                                              'full'=>false,
  *                                              'index_first'=>array(0=>0),
  *                                              'length'=>array(0=>5),
  *                                              'left'=>array(4),
- *                                              'next'=>'b')
+ *                                              'correctending'=>'b')
  *                                        ));
  *
  *       return array('regex'=>'ab+[a-z]*bacd',
@@ -146,8 +149,9 @@ class qtype_preg_cross_tester extends UnitTestCase {
             }
             // checking next possible character
             if ($matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-                $nextpassed = (($expected['next'] === '' && $obtained->next === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||                                                           // both results are empty
-                               ($expected['next'] !== '' && $obtained->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['next'], $obtained->next) !== false));    // expected 'next' contains obtained 'next'
+                $nextpassed = (($expected['correctending'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $obtained->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                               ($expected['correctending'] === qtype_preg_matching_results::DELETE_TAIL && $obtained->correctending === qtype_preg_matching_results::DELETE_TAIL) ||
+                               ($expected['correctending'] !== '' && $obtained->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $obtained->correctending) !== false));    // expected 'correctending' contains obtained 'correctending'
             } else {
                 $nextpassed = true;
             }
@@ -190,9 +194,9 @@ class qtype_preg_cross_tester extends UnitTestCase {
             echo 'obtained result '; print_r($obtained->length); echo " for 'length' is incorrect    (test from $testdataclassname)<br/>";
         }
 
-        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
+        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'correctending' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$nextpassed) {
-            echo 'obtained result \'' . $obtained->next . "' for 'next' is incorrect    (test from $testdataclassname)<br/>";
+            echo 'obtained result \'' . $obtained->correctending . "' for 'correctending' is incorrect    (test from $testdataclassname)<br/>";
         }
 
         $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
@@ -282,7 +286,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                         echo 'full = ' . $obtained->full; echo '<br/>';
                                         echo 'index_first = '; print_r($obtained->index_first); echo '<br/>';
                                         echo 'length = '; print_r($obtained->length); echo '<br/>';
-                                        echo 'next = ' . $obtained->next . '<br/>';
+                                        echo 'correctending = ' . $obtained->correctending . '<br/>';
                                         echo 'left = ' . $obtained->left . '<br/>';
                                     }
                                 }
