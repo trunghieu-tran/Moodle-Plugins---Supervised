@@ -75,8 +75,8 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($this->wrong_head($response['answer'], $matchresults));
-            $correctpart = $renderer->render_matched($this->correct_before_hint($response['answer'], $matchresults));
+            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+            $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
             $hint = $renderer->render_hinted($this->hinted_string($response['answer'], $matchresults));
             if ($this->to_be_continued($matchresults)) {
                 $hint .= $renderer->render_tobecontinued();
@@ -112,9 +112,9 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($this->wrong_head($response['answer'], $matchresults));
-            $correctpart = $renderer->render_matched($this->correct_part($response['answer'], $matchresults));
-            $wrongtail = $renderer->render_unmatched($this->wrong_tail($response['answer'], $matchresults));
+            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+            $correctpart = $renderer->render_matched($matchresults->matched_part());
+            $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
@@ -125,46 +125,6 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         //Correctness should be shown if engine support partial matching or a full match is achieved
         //Also correctness should be shown if this is not pure-assert match
         return $matchresults->length[0] > 0 && ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING));
-    }
-
-    public function wrong_head($response, $matchresults) {
-        $wronghead = '';
-        if ($matchresults->is_match()) {//There is match
-            if ($matchresults->index_first[0] > 0) {//if there is wrong heading
-                $wronghead = substr($response, 0, $matchresults->index_first[0]);
-            }
-        } else {//No match, all response is wrong head (to display hint after it)
-            $wronghead = $response;
-        }
-        return $wronghead;
-    }
-
-    public function correct_part($response, $matchresults) {
-        $correctpart = '';
-        if ($matchresults->is_match()) {//There is match
-           // if ($matchresults->index_first[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {//TODO - delete? if there is a match, than there should be some matching results for expression at least
-                $correctpart = substr($response, $matchresults->index_first[0], $matchresults->length[0]);
-            //}
-        }
-        return $correctpart;
-    }
-
-    public function correct_before_hint($response, $matchresults) {
-        $correctbeforehint = '';
-        if ($matchresults->is_match()) {//There is match
-            $correctbeforehint = substr($response, $matchresults->index_first[0], $matchresults->correctendingstart -  $matchresults->index_first[0]);
-        }
-        return $correctbeforehint;
-    }
-
-    public function wrong_tail($response, $matchresults) {
-        $wrongtail = '';
-        if ($matchresults->is_match()) {//There is match
-            if ($matchresults->index_first[0] + $matchresults->length[0] < strlen($response)) {//if there is wrong tail
-                $wrongtail =  substr($response, $matchresults->index_first[0] + $matchresults->length[0], strlen($response) - $matchresults->index_first[0] - $matchresults->length[0]);
-            }
-        }
-        return $wrongtail;
     }
 
 }
