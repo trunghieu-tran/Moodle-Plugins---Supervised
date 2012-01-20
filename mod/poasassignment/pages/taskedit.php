@@ -2,6 +2,7 @@
 global $CFG;
 require_once('abstract_page.php');
 require_once(dirname(dirname(__FILE__)) . '/model.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 class taskedit_page extends abstract_page {
     private $taskid;
@@ -95,6 +96,47 @@ class taskedit_page extends abstract_page {
        		$this->mform->display();
     	}
     }
+    /**
+     * Prepare flexible table for using
+     * 
+     * @access private
+     * @return object flexible_table
+     */
+    private function prepare_flexible_table_owners() {
+    	global $PAGE, $OUTPUT;
+    	$table = new flexible_table('mod-poasassignment-task-owners');
+    	$table->baseurl = $PAGE->url;
+    	$columns = array(
+    			'fullname', 
+    			'usergroups', 
+    			'attemptstatus', 
+    			'gradestatus', 
+    			'changetaskwithprogress',
+    			'changetaskwithoutprogress',
+    			'leavehiddentask');
+    	$headers = array(
+    			get_string('fullname', 'poasassignment'),
+    			get_string('usergroups', 'poasassignment'),
+    			get_string('attemptstatus', 'poasassignment'),
+    			get_string('gradestatus', 'poasassignment'),
+    			get_string('changetaskwithprogress', 'poasassignment').
+    				$OUTPUT->help_icon('changetaskwithprogress', 'poasassignment'),
+    			get_string('changetaskwithoutprogress', 'poasassignment').
+    				$OUTPUT->help_icon('changetaskwithoutprogress', 'poasassignment'),
+    			get_string('leavehiddentask', 'poasassignment').
+    				$OUTPUT->help_icon('leavehiddentask', 'poasassignment')
+    	);
+    	$table->define_columns($columns);
+    	$table->define_headers($headers);
+    	$table->collapsible(true);
+    	$table->initialbars(false);
+    	$table->set_attribute('class', 'poasassignment-table task-owners');
+    	//$table->set_attribute('width', '100%');
+    
+    	$table->setup();
+    
+    	return $table;
+    }
     
     /**
      * Get "rating - penaty = total" string 
@@ -114,6 +156,65 @@ class taskedit_page extends abstract_page {
 		
 		return $string;
     }
+    
+    /**
+     * Get information about task owner and his task's status
+     * 
+     * @access private
+     * @param object $userinfo assignee object
+     * @return array information
+     */
+    private function get_owner($userinfo) {
+    	$model = poasassignment_model::get_instance();
+    	$owner = array();
+    	
+    	// Get student username and profile link
+    	$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+    	$owner[] = html_writer::link($userurl, fullname($userinfo->userinfo, true));
+    	
+    	// TODO Get student's groups
+    	$owner[] = '?';
+    	
+    	
+    	// Get information about assignee's attempts and grades
+    	if ($attempt = $model->get_last_attempt($userinfo->id)) {
+    		$owner[] = get_string('hasattempts', 'poasassignment');
+    	
+    		// If assignee has an attempt(s), show information about his grade
+    		if ($attempt->rating != null) {
+    			// Show actual grade with penalty
+    			$owner[] = 
+    				get_string('hasgrade', 'poasassignment').
+    				' ('.
+    				$this->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+    				')';
+    		}
+    		else {
+    			// Looks like assignee has no grade or outdated grade
+    			if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
+    				$owner[] = 
+    					get_string('hasoutdatedgrade', 'poasassignment').
+    					' ('.
+    					$this->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+    					')';    	
+    			}
+    			else {
+    				// There is no graded attempts, so show 'No grade'
+    				$owner[] = get_string('nograde', 'poasassignment');
+    			}
+    		}
+    	}
+    	else {
+    		// No attepts => no grade
+    		$owner[] = get_string('hasnoattempts', 'poasassignment');
+    		$owner[] = get_string('nograde', 'poasassignment');
+    	}
+    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="changetaskwithprogress" checked="checked"></input>';
+    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="changetaskwithoutprogress"></input>';
+    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="leavehiddentask"></input>';
+    	
+    	return $owner;
+    }
     /**
      * Show confirm update screen
      * 
@@ -128,61 +229,22 @@ class taskedit_page extends abstract_page {
     	if (count($owners) > 0) {
     		$usersinfo = $model->get_users_info($owners);
     		print_string('ownersofthetask', 'poasassignment');
-    		echo '<ul class="taskowners">';
+    		$table = $this->prepare_flexible_table_owners();
     		foreach ($usersinfo as $userinfo) {
-    			
-    			// Show student username and profile link
-    			$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
-    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).' - ';
-    			
-    			// Show information about assignee's attempts and grades
-    			if ($attempt = $model->get_last_attempt($userinfo->id)) {
-    				print_string('hasattempts', 'poasassignment');    				
-    				echo '. ';
-    				
-    				// If assignee has an attempt(s), show information about his grade
-    				if ($attempt->rating != null) {
-    					// Show actual grade with penalty
-						print_string('hasgrade', 'poasassignment');
-						echo ' ('.
-							$this->show_rating_methematics($attempt->rating,$model->get_penalty($attempt->id)).
-							')';
-    				}
-    				else {
-    					// Looks like assignee has no grade or outdated grade    	
-    					if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
-    						print_string('hasoutdatedgrade', 'poasassignment');
-    						echo '. ('.
-								$this->show_rating_methematics($lastgraded->rating,$model->get_penalty($lastgraded->id)).
-							')';
-    						
-    					}
-    					else {
-    						// There is no graded attempts, so show 'No grade'
-    						print_string('nograde', 'poasassignment');    						
-    						echo '.';
-    					}    									
-    				}
-    			}
-    			else {
-    				// No attepts => no grade
-    				print_string('hasnoattempts', 'poasassignment');
-    				echo '. ';
-    				print_string('nograde', 'poasassignment');
-    			}
-    			echo '</li>';
+    			$table->add_data($this->get_owner($userinfo));
     		}
-    		echo '</ul>';
     	}
     	else {
     		print_string('nooneownsthetask', 'poasassignment');
     		echo '<br/><br/>';
     	}
+    	$table->print_html();
     }
     
     public static function display_in_navbar() {
         return false;
     }
+    
 }
 class taskedit_form extends moodleform {
 

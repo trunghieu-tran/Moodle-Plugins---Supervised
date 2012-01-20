@@ -47,3 +47,9 @@ p.no-info-message {text-align: center;}
 	color:red;
 	font-weight:bold;
 }
+table.task-owners th {
+	white-space: normal;
+}
+table.task-owners {
+	text-align: center;
+}

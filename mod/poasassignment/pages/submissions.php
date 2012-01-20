@@ -38,7 +38,7 @@ class submissions_page extends abstract_page {
         $table->define_headers($headers);
         //$table->sortable(true, 'name');
         $table->collapsible(true);
-        $table->initialbars(true);
+        $table->initialbars(false);
         /* $table->column_suppress('fullname'); */
         //$table->set_attribute('border', '1');
 		$table->set_attribute('class', 'poasassignment-table');
