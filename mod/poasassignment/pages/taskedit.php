@@ -57,13 +57,7 @@ class taskedit_page extends abstract_page {
                 print_error('invalidtaskid','poasassignment');
         }
         if ($this->mode == 'changeconfirmed') {
-        	$confirm = optional_param('confirm', get_string('no'), PARAM_TEXT);
-        	if ($confirm == get_string('no')) {
-        		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
-        	}
-        	else {
-        		$this->update_confirmed();	
-        	}
+        	$this->update_confirmed();        	
         }
         
         $poasassignmentid = $model->get_poasassignment()->id;
@@ -111,6 +105,34 @@ class taskedit_page extends abstract_page {
      * Updates task using settings, sent by POST
      */
     private function update_confirmed() {
+    	$confirm = required_param('confirm', PARAM_TEXT);
+    	
+    	if ($confirm == get_string('no')) {
+    		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
+    	}
+    	else {
+    		
+    		$ownerscount = required_param('ownerscount', PARAM_INT);
+    		// If there is at least one student, who owns the task,
+    		// apply changes to him according to settings
+    		if ($ownerscount > 0) {    			
+    			$assigneeids = $_POST['assigneids'];
+    			// $_POST['assigneids'] contains array of owners ids
+    			foreach ($assigneeids as $assigneeid) {
+    				$action = required_param('action_'.$assigneeid, PARAM_TEXT);
+    				switch ($action) {
+    					case 'changetaskwithprogress':
+    						break;
+    					case 'changetaskwithoutprogress':
+    						break;
+    					case 'leavehiddentask':
+    						break;
+    				}
+    			}
+    		}
+    		print_r($_POST);
+    		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)), 'applying changes');
+    	}
     	
     }
     /**
@@ -250,6 +272,7 @@ class taskedit_page extends abstract_page {
     	// Open form
     	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
     	
+    	echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
     	// If there are students, that own this task, show them
     	if (count($owners) > 0) {
     		// Show owners table
@@ -257,10 +280,10 @@ class taskedit_page extends abstract_page {
     		print_string('ownersofthetask', 'poasassignment');
     		$table = $this->prepare_flexible_table_owners();
     		foreach ($usersinfo as $userinfo) {
-    			$table->add_data($this->get_owner($userinfo));
+    			$table->add_data($this->get_owner($userinfo));    			
+    			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
     		}
     		$table->print_html();
-    		
     	}
     	else {
     		print_string('nooneownsthetask', 'poasassignment');
