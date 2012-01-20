@@ -36,12 +36,6 @@ class qtype_preg_matching_results {
     public $length;
     /** @var integer The number of characters left to complete matching. */
     public $left;
-    /** @var integer Start index for the correct ending.
-     *
-     * May be less than index_first[0]+length[0] if there is no way to complete matching
-     * from current point of fail due to assertions or another reasons.
-     */
-    public $correctendingstart;
     /** @var string A string (shortest if possible), which, been added after partial match, would give a full match.
      *
      * Should be UNKNOWN_NEXT_CHARACTER if undetermined by engine, DELETE_TAIL if there is nothing to append, but we should delete instead
@@ -49,13 +43,20 @@ class qtype_preg_matching_results {
     public $correctending;
     /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
     public $correctendingcomplete;
+    /** @var integer Start index for the correct ending.
+     *
+     * May be less than index_first[0]+length[0] if there is no way to complete matching
+     * from current point of fail due to assertions or another reasons.
+     */
+    public $correctendingstart;
 
     ////Source data - TODO - add info about subpatterns, including number of them, names etc
     /** @var string String with which match was performed*/
     public $str;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
-                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND, $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false) {
+                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
+                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
