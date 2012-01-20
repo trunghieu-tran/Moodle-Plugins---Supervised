@@ -38,7 +38,7 @@ class qtype_preg_matching_results {
     public $left;
     /** @var integer Start index for the correct ending.
      *
-     * May be less than index_first[0]+length[0] if there is no way to complete matching 
+     * May be less than index_first[0]+length[0] if there is no way to complete matching
      * from current point of fail due to assertions or another reasons.
      */
     public $correctendingstart;
@@ -55,8 +55,7 @@ class qtype_preg_matching_results {
     public $str;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
-                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
-                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND) {
+                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND, $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
@@ -207,11 +206,11 @@ class qtype_preg_matching_results {
         if ($this->correctendingstart !== qtype_preg_matching_results::NO_MATCH_FOUND && $this->correctendingstart < $this->index_first[0] + $this->length[0]) {
             throw new qtype_preg_exception('Error: correct ending ends at'.$this->correctendingstart.' while matching ends at'.($this->index_first[0] + $this->length[0]));
         }
-        
+
 
         //The matching engine didn't supply correct ending start, but supplied next character (and match isn't full).
         //We could assume that correctendingstart==index_first[0]+length[0], i.e. right after matching fail position
-        if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND && 
+        if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND &&
             (!$this->full && $this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
             $this->correctendingstart = $this->index_first[0] + $this->length[0];
         }
