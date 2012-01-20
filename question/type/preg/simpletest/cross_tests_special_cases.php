@@ -23,7 +23,7 @@ class qtype_preg_cross_tests_special_cases {
                         'index_first'=>array(0=>-1),
                         'length'=>array(0=>0),
                         'left'=>array(3),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         return array('regex'=>'abc',
                      'tests'=>array($test1));
@@ -36,7 +36,7 @@ class qtype_preg_cross_tests_special_cases {
                         'index_first'=>array(0=>0,1=>0,2=>-1),
                         'length'=>array(0=>2,1=>2,2=>-1),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'correctending'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(?:(ab)|(cd))\2',
                      'tests'=>array($test1));
@@ -49,7 +49,7 @@ class qtype_preg_cross_tests_special_cases {
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>0),
                         'left'=>array(1),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         return array('regex'=>'^a',
                      'tests'=>array($test1));
@@ -62,7 +62,7 @@ class qtype_preg_cross_tests_special_cases {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'\378',
                      'tests'=>array($test1));

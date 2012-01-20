@@ -24,7 +24,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>17),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'_the matcher works',
                         'is_match'=>false,
@@ -32,7 +32,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>18),
                         'length'=>array(0=>0),
                         'left'=>array(17),
-                        'next'=>'t');
+                        'correctending'=>'t');
 
         $test3 = array( 'str'=>'the matcher',
                         'is_match'=>true,
@@ -40,7 +40,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>11),
                         'left'=>array(6),
-                        'next'=>' ');
+                        'correctending'=>' ');
 
         $test4 = array( 'str'=>'',
                         'is_match'=>false,
@@ -48,7 +48,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>0),
                         'left'=>array(17),
-                        'next'=>'t');
+                        'correctending'=>'t');
 
         return array('regex'=>'^the matcher works',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -61,7 +61,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'def',
                         'is_match'=>true,
@@ -69,7 +69,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'deff',
                         'is_match'=>true,
@@ -77,7 +77,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
 
         return array('regex'=>'^abc|def$',
                      'tests'=>array($test1, $test2, $test3));
@@ -90,7 +90,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'cdi',
                         'is_match'=>true,
@@ -98,7 +98,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'efi',
                         'is_match'=>true,
@@ -106,7 +106,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test4 = array( 'str'=>'ghi',
                         'is_match'=>true,
@@ -114,7 +114,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test5 = array( 'str'=>'yzi',
                         'is_match'=>false,
@@ -122,7 +122,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>3),
                         'length'=>array(0=>0),
                         'left'=>array(3),
-                        'next'=>'aceg');
+                        'correctending'=>'aceg');
 
         return array('regex'=>'^(?:ab|cd|ef|gh)i$',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
@@ -135,7 +135,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>' 9bc',
                         'is_match'=>true,
@@ -143,7 +143,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'  b',
                         'is_match'=>true,
@@ -151,7 +151,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'abcdefghijklmnopqrstuvwxyz');
+                        'correctending'=>'abcdefghijklmnopqrstuvwxyz');
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3));
@@ -164,7 +164,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'[prefix] a',
                         'is_match'=>true,
@@ -172,7 +172,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>8),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'^*[a-z 0-9](?:\b)+a${1,}',
                      'tests'=>array($test1, $test2));
@@ -185,7 +185,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(3),
-                        'next'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
+                        'correctending'=>' acdefghijklmnopqrstuvwxyz0123456789!?.,');
 
         $test2 = array( 'str'=>'axcd',
                         'is_match'=>true,
@@ -193,7 +193,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'aacde',
                         'is_match'=>true,
@@ -201,7 +201,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
 
         return array('regex'=>'^a[^b]cd$',
                      'tests'=>array($test1, $test2, $test3));
@@ -214,7 +214,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(3),
-                        'next'=>'B');
+                        'correctending'=>'B');
 
         $test2 = array( 'str'=>'aBC',
                         'is_match'=>true,
@@ -222,7 +222,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(2),
-                        'next'=>'c');
+                        'correctending'=>'c');
 
         return array('regex'=>'aBcD',
                      'tests'=>array($test1, $test2));
@@ -235,7 +235,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'aBcD',
                      'modifiers'=>'i',
@@ -250,7 +250,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>4,1=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'',
                         'is_match'=>true,
@@ -258,7 +258,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(abcd|)',
                      'tests'=>array($test1, $test2));
@@ -271,7 +271,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>1,2=>3,3=>4),
                         'length'=>array(0=>6,1=>4,2=>2,3=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'ad',
                         'is_match'=>true,
@@ -279,7 +279,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>1,2=>-1,3=>-1),    // the quantifier is outside subpatterns 2 and 3 so they are not matched!
                         'length'=>array(0=>2,1=>0,2=>-1,3=>-1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'^a((b(c)(?:\b|\B))*)d$',
                      'tests'=>array($test1, $test2));
@@ -292,7 +292,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1),
                         'length'=>array(0=>2,1=>2,2=>-1),
                         'left'=>array(2),
-                        'next'=>'.');
+                        'correctending'=>'.');
 
         $test2 = array( 'str'=>'1',
                         'is_match'=>true,
@@ -300,7 +300,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1),
                         'length'=>array(0=>1,1=>1,2=>-1),
                         'left'=>array(2),
-                        'next'=>'.');
+                        'correctending'=>'.');
 
         return array('regex'=>'[+\-]?([0-9]+)?\.([0-9]+)',
                      'tests'=>array($test1, $test2));
@@ -313,7 +313,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>1,1=>1,2=>3,3=>5),
                         'length'=>array(0=>6,1=>2,2=>2,3=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'[prefix] abef',
                         'is_match'=>true,
@@ -321,7 +321,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>9,1=>9,2=>-1,3=>11),
                         'length'=>array(0=>4,1=>2,2=>-1,3=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(ab)(cd)?(ef)',
                      'tests'=>array($test1, $test2));
@@ -334,7 +334,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>-1,4=>-1),
                         'length'=>array(0=>2,1=>2,2=>2,3=>-1,4=>-1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'((ab)|(cd)|(efgh))',
                      'tests'=>array($test1));
@@ -347,7 +347,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>5,1=>5),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(a*)',
                      'tests'=>array($test1));
@@ -360,7 +360,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>4),
                         'length'=>array(0=>5,1=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(a)*',
                      'tests'=>array($test1));
@@ -373,7 +373,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
                         'length'=>array(0=>3,1=>3,2=>1,3=>1,4=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abcabc',
                         'is_match'=>true,
@@ -381,7 +381,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>3,2=>3,3=>4,4=>5),
                         'length'=>array(0=>6,1=>3,2=>1,3=>1,4=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(([a*]|\b)([b*]|\b)([c*]|\b))+',
                      'tests'=>array($test1, $test2));
@@ -394,7 +394,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>1),
                         'length'=>array(0=>2,1=>1,2=>-1,3=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'*&^%&^',
                         'is_match'=>false,
@@ -402,7 +402,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>2,1=>-1,2=>-1,3=>-1),
                         'length'=>array(0=>0,1=>-1,2=>-1,3=>-1),
                         'left'=>array(2),
-                        'next'=>'z');
+                        'correctending'=>'z');
 
         return array('regex'=>'(z|y(x))(w)',
                      'tests'=>array($test1, $test2));
@@ -415,7 +415,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>7),
                         'length'=>array(0=>8,1=>3,2=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'dog-dogs',
                         'is_match'=>true,
@@ -423,7 +423,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>7),
                         'length'=>array(0=>8,1=>3,2=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(?|(cat)|(dog))-\1(s)',
                      'tests'=>array($test1, $test2));
@@ -436,7 +436,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>-1,4=>2),
                         'length'=>array(0=>4,1=>1,2=>1,3=>-1,4=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'acdee',
                         'is_match'=>true,
@@ -444,7 +444,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>2,4=>3),
                         'length'=>array(0=>5,1=>1,2=>1,3=>1,4=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(a)(?|(b)|(c)(d))(e)\4',
                      'tests'=>array($test1, $test2));
@@ -457,7 +457,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -465,7 +465,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'abbc',
                         'is_match'=>true,
@@ -473,7 +473,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(1),
-                        'next'=>'c');
+                        'correctending'=>'c');
 
         return array('regex'=>'^ab?c$',
                      'tests'=>array($test1, $test2, $test3));
@@ -486,7 +486,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(1),    // 'left' takes priority
-                        'next'=>'ab');
+                        'correctending'=>'ab');
 
         $test2 = array( 'str'=>'abb',
                         'is_match'=>true,
@@ -494,7 +494,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'...ababababababababababbabababaabbbbbbbbbbbbaaaaaaaaaaaaabbbbbbbbbababababababb',
                         'is_match'=>true,
@@ -502,7 +502,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>3),
                         'length'=>array(0=>76),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(?:a|b)*abb$',
                      'tests'=>array($test1, $test2, $test3));
@@ -515,7 +515,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>30),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abcabcabcabcabcabcabcabcabcab',
                         'is_match'=>true,
@@ -523,7 +523,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>27),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'ab',
                         'is_match'=>true,
@@ -531,7 +531,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>0),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test4 = array( 'str'=>'',
                         'is_match'=>true,
@@ -539,7 +539,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>0),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(?:abc)*',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -552,7 +552,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -560,7 +560,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
@@ -568,7 +568,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>101),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'^ab+c$',
                      'tests'=>array($test1, $test2, $test3));
@@ -581,7 +581,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>6),
                         'left'=>array(11),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
@@ -589,7 +589,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>27),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
@@ -597,7 +597,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>36),
                         'left'=>array(1),
-                        'next'=>'c');
+                        'correctending'=>'c');
 
         return array('regex'=>'^ab{15,35}c$',
                      'tests'=>array($test1, $test2, $test3));
@@ -610,7 +610,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>6),
                         'left'=>array(11),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test2 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
@@ -618,7 +618,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>27),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc',
                         'is_match'=>true,
@@ -626,7 +626,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>104),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'^ab{15,}c$',
                      'tests'=>array($test1, $test2, $test3));
@@ -639,13 +639,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(4),
-                                              'next'=>'b'),
+                                              'correctending'=>'b'),
                                         array('is_match'=>true,    // result for fa engine
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>5),
                                               'left'=>array(4),
-                                              'next'=>'b')
+                                              'correctending'=>'b')
                                         ));
         $test2 = array('str'=>'ababac',
                        'results'=>array(array('is_match'=>true,    // result for backtracking engine
@@ -653,13 +653,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(4),
-                                              'next'=>'b'),
+                                              'correctending'=>'b'),
                                         array('is_match'=>true,    // result for fa engine
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>6),
                                               'left'=>array(1),
-                                              'next'=>'d')
+                                              'correctending'=>'d')
                                         ));
 
         return array('regex'=>'ab+[a-z]*bacd',
@@ -673,7 +673,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>5),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -681,7 +681,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(3),
-                        'next'=>' ');
+                        'correctending'=>' ');
 
         $test3 = array( 'str'=>'a',
                         'is_match'=>true,
@@ -689,7 +689,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(4),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test4 = array( 'str'=>'',
                         'is_match'=>false,
@@ -697,7 +697,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>-1),
                         'length'=>array(0=>-1),
                         'left'=>array(5),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         return array('regex'=>'ab\b cd',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -710,7 +710,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>2),
                         'length'=>array(0=>5,1=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'ab',
                         'is_match'=>true,
@@ -718,7 +718,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>2,1=>-1),
                         'left'=>array(1),
-                        'next'=>'h');
+                        'correctending'=>'h');
 
         $test3 = array('str'=>'abe',    // different strategies
                        'results'=>array(array('is_match'=>true,
@@ -726,13 +726,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>3,1=>-1),
                                               'left'=>array(2),
-                                              'next'=>'f'),
+                                              'correctending'=>'f'),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>2,1=>-1),
                                               'left'=>array(1),
-                                              'next'=>'h')
+                                              'correctending'=>'h')
                                         ));
 
         return array('regex'=>'ab(cd|efg|h)',
@@ -746,7 +746,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>12,1=>6,2=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abcabc',
                         'is_match'=>true,
@@ -754,7 +754,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>6,1=>6,2=>3),
                         'left'=>array(6),
-                        'next'=>'a');    // backref #1 not captured at all
+                        'correctending'=>'a');    // backref #1 not captured at all
 
         $test3 = array( 'str'=>'abcabcab',
                         'is_match'=>true,
@@ -762,7 +762,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>8,1=>6,2=>3),
                         'left'=>array(4),
-                        'next'=>'c');    // backref #1 captured partially
+                        'correctending'=>'c');    // backref #1 captured partially
 
         return array('regex'=>'((abc)\2)\1',
                      'tests'=>array($test1, $test2, $test3));
@@ -775,7 +775,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>3),
                         'length'=>array(0=>12,1=>9,2=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(abc(def)ghi)\g{-1}',
                      'tests'=>array($test1));
@@ -788,7 +788,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>2),
                         'length'=>array(0=>4,1=>2,2=>-1,3=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'cdcd',
                         'is_match'=>true,
@@ -796,7 +796,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1,2=>0,3=>2),
                         'length'=>array(0=>4,1=>-1,2=>2,3=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'aba',
                         'is_match'=>true,
@@ -804,7 +804,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
                         'length'=>array(0=>3,1=>2,2=>-1,3=>-1),
                         'left'=>array(1),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test4 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -812,7 +812,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>-1,3=>-1),
                         'length'=>array(0=>2,1=>2,2=>-1,3=>-1),
                         'left'=>array(2),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         return array('regex'=>'(?:(ab)|(cd))(\1|\2)',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -825,7 +825,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>12,2=>12),
                         'length'=>array(0=>24,1=>6,2=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'cdcd',
                         'is_match'=>false,
@@ -833,7 +833,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>4,1=>-1,2=>-1),
                         'length'=>array(0=>0,1=>-1,2=>-1),
                         'left'=>array(10000000),                    // TODO: standardize this value
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'((ab)\2cd)*\1',
                      'tests'=>array($test1, $test2));
@@ -846,7 +846,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>8,1=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abcdab',
                         'is_match'=>true,
@@ -854,7 +854,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>6,1=>4),
                         'left'=>array(2),
-                        'next'=>'c');
+                        'correctending'=>'c');
 
         $test3 = array( 'str'=>'abcd',
                         'is_match'=>true,
@@ -862,7 +862,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>4,1=>4),
                         'left'=>array(4),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         $test4 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -870,7 +870,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>3,1=>-1),
                         'left'=>array(5),
-                        'next'=>'d');
+                        'correctending'=>'d');
 
         return array('regex'=>'(abcd)\1',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -883,7 +883,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>8,1=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'abxycd',
                         'is_match'=>true,
@@ -891,7 +891,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array('str'=>'cdxyabab',
                        'results'=>array(array('is_match'=>true,        // different strategies
@@ -899,13 +899,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>6,1=>-1),
                                               'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                                              'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER),
+                                              'correctending'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>4,1=>-1),
                                               'left'=>array(2),
-                                              'next'=>'c')
+                                              'correctending'=>'c')
                                         ));
 
         $test4 = array( 'str'=>'cdxycd',
@@ -914,7 +914,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>6,1=>-1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(?:(ab)|cd)xy(?:ab\1|cd)',
                      'tests'=>array($test1, $test2, $test3, $test4));
@@ -927,7 +927,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>3,1=>-1),
                         'left'=>array(12),
-                        'next'=>'cbr');
+                        'correctending'=>'cbr');
 
         $test2 = array('str'=>'Do cats',
                        'results'=>array(array('is_match'=>true,        // different strategies
@@ -935,13 +935,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>7,1=>1),
                                               'left'=>array(10),
-                                              'next'=>' '),
+                                              'correctending'=>' '),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>6,1=>0),
                                               'left'=>array(9),
-                                              'next'=>' ')
+                                              'correctending'=>' ')
                                         ));
 
         $test3 = array( 'str'=>'bat eat fat?',
@@ -950,7 +950,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>12,1=>-1),
                         'length'=>array(0=>0,1=>-1),
                         'left'=>array(10),
-                        'next'=>'D');
+                        'correctending'=>'D');
 
         return array('regex'=>'Do (?:[cbr]at(s|)) eat (?:[cbr]at\1)\?',
                      'tests'=>array($test1, $test2, $test3));
@@ -963,7 +963,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>1,1=>-1),
                         'left'=>array(9),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         $test2 = array( 'str'=>'0as',
                         'is_match'=>true,
@@ -971,7 +971,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>2,1=>-1),
                         'left'=>array(8),
-                        'next'=>'b');
+                        'correctending'=>'b');
 
         $test3 = array('str'=>'0defab',        // different strategies
                        'results'=>array(array('is_match'=>true,
@@ -979,13 +979,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>4,1=>-1),
                                               'left'=>array(12),
-                                              'next'=>'g'),
+                                              'correctending'=>'g'),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>-1),
                                               'length'=>array(0=>1,1=>-1),
                                               'left'=>array(9),
-                                              'next'=>'a')
+                                              'correctending'=>'a')
                                         ));
 
         return array('regex'=>'0(abc|defghx)[0-9]{3}\1',
@@ -999,7 +999,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>-1),
                         'length'=>array(0=>1,1=>-1),
                         'left'=>array(13),
-                        'next'=>'a');
+                        'correctending'=>'a');
 
         $test2 = array('str'=>'0aaaaaaz',
                        'results'=>array(array('is_match'=>true,        // different strategies
@@ -1007,13 +1007,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>7,1=>6),
                                               'left'=>array(9),
-                                              'next'=>'0123456789'),
+                                              'correctending'=>'0123456789'),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>6,1=>5),
                                               'left'=>array(8),
-                                              'next'=>'0123456789')
+                                              'correctending'=>'0123456789')
                                         ));
 
         return array('regex'=>'0(a{5,10})[0-9]{3}\1',
@@ -1027,13 +1027,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>6,1=>3),
                                               'left'=>array(4),
-                                              'next'=>'x'),
+                                              'correctending'=>'x'),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
-                                              'next'=>'x')
+                                              'correctending'=>'x')
                                         ));
 
         $test2 = array( 'str'=>'ababbaxbba',
@@ -1042,7 +1042,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>3),
                         'length'=>array(0=>10,1=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array('str'=>'abab',
                        'results'=>array(array('is_match'=>true,        // different strategies
@@ -1050,13 +1050,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>4,1=>2),
                                               'left'=>array(6),
-                                              'next'=>'b'),
+                                              'correctending'=>'b'),
                                         array('is_match'=>true,
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
-                                              'next'=>'x')
+                                              'correctending'=>'x')
                                         ));
 
         return array('regex'=>'(a|b\1)+x\1',
@@ -1070,7 +1070,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>2,2=>0),
                         'length'=>array(0=>5,1=>3,2=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'xabxab',
                         'is_match'=>true,
@@ -1078,7 +1078,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>1,1=>3,2=>1),
                         'length'=>array(0=>5,1=>3,2=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(x\2|(ab))+',
                      'tests'=>array($test1, $test2));
@@ -1091,7 +1091,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>2,1=>2,2=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'xabxab',
                         'is_match'=>true,
@@ -1099,7 +1099,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>1,1=>1,2=>1),
                         'length'=>array(0=>2,1=>2,2=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(x\58|(ab))+',
                      'tests'=>array($test1, $test2));
@@ -1112,7 +1112,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>2),
                         'length'=>array(0=>3,1=>1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test2 = array( 'str'=>'ababba',
                         'is_match'=>true,
@@ -1120,7 +1120,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>3),
                         'length'=>array(0=>6,1=>3),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test3 = array( 'str'=>'ababbabbba',
                         'is_match'=>true,
@@ -1128,7 +1128,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>6),
                         'length'=>array(0=>10,1=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
 
         $test4 = array( 'str'=>'ababbabbbabbbba',
@@ -1137,7 +1137,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>10),
                         'length'=>array(0=>15,1=>5),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test5 = array( 'str'=>'ababbabbbabbbb',
                         'is_match'=>true,
@@ -1145,7 +1145,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>6),
                         'length'=>array(0=>10,1=>4),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         $test6 = array( 'str'=>'',
                         'is_match'=>false,
@@ -1153,7 +1153,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>-1,1=>-1),
                         'length'=>array(0=>-1,1=>-1),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(a|b\1)+',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
@@ -1167,7 +1167,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'ab(?=cd)',
                      'tests'=>array($test1));
@@ -1180,7 +1180,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>0),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'a\Gb',
                      'tests'=>array($test1));
@@ -1193,7 +1193,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>9),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'(?(?=[^a-z]*[a-z])\d{2}-[a-z]{3}-\d{2}|\d{2}-\d{2}-\d{2})',
                      'tests'=>array($test1));
@@ -1206,7 +1206,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>16),
                         'left'=>array(0),
-                        'next'=>'');
+                        'correctending'=>'');
 
         return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
