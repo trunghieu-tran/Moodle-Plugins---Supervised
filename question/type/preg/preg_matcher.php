@@ -27,6 +27,7 @@ class qtype_preg_matching_results {
     const DELETE_TAIL = null;
 
 
+    ////Match data
     /** @var boolean Is match full or partial? */
     public $full;
     /** @var array Indexes of first matched character - array where 0 => full match, 1=> first subpattern etc. */
@@ -48,6 +49,10 @@ class qtype_preg_matching_results {
     public $correctending;
     /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
     public $correctendingcomplete;
+
+    ////Source data - TODO - add info about subpatterns, including number of them, names etc
+    /** @var string String with which match was performed*/
+    public $str;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
@@ -165,6 +170,7 @@ class qtype_preg_matching_results {
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         $this->correctendingstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+        $this->str = null;
     }
 
     /**
@@ -236,6 +242,57 @@ class qtype_preg_matching_results {
         return $index_last;
     }
 
+    /**
+     * Returns non-matched heading before subpattern match
+     */
+    public function match_heading($subpattern = 0) {
+        $wronghead = '';
+        if ($this->is_match()) {//There is match
+            if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
+                $wronghead = substr($this->str, 0, $this->index_first[$subpattern]);
+            }
+        } else {//No match, assuming all string is wrong heading (to display hint after it)
+            $wronghead = $this->str;
+        }
+        return $wronghead;
+    }
+
+    /**
+     * Returns matched part of the string for given subpattern
+     */
+    public function matched_part($subpattern = 0) {
+        $correctpart = '';
+        if ($this->is_match()) {//There is match
+            if ( isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $correctpart = substr($this->str, $this->index_first[$subpattern], $this->length[$subpattern]);
+            }
+        }
+        return $correctpart;
+    }
+
+    /**
+     * Returns non-matched tail after subpattern match
+     */
+    public function match_tail($subpattern = 0) {
+        $wrongtail = '';
+        if ($this->is_match()) {//There is match
+            if ($this->index_first[$subpattern] + $this->length[$subpattern] < strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail =  substr($this->str, $this->index_first[$subpattern] + $this->length[$subpattern], strlen($this->str) - $this->index_first[$subpattern] - $this->length[$subpattern]);
+            }
+        }
+        return $wrongtail;
+    }
+
+    /**
+     * Returns correct part before hint
+     */
+    public function correct_before_hint() {
+        $correctbeforehint = '';
+        if ($this->is_match()) {//There is match
+            $correctbeforehint = substr($this->str, $this->index_first[0], $this->correctendingstart -  $this->index_first[0]);
+        }
+        return $correctbeforehint;
+    }
 }
 
 class qtype_preg_matcher extends qtype_preg_regex_handler {
@@ -325,6 +382,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
         //Reset match data and perform matching.
         $this->matchresults = $this->match_inner($str);
+        //Save source data for the match
+        $this->matchresults->str = $this->str;
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {
