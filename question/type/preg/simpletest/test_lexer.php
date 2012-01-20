@@ -194,7 +194,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $token = $lexer->nextToken();//\g{-2}
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 10);
+        $this->assertTrue($token->value->number == 11);
         $flag = false;
         try {
             $token = $lexer->nextToken();//\a
