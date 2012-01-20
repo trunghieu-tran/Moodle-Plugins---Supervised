@@ -948,6 +948,7 @@ class poasassignment_model {
      * @return object record
      */
     private function create_assignee($userid) {
+    	global $DB;
     	$rec = new stdClass();
     	$rec->userid = $userid;
     	$rec->poasassignmentid = $this->poasassignment->id;
