@@ -33,11 +33,6 @@ class qtype_preg_matching_results {
     public $index_first;
     /** @var array Length of the matches - array where 0 => full match, 1=> first subpattern etc. */
     public $length;
-    /** @var character Possible next character.
-     *
-     * @deprecated since 2.2, use correctending[0] instead
-     */
-    public $next;
     /** @var integer The number of characters left to complete matching. */
     public $left;
     /** @var integer Start index for the correct ending.
@@ -54,13 +49,12 @@ class qtype_preg_matching_results {
     /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
     public $correctendingcomplete;
 
-    public function __construct($full = false, $index_first = array(), $length = array(), $next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                                $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND,
-                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false) {
+    public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
+                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
+                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
-        $this->next = $next;
         $this->left = $left;
         $this->correctendingstart = $correctendingstart;
         $this->correctending = $correctending;
@@ -161,14 +155,7 @@ class qtype_preg_matching_results {
     */
     public function invalidate_match($subpattcount = 0) {
         $this->full = false;
-        //$this->next = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
-        //Produce one-character correct ending from next
-        //TODO - remove when next would be deleted
-        if ($this->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
-            $this->correctendingcomplete = false;
-            $this->correctending = $this->next;
-        }
         $this->index_first = array();
         $this->length = array();
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
@@ -219,21 +206,8 @@ class qtype_preg_matching_results {
         //The matching engine didn't supply correct ending start, but supplied next character (and match isn't full).
         //We could assume that correctendingstart==index_first[0]+length[0], i.e. right after matching fail position
         if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND && 
-            (!$this->full && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
+            (!$this->full && $this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
             $this->correctendingstart = $this->index_first[0] + $this->length[0];
-        }
-
-        //Correct ending supplied, but next character isn't
-        //TODO - remove when next would be deleted
-        if ($this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
-            $this->next = $this->correctending[0];
-        }
-
-        //Produce one-character correct ending from next
-        //TODO - remove when next would be deleted
-        if ($this->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->next !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
-            $this->correctendingcomplete = false;
-            $this->correctending = $this->next;
         }
     }
 
