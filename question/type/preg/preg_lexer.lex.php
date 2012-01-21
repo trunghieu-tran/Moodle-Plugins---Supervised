@@ -1370,7 +1370,7 @@ array(
                             {        // beginning of a lexem
     $this->push_opt_lvl();
     $this->lexemcount++;
-    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, -$this->lexemcount));
+    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, -$this->lexemcount));
     return $res;
 }
                         case -66:
@@ -1378,7 +1378,7 @@ array(
                         case 66:
                             {        // ending of a lexem
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar));
+    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
                         case -67:

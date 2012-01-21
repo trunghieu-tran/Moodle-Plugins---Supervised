@@ -204,9 +204,25 @@ expr(A) ::= expr(B) CLOSEBRACK. [ERROR_PREC] {
     A->indlast = B->indlast + 1;
 }
 
+expr(A) ::= expr(B) CLOSELEXEM. [ERROR_PREC] {
+    //ECHO 'UNOPENLEXEM <br/>';
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM, array(B->indlast + 1), array(B->indlast + 6));
+    $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast + 6;
+}
+
 expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
     //ECHO 'CLOSEPARENATSTART <br/>';
-    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indfirst), array(B->indfirst));
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indfirst), array(B->indlast));
+    $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
+}
+
+expr(A) ::= CLOSELEXEM(B). [ERROR_PREC_SHORT] {
+    //ECHO 'CLOSELEXEMATSTART <br/>';
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM, array(B->indfirst), array(B->indlast));
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
@@ -231,8 +247,34 @@ expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
     A->indfirst = B->indfirst;
 }
 
+expr(A) ::= OPENLEXEM(B) expr(C). [ERROR_PREC] {
+    //ECHO 'UNCLOSEDLEXEM <br/>';
+    $emptyparens = false;
+    foreach($this->errornodes as $key=>$node) {
+        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM && $node->indfirst == B->indlast + 1) {//empty parens, avoiding two error messages
+            unset($this->errornodes[$key]);
+            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_LEXEM, array(B->indfirst), array(B->indlast + 6), $this->parens[B->subtype]);
+            $emptyparens = true;
+            A->indlast = B->indlast + 6;
+        }
+    }
+    if (!$emptyparens) {//regular unclosed parens
+        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_LEXEM, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
+        A->indlast = C->indlast;
+    }
+    $this->reducecount++;
+    A->indfirst = B->indfirst;
+}
+
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
     A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
+    $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = B->indlast;
+}
+
+expr(A) ::= OPENLEXEM(B). [ERROR_PREC_SHORT] {
+    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_LEXEM, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
