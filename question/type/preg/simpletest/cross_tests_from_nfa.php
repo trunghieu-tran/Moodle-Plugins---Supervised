@@ -450,6 +450,19 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_subpatt_named() {
+        $test1 = array( 'str'=>'abcabcabc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>9,1=>3),
+                        'left'=>array(0),
+                        'correctending'=>'');
+
+        return array('regex'=>'(?P<name>abc)\1\g{name}',
+                     'tests'=>array($test1));
+    }
+
     function data_for_test_quant_qu() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
