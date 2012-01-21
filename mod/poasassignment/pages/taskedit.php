@@ -42,19 +42,13 @@ class taskedit_page extends abstract_page {
 		
         $model = poasassignment_model::get_instance();
         if ($this->mode == SHOW_MODE || $this->mode == HIDE_MODE) {
-            if (isset($this->taskid) && $this->taskid > 0) {
-                $this->task = $DB->get_record('poasassignment_tasks', array('id'=>$this->taskid));
-                if ($this->mode == SHOW_MODE) {
-                    $this->task->hidden = 0;
-                }
-                else {
-                    $this->task->hidden = 1;
-                }
-                $DB->update_record('poasassignment_tasks', $this->task);
+            if (isset($this->taskid) && $this->taskid > 0) {            	
+            	$model->set_task_visibility($this->taskid, $this->mode == SHOW_MODE);
                 redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
             }
-            else
+            else {
                 print_error('invalidtaskid','poasassignment');
+            }
         }
         if ($this->mode == 'changeconfirmed') {
         	$this->update_confirmed();        	
@@ -110,22 +104,46 @@ class taskedit_page extends abstract_page {
     	if ($confirm == get_string('no')) {
     		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
     	}
-    	else {
-    		
+    	else {    		
     		$ownerscount = required_param('ownerscount', PARAM_INT);
     		// If there is at least one student, who owns the task,
     		// apply changes to him according to settings
-    		if ($ownerscount > 0) {    			
-    			$assigneeids = $_POST['assigneids'];
+    		if ($ownerscount > 0) {
     			// $_POST['assigneids'] contains array of owners ids
+    			$assigneeids = $_POST['assigneids'];
+    			$model = poasassignment_model::get_instance();
+    			
+    			// If teacher prefered to create new task for at least one student,
+    			// create new task and make old hidden
+    			$createnew = false;    			
+    			foreach ($assigneeids as $assigneeid) {
+    				$action = required_param('action_'.$assigneeid, PARAM_TEXT);
+    				if ($action == 'leavehiddentask') {
+    					$createnew = true;
+    				}
+    			}
+    			//$newtaskid = id старого
+    			if ($createnew) {
+    				$newtaskid = $model->add_task($data);
+    				// Создать новое задание
+    				// сделать старое невидимым
+    				//$newtaskid = id нового
+    			}
+    			
     			foreach ($assigneeids as $assigneeid) {
     				$action = required_param('action_'.$assigneeid, PARAM_TEXT);
     				switch ($action) {
     					case 'changetaskwithprogress':
+    						// Изменить задание
+    						// set assignee->taskid = $newtaskid;
     						break;
     					case 'changetaskwithoutprogress':
+    						$model->drop_assignee_progress($assigneeid);
+    						// ... изменить задание
+    						// set assignee->taskid = $newtaskid;
     						break;
     					case 'leavehiddentask':
+    						// ничего - taskid не менять, задание не менять
     						break;
     				}
     			}
