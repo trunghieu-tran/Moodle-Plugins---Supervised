@@ -244,10 +244,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
     return $res;
 }
-<YYINITIAL> \(\?\#\{\{\) {
+<YYINITIAL> \(\?\#\{\{\) {        // beginning of a lexem
     $this->push_opt_lvl();
     $this->lexemcount++;
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, -$this->lexemcount));
+    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, -$this->lexemcount));
     return $res;
 }
 <YYINITIAL> \) {
@@ -255,10 +255,13 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
-<YYINITIAL> \(\?\#\}\}\) {
+<YYINITIAL> \(\?\#\}\}\) {        // ending of a lexem
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
+    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
+}
+<YYINITIAL> \(\?\#[^)]*\) {        // comment
+    return $this->nextToken();
 }
 <YYINITIAL> \(\?> {
     $this->push_opt_lvl();
