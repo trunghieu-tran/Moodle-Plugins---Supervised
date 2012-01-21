@@ -331,22 +331,22 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);
     }
     function test_lexer_lexems() {
-        $regex = "(?#{{)(?#{{)(?#}})(?#}})";
+        $regex = "(?#this should be skipped)(?#{{)(?#{{)(?#}})(?#}})";
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $token = $lexer->nextToken();    // (?#{{)
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENLEXEM);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
         $this->assertTrue($token->value->number === -1);
         $token = $lexer->nextToken();    // (?#{{)
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENLEXEM);
         $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
         $this->assertTrue($token->value->number === -2);
         $token = $lexer->nextToken();    // (?#}})
-        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSELEXEM);
         $token = $lexer->nextToken();    // (?#}})
-        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSELEXEM);
     }
     function test_lexer_charclass() {
         //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]

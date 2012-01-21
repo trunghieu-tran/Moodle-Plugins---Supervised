@@ -69,15 +69,16 @@
 %nonassoc ERROR_PREC_VERY_SHORT.
 %nonassoc ERROR_PREC_SHORT.
 %nonassoc ERROR_PREC.
-%nonassoc CLOSEBRACK.
+%nonassoc CLOSEBRACK CLOSELEXEM.
 %left ALT.
 %left CONC PARSLEAF.
 %nonassoc QUANT.
-%nonassoc OPENBRACK CONDSUBPATT.
+%nonassoc OPENBRACK CONDSUBPATT OPENLEXEM.
 
 start ::= lastexpr(B). {
     $this->root = B;
 }
+
 expr(A) ::= expr(B) expr(C). [CONC] {
     A = new preg_node_concat;
     A->operands[0] = B;
@@ -86,6 +87,7 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
 }
+
 expr(A) ::= expr(B) ALT expr(C). {
     //ECHO 'ALT <br/>';
     A = new preg_node_alt;
@@ -95,6 +97,7 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
 }
+
 expr(A) ::= expr(B) ALT. {
     A = new preg_node_alt;
     A->operands[0] = B;
@@ -131,6 +134,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     A->indfirst = B->indfirst;
     A->indlast = C->indlast + 1;
 }
+
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     //ECHO  'CONDSUB TF <br/>';
     A = new preg_node_cond_subpatt;
@@ -154,6 +158,18 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A->indfirst = D->indfirst;
     A->indlast = C->indlast + 1;
 }
+
+expr(A) ::= OPENLEXEM(B) expr(C) CLOSELEXEM. {
+    //ECHO 'LEXEM '.$this->parens[B].'<br/>';
+    A = new preg_node_subpatt;
+    A->number = B->number;
+    A->subtype = B->subtype;
+    A->operands[0] = C;
+    $this->reducecount++;
+    A->indfirst = B->indfirst;
+    A->indlast = C->indlast + 1;
+}
+
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
     if (B->type != preg_node::TYPE_LEAF_CHARSET || !B->w && !B->W) {
@@ -174,6 +190,7 @@ expr(A) ::= PARSLEAF(B). {
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
 }
+
 lastexpr(A) ::= expr(B). {
     A = B;
     $this->reducecount++;
@@ -267,7 +284,6 @@ expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
 }
-
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
     A = $this->create_error_node(preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, array(B->indfirst),  array(B->indlast));
