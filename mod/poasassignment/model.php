@@ -434,7 +434,14 @@ class poasassignment_model {
         return $taskid;
     }
 
-    function update_task($taskid, $task) {
+    /** 
+     * Update task
+     * 
+     * @access public
+     * @param int $taskid task id
+     * @param object $task updated task
+     */
+    public function update_task($taskid, $task) {
         global $DB;
         $task->id=$taskid;
         $task->poasassignmentid=$this->poasassignment->id;
@@ -1635,4 +1642,24 @@ class poasassignment_model {
     	return $DB->update_record('poasassignment_tasks', $task);    		
     }
 
+    /**
+     * Change task for assignee
+     * 
+     * @access public
+     * @param int $assigneeid assignee id
+     * @param int $taskid new task id
+     * @return bool true, if update is successfull or false
+     */
+    public function change_assignee_taskid($assigneeid, $taskid) {
+    	global $DB;
+    	if ($DB->record_exists('poasassignment_assignee', array('id' => $assigneeid))) {
+    		$assignee = $DB->get_record(
+    				'poasassignment_assignee', 
+    				array('id' => $assigneeid),
+    				'id, taskid');
+    		$assignee->taskid = $taskid;
+    		return $DB->update_record('poasassignment_assignee', $assignee);
+    	}
+    	return false;
+    }
 }

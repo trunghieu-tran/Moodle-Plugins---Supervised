@@ -9,7 +9,6 @@ class taskedit_page extends abstract_page {
     private $owners;
     
     function __construct($cm,$poasassignment) {
-        global $DB;
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
         $this->mode   = optional_param('mode', null, PARAM_INT);
         $this->cm = $cm;
@@ -28,7 +27,7 @@ class taskedit_page extends abstract_page {
         return true;
     }
     function pre_view() {
-        global $DB, $PAGE;
+        global $PAGE;
 		$id = poasassignment_model::get_instance()->get_cm()->id;
 		// add navigation nodes
 		$tasks = new moodle_url('view.php', array('id' => $id,
@@ -122,33 +121,49 @@ class taskedit_page extends abstract_page {
     					$createnew = true;
     				}
     			}
-    			//$newtaskid = id старого
+    			
+    			$newtaskid = required_param('taskid', PARAM_INT);
+    			
     			if ($createnew) {
-    				$newtaskid = $model->add_task($data);
-    				// Создать новое задание
-    				// сделать старое невидимым
-    				//$newtaskid = id нового
+    				// Create new task
+    				$newtaskid = $model->add_task((object)$_POST);
+    				// Make old task hidden
+    				$model->set_task_visibility(required_param('taskid', PARAM_INT), false);
+    				// Make new task visible
+    				$model->set_task_visibility($newtaskid, true);
     			}
     			
     			foreach ($assigneeids as $assigneeid) {
     				$action = required_param('action_'.$assigneeid, PARAM_TEXT);
     				switch ($action) {
     					case 'changetaskwithprogress':
-    						// Изменить задание
-    						// set assignee->taskid = $newtaskid;
+    						// Update task
+    						$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
+    						// Update taskid if new task is created
+    						if ($createnew) {
+    							$model->change_assignee_taskid($assigneeid, $newtaskid);
+    						}
     						break;
     					case 'changetaskwithoutprogress':
-    						$model->drop_assignee_progress($assigneeid);
-    						// ... изменить задание
-    						// set assignee->taskid = $newtaskid;
+    						// Update task
+    						$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
+    						// Update taskid if new task is created
+    						if ($createnew) {
+    							$model->change_assignee_taskid($assigneeid, $newtaskid);
+    						}
+    						// Drop progress - attempts and grades
+    						$model->drop_assignee_progress($assigneeid);    						
     						break;
     					case 'leavehiddentask':
-    						// ничего - taskid не менять, задание не менять
+    						// Everything is done already for this case
     						break;
     				}
     			}
     		}
-    		print_r($_POST);
+    		else {
+				// Update task
+    			$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
+    		}
     		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)), 'applying changes');
     	}
     	
