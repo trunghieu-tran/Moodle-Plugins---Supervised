@@ -190,6 +190,19 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
+    function test_parser_lexems() {
+        $parser =& $this->run_parser('(?#{{)(?#{{)a(?#}})b(?#}})');
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->number == -1);
+        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->operands[0]->operands[0]->number == -2);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->charset == 'a');
+        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[1]->charset == 'b');
+    }
     function test_parser_duplicate_subpattern_numbers() {
         $parser =& $this->run_parser('(?|a|b|c)');
         $root = $parser->get_root();
