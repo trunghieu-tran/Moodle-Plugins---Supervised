@@ -25,11 +25,8 @@ class qtype_preg_regex_handler {
     protected $modifiers;
     //Max number of a subpattern available in regular expression
     protected $maxsubpatt;
-    //Keys for subpatterns:
-    // positive numbers for numbered subpatterns,
-    // negative numbers for lexems,
-    // strings for named subpatterns.
-    protected $subpatternkeys;
+    //A map where keys are subpattern names and values are their numbers
+    protected $subpatternmap;
 
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
@@ -52,6 +49,7 @@ class qtype_preg_regex_handler {
     public function __construct($regex = null, $modifiers = null) {
         $this->errors = array();
         $this->maxsubpatt = 0;
+        $this->subpatternmap = array();
         if ($regex === null) {
             return;
         }
@@ -88,6 +86,13 @@ class qtype_preg_regex_handler {
     */
     public function used_notation() {
         return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
+    }
+
+    /**
+    * returns subpatterns map
+    */
+    public function get_subpattern_map() {
+        return $this->subpatternmap;
     }
 
     /**
@@ -170,6 +175,7 @@ class qtype_preg_regex_handler {
         }
 
         $this->maxsubpatt = $lexer->get_max_subpattern();
+        $this->subpatternmap = $lexer->get_subpattern_map();
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);

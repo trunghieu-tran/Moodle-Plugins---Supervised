@@ -12,6 +12,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->errors = array();
     $this->lastsubpatt = 0;
     $this->maxsubpatt = 0;
+    $this->subpatternmap = array();
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
     //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis
@@ -24,6 +25,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     protected $errors;
     protected $lastsubpatt;
     protected $maxsubpatt;
+    protected $subpatternmap;
     protected $optstack;
     protected $optcount;
 
@@ -41,6 +43,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
     public function get_max_subpattern() {
         return $this->maxsubpatt;
+    }
+
+    public function get_subpattern_map() {
+        return $this->subpatternmap;
     }
 
     protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
@@ -248,6 +254,51 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->lastsubpatt));
     return $res;
 }
+<YYINITIAL> \(\?\<[a-zA-Z_0-9]+\> {    // named subpattern (?<name>...)
+    $this->push_opt_lvl();
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+        $num = ++$this->lastsubpatt;
+        $this->subpatternmap[$str] = $num;
+    } else {                                                // subpatterns with same names should have same numbers
+        $num = $this->subpatternmap[$str];
+        // TODO check if we are inside a (?|...) group
+    }
+    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    return $res;
+}
+<YYINITIAL> \(\?\'[a-zA-Z_0-9]+\' {    // named subpattern (?'name'...)
+    $this->push_opt_lvl();
+    $str = substr($this->yytext(), 3);
+    $str = substr($str, 0, strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+        $num = ++$this->lastsubpatt;
+        $this->subpatternmap[$str] = $num;
+    } else {                                                // subpatterns with same names should have same numbers
+        $num = $this->subpatternmap[$str];
+        // TODO check if we are inside a (?|...) group
+    }
+    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    return $res;
+}
+<YYINITIAL> \(\?P\<[a-zA-Z_0-9]+\> {   // named subpattern (?P<name>...)
+    $this->push_opt_lvl();
+    $str = substr($this->yytext(), 4);
+    $str = substr($str, 0, strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+        $num = ++$this->lastsubpatt;
+        $this->subpatternmap[$str] = $num;
+    } else {                                                // subpatterns with same names should have same numbers
+        $num = $this->subpatternmap[$str];
+        // TODO check if we are inside a (?|...) group
+    }
+    $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    return $res;
+}
 <YYINITIAL> \(\?: {
     $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
@@ -376,37 +427,37 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {
+<YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = 'name_' . substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {
+<YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = 'name_' . substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {
+<YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = 'name_' . substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {
+<YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = 'name_' . substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {
+<YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {    // named backreference
     $str = substr($this->yytext(), 4);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = 'name_' . substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
