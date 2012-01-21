@@ -213,7 +213,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
             $token = $lexer->nextToken();
             $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
             $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-            $this->assertTrue($token->value->number == 'name_'.($i + 1));
+            $this->assertTrue($token->value->number == 'name_name_'.($i + 1));
         }
     }
     function test_lexer_tricky_backref() {
@@ -274,7 +274,61 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token[1]->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token[1]->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token[1]->value->charset == '8');
-
+    }
+    function test_lexer_named_subpatterns_and_backreferences() {
+        $regex = "(?|(?<qwe>)|(?'qwe'))(?P<rty>)\k<qwe>\k'qwe'\g{qwe}\k{rty}(?P=rty)";
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $token = $lexer->nextToken();    // (?|
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === 'grouping');
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // |
+        $this->assertTrue($token->type == preg_parser_yyParser::ALT);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->number === 1);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();    // (
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->number === 2);
+        $token = $lexer->nextToken();    // )
+        $this->assertTrue($token->type == preg_parser_yyParser::CLOSEBRACK);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number == 'name_qwe');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number == 'name_qwe');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number == 'name_qwe');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number == 'name_rty');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
+        $this->assertTrue($token->value->number == 'name_rty');
+        $map = $lexer->get_subpattern_map();
+        $this->assertTrue(count($map) === 2);
+        $this->assertTrue(array_key_exists('qwe', $map) && $map['qwe'] === 1);
+        $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);
     }
     function test_lexer_charclass() {
         //[a][abc][ab{][ab\\][ab\]][a\db][a-d][3-6]
