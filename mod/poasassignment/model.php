@@ -397,10 +397,13 @@ class poasassignment_model {
     }
 
     /**
-     * Adds task into DB
-     * @param $data
+     * Add task into DB
+     * 
+     * @access public
+     * @param object $data task's parameters
+     * @return int inserted task id 
      */
-    function add_task($data) {
+    public function add_task($data) {
         global $DB;
         $data->poasassignmentid=$this->poasassignment->id;
         //$poasassignment = $DB->get_record('poasassignment',array('id'=>$this->poasassignment->id));
@@ -1610,6 +1613,26 @@ class poasassignment_model {
 		    	WHERE   grmem.userid = $userid";
     	$groups = $DB->get_records_sql($sql);
     	return $groups;
+    }
+    
+    /**
+     * Hide or show task by it's id 
+     * 
+     * @access public
+     * @param int $taskid task id
+     * @param bool $visibility true to show task, false to hide
+     * @return bool true
+     */
+    public function set_task_visibility($taskid, $visibility) {
+    	global $DB;
+		$task = $DB->get_record('poasassignment_tasks', array('id'=>$taskid));
+		if ($visibility) {
+			$task->hidden = 0;
+		}
+		else {
+			$task->hidden = 1;
+		}
+    	return $DB->update_record('poasassignment_tasks', $task);    		
     }
 
 }
