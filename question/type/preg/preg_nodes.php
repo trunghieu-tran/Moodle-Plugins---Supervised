@@ -675,22 +675,38 @@ class preg_leaf_backref extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
 
+    public function get_number_from_map() {
+        $number = $this->number;
+        if (strpos($number, 'name_') === 0) {
+            $map = $this->matcher->get_subpattern_map();
+            $key = substr($number, 5);    //Names in backreferences start with 'name_' prefix
+            if (array_key_exists($key, $map)) {
+                $number = $map[$key];
+            } else {
+                $number = -1;
+            }
+        }
+        return $number;
+    }
+
     public function consumes() {
-        if (!$this->matcher->is_subpattern_captured($this->number)) {
+        $number = $this->get_number_from_map($this->number);
+        if ($number == -1 || !$this->matcher->is_subpattern_captured($number)) {
             return 0;
         }
-        return $this->matcher->match_length($this->number);
+        return $this->matcher->match_length($number);
     }
 
     protected function match_inner($str, $pos, &$length, $cs) {
-        if (!$this->matcher->is_subpattern_captured($this->number)) {
+        $number = $this->get_number_from_map($this->number);
+        if ($number == -1 || !$this->matcher->is_subpattern_captured($number)) {
             $length = 0;
             return false;
         }
         $textlib = textlib_get_instance();
         $len = $textlib->strlen($str);
-        $subpattlen = $this->matcher->match_length($this->number);
-        $start = $this->matcher->first_correct_character_index($this->number);
+        $subpattlen = $this->matcher->match_length($number);
+        $start = $this->matcher->first_correct_character_index($number);
         $end = $start + $subpattlen - 1;
         if ($subpattlen > 0 && $pos >= $len) {
             $length = 0;
@@ -727,10 +743,11 @@ class preg_leaf_backref extends preg_leaf {
 
     public function next_character($str, $pos, $length = 0) {
         // TODO: check for assertions in case of $length == 0
-        if (!$this->matcher->is_subpattern_captured($this->number)) {
+        $number = $this->get_number_from_map($this->number);
+        if ($number == -1 || !$this->matcher->is_subpattern_captured($number)) {
             return '';
         }
-        $start = $this->matcher->first_correct_character_index($this->number);
+        $start = $this->matcher->first_correct_character_index($number);
         $textlib = textlib_get_instance();
         if ($start + $length >= $textlib->strlen($str)) {
             return '';
