@@ -1293,9 +1293,10 @@ class poasassignment_model {
     /**
      * Saves assignee grade in gradebook
      *
+     * @access public
      * @param object $assignee
      */
-    function update_assignee_gradebook_grade($assignee) {
+    public function update_assignee_gradebook_grade($assignee) {
         global $CFG, $DB;
         require_once($CFG->libdir.'/gradelib.php');
 
@@ -1661,5 +1662,54 @@ class poasassignment_model {
     		return $DB->update_record('poasassignment_assignee', $assignee);
     	}
     	return false;
+    }
+    
+    public function drop_assignee_progress($assigneeid) {
+    	global $DB;
+    	
+    	// Clean assignee record
+    	$assignee = $DB->get_record(
+    			'poasassignment_assignee', 
+    			array('id' => $assigneeid), 
+    			'id, taskid, finalized, timetaken, lastattemptid, taskindex, userid'
+    	);
+    	$assignee->taskid = 0;
+    	$assignee->finalized = null;
+    	$assignee->timetaken = 0;    	
+    	$assignee->lastattemptid = null;
+    	$assignee->taskindex = null;
+    	$DB->update_record('poasassignment_assignee', $assignee);
+    	
+    	// Delete random task values for the assignee
+    	$DB->delete_records('poasassignment_task_values', array('assigneeid' => $assigneeid));
+    	
+    	// Get all attempts
+    	$attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assigneeid), 'id');    	
+    	foreach ($attempts as $attempt) {
+    		// Delete all submissions for each attempt
+    		$DB->delete_records('poasassignment_rating_values', array('attemptid' => $attempt->id));
+    		// Delete all grades for each attempt
+    		$DB->delete_records('poasassignment_submissions', array('attemptid' => $attempt->id));
+    	}
+    	// Delete all attempts
+    	$DB->delete_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
+    	
+    	// Delete grade from gradebook
+    	global $CFG;
+    	require_once($CFG->libdir.'/gradelib.php');
+    	$record = new stdClass();
+    	$record->userid = $assignee->userid;
+    	$record->rawgrade = null;
+    	grade_update(
+    			'mod/poasassignment', 
+    			$this->poasassignment->course, 
+    			'mod', 
+    			'poasassignment', 
+    			$this->poasassignment->id, 
+    			0, 
+    			$record, 
+    			null
+    	);
+    	
     }
 }
