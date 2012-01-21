@@ -23,6 +23,7 @@ $string['dfa_matcher'] = 'Deterministic finite state automata';
 $string['dfaheading'] = 'Deterministic finite state automata engine settings';
 $string['dfalimitsdescription'] = 'Allows you to tune time and memory limits for DFA engine to use when matching complex regexes.';
 $string['editingpreg'] = 'Editing regular expression question';
+$string['emptylexem'] = 'Regex syntax error: empty lexem in position from {$a->indfirst} to {$a->indlast}';
 $string['emptyparens'] = 'Regex syntax error: empty parenthesis in position from {$a->indfirst} to {$a->indlast}';
 $string['engine'] = 'Matching engine';
 $string['engine_help'] = '<p>There is no \'best\' matching enginge, so you could choose engine that best fits particular question. </p>
@@ -100,14 +101,16 @@ $string['threealtincondsubpatt'] = 'Regex syntax error: three or more top-level 
 $string['tobecontinued'] = '...';
 $string['toolargefa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="'.$CFG->wwwroot.'/admin/settings.php?section=qtypesettingpreg">increase time and memory limits</a> or simplify you regular expression.';
 $string['toomanyerrors'] = '.......{$a} more errors';
-$string['unclosedparen'] = 'Regex syntax error: closing parenthesis \')\' missing for opening parenthesis in position {$a->indfirst}';
-$string['unclosedsqbrackets'] = 'Regex syntax error: closing brackets \']\' missing for character class starting at position {$a->indfirst}';
+$string['unclosedlexem'] = 'Regex syntax error: missing ending of the lexem \'(?#}})\' for the beginning of the lexem in position {$a->indfirst}';
+$string['unclosedparen'] = 'Regex syntax error: missing closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}';
+$string['unclosedsqbrackets'] = 'Regex syntax error: missing a closing bracket \']\' for the character class starting in position {$a->indfirst}';
 $string['ungreedyquant'] = 'ungreedy quantifiers';
-$string['unopenedparen'] = 'Regex syntax error: opening parenthesis \'(\' missing for closing parenthesis in position {$a->indfirst}';
+$string['unopenedlexem'] = 'Regex syntax error: missing beginning of the lexem \'(?#{{)\' for the ending of the lexem in position {$a->indfirst}';
+$string['unopenedparen'] = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}';
 $string['setunsetmod'] = 'Regex syntax error: set and unset same modifier between {$a->indfirst} {$a->indlast}';
 $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by {$a->engine}';
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by engine {$a->classname}.';
 $string['usehint'] = 'Allow next characters hinting';
-$string['usehint_help'] = 'In behaviours, which allows multiple tries (e.g. adaptive or interactive) show student Hint next character button allowing getting one-character hint with applying Hint next character penalty. Not all matching engines support hinting.';
+$string['usehint_help'] = 'In behaviours, which allow multiple tries (e.g. adaptive or interactive) show student Hint next character button allowing getting one-character hint with applying Hint next character penalty. Not all matching engines support hinting.';
 ?>
 

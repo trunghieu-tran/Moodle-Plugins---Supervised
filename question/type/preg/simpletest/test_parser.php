@@ -314,6 +314,26 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($errornodes[3]->firstindxs[0] == 15);
         $this->assertTrue($errornodes[3]->lastindxs[0] == 15);
     }
+    function test_lexem_syntax_errors() {
+        //Unopened lexem
+        $parser =& $this->run_parser('(?#}})(qwe)(?#}})');
+        $this->assertTrue($parser->get_error());
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM);
+        //Unclosed lexem
+        $parser =& $this->run_parser('(?#{{)(?#}})(?#{{)(qwe)');
+        $this->assertTrue($parser->get_error());
+        $errornodes = $parser->get_error_nodes();
+        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_LEXEM);
+        $this->assertTrue($errornodes[2]->type == preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_EMPTY_LEXEM);
+    }
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
         $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
