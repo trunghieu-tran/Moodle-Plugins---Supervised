@@ -13,6 +13,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->lastsubpatt = 0;
     $this->maxsubpatt = 0;
     $this->subpatternmap = array();
+    $this->lexemcount = 0;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
     //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis
@@ -26,6 +27,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     protected $lastsubpatt;
     protected $maxsubpatt;
     protected $subpatternmap;
+    protected $lexemcount;
     protected $optstack;
     protected $optcount;
 
@@ -242,7 +244,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
     return $res;
 }
+<YYINITIAL> \(\?\#\{\{\) {
+    $this->push_opt_lvl();
+    $this->lexemcount++;
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, -$this->lexemcount));
+    return $res;
+}
 <YYINITIAL> \) {
+    $this->pop_opt_lvl();
+    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
+    return $res;
+}
+<YYINITIAL> \(\?\#\}\}\) {
     $this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
