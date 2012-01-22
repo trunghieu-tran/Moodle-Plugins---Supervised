@@ -170,7 +170,7 @@ class tasks_page extends abstract_page {
                 if ($field->showintable>0) {
                     if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
                         $taskvalue=$DB->get_record('poasassignment_task_values',
-                                                    array('taskid'=>$task->id,'fieldid'=>$field->id,'assigneeid'=>0));
+                                                    array('taskid'=>$task->id, 'fieldid'=>$field->id, 'assigneeid'=>0));
                         if (!$taskvalue)
                             $taskvalue->value='null';
                         else {

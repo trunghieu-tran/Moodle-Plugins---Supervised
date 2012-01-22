@@ -183,14 +183,14 @@ switch ($action) {
     	
     	// If there are students, that own this task, show them
     	if (count($owners) > 0) {
+    		require_once ('poasassignment_view.php');
+    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners();
     		$usersinfo = $poasmodel->get_users_info($owners);
     		print_string('ownersofthetask', 'poasassignment');
-    		echo '<ul class="taskowners">';
     		foreach ($usersinfo as $userinfo) {
-    			$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
-    			echo '<li>'.html_writer::link($userurl, fullname($userinfo->userinfo, true)).'</li>';
+    			$table->add_data(get_owner($userinfo));
     		}
-    		echo '</ul>';
+    		$table->print_html();
     	}
     	else {
     		print_string('nooneownsthetask', 'poasassignment');
@@ -240,4 +240,52 @@ switch ($action) {
     	$poasmodel->delete_task($taskid);
     	redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')));
     	break;
+}
+function get_owner($userinfo) {
+	$model = poasassignment_model::get_instance();
+	$owner = array();
+
+	// Get student username and profile link
+	$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+	$owner[] = html_writer::link($userurl, fullname($userinfo->userinfo, true));
+
+	// TODO Get student's groups
+	$owner[] = '?';
+
+
+	// Get information about assignee's attempts and grades
+	if ($attempt = $model->get_last_attempt($userinfo->id)) {
+		$owner[] = get_string('hasattempts', 'poasassignment');
+
+		// If assignee has an attempt(s), show information about his grade
+		if ($attempt->rating != null) {
+			// Show actual grade with penalty
+			$owner[] =
+			get_string('hasgrade', 'poasassignment').
+			' ('.
+			$this->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+			')';
+		}
+		else {
+			// Looks like assignee has no grade or outdated grade
+			if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
+				$owner[] =
+				get_string('hasoutdatedgrade', 'poasassignment').
+				' ('.
+				$this->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+				')';
+			}
+			else {
+				// There is no graded attempts, so show 'No grade'
+				$owner[] = get_string('nograde', 'poasassignment');
+			}
+		}
+	}
+	else {
+		// No attepts => no grade
+		$owner[] = get_string('hasnoattempts', 'poasassignment');
+		$owner[] = get_string('nograde', 'poasassignment');
+	}
+
+	return $owner;
 }
