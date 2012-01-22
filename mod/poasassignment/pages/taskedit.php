@@ -106,11 +106,11 @@ class taskedit_page extends abstract_page {
     	else {    		
     		$ownerscount = required_param('ownerscount', PARAM_INT);
     		// If there is at least one student, who owns the task,
-    		// apply changes to him according to settings
+    		// apply changes to him according to settings    		
+    		$model = poasassignment_model::get_instance();
     		if ($ownerscount > 0) {
     			// $_POST['assigneids'] contains array of owners ids
     			$assigneeids = $_POST['assigneids'];
-    			$model = poasassignment_model::get_instance();
     			
     			// If teacher prefered to create new task for at least one student,
     			// create new task and make old hidden
@@ -164,50 +164,9 @@ class taskedit_page extends abstract_page {
 				// Update task
     			$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
     		}
-    		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)), 'applying changes');
+    		redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
     	}
     	
-    }
-    /**
-     * Prepare flexible table for using
-     * 
-     * @access private
-     * @return object flexible_table
-     */
-    private function prepare_flexible_table_owners() {
-    	global $PAGE, $OUTPUT;
-    	$table = new flexible_table('mod-poasassignment-task-owners');
-    	$table->baseurl = $PAGE->url;
-    	$columns = array(
-    			'fullname', 
-    			'usergroups', 
-    			'attemptstatus', 
-    			'gradestatus', 
-    			'changetaskwithprogress',
-    			'changetaskwithoutprogress',
-    			'leavehiddentask');
-    	$headers = array(
-    			get_string('fullname', 'poasassignment'),
-    			get_string('usergroups', 'poasassignment'),
-    			get_string('attemptstatus', 'poasassignment'),
-    			get_string('gradestatus', 'poasassignment'),
-    			get_string('changetaskwithprogress', 'poasassignment').' '.
-    				$OUTPUT->help_icon('changetaskwithprogress', 'poasassignment'),
-    			get_string('changetaskwithoutprogress', 'poasassignment').' '.
-    				$OUTPUT->help_icon('changetaskwithoutprogress', 'poasassignment'),
-    			get_string('leavehiddentask', 'poasassignment').' '.
-    				$OUTPUT->help_icon('leavehiddentask', 'poasassignment')
-    	);
-    	$table->define_columns($columns);
-    	$table->define_headers($headers);
-    	$table->collapsible(true);
-    	$table->initialbars(false);
-    	$table->set_attribute('class', 'poasassignment-table task-owners');
-    	//$table->set_attribute('width', '100%');
-    
-    	$table->setup();
-    
-    	return $table;
     }
     
     /**
@@ -311,7 +270,24 @@ class taskedit_page extends abstract_page {
     		// Show owners table
     		$usersinfo = $model->get_users_info($owners);
     		print_string('ownersofthetask', 'poasassignment');
-    		$table = $this->prepare_flexible_table_owners();
+    		require_once ('poasassignment_view.php');
+    		$extcolumns = array(
+    				'changetaskwithprogress',
+    				'changetaskwithoutprogress',
+    				'leavehiddentask'
+    				);
+    		$extheaders = array(
+    				get_string('changetaskwithprogress', 'poasassignment').' '.
+    					$OUTPUT->help_icon('changetaskwithprogress', 'poasassignment'),
+    			
+    				get_string('changetaskwithoutprogress', 'poasassignment').' '.
+    					$OUTPUT->help_icon('changetaskwithoutprogress', 'poasassignment'),
+    			
+    				get_string('leavehiddentask', 'poasassignment').' '.
+    					$OUTPUT->help_icon('leavehiddentask', 'poasassignment')
+    				);
+    		
+    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
     		foreach ($usersinfo as $userinfo) {
     			$table->add_data($this->get_owner($userinfo));    			
     			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
@@ -332,7 +308,6 @@ class taskedit_page extends abstract_page {
     	
     	// Add updated task in hidden elements
     	foreach ((array)$data as $name => $field) {
-    		echo '<br/>'.$name.'='.$field;
     		echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
     	}
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
