@@ -7,8 +7,10 @@ class taskfieldedit_page extends abstract_page {
     private $fieldid;
     private $field;
     private $mform;
+    private $mode;
     function __construct() {
         $this->fieldid = optional_param('fieldid', 0, PARAM_INT);
+        $this->mode = optional_param('mode', '', PARAM_TEXT);
     }
     function get_cap() {
         return 'mod/poasassignment:managetasksfields';
@@ -59,6 +61,9 @@ class taskfieldedit_page extends abstract_page {
                      0);
         }
         else {
+        	if ($this->mode == 'confirmedit') {
+        		redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), 'edit');
+        	}
             if ($this->mform->get_data()) {
                 $data = $this->mform->get_data();    
                 if ($this->fieldid > 0) {
@@ -88,15 +93,24 @@ class taskfieldedit_page extends abstract_page {
     public static function display_in_navbar() {
         return false;
     }
+    
+    public function confirm_update($data) {
+    	
+    }
 }
 class taskfieldedit_form extends moodleform {
     function definition() {
         $mform = $this->_form;
         $instance = $this->_customdata;
-        if ($instance['fieldid'] > 0)
+        if ($instance['fieldid'] > 0) {
             $mform->addElement('header','taskfieldeditheader',get_string('taskfieldeditheader','poasassignment'));
-        else
+            $mform->addElement('hidden', 'mode', 'confirmedit');
+        }
+        else {
             $mform->addElement('header','taskfieldaddheader',get_string('taskfieldaddheader','poasassignment'));
+            $mform->addElement('hidden', 'mode', 'confirmadd');
+        }
+        $mform->setType('mode', PARAM_TEXT);
         
         $mform->addElement('text','name',get_string('taskfieldname','poasassignment'),array('size'=>45));
         $mform->addElement('textarea','description',get_string('taskfielddescription','poasassignment'),'rows="5" cols="50"');

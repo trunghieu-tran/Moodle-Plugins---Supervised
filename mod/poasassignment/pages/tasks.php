@@ -197,7 +197,7 @@ class tasks_page extends abstract_page {
                                         $variants=$poasmodel->get_field_variants($field->id);
                                         foreach ($opts as $opt) {
                                             //$variant = $poasmodel->get_variant($opt,$poasmodel->get_field_variants($field->id));
-                                            $variant=$variants[$opt];
+                                            $variant = $variants[$opt];
                                             $taskvalue->value.=$variant.'<br>';
                                         }
                                     }

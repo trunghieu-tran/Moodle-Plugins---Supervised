@@ -61,4 +61,5 @@ class poasassignment_view {
     
     	return $table;
     }
+    
 }

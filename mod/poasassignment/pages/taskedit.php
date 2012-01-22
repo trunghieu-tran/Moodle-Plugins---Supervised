@@ -308,7 +308,14 @@ class taskedit_page extends abstract_page {
     	
     	// Add updated task in hidden elements
     	foreach ((array)$data as $name => $field) {
-    		echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
+    		if (!is_array($field)) {
+    			echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
+    		}
+    		else {
+    			foreach ($field as $key => $value) {
+    				echo '<input type="hidden" name="'.$name.'['.$key.']" value="'.$value.'"/>';
+    			}
+    		}
     	}
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
     	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
