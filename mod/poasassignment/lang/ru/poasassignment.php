@@ -203,3 +203,4 @@ $string['leavehiddentask_help'] = 'У студента остается стар
 $string['changetaskconfirmation'] = 'Внести изменения в задание?';
 $string['changingtaskwillchangestudentsdata'] = 'Изменение задания повлияет на студентов';
 $string['deletecriterion'] = 'Удалить критерий';
+$string['taskview'] = 'Просмотр задания';

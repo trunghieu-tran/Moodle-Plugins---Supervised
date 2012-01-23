@@ -520,8 +520,7 @@ class poasassignment_model {
             $name='field'.$field->id;
             if (($field->ftype==STR || $field->ftype==TEXT ||
                         $field->ftype==FLOATING || $field->ftype==NUMBER ||
-                        $field->ftype==DATE) && $field->random = 0) {
-
+                        $field->ftype==DATE || $field->ftype == LISTOFELEMENTS) && $field->random == 0) {
                 $value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid));
                 if ($value)
                     $task->$name=$value->value;
