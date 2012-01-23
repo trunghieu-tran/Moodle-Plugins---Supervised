@@ -464,7 +464,13 @@ class poasassignment_model {
                 $fieldvalue->value=$multilistvalue;
             }
 
-            if ($getrec=$DB->get_record('poasassignment_task_values',array('taskid'=>$taskid,'fieldid'=>$field->id))) {
+            if ($getrec = $DB->get_record(
+            		'poasassignment_task_values',
+            		array(
+            				'taskid' => $taskid,
+            				'fieldid' => $field->id,
+            				'assigneeid' => 0
+            		))) {
                 $fieldvalue->id=$getrec->id;
                 $taskvalueid=$DB->update_record('poasassignment_task_values',$fieldvalue);
             }
@@ -512,9 +518,9 @@ class poasassignment_model {
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($fields as $field) {
             $name='field'.$field->id;
-            if ($field->ftype==STR || $field->ftype==TEXT ||
+            if (($field->ftype==STR || $field->ftype==TEXT ||
                         $field->ftype==FLOATING || $field->ftype==NUMBER ||
-                        $field->ftype==DATE || !$field->random) {
+                        $field->ftype==DATE) && $field->random = 0) {
 
                 $value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid));
                 if ($value)
@@ -1690,6 +1696,20 @@ class poasassignment_model {
     				'poasassignment_assignee', 
     				array('id' => $assigneeid),
     				'id, taskid');
+    		
+    		// Update random generated values for assignee
+    		$taskrandomvalues = $DB->get_records(
+    				'poasassignment_task_values', 
+    				array(
+    						'taskid' => $assignee->taskid, 
+    						'assigneeid' => $assigneeid), 
+    				'id', 
+    				'id, taskid');
+    		foreach ($taskrandomvalues as $taskrandomvalue) {
+    			$taskrandomvalue->taskid = $taskid;
+    			$DB->update_record('poasassignment_task_values', $taskrandomvalue);
+    		}
+    		
     		$assignee->taskid = $taskid;
     		return $DB->update_record('poasassignment_assignee', $assignee);
     	}
