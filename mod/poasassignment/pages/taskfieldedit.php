@@ -61,18 +61,12 @@ class taskfieldedit_page extends abstract_page {
                      0);
         }
         else {
-        	if ($this->mode == 'confirmedit') {
-        		echo 'Одно или несколько заданий уже выполняются студентами.';
-        		echo '<br/>Список заданий и прогресса студентов по заданиям';
-        		echo '<br/>Укажите, каким образом изменить прогресс студентов?';
-        		echo '<br/> Если был изменен тип - автосброс поля во всех заданиях';
-        		echo '<br/> Сбросить значения поля в заданиях?';
-        		echo '<br/> Или укажите значение по-умолчанию';
-        		redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), 'edit');
-        	}
             if ($this->mform->get_data()) {
-                $data = $this->mform->get_data();    
-                if ($this->fieldid > 0) {
+                $data = $this->mform->get_data();                
+                if ($this->mode == 'confirmedit') {
+                	$this->confirm_update($data );
+                }    
+                if ($this->fieldid > 0) {                	
                     $model->update_task_field($this->fieldid, $data);
                 }
                 else {
@@ -104,7 +98,14 @@ class taskfieldedit_page extends abstract_page {
     }
     
     public function confirm_update($data) {
-    	
+    	$model = poasassignment_model::get_instance();
+    	echo 'Одно или несколько заданий уже выполняются студентами.';
+    	echo '<br/>Список заданий и прогресса студентов по заданиям';
+    	echo '<br/>Укажите, каким образом изменить прогресс студентов?';
+    	echo '<br/> Если был изменен тип - автосброс поля во всех заданиях';
+    	echo '<br/> Сбросить значения поля в заданиях?';
+    	echo '<br/> Или укажите значение по-умолчанию';
+    	redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), 'edit');
     }
 }
 class taskfieldedit_form extends moodleform {

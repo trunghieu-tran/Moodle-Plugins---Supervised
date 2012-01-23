@@ -132,24 +132,28 @@ class taskedit_page extends abstract_page {
     				// Make new task visible
     				$model->set_task_visibility($newtaskid, true);
     			}
-    			
     			foreach ($assigneeids as $assigneeid) {
     				$action = required_param('action_'.$assigneeid, PARAM_TEXT);
     				switch ($action) {
     					case 'changetaskwithprogress':
-    						// Update task
-    						$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
     						// Update taskid if new task is created
     						if ($createnew) {
     							$model->change_assignee_taskid($assigneeid, $newtaskid);
     						}
+    						else {
+    							// Update task
+    							$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);    							
+    						}
     						break;
     					case 'changetaskwithoutprogress':
-    						// Update task
-    						$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
+
     						// Update taskid if new task is created
     						if ($createnew) {
     							$model->change_assignee_taskid($assigneeid, $newtaskid);
+    						}
+    						else {
+    							// Update task
+    							$model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);    							
     						}
     						// Drop progress - attempts and grades
     						$model->drop_assignee_progress($assigneeid);    						
