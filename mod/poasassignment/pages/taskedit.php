@@ -174,25 +174,6 @@ class taskedit_page extends abstract_page {
     }
     
     /**
-     * Get "rating - penaty = total" string 
-     *  
-     * @access private
-     * @param int $rating
-     * @param int $penalty
-     */
-    private function show_rating_methematics($rating, $penalty) {
-    	$string = '';
-    	
-    	$string .= $rating;
-		$string .= ' - ';
-		$string .= '<span style="color:red;">'.$penalty.'</span>';
-		$string .= ' = ';
-		$string .= $rating - $penalty;
-		
-		return $string;
-    }
-    
-    /**
      * Get information about task owner and his task's status
      * 
      * @access private

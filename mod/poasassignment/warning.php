@@ -241,6 +241,23 @@ switch ($action) {
     	redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'tasks')));
     	break;
 }
+/**
+ * Get "rating - penaty = total" string
+ *
+ * @param int $rating
+ * @param int $penalty
+ */
+function show_rating_methematics($rating, $penalty) {
+	$string = '';
+
+	$string .= $rating;
+	$string .= ' - ';
+	$string .= '<span style="color:red;">'.$penalty.'</span>';
+	$string .= ' = ';
+	$string .= $rating - $penalty;
+
+	return $string;
+}
 function get_owner($userinfo) {
 	$model = poasassignment_model::get_instance();
 	$owner = array();
@@ -263,7 +280,7 @@ function get_owner($userinfo) {
 			$owner[] =
 			get_string('hasgrade', 'poasassignment').
 			' ('.
-			$this->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+			show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
 			')';
 		}
 		else {
@@ -272,7 +289,7 @@ function get_owner($userinfo) {
 				$owner[] =
 				get_string('hasoutdatedgrade', 'poasassignment').
 				' ('.
-				$this->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+				show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
 				')';
 			}
 			else {
