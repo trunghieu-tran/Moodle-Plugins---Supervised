@@ -174,7 +174,7 @@ class tasks_page extends abstract_page {
                         if (!$taskvalue)
                             $taskvalue->value='null';
                         else {
-                            if ($field->random)
+                            if ($field->random == 1)
                                 $taskvalue->value= 'random';
                             else {
                                 if (isset($taskvalue->value)) {

@@ -62,6 +62,12 @@ class taskfieldedit_page extends abstract_page {
         }
         else {
         	if ($this->mode == 'confirmedit') {
+        		echo 'Одно или несколько заданий уже выполняются студентами.';
+        		echo '<br/>Список заданий и прогресса студентов по заданиям';
+        		echo '<br/>Укажите, каким образом изменить прогресс студентов?';
+        		echo '<br/> Если был изменен тип - автосброс поля во всех заданиях';
+        		echo '<br/> Сбросить значения поля в заданиях?';
+        		echo '<br/> Или укажите значение по-умолчанию';
         		redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), 'edit');
         	}
             if ($this->mform->get_data()) {
@@ -70,7 +76,10 @@ class taskfieldedit_page extends abstract_page {
                     $model->update_task_field($this->fieldid, $data);
                 }
                 else {
-                    $model->add_task_field($data);
+                	// Insert field
+                    $data = $model->add_task_field($data);
+                    // Generate random values for students, who already took the task
+                    $model->generate_randoms($data);
                 }
                 redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
             }

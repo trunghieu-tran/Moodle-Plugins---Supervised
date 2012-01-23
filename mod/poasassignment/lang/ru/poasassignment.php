@@ -202,3 +202,4 @@ $string['changetaskwithoutprogress_help'] = 'Задание изменяется
 $string['leavehiddentask_help'] = 'У студента остается старая версия задания, а все изменения учитываются в новом создаваемом задании. Старое задание становится невидмым, его невозможно взять';
 $string['changetaskconfirmation'] = 'Внести изменения в задание?';
 $string['changingtaskwillchangestudentsdata'] = 'Изменение задания повлияет на студентов';
+$string['deletecriterion'] = 'Удалить критерий';

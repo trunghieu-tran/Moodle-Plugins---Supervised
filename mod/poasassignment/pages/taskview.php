@@ -57,7 +57,7 @@ class taskview_page extends abstract_page {
             if (!$field->secretfield || $owntask || has_capability('mod/poasassignment:managetasks', $model->get_context())) {
                 // If it is random value and our task, load value from DB
                 if ($field->random && ($owntask || has_capability('mod/poasassignment:managetasks',$model->get_context()))) {
-                    $assigneeid = $smodel->assignee->id;
+                    $assigneeid = $model->assignee->id;
                     $taskvalue = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,
                                                                         'taskid'=>$this->taskid,
                                                                         'assigneeid'=>$assigneeid));

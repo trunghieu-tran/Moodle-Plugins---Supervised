@@ -766,30 +766,39 @@ class poasassignment_model {
         return '';
     }
 
-     function add_task_field($data) {
+    /**
+     * Add task field to instance
+     * 
+     * @access public
+     * @param object $data field to insert in DB
+     * @return object record with id 
+     */
+	function add_task_field($data) {
         global $DB;
-        $data->poasassignmentid=$this->poasassignment->id;
+        $data->poasassignmentid = $this->poasassignment->id;
         $data->showintable=isset($data->showintable);
         //$data->searchparameter=isset($data->searchparameter);
         $data->secretfield=isset($data->secretfield);
         $data->random=isset($data->random);
-        $data->assigneeid = 0;
+        $data->assigneeid = 0;        
 
-        $fieldid= $DB->insert_record('poasassignment_fields',$data);
+        $fieldid = $DB->insert_record('poasassignment_fields',$data);
+        $data->id = $fieldid;
         if ($data->ftype==LISTOFELEMENTS || $data->ftype==MULTILIST) {
             $variants=explode("\n",$data->variants);
             $i=0;
+            $data->variants = $variants;
             foreach ($variants as $variant) {
-                $rec->fieldid=$fieldid;
-                $rec->sortorder=$i;
-                $rec->value=$variant;
+                $rec->fieldid = $fieldid;
+                $rec->sortorder = $i;
+                $rec->value = $variant;
                 $DB->insert_record('poasassignment_variants',$rec);
                 $i++;
             }
         }
-        if ($data->ftype==FLOATING || $data->ftype==NUMBER) {
-            if ($data->valuemax==$data->valuemin)
-                $data->random=0;
+        if ($data->ftype == FLOATING || $data->ftype == NUMBER) {
+            if ($data->valuemax == $data->valuemin)
+                $data->random = 0;
         }
         $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($tasks as $task) {
@@ -797,14 +806,13 @@ class poasassignment_model {
             $taskvalue->taskid=$task->id;
             $DB->insert_record('poasassignment_task_values',$taskvalue);
         }
-        return $fieldid;
+        return $data;
     }
 
     function update_task_field($fieldid,$field) {
         global $DB;
         $field->id=$fieldid;
         $field->showintable=isset($field->showintable);
-        //$field->searchparameter=isset($field->searchparameter);
         $field->secretfield=isset($field->secretfield);
         $field->random=isset($field->random);
         if ($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST) {
@@ -1033,6 +1041,25 @@ class poasassignment_model {
             $this->update_assignee_gradebook_grade($DB->get_record('poasassignment_assignee', array('id' => $attempt->assigneeid)));
             // TODO Просто вызвать функцию, которая выставляет оценку
         }
+    }
+    
+    public function get_random_value($field) {
+    	if (!($field->valuemin == 0 && $field->valuemax == 0)) {
+    		if ($field->ftype == NUMBER)
+    			$randvalue = rand($field->valuemin, $field->valuemax);
+    		if ($field->ftype == FLOATING)
+    			$randvalue = (float)rand($field->valuemin * 100, $field->valuemax * 100) / 100;
+    	}
+    	else {
+    		if ($field->ftype == NUMBER)
+    			$randvalue = rand();
+    		if ($field->ftype == FLOATING)
+    			$randvalue = (float)rand() / 100;
+    	}
+    	if ($field->ftype == LISTOFELEMENTS) {
+    		$randvalue = rand(0, count($field->variants) - 1);
+    	}
+    	return $randvalue;
     }
     function bind_task_to_assignee($userid,$taskid) {
         global $DB;
@@ -1664,6 +1691,12 @@ class poasassignment_model {
     	return false;
     }
     
+    /**
+     * Drop student's attempts and grades
+     * 
+     * @access public
+     * @param int $assigneeid
+     */
     public function drop_assignee_progress($assigneeid) {
     	global $DB;
     	
@@ -1711,5 +1744,30 @@ class poasassignment_model {
     			null
     	);
     	
+    }
+    
+    /**
+     * Generate random fields for students who don't have value in this field
+     * 
+     * @param object $field
+     */
+    public function generate_randoms($field) {
+    	if ($field->random == 1) {    		
+	    	global $DB;
+	    	$sql = "SELECT a.id, a.taskid, a.userid FROM
+	    	{poasassignment_assignee} a WHERE taskid <> 0 AND
+	    	a.poasassignmentid = $field->poasassignmentid";
+	    	
+	    	$assignees = $DB->get_records_sql($sql);
+	    	foreach ($assignees as $assignee) {
+	    		$value = $this->get_random_value($field);
+	    		$rec = new stdClass();
+	    		$rec->taskid = $assignee->taskid;
+	    		$rec->fieldid = $field->id;
+	    		$rec->value = $value;
+	    		$rec->assigneeid = $assignee->id;
+	    		$DB->insert_record('poasassignment_task_values', $rec);
+	    	}
+    	}
     }
 }

@@ -305,3 +305,4 @@ $string['changetaskwithoutprogress_help'] = 'Change task, save student\'s attemp
 $string['leavehiddentask_help'] = 'Save old version of the task for the student, all changes will be applied to create new task. Old task will be hidden from students';
 $string['changetaskconfirmation'] = 'Are you sure you want to change the task?';
 $string['changingtaskwillchangestudentsdata'] = 'Changing the task will cause effect on students';
+$string['deletecriterion'] = 'Delete criterion';
