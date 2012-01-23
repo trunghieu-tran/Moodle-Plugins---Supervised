@@ -116,6 +116,7 @@ class criterionsedit_form extends moodleform {
             $mform->setType('grader' . (count($sources) - 1), PARAM_INT);
         }
         $repeatarray[] = &MoodleQuickForm::createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);
+        $repeatarray[] = $mform->createElement('checkbox', 'delete', get_string('deletecriterion', 'poasassignment'));
         $repeatarray[] = &MoodleQuickForm::createElement('hidden', 'criterionid', -1);
 
         if ($instance){
@@ -131,6 +132,12 @@ class criterionsedit_form extends moodleform {
         $repeateloptions['description']['helpbutton'] = array('criteriondescription', 'poasassignment');
         $repeateloptions['weight']['helpbutton'] = array('criterionweight', 'poasassignment');
         $repeateloptions['source']['helpbutton'] = array('criterionsource', 'poasassignment');
+        
+        $repeateloptions['delete']['default'] = 0;
+        $repeateloptions['name']['disabledif'] = array('delete', 'eq', 1);
+        $repeateloptions['description']['disabledif'] = array('delete', 'eq', 1);        
+        $repeateloptions['weight']['disabledif'] = array('delete', 'eq', 1);
+        $repeateloptions['source']['disabledif'] = array('delete', 'eq', 1);
 
         $mform->setType('criterionid', PARAM_INT);
 
