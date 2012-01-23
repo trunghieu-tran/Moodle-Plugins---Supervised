@@ -728,6 +728,22 @@ class poasassignment_model {
         return $default_values;
     }
 
+    /**
+     * Get variants for field
+     * 
+     * @access public
+     * @param int $fieldid
+     * @return array variants
+     */
+    public function get_variants($fieldid) {
+    	global $DB;
+    	$records = $DB->get_records('poasassignment_variants', array('fieldid' => $fieldid), 'sortorder, id', 'id, value');
+    	$variants = array();
+    	foreach ($records as $record) {
+    		$variants[] = $record->value;
+    	}
+    	return $variants;
+    }
     function get_variant($index,$variants) {
         $tok = strtok($variants,"\n");
         while (strlen($tok)>0) {
@@ -1043,6 +1059,13 @@ class poasassignment_model {
         }
     }
     
+    /**
+     * Get random valuefrom field $field
+     * 
+     * @access public
+     * @param object $field
+     * @return mixed value
+     */
     public function get_random_value($field) {
     	if (!($field->valuemin == 0 && $field->valuemax == 0)) {
     		if ($field->ftype == NUMBER)
@@ -1061,45 +1084,27 @@ class poasassignment_model {
     	}
     	return $randvalue;
     }
-    function bind_task_to_assignee($userid,$taskid) {
+    
+    function bind_task_to_assignee($userid, $taskid) {
         global $DB;
         $rec = $this->get_assignee($userid);
-        //$rec->userid=$userid;
-        //$rec->poasassignmentid=$this->poasassignment->id;
         $rec->taskid = $taskid;
         $rec->taskindex++;        
         $rec->timetaken = time();
         $DB->update_record('poasassignment_assignee', $rec);
         $this->assignee->id = $rec->id;
 
-        $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
+        $fields = $DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));        
         foreach ($fields as $field) {
-            if ($field->random) {
-                if (!($field->valuemin==0 && $field->valuemax==0)) {
-                    if ($field->ftype==NUMBER)
-                        $randvalue=rand($field->valuemin,$field->valuemax);
-                    if ($field->ftype==FLOATING)
-                        $randvalue=(float)rand($field->valuemin*100,$field->valuemax*100)/100;
-                }
-                else {
-                    if ($field->ftype==NUMBER)
-                        $randvalue=rand();
-                    if ($field->ftype==FLOATING)
-                        $randvalue=(float)rand()/100;
-                }
-                if ($field->ftype==LISTOFELEMENTS) {
-                    $tok = strtok($field->variants,"\n");
-                    $count=0;
-                    while ($tok) {
-                        $count++;
-                        $tok=strtok("\n");
-                    }
-                        $randvalue=rand(0,$count-1);
-                }
-                $randrec->taskid=$taskid;
-                $randrec->fieldid=$field->id;
-                $randrec->value=$randvalue;
-                $randrec->assigneeid=$this->assignee->id;
+        	
+            if ($field->random == 1) {
+            	$field->variants = $this->get_variants($field->id);
+            	
+            	$randrec->value = $this->get_random_value($field);
+                $randrec->taskid = $taskid;
+                $randrec->fieldid = $field->id;                
+                $randrec->assigneeid = $this->assignee->id;
+                
                 $DB->insert_record('poasassignment_task_values',$randrec);
             }
         }
