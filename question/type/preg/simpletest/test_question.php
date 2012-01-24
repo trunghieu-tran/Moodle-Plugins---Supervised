@@ -108,7 +108,14 @@ class qtype_preg_question_test extends UnitTestCase {
         $answer3->fraction = 100;
         $answer3->feedback = '{$0}|{$1}|{$2}|{$3}';
 
-        $subpatt->answers = array($answer1, $answer2, $answer3);
+        //Answer with named subpattern
+        $answer4 = new stdClass;
+        $answer4->id = 203;
+        $answer4->answer = '(?P<name>value)nonvalue';
+        $answer4->fraction = 100;
+        $answer4->feedback = '{$name}';
+
+        $subpatt->answers = array($answer1, $answer2, $answer3, $answer4);
         $this->subpattquestion = $subpatt;
 
 
@@ -327,6 +334,12 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
         $this->assertTrue($replaced === '');
+        //Named subpattern test
+        $response = array('answer' => 'valuenonvalue');
+        $bestfit = $customengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $customengine->insert_subpatterns('{$name}', $response, $matchresults);
+        $this->assertTrue($replaced === 'value');
 
         ////Engine using PHP preg_match function
         $phpengine = clone $this->subpattquestion;
