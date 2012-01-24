@@ -50,9 +50,14 @@ class qtype_preg_matching_results {
      */
     public $correctendingstart;
 
-    ////Source data - TODO - add info about subpatterns, including number of them, names etc
+    ////Source data - TODO - add info about lexemes
     /** @var string String with which match was performed*/
-    public $str;
+    protected $str;
+    /** @var integer Max number of a subpattern available in regular expression */
+    protected $maxsubpatt;
+    /** @var array A map where keys are subpattern names and values are their numbers */
+    protected $subpatternmap;
+
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
@@ -64,6 +69,15 @@ class qtype_preg_matching_results {
         $this->correctendingstart = $correctendingstart;
         $this->correctending = $correctending;
         $this->correctendingcomplete = $correctendingcomplete;
+    }
+
+    /**
+     * Sets info about string and regular expression, that is needed for some functions to work
+     */
+    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array()) {
+        $this->str = $str;
+        $this->maxsubpatt = $maxsubpatt;
+        $this->subpatternmap = $subpatternmap;
     }
 
     /**
@@ -242,9 +256,43 @@ class qtype_preg_matching_results {
     }
 
     /**
+     * Return subpattern index in the index_first and length arrays
+     *
+     * If it is subpattern name, use $subpatternmap to find appropriate index,
+     * otherwise (numbered subpattern or lexeme) just return $subpattern.
+     */
+    public function subpattern_index($subpattern) {
+        if (is_string($subpattern)) {//named subpattern
+            return $this->subpatternmap[$subpattern];
+        }
+        return $subpattern;
+    }
+
+    /**
+     * Returns keys for all subpatterns in regular expression
+     *
+     * Use to enumerate subpatterns
+     */
+    public function all_subpatterns() {
+        //Merge all numeric subpattern keys (numbered subpatterns and lexems) with named subpatterns from $subpatternman
+        return array_merge(array_keys($this->index_first), array_keys($this->subpatternmap));
+    }
+
+    public function index_first($subpattern = 0) {
+        $subpattern = $this->subpattern_index($subpattern);
+        return $this->index_first[$subpattern];
+    }
+
+    public function length($subpattern = 0) {
+        $subpattern = $this->subpattern_index($subpattern);
+        return $this->length[$subpattern];
+    }
+
+    /**
      * Returns non-matched heading before subpattern match
      */
     public function match_heading($subpattern = 0) {
+        $subpattern = $this->subpattern_index($subpattern);
         $wronghead = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
@@ -260,6 +308,7 @@ class qtype_preg_matching_results {
      * Returns matched part of the string for given subpattern
      */
     public function matched_part($subpattern = 0) {
+        $subpattern = $this->subpattern_index($subpattern);
         $correctpart = '';
         if ($this->is_match()) {//There is match
             if ( isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -273,6 +322,7 @@ class qtype_preg_matching_results {
      * Returns non-matched tail after subpattern match
      */
     public function match_tail($subpattern = 0) {
+        $subpattern = $this->subpattern_index($subpattern);
         $wrongtail = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] + $this->length[$subpattern] < strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
@@ -382,7 +432,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         //Reset match data and perform matching.
         $this->matchresults = $this->match_inner($str);
         //Save source data for the match
-        $this->matchresults->str = $this->str;
+        $this->matchresults->set_source_info($this->str, $this->maxsubpatt, $this->subpatternmap);
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {
