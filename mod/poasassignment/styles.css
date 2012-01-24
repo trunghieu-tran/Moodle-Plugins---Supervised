@@ -33,6 +33,7 @@ p.no-info-message {text-align: center;}
 #page-mod-poasassignment-view th {font-weight: normal;}*/
 
 .poasassignment-confirmation-buttons {
+	margin-top: 10px;
 	text-align: center;
 }
 .poasassignment-confirmation-buttons .singlebutton {
