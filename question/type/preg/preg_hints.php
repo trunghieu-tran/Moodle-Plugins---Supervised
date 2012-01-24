@@ -124,7 +124,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         $queryengine = $this->question->get_query_matcher($this->question->engine);
         //Correctness should be shown if engine support partial matching or a full match is achieved
         //Also correctness should be shown if this is not pure-assert match
-        return $matchresults->length[0] > 0 && ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING));
+        return ($matchresults->is_match() || $queryengine->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) && $matchresults->length[0] !== 0;
     }
 
 }
