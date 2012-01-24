@@ -170,7 +170,6 @@ class qtype_preg_matching_results {
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         $this->correctendingstart = qtype_preg_matching_results::NO_MATCH_FOUND;
-        $this->str = null;
     }
 
     /**
@@ -209,7 +208,7 @@ class qtype_preg_matching_results {
         }
 
 
-        //The matching engine didn't supply correct ending start, but supplied next character (and match isn't full).
+        //The matching engine didn't supply correct ending start, but supplied next characters (and match isn't full).
         //We could assume that correctendingstart==index_first[0]+length[0], i.e. right after matching fail position
         if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND &&
             (!$this->full && $this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
