@@ -456,9 +456,10 @@ class qtype_preg_question extends question_graded_automatically
         // c.f. failed test in simpletest/testquestion.php
 
         if ($matchresults->is_match()) {
-            foreach ($matchresults->index_first as $i => $startindex) {
+            foreach ($matchresults->all_subpatterns() as $i) {
                 $search = '{$'.$i.'}';
-                $length = $matchresults->length[$i];
+                $startindex = $matchresults->index_first($i);
+                $length = $matchresults->length($i);
                 if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
                     $replace = substr($answer, $startindex, $length);
                 } else {
