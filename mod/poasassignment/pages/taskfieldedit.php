@@ -8,9 +8,11 @@ class taskfieldedit_page extends abstract_page {
     private $field;
     private $mform;
     private $mode;
-    function __construct() {
+    function __construct($cm, $poasassignment) {
         $this->fieldid = optional_param('fieldid', 0, PARAM_INT);
-        $this->mode = optional_param('mode', '', PARAM_TEXT);
+        $this->mode = optional_param('mode', '', PARAM_TEXT);        
+        $this->cm = $cm;
+        $this->poasassignment = $poasassignment;
     }
     function get_cap() {
         return 'mod/poasassignment:managetasksfields';
@@ -62,20 +64,18 @@ class taskfieldedit_page extends abstract_page {
         }
         else {
             if ($this->mform->get_data()) {
-                $data = $this->mform->get_data();                
-                if ($this->mode == 'confirmedit') {
-                	$this->confirm_update($data );
-                }    
-                if ($this->fieldid > 0) {                	
-                    $model->update_task_field($this->fieldid, $data);
-                }
-                else {
+                $data = $this->mform->get_data();    
+                //if ($this->fieldid > 0) {                	
+                    //$model->update_task_field($this->fieldid, $data);
+                //}
+                if ($this->fieldid <= 0) {
                 	// Insert field
                     $data = $model->add_task_field($data);
                     // Generate random values for students, who already took the task
                     $model->generate_randoms($data);
+                    // Redirect to fields page                    
+                    redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
                 }
-                redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
             }
         }
     }
@@ -83,29 +83,151 @@ class taskfieldedit_page extends abstract_page {
         global $DB, $OUTPUT, $USER;
 		
         $model = poasassignment_model::get_instance();
-        $poasassignmentid = $model->get_poasassignment()->id;
-        if ($this->fieldid > 0) {
-            $this->mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
-            $data = new stdClass();
-            $data->variants = $model->get_field_variants($this->fieldid, 0);
-            $data->id = $model->get_cm()->id;
-            $this->mform->set_data($data);
+        
+        if ($data = $this->mform->get_data()) {
+	        if ($this->mode == 'confirmedit') {
+	        	$this->confirm_update($data);
+	        }
         }
-        $this->mform->display();
+        else {        
+	        if ($this->fieldid > 0) {
+	            $this->mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
+	            $data = new stdClass();
+	            $data->variants = $model->get_field_variants($this->fieldid, 0);
+	            $data->id = $model->get_cm()->id;
+	            $this->mform->set_data($data);
+	        }
+	        $this->mform->display();
+        }
     }
     public static function display_in_navbar() {
         return false;
     }
     
-    public function confirm_update($data) {
+    /**
+     * Show confirm screen with task owners list
+     * 
+     * @access private
+     * @param object $data data from moodleform
+     */
+    private function confirm_update($data) {
+    	global $OUTPUT, $CFG;
     	$model = poasassignment_model::get_instance();
-    	echo 'Одно или несколько заданий уже выполняются студентами.';
-    	echo '<br/>Список заданий и прогресса студентов по заданиям';
-    	echo '<br/>Укажите, каким образом изменить прогресс студентов?';
-    	echo '<br/> Если был изменен тип - автосброс поля во всех заданиях';
-    	echo '<br/> Сбросить значения поля в заданиях?';
-    	echo '<br/> Или укажите значение по-умолчанию';
-    	redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), 'edit');
+    	$owners = $model->get_instance_task_owners();
+    	
+    	// Open form
+    	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
+    	
+    	echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
+    	
+    	if (count($owners) > 0) {
+    		// Show owners table
+    		$usersinfo = $model->get_users_info($owners);
+    		print_string('instanceowners', 'poasassignment');
+    		require_once ('poasassignment_view.php');
+    		$extcolumns = array(
+    				'task',
+    				'saveprogress',
+    				'dropprogress'
+    		);
+    		$extheaders = array(
+    				get_string('task', 'poasassignment'),
+    		
+    				get_string('saveprogress', 'poasassignment').' '.
+    				$OUTPUT->help_icon('saveprogress', 'poasassignment'),
+    		
+    				get_string('dropprogress', 'poasassignment').' '.
+    				$OUTPUT->help_icon('dropprogress', 'poasassignment')
+    		);
+    		
+    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
+    		foreach ($usersinfo as $userinfo) {
+    			$table->add_data($this->get_owner($userinfo));
+    			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
+    		}
+    		$table->print_html();
+    	}
+    	else {
+    		print_string('nobodytooktask', 'poasassignment');
+    	}
+    	
+    	// Ask user to confirm delete
+    	echo '<br/>';
+    	print_string('changefieldconfirmation', 'poasassignment');
+    	if (count($owners) > 0) {
+    		echo ' <span class="poasassignment-critical">(';
+    		print_string('changingfieldwillchangestudentsdata', 'poasassignment');
+    		echo ')</span>';
+    	}
+    	
+    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+    	echo '<input type="hidden" name="mode" value="changeconfirmed"/>';
+    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+    	echo '</form>';
+    }
+    
+    private function get_owner($userinfo) {
+    	$model = poasassignment_model::get_instance();
+    	$owner = array();
+    	
+    	// Get student username and profile link
+    	$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+    	$owner[] = html_writer::link($userurl, fullname($userinfo->userinfo, true));
+    	
+    	// TODO Get student's groups
+    	$owner[] = '?';
+    	
+    	// Get information about assignee's attempts and grades
+    	if ($attempt = $model->get_last_attempt($userinfo->id)) {
+    		$owner[] = get_string('hasattempts', 'poasassignment');
+    	
+    		// If assignee has an attempt(s), show information about his grade
+    		if ($attempt->rating != null) {
+    			// Show actual grade with penalty
+    			$owner[] =
+    			get_string('hasgrade', 'poasassignment').
+    			' ('.
+    			$this->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+    			')';
+    		}
+    		else {
+    			// Looks like assignee has no grade or outdated grade
+    			if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
+    				$owner[] =
+    				get_string('hasoutdatedgrade', 'poasassignment').
+    				' ('.
+    				$this->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+    				')';
+    			}
+    			else {
+    				// There is no graded attempts, so show 'No grade'
+    				$owner[] = get_string('nograde', 'poasassignment');
+    			}
+    		}
+    	}
+    	else {
+    		// No attepts => no grade
+    		$owner[] = get_string('hasnoattempts', 'poasassignment');
+    		$owner[] = get_string('nograde', 'poasassignment');
+    	}
+    	
+    	// Get link to student's task
+    	$taskurl = new moodle_url(
+	    			'view.php', 
+	    			array(
+	    					'page' => 'taskview', 
+	    					'taskid' => $userinfo->taskid, 
+	    					'id' => $model->get_cm()->id
+	    					)
+	    			);
+    	$task = $model->get_task_info($userinfo->taskid);
+    	$owner[] = html_writer::link($taskurl, $task->name.$model->help_icon($task->description));
+    	
+    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="saveprogress" checked="checked"></input>';
+    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="dropprogress"></input>';
+    	
+    	return $owner;
     }
 }
 class taskfieldedit_form extends moodleform {

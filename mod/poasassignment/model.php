@@ -1772,7 +1772,8 @@ class poasassignment_model {
     
     /**
      * Generate random fields for students who don't have value in this field
-     * 
+     *
+     * @access public
      * @param object $field
      */
     public function generate_randoms($field) {
@@ -1793,5 +1794,25 @@ class poasassignment_model {
 	    		$DB->insert_record('poasassignment_task_values', $rec);
 	    	}
     	}
+    }
+    
+    public function get_instance_task_owners() {
+    	global $DB;
+    	$poasid = $this->get_poasassignment()->id;
+		$rec = $DB->get_records_sql("SELECT id, userid, taskid FROM {poasassignment_assignee} WHERE poasassignmentid = $poasid AND taskid > 0 ORDER BY id");
+		return $rec;
+    }
+    
+    /**
+     * Get general information about task
+     * 
+     * @access public
+     * @param int $taskid task id
+     * @return object record or false
+     */
+    public function get_task_info($taskid) {
+    	global $DB;
+    	$task = $DB->get_record('poasassignment_tasks', array('id' => $taskid), 'name, description');
+    	return $task;
     }
 }

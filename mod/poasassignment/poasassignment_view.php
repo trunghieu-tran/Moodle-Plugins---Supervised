@@ -2,6 +2,7 @@
 /**
  * Class, that renders data. Singletone. 
  */
+require_once($CFG->libdir . '/tablelib.php');
 class poasassignment_view {
  	protected static $view;
  	
@@ -53,7 +54,7 @@ class poasassignment_view {
     	$headers = array_merge($headers, $extraheaders);
     	$table->define_columns($columns);
     	$table->define_headers($headers);
-    	$table->collapsible(true);
+    	$table->collapsible(false);
     	$table->initialbars(false);
     	$table->set_attribute('class', 'poasassignment-table task-owners');
     	    
