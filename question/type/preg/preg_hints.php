@@ -159,7 +159,10 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     }
     public function hinted_string($response, $matchresults) {
         //One-character hint
-        return $matchresults->correctending[0];
+        if (isset($matchresults->correctending[0])) {
+            return $matchresults->correctending[0];
+        }
+        return '';
     }
 
     public function to_be_continued($matchresults) {
