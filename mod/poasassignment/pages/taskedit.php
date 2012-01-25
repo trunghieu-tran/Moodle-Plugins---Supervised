@@ -96,6 +96,8 @@ class taskedit_page extends abstract_page {
     
     /**
      * Updates task using settings, sent by POST
+     * 
+     * @access private
      */
     private function update_confirmed() {
     	$confirm = required_param('confirm', PARAM_TEXT);
