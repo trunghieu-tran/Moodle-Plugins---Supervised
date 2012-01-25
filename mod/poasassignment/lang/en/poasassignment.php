@@ -313,4 +313,4 @@ $string['saveprogress_help'] = 'Save student\'s attempts and grades';
 $string['dropprogress'] = 'Drop progress';
 $string['dropprogress_help'] = 'Drop student\'s attempts and grades';
 $string['changefieldconfirmation'] = 'Are you sure you want to change the field?';
-$string['changingfieldwillchangestudentsdata'] = 'Changing the field will cause effect on students';
+$string['changingfieldwillchangestudentsdata'] = 'Changing the field will cause effect on students. All random fields will be recalculated';

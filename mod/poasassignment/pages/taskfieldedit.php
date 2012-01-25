@@ -64,10 +64,7 @@ class taskfieldedit_page extends abstract_page {
         }
         else {
             if ($this->mform->get_data()) {
-                $data = $this->mform->get_data();    
-                //if ($this->fieldid > 0) {                	
-                    //$model->update_task_field($this->fieldid, $data);
-                //}
+                $data = $this->mform->get_data();
                 if ($this->fieldid <= 0) {
                 	// Insert field
                     $data = $model->add_task_field($data);
@@ -77,6 +74,9 @@ class taskfieldedit_page extends abstract_page {
                     redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
                 }
             }
+        }
+    	if ($this->mode == 'changeconfirmed') {
+        	$this->update_confirmed();        	
         }
     }
     function view() {
@@ -114,9 +114,8 @@ class taskfieldedit_page extends abstract_page {
     	global $OUTPUT, $CFG;
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_instance_task_owners();
-    	
     	// Open form
-    	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
+    	echo '<form action="view.php?page=taskfieldedit&id='.$this->cm->id.'" method="post">';
     	
     	echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
     	
@@ -145,6 +144,41 @@ class taskfieldedit_page extends abstract_page {
     			$table->add_data($this->get_owner($userinfo));
     			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
     		}
+    		print_r($_POST);
+    		// Add field's parameters
+    		
+    		echo '<input type="hidden" name="name" value="'.required_param('name', PARAM_TEXT).'"/>';
+    		echo '<input type="hidden" name="description" value="'.required_param('description', PARAM_TEXT).'"/>';
+    		echo '<input type="hidden" name="ftype" value="'.required_param('ftype', PARAM_INT).'"/>';
+    		
+    		// Checkboxes
+    		if (optional_param('showintable', false, PARAM_INT)) {
+    			echo 'showintable';
+    			echo '<input type="hidden" name="showintable" value="1"/>';
+    		}
+    		if (optional_param('secretfield', false, PARAM_INT)) {
+    			echo 'secretfield';
+    			echo '<input type="hidden" name="secretfield" value="1"/>';
+    		}
+    		if (optional_param('random', false, PARAM_INT)) {
+    			echo 'random';
+    			echo '<input type="hidden" name="random" value="1"/>';
+    		}
+    		
+    		if (optional_param('valuemin', false, PARAM_FLOAT) !== false) {
+    			echo 'valuemin';
+    			echo '<input type="hidden" name="valuemin" value="' . required_param('valuemin', PARAM_FLOAT) . '"/>';
+    		}
+    		if (optional_param('valuemax', false, PARAM_FLOAT) !== false) {
+    			echo 'valuemax';
+    			echo '<input type="hidden" name="valuemax" value="' . required_param('valuemax', PARAM_FLOAT) . '"/>';
+    		}
+    		
+    		if ($variants = optional_param('variants', false, PARAM_RAW)) {
+    			echo '<input type="hidden" name="variants" value="' . $variants . '"/>';
+    		}
+    		
+    		echo '<input type="hidden" name="fieldid" value="'.$this->fieldid.'"/>';
     		$table->print_html();
     	}
     	else {
@@ -167,6 +201,43 @@ class taskfieldedit_page extends abstract_page {
     	echo '</form>';
     }
     
+    /**
+     * Updates task using settings, sent by POST
+     * 
+     * @access private
+     */
+    private function update_confirmed() {
+    	$confirm = required_param('confirm', PARAM_TEXT);
+    	
+    	if ($confirm == get_string('no')) {
+    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+    	}
+    	else {
+    		$model = poasassignment_model::get_instance();
+
+    		// Удалить task values для старого поля
+    		$model->delete_fieldvalues($this->fieldid);
+    		
+    		// Update task field, insert new task field variants
+    		$model->update_task_field($this->fieldid, (object)$_POST);
+    		
+    		// Generate random values for field
+    		$model->generate_randoms($model->get_task_field($this->fieldid));
+    		
+    		if (required_param('ownerscount', PARAM_INT) > 0) {
+    			// $_POST['assigneids'] contains array of owners ids
+    			$assigneeids = $_POST['assigneids'];
+    			foreach ($assigneeids as $assigneeid) {
+    				if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
+    					// Drop progress - attempts and grades
+    					$model->drop_assignee_progress($assigneeid);
+    				}
+    			}
+    		}
+    		// сбросить прогресс, если требуется
+    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+    	}
+    } 
     private function get_owner($userinfo) {
     	$model = poasassignment_model::get_instance();
     	$owner = array();

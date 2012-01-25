@@ -763,6 +763,7 @@ class poasassignment_model {
 
     /**
      * Returns variants of the field by field id
+     * 
      * @param int $fieldid field id
      * @param int $asarray
      * @param string $separator symbols to separate variants
@@ -787,6 +788,27 @@ class poasassignment_model {
         return '';
     }
 
+    /** 
+     * Insert variants of list or multilist field type
+     * 
+     * @access private
+     * @param int $fieldid field id
+     * @param string $variants varitants, separated by \n sybmol
+     * @return array variants
+     */
+    private function insert_field_variants($fieldid, $variants) {
+    	global $DB;
+    	$variants = explode("\n", $variants);
+    	$i = 0;
+    	foreach ($variants as $variant) {
+    		$rec->fieldid = $fieldid;
+    		$rec->sortorder = $i;
+    		$rec->value = $variant;
+    		$DB->insert_record('poasassignment_variants', $rec);
+    		$i++;
+    	}
+    	return $variants;
+    } 
     /**
      * Add task field to instance
      * 
@@ -798,7 +820,6 @@ class poasassignment_model {
         global $DB;
         $data->poasassignmentid = $this->poasassignment->id;
         $data->showintable=isset($data->showintable);
-        //$data->searchparameter=isset($data->searchparameter);
         $data->secretfield=isset($data->secretfield);
         $data->random=isset($data->random);
         $data->assigneeid = 0;        
@@ -806,22 +827,13 @@ class poasassignment_model {
         $fieldid = $DB->insert_record('poasassignment_fields',$data);
         $data->id = $fieldid;
         if ($data->ftype==LISTOFELEMENTS || $data->ftype==MULTILIST) {
-            $variants=explode("\n",$data->variants);
-            $i=0;
-            $data->variants = $variants;
-            foreach ($variants as $variant) {
-                $rec->fieldid = $fieldid;
-                $rec->sortorder = $i;
-                $rec->value = $variant;
-                $DB->insert_record('poasassignment_variants',$rec);
-                $i++;
-            }
+            $data->variants = $this->insert_field_variants($fieldid, $data->variants);
         }
         if ($data->ftype == FLOATING || $data->ftype == NUMBER) {
             if ($data->valuemax == $data->valuemin)
                 $data->random = 0;
         }
-        $tasks=$DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
+        $tasks = $DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($tasks as $task) {
             $taskvalue->fieldid=$fieldid;
             $taskvalue->taskid=$task->id;
@@ -830,28 +842,34 @@ class poasassignment_model {
         return $data;
     }
 
-    function update_task_field($fieldid,$field) {
+    /**
+     * Update task's field. If field's type was list of elements or
+     * multiple list, list variants will be deleted. 
+     * 
+     * @access public
+     * @param int $fieldid field id
+     * @param object $field record
+     * @return boolean true
+     */
+    function update_task_field($fieldid, $field) {
         global $DB;
-        $field->id=$fieldid;
-        $field->showintable=isset($field->showintable);
-        $field->secretfield=isset($field->secretfield);
-        $field->random=isset($field->random);
-        if ($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST) {
-            $DB->delete_records('poasassignment_variants',array('fieldid'=>$field->id));
-
-            $variants=explode("\n",$field->variants);
-            $i=0;
-            foreach ($variants as $variant) {
-                $rec->fieldid=$field->id;
-                $rec->sortorder=$i;
-                $rec->value=$variant;
-                $DB->insert_record('poasassignment_variants',$rec);
-                $i++;
-            }
+        
+        // Create record object
+        $field->id = $fieldid;
+        $field->showintable = isset($field->showintable);
+        $field->secretfield = isset($field->secretfield);
+        $field->random = isset($field->random);
+        
+        // Drop old variants
+        $DB->delete_records('poasassignment_variants', array('fieldid' => $field->id));
+        
+        // Add new variants if needed 
+        if ($field->ftype == LISTOFELEMENTS || $field->ftype == MULTILIST) {
+            $this->insert_field_variants($field->id, $field->variants);
         }
-        if ($field->ftype==FLOATING || $field->ftype==NUMBER) {
-            if ($field->valuemax==$field->valuemin)
-                $field->random=0;
+        if ($field->ftype == FLOATING || $field->ftype == NUMBER) {
+            if ($field->valuemax == $field->valuemin)
+                $field->random = 0;
         }
         return $DB->update_record('poasassignment_fields',$field);
     }
@@ -1814,5 +1832,25 @@ class poasassignment_model {
     	global $DB;
     	$task = $DB->get_record('poasassignment_tasks', array('id' => $taskid), 'name, description');
     	return $task;
+    }
+    
+    /**
+     * Delete field values for all tasks and assignees
+     * 
+     * @param int $fieldid field id
+     * @return boolean true
+     */
+    public function delete_fieldvalues($fieldid) {
+    	global $DB;
+    	return $DB->delete_records('poasassignment_task_values', array('fieldid' => $fieldid));
+    }
+    
+    public function get_task_field($fieldid) {
+    	global $DB;
+    	$field = $DB->get_record('poasassignment_fields', array('id' => $fieldid));
+    	if ($field->ftype == LISTOFELEMENTS || $field->ftype == MULTILIST) {
+    		$field->variants = $this->get_variants($fieldid);
+    	}
+    	return $field;
     }
 }
