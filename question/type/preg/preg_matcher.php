@@ -57,7 +57,8 @@ class qtype_preg_matching_results {
     protected $maxsubpatt;
     /** @var array A map where keys are subpattern names and values are their numbers */
     protected $subpatternmap;
-
+    /** @var integer Number of lexems (defined by user) in regular expression */
+    protected $lexemcount;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
@@ -74,10 +75,11 @@ class qtype_preg_matching_results {
     /**
      * Sets info about string and regular expression, that is needed for some functions to work
      */
-    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array()) {
+    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array(), $lexemcount = 0) {
         $this->str = $str;
         $this->maxsubpatt = $maxsubpatt;
         $this->subpatternmap = $subpatternmap;
+        $this->lexemcount = $lexemcount;
     }
 
     /**
@@ -432,7 +434,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         //Reset match data and perform matching.
         $this->matchresults = $this->match_inner($str);
         //Save source data for the match
-        $this->matchresults->set_source_info($this->str, $this->maxsubpatt, $this->subpatternmap);
+        $this->matchresults->set_source_info($this->str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {

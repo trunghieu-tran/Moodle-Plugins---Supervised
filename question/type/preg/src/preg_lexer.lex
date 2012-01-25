@@ -51,6 +51,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         return $this->subpatternmap;
     }
 
+    public function get_lexem_count() {
+        return $this->lexemcount;
+    }
+
     protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
         if ($subtype !== null) {
