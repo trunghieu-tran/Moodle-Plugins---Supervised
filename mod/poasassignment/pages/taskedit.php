@@ -244,7 +244,7 @@ class taskedit_page extends abstract_page {
      * @param mixed $data - updated task data
      */
     public function confirm_update($data) {    	
-    	global $OUTPUT;
+    	global $OUTPUT, $CFG;
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_task_owners($this->taskid);
     	
