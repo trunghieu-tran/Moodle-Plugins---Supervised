@@ -27,6 +27,8 @@ class qtype_preg_regex_handler {
     protected $maxsubpatt;
     //A map where keys are subpattern names and values are their numbers
     protected $subpatternmap;
+    //Number of lexems (defined by user) in regular expression
+    protected $lexemcount;
 
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
@@ -50,6 +52,7 @@ class qtype_preg_regex_handler {
         $this->errors = array();
         $this->maxsubpatt = 0;
         $this->subpatternmap = array();
+		$this->lexemcount = 0;
         if ($regex === null) {
             return;
         }
@@ -176,6 +179,7 @@ class qtype_preg_regex_handler {
 
         $this->maxsubpatt = $lexer->get_max_subpattern();
         $this->subpatternmap = $lexer->get_subpattern_map();
+		$this->lexemcount = $lexer->get_lexem_count();
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
