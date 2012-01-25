@@ -38,6 +38,9 @@ class qtype_preg_lexer extends JLexBase  {
     public function get_subpattern_map() {
         return $this->subpatternmap;
     }
+    public function get_lexem_count() {
+        return $this->lexemcount;
+    }
     protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
         if ($subtype !== null) {
