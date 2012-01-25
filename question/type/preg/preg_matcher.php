@@ -262,7 +262,7 @@ class qtype_preg_matching_results {
      * otherwise (numbered subpattern or lexeme) just return $subpattern.
      */
     public function subpattern_index($subpattern) {
-        if (is_string($subpattern)) {//named subpattern
+        if (array_key_exists($subpattern, $this->subpatternmap)) {//named subpattern
             return $this->subpatternmap[$subpattern];
         }
         return $subpattern;
