@@ -1734,7 +1734,7 @@ class poasassignment_model {
     }
     
     /**
-     * Drop student's attempts and grades
+     * Drop student's attempts and grades, but save task id
      * 
      * @access public
      * @param int $assigneeid
@@ -1748,11 +1748,8 @@ class poasassignment_model {
     			array('id' => $assigneeid), 
     			'id, taskid, finalized, timetaken, lastattemptid, taskindex, userid'
     	);
-    	$assignee->taskid = 0;
-    	$assignee->finalized = null;
-    	$assignee->timetaken = 0;    	
+    	$assignee->finalized = null;    	
     	$assignee->lastattemptid = null;
-    	$assignee->taskindex = null;
     	$DB->update_record('poasassignment_assignee', $assignee);
     	
     	// Delete random task values for the assignee
@@ -1853,4 +1850,23 @@ class poasassignment_model {
     	}
     	return $field;
     }
+    
+	/**
+	 * Get "rating - penaty = total" string
+	 *
+	 * @access public
+	 * @param int $rating
+	 * @param int $penalty
+	 */
+	public function show_rating_methematics($rating, $penalty) {
+		$string = '';
+	
+		$string .= $rating;
+		$string .= ' - ';
+		$string .= '<span style="color:red;">'.$penalty.'</span>';
+		$string .= ' = ';
+		$string .= $rating - $penalty;
+	
+		return $string;
+	}
 }

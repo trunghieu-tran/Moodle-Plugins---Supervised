@@ -204,7 +204,7 @@ class taskedit_page extends abstract_page {
     			$owner[] = 
     				get_string('hasgrade', 'poasassignment').
     				' ('.
-    				$this->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+    				$model->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
     				')';
     		}
     		else {
@@ -213,7 +213,7 @@ class taskedit_page extends abstract_page {
     				$owner[] = 
     					get_string('hasoutdatedgrade', 'poasassignment').
     					' ('.
-    					$this->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+    					$model->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
     					')';    	
     			}
     			else {
