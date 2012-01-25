@@ -214,3 +214,4 @@ $string['changefieldconfirmation'] = 'Изменить поле?';
 $string['changingfieldwillchangestudentsdata'] = 'Изменение поля повлияет на задания студентов. Все случайные поля для студентов будут пересчитаны';
 $string['addfieldconfirmation'] = 'Создать поле?';
 $string['addingfieldwillchangestudentsdata'] = 'Создание поля повлияет на задания студентов. Если создается случайное поле, значение для него будет автоматически вычислено для всех студентов';
+$string['deletingfieldwillchangestudentsdata'] = 'Удаление поля повлияет на задания студентов';

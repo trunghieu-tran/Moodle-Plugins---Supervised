@@ -62,19 +62,6 @@ class taskfieldedit_page extends abstract_page {
                      null, 
                      0);
         }
-        /*else {
-            if ($this->mform->get_data()) {
-                $data = $this->mform->get_data();
-                if ($this->fieldid <= 0) {
-                	// Insert field
-                    $data = $model->add_task_field($data);
-                    // Generate random values for students, who already took the task
-                    $model->generate_randoms($data);
-                    // Redirect to fields page                    
-                    redirect(new moodle_url('view.php',array('id' => $model->get_cm()->id,'page' => 'tasksfields')), null, 0);
-                }
-            }
-        }*/
     	if ($this->mode == 'changeconfirmed') {
         	$this->update_confirmed();        	
         }
@@ -110,7 +97,13 @@ class taskfieldedit_page extends abstract_page {
         return false;
     }
     
-    private function show_owners($owners) {
+    /**
+     * Show table of task's owners
+     * 
+     * @access public
+     * @param unknown_type $owners
+     */
+    public function show_owners($owners) {
     	global $CFG, $OUTPUT;
     	$model = poasassignment_model::get_instance();
     	echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
@@ -156,12 +149,8 @@ class taskfieldedit_page extends abstract_page {
     			echo '<input type="hidden" name="random" value="1"/>';
     		}
     	
-    		if (optional_param('valuemin', false, PARAM_FLOAT) !== false) {
-    			echo '<input type="hidden" name="valuemin" value="' . required_param('valuemin', PARAM_FLOAT) . '"/>';
-    		}
-    		if (optional_param('valuemax', false, PARAM_FLOAT) !== false) {
-    			echo '<input type="hidden" name="valuemax" value="' . required_param('valuemax', PARAM_FLOAT) . '"/>';
-    		}
+    		echo '<input type="hidden" name="valuemin" value="' . optional_param('valuemin', 0, PARAM_FLOAT) . '"/>';
+    		echo '<input type="hidden" name="valuemax" value="' . optional_param('valuemax', 0, PARAM_FLOAT) . '"/>';
     	
     		if ($variants = optional_param('variants', false, PARAM_RAW)) {
     			echo '<input type="hidden" name="variants" value="' . $variants . '"/>';
@@ -238,7 +227,7 @@ class taskfieldedit_page extends abstract_page {
     }
     
     /**
-     * Updates task using settings, sent by POST
+     * Updates task field using settings, sent by POST
      * 
      * @access private
      */
@@ -277,7 +266,9 @@ class taskfieldedit_page extends abstract_page {
     } 
     
     /**
+     * Add task field using settings, sent by POST
      * 
+     * @access private
      */
     private function add_confirmed() {
     	$confirm = required_param('confirm', PARAM_TEXT);

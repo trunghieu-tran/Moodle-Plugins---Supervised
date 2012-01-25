@@ -874,23 +874,34 @@ class poasassignment_model {
         return $DB->update_record('poasassignment_fields',$field);
     }
 
-    function delete_field($id) {
+    /**
+     * Delete task field and all task values for the field
+     * 
+     * @access public
+     * @param int $id field id
+     */
+    public function delete_field($id) {
         global $DB;
-        $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
-        $taskvalues=$DB->get_records('poasassignment_task_values',array('fieldid'=>$id));
-        $field=$DB->get_record('poasassignment_fields',array('id'=>$id));
-        if ($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST) {
-            $DB->delete_records('poasassignment_variants',array('fieldid'=>$id));
+        
+
+        
+        $field = $DB->get_record('poasassignment_fields', array('id' => $id));
+        // Delete variants if type is list or multilist
+        if ($field->ftype == LISTOFELEMENTS || $field->ftype == MULTILIST) {
+            $DB->delete_records('poasassignment_variants', array('fieldid' => $id));
         }
+        
+        // Delete files
+        $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
+        $taskvalues = $DB->get_records('poasassignment_task_values', array('fieldid' => $id));
         foreach ($taskvalues as $taskvalue) {
-            //echo $field->ftype;
-            if ($field->ftype==FILE)
-                $this->delete_files($cm->id,'poasassignmenttaskfiles',$taskvalue->id);
+            if ($field->ftype == FILE)
+                $this->delete_files($cm->id, 'poasassignmenttaskfiles', $taskvalue->id);
         }
-        $DB->delete_records('poasassignment_fields',array('id'=>$id));
-        $DB->delete_records('poasassignment_task_values',array('fieldid'=>$id));
-
-
+        // Delete field
+        $DB->delete_records('poasassignment_fields', array('id' => $id));
+        //Delete task values
+        $DB->delete_records('poasassignment_task_values', array('fieldid' => $id));
     }
 
     function prepare_files($dir,$contextid,$filearea,$itemid) {

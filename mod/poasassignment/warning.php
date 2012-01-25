@@ -13,7 +13,7 @@ $poasmodel = poasassignment_model::get_instance();
 $poasmodel->cash_instance($poasassignment->id);
 require_login($course, true, $cm);
     
-global $OUTPUT,$DB,$PAGE;
+global $OUTPUT,$DB,$PAGE, $CFG;
 $PAGE->set_title(get_string('modulename','poasassignment').':'.$poasassignment->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'poasassignment')));
@@ -60,42 +60,120 @@ switch ($action) {
         }
     case 'deletefield':
         require_capability('mod/poasassignment:managetasksfields',$context);
-        $fieldid=optional_param('fieldid',-1,PARAM_INT);
+        $fieldid = required_param('fieldid', PARAM_INT);
         $PAGE->set_url('/mod/poasassignment/warning.php?id='.$cm->id.'&fieldid='.$fieldid.'&action=deletefield');
-        if(!isset($fieldid) ||$fieldid<1)
+        if ($fieldid < 1) {
             print_error('invalidfieldid','poasassignment');
-        $field=$DB->get_record('poasassignment_fields',array('id'=>$fieldid));
+        }
+        $field = $DB->get_record('poasassignment_fields',array('id' => $fieldid));
         if(!$field)
             print_error('invalidfieldid','poasassignment');
         echo $OUTPUT->header();
         echo $OUTPUT->heading($poasassignment->name);
-        echo $OUTPUT->box_start();
-        echo get_string('deletefieldconfirmation','poasassignment');
-        echo '<br>- ' . $field->name;
-        echo $OUTPUT->box_end();
-        echo '<div align="center" class="buttons">';
-        $yesbutton =  $OUTPUT->single_button(new moodle_url('warning.php',
-                                    array('id'=>$id,'fieldid'=>$fieldid,'action'=>'deletefieldconfirmed')), 
-                                    get_string('yes'),
-                                    'post');                
-        $nobutton =  $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$id,'page'=>'tasksfields')), get_string('no'),'get');
-        echo '</div>';
-		echo '<table align="center"><tr><td>'.$yesbutton.'</td><td>'.$nobutton.'</td></tr></table>';
+        
+        $model = poasassignment_model::get_instance();
+        $owners = $model->get_instance_task_owners();        
+        
+        // Open form
+        echo '<form action="warning.php?action=deletefieldconfirmed&id=' . $cm->id . '" method="post">';
+        
+        echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
+        if (count($owners) > 0) {
+        	// Show owners table
+        	$usersinfo = $model->get_users_info($owners);
+        	print_string('instanceowners', 'poasassignment');
+        	require_once ('poasassignment_view.php');
+        	$extcolumns = array(
+        			'task',
+        			'saveprogress',
+        			'dropprogress'
+        	);
+        	$extheaders = array(
+        			get_string('task', 'poasassignment'),
+        	
+        			get_string('saveprogress', 'poasassignment').' '.
+        			$OUTPUT->help_icon('saveprogress', 'poasassignment'),
+        	
+        			get_string('dropprogress', 'poasassignment').' '.
+        			$OUTPUT->help_icon('dropprogress', 'poasassignment')
+        	);
+        	$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
+        	foreach ($usersinfo as $userinfo) {
+        		$row = get_owner($userinfo);
+        		// Get link to student's task
+		    	$taskurl = new moodle_url(
+			    			'view.php', 
+			    			array(
+			    					'page' => 'taskview', 
+			    					'taskid' => $userinfo->taskid, 
+			    					'id' => $id
+			    					)
+			    			);
+		    	$task = $model->get_task_info($userinfo->taskid);
+		    	$row[] = html_writer::link($taskurl, $task->name.$model->help_icon($task->description));
+		    	
+		    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="saveprogress" checked="checked"></input>';
+		    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="dropprogress"></input>';
+        		$table->add_data($row);
+        		echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
+        	}
+        	$table->print_html();
+        }
+        else {
+        	print_string('nobodytooktask', 'poasassignment');
+        }
+        
+        // Ask user to confirm delete
+        echo '<br/>';
+        print_string('deletefieldconfirmation', 'poasassignment');
+        if (count($owners) > 0) {
+        	echo ' <span class="poasassignment-critical">(';
+        	print_string('deletingfieldwillchangestudentsdata', 'poasassignment');
+        	echo ')</span>';
+        }
+        
+        $nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+        $yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+        echo '<input type="hidden" name="mode" value="deleteconfirmed"/>';
+        echo '<input type="hidden" name="fieldid" value="'.$fieldid.'"/>';
+        echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+        echo '</form>';
         echo $OUTPUT->footer();    
         break;
     case 'deletefieldconfirmed':
     	require_capability('mod/poasassignment:managetasksfields',$context);
-        if (isset($_POST['fieldid']))
-            $fieldid = $_POST['fieldid'];
-        if(!isset($fieldid) ||$fieldid<1)
-            print_error('invalidfieldid','poasassignment');
-        $field=$DB->get_record('poasassignment_fields',array('id'=>$fieldid));
-        if(!$field)
-            print_error('invalidfieldid','poasassignment');
-        $poasmodel=poasassignment_model::get_instance($poasassignment);
-        $poasmodel->delete_field($fieldid);
-        
-        redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cm->id,'page'=>'tasksfields')),null,0);
+        $confirm = required_param('confirm', PARAM_TEXT);
+        if ($confirm == get_string('no')) {
+        	redirect(
+        			new moodle_url(
+        					'/mod/poasassignment/view.php',
+        					array(
+        							'id'=>$cm->id,
+        							'page'=>'tasksfields'
+        							)
+        					)
+        			);
+        }
+        else {
+        	$model = poasassignment_model::get_instance();
+        	$fieldid = required_param('fieldid', PARAM_INT);
+        	if($fieldid < 1)
+        		print_error('invalidfieldid','poasassignment');
+        	
+        	$model->delete_field($fieldid);
+        	
+        	if (required_param('ownerscount', PARAM_INT) > 0) {
+    			// $_POST['assigneids'] contains array of owners ids
+    			$assigneeids = $_POST['assigneids'];
+    			foreach ($assigneeids as $assigneeid) {
+    				if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
+    					// Drop progress - attempts and grades
+    					$model->drop_assignee_progress($assigneeid);
+    				}
+    			}
+    		}
+        }
+        redirect(new moodle_url('view.php',array('id' => $cm->id, 'page'=>'tasksfields')));
         break;
     case 'taketask':
         $taskid = optional_param('taskid', -1, PARAM_INT);
@@ -148,9 +226,7 @@ switch ($action) {
     case 'deletetask':
     	require_capability('mod/poasassignment:managetasks', $context);
     	// Get task id
-    	if (isset($_GET['taskid'])) {
-    		$taskid = $_GET['taskid'];
-    	}
+    	$taskid = required_param('taskid', PARAM_INT);
     	// Breadcrumbs
     	$PAGE->set_url(new moodle_url('/mod/poasassignment/warning.php',array('id'=>$id,'taskid'=>$taskid,'action'=>'deletetask')));
     	$url = new moodle_url('view.php', array('id' => $id, 'page' => 'tasks')); 

@@ -316,3 +316,4 @@ $string['changefieldconfirmation'] = 'Are you sure you want to change the field?
 $string['changingfieldwillchangestudentsdata'] = 'Changing the field will cause effect on students. All random fields will be recalculated';
 $string['addfieldconfirmation'] = 'Are you sure you want to create the field?';
 $string['addingfieldwillchangestudentsdata'] = 'Adding the field will cause effect on students. If the field is random, values will be generated';
+$string['deletingfieldwillchangestudentsdata'] = 'Deleting the field will cause effect on students';
