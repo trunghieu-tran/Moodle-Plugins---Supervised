@@ -449,35 +449,35 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {    // named backreference
     $str = substr($this->yytext(), 4);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
