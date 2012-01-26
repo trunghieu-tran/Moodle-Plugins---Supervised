@@ -2,7 +2,6 @@
 /**
  * Class, that renders data. Singletone. 
  */
-require_once($CFG->libdir . '/tablelib.php');
 class poasassignment_view {
  	protected static $view;
  	
@@ -36,7 +35,8 @@ class poasassignment_view {
      * @return object flexible_table
      */
     public function prepare_flexible_table_owners(array $extracolumns = array(), array $extraheaders = array()) {
-    	global $PAGE, $OUTPUT;
+    	global $PAGE, $OUTPUT, $CFG;
+    	require_once($CFG->libdir . '/tablelib.php');    	
     	$table = new flexible_table('mod-poasassignment-task-owners');
     	$table->baseurl = $PAGE->url;
     	$columns = array(
