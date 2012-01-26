@@ -64,8 +64,7 @@ class poasassignment_model {
                                     'submission' => 'pages/submission.php',
                                     'taskfieldedit' => 'pages/taskfieldedit.php',
                                     'categoryedit' => 'pages/categoryedit.php',
-                                    'taskedit' => 'pages/taskedit.php',
-                                    'criterionproblem' => 'pages/criterionproblem.php'
+                                    'taskedit' => 'pages/taskedit.php'
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
@@ -567,6 +566,7 @@ class poasassignment_model {
      * POASASSIGNMENT_CRITERION_CANT_BE_CHANGED or
      * POASASSIGNMENT_CRITERION_CANT_BE_CREATED
      */
+    // TODO вообще переделать пока никто этого не видел
     function save_criterion($data) {
         global $DB;
         for ($i = 0; $i < $data->option_repeats; $i++) {
@@ -1593,7 +1593,7 @@ class poasassignment_model {
 	 */
 	public function get_last_graded_attempt($assigneeid) {
 		global $DB;
-		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? AND rating >= 0 AND ratingdate > 0 ORDER BY attemptnumber DESC LIMIT 1;", array($assigneeid));
+		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? AND rating >= 0 AND ratingdate > 0 ORDER BY attemptdate DESC LIMIT 1;", array($assigneeid));
 		return $rec;
 	}
 
@@ -1606,51 +1606,33 @@ class poasassignment_model {
     /**
      * Looks for any rated attempt
      *
+     * @access public
      * @return boolean true, if instance has no rated attempts, else false
      */
     public function instance_has_rated_attempts() {
         global $DB;
-        $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
-        if ($assignees) {
-            foreach ($assignees as $assignee) {
-                $attempts = $DB->get_records('poasassignment_attempts',array('assigneeid' => $assignee->id));
-                if ($attempts)
-                {
-                    foreach ($attempts as $attempt) {
-                        if ($DB->get_records('poasassignment_rating_values',array('attemptid' => $attempt->id))) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-        else {
-            return false;
-        }
+        $sql = "SELECT COUNT(*) as count FROM {poasassignment_assignee} st join {poasassignment_attempts} at on st.id = at.assigneeid";
+        $sql .= " WHERE st.poasassignmentid = ? AND at.rating IS NOT NULL AND at.ratingdate IS NOT NULL";
+        $rec = $DB->get_record_sql($sql, array($this->get_poasassignment()->id));
+        return $rec->count > 0;
     }
 
     /**
-     * Get students with graded attempts in the instance
+     * Get assignees with rating
      *
-     * @return array of students or null
+     * @access public
+     * @return array assignees
      */
-    public function get_criterion_problem_students() {
+    public function get_graded_assignees() {
         global $DB;
-        $id = $this->poasassignment->id;
-        $sql = "SELECT st.id, st.userid, att.id, att.rating
-                FROM {poasassignment_assignee} st
-                JOIN {poasassignment_attempts} att
-                    ON  att.id = st.lastattemptid
-                WHERE   st.poasassignmentid = $id";
-        $students = $DB->get_records_sql($sql);
-        if ($students)
-            return $students;
-        else
-            return null;
+        $sql = "SELECT DISTINCT st.id, st.userid, st.taskid";
+        $sql .= " FROM {poasassignment_assignee} st join {poasassignment_attempts} at on st.id = at.assigneeid";
+        $sql .= " WHERE st.poasassignmentid = ? AND at.rating IS NOT NULL AND at.ratingdate IS NOT NULL";
+        $assignees = $DB->get_records_sql($sql, array($this->get_poasassignment()->id));
+        foreach ($assignees as $assignee) {
+        	$assignee->attempt = $this->get_last_graded_attempt($assignee->id);
+        }
+        return $assignees;
     }
     
     /**
@@ -1879,5 +1861,52 @@ class poasassignment_model {
 		$string .= $rating - $penalty;
 	
 		return $string;
+	}
+	
+	public function get_flexible_table_assignees_row($assignee) {
+		$row = array();
+		
+		// Get student username and profile link
+		$userurl = new moodle_url('/user/profile.php', array('id' => $assignee->userid));
+		$row[] = html_writer::link($userurl, fullname($assignee->userinfo, true));
+		
+		// TODO Get student's groups
+		$row[] = '?';
+		
+		// Get information about assignee's attempts and grades
+		if ($attempt = $this->get_last_attempt($assignee->id)) {
+			$row[] = get_string('hasattempts', 'poasassignment');
+		
+			// If assignee has an attempt(s), show information about his grade
+			if ($attempt->rating != null) {
+				// Show actual grade with penalty
+				$row[] =
+					get_string('hasgrade', 'poasassignment').
+					' ('.
+					$this->show_rating_methematics($attempt->rating, $this->get_penalty($attempt->id)).
+					')';
+			}
+			else {
+				// Looks like assignee has no grade or outdated grade
+				if ($lastgraded = $this->get_last_graded_attempt($assignee->id)) {
+					$row[] =
+						get_string('hasoutdatedgrade', 'poasassignment').
+						' ('.
+						$this->show_rating_methematics($lastgraded->rating, $this->get_penalty($lastgraded->id)).
+						')';
+				}
+				else {
+					// There is no graded attempts, so show 'No grade'
+					$row[] = get_string('nograde', 'poasassignment');
+				}
+			}
+		}
+		else {
+			// No attepts => no grade
+			$row[] = get_string('hasnoattempts', 'poasassignment');
+			$row[] = get_string('nograde', 'poasassignment');
+		}		
+		
+		return $row;
 	}
 }

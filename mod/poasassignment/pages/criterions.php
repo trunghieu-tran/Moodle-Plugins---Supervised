@@ -7,45 +7,130 @@ require_once($CFG->libdir.'/formslib.php');
 class criterions_page extends abstract_page {
     private $mform;
 
-    function criterions_page() {
+    function __construct($cm, $poasassignment) {
+    	$this->cm = $cm;
+    	$this->poasassignment = $poasassignment;
     }
 
     public function pre_view() {
-        $poasmodel = poasassignment_model::get_instance();
-        $context = $poasmodel->get_context();
-        $id = $poasmodel->get_cm()->id;
-        if (has_capability('mod/poasassignment:managecriterions', $context)) {
-            $this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
-            if($this->mform->get_data()) {
-                    $data = $this->mform->get_data();
-                    $result = $poasmodel->save_criterion($data);
-                    if ($result == POASASSIGNMENT_CRITERION_OK) {
-                        redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
-                    }
-                    else {
-                        redirect(new moodle_url('view.php',
-                                                array('id' => $id,
-                                                      'page' => 'criterionproblem',
-                                                      'code' => $result)),
-                                 null,
-                                 0);
-                    }
-            }
-        }
+        
     }
     function view() {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $id = $poasmodel->get_cm()->id;
 		$context = $poasmodel->get_context();
+		
 		if (has_capability('mod/poasassignment:managecriterions', $context)) {
-			$this->mform->set_data($poasmodel->get_criterions_data());
-			$this->mform->display();
+			$this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
+			if($this->mform->get_data()) {
+				$data = $this->mform->get_data();
+				$this->confirm_update($data);
+				/*
+				 $result = $poasmodel->save_criterion($data);
+				if ($result == POASASSIGNMENT_CRITERION_OK) {
+				redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+				}*/
+			}
+			else {			
+				$this->mform->set_data($poasmodel->get_criterions_data());
+				$this->mform->display();
+			}
 		}
 		else {
 			$this->show_read_only_criterions();
 		}
 
+    }
+    /**
+     * Show confirm update criterions page
+     * 
+     * @access private
+     * @param object $data data from criterions moodleform
+     */
+    private function confirm_update($data) {
+    	global $OUTPUT;
+    	$model = poasassignment_model::get_instance();
+    	// Open form
+    	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
+    	
+    	
+    	if ($model->instance_has_rated_attempts()) {
+    		$graded = $model->get_graded_assignees();
+    		echo '<input type="hidden" name="gradedcount" value="' . count($graded) . '"/>';
+    		// Show table of graded students
+    		$usersinfo = $model->get_users_info($graded);
+    		print_string('gradedassignees', 'poasassignment');
+    		require_once ('poasassignment_view.php');
+    		
+    		$extcolumns = array(
+    				'task',
+    				'put0',
+    				'put100',
+    				'puttotal',
+    				'putspecified',
+    				'putnull'
+    		);
+    		$extheaders = array(
+    				get_string('task', 'poasassignment'),
+    		
+    				get_string('put0', 'poasassignment').' '.
+    				$OUTPUT->help_icon('put0', 'poasassignment'),
+    				
+    				get_string('put100', 'poasassignment').' '.
+					$OUTPUT->help_icon('put100', 'poasassignment'),
+    				
+    				get_string('puttotal', 'poasassignment').' '.
+    				$OUTPUT->help_icon('puttotal', 'poasassignment'),
+    				
+    				get_string('putspecified', 'poasassignment').' '.
+    				$OUTPUT->help_icon('putspecified', 'poasassignment'),
+    		
+    				get_string('putnull', 'poasassignment').' '.
+    				$OUTPUT->help_icon('putnull', 'poasassignment')
+    		);
+    		
+    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
+    		foreach ($usersinfo as $userinfo) {
+    			$table->add_data($this->get_graded($userinfo));
+    			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
+    		}
+    		$table->print_html();
+    	}
+    	else {
+    		echo '<input type="hidden" name="gradedcount" value="0"/>';
+    		print_string('nobodyhasgrade', 'poasassignment');
+    	}
+    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+    	echo '<input type="hidden" name="mode" value="updateconfirmed"/>';
+    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+    	echo '</form>';
+    }
+    
+    private function get_graded($userinfo) {
+    	$model = poasassignment_model::get_instance();
+    	$row = $model->get_flexible_table_assignees_row($userinfo);
+    	// Get link to student's task
+    	$taskurl = new moodle_url(
+    			'view.php',
+    			array(
+    					'page' => 'taskview',
+    					'taskid' => $userinfo->taskid,
+    					'id' => $model->get_cm()->id
+    			)
+    	);
+    	
+    	$task = $model->get_task_info($userinfo->taskid);
+    	$row[] = html_writer::link($taskurl, $task->name . $model->help_icon($task->description));
+    	
+    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put0"></input>';
+    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put100"></input>';
+    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="puttotal" checked="checked"></input>';
+    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putspecified"></input>'
+    				.'<input type="text" name="specified_'.$userinfo->id.'" value="77"/>';
+    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putnull"></input>';
+    	return $row;
     }
 	private function show_read_only_criterions() {
 		global $OUTPUT, $DB;

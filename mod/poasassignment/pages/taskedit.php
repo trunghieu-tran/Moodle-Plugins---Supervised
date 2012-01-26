@@ -241,7 +241,7 @@ class taskedit_page extends abstract_page {
      * of taskowners and offer what to do with each student
      * 
      * @access public
-     * @param mixed $data - updated task data
+     * @param object $data - updated task data
      */
     public function confirm_update($data) {    	
     	global $OUTPUT, $CFG;

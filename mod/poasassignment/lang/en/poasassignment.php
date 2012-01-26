@@ -270,12 +270,6 @@ $string['noattemptsshort'] = 'No attempts';
 $string['leavecomment'] = 'Leave comment';
 $string['errornoweightnumeric'] = 'Must be numeric';
 $string['nocriterions'] = 'No criterions';
-$string['criterionproblem'] = 'Resolving problems with criterions';
-$string['criterionproblem_help'] = 'On the page you can resolve problems with criterions:
-
-* creating new criterion
-* deleting existing criterion
-* changing weight of the criterion';
 $string['criterioncantbecreated'] = 'Criterion can\'t be created, because following students have grades';
 $string['unknowncriterionerror'] = 'Unknown critreion managing error';
 $string['putzero'] = 'Put 0';
@@ -317,3 +311,15 @@ $string['changingfieldwillchangestudentsdata'] = 'Changing the field will cause 
 $string['addfieldconfirmation'] = 'Are you sure you want to create the field?';
 $string['addingfieldwillchangestudentsdata'] = 'Adding the field will cause effect on students. If the field is random, values will be generated';
 $string['deletingfieldwillchangestudentsdata'] = 'Deleting the field will cause effect on students';
+$string['nobodyhasgrade'] = 'Nobody has grade for this assignment';
+$string['gradedassignees'] = 'Assignees with grade';
+$string['put0'] = 'Put 0';
+$string['put0_help'] = 'Put 0 for all new criterions';
+$string['put100'] = 'Put 100';
+$string['put100_help'] = 'Put 100 for all new criterions';
+$string['puttotal'] = 'Put total';
+$string['puttotal_help'] = 'Put total grade as grade for all new criterions. Total grade won\'t change';
+$string['putspecified'] = 'Put specified';
+$string['putspecified_help'] = 'Put specified grade for all new criterions';
+$string['putnull'] = 'Leave empty';
+$string['putnull_help'] = 'Do not put any grade for new criterions';
