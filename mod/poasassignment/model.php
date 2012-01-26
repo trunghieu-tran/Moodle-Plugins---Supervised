@@ -1629,9 +1629,6 @@ class poasassignment_model {
         $sql .= " FROM {poasassignment_assignee} st join {poasassignment_attempts} at on st.id = at.assigneeid";
         $sql .= " WHERE st.poasassignmentid = ? AND at.rating IS NOT NULL AND at.ratingdate IS NOT NULL";
         $assignees = $DB->get_records_sql($sql, array($this->get_poasassignment()->id));
-        foreach ($assignees as $assignee) {
-        	$assignee->attempt = $this->get_last_graded_attempt($assignee->id);
-        }
         return $assignees;
     }
     
@@ -1863,6 +1860,14 @@ class poasassignment_model {
 		return $string;
 	}
 	
+	/** 
+	 * Get row for flexible assignees row (used while confirming updating tasks, 
+	 * fields, criterions)
+	 * 
+	 * @access public
+	 * @param object $assignee assignee record
+	 * @return array assignee
+	 */
 	public function get_flexible_table_assignees_row($assignee) {
 		$row = array();
 		
