@@ -13,7 +13,9 @@ class criterions_page extends abstract_page {
     }
 
     public function pre_view() {
-        
+        if (optional_param('mode', '', PARAM_ACTION) == 'updateconfirmed') {
+        	$this->update_confirmed();
+        }
     }
     function view() {
         global $DB, $OUTPUT;
@@ -42,6 +44,15 @@ class criterions_page extends abstract_page {
 		}
 
     }
+    
+    private function update_confirmed() {
+    	if (required_param('confirm', PARAM_ALPHA) == get_string('no')) {
+    		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions')));
+    	}
+    	else {
+    		
+    	}
+    }
     /**
      * Show confirm update criterions page
      * 
@@ -52,7 +63,7 @@ class criterions_page extends abstract_page {
     	global $OUTPUT;
     	$model = poasassignment_model::get_instance();
     	// Open form
-    	echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
+    	echo '<form action="view.php?page=criterions&id='.$this->cm->id.'" method="post">';
     	
     	
     	if ($model->instance_has_rated_attempts()) {
@@ -101,6 +112,35 @@ class criterions_page extends abstract_page {
     		echo '<input type="hidden" name="gradedcount" value="0"/>';
     		print_string('nobodyhasgrade', 'poasassignment');
     	}
+    	
+    	// Ask user to confirm update
+    	echo '<br/>';
+    	print_string('updatecriterionsconfirmation', 'poasassignment');
+    	if (count($graded) > 0) {
+    		echo ' <span class="poasassignment-critical">(';
+    		print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
+    		echo ')</span>';
+    	}
+    	
+    	// Add updated criterions in hidden elements
+    	print_r($data);
+    	echo '<input type="hidden" name="option_repeats" value="'.$data->option_repeats.'"/>';
+    	foreach($data->name as $name) {
+    		echo '<input type="hidden" name="name[]" value="'.$name.'"/>';
+    	}
+    	foreach($data->description as $description) {
+    		echo '<input type="hidden" name="description[]" value="'.$description.'"/>';
+    	}    	
+    	foreach($data->weight as $weight) {
+    		echo '<input type="hidden" name="weight[]" value="'.$weight.'"/>';
+    	}
+    	foreach($data->source as $source) {
+    		echo '<input type="hidden" name="source[]" value="'.$source.'"/>';
+    	}
+    	foreach($data->criterionid as $criterionid) {
+    		echo '<input type="hidden" name="criterionid[]" value="'.$criterionid.'"/>';
+    	}
+    	
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
     	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
     	echo '<input type="hidden" name="mode" value="updateconfirmed"/>';
@@ -108,6 +148,13 @@ class criterions_page extends abstract_page {
     	echo '</form>';
     }
     
+    /**
+     * Get row for graded assignees flexible table
+     * 
+     * @access public
+     * @param object $userinfo graded assignee
+     * @return array row
+     */
     private function get_graded($userinfo) {
     	$model = poasassignment_model::get_instance();
     	$row = $model->get_flexible_table_assignees_row($userinfo);
@@ -128,7 +175,7 @@ class criterions_page extends abstract_page {
     	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put100"></input>';
     	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="puttotal" checked="checked"></input>';
     	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putspecified"></input>'
-    				.'<input type="text" name="specified_'.$userinfo->id.'" value="77"/>';
+    				.'<input type="text" name="specified_'.$userinfo->id.'" value="77" style="width:30px"/>';
     	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putnull"></input>';
     	return $row;
     }

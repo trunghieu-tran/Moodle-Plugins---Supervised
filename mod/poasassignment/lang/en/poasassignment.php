@@ -323,3 +323,5 @@ $string['putspecified'] = 'Put specified';
 $string['putspecified_help'] = 'Put specified grade for all new criterions';
 $string['putnull'] = 'Leave empty';
 $string['putnull_help'] = 'Do not put any grade for new criterions';
+$string['changingcriterionswillchangestudentsdata'] = 'Changing criterions will cause effect on student\'s rating';
+$string['updatecriterionsconfirmation'] = 'Update criterions?';

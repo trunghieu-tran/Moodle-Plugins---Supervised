@@ -227,3 +227,5 @@ $string['putspecified'] = 'Поставить указанный';
 $string['putspecified_help'] = 'Поставить указанный балл по новым кретериям';
 $string['putnull'] = 'Не выставлять';
 $string['putnull_help'] = 'Новые критерии остаются без оценок, их необходимо выставить в персональном порядке';
+$string['changingcriterionswillchangestudentsdata'] = 'Изменение критериев затронет оценки студентов';
+$string['updatecriterionsconfirmation'] = 'Обновить критерии оценивания?';
