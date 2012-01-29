@@ -213,7 +213,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
             $token = $lexer->nextToken();
             $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
             $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-            $this->assertTrue($token->value->number == 'name_name_'.($i + 1));
+            $this->assertTrue($token->value->number == 'name_'.($i + 1));
         }
     }
     function test_lexer_tricky_backref() {
@@ -308,23 +308,23 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 'name_qwe');
+        $this->assertTrue($token->value->number == 'qwe');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 'name_qwe');
+        $this->assertTrue($token->value->number == 'qwe');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 'name_qwe');
+        $this->assertTrue($token->value->number == 'qwe');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 'name_rty');
+        $this->assertTrue($token->value->number == 'rty');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_BACKREF);
-        $this->assertTrue($token->value->number == 'name_rty');
+        $this->assertTrue($token->value->number == 'rty');
         $map = $lexer->get_subpattern_map();
         $this->assertTrue(count($map) === 2);
         $this->assertTrue(array_key_exists('qwe', $map) && $map['qwe'] === 1);
