@@ -476,17 +476,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {
             $this->matchresults->invalidate_match();
-        } else {//do some sanity checks
-
-            //Check that engine have correct capabilities
-            $subpattcnt = $this->matchresults->captured_subpatterns_count();
-            if(!$this->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING) && $subpattcnt > 0) {
-                throw new qtype_preg_exception('Error: subpatterns returned while engine '.$this->name().' doesn\'t support subpattern matching');
-            }
-            if(!$this->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT) && $this->matchresults->left != qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
-                throw new qtype_preg_exception('Error: characters left returned while engine '.$this->name().' doesn\'t support determining of how many characters left');
-            }
-
+        } else {//Do some sanity checks and calculate necessary fields
             $this->matchresults->validate();
         }
 
