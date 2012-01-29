@@ -70,7 +70,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
      */
-    public function render_correctending_hint($renderer, $response) {
+    public function render_stringextension_hint($renderer, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
@@ -81,10 +81,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
             if ($this->to_be_continued($matchresults)) {
                 $hint .= $renderer->render_tobecontinued();
             }
-            $wrongtail = '';
-            if ($matchresults->correctending === qtype_preg_matching_results::DELETE_TAIL) {
-                $wrongtail = $renderer->render_deleted($this->wrong_tail($response['answer'], $matchresults));
-            }
+            $wrongtail = $renderer->render_deleted($this->tail_to_delete($response['answer'], $matchresults));
             return $wronghead.$correctpart.$hint.$wrongtail;
         }
         return '';
@@ -155,18 +152,20 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
     ////qtype_preg_matching_hint functions implementation
     public function render_hint($renderer, $response) {
-        return $this->render_correctending_hint($renderer, $response);
+        return $this->render_stringextension_hint($renderer, $response);
     }
     public function hinted_string($response, $matchresults) {
         //One-character hint
-        if (isset($matchresults->correctending[0])) {
-            return $matchresults->correctending[0];
+        $hintedstring = $matchresults->string_extension();
+        if (strlen($hintedstring) > 0) {
+            return $hintedstring[0];
         }
         return '';
     }
 
     public function to_be_continued($matchresults) {
-        return strlen($matchresults->correctending) > 1 || $matchresults->correctendingcomplete === false;
+        $hintedstring = $matchresults->string_extension();
+        return strlen($hintedstring) > 1 || $matchresults->extendedmatch->full === false;
     }
 
 }

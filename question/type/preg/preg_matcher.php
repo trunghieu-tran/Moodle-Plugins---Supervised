@@ -23,8 +23,6 @@ class qtype_preg_matching_results {
     const UNKNOWN_NEXT_CHARACTER = '';
     //How many characters left is unknown
     const UNKNOWN_CHARACTERS_LEFT = 999999999;
-    //There is no next character: characters should be deleted to form correct match
-    const DELETE_TAIL = null;
 
 
     ////Match data
@@ -36,19 +34,22 @@ class qtype_preg_matching_results {
     public $length;
     /** @var integer The number of characters left to complete matching. */
     public $left;
-    /** @var string A string (shortest if possible), which, been added after partial match, would give a full match.
+    /** @var object of qtype_preg_matching_results, containing string extended to give more close match than this  ($this->extededmatch->left <= $this->left)
      *
-     * Should be UNKNOWN_NEXT_CHARACTER if undetermined by engine, DELETE_TAIL if there is nothing to append, but we should delete instead
+     * There are several ways this string could be generated:
+     * add characters to the end of matching part (index_first[0]+length[0]);
+     * add characters before the end of matching part if it is impossible to complete match from the current point of match fail;
+     * just delete unmatched tail if match failed on the $ assertion.
+     * Should be null if not generated.
      */
-    public $correctending;
-    /** @var boolean Does correct ending, applied from $correctendingstart, produce full match*/
-    public $correctendingcomplete;
-    /** @var integer Start index for the correct ending.
+    public $extendedmatch;
+    /** @var integer Start index for the added characters in extendedmatch object
      *
      * May be less than index_first[0]+length[0] if there is no way to complete matching
-     * from current point of fail due to assertions or another reasons.
+     * from current point of fail due to assertions, backreferences or another reasons.
+     * This field is filled by qtype_preg_matching_results::validate() and should not be set by matching engine
      */
-    public $correctendingstart;
+    public $extensionstart;
 
     ////Source data - TODO - add info about lexemes
     /** @var string String with which match was performed*/
@@ -61,15 +62,13 @@ class qtype_preg_matching_results {
     protected $lexemcount;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
-                                $correctending = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER, $correctendingcomplete = false,
-                                $correctendingstart =  qtype_preg_matching_results::NO_MATCH_FOUND) {
+                                $extendedmatch = null) {
         $this->full = $full;
         $this->index_first = $index_first;
         $this->length = $length;
         $this->left = $left;
-        $this->correctendingstart = $correctendingstart;
-        $this->correctending = $correctending;
-        $this->correctendingcomplete = $correctendingcomplete;
+        $this->extendedmatch = $extendedmatch;
+        $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
     /**
@@ -80,6 +79,11 @@ class qtype_preg_matching_results {
         $this->maxsubpatt = $maxsubpatt;
         $this->subpatternmap = $subpatternmap;
         $this->lexemcount = $lexemcount;
+    }
+
+    
+    public function str() {
+        return $this->str;
     }
 
     /**
@@ -185,7 +189,12 @@ class qtype_preg_matching_results {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
-        $this->correctendingstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+
+        if ($this->extendedmatch !== null) {
+            $this->extensionstart = 0;
+        } else {
+            $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+        }
     }
 
     /**
@@ -213,22 +222,21 @@ class qtype_preg_matching_results {
             }
         }
 
-        //Correct ending starts before matching start
-        if ($this->correctendingstart !== qtype_preg_matching_results::NO_MATCH_FOUND && $this->correctendingstart < $this->index_first[0]) {
-            throw new qtype_preg_exception('Error: correct ending starts at'.$this->correctendingstart.' before matching starts at'.$this->index_first[0]);
-        }
-
-        //Correct ending starts after partial match ending
-        if ($this->correctendingstart !== qtype_preg_matching_results::NO_MATCH_FOUND && $this->correctendingstart < $this->index_first[0] + $this->length[0]) {
-            throw new qtype_preg_exception('Error: correct ending ends at'.$this->correctendingstart.' while matching ends at'.($this->index_first[0] + $this->length[0]));
-        }
-
-
-        //The matching engine didn't supply correct ending start, but supplied next characters (and match isn't full).
-        //We could assume that correctendingstart==index_first[0]+length[0], i.e. right after matching fail position
-        if ($this->correctendingstart === qtype_preg_matching_results::NO_MATCH_FOUND &&
-            (!$this->full && $this->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER)) {
-            $this->correctendingstart = $this->index_first[0] + $this->length[0];
+        //Calculate extension start comparing existing and extended strings
+        //We could find it looking for the first different character in two strings
+        if (!$this->full && $this->extendedmatch !== null) {
+            //Find out extenstion start comparing two strings
+            $str1 = $this->str;
+            $str2 = $this->extendedmatch->str;
+            for ($i =0; $i <= $this->length[0]; $i++) {
+                //One of the string ended or characters are different
+                if ($this->extendedmatch->index_first[0] + $i < strlen($str2) || $this->index_first[0] + $i < strlen($str1)
+                    || $str1[$this->index_first[0] + $i] != $str2[$this->extendedmatch->index_first[0] + $i]) {
+                    $this->extensionstart = $this->index_first[0] + $i;
+                    $this->extendedmatch->extensionstart = $this->extendedmatch->index_first[0] + $i;
+                    break;
+                }
+            }
         }
     }
 
@@ -340,10 +348,38 @@ class qtype_preg_matching_results {
     public function correct_before_hint() {
         $correctbeforehint = '';
         if ($this->is_match()) {//There is match
-            $correctbeforehint = substr($this->str, $this->index_first[0], $this->correctendingstart -  $this->index_first[0]);
+            $correctbeforehint = substr($this->str, $this->index_first[0], $this->extensionstart -  $this->index_first[0]);
         }
         return $correctbeforehint;
     }
+
+        /**
+     * Returnstail after point where extension is started
+     */
+    public function tail_to_delete() {
+        $wrongtail = '';
+        if ($this->is_match()) {//There is match
+            if ($this->extensionstart < strlen($this->str) && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail =  substr($this->str, $this->extensionstart, strlen($this->str) - $this->extensionstart);
+            }
+        }
+        return $wrongtail;
+    }
+
+    /**
+     * Returns part of the string, added by matcher
+     */
+   public function string_extension() {
+        $extension = '';
+        if ($this->extendedmatch !== null) {
+            $extendedstr = $this->extendedmatch->str();
+            if ($this->extendedmatch->extensionstart < strlen($extendedstr)) {
+                $extension = substr($extendedstr, $this->extendedmatch->extensionstart, strlen($extendedstr) - $this->extendedmatch->extensionstart);
+            }
+        }
+        return $extension;
+   }
+    
 }
 
 class qtype_preg_matcher extends qtype_preg_regex_handler {
