@@ -1306,7 +1306,7 @@ array(
                         case 58:
                             {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
@@ -1316,7 +1316,7 @@ array(
                         case 59:
                             {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
@@ -1326,7 +1326,7 @@ array(
                         case 60:
                             {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
@@ -1336,7 +1336,7 @@ array(
                         case 61:
                             {    // named backreference
     $str = substr($this->yytext(), 3);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
@@ -1407,7 +1407,7 @@ array(
                         case 68:
                             {    // named backreference
     $str = substr($this->yytext(), 4);
-    $str = 'name_' . substr($str, 0, strlen($str) - 1);
+    $str = substr($str, 0, strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
