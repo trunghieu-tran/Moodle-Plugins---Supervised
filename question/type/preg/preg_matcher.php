@@ -178,14 +178,14 @@ class qtype_preg_matching_results {
     /**
     * Invalidates match by setting all data to no match values
     */
-    public function invalidate_match($subpattcount = 0) {
+    public function invalidate_match() {
         $this->full = false;
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
         //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
         //Use negative values for no match at all
-        for ($i = 0; $i <= $subpattcount; $i++) {
+        for ($i = - $this->lexemcount; $i <= $this->maxsubpatt; $i++) {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
@@ -432,7 +432,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //Invalidate match called later to allow parser to count subpatterns
-        $this->matchresults->invalidate_match($this->maxsubpatt);
+        $this->matchresults->set_source_info($this->str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $this->matchresults->invalidate_match();
     }
 
     /**
@@ -474,7 +475,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {
-            $this->matchresults->invalidate_match($this->maxsubpatt);
+            $this->matchresults->invalidate_match();
         } else {//do some sanity checks
 
             //Check that engine have correct capabilities
@@ -510,7 +511,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         $result = new qtype_preg_matching_results();
-        $result->invalidate_match($this->maxsubpatt);
+        $result->set_source_info($this->str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $result->invalidate_match();
 
 
         if ($this->anchor->start) {
