@@ -229,3 +229,6 @@ $string['putnull'] = 'Не выставлять';
 $string['putnull_help'] = 'Новые критерии остаются без оценок, их необходимо выставить в персональном порядке';
 $string['changingcriterionswillchangestudentsdata'] = 'Изменение критериев затронет оценки студентов';
 $string['updatecriterionsconfirmation'] = 'Обновить критерии оценивания?';
+$string['newcriterionwithgrade'] = 'Создан новый критерий и по нему автоматически выставлена оценка';
+$string['newcriterionwithgradespecified'] = 'Создан новый критерий и по нему выставлена оценка';
+$string['newcriterionwithgradetotal'] = 'Создан новый критерий и по нему выставлена оценка, равная текущему общему баллу';

@@ -632,6 +632,61 @@ class poasassignment_model {
 	    	$this->update_assignee_gradebook_grade($assignee);
     	}
     }
+    
+    /**
+     * Put grade on every criterion in each assignee's attempt
+     * 
+     * @access public
+     * @param int $assigneeid assignee id
+     * @param array $criterions criterion objects
+     * @param mixed $value rating
+     * @param string $comment comment string
+     */
+    public function new_criterion_rating($assigneeid, $criterions, $value, $comment = '') {
+    	global $DB;
+    	$attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
+    	foreach ($attempts as $attempt) {
+    		if ($value == 'total') {
+    			$value = $attempt->rating;
+    		}
+    		foreach ($criterions as $criterion) {
+    			$this->put_rating($criterion->id, $attempt->id, $value, $comment);
+    		}
+    	}
+    }
+    /**
+     * Puts rating on criterion in database
+     * 
+     * @access public
+     * @param int $criterionid criterion id
+     * @param int $attemptid attempt id
+     * @param int $value rating value
+     * @param string $commentmessage comment to rating (optional)
+     */
+    public function put_rating($criterionid, $attemptid, $value, $commentmessage) {
+    	global $DB;
+    	$rating = new stdClass();    	
+    	$rating->criterionid = $criterionid;
+    	$rating->attemptid = $attemptid;
+    	$rating->value = $value;
+    	
+    	$id = $DB->insert_record('poasassignment_rating_values', $rating);
+    	// Insert comment
+    	$cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
+    	$context = get_context_instance(CONTEXT_MODULE, $cm->id);    		
+    	
+    	$options = new stdClass();
+    	$options->area    = 'poasassignment_comment';
+    	$options->pluginname = 'poasassignment';
+    	$options->context = $context;
+    	$options->cm = $cm;
+    	$options->showcount = true;
+    	$options->component = 'mod_poasassignment';
+    	$options->itemid  = $id;
+    	
+    	$comment = new comment($options);
+    	$comment->add($commentmessage);
+    }
 
     function get_rating_data($assigneeid) {
         global $DB;
