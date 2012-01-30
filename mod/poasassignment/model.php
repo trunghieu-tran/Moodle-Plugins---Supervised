@@ -557,58 +557,80 @@ class poasassignment_model {
     }
 
     /**
-     * Saves criterions into DB
-     *
-     * @param $data data from criterions moodleform
-     * @return int POASASSIGNMENT_CRITERION_OK if there was no problem
-     * while saving criterions, else
-     * POASASSIGNMENT_CRITERION_CANT_BE_DELETED or
-     * POASASSIGNMENT_CRITERION_CANT_BE_CHANGED or
-     * POASASSIGNMENT_CRITERION_CANT_BE_CREATED
+     * Update instance criterions. Includes:
+     *  - delete criterions, that marked as 'to be deleted';
+     *  - update existing criterions;
+     *  - create new criterions.
+     *  
+     * @access public
+     * @param array $criterions criterions objects
+     * @return array inserted criterions
      */
-    // TODO вообще переделать пока никто этого не видел
-    function save_criterion($data) {
-        global $DB;
-        for ($i = 0; $i < $data->option_repeats; $i++) {
-            $rec->name = $data->name[$i];
-            $rec->description = $data->description[$i];
-            $rec->weight = $data->weight[$i];
-            $rec->poasassignmentid = $this->poasassignment->id;
-
-            // If grader is used, add criterion id to it's record in DB
-            if ($data->source[$i] > 0) {
-                $name = 'grader'.$data->source[$i];
-                // $data->$name contains id of our used grader
-                $rec->graderid = $data->$name;
-            }
-            else
-                $rec->graderid = 0;
-
-            $recordisempty = $rec->name == '';
-            $recordisempty = $recordisempty && $rec->description == '';
-            $recordisempty = $recordisempty && $rec->weight == '';
-            if ($recordisempty) {
-                if ($data->criterionid[$i] !== -1)
-                    $DB->delete_records('poasassignment_criterions',
-                                        array('id' => $data->criterionid[$i]));
-            }
-            else {
-                if ($data->criterionid[$i] == -1) {
-                    if ($this->instance_has_rated_attempts()) {
-                        return POASASSIGNMENT_CRITERION_CANT_BE_CREATED;
-                    }
-                    else {
-                        $DB->insert_record('poasassignment_criterions', $rec);
-                    }
-                }
-                else {
-                    $rec->id = $data->criterionid[$i];
-                    $DB->update_record('poasassignment_criterions', $rec);
-                }
-            }
-
-        }
-        return POASASSIGNMENT_CRITERION_OK;
+    public function update_criterions($criterions) {
+    	global $DB;
+    	foreach ($criterions as $key => $criterion) {
+    		if ($criterion->delete) {
+    			// Delete criterion and all grades 
+    			$DB->delete_records('poasassignment_criterions', array('id' => $criterion->id));
+    			$DB->delete_records('poasassignment_rating_values', array('criterionid' => $criterion->id));
+    			// Only new criterions must be returned
+    			unset($criterions[$key]);
+    		}
+    		else {
+    			unset($criterion->delete);
+    			if (!isset($criterion->id) || $criterion->id == -1) {
+    				// Insert new criterions
+    				unset($criterion->id);    				
+    				$criterion->id = $DB->insert_record('poasassignment_criterions', $criterion);    				
+    			}
+    			else {
+    				// Update existing criterions
+    				$DB->update_record('poasassignment_criterions', $criterion);
+    				// Only new criterions must be returned
+    				unset($criterions[$key]);
+    			}
+    		}
+    	}
+    	return $criterions;
+    }
+    
+    /**
+     * Updates rating for each assignee's attempt . Update values in table
+     * {poasassignment_attempts} and Moodle Gradebook.
+     * 
+     * @access public
+     * @param int $assigneeid assignee id
+     */
+    public function recalculate_rating($assigneeid) {
+    	global $DB;
+    	// Get all attempts to recalculate
+    	$attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assigneeid), 'id', 'id, rating, ratingdate, attemptdate');
+    	if (count($attempts) > 0) {
+    		$assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
+    		// Calculate total weight of criterions
+    		$criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $assignee->poasassignmentid), 'id', 'id, weight');
+    		$totalweight = 0;
+    		foreach ($criterions as $criterion) {
+    			$totalweight += $criterion->weight;
+    		}
+    		// Calculate relative weight for each criterion
+    		foreach ($criterions as $criterion) {
+    			$criterion->relativeweight = round($criterion->weight / $totalweight, 2);
+    		}
+	    	foreach ($attempts as $attempt) {
+	    		$ratingvalues = $DB->get_records('poasassignment_rating_values', array('attemptid' => $attempt->id), 'id', 'id, value, criterionid, attemptid');
+	    		// Calculate total rating for each attempt
+	    		$rating = 0;
+    			foreach ($ratingvalues as $ratingvalue) {
+    				$rating += $ratingvalue->value * $criterions[$ratingvalue->criterionid]->relativeweight;
+    			}
+    			
+    			$attempt->rating = $rating;
+    			$attempt->ratingdate = time();
+    			$DB->update_record('poasassignment_attempts', $attempt);
+	    	}
+	    	$this->update_assignee_gradebook_grade($assignee);
+    	}
     }
 
     function get_rating_data($assigneeid) {

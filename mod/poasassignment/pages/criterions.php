@@ -45,12 +45,59 @@ class criterions_page extends abstract_page {
 
     }
     
+    /** 
+     * Extract criterion objects from POST
+     * 
+     * @access private 
+     * @return array criterions
+     */
+    private function get_criterions_from_post() {
+    	$count = required_param('option_repeats', PARAM_INT);
+    	
+    	$names = required_param('name', PARAM_RAW);
+    	$descriptions = required_param('description', PARAM_RAW);
+    	$weights = required_param('weight', PARAM_RAW);
+    	$sources = required_param('source', PARAM_RAW);
+    	$criterionids = required_param('criterionid', PARAM_RAW);
+    	$delete = optional_param('delete', array(), PARAM_RAW);
+    	
+    	$criterions = array();
+    	for ($i = 0; $i < $count; $i++) {
+    		if ($names[$i] != '') {
+    			$criterion = new stdClass();
+    			$criterion->id = $criterionids[$i];
+    			$criterion->name = $names[$i];
+    			$criterion->description = $descriptions[$i];
+    			$criterion->weight = $weights[$i];
+    			$criterion->graderid = $sources[$i];
+    			$criterion->delete = isset($delete[$i]) && $delete[$i] == 1;
+    			$criterion->poasassignmentid = $this->poasassignment->id;
+    			
+    			$criterions[] = $criterion;
+    		}
+    	}
+    	return $criterions;
+    }
+    
     private function update_confirmed() {
     	if (required_param('confirm', PARAM_ALPHA) == get_string('no')) {
     		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions')));
     	}
     	else {
-    		
+    		$model = poasassignment_model::get_instance();
+    		$gradedcount = required_param('gradedcount', PARAM_INT);
+    		$insertedcriterions = $model->update_criterions($this->get_criterions_from_post());
+    		if ($gradedcount > 0) {
+    			$assigneeids = required_param('assigneeids', PARAM_RAW);
+    			foreach($assigneeids as $assigneeid) {
+    				foreach($insertedcriterions as $insertedcriterion) {
+    					
+    				}
+    				$model->recalculate_rating($assigneeid);
+    			}
+
+    		}
+    		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions'), 'redirecting...'));
     	}
     }
     /**
@@ -104,7 +151,7 @@ class criterions_page extends abstract_page {
     		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
     		foreach ($usersinfo as $userinfo) {
     			$table->add_data($this->get_graded($userinfo));
-    			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
+    			echo '<input type="hidden" name="assigneeids[]" value="'.$userinfo->id.'"/>';
     		}
     		$table->print_html();
     	}
@@ -121,9 +168,8 @@ class criterions_page extends abstract_page {
     		print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
     		echo ')</span>';
     	}
-    	
-    	// Add updated criterions in hidden elements
     	print_r($data);
+    	// Add updated criterions in hidden elements
     	echo '<input type="hidden" name="option_repeats" value="'.$data->option_repeats.'"/>';
     	foreach($data->name as $name) {
     		echo '<input type="hidden" name="name[]" value="'.$name.'"/>';
@@ -139,6 +185,11 @@ class criterions_page extends abstract_page {
     	}
     	foreach($data->criterionid as $criterionid) {
     		echo '<input type="hidden" name="criterionid[]" value="'.$criterionid.'"/>';
+    	}
+    	if (isset($data->delete)) {
+	    	foreach($data->delete as $key => $delete) {
+	    		echo '<input type="hidden" name="delete['.$key.']" value="'.$delete.'"/>';
+	    	}
     	}
     	
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
@@ -266,10 +317,7 @@ class criterionsedit_form extends moodleform {
         $repeateloptions['source']['helpbutton'] = array('criterionsource', 'poasassignment');
         
         $repeateloptions['delete']['default'] = 0;
-        $repeateloptions['name']['disabledif'] = array('delete', 'eq', 1);
-        $repeateloptions['description']['disabledif'] = array('delete', 'eq', 1);        
-        $repeateloptions['weight']['disabledif'] = array('delete', 'eq', 1);
-        $repeateloptions['source']['disabledif'] = array('delete', 'eq', 1);
+        $repeateloptions['delete']['disabledif'] = array('criterionid', 'eq', -1);
 
         $mform->setType('criterionid', PARAM_INT);
 
