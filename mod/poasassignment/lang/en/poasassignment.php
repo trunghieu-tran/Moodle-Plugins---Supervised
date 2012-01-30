@@ -325,3 +325,6 @@ $string['putnull'] = 'Leave empty';
 $string['putnull_help'] = 'Do not put any grade for new criterions';
 $string['changingcriterionswillchangestudentsdata'] = 'Changing criterions will cause effect on student\'s rating';
 $string['updatecriterionsconfirmation'] = 'Update criterions?';
+$string['newcriterionwithgrade'] = 'New criterion is created and has default grade';
+$string['newcriterionwithgradespecified'] = 'New criterion is created and has grade';
+$string['newcriterionwithgradetotal'] = 'New criterion is created and has grade that equals current total grade';

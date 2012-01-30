@@ -89,9 +89,32 @@ class criterions_page extends abstract_page {
     		$insertedcriterions = $model->update_criterions($this->get_criterions_from_post());
     		if ($gradedcount > 0) {
     			$assigneeids = required_param('assigneeids', PARAM_RAW);
+    			
     			foreach($assigneeids as $assigneeid) {
-    				foreach($insertedcriterions as $insertedcriterion) {
-    					
+    				if (count($insertedcriterions) > 0) {
+    					$action = required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT);
+	    				switch($action) {
+	    					case 'put0':
+	    						$model->new_criterion_rating($assigneeid, $insertedcriterions, 0, get_string('newcriterionwithgrade', 'poasassignment').' 0');
+	    						break;
+    						case 'put100':
+    							$model->new_criterion_rating($assigneeid, $insertedcriterions, 100, get_string('newcriterionwithgrade', 'poasassignment').' 100');
+    							break;
+    						case 'puttotal':
+    							$model->new_criterion_rating($assigneeid, $insertedcriterions, 'total', get_string('newcriterionwithgradetotal', 'poasassignment'));
+    							break;
+    						case 'putspecified':   
+    							$grade = required_param('specified_'.$assigneeid, PARAM_INT); 							
+    							$model->new_criterion_rating(
+    								$assigneeid, 
+    								$insertedcriterions, 
+    								$grade, 
+    								get_string('newcriterionwithgradespecified', 'poasassignment').' '.$grade);
+    							break;
+    						case 'putnull':
+    							$model->new_criterion_rating($assigneeid, $insertedcriterions, null, get_string('newcriterionwithgrade', 'poasassignment').' null');
+    							break;
+	    				}
     				}
     				$model->recalculate_rating($assigneeid);
     			}
@@ -168,7 +191,6 @@ class criterions_page extends abstract_page {
     		print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
     		echo ')</span>';
     	}
-    	print_r($data);
     	// Add updated criterions in hidden elements
     	echo '<input type="hidden" name="option_repeats" value="'.$data->option_repeats.'"/>';
     	foreach($data->name as $name) {
