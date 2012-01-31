@@ -28,6 +28,16 @@ class qtype_preg_fa_transition {
     public $to;
     /** @var integer priority of this transitions over other - 0 means the highest priority*/
     public $priority;
+
+    public function __clone() {
+        $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf
+    }
+
+    public function __construct(&$from, &$pregleaf, &$to) {
+        $this->from =& $from;
+        $this->pregleaf = clone $pregleaf;
+        $this->to =& $to;
+    }
 };
 
 /**
@@ -36,9 +46,9 @@ class qtype_preg_fa_transition {
 class qtype_preg_fa_state {
 
     /** @var object reference to the qtype_preg_finite_automaton object this state belongs to
-    *
-    * We are violating principle "child shoudn't know the parent" there, but the state need to signal important information back to automaton during it's construction: becoming non-deterministic, having eps or pure-assert transitions etc
-    */
+     *
+     * We are violating principle "child shoudn't know the parent" there, but the state need to signal important information back to automaton during it's construction: becoming non-deterministic, having eps or pure-assert transitions etc
+     */
     protected $FA;
 
     /** @var array of qtype_preg_fa_transition child objects, indexed*/
@@ -46,14 +56,14 @@ class qtype_preg_fa_state {
     /** @var whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions*/
     protected $deterministic;
 
-    public function __construct() {
-        $this->FA = null;
+    public function __construct(&$FA = null) {
+        $this->FA =& $FA;
         $this->outtransitions = array();
         $this->deterministic = true;
     }
 
-    public function set_FA($FA) {
-        $this->FA = &$FA;
+    public function set_FA(&$FA) {
+        $this->FA =& $FA;
     }
 
     /**
@@ -61,8 +71,9 @@ class qtype_preg_fa_state {
     *
     * @param transtion object of child class of qtype_preg_fa_transition
     */
-    public function add_transition($transition) {
+    public function add_transition($transition, &$priority_counter) {
         $transition->from =& $this;
+        $transition->priority = $priority_counter++;
         $this->outtransitions[] = $transition;
         //TODO - check whether it makes a node non-deterministic
         //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
@@ -76,6 +87,28 @@ class qtype_preg_fa_state {
         }
 
         $this->FA->transition_added();
+    }
+
+    /**
+    * Moves transitions from one state to another
+    *
+    * @param with an object of qtype_preg_fa_state to take transitions from
+    */
+    public function merge_transition_set($with) {
+        $this->outtransitions = array_merge($this->outtransitions, $with->outtransitions);
+    }
+
+    /**
+    * Replaces oldref with newref in each transition
+    * @param oldref - a reference to the old state
+    * @param newref - a reference to the new state
+    */
+    public function update_state_references(&$oldref, &$newref) {
+        foreach($this->outtransitions as $transition) {
+            if ($transition->to === $oldref) {
+                $transition->to =& $newref;
+            }
+        }
     }
 
     public function outgoing_transitions() {
@@ -94,15 +127,15 @@ class qtype_preg_fa_state {
     *
     * End state doesn't have outgoing transitions
     */
-    public function is_end_state() {
+    /*public function is_end_state() {
         return empty($this->outtransitions);
-    }
+    }*/
 };
 
 
 /**
-* Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa
-*/
+ * Inherit to define qtype_preg_deterministic_fa and qtype_preg_nondeterministic_fa
+ */
 abstract class qtype_preg_finite_automaton {
 
     /** @var array of qtype_preg_fa_state, indexed by state number */
@@ -112,7 +145,7 @@ abstract class qtype_preg_finite_automaton {
     /** @var object of end state*/
     protected $endstate;
 
-    /** @var boolean is automaton really deterministic - it could be even if it shoudn't 
+    /** @var boolean is automaton really deterministic - it could be even if it shoudn't
     *
     * May be used for optimisation when NFA class actually store DFA
     */
@@ -123,15 +156,15 @@ abstract class qtype_preg_finite_automaton {
     /** @var boolean whether automaton has simple assertion transtions*/
     protected $hasassertiontransitions;
 
-    
+
     protected $statelimit;
     protected $statecount;
 
     protected $transitionlimit;
     protected $transitioncount;
-    
 
-    public function __contruct() {
+
+    public function __construct() {
         $this->states = array();
         $this->startstate = null;
         $this->endstate = null;
@@ -187,11 +220,24 @@ abstract class qtype_preg_finite_automaton {
         return $this->endstate;
     }
 
+    public function get_states() {
+        return $this->states;
+    }
+	
+	public function state_exists(&$state) {
+        foreach ($this->states as $curstate) {
+            if ($curstate === $state) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
-    * Set start state of automaton to be given state
+    * Set start state of automaton to the given state
     */
-    public function set_start_state($state) {
-        if (in_array($state, $this->states)) {
+    public function set_start_state(&$state) {
+        if ($this->state_exists($state)) {
             $this->startstate =& $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
@@ -199,13 +245,24 @@ abstract class qtype_preg_finite_automaton {
     }
 
     /**
-    * Set end state of automaton to be given state
+    * Set end state of automaton to the given state
     */
-    public function set_end_state($state) {
-        if (in_array($state, $this->states)) {
+    public function set_end_state(&$state) {
+        if ($this->state_exists($state)) {
             $this->endstate =& $state;
         } else {
             throw new qtype_preg_exception('set_end_state error: No state '.$stateindex.' in automaton');
+        }
+    }
+
+    /**
+    * Replaces oldref with newref in every transition of the automaton
+    * @param oldref - a reference to the old state
+    * @param newref - a reference to the new state
+    */
+    public function update_state_references(&$oldref, &$newref) {
+        foreach ($this->states as $curstate) {
+            $curstate->update_state_references($oldref, $newref);
         }
     }
 
@@ -238,15 +295,30 @@ abstract class qtype_preg_finite_automaton {
     /**
     * Adds a state to the automaton and returns it's index
     *
-    * @param state object of qtype_preg_fa_state class
+    * @param state a reference to an object of qtype_preg_fa_state class
     */
-    public function add_state($state) {
-        
+    public function add_state(&$state) {
         $this->states[] =& $state;
-        $state->set_FA(& $this);
+        $state->set_FA(&$this);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');
+        }
+    }
+
+    /**
+    * Removes a state from the automaton
+    *
+    * @param state a reference to the state to be removed
+    */
+    public function remove_state(&$state) {
+        foreach ($this->states as $key=>$curstate) {
+            if ($curstate === $state) {
+                $this->transitioncount -= count($curstate->outgoing_transitions());
+                $this->statecount--;
+                unset($this->states[$key]);
+                break;
+            }
         }
     }
 
@@ -357,6 +429,59 @@ abstract class qtype_preg_finite_automaton {
 
     public function __clone() {
         //TODO - clone automaton
+    }
+
+    /**
+    * debug function for generating dot code for drawing nfa
+    * @param dotfilename - name of the dot file
+    * @param jpgfilename - name of the resulting jpg file
+    */
+    public function draw_nfa($dotfilename, $jpgfilename) {
+        $regexhandler = new qtype_preg_regex_handler();
+        $dir = $regexhandler->get_temp_dir('nfa');
+        $dotfn = $dir.$dotfilename;
+        $dotfile = fopen($dotfn, 'w');
+        // numerate all states
+        $tmp = 0;
+        foreach ($this->states as $curstate)
+        {
+            $curstate->id = $tmp;
+            $tmp++;
+        }
+        // generate dot code
+        fprintf($dotfile, "digraph {\n");
+        fprintf($dotfile, "rankdir = LR;\n");
+        foreach ($this->states as $curstate) {
+            $index1 = $curstate->id;
+            // draw a single state
+            if (count($curstate->outgoing_transitions()) == 0) {
+                fprintf($dotfile, "%s\n", "$index1");
+            } else {    // draw a state with transitions
+                foreach ($curstate->outgoing_transitions() as $curtransition) {
+                    $index2 = $curtransition->to->id;
+                    $lab = $curtransition->pregleaf->tohr();
+                    // information about subpatterns
+                    /*if (count($curtransition->tags) > 0) {
+                        $lab = $lab."starts";
+                        foreach ($curtransition->tags as $key=>$val) {
+                            $lab = $lab."$key,";
+                        }
+                    }
+                    if (count($curtransition->tags) > 0) {
+                        $lab = $lab."ends";
+                        foreach ($curtransition->tags as $key=>$val) {
+                            $lab = $lab."$key,";
+                        }
+                    }*/
+                    $lab = $lab."$curtransition->priority";
+                    fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
+                }
+            }
+        }
+        fprintf($dotfile, "};");
+        fclose($dotfile);
+        $regexhandler->execute_dot($dotfn, $jpgfilename);
+        unlink($dotfn);
     }
 
 
