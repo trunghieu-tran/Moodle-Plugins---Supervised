@@ -185,12 +185,11 @@ class qtype_preg_question extends question_graded_automatically
                 if ($answer->fraction >= $this->hintgradeborder) {
                     $bestfitanswer = $answer;
                     $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
-                    $matchresults = $matcher->get_match_results();
                     $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
-                        $maxfitness = (-1)*$matchresults->left;
+                        $maxfitness = (-1)*$bestmatchresult->left;
                     } else {
-                        $maxfitness = $matchresults->length();
+                        $maxfitness = $bestmatchresult->length();
                     }
                     break;//Any one that fits border helps
                 }
