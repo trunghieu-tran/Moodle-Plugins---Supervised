@@ -822,11 +822,20 @@ class poasassignment_model {
     	$records = $DB->get_records('poasassignment_variants', array('fieldid' => $fieldid), 'sortorder, id', 'id, value');
     	$variants = array();
     	foreach ($records as $record) {
-    		$variants[] = $record->value;
+    		$variants[] = trim($record->value);
     	}
     	return $variants;
     }
-    function get_variant($index,$variants) {
+    
+    /**
+     * Get list item by it's index
+     * 
+     * @access public
+     * @param int $index item index
+     * @param string $variants variants, separated by "\n"
+     * @return string variant or error message
+     */
+    function get_variant($index, $variants) {
         $tok = strtok($variants,"\n");
         while (strlen($tok)>0) {
             $opt[]=$tok;

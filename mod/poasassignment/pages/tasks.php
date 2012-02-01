@@ -87,7 +87,7 @@ class tasks_page extends abstract_page {
         $table->define_headers($headers);
         $table->collapsible(true);
         $table->initialbars(true);
-        $table->set_attribute('class', 'poasassignment-table');
+        $table->set_attribute('class', 'poasassignment-table tasks-table');
         $table->set_attribute('width', '100%');
         $table->setup();
         // Show all tasks if we can manage tasks
