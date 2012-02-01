@@ -328,3 +328,5 @@ $string['updatecriterionsconfirmation'] = 'Update criterions?';
 $string['newcriterionwithgrade'] = 'New criterion is created and has default grade';
 $string['newcriterionwithgradespecified'] = 'New criterion is created and has grade';
 $string['newcriterionwithgradetotal'] = 'New criterion is created and has grade that equals current total grade';
+$string['notdefined'] = 'Not defined';
+$string['comments'] = 'Comments';

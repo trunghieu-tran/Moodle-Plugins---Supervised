@@ -13,25 +13,27 @@ class randomchoice extends taskgiver {
 
     function process_before_tasks($cmid, $poasassignment) {
         global $USER,$DB;
-        if(has_capability('mod/poasassignment:managetasks',poasassignment_model::get_instance()->get_context())) {
-            return;
-        }
-        if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id))) {
-            $model = poasassignment_model::get_instance();
-            $tasks = $model->get_available_tasks($USER->id);
-			$taskid = poasassignment_model::get_random_task_id($tasks);
-            //$tasksarray = array();
-            //foreach($tasks as $task) 
-            //    $tasksarray[] = $task->id;
-            if($taskid > -1) {
-                //$taskid = $tasksarray[rand(0, count($tasksarray) - 1)];
-                $poasmodel = poasassignment_model::get_instance($poasassignment);
-                $poasmodel->bind_task_to_assignee($USER->id, $taskid);
-                redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
-            }
-            else {
-                print_string('noavailabletask','poasassignmenttaskgivers_randomchoice');
-            }
+        //if(has_capability('mod/poasassignment:managetasks',poasassignment_model::get_instance()->get_context())) {
+        //    return;
+        //}
+        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+	        if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id))) {
+	            $model = poasassignment_model::get_instance();
+	            $tasks = $model->get_available_tasks($USER->id);
+				$taskid = poasassignment_model::get_random_task_id($tasks);
+	            //$tasksarray = array();
+	            //foreach($tasks as $task) 
+	            //    $tasksarray[] = $task->id;
+	            if($taskid > -1) {
+	                //$taskid = $tasksarray[rand(0, count($tasksarray) - 1)];
+	                $poasmodel = poasassignment_model::get_instance($poasassignment);
+	                $poasmodel->bind_task_to_assignee($USER->id, $taskid);
+	                redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'view')),null,0);
+	            }
+	            else {
+	                print_string('noavailabletask','poasassignmenttaskgivers_randomchoice');
+	            }
+	        }
         }
     }
 }
