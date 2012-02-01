@@ -164,6 +164,39 @@ class taskfieldedit_page extends abstract_page {
     }
     
     /**
+     * Generate HTML-string that contains all params as hidden
+     * elements
+     *  
+     * @access private
+     * @param object $data field
+     * @return string html-code
+     */
+    private function data_to_hidden($data) {
+    	$html = '';    	
+    	$html .= '<input type="hidden" name="name" value="'.$data->name.'"/>';
+    	$html .= '<input type="hidden" name="description" value="'.$data->description.'"/>';
+    	$html .= '<input type="hidden" name="ftype" value="'.$data->ftype.'"/>';
+    	if (isset($data->showintable)) {
+    		$html .= '<input type="hidden" name="showintable" value="1"/>';
+    	}
+    	if (isset($data->secretfield)) {
+    		$html .= '<input type="hidden" name="secretfield" value="1"/>';
+    	}
+    	if (isset($data->random)) {
+    		$html .= '<input type="hidden" name="random" value="1"/>';
+    	}
+    	if (isset($data->variants)) {
+    		$html .= '<input type="hidden" name="variants" value="'.$data->variants.'"/>';
+    	}
+    	if (isset($data->valuemax)) {
+    		$html .= '<input type="hidden" name="valuemax" value="'.$data->valuemax.'"/>';
+    	}
+    	if (isset($data->valuemin)) {
+    		$html .= '<input type="hidden" name="valuemin" value="'.$data->valuemin.'"/>';
+    	}
+    	return $html;
+    }
+    /**
      * Show confirm edit screen with task owners list
      * 
      * @access private
@@ -202,6 +235,7 @@ class taskfieldedit_page extends abstract_page {
      * @param object $data data from moodleform
      */
     private function confirm_add($data) {
+    	print_r($_POST);
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_instance_task_owners();
     	// Open form
@@ -218,6 +252,10 @@ class taskfieldedit_page extends abstract_page {
     		print_string('addingfieldwillchangestudentsdata', 'poasassignment');
     		echo ')</span>';
     	}
+    	
+    	// Add field params as hidden elements
+
+    	echo $this->data_to_hidden($data);
     	
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
     	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';

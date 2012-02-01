@@ -49,13 +49,21 @@ class tasksfields_page extends abstract_page {
         $poasmodel = poasassignment_model::get_instance();
         $table = new flexible_table('mod-poasassignment-tasksfields');
         $table->baseurl = $PAGE->url;
-        $columns=array('name','ftype','showintable','secretfield','random','range');
-        $headers=array(get_string('taskfieldname','poasassignment'),
+        $columns = array(
+        		'name',
+        		'ftype',
+        		'range',
+        		'random',
+        		'secretfield',
+        		'showintable');
+        $headers = array(
+        		get_string('taskfieldname','poasassignment'),
                 get_string('ftype','poasassignment'),
-                get_string('showintable','poasassignment'),
-                get_string('secretfield','poasassignment'),
-                get_string('random','poasassignment'),
-                get_string('range','poasassignment'));
+        		get_string('range','poasassignment'),
+        		get_string('random','poasassignment'),
+        		get_string('secretfield','poasassignment'),
+                get_string('showintable','poasassignment'));
+        
         $table->define_columns($columns);
         $table->define_headers($headers);
         $table->collapsible(true);
@@ -111,10 +119,10 @@ class tasksfields_page extends abstract_page {
 
             $row = array($name,
                     $poasmodel->ftypes[$field->ftype],
-                    $field->showintable == 1 ? get_string('yes') : get_string('no'),
-                    $field->secretfield == 1 ? get_string('yes') : get_string('no'),
-                    $field->random == 1 ? get_string('yes') : get_string('no'),
-                    $range);
+            		$range,
+            		$field->random == 1 ? get_string('yes') : get_string('no'),
+            		$field->secretfield == 1 ? get_string('yes') : get_string('no'),
+                    $field->showintable == 1 ? get_string('yes') : get_string('no'));
             $table->add_data($row);
         }
         $table->print_html();
