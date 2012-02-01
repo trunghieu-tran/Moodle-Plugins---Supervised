@@ -364,11 +364,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result->index_first[0] = $startpos;
             $result->index_first_old[0] = $result->index_first[0];
             $result->length_old[0] = $result->length[0];
-            if ($result->extendedmatch !== null) {
-                $result->extendedmatch->index_first[0] = $result->index_first[0];
-                $result->extendedmatch->index_first_old[0] = $result->index_first_old[0];
-                $result->extendedmatch->length_old[0] = $result->length_old[0];
-            }
+        }
+        if ($result->extendedmatch !== null) {
+            $result->extendedmatch->index_first[0] = $result->index_first[0];
+            $result->extendedmatch->index_first_old[0] = $result->index_first_old[0];
+            $result->extendedmatch->length_old[0] = $result->length_old[0];
         }
         return new qtype_preg_matching_results($result->full, $result->index_first_old, $result->length_old, $result->left, $result->extendedmatch);
     }
