@@ -220,7 +220,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $matchresults->correctending[0]));
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue(strstr('crb', $hintstr[0]));
         $this->assertTrue($matchresults->match_tail() == 'hats?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //Matching breaks inside the word
@@ -228,7 +229,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat b');
-        $this->assertTrue(strstr('a', $matchresults->correctending[0]));
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue(strstr('a', $hintstr[0]));
         $this->assertTrue($matchresults->match_tail() == 'ets?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong head
@@ -236,7 +238,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == '');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $matchresults->correctending[0]));
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue(strstr('crb', $hintstr[0]));
         $this->assertTrue($matchresults->match_tail() == 'hats?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong tail
@@ -244,7 +247,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
-        $this->assertTrue(strstr('crb', $matchresults->correctending[0]));
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue(strstr('crb', $hintstr[0]));
         $this->assertTrue($matchresults->match_tail() == '');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong tail and hinted character
@@ -252,7 +256,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat rats?');
-        $this->assertTrue($matchresults->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue($hintstr === '');
         $this->assertTrue($matchresults->match_tail() == '');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No correct part - so no guess except hinting
@@ -260,7 +265,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading().$matchresults->match_tail() == '!@#$^%&');
         $this->assertTrue($matchresults->matched_part() == '');
-        $this->assertTrue(strstr('D', $matchresults->correctending[0]));
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue(strstr('D', $hintstr[0]));
         $this->assertTrue($hintobj->could_show_hint($matchresults));
 
         ////Engine without partial matching support should show colored parts only when there is a match
@@ -274,7 +280,8 @@ class qtype_preg_question_test extends UnitTestCase {
         $matchresults = $bestfit['match'];
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat rats?');
-        $this->assertTrue($matchresults->correctending == qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+        $hintstr = $matchresults->string_extension();
+        $this->assertTrue($hintstr === '');
         $this->assertTrue($matchresults->match_tail() == ' Really?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
 
