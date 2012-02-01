@@ -909,8 +909,8 @@ class poasassignment_model {
         $data->secretfield = isset($data->secretfield);
         $data->random = isset($data->random);
         $data->assigneeid = 0;
-        $data->name = clean_param($data->name, PARAM_TEXT);
-        $data->description = clean_param($data->description, PARAM_TEXT);
+        $data->name = trim(clean_param($data->name, PARAM_TEXT));
+        $data->description = trim(clean_param(s($data->description), PARAM_TEXT));
 
         $fieldid = $DB->insert_record('poasassignment_fields',$data);
         $data->id = $fieldid;
@@ -1008,6 +1008,7 @@ class poasassignment_model {
     }
 
     function htmllize_tree($dir) {
+    	require_once(dirname(dirname(dirname(__FILE__))).'/lib/plagiarismlib.php');
         global $CFG,$OUTPUT;
         $yuiconfig = array();
         $yuiconfig['type'] = 'html';
@@ -1022,10 +1023,11 @@ class poasassignment_model {
         }
 
         foreach ($dir['files'] as $file) {
-            $filename = $file->get_filename();
-            $icon = substr(mimeinfo("icon", $filename), 0, -4);
-            $image = $OUTPUT->pix_icon("/f/$icon", $filename, 'moodle', array('class'=>'icon'));
+        	$filename = $file->get_filename();
+            $icon = mimeinfo("icon", $filename);
+            $image = $OUTPUT->pix_icon("f/$icon", $filename, 'moodle', array('class'=>'icon'));
             $result .= '<li yuiConfig=\''.json_encode($yuiconfig).'\'><div>'.$image.' '.$file->fileurl.' </div></li>';
+            
         }
         $result .= '</ul>';
         return $result;
