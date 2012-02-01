@@ -894,13 +894,14 @@ class poasassignment_model {
      * @return object record with id 
      */
 	function add_task_field($data) {
-		print_r($data);
         global $DB;
         $data->poasassignmentid = $this->poasassignment->id;
-        $data->showintable=isset($data->showintable);
-        $data->secretfield=isset($data->secretfield);
-        $data->random=isset($data->random);
-        $data->assigneeid = 0;        
+        $data->showintable = isset($data->showintable);
+        $data->secretfield = isset($data->secretfield);
+        $data->random = isset($data->random);
+        $data->assigneeid = 0;
+        $data->name = clean_param($data->name, PARAM_TEXT);
+        $data->description = clean_param($data->description, PARAM_TEXT);
 
         $fieldid = $DB->insert_record('poasassignment_fields',$data);
         $data->id = $fieldid;
@@ -937,6 +938,8 @@ class poasassignment_model {
         $field->showintable = isset($field->showintable);
         $field->secretfield = isset($field->secretfield);
         $field->random = isset($field->random);
+        $field->name = clean_param($field->name, PARAM_TEXT);
+        $field->description = clean_param($field->description, PARAM_TEXT);
         
         // Drop old variants
         $DB->delete_records('poasassignment_variants', array('fieldid' => $field->id));
