@@ -28,7 +28,7 @@
  *             'index_first'=>array(0=>0),        // indexes of first correct characters for subpatterns. subpattern numbers are defined by array keys
  *             'length'=>array(0=>2),             // length of the i-subpattern
  *             'left'=>0,                         // number of characters left to complete match
- *             'correctending'=>'');              // a string of possible next characters in case of not full match
+ *             'next'=>'');              // a string of possible next characters in case of not full match
  *
  *    Remark: different matching engines may give different results, especially when matching quantifiers. This situation appears when a character may
  *    lead to continuing matching both a quantifier and the rest of the regex, for example:
@@ -48,7 +48,7 @@
  *                       'index_first'=>array(0=>0),
  *                       'length'=>array(0=>8),
  *                       'left'=>0,
- *                       'correctending'=>'');
+ *                       'next'=>'');
  *
  *       return array('regex'=>'.* ME',
  *                    'modifiers'=>'i',
@@ -63,13 +63,13 @@
  *                                              'index_first'=>array(0=>0),
  *                                              'length'=>array(0=>3),
  *                                              'left'=>array(4),
- *                                              'correctending'=>'b'),
+ *                                              'next'=>'b'),
  *                                        array('is_match'=>true,    // result for fa engine
  *                                              'full'=>false,
  *                                              'index_first'=>array(0=>0),
  *                                              'length'=>array(0=>5),
  *                                              'left'=>array(4),
- *                                              'correctending'=>'b')
+ *                                              'next'=>'b')
  *                                        ));
  *
  *       return array('regex'=>'ab+[a-z]*bacd',
@@ -153,8 +153,8 @@ class qtype_preg_cross_tester extends UnitTestCase {
             if ($obtained->extendedmatch !== null) {
                 $str = $obtained->string_extension();
             }
-            $nextpassed = (($expected['correctending'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['correctending'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $str[0]) !== false));    // expected 'correctending' contains obtained 'correctending'
+            $nextpassed = (($expected['next'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['next'], $str[0]) !== false));    // expected 'next' contains obtained 'next'
         }
         // checking number of characters left
         $leftpassed = true;
@@ -185,9 +185,9 @@ class qtype_preg_cross_tester extends UnitTestCase {
         if (!$indexlastpassed) {
             echo 'obtained result '; print_r($obtained->length); echo " for 'length' is incorrect    (test from $testdataclassname)<br/>";
         }
-        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'correctending' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
+        $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'next' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$nextpassed) {
-            echo 'obtained result \'' . $obtained->string_extension() . "' for 'correctending' is incorrect    (test from $testdataclassname)<br/>";
+            echo 'obtained result \'' . $obtained->string_extension() . "' for 'next' is incorrect    (test from $testdataclassname)<br/>";
         }
         $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$leftpassed) {
