@@ -14,14 +14,18 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
+if (!defined('NOMATCH')) {
+    define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
+}
+
 class qtype_preg_cross_tests_special_cases {
 
     function data_for_test_empty_string() {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>-1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
                         'left'=>array(3),
                         'correctending'=>'a');
 
@@ -33,8 +37,8 @@ class qtype_preg_cross_tests_special_cases {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0,2=>-1),
-                        'length'=>array(0=>2,1=>2,2=>-1),
+                        'index_first'=>array(0=>0,1=>0,2=>NOMATCH),
+                        'length'=>array(0=>2,1=>2,2=>NOMATCH),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'correctending'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -46,8 +50,8 @@ class qtype_preg_cross_tests_special_cases {
         $test1 = array( 'str'=>'b',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
                         'left'=>array(1),
                         'correctending'=>'a');
 
@@ -62,7 +66,7 @@ class qtype_preg_cross_tests_special_cases {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'correctending'=>'');
+                        'correctending'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'\378',
                      'tests'=>array($test1));
