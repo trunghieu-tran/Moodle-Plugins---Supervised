@@ -228,9 +228,9 @@ class qtype_preg_matching_results {
             //Find out extenstion start comparing two strings
             $str1 = $this->str;
             $str2 = $this->extendedmatch->str;
-            for ($i =0; $i <= $this->length[0]; $i++) {
+            for ($i = 0; $i <= $this->length[0]; $i++) {
                 //One of the string ended or characters are different
-                if ($this->extendedmatch->index_first[0] + $i < strlen($str2) || $this->index_first[0] + $i < strlen($str1)
+                if ($this->extendedmatch->index_first[0] + $i >= strlen($str2) || $this->index_first[0] + $i >= strlen($str1)
                     || $str1[$this->index_first[0] + $i] != $str2[$this->extendedmatch->index_first[0] + $i]) {
                     $this->extensionstart = $this->index_first[0] + $i;
                     $this->extendedmatch->extensionstart = $this->extendedmatch->index_first[0] + $i;
