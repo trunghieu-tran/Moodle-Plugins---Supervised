@@ -77,7 +77,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                        'correctending'=>'');
 
         return array('regex'=>'^abc|def$',
                      'tests'=>array($test1, $test2, $test3));
@@ -201,7 +201,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(0),
-                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                        'correctending'=>'');
 
         return array('regex'=>'^a[^b]cd$',
                      'tests'=>array($test1, $test2, $test3));
@@ -1186,19 +1186,6 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1));
     }
 
-    /*function data_for_test_leaf_assert_G() {
-        $test1 = array( 'str'=>'ab',
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>0),
-                        'left'=>array(0),
-                        'correctending'=>'');
-
-        return array('regex'=>'a\Gb',
-                     'tests'=>array($test1));
-    }*/
-
     function data_for_test_node_cond_subpatt() {
         $test1 = array( 'str'=>'11-aaa-11',
                         'is_match'=>true,
@@ -1224,5 +1211,18 @@ class qtype_preg_cross_tests_from_nfa {
         return array('regex'=>'^(?:/\+.*abc\*)$',
                      'tests'=>array($test1));
     }
+
+    /*function data_for_test_leaf_assert_G() {
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0),
+                        'left'=>array(0),
+                        'correctending'=>'');
+
+        return array('regex'=>'a\Gb',
+                     'tests'=>array($test1));
+    }*/
 }
 ?>

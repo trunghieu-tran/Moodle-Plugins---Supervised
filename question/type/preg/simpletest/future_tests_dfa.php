@@ -26,24 +26,24 @@ class qtype_preg_dfa_future_test extends UnitTestCase {
     function test_assert_nesting() {
         $matcher = new qtype_preg_dfa_preg_matcher('g(?=[bcd]*(?=[cd]*b)a)[abcd]*');
         $matcher->match('gccbadcdcd');
-        $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index()==10);
-        $this->assertTrue($matcher->next_char()=='');
+        $this->assertTrue($matcher->get_match_results()->full);
+        $this->assertTrue($matcher->get_match_results()->length()==10);
+        $this->assertTrue(substr($matcher->get_match_results()->string_extension(), 0, 1)=='');
         $matcher->match('gccabdcdcd');
-        $this->assertTrue($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index()==10);
-        $this->assertTrue($matcher->next_char()=='');
+        $this->assertTrue($matcher->get_match_results()->full);
+        $this->assertTrue($matcher->get_match_results()->length()==10);
+        $this->assertTrue(substr($matcher->get_match_results()->string_extension(), 0, 1)=='');
         $matcher->match('gccaddcdcd');
-        $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index()==10);
-        $this->assertTrue($matcher->next_char()=='b');
+        $this->assertFalse($matcher->get_match_results()->full);
+        $this->assertTrue($matcher->get_match_results()->length()==10);
+        $this->assertTrue(substr($matcher->get_match_results()->string_extension(), 0, 1)=='b');
     }
     function test_next_character() {
         $matcher = new qtype_preg_dfa_preg_matcher('a(?=[%asd])\W');
         $matcher->match('aa');
-        $this->assertFalse($matcher->is_matching_complete());
-        $this->assertTrue($matcher->last_correct_character_index()==0);
-        $this->assertTrue($matcher->next_char()=='%');
+        $this->assertFalse($matcher->get_match_results()->full);
+        $this->assertTrue($matcher->get_match_results()->length()==0);
+        $this->assertTrue(substr($matcher->get_match_results()->string_extension(), 0, 1)=='%');
     }
 }
 ?>
