@@ -894,6 +894,7 @@ class poasassignment_model {
      * @return object record with id 
      */
 	function add_task_field($data) {
+		print_r($data);
         global $DB;
         $data->poasassignmentid = $this->poasassignment->id;
         $data->showintable=isset($data->showintable);
