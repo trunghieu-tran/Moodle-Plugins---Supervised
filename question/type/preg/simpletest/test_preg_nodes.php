@@ -118,7 +118,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('');
-        $this->assertTrue($matcher->is_matching_complete());
+        $this->assertTrue($matcher->get_match_results()->full);
         $backref = new preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;

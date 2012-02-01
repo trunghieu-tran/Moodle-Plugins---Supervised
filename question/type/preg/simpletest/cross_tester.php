@@ -148,10 +148,13 @@ class qtype_preg_cross_tester extends UnitTestCase {
                 $indexlastpassed = ($expected['length'][0] == $obtained->length[0]);
             }
             // checking next possible character
-            if ($matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-                $nextpassed = (($expected['correctending'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $obtained->correctending === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                               ($expected['correctending'] === qtype_preg_matching_results::DELETE_TAIL && $obtained->correctending === qtype_preg_matching_results::DELETE_TAIL) ||
-                               ($expected['correctending'] !== '' && $obtained->correctending !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $obtained->correctending[0]) !== false));    // expected 'correctending' contains obtained 'correctending'
+            if (!$obtained->full && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+                $str = '';
+                if ($obtained->extendedmatch !== null) {
+                    $str = $obtained->string_extension();
+                }
+                $nextpassed = (($expected['correctending'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                               ($expected['correctending'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['correctending'], $str[0]) !== false));    // expected 'correctending' contains obtained 'correctending'
             } else {
                 $nextpassed = true;
             }
@@ -196,7 +199,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
 
         $this->assertTrue($assertionstrue || $nextpassed, "$matchername failed 'correctending' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$nextpassed) {
-            echo 'obtained result \'' . $obtained->correctending . "' for 'correctending' is incorrect    (test from $testdataclassname)<br/>";
+            echo 'obtained result \'' . $obtained->extendedmatch->string_extension() . "' for 'correctending' is incorrect    (test from $testdataclassname)<br/>";
         }
 
         $this->assertTrue($assertionstrue || $leftpassed, "$matchername failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
@@ -286,7 +289,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                         echo 'full = ' . $obtained->full; echo '<br/>';
                                         echo 'index_first = '; print_r($obtained->index_first); echo '<br/>';
                                         echo 'length = '; print_r($obtained->length); echo '<br/>';
-                                        echo 'correctending = ' . $obtained->correctending . '<br/>';
+                                        echo 'correctending = ' . $obtained->extendedmatch->string_extension() . '<br/>';
                                         echo 'left = ' . $obtained->left . '<br/>';
                                     }
                                 }

@@ -232,11 +232,11 @@ class qtype_preg_cross_tests_from_backtracking {
                                               'index_first'=>array(0=>0,1=>5),
                                               'length'=>array(0=>6,1=>1),
                                               'left'=>array(3),
-                                              'correctending'=>'a')
+                                              'correctending'=>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
                                         ));
 
         return array('regex'=>'abcd([a-z]|[A-Z]){3,10}Az',
-                     'tests'=>array($test0, $test1));
+                     'tests'=>array($test1));
     }
 
     function data_for_test_Q_FIN_4() {
@@ -549,7 +549,7 @@ class qtype_preg_cross_tests_from_backtracking {
                        'index_first'=>array(0=>0,1=>-1,2=>-1),
                        'length'=>array(0=>3,1=>-1,2=>-1),
                        'left'=>array(0),
-                       'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                       'correctending'=>'');
 
         $test1 = array('str'=>'abc',
                        'is_match'=>true,
@@ -842,7 +842,7 @@ class qtype_preg_cross_tests_from_backtracking {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3),
                        'left'=>array(0),
-                       'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                       'correctending'=>'');
 
         return array('regex'=>'abc$',
                      'tests'=>array($test0, $test1));

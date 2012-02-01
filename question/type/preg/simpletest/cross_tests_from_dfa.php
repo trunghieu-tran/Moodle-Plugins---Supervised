@@ -523,7 +523,7 @@ class qtype_preg_cross_tests_from_dfa {
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                        'correctending'=>'');
 
         return array('regex'=>'ab$',
                      'tests'=>array($test1, $test2));
@@ -552,7 +552,7 @@ class qtype_preg_cross_tests_from_dfa {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'left'=>array(0),
-                        'correctending'=>qtype_preg_matching_results::DELETE_TAIL);
+                        'correctending'=>'');
 
         return array('regex'=>'^ab$',
                      'tests'=>array($test1, $test2, $test3));
