@@ -220,6 +220,9 @@ class taskfieldedit_page extends abstract_page {
     		echo ')</span>';
     	}
     	
+    	// Add field params as hidden elements
+    	echo $this->data_to_hidden($data);
+    	
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
     	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
     	echo '<input type="hidden" name="mode" value="changeconfirmed"/>';    	
@@ -235,7 +238,6 @@ class taskfieldedit_page extends abstract_page {
      * @param object $data data from moodleform
      */
     private function confirm_add($data) {
-    	print_r($_POST);
     	$model = poasassignment_model::get_instance();
     	$owners = $model->get_instance_task_owners();
     	// Open form
@@ -254,7 +256,6 @@ class taskfieldedit_page extends abstract_page {
     	}
     	
     	// Add field params as hidden elements
-
     	echo $this->data_to_hidden($data);
     	
     	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
@@ -416,9 +417,9 @@ class taskfieldedit_form extends moodleform {
         }
         $mform->setType('mode', PARAM_TEXT);
         
-        $mform->addElement('text','name',get_string('taskfieldname','poasassignment'),array('size'=>45));
+        $mform->addElement('text','name',get_string('taskfieldname','poasassignment'),array('maxlength' => 45, 'size' => 50));
         $mform->addElement('textarea','description',get_string('taskfielddescription','poasassignment'),'rows="5" cols="50"');
-        $mform->addRule('name', null, 'required', null, 'client');        
+        $mform->addRule('name', null, 'required', null, 'client');
         $ftypes = array(get_string('char','poasassignment'),
                         get_string('text','poasassignment'),
                         get_string('float','poasassignment'),
