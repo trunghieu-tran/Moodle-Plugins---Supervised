@@ -77,7 +77,7 @@ abstract class qtype_specific_hint {
      */
     abstract public function hint_response_based();
 
-    /** 
+    /**
      * Returns whether question and response allows for the hint to be done
      */
     abstract public function hint_available($response = null);
@@ -89,7 +89,7 @@ abstract class qtype_specific_hint {
         return false;//Most hint have fixed penalty (cost)
     }
 
-    /** 
+    /**
      * Returns penalty (cost) for using specific hint of given hint type (possibly for given response)
      *
      * Even if response is used to calculate penalty, hint object should still return an approximation to show to the student if $response is null
@@ -175,7 +175,7 @@ class qtype_preg_question extends question_graded_automatically
         $querymatcher = $this->get_query_matcher($this->engine);//this matcher will be used to query engine capabilities
         $knowleftcharacters = $querymatcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT);
         $ispartialmatching = $querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING);
-        
+
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
@@ -185,11 +185,12 @@ class qtype_preg_question extends question_graded_automatically
                 if ($answer->fraction >= $this->hintgradeborder) {
                     $bestfitanswer = $answer;
                     $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
+                    $matchresults = $matcher->get_match_results();
                     $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
-                        $maxfitness = (-1)*$matcher->characters_left();
+                        $maxfitness = (-1)*$matchresults->left;
                     } else {
-                        $maxfitness = $matcher->match_length();
+                        $maxfitness = $matchresults->length();
                     }
                     break;//Any one that fits border helps
                 }
@@ -384,7 +385,7 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             $deltail = false;
-            if ($matchresults->correctending === qtype_preg_matching_results::DELETE_TAIL) {    
+            if ($matchresults->correctending === qtype_preg_matching_results::DELETE_TAIL) {
                 $deltail = true;
             }
 
@@ -392,7 +393,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($firstindex + $length < strlen($currentanswer)) {//if there is wrong tail
                 $wrongtail =  substr($currentanswer, $firstindex + $length, strlen($currentanswer) - $firstindex - $length);
             }
-            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail, 
+            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail,
                             'correctbeforehint' =>  $correctbeforehint, 'deltail' => $deltail);
         }
 
@@ -415,7 +416,7 @@ class qtype_preg_question extends question_graded_automatically
      * Returns formatted feedback text to show to the user, or null if no feedback should be shown
      */
     public function get_feedback_for_response($response, $qa) {
-    
+
         $bestfit = $this->get_best_fit_answer($response);
         $feedback = '';
         //If best fit answer is found and there is a full match
@@ -444,9 +445,9 @@ class qtype_preg_question extends question_graded_automatically
     */
     public function insert_subpatterns($subject, $response, $matchresults) {
 
-        //Sanity check 
+        //Sanity check
         if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
-            //There are no placeholders for sure 
+            //There are no placeholders for sure
             return $subject;
         }
 
