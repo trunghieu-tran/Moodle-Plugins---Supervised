@@ -140,7 +140,7 @@ class taskedit_page extends abstract_page {
     					case 'changetaskwithprogress':
     						// Update taskid if new task is created
     						if ($createnew) {
-    							$model->change_assignee_taskid($assigneeid, $newtaskid);
+    							$model->replace_assignee_taskid($assigneeid, $newtaskid);
     						}
     						else {
     							// Update task
@@ -151,7 +151,7 @@ class taskedit_page extends abstract_page {
 
     						// Update taskid if new task is created
     						if ($createnew) {
-    							$model->change_assignee_taskid($assigneeid, $newtaskid);
+    							$model->replace_assignee_taskid($assigneeid, $newtaskid);
     						}
     						else {
     							// Update task

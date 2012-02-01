@@ -167,51 +167,50 @@ class tasks_page extends abstract_page {
             $row[]=$namecolumn;
             $row[]=shorten_text($task->description);
             foreach ($fields as $field) {
+            	$value = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
                 if ($field->showintable>0) {
                     if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
                         $taskvalue=$DB->get_record('poasassignment_task_values',
                                                     array('taskid'=>$task->id, 'fieldid'=>$field->id, 'assigneeid'=>0));
-                        if (!$taskvalue)
-                            $taskvalue->value='null';
-                        else {
+                        if ($taskvalue) {
                             if ($field->random == 1)
-                                $taskvalue->value= 'random';
+                                $value= 'random';
                             else {
                                 if (isset($taskvalue->value)) {
-                                    if ($field->ftype==TEXT)
-                                        $taskvalue->value=shorten_text($taskvalue->value);
-                                    if ($field->ftype==LISTOFELEMENTS) {
-                                        $variants=$poasmodel->get_field_variants($field->id);
-                                        $variant=$variants[$taskvalue->value];
-                                        //$variant = $poasmodel->get_variant($taskvalue->value,$field->variants);
-                                        $taskvalue->value=$variant;
-                                    }
-                                    if ($field->ftype==MULTILIST) {
-                                        $tok = strtok($taskvalue->value,',');
-                                        $opts=array();
-                                        while(strlen($tok)>0) {
-                                            $opts[]=$tok;
-                                            $tok=strtok(',');
-                                        }
-                                        $taskvalue->value='';
-                                        $variants=$poasmodel->get_field_variants($field->id);
-                                        foreach ($opts as $opt) {
-                                            //$variant = $poasmodel->get_variant($opt,$poasmodel->get_field_variants($field->id));
-                                            $variant = $variants[$opt];
-                                            $taskvalue->value.=$variant.'<br>';
-                                        }
-                                    }
-                                    if ($field->ftype==DATE) {
-                                        $taskvalue->value=userdate($taskvalue->value);
-                                    }
-                                    if ($field->ftype==FILE) {
-                                        $context= get_context_instance(CONTEXT_MODULE, $this->cm->id);
-                                        $taskvalue->value=$poasmodel->view_files($context->id,'poasassignmenttaskfiles',$taskvalue->id);
-                                    }
+                                	switch ($field->ftype) {
+                                		case TEXT:
+                                			$value = shorten_text($taskvalue->value);
+                                			break;
+                                		case LISTOFELEMENTS:
+                                			$variants = $poasmodel->get_variants($field->id);
+                                			$variant = $variants[$taskvalue->value];
+                                			$value = $variant;
+                                			break;
+                                		case MULTILIST:
+                                			$indexes = explode(',', $taskvalue->value);
+                                			$variants = $poasmodel->get_variants($field->id);
+                                			$value = '';
+                                			foreach ($indexes as $index) {
+                                				if (is_number($index)) {
+                                					$value .= $variants[$index].'<br/>';
+                                				}
+                                			}
+                                			break;
+                                		case DATE:
+                                			$value = userdate($taskvalue->value);
+                                			break;
+                                		case FILE:
+                                			$context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
+                                			$value = $poasmodel->view_files($context->id,'poasassignmenttaskfiles',$taskvalue->id);
+                                			break;
+                                		default:
+                                			$value = $taskvalue->value; 
+                                			break;
+                                	}
                                 }
                             }
                         }
-                        $row[] = $taskvalue->value;
+                        $row[] = $value;
                     }
                 }
             }

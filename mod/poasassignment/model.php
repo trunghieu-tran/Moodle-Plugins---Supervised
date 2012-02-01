@@ -1,7 +1,8 @@
 <?php
 require_once('lib.php');
 require_once('answer/answer.php');
-require_once(dirname(dirname(dirname(__FILE__))).'/comment/lib.php');
+require_once($CFG->dirroot . '/comment/lib.php');
+comment::init();
 /**
  * Main DB-work class. Singletone
  */
@@ -921,12 +922,12 @@ class poasassignment_model {
             if ($data->valuemax == $data->valuemin)
                 $data->random = 0;
         }
-        $tasks = $DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
+        /*$tasks = $DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($tasks as $task) {
             $taskvalue->fieldid=$fieldid;
             $taskvalue->taskid=$task->id;
             $DB->insert_record('poasassignment_task_values',$taskvalue);
-        }
+        }*/
         return $data;
     }
 
@@ -1781,14 +1782,15 @@ class poasassignment_model {
     }
 
     /**
-     * Change task for assignee
+     * Connects existing task with existing assignee.
+     * Used when teacher updates task and asks module to save old task.
      * 
      * @access public
      * @param int $assigneeid assignee id
      * @param int $taskid new task id
      * @return bool true, if update is successfull or false
      */
-    public function change_assignee_taskid($assigneeid, $taskid) {
+    public function replace_assignee_taskid($assigneeid, $taskid) {
     	global $DB;
     	if ($DB->record_exists('poasassignment_assignee', array('id' => $assigneeid))) {
     		$assignee = $DB->get_record(
