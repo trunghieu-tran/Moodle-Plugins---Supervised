@@ -135,8 +135,8 @@ class criterions_page extends abstract_page {
     	// Open form
     	echo '<form action="view.php?page=criterions&id='.$this->cm->id.'" method="post">';
     	
-    	
-    	if ($model->instance_has_rated_attempts()) {
+    	$has_rated_attempts = $model->instance_has_rated_attempts();
+    	if ($has_rated_attempts) {
     		$graded = $model->get_graded_assignees();
     		echo '<input type="hidden" name="gradedcount" value="' . count($graded) . '"/>';
     		// Show table of graded students
@@ -186,7 +186,7 @@ class criterions_page extends abstract_page {
     	// Ask user to confirm update
     	echo '<br/>';
     	print_string('updatecriterionsconfirmation', 'poasassignment');
-    	if (count($graded) > 0) {
+    	if ($has_rated_attempts) {
     		echo ' <span class="poasassignment-critical">(';
     		print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
     		echo ')</span>';

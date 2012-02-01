@@ -69,7 +69,7 @@ class tasksfields_page extends abstract_page {
         $table->collapsible(true);
         $table->initialbars(true);
         $table->column_class('taskfieldname', 'name');
-        $table->set_attribute('class', 'poasassignment-table');
+        $table->set_attribute('class', 'poasassignment-table taskfields-table');
         //$table->set_attribute('border', '1');
         //$table->set_attribute('width', '100%');
 
@@ -83,6 +83,8 @@ class tasksfields_page extends abstract_page {
 		else {
 			$sort = '';
 		}
+		$yes_icon = $OUTPUT->pix_icon('yes', get_string('yes'), 'mod_poasassignment');
+		$no_icon = $OUTPUT->pix_icon('no', get_string('no'), 'mod_poasassignment');
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid'=>$this->poasassignment->id), $sort);
         foreach($fields as $field) {
 
@@ -111,18 +113,21 @@ class tasksfields_page extends abstract_page {
 
             // $str='';
             // foreach ($variants as $variant) $str.=$variant->value."<br>";
-            $range='';
-            if($field->ftype==NUMBER || $field->ftype==FLOATING)
-                $range='['.$field->valuemin.','.$field->valuemax.']';
-            if($field->ftype==MULTILIST || $field->ftype==LISTOFELEMENTS)
-                $range=$poasmodel->get_field_variants($field->id,0,"<br>");
+            $range = '<b>[*]</b>';
+            if($field->ftype == NUMBER || $field->ftype == FLOATING) {
+                $range = '<b>[</b>'.$field->valuemin.'<b>, </b>'.$field->valuemax.'<b>]</b>';
+            }
+            if($field->ftype == MULTILIST || $field->ftype == LISTOFELEMENTS) {                
+                $range = '<b>[</b>'.implode('<b>, </b>', $poasmodel->get_variants($field->id)) .'<b>]</b>'; 
+            }
 
+            
             $row = array($name,
                     $poasmodel->ftypes[$field->ftype],
             		$range,
-            		$field->random == 1 ? get_string('yes') : get_string('no'),
-            		$field->secretfield == 1 ? get_string('yes') : get_string('no'),
-                    $field->showintable == 1 ? get_string('yes') : get_string('no'));
+            		$field->random == 1 ? $yes_icon : $no_icon,
+		            $field->secretfield == 1 ? $yes_icon : $no_icon,
+		            $field->showintable == 1 ? $yes_icon : $no_icon);
             $table->add_data($row);
         }
         $table->print_html();

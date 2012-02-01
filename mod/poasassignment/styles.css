@@ -48,9 +48,14 @@ p.no-info-message {text-align: center;}
 	color:red;
 	font-weight:bold;
 }
-table.task-owners th {
-	white-space: normal;
+table.task-owners th,
+.tasks-table th ,
+.taskfields-table th{
+	white-space: normal !important;
 }
-table.task-owners {
-	text-align: center;
+table.task-owners,
+.tasks-table td,
+.taskfields-table td{
+	text-align: center !important;
+	vertical-align: middle !important;
 }
