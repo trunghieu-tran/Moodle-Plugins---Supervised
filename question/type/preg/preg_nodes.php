@@ -686,22 +686,24 @@ class preg_leaf_backref extends preg_leaf {
 
     public function consumes() {
         $number = $this->get_number_from_map($this->number);
-        if (!$this->matcher->is_subpattern_captured($number)) {
+        $matchresults = $this->matcher->get_match_results();
+        if (!$matchresults->is_subpattern_captured($number)) {
             return 0;
         }
-        return $this->matcher->match_length($number);
+        return $matchresults->length($number);
     }
 
     protected function match_inner($str, $pos, &$length, $cs) {
         $number = $this->get_number_from_map($this->number);
-        if (!$this->matcher->is_subpattern_captured($number)) {
+        $matchresults = $this->matcher->get_match_results();
+        if (!$matchresults->is_subpattern_captured($number)) {
             $length = 0;
             return false;
         }
         $textlib = textlib_get_instance();
         $len = $textlib->strlen($str);
-        $subpattlen = $this->matcher->match_length($number);
-        $start = $this->matcher->first_correct_character_index($number);
+        $subpattlen = $matchresults->length($number);
+        $start = $matchresults->index_first($number);
         $end = $start + $subpattlen - 1;
         if ($subpattlen > 0 && $pos >= $len) {
             $length = 0;
@@ -739,10 +741,11 @@ class preg_leaf_backref extends preg_leaf {
     public function next_character($str, $pos, $length = 0) {
         // TODO: check for assertions in case of $length == 0
         $number = $this->get_number_from_map($this->number);
-        if (!$this->matcher->is_subpattern_captured($number)) {
+        $matchresults = $this->matcher->get_match_results();
+        if (!$matchresults->is_subpattern_captured($number)) {
             return '';
         }
-        $start = $this->matcher->first_correct_character_index($number);
+        $start = $matchresults->index_first($number);
         $textlib = textlib_get_instance();
         if ($start + $length >= $textlib->strlen($str)) {
             return '';
