@@ -252,6 +252,8 @@ class qtype_preg_matching_results {
                     break;
                 }
             }
+        } elseif ($this->full) {
+            $this->extensionstart = $this->index_first[0] + $this->length[0];
         }
 
         if (is_object($this->extendedmatch)) {
