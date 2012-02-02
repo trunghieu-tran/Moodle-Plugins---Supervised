@@ -212,7 +212,7 @@ class qtype_preg_matching_results {
 
     /**
     * Throws exception if match results contain obvious abnormalities
-    * Also feel some values with defaults if they are not supplied by matching engine
+    * Also compute extensionstart field
     */
     public function validate() {
         if ($this->is_match()) {//Match found
@@ -238,7 +238,7 @@ class qtype_preg_matching_results {
         }
         //Calculate extension start comparing existing and extended strings
         //We could find it looking for the first different character in two strings
-        if (!$this->full && $this->extendedmatch !== null) {
+        if (!$this->full && is_object($this->extendedmatch)) {
             //Find out extenstion start comparing two strings
             $str1 = $this->str;
             $str2 = $this->extendedmatch->str;
@@ -251,6 +251,10 @@ class qtype_preg_matching_results {
                     break;
                 }
             }
+        }
+
+        if (is_object($this->extendedmatch)) {
+            $this->extendedmatch->validate();
         }
     }
 
