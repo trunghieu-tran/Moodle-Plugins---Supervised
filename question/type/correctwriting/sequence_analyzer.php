@@ -43,9 +43,12 @@ class  qtype_correctwriting_sequence_analyzer {
     public function __construct($question, $answer, $language, $correctedresponse=null) {
         $this->answer=$answer;
         $this->correctedresponse=$correctedresponse;
-        $this->language=$language;
-        //Compute lcs
-        $lcs()=$this->lcs();
+        //If question is set null we suppose this is a unit-test mode and don't do stuff
+        if ($question!=null) {
+         $this->language=$language;
+         //Compute lcs
+         $lcs=$this->lcs();
+        }
         //TODO:
         //1. Compute LCS - Mamontov
         //  - lcs function
@@ -59,15 +62,6 @@ class  qtype_correctwriting_sequence_analyzer {
         //NOTE: if some stage create errors, stop processing right there
     }
 
-    /**
-     *  This constructor is used for TESTING ONLY.
-     *  Not under any circumstances anyone would use it. Use previous instead
-     *  It uses same arguments as another, but they can't be null
-     */
-    public function __construct($answer,$correctedresponse) {
-        $this->answer=$answer;
-        $this->correctedresponse=$correctedresponse;
-    }
     /**
      * Compute and return longest common subsequence (tokenwise) of answer and corrected response.
      *
