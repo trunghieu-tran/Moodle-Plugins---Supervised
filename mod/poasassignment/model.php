@@ -647,7 +647,7 @@ class poasassignment_model {
     	global $DB;
     	$attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
     	foreach ($attempts as $attempt) {
-    		if ($value == 'total') {
+    		if ($value === 'total') {
     			$value = $attempt->rating;
     		}
     		foreach ($criterions as $criterion) {

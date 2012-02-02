@@ -26,23 +26,28 @@ class grade_page extends abstract_page{
         }
         return true;
     }
+    
+    public function pre_view() {
+    	$poasmodel = poasassignment_model::get_instance();
+    	$cmid = $poasmodel->get_cm()->id;
+    	$poasassignmentid = $poasmodel->get_poasassignment()->id;
+    	$this->mform = new grade_form(null,array('id' => $cmid, 'assigneeid' => $this->assigneeid, 'poasassignmentid' => $poasassignmentid));
+    	if ($this->mform->is_cancelled()) {
+    		redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
+    	}
+    	else {
+    		if($data = $this->mform->get_data()) {
+    			$poasmodel->save_grade($this->assigneeid, $data);
+    			redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
+    		}
+    	}
+    	
+    }
     function view() {
-        $poasmodel = poasassignment_model::get_instance();
-        $cmid = $poasmodel->get_cm()->id;
-        $poasassignmentid = $poasmodel->get_poasassignment()->id;
-        $mform = new grade_form(null,array('id' => $cmid, 'assigneeid' => $this->assigneeid, 'poasassignmentid' => $poasassignmentid));
-        $data = $poasmodel->get_rating_data($this->assigneeid);
-        $mform->set_data($data);
-        if ($mform->is_cancelled()) {
-            redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
-        }
-        else {
-            if($data = $mform->get_data()) {
-                $poasmodel->save_grade($this->assigneeid, $data);
-                redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
-            }
-        }
-        $mform->display();
+    	$model = poasassignment_model::get_instance();
+        $data = $model->get_rating_data($this->assigneeid);
+        $this->mform->set_data($data);
+        $this->mform->display();
     }
     
     public static function display_in_navbar() {

@@ -330,3 +330,5 @@ $string['newcriterionwithgradespecified'] = 'New criterion is created and has gr
 $string['newcriterionwithgradetotal'] = 'New criterion is created and has grade that equals current total grade';
 $string['notdefined'] = 'Not defined';
 $string['comments'] = 'Comments';
+$string['canceltask'] = "Cancel student's task";
+$string['randomfield'] = 'Random field';
