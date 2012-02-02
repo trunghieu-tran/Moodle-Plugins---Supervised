@@ -22,8 +22,8 @@
   */
 function create_tokens($types,$values,$is_answer) {
     $result=array();
-    for($i=0;$i<count($type);$i++) {
-      array_push($result,new qtype_correctwriting_token_base($types[$i],$values[$i],$is_answer,null);
+    for($i=0;$i<count($types);$i++) {
+      array_push($result,new qtype_correctwriting_token_base($types[$i],$values[$i],$is_answer,null));
     }
     return $result;
 }
@@ -40,24 +40,25 @@ function create_response($types,$values) {
     return create_tokens($types,$values,false);
 }
 
+/**
+  *  Returns lcs for test-cases
+  */
+function get_test_lcs($answer_types,$answer_values,$response_types,$response_values) {
+    $answer=create_answer($answer_types,$answer_values);
+    $response=create_response($response_types,$response_values);
+    $test_seq_an=new qtype_correctwriting_sequence_analyzer(null,$answer,null,$response);
+    return $test_seq_an->lcs();
+}
 
  //Class of unit-test for sequence analyzer
  class qtype_correctwriting_sequence_analyzer_simpletest extends UnitTestCase {
     
-    /**
-     *  Returns lcs for test-cases
-     */
-    private function get_test_lcs($answer_types,$answer_values,$response_types,$response_values) {
-       $answer=create_answer($answer_types,$answer_values);
-       $response=create_response($response_types,$response_values);
-       $test_seq_an=new qtype_correctwriting_sequence_analyzer($response,$answer);
-       return $test_seq_an->lcs();
-    }
+    
     //Tests lcs for equal lexeme
     public function test_equal_correctedresponse() {
        $types=array("noun","verb","verb","exclamation_mark");
        $values=array("I","am","testing","!");
-       $lcs=$this->get_test_lcs($types,$values,$types,$values);
+       $lcs=get_test_lcs($types,$values,$types,$values);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -73,7 +74,7 @@ function create_response($types,$values) {
        $types=array("noun","verb","verb","exclamation_mark");
        $values=array("I","am","testing","!");
        $rvalues=array("She","is","testing","!");
-       $lcs=$this->get_test_lcs($types,$values,$types,$rvalues);
+       $lcs=get_test_lcs($types,$values,$types,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -90,7 +91,7 @@ function create_response($types,$values) {
        $avalues=array("I","am","testing","!");
        $rtypes=array("noun","verb","verb");
        $rvalues=array("I","am","testing");
-       $lcs=$this->get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
+       $lcs=get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -105,9 +106,9 @@ function create_response($types,$values) {
     public function test_added_lexemes() {
        $atypes=array("noun","verb","verb","exclamation_mark");
        $avalues=array("I","am","testing","!");
-       $atypes=array("noun","verb","verb","exclamation_mark","exclamation_mark");
-       $avalues=array("I","am","testing","!","!");
-       $lcs=$this->get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
+       $rtypes=array("noun","verb","verb","exclamation_mark","exclamation_mark");
+       $rvalues=array("I","am","testing","!","!");
+       $lcs=get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==2 );
@@ -128,7 +129,7 @@ function create_response($types,$values) {
        $types=array("noun");
        $avalues=array("I");
        $rvalues=array("She");
-       $lcs=$this->get_test_lcs($types,$avalues,$types,$rvalues);
+       $lcs=get_test_lcs($types,$avalues,$types,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==0 );
@@ -140,7 +141,7 @@ function create_response($types,$values) {
        $avalues=array("This","is","correct","answer",".");
        $rtypes=array( "data","data","data",  "data",  "data","data"      ,"data");
        $rvalues=array("This","not","correct","answer","This","definitely","not");
-       $lcs=$this->get_test_lcs($types,$avalues,$types,$rvalues);
+       $lcs=get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==3 );
