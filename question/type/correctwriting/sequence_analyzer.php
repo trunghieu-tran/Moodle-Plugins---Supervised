@@ -61,7 +61,7 @@ class  qtype_correctwriting_sequence_analyzer {
 
     /**
      *  This constructor is used for TESTING ONLY.
-     *  Not under any circumstances anyone will use it. Use previous instead
+     *  Not under any circumstances anyone would use it. Use previous instead
      *  It uses same arguments as another, but they can't be null
      */
     public function __construct($answer,$correctedresponse) {
