@@ -358,8 +358,8 @@ class qtype_preg_matching_results {
         return $correctbeforehint;
     }
 
-        /**
-     * Returnstail after point where extension is started
+    /**
+     * Returns tail after point where extension is started
      */
     public function tail_to_delete() {
         $wrongtail = '';
