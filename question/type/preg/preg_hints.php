@@ -81,7 +81,9 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
             if ($this->to_be_continued($matchresults)) {
                 $hint .= $renderer->render_tobecontinued();
             }
-            $wrongtail = $renderer->render_deleted($this->tail_to_delete($response['answer'], $matchresults));
+            if (strlen($hint) == 0) {
+                $wrongtail = $renderer->render_deleted($this->tail_to_delete($response['answer'], $matchresults));
+            }
             return $wronghead.$correctpart.$hint.$wrongtail;
         }
         return '';
