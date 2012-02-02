@@ -44,7 +44,7 @@ class parameterchoice extends taskgiver{
                     if($fieldvalues) {
                         if($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST || $field->ftype==STR || $field->ftype==TEXT) {
                             foreach($fieldvalues as $fieldvalue) {
-                                if(empty($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
+                                if(!isset($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
                                     continue;
                                 }
                                 if($tasks[$fieldvalue->taskid]->hidden==0) {
