@@ -13,42 +13,44 @@ class submissions_page extends abstract_page {
         return 'mod/poasassignment:grade';
     }
     
+    private function prepare_flexible_table() {
+    	global $PAGE;
+    	$table = new flexible_table('mod-poasassignment-submissions');
+    	$table->baseurl = $PAGE->url;
+    	$columns = array('picture');
+    	$columns[] = 'fullname';
+    	$headers = array(' ',get_string('fullname', 'poasassignment'));
+    	if($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
+    		$columns[]='task';
+    		$headers[]=get_string('task','poasassignment');
+    	}
+    	$columns[]='submission';
+    	$columns[]='status';
+    	$columns[]='submissiondate';
+    	$columns[]='gradedate';
+    	$columns[]='grade';
+    	$headers[]=get_string('submission','poasassignment');
+    	$headers[]=get_string('status','poasassignment');
+    	$headers[]=get_string('submissiondate','poasassignment');
+    	$headers[]=get_string('gradedate','poasassignment');
+    	$headers[]=get_string('grade','poasassignment');
+    	
+    	$table->define_columns($columns);
+    	$table->define_headers($headers);
+    	$table->collapsible(true);
+    	$table->initialbars(false);
+    	$table->set_attribute('class', 'poasassignment-table');
+    	$table->set_attribute('width', '100%');
+    	return $table;
+    }
     function view() {
-        global $DB, $CFG, $OUTPUT, $PAGE;
-        $table = new flexible_table('mod-poasassignment-submissions');
-        $table->baseurl = $PAGE->url;
-        $columns = array('picture');
-        $columns[] = 'fullname';
-        $headers = array(' ',get_string('fullname', 'poasassignment'));
-        if($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
-            $columns[]='task';
-            $headers[]=get_string('task','poasassignment');
-        }
-        $columns[]='submission';
-        $columns[]='status';
-        $columns[]='submissiondate';
-        $columns[]='gradedate';
-        $columns[]='grade';
-        $headers[]=get_string('submission','poasassignment');
-        $headers[]=get_string('status','poasassignment');
-        $headers[]=get_string('submissiondate','poasassignment');
-        $headers[]=get_string('gradedate','poasassignment');
-        $headers[]=get_string('grade','poasassignment');
-        $table->define_columns($columns);
-        $table->define_headers($headers);
-        //$table->sortable(true, 'name');
-        $table->collapsible(true);
-        $table->initialbars(false);
-        /* $table->column_suppress('fullname'); */
-        //$table->set_attribute('border', '1');
-		$table->set_attribute('class', 'poasassignment-table');
-		$table->set_attribute('width', '100%');
+        global $DB, $CFG, $OUTPUT;
+        $table = $this->prepare_flexible_table();
         
         $table->setup();
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
         $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
         $plugins=$poasmodel->get_plugins();
-        //$plugins=$DB->get_records('poasassignment_answers');
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
         groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
@@ -66,29 +68,35 @@ class submissions_page extends abstract_page {
     }
     private function get_row($userid, $poasassignmentid, $indtasks, $plugins) {
         global $DB, $OUTPUT;
-        $poasmodel=poasassignment_model::get_instance($poasassignmentid);
-        $row=array();
-        $user=$DB->get_record('user',array('id'=>$userid));
-        $user=$DB->get_record('user',array('id'=>$userid));
-        $row[]=$OUTPUT->user_picture($user);
+        $poasmodel = poasassignment_model::get_instance($poasassignmentid);
+        
+        // Row that will be returned
+        $row = array();
+        
+        // Add user photo to the row
+        $user = $DB->get_record('user', array('id' => $userid));
+        $row[] = $OUTPUT->user_picture($user);
+        
+        // Add user's name to the row
         $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
         $row[]=html_writer::link($userurl,fullname($user, true));
-        //$row[]=$user->firstname.' '.$user->lastname;
-        $assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
         
+        // Add task info to the row
+        $assignee = $DB->get_record('poasassignment_assignee', array('userid'=>$userid, 'poasassignmentid' => $this->poasassignment->id));        
         if($indtasks) {
             if($assignee) {
                 $task=$DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
                 $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get'); 
                 $deleteurl = new moodle_url('warning.php',array('action'=>'canceltask','assigneeid'=>$assignee->id,'id'=>$this->cm->id),'d','post');
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
-                            '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                            '" class="iconsmall" alt="'.get_string('canceltask', 'poasassignment').'" title="'.get_string('canceltask', 'poasassignment').'" /></a>';
                 
                 $row[]=html_writer::link($taskurl,$task->name).' '.$deleteicon;
             }
             else
                 $row[]=get_string('notask','poasassignment');
         }
+        // Add last submission to the row
         $submis='';
         if($assignee) {
             foreach($plugins as $plugin) {
@@ -99,6 +107,8 @@ class submissions_page extends abstract_page {
 		}
 		$submis = shorten_text($submis);
         $row[]=$submis;
+        
+        // Add task status to the row
         if($assignee) {
             $attempts = $DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
             if(($indtasks && isset($assignee->taskid) && $assignee->taskid>0 && $attempts)||(!$indtasks && $attempts))
@@ -114,6 +124,8 @@ class submissions_page extends abstract_page {
             if($indtasks)
                 $row[]=get_string('notask','poasassignment');
         }
+        
+        // Add attempt date to the row
         if($assignee) {
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
             if($attemptscount>0) {
@@ -125,8 +137,9 @@ class submissions_page extends abstract_page {
         }
         else    
             $row[]='-';
-        //$row[]='submission date';
-        //$row[]='grade date';
+        
+        // Add rating date to the row
+        // Add rating to the row
         if($assignee) {
 			
             $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));

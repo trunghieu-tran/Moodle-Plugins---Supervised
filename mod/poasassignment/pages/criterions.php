@@ -79,11 +79,27 @@ class criterions_page extends abstract_page {
     	return $criterions;
     }
     
+    /**
+     * Returns true, if $data param contains info about new criterion(s) data
+     * 
+     * @access private
+     * @param object $data criterions data
+     * @return boolean true if there is at least 1 new criterion
+     */
+    private function has_new_criterions($data) {
+    	foreach ($data->name as $index => $name) {
+    		if ($name != '' && isset($data->criterionid[$index]) && $data->criterionid[$index] == -1) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     private function update_confirmed() {
-    	if (required_param('confirm', PARAM_ALPHA) == get_string('no')) {
+    	if (required_param('confirm', PARAM_TEXT) == get_string('no')) {
     		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions')));
     	}
-    	else {
+    	if (required_param('confirm', PARAM_TEXT) == get_string('yes')) {
     		$model = poasassignment_model::get_instance();
     		$gradedcount = required_param('gradedcount', PARAM_INT);
     		$insertedcriterions = $model->update_criterions($this->get_criterions_from_post());

@@ -172,10 +172,11 @@ class tasks_page extends abstract_page {
                     if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
                         $taskvalue=$DB->get_record('poasassignment_task_values',
                                                     array('taskid'=>$task->id, 'fieldid'=>$field->id, 'assigneeid'=>0));
-                        if ($taskvalue) {
-                            if ($field->random == 1)
-                                $value= 'random';
-                            else {
+                        if ($field->random == 1) {
+                        	$value= get_string('randomfield', 'poasassignment');
+                        }
+                        else {                        
+	                        if ($taskvalue) {
                                 if (isset($taskvalue->value)) {
                                 	switch ($field->ftype) {
                                 		case TEXT:
@@ -208,7 +209,7 @@ class tasks_page extends abstract_page {
                                 			break;
                                 	}
                                 }
-                            }
+	                        }
                         }
                         $row[] = $value;
                     }

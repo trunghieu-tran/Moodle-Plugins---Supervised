@@ -51,9 +51,6 @@ class view_page extends abstract_page {
         if ($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             echo $OUTPUT->heading(get_string('status','poasassignment'));
-            // If user have task
-            //if ($DB->record_exists('poasassignment_assignee',
-            //        array('userid'=>$USER->id,'poasassignmentid'=>$this->poasassignment->id))) {
                 $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$USER->id,
                                                                             'poasassignmentid'=>$this->poasassignment->id));
                 if ($assignee && $assignee->taskid > 0) {

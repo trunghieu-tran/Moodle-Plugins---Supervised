@@ -342,7 +342,7 @@ class taskedit_form extends moodleform {
                 $mform->addElement('htmleditor','field'.$field->id,$name);
                 
             if( ($field->ftype==FLOATING || $field->ftype==NUMBER) && $field->random) {
-                $mform->addElement('static','field'.$field->id,$name,'random field');
+                $mform->addElement('static','field'.$field->id,$name, get_string('randomfield', 'poasassignment'));
             }
             
             if( ($field->ftype==FLOATING || $field->ftype==NUMBER) && !$field->random) {
@@ -369,7 +369,7 @@ class taskedit_form extends moodleform {
                         $select->setMultiple(true);
                 }
                 else
-                    $mform->addElement('static','field'.$field->id,$name,'random field');
+                    $mform->addElement('static','field'.$field->id,$name,get_string('randomfield', 'poasassignment'));
             }
         }
         
