@@ -29,7 +29,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_concat() {
         $matcher = new qtype_preg_nfa_matcher('^abc$');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_concat.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_concat.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -38,7 +38,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_alt() {
         $matcher = new qtype_preg_nfa_matcher('^ab|cd$');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_alt.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_alt.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -47,7 +47,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_aster() {
         $matcher = new qtype_preg_nfa_matcher('a*');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_aster.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_aster.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -56,7 +56,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_brace_infinite() {
         $matcher = new qtype_preg_nfa_matcher('(?:ab){3,}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_brace_infinite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_infinite.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -65,7 +65,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_plus() {
         $matcher = new qtype_preg_nfa_matcher('a+');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_plus.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_plus.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -74,7 +74,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_qu() {
         $matcher = new qtype_preg_nfa_matcher('(?:ab)?');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_qu.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_qu.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -83,7 +83,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_brace_finite() {
         $matcher = new qtype_preg_nfa_matcher('a{3,6}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_brace_finite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_finite.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -92,7 +92,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt() {
         $matcher = new qtype_preg_nfa_matcher('(a|b|cd|)');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -101,7 +101,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_complex_1() {
         $matcher = new qtype_preg_nfa_matcher('^[-.\w]+@(?:[a-z\d](a|b|cd|)[-a-z\d]+\.)+[a-z]{2,6}$');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_complex_1.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_complex_1.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -110,7 +110,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_complex_2() {
         $matcher = new qtype_preg_nfa_matcher('(ab)|c{1,}|^de|f{1,2}|(gh)|i$|');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_complex_2.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_complex_2.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -119,7 +119,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_concat() {
         $matcher = new qtype_preg_nfa_matcher('ab(cd)(ef)g');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_concat.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_concat.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -128,7 +128,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_alt() {
         $matcher = new qtype_preg_nfa_matcher('a|(bc)|(de)|f');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_alt.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_alt.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -137,7 +137,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_brace_finite() {
         $matcher = new qtype_preg_nfa_matcher('(a){3,6}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_brace_finite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_brace_finite.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -146,7 +146,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_brace_infinite() {
         $matcher = new qtype_preg_nfa_matcher('(a){3,}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_brace_infinite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_brace_infinite.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -155,7 +155,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_aster() {
         $matcher = new qtype_preg_nfa_matcher('(a*)*');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_aster.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_aster.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -164,7 +164,7 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
     function test_build_subpatt_uncounted() {
         $matcher = new qtype_preg_nfa_matcher('(?:ab)+');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw_nfa('dotcode.dot', 'test_build_subpatt_uncounted.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_subpatt_uncounted.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
