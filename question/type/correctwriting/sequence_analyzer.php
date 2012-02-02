@@ -22,8 +22,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/langs_code/tokens_base.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/get_one_lcs.php');
 
 //Other necessary requires
 
