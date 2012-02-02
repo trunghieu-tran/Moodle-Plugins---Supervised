@@ -44,14 +44,20 @@ function create_response($types,$values) {
  //Class of unit-test for sequence analyzer
  class qtype_correctwriting_sequence_analyzer_simpletest extends UnitTestCase {
     
+    /**
+     *  Returns lcs for test-cases
+     */
+    private function get_test_lcs($answer_types,$answer_values,$response_types,$response_values) {
+       $answer=create_answer($answer_types,$answer_values);
+       $response=create_response($response_types,$response_values);
+       $test_seq_an=new qtype_correctwriting_sequence_analyzer($response,$answer);
+       return $test_seq_an->lcs();
+    }
     //Tests lcs for equal lexeme
     public function test_equal_correctedresponse() {
        $types=array("noun","verb","verb","exclamation_mark");
        $values=array("I","am","testing","!");
-       $answer=create_answer($types,$values);
-       $response=create_response($types,$values);
-       $test_seq_an=new qtype_correctwriting_sequence_analyzer($response,$answer);
-       $lcs=$test_seq_an->lcs();
+       $lcs=get_test_lcs($types,$values,$types,$values);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -64,27 +70,18 @@ function create_response($types,$values) {
     }
     //Tests lcs for replaced lexemes
     public function test_replaced_lexemes() {
-       $answer=array( new qtype_correctwriting_token_base("I","noun",true,new qtype_correctwriting_node_position(0,0,0,3)),
-                      new qtype_correctwriting_token_base("am","article",true,new qtype_correctwriting_node_position(0,0,5,7)),
-                      new qtype_correctwriting_token_base("testing","verb",true,new qtype_correctwriting_node_position(0,0,9,16)),
-                      new qtype_correctwriting_token_base("!","exclamation_mark",true,new qtype_correctwriting_node_position(0,0,17,17))
-                    );
-       $response=array( new qtype_correctwriting_token_base("She","noun",false,new qtype_correctwriting_node_position(0,0,0,3)),
-                        new qtype_correctwriting_token_base("is","article",false,new qtype_correctwriting_node_position(0,0,7,9)),
-                        new qtype_correctwriting_token_base("testing","verb",false,new qtype_correctwriting_node_position(0,0,13,20)),
-                        new qtype_correctwriting_token_base("!","exclamation_mark",false,new qtype_correctwriting_node_position(0,0,22,22))
-                      );
-       $test_seq_an=new qtype_correctwriting_sequence_analyzer(null,$answer,null,$response);
-       //Check some errors
-       $this->assertTrue($test_seq_an->is_errors() );
+       $types=array("noun","verb","verb","exclamation_mark");
+       $values=array("I","am","testing","!");
+       $rvalues=array("She","is","testing","!");
+       $lcs=get_test_lcs($types,$values,$types,$rvalues);
+       //Check LCS props
+       $this->assertTrue( $lcs!=null );
+       $this->assertTrue( count($lcs)==1 );
        
        //Check LCS
-       $lcs=$tests_seq_an->lcs();
-       $this->assertTrue( array_key_exists($lcs[0],2) && lcs[0][2]==2 );
-       $this->assertTrue( array_key_exists($lcs[0],3) && lcs[0][3]==3 );
+       $this->assertTrue( $lcs[0][2]==2 );
+       $this->assertTrue( $lcs[0][3]==3 );
        $this->assertTrue( count($lcs[0])==2);
-
-       //TODO: Develop error class for testing errors. Place test for errors here
     }
     
     //Tests lcs for removed lexemes
@@ -109,7 +106,7 @@ function create_response($types,$values) {
        $this->assertTrue( array_key_exists($lcs[0],2) && lcs[0][2]==2 );
        $this->assertTrue( count($lcs[0])==3);
 
-       //TODO: Develop error class for testing errors. Place test for errors here
+       
     }
     
     //Tests lcs for added lexemes
@@ -142,7 +139,7 @@ function create_response($types,$values) {
        $this->assertTrue( array_key_exists($lcs[1],3) && lcs[1][3]==4 );
        $this->assertTrue( count($lcs[1])==1);
        
-       //TODO: Develop error class for testing errors. Place test for errors here
+       
     }
     
     //Tests analyzer for empty lcs
@@ -202,6 +199,6 @@ function create_response($types,$values) {
        $this->assertTrue( array_key_exists($lcs[3],1) && lcs[3][1]==9 );
        $this->assertTrue( count($lcs[3])==2);
        
-       //TODO: Develop error class for testing errors. Place test for errors here
+       
     }
  }
