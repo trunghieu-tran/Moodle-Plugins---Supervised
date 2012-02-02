@@ -220,8 +220,22 @@ class qtype_preg_matching_results {
                 || $this->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND || $this->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
                 throw new qtype_preg_exception('Error: match was found but no match information returned');
             }
-        }
 
+            //Check that each subpattern lies inside overall match
+            foreach ($this->index_first as $i => $start) {
+                if ($start === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    //No need to check subpattern that wasn't matched
+                    break;
+                }
+                if ($start < $this->index_first[0] || $start > $this->index_first[0] + $this->length[0]) {
+                    throw new qtype_preg_exception('Error: '.$i.' subpattern start '.$start.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                }
+                $end = $start + $this->length[$i];
+                if ($end < $this->index_first[0] || $end > $this->index_first[0] + $this->length[0]) {
+                    throw new qtype_preg_exception('Error: '.$i.' subpattern end '.$end.' doesn\'t lie between match start '.$this->index_first[0].' and end '.($this->index_first[0] + $this->length[0]));
+                }
+            }
+        }
         //Calculate extension start comparing existing and extended strings
         //We could find it looking for the first different character in two strings
         if (!$this->full && $this->extendedmatch !== null) {
