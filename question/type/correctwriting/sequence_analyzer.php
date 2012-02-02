@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/tokens_base.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/langs_code/tokens_base.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
 
 //Other necessary requires
@@ -41,7 +41,11 @@ class  qtype_correctwriting_sequence_analyzer {
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
     public function __construct($question, $answer, $language, $correctedresponse=null) {
-
+        $this->answer=$answer;
+        $this->correctedresponse=$correctedresponse;
+        $this->language=$language;
+        //Compute lcs
+        $lcs()=$this->lcs();
         //TODO:
         //1. Compute LCS - Mamontov
         //  - lcs function
@@ -56,6 +60,15 @@ class  qtype_correctwriting_sequence_analyzer {
     }
 
     /**
+     *  This constructor is used for TESTING ONLY.
+     *  Not under any circumstances anyone will use it. Use previous instead
+     *  It uses same arguments as another, but they can't be null
+     */
+    public function __construct($answer,$correctedresponse) {
+        $this->answer=$answer;
+        $this->correctedresponse=$correctedresponse;
+    }
+    /**
      * Compute and return longest common subsequence (tokenwise) of answer and corrected response.
      *
      * Array of individual lcs contains answer indexes as keys and response indexes as values.
@@ -68,7 +81,7 @@ class  qtype_correctwriting_sequence_analyzer {
     /**
      * Returns an array of mistakes objects for given individual lcs array
      */
-    public function matches_to_mistakes($lcs) {
+    public function lcs_to_mistakes($lcs) {
     }
 
     /**
