@@ -57,7 +57,7 @@ function create_response($types,$values) {
     public function test_equal_correctedresponse() {
        $types=array("noun","verb","verb","exclamation_mark");
        $values=array("I","am","testing","!");
-       $lcs=get_test_lcs($types,$values,$types,$values);
+       $lcs=$this->get_test_lcs($types,$values,$types,$values);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -73,7 +73,7 @@ function create_response($types,$values) {
        $types=array("noun","verb","verb","exclamation_mark");
        $values=array("I","am","testing","!");
        $rvalues=array("She","is","testing","!");
-       $lcs=get_test_lcs($types,$values,$types,$rvalues);
+       $lcs=$this->get_test_lcs($types,$values,$types,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
@@ -86,60 +86,41 @@ function create_response($types,$values) {
     
     //Tests lcs for removed lexemes
     public function test_removed_lexemes() {
-       $answer=array( new qtype_correctwriting_token_base("I","noun",true,new qtype_correctwriting_node_position(0,0,0,3)),
-                      new qtype_correctwriting_token_base("am","article",true,new qtype_correctwriting_node_position(0,0,5,7)),
-                      new qtype_correctwriting_token_base("testing","verb",true,new qtype_correctwriting_node_position(0,0,9,16)),
-                      new qtype_correctwriting_token_base("!","exclamation_mark",true,new qtype_correctwriting_node_position(0,0,17,17))
-                    );
-       $response=array( new qtype_correctwriting_token_base("I","noun",false,new qtype_correctwriting_node_position(0,0,0,3)),
-                        new qtype_correctwriting_token_base("am","article",false,new qtype_correctwriting_node_position(0,0,7,9)),
-                        new qtype_correctwriting_token_base("testing","verb",false,new qtype_correctwriting_node_position(0,0,13,20))
-                      );
-       $test_seq_an=new qtype_correctwriting_sequence_analyzer(null,$answer,null,$response);
-       //Check some errors
-       $this->assertTrue($test_seq_an->is_errors() );
+       $atypes=array("noun","verb","verb","exclamation_mark");
+       $avalues=array("I","am","testing","!");
+       $rtypes=array("noun","verb","verb");
+       $rvalues=array("I","am","testing");
+       $lcs=$this->get_test_lcs($types,$values,$types,$rvalues);
+       //Check LCS props
+       $this->assertTrue( $lcs!=null );
+       $this->assertTrue( count($lcs)==1 );
        
-       //Check LCS
-       $lcs=$tests_seq_an->lcs();
-       $this->assertTrue( array_key_exists($lcs[0],0) && lcs[0][0]==0 );
-       $this->assertTrue( array_key_exists($lcs[0],1) && lcs[0][1]==1 );
-       $this->assertTrue( array_key_exists($lcs[0],2) && lcs[0][2]==2 );
-       $this->assertTrue( count($lcs[0])==3);
-
-       
+       $this->assertTrue( $lcs[0][0]==0 );
+       $this->assertTrue( $lcs[0][1]==1 );
+       $this->assertTrue( $lcs[0][2]==2 );
+       $this->assertTrue( count($lcs[0])==3);   
     }
     
     //Tests lcs for added lexemes
     public function test_added_lexemes() {
-       $answer=array( new qtype_correctwriting_token_base("I","noun",true,new qtype_correctwriting_node_position(0,0,0,3)),
-                      new qtype_correctwriting_token_base("am","article",true,new qtype_correctwriting_node_position(0,0,5,7)),
-                      new qtype_correctwriting_token_base("testing","verb",true,new qtype_correctwriting_node_position(0,0,9,16)),
-                      new qtype_correctwriting_token_base("!","exclamation_mark",true,new qtype_correctwriting_node_position(0,0,17,17))
-                    );
-       $response=array( new qtype_correctwriting_token_base("I","noun",false,new qtype_correctwriting_node_position(0,0,0,3)),
-                        new qtype_correctwriting_token_base("am","article",false,new qtype_correctwriting_node_position(0,0,7,9)),
-                        new qtype_correctwriting_token_base("testing","verb",false,new qtype_correctwriting_node_position(0,0,13,20))
-                        new qtype_correctwriting_token_base("!","exclamation_mark",false,new qtype_correctwriting_node_position(0,0,22,22))
-                        new qtype_correctwriting_token_base("!","exclamation_mark",false,new qtype_correctwriting_node_position(0,0,23,23))
-                      );
-       $test_seq_an=new qtype_correctwriting_sequence_analyzer(null,$answer,null,$response);
-       //Check some errors
-       $this->assertTrue($test_seq_an->is_errors() );
+       $atypes=array("noun","verb","verb","exclamation_mark");
+       $avalues=array("I","am","testing","!");
+       $atypes=array("noun","verb","verb","exclamation_mark","exclamation_mark");
+       $avalues=array("I","am","testing","!","!");
+       $lcs=$this->get_test_lcs($types,$values,$types,$rvalues);
+       //Check LCS props
+       $this->assertTrue( $lcs!=null );
+       $this->assertTrue( count($lcs)==2 );
        
-       //Check LCS
-       $lcs=$tests_seq_an->lcs();
-       $this->assertTrue( count($lcs)==2);
-       
-       $this->assertTrue( array_key_exists($lcs[0],0) && lcs[0][0]==0 );
-       $this->assertTrue( array_key_exists($lcs[0],1) && lcs[0][1]==1 );
-       $this->assertTrue( array_key_exists($lcs[0],2) && lcs[0][2]==2 );
-       $this->assertTrue( array_key_exists($lcs[0],3) && lcs[0][3]==3 );
+       //Check LCS   
        $this->assertTrue( count($lcs[0])==4);
-
-       $this->assertTrue( array_key_exists($lcs[1],3) && lcs[1][3]==4 );
+       $this->assertTrue( $lcs[0][0]==0 );
+       $this->assertTrue( $lcs[0][1]==1 );
+       $this->assertTrue( $lcs[0][2]==2 );
+       $this->assertTrue( $lcs[0][3]==3 );
+       
        $this->assertTrue( count($lcs[1])==1);
-       
-       
+       $this->assertTrue( $lcs[1][3]==4 );
     }
     
     //Tests analyzer for empty lcs
