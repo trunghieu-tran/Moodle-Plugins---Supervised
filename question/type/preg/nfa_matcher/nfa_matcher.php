@@ -167,10 +167,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             break;
                         }
                     }
+                    $isbackref = false;
                     if (!$skip) {
                         if (is_a($transition->pregleaf, 'preg_leaf_backref')) {        // only generated subpatterns can be passed
                             if (array_key_exists($transition->pregleaf->number, $curstate->length_old) && $curstate->length_old[$transition->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                                 $length = $curstate->length_old[$transition->pregleaf->number];
+                                $isbackref = true;
                             } else {
                                 $skip = true;
                             }
@@ -185,14 +187,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, null, 0, $curstate);
                         // generate a next character
-                        if ($length == 1) {
+                        if (!$isbackref && $length > 0) {
                             $newstate->concatenate_char_to_str($transition->pregleaf->next_character($str, $startpos + $newstate->length[0]));
-                        } else if ($length > 1) {
+                        } else if ($isbackref) {
                             for ($i = 0; $i < $length; $i++) {
                                 $tmp = $newstate->str();
                                 $newstate->concatenate_char_to_str($tmp[$newstate->index_first_old[$transition->pregleaf->number] + $i]);
                             }
-
                         }
                         $newstate->length[0] += $length;
 
@@ -364,11 +365,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $result->index_first[0] = $startpos;
             $result->index_first_old[0] = $result->index_first[0];
             $result->length_old[0] = $result->length[0];
-            if ($result->extendedmatch !== null) {
-                $result->extendedmatch->index_first[0] = $result->index_first[0];
-                $result->extendedmatch->index_first_old[0] = $result->index_first_old[0];
-                $result->extendedmatch->length_old[0] = $result->length_old[0];
-            }
+        }
+        if ($result->extendedmatch !== null) {
+            $result->extendedmatch->index_first[0] = $result->index_first[0];
+            $result->extendedmatch->index_first_old[0] = $result->index_first_old[0];
+            $result->extendedmatch->length_old[0] = $result->length_old[0];
         }
         return new qtype_preg_matching_results($result->full, $result->index_first_old, $result->length_old, $result->left, $result->extendedmatch);
     }
