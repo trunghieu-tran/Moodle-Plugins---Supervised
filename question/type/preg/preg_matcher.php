@@ -192,6 +192,7 @@ class qtype_preg_matching_results {
 
         if ($this->extendedmatch !== null) {
             $this->extensionstart = 0;
+            $this->extendedmatch->extensionstart = 0;
         } else {
             $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
