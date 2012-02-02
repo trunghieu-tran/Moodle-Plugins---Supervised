@@ -47,7 +47,20 @@ class answer_file extends poasassignment_answer {
                            'fileamount', 
                            get_string('submissionfilesamount', 
                                       'poasassignmentanswertypes_answer_file'), 
-                           array(1,2,3,4,5,6,7,8,9,10));
+                           array(
+                           		1=>1,
+                           		2=>2,
+                           		3=>3,
+                           		4=>4,
+                           		5=>5,
+                           		6=>6,
+                           		7=>7,
+                           		8=>8,
+                           		9=>9,
+                           		10=>10,
+                           		15=>15,
+                           		20=>20,
+                           		30=>30));
         $conditions = array('poasassignmentid' => $poasassignmentid,
                             'answerid' => $this->answerid,
                             'name' => 'fileamount');
@@ -102,68 +115,67 @@ class answer_file extends poasassignment_answer {
     }
     
     static function validation($data, &$errors) {
-        // TODO check 'fileextensions' element, it must look like "ext,ext,ext"
+    	if ( isset($data['answerfile']) && $data['fileextensions'] !== '') {
+	    	// Must look like *.txt, *.ogg, *.doc	    	
+	    	if (preg_match('/^([a-zA-Z]+|(\*\.[a-zA-Z0-9]+))(,(\s)?([a-zA-Z]+|(\*\.[a-zA-Z0-9]+)))*$/', $data['fileextensions']) == 0)
+	    		$errors['fileextensions'] = get_string('incorrectextensions','poasassignmentanswertypes_answer_file');
+    		return $errors;
+    	}
     }
     function save_settings($poasassignment, $id) {
         global $DB;
         if ($this->checked) {
-            //$plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
+        	$settingsrecord = new stdClass();
+        	
             $settingsrecord->poasassignmentid = $id;
-            //$settingsrecord->answerid=$plugin->id;
-            $settingsrecord->answerid=$this->answerid;
+            $settingsrecord->answerid = $this->answerid;
+            $settingsrecord->name = 'fileamount';
+            $settingsrecord->value = $poasassignment->fileamount;
+            $DB->insert_record('poasassignment_ans_stngs', $settingsrecord);
             
-            $settingsrecord->name='fileamount';
-            $settingsrecord->value=$poasassignment->fileamount;
-            $DB->insert_record('poasassignment_ans_stngs',$settingsrecord);
+            $settingsrecord->name = 'maxfilesize';
+            $settingsrecord->value = $poasassignment->maxfilesize;
+            $DB->insert_record('poasassignment_ans_stngs', $settingsrecord);
             
-            $settingsrecord->name='maxfilesize';
-            $settingsrecord->value=$poasassignment->maxfilesize;
-            $DB->insert_record('poasassignment_ans_stngs',$settingsrecord);
-            
-            $settingsrecord->name='fileextensions';
-            $settingsrecord->value=$poasassignment->fileextensions;
-            $DB->insert_record('poasassignment_ans_stngs',$settingsrecord);
+            $settingsrecord->name = 'fileextensions';
+            $settingsrecord->value = $poasassignment->fileextensions;
+            $DB->insert_record('poasassignment_ans_stngs', $settingsrecord);
         }
     }
     function update_settings($poasassignment) {
         global $DB;
-        //$plugin=$DB->get_record('poasassignment_answers',array('name'=>'answer_file'));
-        $conditions = array('poasassignmentid'=>$poasassignment->id,
-                //'answerid'=>$plugin->id);
-                'answerid'=>$this->answerid);
-        $recordexists = $DB->record_exists('poasassignment_ans_stngs',$conditions);
+        $conditions = array('poasassignmentid' => $poasassignment->id, 'answerid' => $this->answerid);
+        $recordexists = $DB->record_exists('poasassignment_ans_stngs', $conditions);
         if (!$recordexists)
-            $this->save_settings($poasassignment,$poasassignment->id);
-        //$temp=$poasassignment->flags&64;
+            $this->save_settings($poasassignment, $poasassignment->id);
         if ($recordexists && !$this->checked)
             $this->delete_settings($poasassignment->id);
         if ($recordexists && $this->checked) {
-            $settingsrecord->poasassignmentid=$poasassignment->id;
-            //$settingsrecord->answerid=$plugin->id;
-            $settingsrecord->answerid=$this->answerid;
-            
-            $conditions = array('poasassignmentid'=>$poasassignment->id,
-                    'name'=>'fileamount');
-            $currentsetting=$DB->get_record('poasassignment_ans_stngs',$conditions);
-            $settingsrecord->id=$currentsetting->id;
-            $settingsrecord->name='fileamount';
-            $settingsrecord->value=$poasassignment->fileamount;
+        	$settingsrecord = new stdClass();
+            $settingsrecord->poasassignmentid = $poasassignment->id;
+            $settingsrecord->answerid = $this->answerid;            
+            $conditions = array('poasassignmentid' => $poasassignment->id,
+                    			'name' => 'fileamount');
+            $currentsetting = $DB->get_record('poasassignment_ans_stngs',$conditions);
+            $settingsrecord->id = $currentsetting->id;
+            $settingsrecord->name ='fileamount';
+            $settingsrecord->value = $poasassignment->fileamount;
             $DB->update_record('poasassignment_ans_stngs',$settingsrecord);
             
             $conditions = array('poasassignmentid'=>$poasassignment->id,
-                    'name'=>'maxfilesize');
-            $currentsetting=$DB->get_record('poasassignment_ans_stngs',$conditions);
-            $settingsrecord->id=$currentsetting->id;
-            $settingsrecord->name='maxfilesize';
-            $settingsrecord->value=$poasassignment->maxfilesize;
-            $DB->update_record('poasassignment_ans_stngs',$settingsrecord);
+                    			'name'=>'maxfilesize');
+            $currentsetting = $DB->get_record('poasassignment_ans_stngs',$conditions);
+            $settingsrecord->id = $currentsetting->id;
+            $settingsrecord->name = 'maxfilesize';
+            $settingsrecord->value = $poasassignment->maxfilesize;
+            $DB->update_record('poasassignment_ans_stngs', $settingsrecord);
             
-            $conditions = array('poasassignmentid'=>$poasassignment->id,
-                    'name'=>'fileextensions');
-            $currentsetting=$DB->get_record('poasassignment_ans_stngs',$conditions);
-            $settingsrecord->id=$currentsetting->id;
-            $settingsrecord->name='fileextensions';
-            $settingsrecord->value=$poasassignment->fileextensions;
+            $conditions = array('poasassignmentid' => $poasassignment->id,
+                    			'name'=>'fileextensions');
+            $currentsetting = $DB->get_record('poasassignment_ans_stngs', $conditions);
+            $settingsrecord->id = $currentsetting->id;
+            $settingsrecord->name = 'fileextensions';
+            $settingsrecord->value = $poasassignment->fileextensions;
             $DB->update_record('poasassignment_ans_stngs',$settingsrecord);
         }
     }
@@ -188,7 +200,7 @@ class answer_file extends poasassignment_answer {
                            get_string('pluginname','poasassignmentanswertypes_answer_file'));
                 
         $options = array();
-        $options['subdirs'] = 0;
+        $options['subdirs'] = 1;
         $plugin_settings_size = $DB->get_record('poasassignment_ans_stngs', 
                                                 array('poasassignmentid' => $poasassignmentid,
                                                        'answerid' => $this->answerid,
@@ -197,13 +209,24 @@ class answer_file extends poasassignment_answer {
                                                   array('poasassignmentid' => $poasassignmentid,
                                                         'answerid' => $this->answerid,
                                                         'name'=>'fileamount'));  
-                                                                    
-        $options['maxbytes'] = $plugin_settings_size->value;
-        $options['maxfiles'] = ($plugin_settings_amount->value) + 1;
-        $mform->addElement('filemanager', 
-                           'answerfiles_filemanager', 
-                           get_string('pluginname','poasassignmentanswertypes_answer_file'),
-                           $options);
+        $plugin_settings_types = $DB->get_record('poasassignment_ans_stngs',
+								        		 array('poasassignmentid' => $poasassignmentid,
+								        				'answerid' => $this->answerid,
+								        				'name' => 'fileextensions'));
+        if ($plugin_settings_size) {
+        	$options['maxbytes'] = $plugin_settings_size->value;
+        }
+        if ($plugin_settings_amount) {
+        	$options['maxfiles'] = $plugin_settings_amount->value;
+        }
+        if ($plugin_settings_types) {
+        	$options['accepted_types'] = explode(',', $plugin_settings_types->value);
+        }
+        $mform->addElement( 'filemanager', 
+                            'answerfiles_filemanager', 
+                            get_string('pluginname','poasassignmentanswertypes_answer_file'),
+			        		null,
+			        		$options);
         $mform->closeHeaderBefore('answerfileheader');
     }
     function configure_flag($poasassignment) {
