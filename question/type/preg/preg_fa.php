@@ -434,7 +434,7 @@ abstract class qtype_preg_finite_automaton {
      * @param dotfilename - name of the dot file.
      * @param jpgfilename - name of the resulting jpg file.
      */
-    public function draw_nfa($dotfilename, $jpgfilename) {
+    public function draw($dotfilename, $jpgfilename) {
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nfa');
         $dotfn = $dir.$dotfilename;
@@ -457,21 +457,30 @@ abstract class qtype_preg_finite_automaton {
             } else {    // draw a state with transitions
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
                     $index2 = $curtransition->to->id;
-                    $lab = $curtransition->pregleaf->tohr();
+                    $lab = $curtransition->pregleaf->tohr().',';
                     // information about subpatterns
-                    /*if (count($curtransition->tags) > 0) {
-                        $lab = $lab."starts";
-                        foreach ($curtransition->tags as $key=>$val) {
-                            $lab = $lab."$key,";
+                    $subpatt_start = array();
+                    $subpatt_end = array();
+                    foreach ($curtransition->tags as $value) {
+                        if ($value % 2 == 0) {
+                            $subpatt_start[] = $value / 2;
+                        } else {
+                            $subpatt_end[] = ($value - 1) / 2;
                         }
                     }
-                    if (count($curtransition->tags) > 0) {
-                        $lab = $lab."ends";
-                        foreach ($curtransition->tags as $key=>$val) {
-                            $lab = $lab."$key,";
+                    if (count($subpatt_start) > 0) {
+                        $lab = $lab."starts";
+                        foreach ($subpatt_start as $num) {
+                            $lab = $lab."$num,";
                         }
-                    }*/
-                    $lab = $lab."$curtransition->priority";
+                    }
+                    if (count($subpatt_end) > 0) {
+                        $lab = $lab."ends";
+                        foreach ($subpatt_end as $num) {
+                            $lab = $lab."$num,";
+                        }
+                    }
+                    $lab = $lab."priority=$curtransition->priority";
                     fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
                 }
             }
