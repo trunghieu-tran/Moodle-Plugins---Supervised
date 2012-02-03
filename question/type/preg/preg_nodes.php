@@ -126,19 +126,20 @@ abstract class preg_leaf extends preg_node {
     /*
     * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
     */
-    public function consumes() {
+    public function consumes($matcherstateobj = null) {
         return 1;
     }
 
-    /*
-    * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
-    * Contains universal code to deal with merged assertions. Overload match_inner to define you leaf type matching
-    * @param str string with which matching is supporting
-    * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
-    * @param length the length of match (for backreference or recursion), can be 0 for asserts
-    * @param cs case sensitivity of the match
-    */
-    public function match($str, $pos, &$length, $cs)
+    /**
+     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
+     * Contains universal code to deal with merged assertions. Overload match_inner to define you leaf type matching
+     * @param str the string being matched
+     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
+     * @param length an integer variable to store the length of the match
+     * @param cs case sensitivity of the match
+     * @param matcherstateobj an object for representing matcher's state. It should have the following methods: index_first($num=0), length($num=0), is_subpattern_captured($num=0).
+     */
+    public function match($str, $pos, &$length, $cs, $matcherstateobj = null)
     {
         $result = true;
         //Check merged assertions
@@ -147,21 +148,22 @@ abstract class preg_leaf extends preg_node {
         }
         //Now check this leaf
         if ($result) {
-            $result = $this->match_inner($str, $pos, $length, $cs);
+            $result = $this->match_inner($str, $pos, $length, $cs, $matcherstateobj);
         }
 
         return $result;
     }
 
-    /*
-    * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
-    * Implement details of particular leaf matching
-    * @param str string with which matching is supporting
-    * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
-    * @param length the length of match (for backreference or recursion), can be 0 for asserts
-    * @param cs case sensitivity of the match
-    */
-    abstract protected function match_inner($str, $pos, &$length, $cs);
+    /**
+     * Returns true if character(s) starting from $str[$pos] matches with leaf, false otherwise
+     * Implements details of particular leaf matching
+     * @param str the string being matched
+     * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
+     * @param length an integer variable to store the length of the match
+     * @param cs case sensitivity of the match
+     * @param matcherstateobj an object for representing matcher's state. It should have the following methods: index_first($num=0), length($num=0), is_subpattern_captured($num=0).
+     */
+    abstract protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null);
 
     /*
     * Returns a character suitable for both this leaf and merged assertions and previous character
@@ -169,7 +171,7 @@ abstract class preg_leaf extends preg_node {
     * @param pos position of the last matched character in the string
     * @param length number of characters matched in case of partial backreference match
     */
-    abstract public function next_character($str, $pos, $length = 0);
+    abstract public function next_character($str, $pos, $length = 0, $matcherstateobj = null);
 
     /**
     * function gives leaf in human readable form
@@ -213,7 +215,7 @@ class preg_leaf_charset extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         $textlib = textlib_get_instance();//use textlib to avoid unicode problems
         if ($pos>=$textlib->strlen($str)) {
             $length = 0;
@@ -240,7 +242,7 @@ class preg_leaf_charset extends preg_leaf {
         return $result;
     }
 
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         if ($this->negative) {
             $i = ord(' ');
             while (strchr(chr($i), $this->charset) !== false) {
@@ -292,14 +294,14 @@ class preg_leaf_meta extends preg_leaf {
 
     //TODO - ui_nodename()
 
-    public function consumes() {
+    public function consumes($matcherstateobj = null) {
         if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             return 0;
         }
         return 1;
     }
 
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
                 $result = 'D';
@@ -315,7 +317,7 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             $length = 0;
             return true;
@@ -409,7 +411,7 @@ class preg_leaf_assert extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_ASSERT;
     }
 
-    public function consumes() {
+    public function consumes($matcherstateobj = null) {
         return 0;
     }
 
@@ -418,7 +420,7 @@ class preg_leaf_assert extends preg_leaf {
     }
 
     //TODO - ui_nodename()
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         $textlib = textlib_get_instance();
         $length = 0;
         switch ($this->subtype) {
@@ -460,7 +462,7 @@ class preg_leaf_assert extends preg_leaf {
         }
         return $result;
     }
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
@@ -524,9 +526,9 @@ class preg_leaf_combo extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_COMBO;
     }
 
-    public function consumes() {//TODO: fix it!
+    public function consumes($matcherstateobj = null) {//TODO: fix it!
         if (is_array($this->childs)) {
-            return $this->childs[0]->consumes() + $this->childs[0]->consumes();
+            return $this->childs[0]->consumes($matcherstateobj = null) + $this->childs[0]->consumes($matcherstateobj = null);
         } else {
             return true;
         }
@@ -536,7 +538,7 @@ class preg_leaf_combo extends preg_leaf {
         return 'leaf_combo';
     }
 
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         $match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
         $match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
         if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
@@ -560,10 +562,10 @@ class preg_leaf_combo extends preg_leaf {
         }
         return $result;
     }
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
             if (is_array($this->childs)) {
-                return $this->childs[0]->next_character($str, $pos, $length);
+                return $this->childs[0]->next_character($str, $pos, $length, $matcherstateobj);
         } else {
             return 'ERROR: combo of nothing!';
         }
@@ -675,35 +677,22 @@ class preg_leaf_backref extends preg_leaf {
         $this->type = preg_node::TYPE_LEAF_BACKREF;
     }
 
-    public function get_number_from_map() {
-        $map = $this->matcher->get_subpattern_map();
-        if (array_key_exists($this->number, $map)) {
-            return $map[$this->number];
-        } else {
-            return $this->number;
-        }
-    }
-
-    public function consumes() {
-        $number = $this->get_number_from_map($this->number);
-        $matchresults = $this->matcher->get_match_results();
-        if (!$matchresults->is_subpattern_captured($number)) {
+    public function consumes($matcherstateobj = null) {
+        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
             return 0;
         }
-        return $matchresults->length($number);
+        return $matcherstateobj->length($this->number);
     }
 
-    protected function match_inner($str, $pos, &$length, $cs) {
-        $number = $this->get_number_from_map($this->number);
-        $matchresults = $this->matcher->get_match_results();
-        if (!$matchresults->is_subpattern_captured($number)) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
+        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
             $length = 0;
             return false;
         }
         $textlib = textlib_get_instance();
         $len = $textlib->strlen($str);
-        $subpattlen = $matchresults->length($number);
-        $start = $matchresults->index_first($number);
+        $subpattlen = $matcherstateobj->length($this->number);
+        $start = $matcherstateobj->index_first($this->number);
         $end = $start + $subpattlen - 1;
         if ($subpattlen > 0 && $pos >= $len) {
             $length = 0;
@@ -738,19 +727,22 @@ class preg_leaf_backref extends preg_leaf {
         return 'leaf_backref';
     }
 
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // TODO: check for assertions in case of $length == 0
-        $number = $this->get_number_from_map($this->number);
-        $matchresults = $this->matcher->get_match_results();
-        if (!$matchresults->is_subpattern_captured($number)) {
+        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
             return '';
         }
-        $start = $matchresults->index_first($number);
+        $start = $matcherstateobj->index_first($this->number);
+        $end = $start + $matcherstateobj->length($this->number);
         $textlib = textlib_get_instance();
-        if ($start + $length >= $textlib->strlen($str)) {
+        if ($end > $textlib->strlen($str)) {
             return '';
         }
-        return $str[$start + $length];
+        $res = '';
+        for ($i = $start + $length; $i < $end; $i++) {
+            $res .= $str[$i];
+        }
+        return $res;
     }
 
     public function tohr() {
@@ -765,13 +757,13 @@ class preg_leaf_option extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_OPTIONS;
     }
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for preg_leaf_option class before use it!');
     }
     public function name() {
         return 'leaf_option';
     }
-    public function next_character($str, $pos, $length = 0) {
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implements abstract function character for preg_leaf_option class before use it!');
     }
     public function tohr() {
@@ -787,13 +779,13 @@ class preg_leaf_recursion extends preg_leaf {
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_RECURSION;
     }
-    protected function match_inner($str, $pos, &$length, $cs) {
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for preg_leaf_recursion class before use it!');
     }
     public function name() {
         return 'leaf_recursion';
     }
-    public function next_character($str, $pos, $length = 0){
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null){
         die ('TODO: implements abstract function character for preg_leaf_recursion class before use it!');
     }
     public function tohr() {
