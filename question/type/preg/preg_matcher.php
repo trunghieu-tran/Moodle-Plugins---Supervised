@@ -24,7 +24,6 @@ class qtype_preg_matching_results {
     //How many characters left is unknown
     const UNKNOWN_CHARACTERS_LEFT = 999999999;
 
-
     ////Match data
     /** @var boolean Is match full or partial? */
     public $full;
@@ -51,7 +50,7 @@ class qtype_preg_matching_results {
      */
     public $extensionstart;
 
-    ////Source data - TODO - add info about lexemes
+    ////Source data
     /** @var string String with which match was performed*/
     protected $str;
     /** @var integer Max number of a subpattern available in regular expression */
@@ -81,9 +80,53 @@ class qtype_preg_matching_results {
         $this->lexemcount = $lexemcount;
     }
 
-
     public function str() {
         return $this->str;
+    }
+
+    /**
+     * Returns keys for all subpatterns in regular expression
+     *
+     * Use to enumerate subpatterns
+     */
+    public function all_subpatterns() {
+        //Merge all numeric subpattern keys (numbered subpatterns and lexems) with named subpatterns from $subpatternman
+        return array_merge(array_keys($this->index_first), array_keys($this->subpatternmap));
+    }
+
+    /**
+     * Return subpattern index in the index_first and length arrays
+     *
+     * If it is subpattern name, use $subpatternmap to find appropriate index,
+     * otherwise (numbered subpattern or lexeme) just return $subpattern.
+     */
+    public function subpattern_number($subpattern) {
+        if (array_key_exists($subpattern, $this->subpatternmap)) {//named subpattern
+            return $this->subpatternmap[$subpattern];
+        }
+        return $subpattern;
+    }
+
+    /**
+     * Returns true if subpattern is captured
+     * @param subpattern subpattern number
+     */
+    public function is_subpattern_captured($subpattern) {
+        $subpattern = $this->subpattern_number($subpattern);
+        if (!isset($this->length[$subpattern])) {
+            throw new qtype_preg_exception('Error: Asked for unexisting subpattern '.$subpattern);
+        }
+        return ($this->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    public function index_first($subpattern = 0) {
+        $subpattern = $this->subpattern_number($subpattern);
+        return $this->index_first[$subpattern];
+    }
+
+    public function length($subpattern = 0) {
+        $subpattern = $this->subpattern_number($subpattern);
+        return $this->length[$subpattern];
     }
 
     /**
@@ -99,22 +142,22 @@ class qtype_preg_matching_results {
     }
 
     /**
-    * Returns true if there could be no better matching result, so we could stop loop looking for best match
-    *
-    * For now the first (leftmost) full match is enought
-    */
+     * Returns true if there could be no better matching result, so we could stop loop looking for best match
+     *
+     * For now the first (leftmost) full match is enought
+     */
     public function best() {
         return $this->full;
     }
 
     /**
-    * Compares two matching results and returns true if this result is worse than passed by argument
-    *
-    * @param other object of qtype_preg_matching_results
-    * @param orequal make it worse-or-equal function
-    * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match
-    * @return whether @this is worse than $other
-    */
+     * Compares two matching results and returns true if this result is worse than passed by argument
+     *
+     * @param other object of qtype_preg_matching_results
+     * @param orequal make it worse-or-equal function
+     * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match
+     * @return whether @this is worse than $other
+     */
     public function worse_than($other, $orequal = false, $longestmatch = false) {
 
         //1. The match is definitely best (full match)
@@ -163,33 +206,21 @@ class qtype_preg_matching_results {
 
         }
 
-        //5. More subpatterns captured - TODO - dubious, it may be needed by NFA, but have not much use comparing matches from different positions
-        $thissubpatt = $this->captured_subpatterns_count();
-        $othersubpatt = $other->captured_subpatterns_count();
-        if ($othersubpatt > $thissubpatt) {
-            return true;
-        } elseif ($thissubpatt > $othersubpatt) {
-            return false;
-        }
-
         return $orequal;//results are equal
     }
 
     /**
-    * Invalidates match by setting all data to no match values
-    */
+     * Invalidates match by setting all data to no match values
+     */
     public function invalidate_match() {
         $this->full = false;
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
-        //It is correct to have index_first 0 and length 0 (pure-assert expression matches from the beginning of the response)
-        //Use negative values for no match at all
-        for ($i = - $this->lexemcount; $i <= $this->maxsubpatt; $i++) {
+        for ($i = -$this->lexemcount; $i <= $this->maxsubpatt; $i++) {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
-
         if ($this->extendedmatch !== null) {
             $this->extensionstart = 0;
             $this->extendedmatch->extensionstart = 0;
@@ -199,22 +230,9 @@ class qtype_preg_matching_results {
     }
 
     /**
-    * Returns the count of matched subpatterns
-    */
-    public function captured_subpatterns_count() {
-        $subpattcount = 0;
-        foreach ($this->length as $key=>$length) {
-            if ($key != 0 && $length != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $subpattcount++;
-            }
-        }
-        return $subpattcount;
-    }
-
-    /**
-    * Throws exception if match results contain obvious abnormalities
-    * Also compute extensionstart field
-    */
+     * Throws exception if match results contain obvious abnormalities
+     * Also compute extensionstart field
+     */
     public function validate() {
         if ($this->is_match()) {//Match found
             if (!isset($this->index_first[0]) || !isset($this->length[0])
@@ -260,54 +278,10 @@ class qtype_preg_matching_results {
     }
 
     /**
-    * Returns true if subpattern is captured
-    * @param subpattern subpattern number
-    */
-    public function is_subpattern_captured($subpattern) {
-        if (!isset($this->length[$subpattern])) {
-            throw new qtype_preg_exception('Error: Asked for unexisting subpattern '.$subpattern);
-        }
-        return ($this->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
-    }
-
-    /**
-     * Return subpattern index in the index_first and length arrays
-     *
-     * If it is subpattern name, use $subpatternmap to find appropriate index,
-     * otherwise (numbered subpattern or lexeme) just return $subpattern.
-     */
-    public function subpattern_index($subpattern) {
-        if (array_key_exists($subpattern, $this->subpatternmap)) {//named subpattern
-            return $this->subpatternmap[$subpattern];
-        }
-        return $subpattern;
-    }
-
-    /**
-     * Returns keys for all subpatterns in regular expression
-     *
-     * Use to enumerate subpatterns
-     */
-    public function all_subpatterns() {
-        //Merge all numeric subpattern keys (numbered subpatterns and lexems) with named subpatterns from $subpatternman
-        return array_merge(array_keys($this->index_first), array_keys($this->subpatternmap));
-    }
-
-    public function index_first($subpattern = 0) {
-        $subpattern = $this->subpattern_index($subpattern);
-        return $this->index_first[$subpattern];
-    }
-
-    public function length($subpattern = 0) {
-        $subpattern = $this->subpattern_index($subpattern);
-        return $this->length[$subpattern];
-    }
-
-    /**
      * Returns non-matched heading before subpattern match
      */
     public function match_heading($subpattern = 0) {
-        $subpattern = $this->subpattern_index($subpattern);
+        $subpattern = $this->subpattern_number($subpattern);
         $wronghead = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
@@ -323,7 +297,7 @@ class qtype_preg_matching_results {
      * Returns matched part of the string for given subpattern
      */
     public function matched_part($subpattern = 0) {
-        $subpattern = $this->subpattern_index($subpattern);
+        $subpattern = $this->subpattern_number($subpattern);
         $correctpart = '';
         if ($this->is_match()) {//There is match
             if ( isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -337,7 +311,7 @@ class qtype_preg_matching_results {
      * Returns non-matched tail after subpattern match
      */
     public function match_tail($subpattern = 0) {
-        $subpattern = $this->subpattern_index($subpattern);
+        $subpattern = $this->subpattern_number($subpattern);
         $wrongtail = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] + $this->length[$subpattern] < strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
@@ -358,7 +332,7 @@ class qtype_preg_matching_results {
         return $correctbeforehint;
     }
 
-        /**
+    /**
      * Returnstail after point where extension is started
      */
     public function tail_to_delete() {
@@ -374,7 +348,7 @@ class qtype_preg_matching_results {
     /**
      * Returns part of the string, added by matcher
      */
-   public function string_extension() {
+    public function string_extension() {
         $extension = '';
         if ($this->extendedmatch !== null) {
             $extendedstr = $this->extendedmatch->str();
@@ -383,8 +357,7 @@ class qtype_preg_matching_results {
             }
         }
         return $extension;
-   }
-
+    }
 
 }
 
