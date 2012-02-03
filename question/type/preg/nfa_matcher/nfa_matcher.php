@@ -18,17 +18,17 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 
 class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
     public $state;                     // a reference to the state which automaton is in
-    public $index_first_old = array(); // indexes of subpatterns defenetly captured. it's used, for example, when matching quantified subpatterns like (...)*
-    public $length_old = array();      // same as previous field
+    public $index_first_new = array(); // indexes of subpatterns defenetly captured. it's used, for example, when matching quantified subpatterns like (...)*
+    public $length_new = array();      // same as previous field
     public $backref_transition;        // != null if the last transition matched is a backreference
     public $backref_match_len;         // length of the last match
 
-    public function __construct($full, $index_first, $length, $index_first_old, $length_old, $left, $extendedmatch,
+    public function __construct($full, $index_first, $length, $index_first_new, $length_new, $left, $extendedmatch,
                                 &$state, $backref_transition, $backref_match_len, $sourceobj) {
         parent::__construct($full, $index_first, $length, $left, $extendedmatch);
         $this->state = $state;
-        $this->index_first_old = $index_first_old;
-        $this->length_old = $length_old;
+        $this->index_first_new = $index_first_new;
+        $this->length_new = $length_new;
         $this->backref_transition = $backref_transition;
         $this->backref_match_len = $backref_match_len;
         $this->str = $sourceobj->str;
@@ -37,8 +37,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
         $this->lexemcount = $sourceobj->lexemcount;
     }
 
-    public function concatenate_char_to_str($char)
-    {
+    public function concatenate_char_to_str($char) {
         $this->str .= $char;
     }
 }
@@ -133,13 +132,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         } else {
             // The last partially matched transition was a backreference and we can only continue from this transition
             $length = $laststate->length[$laststate->backref_transition->pregleaf->number] - $laststate->backref_match_len;    // Number of characters left for this backreference
-            $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_old, $laststate->length_old, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+            $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_new, $laststate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                             $laststate->backref_transition->to, null, 0, $laststate);
             // re-write the string with correct characters
-            for ($i = 0; $i < $length; $i++) {
-                $tmp = $newstate->str();
-                $newstate->concatenate_char_to_str($tmp[$laststate->index_first_old[$laststate->backref_transition->pregleaf->number] + $laststate->backref_match_len + $i]);
-            }
+            $newstate->concatenate_char_to_str($laststate->backref_transition->pregleaf->next_character($str, $startpos + $laststate->length[0], $laststate->backref_match_len, $laststate));
             $newstate->length[0] += $length;
             array_push($curstates, $newstate);
         }
@@ -161,39 +157,32 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         if ($skipstate->state === $curstate->state/* &&
                             $skipstate->index_first === $curstate->index_first &&
                             $skipstate->length === $curstate->length &&
-                            $skipstate->index_first_old === $curstate->index_first_old &&
-                            $skipstate->length_old === $curstate->length_old*/) {
+                            $skipstate->index_first_new === $curstate->index_first_new &&
+                            $skipstate->length_new === $curstate->length_new*/) {
                             $skip = true;
                             break;
                         }
                     }
-                    $isbackref = false;
                     if (!$skip) {
                         if (is_a($transition->pregleaf, 'preg_leaf_backref')) {        // only generated subpatterns can be passed
-                            if (array_key_exists($transition->pregleaf->number, $curstate->length_old) && $curstate->length_old[$transition->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                                $length = $curstate->length_old[$transition->pregleaf->number];
-                                $isbackref = true;
+                            if (array_key_exists($transition->pregleaf->number, $curstate->length) && $curstate->length[$transition->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                                $length = $curstate->length[$transition->pregleaf->number];
                             } else {
                                 $skip = true;
                             }
                         } else {
-                            $length = $transition->pregleaf->consumes();
+                            $length = $transition->pregleaf->consumes($curstate);
                         }
                     }
                     if (!$skip) {
                         $skip = ($result !== null && $curstate->length[0] + $length > $result->length[0]);        // is it longer then an existing one?
                     }
                     if (!$skip) {
-                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new, $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, null, 0, $curstate);
                         // generate a next character
-                        if (!$isbackref && $length > 0) {
-                            $newstate->concatenate_char_to_str($transition->pregleaf->next_character($str, $startpos + $newstate->length[0]));
-                        } else if ($isbackref) {
-                            for ($i = 0; $i < $length; $i++) {
-                                $tmp = $newstate->str();
-                                $newstate->concatenate_char_to_str($tmp[$newstate->index_first_old[$transition->pregleaf->number] + $i]);
-                            }
+                        if ($length > 0) {
+                            $newstate->concatenate_char_to_str($transition->pregleaf->next_character($str, $startpos + $newstate->length[0], 0, $curstate));
                         }
                         $newstate->length[0] += $length;
 
@@ -202,24 +191,23 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $subpatt_end = array();
                         foreach ($transition->tags as $value) {
                             if ($value % 2 == 0) {
-                                $subpatt_start[] = $value;
+                                $subpatt_start[] = $value / 2;
                             } else {
-                                $subpatt_end[] = $value;
+                                $subpatt_end[] = ($value - 1) / 2;
                             }
                         }
-                        // save subpattern indexes for backreference capturing
-                        foreach ($subpatt_start as $value) {
-                            $number = $value / 2;
-                            $newstate->index_first[$number] = $startpos + $curstate->length[0];
-                            $newstate->length[$number] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                        // set start indexes of subpatterns
+                        foreach ($subpatt_start as $number) {
+                            $newstate->index_first_new[$number] = $startpos + $curstate->length[0];
+                            $newstate->length_new[$number] = qtype_preg_matching_results::NO_MATCH_FOUND;
                         }
-                        foreach ($subpatt_end as $value) {
-                            $number = ($value - 1) / 2;
-                            if ($newstate->index_first[$number] >= 0) {
-                                $newstate->length[$number] = $startpos + $curstate->length[0] - $newstate->index_first[$number] + $length;
+                        // set end indexes of subpatterns
+                        foreach ($subpatt_end as $number) {
+                            if ($newstate->index_first_new[$number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                                $newstate->length_new[$number] = $startpos + $curstate->length[0] - $newstate->index_first_new[$number] + $length;
                                 // rewrite old results of subpattern capturing
-                                $newstate->index_first_old[$number] = $newstate->index_first[$number];
-                                $newstate->length_old[$number] = $newstate->length[$number];
+                                $newstate->index_first[$number] = $newstate->index_first_new[$number];
+                                $newstate->length[$number] = $newstate->length_new[$number];
                             }
                         }
                         array_push($newstates, $newstate);
@@ -234,8 +222,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
         if ($result !== null && $result->is_match()) {
             $result->index_first[0] = $startpos;
-            $result->index_first_old[0] = $result->index_first[0];
-            $result->length_old[0] = $result->length[0];
         }
         return $result;
     }
@@ -274,15 +260,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     array_push($results, $curstate);
                 }
 
-                $this->matchresults->index_first = $curstate->index_first_old;
-                $this->matchresults->length = $curstate->length_old;
                 // iterate over all transitions
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
-                    $curlen = $curstate->length[0];
                     $length = 0;
-                    if ($transition->pregleaf->match($str, $startpos + $curlen, &$length, !$transition->pregleaf->caseinsensitive)) {
+                    if ($transition->pregleaf->match($str, $startpos + $curstate->length[0], &$length, !$transition->pregleaf->caseinsensitive, $curstate)) {
                         // create a new state
-                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_old, $curstate->length_old, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new, $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, null, 0, $curstate);
                         $newstate->length[0] += $length;
                         // get subpattern info
@@ -290,25 +273,23 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $subpatt_end = array();
                         foreach ($transition->tags as $value) {
                             if ($value % 2 == 0) {
-                                $subpatt_start[] = $value;
+                                $subpatt_start[] = $value / 2;
                             } else {
-                                $subpatt_end[] = $value;
+                                $subpatt_end[] = ($value - 1) / 2;
                             }
                         }
                         // set start indexes of subpatterns
-                        foreach ($subpatt_start as $value) {
-                            $number = $value / 2;
-                            $newstate->index_first[$number] = $startpos + $curlen;
-                            $newstate->length[$number] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                        foreach ($subpatt_start as $number) {
+                            $newstate->index_first_new[$number] = $startpos + $curstate->length[0];
+                            $newstate->length_new[$number] = qtype_preg_matching_results::NO_MATCH_FOUND;
                         }
                         // set end indexes of subpatterns
-                        foreach ($subpatt_end as $value) {
-                            $number = ($value - 1) / 2;
-                            if ($newstate->index_first[$number] >= 0) {
-                                $newstate->length[$number] = $startpos + $curlen - $newstate->index_first[$number] + $length;
+                        foreach ($subpatt_end as $number) {
+                            if ($newstate->index_first_new[$number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                                $newstate->length_new[$number] = $startpos + $curstate->length[0] - $newstate->index_first_new[$number] + $length;
                                 // rewrite old results of subpattern capturing
-                                $newstate->index_first_old[$number] = $newstate->index_first[$number];
-                                $newstate->length_old[$number] = $newstate->length[$number];
+                                $newstate->index_first[$number] = $newstate->index_first_new[$number];
+                                $newstate->length[$number] = $newstate->length_new[$number];
                             }
                         }
                         // the new state is calculated, check for zero-length loops
@@ -317,7 +298,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             foreach ($skipstates as $skipstate) {
                                 // does this state already exists?
                                 if ($skipstate->state === $curstate->state && $skipstate->index_first === $curstate->index_first && $skipstate->length === $curstate->length &&
-                                    $skipstate->index_first_old === $curstate->index_first_old && $skipstate->length_old === $curstate->length_old) {
+                                    $skipstate->index_first_new === $curstate->index_first_new && $skipstate->length_new === $curstate->length_new) {
                                     $skip = true;
                                     break;
                                 }
@@ -344,16 +325,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $path = $this->determine_characters_left($str, $startpos, $pathstart);
                         if ($path !== null) {
                             $curstate->left = $path->length[0] - $curstate->length[0];
-                            $curstate->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first_old, $path->length_old, $path->left);
+                            $curstate->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
                             $curstate->extendedmatch->set_source_info($path->str(), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
                         }
                         // finally, save the possible partial match
                         array_push($results, $curstate);
                     }
                 }
-                $this->matchresults->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-                $this->matchresults->invalidate_match($this->maxsubpatt);
-                $this->matchresults->length[0] = 0;
             }
             // replace curstates with newstates
             $curstates = $newstates;
@@ -368,10 +346,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
         if ($result->is_match()) {
             $result->index_first[0] = $startpos;
-            $result->index_first_old[0] = $result->index_first[0];
-            $result->length_old[0] = $result->length[0];
         }
-        return new qtype_preg_matching_results($result->full, $result->index_first_old, $result->length_old, $result->left, $result->extendedmatch);
+        return new qtype_preg_matching_results($result->full, $result->index_first, $result->length, $result->left, $result->extendedmatch);
     }
 
     public function __construct($regex = null, $modifiers = null) {
