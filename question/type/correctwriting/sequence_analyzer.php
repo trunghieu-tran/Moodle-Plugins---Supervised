@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/get_one_lcs.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/get_lcs.php');
 
 //Other necessary requires
 
@@ -70,6 +70,7 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of individual lcs arrays
      */
     public function lcs() {
+        return qtype_correctwriting_sequence_analyzer_compute_lcs($answer,$correctedresponse);
     }
 
     /**
