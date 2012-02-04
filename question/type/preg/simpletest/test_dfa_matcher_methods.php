@@ -545,39 +545,39 @@ class qtype_preg_dfa_matcher_test extends UnitTestCase {
         $matcher = new qtype_preg_dfa_matcher('^(?:a|b)*abb$');
         $matcher->match('cd');
         $this->assertFalse($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == strlen('cd')-1 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
+        $this->assertTrue($matcher->get_match_results()->length() == -1 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
         $matcher->match('ca');
         $this->assertFalse($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == strlen('ca')-1 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
+        $this->assertTrue($matcher->get_match_results()->length() == -1 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
         $matcher->match('ac');
         $this->assertFalse($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 0 && (substr($matcher->get_match_results()->string_extension(), 0, 1) === 'b') || substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
+        $this->assertTrue($matcher->get_match_results()->length() == 1 && (substr($matcher->get_match_results()->string_extension(), 0, 1) === 'b') || substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
         $matcher->match('bb');
         $this->assertFalse($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 1 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
+        $this->assertTrue($matcher->get_match_results()->length() == 2 && substr($matcher->get_match_results()->string_extension(), 0, 1) === 'a');
         $matcher->match('abb');
         $this->assertTrue($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 2 && substr($matcher->get_match_results()->string_extension(), 0, 1) === '');
+        $this->assertTrue($matcher->get_match_results()->length() == 3 && $matcher->get_match_results()->string_extension() === '');
         $matcher->match('ababababababaabbabababababababaabb');//34 characters
         $this->assertTrue($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 33 && substr($matcher->get_match_results()->string_extension(), 0, 1) ==='');
+        $this->assertTrue($matcher->get_match_results()->length() == 34 && $matcher->get_match_results()->string_extension() ==='');
     }
     function test_general_assert() {
         $matcher = new qtype_preg_dfa_matcher('a(?=[xcvnm]*b)[xcvbnm]*');
         $result1 = $matcher->match('an');
         $this->assertFalse($matcher->get_match_results()->full);
         $char = substr($matcher->get_match_results()->string_extension(), 0, 1);
-        $this->assertTrue($matcher->get_match_results()->length() == 1 && strchr('xcvbnm', $char)!==false);
+        $this->assertTrue($matcher->get_match_results()->length() == 2 && strchr('xcvbnm', $char)!==false);
         $matcher->match('anvnvb');
         $this->assertTrue($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 5 && substr($matcher->get_match_results()->string_extension(), 0, 1) === '');
+        $this->assertTrue($matcher->get_match_results()->length() == 6 && $matcher->get_match_results()->string_extension() === '');
         $matcher->match('avnvnv');
         $char = substr($matcher->get_match_results()->string_extension(), 0, 1);
         $this->assertFalse($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 5 && strchr('xcvbnm', $char)!==false);
+        $this->assertTrue($matcher->get_match_results()->length() == 6 && strchr('xcvbnm', $char)!==false);
         $matcher->match('abnm');
         $this->assertTrue($matcher->get_match_results()->full);
-        $this->assertTrue($matcher->get_match_results()->length() == 3 && substr($matcher->get_match_results()->string_extension(), 0, 1) === '');
+        $this->assertTrue($matcher->get_match_results()->length() == 4 && $matcher->get_match_results()->string_extension() === '');
     }
     /*
     *   this is overall test for qtype_preg_dfa_matcher class
