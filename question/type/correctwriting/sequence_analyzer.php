@@ -73,15 +73,15 @@ class  qtype_correctwriting_sequence_analyzer {
         }
         //TODO:
         //1. Compute LCS - Mamontov
-        //  - lcs function
-        //2. For each LCS create  qtype_correctwriting_syntax_analyzer object - Mamontov
+        //  - lcs function  (done)
+        //2. For each LCS create  qtype_correctwriting_syntax_analyzer object - Mamontov (done)
         //  - if there is exception thrown, skip syntax analysis
         //3. Select best fitted syntax_analyzer using their fitness method - Mamontov
-        //4. Set array of mistakes accordingly - Mamontov
+        //4. Set array of mistakes accordingly - Mamontov (done)
         //  - if syntax analyzer is able to return mistakes, use it's mistakes
         //  - otherwise generate own mistakes for individual tokens, using lcs_to_mistakes function
         //NOTE: if response is null just check for errors using syntax analyzer- Mamontov (Done)
-        //NOTE: if some stage create errors, stop processing right there
+        //NOTE: if some stage create errors, stop processing right there (done?)
     }
     /**
      * Scans for an errors in response, computing lcs and 
@@ -96,9 +96,31 @@ class  qtype_correctwriting_sequence_analyzer {
         $lcs=$this->lcs();
         if (count($lcs)==0) {
             //If no LCS found perform only one found in lcs
+            $this->mistakes=$this->lcs_to_mistakes(null);
+            $this->fitness=$this->temporary_fitness;
         }
         else {
             //Otherwise scan all of lcs
+            $max_mistake_array=array();
+            $max_fitness=0;
+            $is_first=true;
+            
+            //Find fitting analyzer
+            for($i=0;$i<count($lcs);$i++) {
+                //Compute fitness and array
+                $cur_mistake_array=$this->lcs_to_mistakes($lcs[$i]);
+                $cur_fitness=$this->temporary_fitness;
+                if ($is_first==true || $cur_fitness>$max_fitness) {
+                    //Set according value
+                    $is_first=false;
+                    $max_mistake_array=$cur_mistake_array;
+                    $max_fitness=$cur_fitness;
+                }
+            }
+            
+            //Set self-properties to return proper values
+            $this->mistakes=$max_mistake_array;
+            $this->fitness=$max_fitness;
         }
     }
     /**
@@ -113,7 +135,7 @@ class  qtype_correctwriting_sequence_analyzer {
     }
 
     /**
-     * Returns an array of mistakes objects for given individual lcs array,using syntax_analyzer if needed
+     * Returns an array of mistake objects for given individual lcs array,using syntax_analyzer if needed
      */
     public function lcs_to_mistakes($lcs) {
         //Create an analyzer if can. If can use it's errors, otherwise generate own
