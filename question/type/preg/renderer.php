@@ -93,7 +93,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders part of the response that should be deleted*/
     public function render_deleted($str) {
         if ($str !== '') {
-            return html_writer::tag('del', htmlspecialchars($str));
+            return html_writer::tag('span', html_writer::tag('del', htmlspecialchars($str)), array('class' => $this->feedback_class(0)));
         }
         return '';
     }

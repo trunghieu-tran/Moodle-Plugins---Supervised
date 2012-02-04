@@ -222,8 +222,8 @@ class qtype_preg_matching_results {
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         if ($this->extendedmatch !== null) {
-            $this->extensionstart = 0;
-            $this->extendedmatch->extensionstart = 0;
+            $this->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND; - TODO - check NFA matcher about this
+            $this->extendedmatch->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND;
         } else {
             $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
@@ -270,6 +270,8 @@ class qtype_preg_matching_results {
                     break;
                 }
             }
+        } elseif ($this->full && $this->extensionstart === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $this->extensionstart = $this->index_first[0] + $this->length[0];
         }
 
         if (is_object($this->extendedmatch)) {
@@ -333,7 +335,7 @@ class qtype_preg_matching_results {
     }
 
     /**
-     * Returnstail after point where extension is started
+     * Returns tail after point where extension is started
      */
     public function tail_to_delete() {
         $wrongtail = '';
