@@ -8,6 +8,8 @@
  * @package questions
  */
  
+ defined('MOODLE_INTERNAL') || die();
+ 
 /**
  * Clones an array recursively. Used for lcs computing to clone array
  * @param object used object
