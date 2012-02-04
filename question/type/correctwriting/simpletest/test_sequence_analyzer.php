@@ -134,7 +134,10 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $rvalues=array("She");
        $lcs=get_test_lcs($types,$avalues,$types,$rvalues);
        //Check LCS props
-       $this->assertTrue( $lcs!=null );
+       
+       //This will pass only because array()==null in PHP
+       $this->assertTrue( $lcs==null );
+       
        $this->assertTrue( count($lcs)==0 );
     }
     

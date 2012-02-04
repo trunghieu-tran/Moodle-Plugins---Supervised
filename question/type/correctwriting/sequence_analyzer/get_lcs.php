@@ -53,13 +53,21 @@ function qtype_correctwriting_sequence_analyzer_compute_lcs($answer,$response) {
     //Fill an array of matches filling an lcs data
     $answer_count=qtype_correctwriting_sequence_analyzer_count($answer);
     $response_count=qtype_correctwriting_sequence_analyzer_count($response);
+    //Flag, that determines whether we found a match
+    $has_match=false;
     for ($i=0;$i<$answer_count;$i++) {
         $matches[$i]=array();
         for ($j=0;$j<$response_count;$j++) {
             if (qtype_correctwriting_sequence_analyzer_is_same($answer[$i],$response[$j])) {
               array_push($matches[$i],$j);
+              $has_match=true;
             }
         }
+    }
+    
+    //If matches are not found, stop right there
+    if ($has_match==false) {
+        return array();
     }
     //An array of found common subsequences, where a subsequence is
     //mixed data, where ["maxind"] - maximum index, which can be taken when appending 
