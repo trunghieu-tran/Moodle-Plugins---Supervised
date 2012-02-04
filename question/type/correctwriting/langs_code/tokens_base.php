@@ -135,6 +135,13 @@ class qtype_correctwriting_token_base {
             $result=$this->value==$other->value;
        return $result;
     }
+    
+    /**
+     * Returns a position of token
+     */
+    public function position() {
+        return $this->position;
+    }
 }
 
 /**
@@ -191,6 +198,19 @@ class qtype_correctwriting_node_position {
      * @param array $nodepositions positions of adjanced nodes
      */
     public function summ($nodepositions) {//Pashaev
+    }
+    
+    /**
+     * Returns a line, where node is located (starting line). Used. when producing sequence errors
+     */
+    public function line() {
+        return $this->linestart;
+    }
+    /**
+     * Returns a position, where node is located (starting column). Used. when producing sequence errors
+     */
+    public function column() {
+        return $this->colstart;
     }
 }
 ?>

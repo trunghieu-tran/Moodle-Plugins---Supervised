@@ -20,13 +20,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
+//Other necessary requires
 require_once($CFG->dirroot.'/question/type/correctwriting/syntax_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/get_lcs.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/lcs_to_mistakes.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_mistakes.php');
 
-//Other necessary requires
+
 
 class  qtype_correctwriting_sequence_analyzer {
 
