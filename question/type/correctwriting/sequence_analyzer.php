@@ -37,6 +37,8 @@ class  qtype_correctwriting_sequence_analyzer {
     protected $correctedresponse;//Array of response tokens where lexical errors are corrected
     protected $mistakes;//Array of mistake objects - student errors (structural errors)
 
+    private   $fitness;  //Fitness for response
+    private   $question; //Used question by analyzer
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
@@ -46,9 +48,21 @@ class  qtype_correctwriting_sequence_analyzer {
         $this->correctedresponse=$correctedresponse;
         //If question is set null we suppose this is a unit-test mode and don't do stuff
         if ($question!=null) {
-         $this->language=$language;
-         //Compute lcs
-         $lcs=$this->lcs();
+            $this->language=$language;
+            $this->question=$question;
+            if ($corrected_response==null) {
+                //Scan errors by syntax_analyzer
+                try {
+                    $analyzer=new qtype_correctwriting_syntax_analyzer($answer,$language,null,null);
+                    $this->errors=$analyzer->errors();
+                } catch () {
+                    //Currently do nothing. TODO: What to do in that case?
+                }
+                
+            } else {
+                //Scan for errors, computing lcs
+                
+            }
         }
         //TODO:
         //1. Compute LCS - Mamontov
