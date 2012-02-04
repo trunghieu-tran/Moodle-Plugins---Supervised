@@ -63,11 +63,11 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $this->assertTrue( $lcs!=null );
        $this->assertTrue( count($lcs)==1 );
        //Check LCS
-       $this->assertTrue( $lcs[0]==0);
-       $this->assertTrue( $lcs[1]==1);
-       $this->assertTrue( $lcs[2]==2);
-       $this->assertTrue( $lcs[3]==3);
-       
+       $this->assertTrue( count($lcs[0])==4);
+       $this->assertTrue( $lcs[0][0]==0);
+       $this->assertTrue( $lcs[0][1]==1);
+       $this->assertTrue( $lcs[0][2]==2);
+       $this->assertTrue( $lcs[0][3]==3);
     }
     //Tests lcs for replaced lexemes
     public function test_replaced_lexemes() {
@@ -80,9 +80,9 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $this->assertTrue( count($lcs)==1 );
        
        //Check LCS
+       $this->assertTrue( count($lcs[0])==2);
        $this->assertTrue( $lcs[0][2]==2 );
        $this->assertTrue( $lcs[0][3]==3 );
-       $this->assertTrue( count($lcs[0])==2);
     }
     
     //Tests lcs for removed lexemes
@@ -157,3 +157,5 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $this->assertTrue( $lcs[2][0]==4 );
     }
  }
+ 
+ ?>
