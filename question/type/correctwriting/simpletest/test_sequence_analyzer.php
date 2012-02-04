@@ -120,8 +120,11 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $this->assertTrue( $lcs[0][2]==2 );
        $this->assertTrue( $lcs[0][3]==3 );
        
-       $this->assertTrue( count($lcs[1])==1);
+       $this->assertTrue( count($lcs[1])==4);
        $this->assertTrue( $lcs[1][3]==4 );
+       $this->assertTrue( $lcs[1][2]==2 );
+       $this->assertTrue( $lcs[1][1]==1 );
+       $this->assertTrue( $lcs[1][0]==0 );
     }
     
     //Tests analyzer for empty lcs
@@ -144,17 +147,12 @@ function get_test_lcs($answer_types,$answer_values,$response_types,$response_val
        $lcs=get_test_lcs($atypes,$avalues,$rtypes,$rvalues);
        //Check LCS props
        $this->assertTrue( $lcs!=null );
-       $this->assertTrue( count($lcs)==3 );
+       $this->assertTrue( count($lcs)==1 );
        
-       $this->assertTrue( count($lcs[0])==2);
+       $this->assertTrue( count($lcs[0])==3);
+       $this->assertTrue( $lcs[0][3]==3 );
        $this->assertTrue( $lcs[0][2]==2 );
-       $this->assertTrue( $lcs[0][3]==3 );       
-
-       $this->assertTrue( count($lcs[1])==1);
-       $this->assertTrue( $lcs[1][0]==0 );
-      
-       $this->assertTrue( count($lcs[2])==1);
-       $this->assertTrue( $lcs[2][0]==4 );
+       $this->assertTrue( $lcs[0][0]==0 );       
     }
  }
  
