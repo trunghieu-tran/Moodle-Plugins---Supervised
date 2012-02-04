@@ -74,17 +74,22 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
-        if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
-            $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
-            $hint = $renderer->render_hinted($this->hinted_string($response['answer'], $matchresults));
-            if ($this->to_be_continued($matchresults)) {
-                $hint .= $renderer->render_tobecontinued();
+        if ($this->could_show_hint($matchresults)) {//hint could be computed
+            if (!$matchresults->full) {//there is a hint to show
+                $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+                $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
+                $hint = $renderer->render_hinted($this->hinted_string($matchresults));
+                if ($this->to_be_continued($matchresults)) {
+                    $hint .= $renderer->render_tobecontinued();
+                }
+                $wrongtail = '';
+                if (strlen($hint) == 0) {
+                    $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
+                }
+                return $wronghead.$correctpart.$hint.$wrongtail;
+            } else {//No hint, due to full match
+                return qtype_preg_hintmatchingpart::render_hint($renderer, $response);
             }
-            if (strlen($hint) == 0) {
-                $wrongtail = $renderer->render_deleted($this->tail_to_delete($response['answer'], $matchresults));
-            }
-            return $wronghead.$correctpart.$hint.$wrongtail;
         }
         return '';
     }
@@ -142,7 +147,9 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
      * Returns whether response allows for the hint to be done
      */
     public function hint_available($response = null) {
-        return parent::hint_available($response) && $this->question->usehint;//TODO check whether answer is correct
+        $bestfit = $this->question->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        return parent::hint_available($response) && $this->question->usehint && !$matchresults->full;
     }
 
     /** 
@@ -156,7 +163,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function render_hint($renderer, $response) {
         return $this->render_stringextension_hint($renderer, $response);
     }
-    public function hinted_string($response, $matchresults) {
+    public function hinted_string($matchresults) {
         //One-character hint
         $hintedstring = $matchresults->string_extension();
         if (strlen($hintedstring) > 0) {
@@ -167,7 +174,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
     public function to_be_continued($matchresults) {
         $hintedstring = $matchresults->string_extension();
-        return strlen($hintedstring) > 1 || $matchresults->extendedmatch->full === false;
+        return strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
     }
 
 }
