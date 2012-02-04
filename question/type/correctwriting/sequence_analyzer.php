@@ -39,6 +39,10 @@ class  qtype_correctwriting_sequence_analyzer {
 
     private   $fitness;  //Fitness for response
     private   $question; //Used question by analyzer
+    
+    private   $moved_mistake_weight;   //Moved lexeme error weight
+    private   $removed_mistake_weight; //Removed lexeme error weight
+    private   $added_mistake_weight;   //Added lexeme error weight
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
@@ -55,13 +59,13 @@ class  qtype_correctwriting_sequence_analyzer {
                 try {
                     $analyzer=new qtype_correctwriting_syntax_analyzer($answer,$language,null,null);
                     $this->errors=$analyzer->errors();
-                } catch () {
+                } catch (Exception $e) {
                     //Currently do nothing. TODO: What to do in that case?
                 }
                 
             } else {
                 //Scan for errors, computing lcs
-                
+                $this->scan_response_errors();
             }
         }
         //TODO:
@@ -73,10 +77,27 @@ class  qtype_correctwriting_sequence_analyzer {
         //4. Set array of mistakes accordingly - Mamontov
         //  - if syntax analyzer is able to return mistakes, use it's mistakes
         //  - otherwise generate own mistakes for individual tokens, using lcs_to_mistakes function
-        //NOTE: if response is null just check for errors using syntax analyzer- Mamontov
+        //NOTE: if response is null just check for errors using syntax analyzer- Mamontov (Done)
         //NOTE: if some stage create errors, stop processing right there
     }
-
+    /**
+     * Scans for an errors in response, computing lcs and 
+     * performing syntax analysis
+     */
+    private function scan_response_errors() {
+        //TODO: Extract these from question
+        $this->moved_mistake_weight=1;
+        $this->removed_mistake_weight=1;
+        $this->added_mistake_weight=1;
+        
+        $lcs=$this->lcs();
+        if (count($lcs)==0) {
+            //If no LCS found perform only one action
+        }
+        else {
+            //Otherwise scan all of lcs
+        }
+    }
     /**
      * Compute and return longest common subsequence (tokenwise) of answer and corrected response.
      *
@@ -101,6 +122,7 @@ class  qtype_correctwriting_sequence_analyzer {
     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
     */
     public function fitness() {
+        return $this->fitness;
     }
 
     public function mistakes() {
