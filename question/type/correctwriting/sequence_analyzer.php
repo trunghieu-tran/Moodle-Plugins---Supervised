@@ -37,12 +37,15 @@ class  qtype_correctwriting_sequence_analyzer {
     protected $correctedresponse;//Array of response tokens where lexical errors are corrected
     protected $mistakes;//Array of mistake objects - student errors (structural errors)
 
-    private   $fitness;  //Fitness for response
+    private   $fitness;            //Fitness for response
+    private   $temporary_fitness;  //A temporary fitness for computation
+    
     private   $question; //Used question by analyzer
     
     private   $moved_mistake_weight;   //Moved lexeme error weight
     private   $removed_mistake_weight; //Removed lexeme error weight
     private   $added_mistake_weight;   //Added lexeme error weight
+    
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
@@ -92,7 +95,7 @@ class  qtype_correctwriting_sequence_analyzer {
         
         $lcs=$this->lcs();
         if (count($lcs)==0) {
-            //If no LCS found perform only one action
+            //If no LCS found perform only one found in lcs
         }
         else {
             //Otherwise scan all of lcs
@@ -110,9 +113,52 @@ class  qtype_correctwriting_sequence_analyzer {
     }
 
     /**
-     * Returns an array of mistakes objects for given individual lcs array
+     * Returns an array of mistakes objects for given individual lcs array,using syntax_analyzer if needed
      */
     public function lcs_to_mistakes($lcs) {
+        //Create an analyzer if can. If can use it's errors, otherwise generate own
+        try {
+            $analyzer=new qtype_correctwriting_syntax_analyzer($this->answer,$this->language,
+                                                               $this->correctedresponse,
+                                                               $lcs);
+            $temporary_fitness=$analyzer->fitness();
+            return $analyzer->mistakes();
+        } catch (Exception $e) {
+            //If exception is thrown we should create own errors
+            $errors=qtype_correctwriting_sequence_analyzer_determine_mistakes($this->answer,
+                                                                              $this->response,
+                                                                              $lcs);
+            //Compute fitness-function
+            $temporary_fitness=$moved_mistake_weight*count($errors["moved"])
+                              +$removed_mistake_weight*count($errors["removed"])
+                              +$added_mistake_weight*count($errors["added"]);
+            $temporary_fitness=$temporary_fitness*-1;
+
+            //Creates an array of mistake objects
+            $result=array();
+            
+            //Create a factory
+            $f=new qtype_correctwriting_sequence_error_factory($this->language,$this->response,$this->answer);
+            
+            //Produce errors, when tokens are moved from their places
+            foreach($result["moved"] as $answer_index => $response_index) {
+               array_push($result,$f->create_moved_error($answer_index,$response_index));
+            }
+            
+            //Produce errors, when tokens are removed from their places
+            foreach($result["removed"] as $answer_index) {
+                array_push($result,$f->create_removing_error($answer_index));
+            }
+            
+            //Produce errors, when an odd tokens are added
+            foreach($result["added"] as $response_index) {
+                 array_push($result,$f->create_added_error($response_index));
+            }
+            
+            return $result;
+        }
+        
+        return null;
     }
 
     /**

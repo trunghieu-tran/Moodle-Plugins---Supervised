@@ -101,4 +101,54 @@ class qtype_correctwriting_lexeme_removing_mistake extends qtype_correctwriting_
     }
 }
 
+//A factory for creating all kinds of these errors
+class qtype_correctwriting_sequence_error_factory {
+    
+    private $language;  //Language object
+    private $answer;    //Array of answer tokens
+    private $response;  //Array of response tokens
+    
+    /**
+     * Constructs a factory for crating sequence errors
+     * @param language object used language
+     * @param answer   array  of answer tokens
+     * @param response array  of response tokens
+     */
+    public function __construct($language,$answer,$respone) {
+        $this->language=$language;
+        $this->answer=$answer;
+        $this->response=$response;
+    }
+    /**
+     * Creates moved lexeme error
+     * @param int answer_index index of lexeme from answer
+     * @param int response_index index of lexeme from response
+     */
+    public function create_moved_error($answer_index,$response_index) {
+        return qtype_correctwriting_lexeme_moving_mistake($this->language,$this->answer,
+                                                          $answer_index,
+                                                          $this->response,
+                                                          $response_index);
+    }
+    /**
+     *  Creates a removed lexeme error
+     *  @param int answer_index index of lexeme from answer
+     */
+    public function create_removing_error($answer_index) {
+        return qtype_correctwriting_lexeme_removing_mistake($this->language,
+                                                            $this->answer,
+                                                            $answer_index,
+                                                            $this->response);
+    }
+    /**
+     * Creates an odd lexeme error
+     * @param int response_index index of lexeme from response
+     */
+    public function create_added_error($response_index) {
+        return qtype_correctwriting_lexeme_adding_mistake($this->language,
+                                                          $this->answer,
+                                                          $this->response,
+                                                          $response_index);
+    }
+}
 ?>
