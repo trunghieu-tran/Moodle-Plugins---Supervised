@@ -70,7 +70,7 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of individual lcs arrays
      */
     public function lcs() {
-        return qtype_correctwriting_sequence_analyzer_compute_lcs($answer,$correctedresponse);
+        return qtype_correctwriting_sequence_analyzer_compute_lcs($this->answer,$this->correctedresponse);
     }
 
     /**
