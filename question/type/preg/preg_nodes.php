@@ -10,9 +10,9 @@
  * @package questions
  */
 
-/*
-* Class for plain lexems (that are not complete nodes), so they could contain position information too
-*/
+/**
+ * Class for plain lexems (that are not complete nodes), so they could contain position information too.
+ */
 class preg_lexem {
     //Subtype of lexem
     public $subtype;
@@ -27,9 +27,9 @@ class preg_lexem {
     }
 }
 
-/*
-* Class for plain subpattern lexems
-*/
+/**
+ * Class for plain subpattern lexems.
+ */
 class preg_lexem_subpatt extends preg_lexem {
     //Number of subpattern
     public $number;
@@ -41,8 +41,29 @@ class preg_lexem_subpatt extends preg_lexem {
 }
 
 /**
-* Generic node class
-*/
+ * The interface for objects that are passed to preg_leaf::match(), preg_leaf::consumes(), preg_leaf::next_character() as $matcherstateobj.
+ */
+interface qtype_preg_matcher_state {
+
+    /**
+     * Returns index of the first character matched for the given subpattern.
+     */
+    public function index_first($subpattern = 0);
+
+    /**
+     * Returns length of the given subpattern.
+     */
+    public function length($subpattern = 0);
+
+    /**
+     * Returns whether the given subpattern is captured.
+     */
+    public function is_subpattern_captured($subpattern);
+}
+
+/**
+ * Generic node class
+ */
 abstract class preg_node {
 
     //////Class constants used to define type
@@ -123,9 +144,10 @@ abstract class preg_leaf extends preg_node {
     //Assertions, merged into this node (preg_leaf_assert objects)
     public $mergedassertions = array();
 
-    /*
-    * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
-    */
+    /**
+     * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
+     * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
+     */
     public function consumes($matcherstateobj = null) {
         return 1;
     }
@@ -137,7 +159,7 @@ abstract class preg_leaf extends preg_node {
      * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
      * @param length an integer variable to store the length of the match
      * @param cs case sensitivity of the match
-     * @param matcherstateobj an object for representing matcher's state. It should have the following methods: index_first($num=0), length($num=0), is_subpattern_captured($num=0).
+     * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
      */
     public function match($str, $pos, &$length, $cs, $matcherstateobj = null)
     {
@@ -161,7 +183,7 @@ abstract class preg_leaf extends preg_node {
      * @param pos position of character in the string, if leaf is no-consuming than position before this character analyzed
      * @param length an integer variable to store the length of the match
      * @param cs case sensitivity of the match
-     * @param matcherstateobj an object for representing matcher's state. It should have the following methods: index_first($num=0), length($num=0), is_subpattern_captured($num=0).
+     * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
      */
     abstract protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null);
 
@@ -170,6 +192,7 @@ abstract class preg_leaf extends preg_node {
     * @param str string already matched
     * @param pos position of the last matched character in the string
     * @param length number of characters matched in case of partial backreference match
+    * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
     */
     abstract public function next_character($str, $pos, $length = 0, $matcherstateobj = null);
 
