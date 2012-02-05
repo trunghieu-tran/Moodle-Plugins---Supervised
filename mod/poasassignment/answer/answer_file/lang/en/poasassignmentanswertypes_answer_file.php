@@ -11,3 +11,7 @@ $string['submissionfilesamount'] = 'Files amount';
 $string['submissionfilesamount_help']='How much files can be uploaded as a submission';
 $string['submissionfilemaxsize'] = 'File size';
 $string['submissionfilemaxsize_help'] = 'Maximum size of file that can be uploaded as submission';
+$string['any'] = 'Any';
+$string['filescount'] = 'Files amount';
+$string['filestypes'] = 'Files types';
+$string['loadfiles'] = 'Load files';

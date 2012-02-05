@@ -48,6 +48,7 @@ class answer_file extends poasassignment_answer {
                            get_string('submissionfilesamount', 
                                       'poasassignmentanswertypes_answer_file'), 
                            array(
+                           		-1=>get_string('any', 'poasassignmentanswertypes_answer_file'),
                            		1=>1,
                            		2=>2,
                            		3=>3,
@@ -60,7 +61,8 @@ class answer_file extends poasassignment_answer {
                            		10=>10,
                            		15=>15,
                            		20=>20,
-                           		30=>30));
+                           		30=>30,
+                           		50=>50));
         $conditions = array('poasassignmentid' => $poasassignmentid,
                             'answerid' => $this->answerid,
                             'name' => 'fileamount');
@@ -189,12 +191,6 @@ class answer_file extends poasassignment_answer {
     }
     function show_answer_form($mform,$poasassignmentid) {
         global $DB;
-        /* $plugin_settings = $DB->get_records('poasassignment_ans_stngs',array('poasassignmentid'=>$poasassignmentid,
-                                                            'answerid'=>$this->answerid)); */
-        /* $mform = new answer_form_file();
-        $mform->display(); */
-        
-        //answer options
         $mform->addElement('header', 
                            'answerfileheader', 
                            get_string('pluginname','poasassignmentanswertypes_answer_file'));
@@ -222,9 +218,18 @@ class answer_file extends poasassignment_answer {
         if ($plugin_settings_types) {
         	$options['accepted_types'] = explode(',', $plugin_settings_types->value);
         }
+        if ($plugin_settings_amount->value == -1) {
+        	$mform->addElement(	'static', 
+        					   	'filescount', 
+        						get_string('filescount', 'poasassignmentanswertypes_answer_file'), 
+        						get_string('any', 'poasassignmentanswertypes_answer_file'));
+        }
+        else {
+        	$mform->addElement('static', 'filetypes', get_string('filestypes', 'poasassignmentanswertypes_answer_file'), $plugin_settings_types->value);
+        }
         $mform->addElement( 'filemanager', 
                             'answerfiles_filemanager', 
-                            get_string('pluginname','poasassignmentanswertypes_answer_file'),
+                            get_string('loadfiles','poasassignmentanswertypes_answer_file'),
 			        		null,
 			        		$options);
         $mform->closeHeaderBefore('answerfileheader');

@@ -105,7 +105,7 @@ class submissions_page extends abstract_page {
                 $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);                
             }
 		}
-		$submis = shorten_text($submis);
+		//$submis = shorten_text($submis);
         $row[]=$submis;
         
         // Add task status to the row
