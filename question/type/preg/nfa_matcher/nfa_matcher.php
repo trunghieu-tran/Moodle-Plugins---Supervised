@@ -239,12 +239,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $results = array();      // possible matches
         $fullmatchfound = false;
 
-        $this->matchresults->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-        $this->matchresults->invalidate_match($this->maxsubpatt);
-        $this->matchresults->length[0] = 0;
+        $result = new qtype_preg_matching_results();
+        $result->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $result->invalidate_match();
+
         // initial state with nothing captured
-        $initialstate = new qtype_preg_nfa_processing_state(false, $this->matchresults->index_first, $this->matchresults->length, $this->matchresults->index_first, $this->matchresults->length, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
-                                                            $this->automaton->start_state(), null, 0, $this->matchresults);
+        $initialstate = new qtype_preg_nfa_processing_state(false, $result->index_first, $result->length, $result->index_first, $result->length, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+                                                            $this->automaton->start_state(), null, 0, $result);
+        $initialstate->length[0] = 0;
         array_push($curstates, $initialstate);
         while (count($curstates) != 0) {
             $newstates = array();
@@ -336,16 +338,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             // replace curstates with newstates
             $curstates = $newstates;
         }
-        $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-        $result->invalidate_match();
+        // find the best result
         foreach ($results as $curresult) {
             if ($result->worse_than($curresult)) {
                 $result = $curresult;
+                $result->index_first[0] = $startpos;    // it's guaranteed that result->is_match() == true
             }
-        }
-        if ($result->is_match()) {
-            $result->index_first[0] = $startpos;
         }
         return new qtype_preg_matching_results($result->full, $result->index_first, $result->length, $result->left, $result->extendedmatch);
     }
