@@ -238,3 +238,4 @@ $string['of'] = 'из';
 $string['needgrade'] = 'ожидает(ют) оценивании';
 $string['canceltask'] = "Отменить задание";
 $string['randomfield'] = 'Случайное поле';
+$string['defaultintro'] = 'Экземпляр модуля индивидуальных заданий Poasassignment';
