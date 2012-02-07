@@ -222,8 +222,8 @@ class qtype_preg_matching_results {
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         if ($this->extendedmatch !== null) {
-            $this->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND; - TODO - check NFA matcher about this
-            $this->extendedmatch->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->extendedmatch->extensionstart = 0;//If there is no match, extension should start from the beginning of the string
         } else {
             $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
