@@ -368,12 +368,14 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     //Constants for the capabilities which could (or could not) be supported by matching engine
     //Partial matching (returning the index of last matched character)
     const PARTIAL_MATCHING = 0;
-    //Returning next possible character after partial match
+    //Returning next possible character(s) after partial match
     const CORRECT_ENDING = 1;
     //Returning the smallest number of characters that needed to complete partial match
     const CHARACTERS_LEFT = 2;
     //Subpattern capturing during matching
     const SUBPATTERN_CAPTURING = 3;
+    //Always return full match as the correct ending (if at all possible)
+    const CORRECT_ENDING_ALWAYS_FULL = 4;
 
     /**
     * Returns true for supported capabilities
