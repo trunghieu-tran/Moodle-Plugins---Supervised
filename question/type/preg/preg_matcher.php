@@ -222,11 +222,9 @@ class qtype_preg_matching_results implements qtype_preg_matcher_state {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
+        $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         if ($this->extendedmatch !== null) {
-            $this->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND; - TODO - check NFA matcher about this
-            $this->extendedmatch->extensionstart = 0;//qtype_preg_matching_results::NO_MATCH_FOUND;
-        } else {
-            $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->extendedmatch->extensionstart = 0;//If there is no match, extension should start from the beginning of the string
         }
     }
 
@@ -369,12 +367,14 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     //Constants for the capabilities which could (or could not) be supported by matching engine
     //Partial matching (returning the index of last matched character)
     const PARTIAL_MATCHING = 0;
-    //Returning next possible character after partial match
+    //Returning next possible character(s) after partial match
     const CORRECT_ENDING = 1;
     //Returning the smallest number of characters that needed to complete partial match
     const CHARACTERS_LEFT = 2;
     //Subpattern capturing during matching
     const SUBPATTERN_CAPTURING = 3;
+    //Always return full match as the correct ending (if at all possible)
+    const CORRECT_ENDING_ALWAYS_FULL = 4;
 
     /**
     * Returns true for supported capabilities
