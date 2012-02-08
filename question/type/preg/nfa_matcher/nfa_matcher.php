@@ -88,6 +88,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         case qtype_preg_matcher::CORRECT_ENDING:
         case qtype_preg_matcher::CHARACTERS_LEFT:
         case qtype_preg_matcher::SUBPATTERN_CAPTURING:
+        case qtype_preg_matcher::CORRECT_ENDING_ALWAYS_FULL:
             return true;
             break;
         }
