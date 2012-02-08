@@ -221,11 +221,9 @@ class qtype_preg_matching_results {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
+        $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         if ($this->extendedmatch !== null) {
-            $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->extendedmatch->extensionstart = 0;//If there is no match, extension should start from the beginning of the string
-        } else {
-            $this->extensionstart = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
     }
 
