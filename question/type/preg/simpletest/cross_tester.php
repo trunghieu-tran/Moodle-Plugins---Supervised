@@ -83,13 +83,29 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+/**
+ * Represents auxiliary class for extra checks. The extra checks are performed by cross-tester
+ * on tests with partial matching: cross-tester concatenates correct heading and returned ending, then
+ * checks this string for full match and some other equalities. The purpose of this class is only to
+ * return the name of the matcher to do this check.
+ */
+abstract class qtype_preg_cross_tests_extra_checker {
+
+    /**
+    * Returns name of the engine, implement it in child classes for each engine.
+    */
+    abstract public function engine_name();
+
+}
+
 class qtype_preg_cross_tester extends UnitTestCase {
 
     var $testdataobjects;    // objects with test data
+    var $extracheckobjects;  // objects for extra checks
 
     /**
-    * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be re-implemented in child classes.
-    */
+     * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be re-implemented in child classes.
+     */
     public function engine_name() {
         return '';
     }
@@ -97,16 +113,23 @@ class qtype_preg_cross_tester extends UnitTestCase {
     public function __construct() {
         global $CFG;
         $this->testdataobjects = array();
+        $this->extracheckobjects = array();
         if ($this->engine_name() === '') {
             return;
         }
-        // find all available test files
+        // Find all available test files.
         if ($dh = opendir($CFG->dirroot . '/question/type/preg/simpletest')) {
             while (($file = readdir($dh)) !== false) {
                 if (strpos($file, 'cross_tests_') === 0 && pathinfo($file, PATHINFO_EXTENSION) == 'php') {
                     require_once($CFG->dirroot . '/question/type/preg/simpletest/' . $file);
                     $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
-                    $this->testdataobjects[] = new $classname;
+                    if (strpos($file, 'cross_tests_extra_checker') === 0) {
+                        // Extra checker found.
+                        $this->extracheckobjects[] = new $classname;
+                    } else {
+                        // Test data object found.
+                        $this->testdataobjects[] = new $classname;
+                    }
                 }
             }
             closedir($dh);
