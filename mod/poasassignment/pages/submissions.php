@@ -84,13 +84,13 @@ class submissions_page extends abstract_page {
         // Add task info to the row
         $assignee = $DB->get_record('poasassignment_assignee', array('userid'=>$userid, 'poasassignmentid' => $this->poasassignment->id));        
         if($indtasks) {
-            if($assignee) {
-                $task=$DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
-                $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get'); 
+            if($assignee && $assignee->taskid != 0) {
+                $task = $DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
+                $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get');
                 $deleteurl = new moodle_url('warning.php',array('action'=>'canceltask','assigneeid'=>$assignee->id,'id'=>$this->cm->id),'d','post');
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('canceltask', 'poasassignment').'" title="'.get_string('canceltask', 'poasassignment').'" /></a>';
-                
+
                 $row[]=html_writer::link($taskurl,$task->name).' '.$deleteicon;
             }
             else
@@ -102,7 +102,7 @@ class submissions_page extends abstract_page {
             foreach($plugins as $plugin) {
                 require_once($plugin->path);
                 $poasassignmentplugin = new $plugin->name();
-                $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);                
+                $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);
             }
 		}
 		//$submis = shorten_text($submis);
@@ -115,7 +115,7 @@ class submissions_page extends abstract_page {
                 $row[]=get_string('taskcompleted','poasassignment');
             if(($indtasks && isset($assignee->taskid) && $assignee->taskid>0 && !$attempts)||(!$indtasks && !$attempts))
                 $row[]=get_string('taskinwork','poasassignment');
-            if($indtasks &&!isset($assignee->taskid))
+            if($indtasks && (!isset($assignee->taskid) || $assignee->taskid == 0))
                 $row[]=get_string('notask','poasassignment');
         }
         else {
