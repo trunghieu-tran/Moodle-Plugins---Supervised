@@ -178,7 +178,7 @@ class view_page extends abstract_page {
         $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
         $plugins=$poasmodel->get_plugins();
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
-        $latestattempt=$DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+        $latestattempt = $poasmodel->get_last_attempt($assignee->id);
         $attemptscount=count($attempts);
         // show latest graded feedback
         foreach($attempts as $attempt) {
