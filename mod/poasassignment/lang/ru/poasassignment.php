@@ -239,3 +239,5 @@ $string['needgrade'] = 'ожидает(ют) оценивании';
 $string['canceltask'] = "Отменить задание";
 $string['randomfield'] = 'Случайное поле';
 $string['defaultintro'] = 'Экземпляр модуля индивидуальных заданий Poasassignment';
+$string['currenttaskgiver'] = 'Текущая стратегия выдачи заданий';
+$string['taskgiversettings_help'] = 'Настройки стратегии выдачи заданий';

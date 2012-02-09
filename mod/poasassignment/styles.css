@@ -59,3 +59,7 @@ table.task-owners,
 	text-align: center !important;
 	vertical-align: middle !important;
 }
+
+a:link.hiddentask, a:visited.hiddentask {
+    color: #AAAAAA;
+}
