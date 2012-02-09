@@ -51,8 +51,7 @@ class view_page extends abstract_page {
         if ($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             echo $OUTPUT->heading(get_string('status','poasassignment'));
-                $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$USER->id,
-                                                                            'poasassignmentid'=>$this->poasassignment->id));
+            $assignee = $poasmodel->get_assignee($USER->id, $this->poasassignment->id);
                 if ($assignee && $assignee->taskid > 0) {
                     echo get_string('youhavetask', 'poasassignment');
                     echo ' ';
@@ -66,13 +65,6 @@ class view_page extends abstract_page {
 											  'get');
                     $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
-					echo 	'<br/>'.
-							get_string('taskwastakenat', 'poasassignment').
-							' - '.
-							userdate($assignee->timetaken).
-							' ('.
-							poasassignment_model::time_difference($assignee->timetaken).
-							')';
 							
                     // If user can cancel task - show cancel button
                     if($poasmodel->can_cancel_task($assignee->id, $this->context)) {
@@ -84,6 +76,15 @@ class view_page extends abstract_page {
                                 '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                         echo ' '.$deleteicon;
                     }
+
+                    echo 	'<br/>'.
+                        get_string('taskwastakenat', 'poasassignment').
+                        ' - '.
+                        userdate($assignee->timetaken).
+                        ' ('.
+                        poasassignment_model::time_difference($assignee->timetaken).
+                        ')';
+
                     if(!empty($this->poasassignment->deadline)) {
                         echo '<br><br>';
                         echo '<b>' .
@@ -169,11 +170,10 @@ class view_page extends abstract_page {
 
         global $OUTPUT,$DB,$USER;
 
-        if(!$assignee=$DB->get_record('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id,
-                                                                            'userid'=>$USER->id)))
-            return;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
-
+        if (!$assignee = $poasmodel->get_assignee($USER->id, $this->poasassignment->id)) {
+            return;
+        }
 
         $attempts=array_reverse($DB->get_records('poasassignment_attempts',array('assigneeid'=>$assignee->id),'attemptnumber'));
         $plugins=$poasmodel->get_plugins();

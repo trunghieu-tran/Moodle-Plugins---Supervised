@@ -135,9 +135,7 @@ class poasassignment_model {
         //echo "now i store instance $id";
     }
     public function cash_assignee_by_user_id($userid) {
-        global $DB;
-        $this->assignee=$DB->get_record('poasassignment_assignee',
-                                        array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id));
+        $this->assignee = $this->get_assignee($userid, $this->poasassignment->id);
         if(!$this->assignee) {
             $this->assignee->id = 0;
         }
@@ -1086,6 +1084,16 @@ class poasassignment_model {
         $attempt->attemptnumber = $attemptscount + 1;
         return $DB->insert_record('poasassignment_attempts', $attempt);
     }
+
+    /**
+     * Get assignee's record. If there is not record - create it.
+     * Method always returns last user's assignee record
+     *
+     * @access public
+     * @param int $userid user id
+     * @param int $poasassignmentid instance id
+     * @return object assignee record
+     */
     public function get_assignee($userid, $poasassignmentid = null) {
         global $DB;
         if ($poasassignmentid == null) {
@@ -1093,11 +1101,19 @@ class poasassignment_model {
         }
         if(!$DB->record_exists('poasassignment_assignee',
                 array('userid' => $userid, 'poasassignmentid' => $poasassignmentid))) {
-			$rec = $this->create_assignee($userid);
+            $rec = $this->create_assignee($userid);
         }
         else {
-            $rec = $DB->get_record('poasassignment_assignee',
-                    array('userid' => $userid, 'poasassignmentid' => $poasassignmentid));
+            $sql = 'SELECT * from {poasassignment_assignee}
+                    WHERE userid = ? AND poasassignmentid = ?
+                    ORDER BY id DESC LIMIT 1';
+            $recs = $DB->get_records_sql($sql, array($userid, $poasassignmentid));
+            if (count($recs) == 1) {
+                $rec = array_pop($recs);
+            }
+            else {
+                $rec = null;
+            }
         }
         $this->assignee->id = $rec->id;
 
@@ -1238,17 +1254,39 @@ class poasassignment_model {
         }
     }
 
+    /**
+     * Cancel assignee's task
+     *
+     * Creates new assignee record for user, old record becomes "history"
+     * @param int $assigneeid assignee's id
+     */
     function cancel_task($assigneeid) {
         global $DB;
-        $rec = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
-        $rec->taskid = 0;
-        $DB->update_record('poasassignment_assignee', $rec);
+        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
+        $newassignee = new stdClass();
+        $newassignee->userid = $assignee->userid;
+        $newassignee->timetaken = 0;
+        $newassignee->taskid = 0;
+        $newassignee->poasassignmentid = $assignee->poasassignmentid;
+
+        $DB->insert_record('poasassignment_assignee', $newassignee);
     }
 
-    function can_cancel_task($assigneeid, $context) {
+    /**
+     * Checks ability to cancel assignee's task
+     *
+     * Assignee can cancel own task if SECOND_CHOICE option is enabled
+     * and he has only one task in "history"
+     *
+     * @access public
+     * @param int $assigneeid assignee's id
+     * @param object $context module context
+     * @return boolean true, if user can cancel task or false
+     */
+    public function can_cancel_task($assigneeid, $context) {
         global $DB;
-        $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
-
+        $assignee = $DB->get_record('poasassignment_assignee',
+            array('id' => $assigneeid), 'userid, poasassignmentid');
         $has_cap = has_capability('mod/poasassignment:managetasks', $context);
         $model = poasassignment_model::get_instance();
         $has_ability = ($this->poasassignment->flags & SECOND_CHOICE)
@@ -1991,60 +2029,60 @@ class poasassignment_model {
 		return $string;
 	}
 	
-	/** 
-	 * Get row for flexible assignees row (used while confirming updating tasks, 
-	 * fields, criterions)
-	 * 
-	 * @access public
-	 * @param object $assignee assignee record
-	 * @return array assignee
-	 */
-	public function get_flexible_table_assignees_row($assignee) {
-		$row = array();
-		
-		// Get student username and profile link
-		$userurl = new moodle_url('/user/profile.php', array('id' => $assignee->userid));
-		$row[] = html_writer::link($userurl, fullname($assignee->userinfo, true));
-		
-		// TODO Get student's groups
-		$row[] = '?';
-		
-		// Get information about assignee's attempts and grades
-		if ($attempt = $this->get_last_attempt($assignee->id)) {
-			$row[] = get_string('hasattempts', 'poasassignment');
-		
-			// If assignee has an attempt(s), show information about his grade
-			if ($attempt->rating != null) {
-				// Show actual grade with penalty
-				$row[] =
-					get_string('hasgrade', 'poasassignment').
-					' ('.
-					$this->show_rating_methematics($attempt->rating, $this->get_penalty($attempt->id)).
-					')';
-			}
-			else {
-				// Looks like assignee has no grade or outdated grade
-				if ($lastgraded = $this->get_last_graded_attempt($assignee->id)) {
-					$row[] =
-						get_string('hasoutdatedgrade', 'poasassignment').
-						' ('.
-						$this->show_rating_methematics($lastgraded->rating, $this->get_penalty($lastgraded->id)).
-						')';
-				}
-				else {
-					// There is no graded attempts, so show 'No grade'
-					$row[] = get_string('nograde', 'poasassignment');
-				}
-			}
-		}
-		else {
-			// No attepts => no grade
-			$row[] = get_string('hasnoattempts', 'poasassignment');
-			$row[] = get_string('nograde', 'poasassignment');
-		}		
-		
-		return $row;
-	}
+    /**
+     * Get row for flexible assignees row (used while confirming updating tasks,
+     * fields, criterions)
+     *
+     * @access public
+     * @param object $assignee assignee record
+     * @return array assignee
+     */
+    public function get_flexible_table_assignees_row($assignee) {
+        $row = array();
+
+        // Get student username and profile link
+        $userurl = new moodle_url('/user/profile.php', array('id' => $assignee->userid));
+        $row[] = html_writer::link($userurl, fullname($assignee->userinfo, true));
+
+        // TODO Get student's groups
+        $row[] = '?';
+
+        // Get information about assignee's attempts and grades
+        if ($attempt = $this->get_last_attempt($assignee->id)) {
+            $row[] = get_string('hasattempts', 'poasassignment');
+
+            // If assignee has an attempt(s), show information about his grade
+            if ($attempt->rating != null) {
+                // Show actual grade with penalty
+                $row[] =
+                    get_string('hasgrade', 'poasassignment').
+                    ' ('.
+                    $this->show_rating_methematics($attempt->rating, $this->get_penalty($attempt->id)).
+                    ')';
+            }
+            else {
+                // Looks like assignee has no grade or outdated grade
+                if ($lastgraded = $this->get_last_graded_attempt($assignee->id)) {
+                    $row[] =
+                        get_string('hasoutdatedgrade', 'poasassignment').
+                        ' ('.
+                        $this->show_rating_methematics($lastgraded->rating, $this->get_penalty($lastgraded->id)).
+                        ')';
+                }
+                else {
+                    // There is no graded attempts, so show 'No grade'
+                    $row[] = get_string('nograde', 'poasassignment');
+                }
+            }
+        }
+        else {
+            // No attepts => no grade
+            $row[] = get_string('hasnoattempts', 'poasassignment');
+            $row[] = get_string('nograde', 'poasassignment');
+        }
+
+        return $row;
+    }
 
     /**
      * Count assignee's attempts
@@ -2058,6 +2096,13 @@ class poasassignment_model {
         return $DB->count_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
     }
 
+    /**
+     * Count assignee's tasks
+     *
+     * @access public
+     * @param object $assignee assignee record
+     * @return int
+     */
     public function count_assignees_tasks($assignee) {
         global $DB;
         return $DB->count_records_sql(
@@ -2065,7 +2110,7 @@ class poasassignment_model {
             FROM {poasassignment_assignee}
             WHERE userid = ?
             AND poasassignmentid = ?
-            AND task <> 0',
+            AND taskid <> 0',
             array($assignee->userid, $assignee->poasassignmentid));
     }
 }
