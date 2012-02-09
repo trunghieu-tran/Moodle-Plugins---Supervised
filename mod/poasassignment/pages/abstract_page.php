@@ -79,7 +79,8 @@ class assignee_choose_form extends moodleform {
         $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
         $recs = $DB->get_records('poasassignment_assignee',array('poasassignmentid' => $poasassignmentid));
         foreach ($recs as $rec) {
-            if($rec->lastattemptid == 0) {
+            $lastattemptid = poasassignment_model::get_instance()->get_last_attempt_id($rec->id);
+            if ($lastattemptid == null || $lastattemptid == 0) {
                 unset($recs[$rec->id]);
                 continue;
             }

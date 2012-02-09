@@ -377,7 +377,7 @@ class poasassignment_model {
         if (count($files) >= 1) {
             $file = array_pop($files);
         }
-        $urls;
+        $urls = array();
         $urls[]=$this->view_poasassignment_file($dir,$urls);
     }
     function view_poasassignment_file($dir,$urls) {
@@ -506,7 +506,7 @@ class poasassignment_model {
         $DB->delete_records('poasassignment_task_values',array('taskid'=>$taskid));
         
         // Delete task from students
-        $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), '', 'id, taskid, taskindex');
+        $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), '', 'id, taskid');
         $DB->delete_records('poasassignment_assignee', array('taskid' => $taskid));
         
         //TODO удалять попытки и оценки студента по этому заданию
@@ -1086,15 +1086,18 @@ class poasassignment_model {
         $attempt->attemptnumber = $attemptscount + 1;
         return $DB->insert_record('poasassignment_attempts', $attempt);
     }
-    public function get_assignee($userid) {
+    public function get_assignee($userid, $poasassignmentid = null) {
         global $DB;
+        if ($poasassignmentid == null) {
+            $poasassignmentid = $this->poasassignment->id;
+        }
         if(!$DB->record_exists('poasassignment_assignee',
-                array('userid' => $userid, 'poasassignmentid' => $this->poasassignment->id))) {
+                array('userid' => $userid, 'poasassignmentid' => $poasassignmentid))) {
 			$rec = $this->create_assignee($userid);
         }
         else {
             $rec = $DB->get_record('poasassignment_assignee',
-                    array('userid' => $userid, 'poasassignmentid' => $this->poasassignment->id));
+                    array('userid' => $userid, 'poasassignmentid' => $poasassignmentid));
         }
         $this->assignee->id = $rec->id;
 
@@ -1114,7 +1117,6 @@ class poasassignment_model {
     	$rec->userid = $userid;
     	$rec->poasassignmentid = $this->poasassignment->id;
     	$rec->taskid = 0;
-    	$rec->taskindex = 0;
     	$rec->timetaken = 0;
     	$rec->id = $DB->insert_record('poasassignment_assignee', $rec);
     	return $rec; 
@@ -1216,7 +1218,6 @@ class poasassignment_model {
         global $DB;
         $rec = $this->get_assignee($userid);
         $rec->taskid = $taskid;
-        $rec->taskindex++;        
         $rec->timetaken = time();
         $DB->update_record('poasassignment_assignee', $rec);
         $this->assignee->id = $rec->id;
@@ -1241,7 +1242,6 @@ class poasassignment_model {
         global $DB;
         $rec = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
         $rec->taskid = 0;
-        $rec->lastattemptid = 0;
         $DB->update_record('poasassignment_assignee', $rec);
     }
 
@@ -1250,7 +1250,9 @@ class poasassignment_model {
         $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
 
         $has_cap = has_capability('mod/poasassignment:managetasks', $context);
-        $has_ability = ($this->poasassignment->flags & SECOND_CHOICE) && ($assignee->taskindex < 2);
+        $model = poasassignment_model::get_instance();
+        $has_ability = ($this->poasassignment->flags & SECOND_CHOICE)
+            && ($model->count_assignees_tasks($assignee) < 2);
         return ($has_cap || $has_ability);
     }
 
@@ -1461,7 +1463,7 @@ class poasassignment_model {
 
         $grade = new stdClass();
         $grade->userid = $assignee->userid;
-        $attempt = $DB->get_record('poasassignment_attempts',array('id'=>$assignee->lastattemptid));
+        $attempt = $this->get_last_attempt($assignee->id);
         if ($attempt) {
             $grade->rawgrade = $attempt->rating - $this->get_penalty($attempt->id);
             $grade->dategraded = $attempt->ratingdate;
@@ -1607,7 +1609,10 @@ class poasassignment_model {
     }
     
     /**
-     * Проверить право пользователя на просмотр задания (проверка даты открытия)
+     * Check available date
+     *
+     * @access public
+     * @return boolean true, if module is opened or available date is not set
      */
     public function is_opened() {
     	if ($this->get_poasassignment()->availabledate != 0) {
@@ -1619,18 +1624,23 @@ class poasassignment_model {
     	}
     	return true;
     }
+
+    /**
+     * Check choice date
+     *
+     * @access public
+     * @return string error message
+     */
 	public function check_dates() {
-		// Проверка параметров, связанных с датой выбора задания
 		if (has_capability('mod/poasassignment:havetask', $this->get_context())
 			&& $this->get_poasassignment()->choicedate != 0) {
 			if (time() > $this->get_poasassignment()->choicedate) {
 				global $USER;
 				$assignee = $this->get_assignee($USER->id);
-				// Если у студента нет задания
+				// If assignee hasn't task
 				if ($assignee->taskid == 0) {
-					// Если требуется выдать случайное
 					if ($this->has_flag(RANDOM_TASKS_AFTER_CHOICEDATE)) {
-						// Попробовать выдать задание
+						// Try to get random task
 						$taskid = poasassignment_model::get_random_task_id($this->get_available_tasks($USER->id));
 						if ($taskid == -1 ) {
 							return 'errormodulehavenotasktogiveyou';
@@ -1638,14 +1648,23 @@ class poasassignment_model {
 						$this->bind_task_to_assignee($USER->id, $taskid);
 					}
 					else {
-						// Вернуть ошибку
+						// Return error
 						return 'erroryouhadtochoosetask';
 					}
 				}
 			}
 		}
 	}
-	static function get_random_task_id($tasks) {
+
+    /**
+     * Get random task from array of tasks
+     *
+     * @access public
+     * @static
+     * @param array $tasks tasks records
+     * @return int id of selected task or -1
+     */
+	static public function get_random_task_id($tasks) {
 		$tasksarray = array();
 		foreach($tasks as $task)
 			$tasksarray[] = $task->id;
@@ -1677,6 +1696,25 @@ class poasassignment_model {
 		$rec = $DB->get_record_sql("SELECT id, attemptdate, rating FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY id DESC LIMIT 1;", array($assigneeid));
 		return $rec;
 	}
+
+    /**
+     * Get last assignee's attempt id
+     *
+     * @access public
+     * @param int $assigneeid assignee id
+     * @return int last attempt's id or null
+     */
+    public function get_last_attempt_id($assigneeid) {
+        global $DB;
+        $rec = $DB->get_record_sql("SELECT id FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY id DESC LIMIT 1;", array($assigneeid));
+        if ($rec && isset($rec->id)) {
+            return $rec->id;
+        }
+        else {
+            return null;
+        }
+    }
+
 	/**
 	 * Get last assignee's attempt with grade
 	 * 
@@ -1830,10 +1868,9 @@ class poasassignment_model {
     	$assignee = $DB->get_record(
     			'poasassignment_assignee', 
     			array('id' => $assigneeid), 
-    			'id, taskid, finalized, timetaken, lastattemptid, taskindex, userid'
+    			'id, taskid, finalized, timetaken, userid'
     	);
-    	$assignee->finalized = null;    	
-    	$assignee->lastattemptid = null;
+    	$assignee->finalized = null;
     	$DB->update_record('poasassignment_assignee', $assignee);
     	
     	// Delete random task values for the assignee
@@ -2008,4 +2045,27 @@ class poasassignment_model {
 		
 		return $row;
 	}
+
+    /**
+     * Count assignee's attempts
+     *
+     * @access public
+     * @param int $assigneeid assignee's id
+     * @return int amount of records
+     */
+    public function count_attempts($assigneeid) {
+        global $DB;
+        return $DB->count_records('poasassignment_attempts', array('assigneeid' => $assigneeid));
+    }
+
+    public function count_assignees_tasks($assignee) {
+        global $DB;
+        return $DB->count_records_sql(
+            'SELECT COUNT(*) as cnt
+            FROM {poasassignment_assignee}
+            WHERE userid = ?
+            AND poasassignmentid = ?
+            AND task <> 0',
+            array($assignee->userid, $assignee->poasassignmentid));
+    }
 }

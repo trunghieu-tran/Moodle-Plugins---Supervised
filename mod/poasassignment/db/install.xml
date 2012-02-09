@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/poasassignment/db" VERSION="20120118" COMMENT="XMLDB file for Moodle mod/poasassignment"
+<XMLDB PATH="mod/poasassignment/db" VERSION="20120209" COMMENT="XMLDB file for Moodle mod/poasassignment"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -114,22 +114,19 @@
         <KEY NAME="graderid" TYPE="foreign" FIELDS="graderid" REFTABLE="poasassignment_graders" REFFIELDS="id" PREVIOUS="poasassignmentid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="poasassignment_assignee" COMMENT="Assignee = user + attempts + task" PREVIOUS="poasassignment_criterions" NEXT="poasassignment_submissions">
+    <TABLE NAME="poasassignment_assignee" COMMENT="Connects Moodle user with poasassignment task and attempts" PREVIOUS="poasassignment_criterions" NEXT="poasassignment_submissions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="timetaken"/>
         <FIELD NAME="timetaken" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="poasassignmentid"/>
         <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timetaken" NEXT="taskid"/>
         <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="finalized"/>
-        <FIELD NAME="finalized" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid" NEXT="lastattemptid"/>
-        <FIELD NAME="lastattemptid" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="finalized" NEXT="taskindex"/>
-        <FIELD NAME="taskindex" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="lastattemptid"/>
+        <FIELD NAME="finalized" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="taskid"/>
         <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="poasassignment_tasks" REFFIELDS="id" PREVIOUS="primary" NEXT="poasassignmentid"/>
-        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="taskid" NEXT="lastattemptid"/>
-        <KEY NAME="lastattemptid" TYPE="foreign" FIELDS="lastattemptid" REFTABLE="poasassignment_attempts" REFFIELDS="id" PREVIOUS="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="taskid"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="poasassignment_submissions" COMMENT="Saves submission data" PREVIOUS="poasassignment_assignee" NEXT="poasassignment_rating_values">

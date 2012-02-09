@@ -7,16 +7,16 @@ class graderresults_page extends abstract_page {
     private $assigneeid;
     function graderresults_page() {
         global $USER, $DB;
+        $model = poasassignment_model::get_instance();
         $this->attemptid = optional_param('attemptid', 0, PARAM_INT);
         $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
         if ($this->attemptid == 0) {
-            $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
-            if($rec = $DB->get_record('poasassignment_assignee', array('userid' => $USER->id, 'poasassignmentid' => $poasassignmentid), 'lastattemptid')) {
-                $this->attemptid = $rec->lastattemptid;
+            if ($assignee = $model->get_assignee($USER->id)) {
+                $this->attemptid = $model->get_last_attempt_id($assignee->id);
             }
         }
         if ($this->assigneeid == 0) {
-            $this->assigneeid = poasassignment_model::get_instance()->get_assigneeid();
+            $this->assigneeid = $model->get_assigneeid();
         }
     }
     

@@ -45,8 +45,7 @@ class backup_poasassignment_activity_structure_step extends backup_activity_stru
         //userinfo here
         $assignees = new backup_nested_element('assignees');
         $assignee = new backup_nested_element('assignee', array('id'), array(
-                'userid', 'teacher', 'timemarked', 'taskid', 'finalized', 
-                'lastattemptid', 'taskindex'));
+                'userid', 'teacher', 'timemarked', 'taskid', 'finalized'));
         
         $randomtaskvalues = new backup_nested_element('randomtaskvalues');
         $randomtaskvalue = new backup_nested_element('randomtaskvalue', array('id'), array(

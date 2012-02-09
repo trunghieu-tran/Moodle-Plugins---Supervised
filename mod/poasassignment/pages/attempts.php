@@ -13,8 +13,9 @@ class attempts_page extends abstract_page {
     
     function has_satisfying_parameters() {
         global $DB,$USER;
-        $context = poasassignment_model::get_instance()->get_context();
-        $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+        $model = poasassignment_model::get_instance();
+        $context = $model->get_context();
+        $poasassignmentid = $model->get_poasassignment()->id;
         if ($this->assigneeid > 0) {
             if (! $this->assignee = $DB->get_record('poasassignment_assignee', array('id' => $this->assigneeid))) {
                 $this->lasterror = 'errornonexistentassignee';
@@ -22,7 +23,7 @@ class attempts_page extends abstract_page {
             }
         }
         else {
-            $poasassignmentid = poasassignment_model::get_instance()->get_poasassignment()->id;
+            $poasassignmentid = $model->get_poasassignment()->id;
             $this->assignee = $DB->get_record('poasassignment_assignee', 
                                               array('userid' => $USER->id,
                                                     'poasassignmentid' => $poasassignmentid));
@@ -32,7 +33,7 @@ class attempts_page extends abstract_page {
             return true;
         }
         // Page exists, if assignee has attempts
-        if ($this->assignee && $this->assignee->lastattemptid > 0) {
+        if ($this->assignee && $model->count_attempts($this->assignee->id) > 0) {
             // Page content is available if assignee wants to see his own attempts
             // or teacher wants to see them
             if($this->assignee->userid == $USER->id) {
@@ -75,7 +76,7 @@ class attempts_page extends abstract_page {
                                                        'attemptnumber'));
             $plugins = $poasmodel->get_plugins();
             $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid'=>$poasassignmentid));
-            $latestattempt = $DB->get_record('poasassignment_attempts', array('id'=>$this->assignee->lastattemptid));
+            $latestattempt = $poasmodel->get_last_attempt($this->assignee->id);
             $attemptscount = count($attempts);  
             foreach($attempts as $attempt) {
 				echo $OUTPUT->box_start();
