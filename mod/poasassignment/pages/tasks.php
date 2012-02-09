@@ -106,12 +106,22 @@ class tasks_page extends abstract_page {
 
             // Adding view icon
             $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
-            $viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('view','poasassignment').
-                            '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>';
-            $namecolumn=$task->name.' '.$viewicon;
+            //$viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('view','poasassignment').
+            //                '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>';
+            //$namecolumn=$task->name.' '.$viewicon;
 
-            if ($task->hidden)
-                $namecolumn='<font color="#AAAAAA">' . $namecolumn;
+            if ($task->hidden) {
+                $namecolumn = html_writer::link(
+                    $viewurl,
+                    $task->name,
+                    array('title' => get_string('view'), 'class' => 'hiddentask'));
+            }
+            else {
+                $namecolumn = html_writer::link(
+                    $viewurl,
+                    $task->name,
+                    array('title' => get_string('view')));
+            }
 
             $namecolumn.=$taskgiver->get_task_extra_string($task->id,$this->cm->id);
 
