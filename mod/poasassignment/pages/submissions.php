@@ -82,7 +82,7 @@ class submissions_page extends abstract_page {
         $row[]=html_writer::link($userurl,fullname($user, true));
         
         // Add task info to the row
-        $assignee = $DB->get_record('poasassignment_assignee', array('userid'=>$userid, 'poasassignmentid' => $this->poasassignment->id));        
+        $assignee = $poasmodel->get_assignee($userid, $this->poasassignment->id);
         if($indtasks) {
             if($assignee && $assignee->taskid != 0) {
                 $task = $DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));

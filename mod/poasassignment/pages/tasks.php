@@ -19,7 +19,8 @@ class tasks_page extends abstract_page {
             $this->lasterror='errorindtaskmodeisdisabled';
             return false;
         }
-        if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$USER->id, 'poasassignmentid'=>$this->poasassignment->id)))
+        $model = poasassignment_model::get_instance();
+        if ($assignee = $model->get_assignee($USER->id,$this->poasassignment->id)){
             if (isset($assignee->taskid) && $assignee->taskid > 0) {
                 if (!has_capability('mod/poasassignment:managetasks',
                         get_context_instance(CONTEXT_MODULE,$this->cm->id))) {
@@ -27,7 +28,7 @@ class tasks_page extends abstract_page {
                     return false;
                 }
             }
-
+        }
         return true;
     }
     function view() {
@@ -104,12 +105,7 @@ class tasks_page extends abstract_page {
                 continue;
             $row = array();
 
-            // Adding view icon
             $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
-            //$viewicon = '<a href="'.$viewurl.'">'.'<img src="'.$OUTPUT->pix_url('view','poasassignment').
-            //                '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('view').'" /></a>';
-            //$namecolumn=$task->name.' '.$viewicon;
-
             if ($task->hidden) {
                 $namecolumn = html_writer::link(
                     $viewurl,
@@ -145,7 +141,7 @@ class tasks_page extends abstract_page {
                             '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
-                 if ($task->hidden) {
+                if ($task->hidden) {
                     $showurl = new moodle_url('view.php',
                                               array('taskid' => $task->id,
                                                     'mode' => SHOW_MODE,
@@ -155,7 +151,7 @@ class tasks_page extends abstract_page {
                                               'get');
                     $showicon = '<a href="'.$showurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
                             '" class="iconsmall" alt="'.get_string('show').'" title="'.get_string('show').'" /></a>';
-                    $namecolumn .= $showicon;
+                    $namecolumn .= '&nbsp;' . $showicon;
                 }
                 else {
                     $hideurl = new moodle_url('view.php',
@@ -167,9 +163,9 @@ class tasks_page extends abstract_page {
                                               'get');
                     $hideicon = '<a href="'.$hideurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
                             '" class="iconsmall" alt="'.get_string('hide').'" title="'.get_string('hide').'" /></a>';
-                    $namecolumn .= $hideicon;
+                    $namecolumn .= '&nbsp;' . $hideicon;
                 }
-                $namecolumn.=' '.$updateicon.' '.$deleteicon;
+                $namecolumn.='&nbsp;'.$updateicon.'&nbsp;'.$deleteicon;
 
             }
             if ($task->hidden)

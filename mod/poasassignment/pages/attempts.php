@@ -24,9 +24,7 @@ class attempts_page extends abstract_page {
         }
         else {
             $poasassignmentid = $model->get_poasassignment()->id;
-            $this->assignee = $DB->get_record('poasassignment_assignee', 
-                                              array('userid' => $USER->id,
-                                                    'poasassignmentid' => $poasassignmentid));
+            $this->assignee = $model->get_assignee($USER->id, $poasassignmentid);
         }
         // Page exists always for teachers
         if (has_capability('mod/poasassignment:grade', $context) || has_capability('mod/poasassignment:finalgrades', $context)) {
