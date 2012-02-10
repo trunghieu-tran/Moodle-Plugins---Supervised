@@ -109,12 +109,11 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * returns the minimal number of characters left for matching
-     * @param str - string being matched
      * @param startpos - start position of matching
      * @param laststate - the last state of the automaton, an object of qtype_preg_nfa_processing_state
      * @return - number of characters left for matching
      */
-    public function determine_characters_left($str, $startpos, $laststate) {
+    public function determine_characters_left($startpos, $laststate) {
         $curstates = array();    // states which the automaton is in
         $skipstates = array();
         $result = null;
@@ -136,7 +135,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $newstate = new qtype_preg_nfa_processing_state(false, $laststate->index_first, $laststate->length, $laststate->index_first_new, $laststate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                             $laststate->backref_transition->to, null, 0, $laststate);
             // re-write the string with correct characters
-            $newstate->concatenate_char_to_str($laststate->backref_transition->pregleaf->next_character($str, $startpos + $laststate->length[0], $laststate->backref_match_len, $laststate));
+            $newstate->concatenate_char_to_str($laststate->backref_transition->pregleaf->next_character($newstate->str(), $startpos + $laststate->length[0], $laststate->backref_match_len, $laststate));
             $newstate->length[0] += $length;
             array_push($curstates, $newstate);
         }
@@ -183,7 +182,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                                                         $transition->to, null, 0, $curstate);
                         // generate a next character
                         if ($length > 0) {
-                            $newstate->concatenate_char_to_str($transition->pregleaf->next_character($str, $startpos + $newstate->length[0], 0, $curstate));
+                            $newstate->concatenate_char_to_str($transition->pregleaf->next_character($newstate->str(), $startpos + $newstate->length[0], 0, $curstate));
                         }
                         $newstate->length[0] += $length;
 
@@ -325,7 +324,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $pathstart = clone $curstate;
                         $pathstart->set_source_info(substr($curstate->str(), 0, $startpos + $curstate->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
 
-                        $path = $this->determine_characters_left($str, $startpos, $pathstart);
+                        $path = $this->determine_characters_left($startpos, $pathstart);
                         if ($path !== null) {
                             $curstate->left = $path->length[0] - $curstate->length[0];
                             $curstate->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
