@@ -1263,10 +1263,12 @@ class poasassignment_model {
     function cancel_task($assigneeid) {
         global $DB;
 
+        // Set "cancelled" = 1 for old assignee record
         $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
         $assignee->cancelled = 1;
         $DB->update_record('poasassignment_assignee', $assignee);
 
+        // Create new assignee record
         $newassignee = new stdClass();
         $newassignee->userid = $assignee->userid;
         $newassignee->timetaken = 0;
@@ -1274,6 +1276,23 @@ class poasassignment_model {
         $newassignee->poasassignmentid = $assignee->poasassignmentid;
 
         $DB->insert_record('poasassignment_assignee', $newassignee);
+
+        // Delete grade from gradebook
+        global $CFG;
+        require_once($CFG->libdir.'/gradelib.php');
+        $record = new stdClass();
+        $record->userid = $assignee->userid;
+        $record->rawgrade = null;
+        grade_update(
+            'mod/poasassignment',
+            $this->poasassignment->course,
+            'mod',
+            'poasassignment',
+            $this->poasassignment->id,
+            0,
+            $record,
+            null
+        );
     }
 
     /**
@@ -1735,7 +1754,7 @@ class poasassignment_model {
      */
 	public function get_last_attempt($assigneeid) {
 		global $DB;
-		$rec = $DB->get_record_sql("SELECT id, attemptdate, rating FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY id DESC LIMIT 1;", array($assigneeid));
+		$rec = $DB->get_record_sql("SELECT * FROM {poasassignment_attempts} WHERE assigneeid = ? ORDER BY id DESC LIMIT 1;", array($assigneeid));
 		return $rec;
 	}
 
