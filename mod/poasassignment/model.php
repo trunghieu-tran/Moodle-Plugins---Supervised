@@ -1257,12 +1257,16 @@ class poasassignment_model {
     /**
      * Cancel assignee's task
      *
-     * Creates new assignee record for user, old record becomes "history"
+     * Creates new assignee record for user, old record becomes "cancelled"
      * @param int $assigneeid assignee's id
      */
     function cancel_task($assigneeid) {
         global $DB;
+
         $assignee = $DB->get_record('poasassignment_assignee', array('id' => $assigneeid));
+        $assignee->cancelled = 1;
+        $DB->update_record('poasassignment_assignee', $assignee);
+
         $newassignee = new stdClass();
         $newassignee->userid = $assignee->userid;
         $newassignee->timetaken = 0;
@@ -1330,7 +1334,7 @@ class poasassignment_model {
             $usersid = array_keys($usersid);
             $count=count($usersid);
             foreach ($usersid as $userid) {
-                if ($assignee=$DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$this->poasassignment->id))) {
+                if ($assignee = $this->get_assignee($userid, $this->poasassignment->id)) {
                     $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
                     if ($attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount))) {
                         if ($attempt->attemptdate>$attempt->ratingdate || !isset($attempt->rating))
@@ -1601,7 +1605,7 @@ class poasassignment_model {
                $instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
                 foreach($tasks as $key => $task) {
                     // Get all assignees that have this task
-                    $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $task->id));
+                    $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $task->id, 'cancelled' => 0));
                     // If nobody have this task continue
                     if(count($assignees) == 0) {
                         continue;
@@ -1635,7 +1639,7 @@ class poasassignment_model {
             }
             if ($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_COURSE) {
                 foreach ($tasks as $key => $task) {
-                    if ($DB->record_exists('poasassignment_assignee', array('taskid' => $task->id))) {
+                    if ($DB->record_exists('poasassignment_assignee', array('taskid' => $task->id, 'cancelled' => 0))) {
                         unset($tasks[$key]);
                     }
                 }
@@ -1969,11 +1973,22 @@ class poasassignment_model {
 	    	}
     	}
     }
-    
+
+    /**
+     * Get all assignees who have task
+     *
+     * @access public
+     * @return array
+     */
     public function get_instance_task_owners() {
     	global $DB;
     	$poasid = $this->get_poasassignment()->id;
-		$rec = $DB->get_records_sql("SELECT id, userid, taskid FROM {poasassignment_assignee} WHERE poasassignmentid = $poasid AND taskid > 0 ORDER BY id");
+		$rec = $DB->get_records_sql(
+            "SELECT id, userid, taskid
+            FROM {poasassignment_assignee}
+            WHERE poasassignmentid = $poasid AND taskid > 0 AND cancelled = 0
+            ORDER BY id");
+
 		return $rec;
     }
     
