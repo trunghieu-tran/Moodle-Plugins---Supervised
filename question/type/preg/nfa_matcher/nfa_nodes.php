@@ -103,8 +103,8 @@ class nfa_preg_leaf extends nfa_preg_node {
 
     public function create_automaton(&$matcher, &$automaton, &$stack, &$priority_counter) {
         // create start and end states of the resulting automaton
-        $start = new qtype_preg_fa_state($automaton);
-        $end = new qtype_preg_fa_state($automaton);
+        $start =& new qtype_preg_fa_state($automaton);
+        $end =& new qtype_preg_fa_state($automaton);
         $start->add_transition(new qtype_preg_nfa_transition($start, $this->pregnode, $end), $priority_counter);
         $automaton->add_state($start);
         $automaton->add_state($end);
@@ -151,7 +151,6 @@ class nfa_preg_node_concat extends nfa_preg_operator {
 
         $automaton->set_start_state($first['start']);
         $automaton->set_end_state($second['end']);
-
         $stack[] = array('start'=>$first['start'], 'end'=>$second['end']);
     }
 
@@ -173,17 +172,17 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 
         // add eps-transitions to the end of each automaton if necessary
         if (count($first['end']->outgoing_transitions()) > 0) {
-            $end = new qtype_preg_fa_state;
+            $end =& new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new preg_leaf_meta;
+            $epsleaf =& new preg_leaf_meta;
             $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
             $first['end']->add_transition(new qtype_preg_nfa_transition($first['end'], $epsleaf, $end), $priority_counter);
             $first['end'] =& $end;
         }
         if (count($second['end']->outgoing_transitions()) > 0) {
-            $end = new qtype_preg_fa_state;
+            $end =& new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new preg_leaf_meta;
+            $epsleaf =& new preg_leaf_meta;
             $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
             $second['end']->add_transition(new qtype_preg_nfa_transition($second['end'], $epsleaf, $end), $priority_counter);
             $second['end'] =& $end;
@@ -198,7 +197,6 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 
         $automaton->set_start_state($first['start']);
         $automaton->set_end_state($first['end']);
-
         $stack[] = array('start'=>$first['start'], 'end'=>$first['end']);
     }
 
@@ -225,7 +223,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         foreach ($body['start']->outgoing_transitions() as $transition) {
             $body['end']->add_transition(clone $transition, $priority_counter);
         }
-        $epsleaf = new preg_leaf_meta;
+        $epsleaf =& new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']), $priority_counter);
         $stack[] = $body;
@@ -235,7 +233,6 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
      * creates an automaton for {m,} quantifier
      */
     private function create_brace(&$matcher, &$automaton, &$stack, &$priority_counter) {
-        // create an automaton for body ($leftborder + 1) times
         $leftborder = $this->pregnode->leftborder;
         for ($i = 0; $i < $leftborder; $i++) {
             $this->operands[0]->create_automaton($matcher, $automaton, $stack, $priority_counter);
@@ -267,6 +264,8 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                 $res['end'] = $cur['end'];
             }
         }
+        $automaton->set_start_state($res['start']);
+        $automaton->set_end_state($res['end']);
         $stack[] = $res;
     }
 
@@ -291,7 +290,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
     private function create_qu(&$matcher, &$automaton, &$stack, &$priority_counter) {
         $this->operands[0]->create_automaton($matcher, $automaton, $stack, $priority_counter);
         $body = array_pop($stack);
-        $epsleaf = new preg_leaf_meta;
+        $epsleaf =& new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']), $priority_counter);
         $stack[] = $body;
@@ -301,7 +300,6 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
      * creates an automaton for {m, n} quantifier
      */
     private function create_brace(&$matcher, &$automaton, &$stack, &$priority_counter) {
-        // create an automaton for body ($leftborder + 1) times
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
         for ($i = 0; $i < $rightborder; $i++) {
@@ -312,34 +310,30 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
             $invstack[] = array_pop($stack);
         }
         $res = null;        // the resulting automaton
-        $endstate = null;   // temporary variable, required if $leftborder != $rightborder
-        if ($leftborder != $rightborder) {
-            $endstate = new qtype_preg_fa_state;
-        }
+        $borderstates = array();
         // linking automatons to the resulting one
         $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($invstack);
-            if ($i >= $leftborder && $leftborder != $rightborder) {
-                $cur['start']->add_transition(new qtype_preg_nfa_transition($cur['start'], $epsleaf, $endstate), $priority_counter);
-            }
-            if ($i > 0) {
-                if ($endstate !== null) {
-                    $endstate->update_state_references($cur['start'], $res['end']);
+            if ($res === null) {
+                $res = $cur;
+            } else {
+                // Concatenate 2 automatons.
+                if ($i >= $leftborder/* && $leftborder != $rightborder*/) {
+                    $borderstates[] =& $res['end'];
                 }
                 $automaton->update_state_references($cur['start'], $res['end']);
                 $res['end']->merge_transition_set($cur['start']);
                 $automaton->remove_state($cur['start']);
-                $res['end'] = $cur['end'];
-            } else {
-                $res = $cur;
+                $res['end'] =& $cur['end'];
             }
         }
-        if ($leftborder != $rightborder) {
-            $automaton->update_state_references($endstate, $res['end']);
-            $res['end']->merge_transition_set($endstate);
+        foreach ($borderstates as $state) {
+            $state->add_transition(new qtype_preg_nfa_transition($cur['start'], $epsleaf, $res['end']), $priority_counter);
         }
+        $automaton->set_start_state($res['start']);
+        $automaton->set_end_state($res['end']);
         $stack[] = $res;
     }
 
