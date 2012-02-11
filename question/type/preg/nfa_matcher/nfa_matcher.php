@@ -38,11 +38,51 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
     public function concatenate_char_to_str($char) {
         $this->str .= $char;
     }
+
+    public function resolve_ambiguity($other) {
+        if ($other === null) {
+            return $this;
+        }
+        // Leftmost rule
+        /*if ($this->last_transitions[count($this->last_transitions) - 1]->priority < $other->last_transitions[count($other->last_transitions) - 1]->priority) {
+            return $this;
+        } else {
+            return $other;
+        }
+        if ($this->index_first[0] > $other->index_first[0]) {
+            return $this;
+        } else {
+            return $other;
+        }*/
+        foreach ($this->index_first as $key=>$value) {
+            if ($key === 0) {
+                continue;
+            }
+            if ($value < $other->index_first[$key] || ($value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] === qtype_preg_matching_results::NO_MATCH_FOUND)) {
+                return $this;
+            } else {
+                return $other;
+            }
+        }
+
+        foreach ($this->length as $key=>$value) {
+            if ($key === 0) {
+                continue;
+            }
+            if ($value < $other->length[$key] || ($value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->length[$key] === qtype_preg_matching_results::NO_MATCH_FOUND)) {
+                return $this;
+            } else {
+                return $other;
+            }
+        }
+
+        return $this;
+    }
 }
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
-    protected $automaton;    // An nfa corresponding to the given regex.
+    public $automaton;    // An nfa corresponding to the given regex.
 
     /**
      * Returns prefix for the NFA engine class.
@@ -312,6 +352,15 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             // If not, save it.
                             if (!$skip) {
                                 array_push($skipstates, $curstate);
+                            }
+                        }
+                        if (!$skip) {
+                            // Now the state is calculated, time to resolve possible ambiguity
+                            foreach ($newstates as $key=>$tmp) {
+                                if ($newstate->state === $tmp->state && $transition->pregleaf == $tmp->last_transitions[count($tmp->last_transitions) - 1]->pregleaf) {
+                                    $newstates[$key] = $newstate->resolve_ambiguity($tmp);
+                                    $skip = true;
+                                }
                             }
                         }
                         if (!$skip) {
