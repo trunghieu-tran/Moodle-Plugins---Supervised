@@ -14,7 +14,7 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 /**
  * Represents a state of an automaton when running.
  */
-class qtype_preg_nfa_processing_state extends qtype_preg_matching_results {
+class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implements qtype_preg_matcher_state {
     public $state;               // A reference to the state which automaton is in.
     public $index_first_new;     // Indexes of subpatterns being captured. Subpatterns which are already captured are stored in index_first.
     public $length_new;          // Same as previous field.

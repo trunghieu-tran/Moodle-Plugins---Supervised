@@ -16,7 +16,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
-class qtype_preg_matching_results implements qtype_preg_matcher_state {
+class qtype_preg_matching_results {
 
     //No match captured
     const NO_MATCH_FOUND = -1;
