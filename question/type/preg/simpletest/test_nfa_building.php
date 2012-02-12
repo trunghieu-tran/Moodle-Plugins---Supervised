@@ -53,10 +53,19 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
         }
     }
 
-    function test_build_brace_infinite() {
+    function test_build_brace_infinite_1() {
+        $matcher = new qtype_preg_nfa_matcher('(?:ab){1,}');
+        if (!$matcher->is_error_exists()) {
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_infinite_1.jpg');
+        } else {
+            $this->assertTrue(false, "nfa building failed <br/>");
+        }
+    }
+	
+	function test_build_brace_infinite_3() {
         $matcher = new qtype_preg_nfa_matcher('(?:ab){3,}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_infinite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_infinite_3.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
@@ -80,10 +89,28 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
         }
     }
 
-    function test_build_brace_finite() {
-        $matcher = new qtype_preg_nfa_matcher('a{3,6}');
+    function test_build_brace_finite_0() {
+        $matcher = new qtype_preg_nfa_matcher('(?:ab){0,3}');
         if (!$matcher->is_error_exists()) {
-            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_finite.jpg');
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_finite_0.jpg');
+        } else {
+            $this->assertTrue(false, "nfa building failed <br/>");
+        }
+    }
+	
+	function test_build_brace_finite_2() {
+        $matcher = new qtype_preg_nfa_matcher('(?:ab){2,3}');
+        if (!$matcher->is_error_exists()) {
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_finite_2.jpg');
+        } else {
+            $this->assertTrue(false, "nfa building failed <br/>");
+        }
+    }
+	
+	function test_build_brace_finite_4() {
+        $matcher = new qtype_preg_nfa_matcher('(?:ab){4}');
+        if (!$matcher->is_error_exists()) {
+            $matcher->automaton->draw('dotcode.dot', 'test_build_brace_finite_4.jpg');
         } else {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
