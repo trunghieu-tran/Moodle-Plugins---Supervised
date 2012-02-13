@@ -300,19 +300,6 @@ class qtype_preg_cross_tests_from_backtracking {
                      'tests'=>array($test0, $test1));
     }
 
-    function data_for_test_Q_FIN_6() {
-        $test0 = array('str'=>'aaaaa',
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>5),
-                       'left'=>array(0),
-                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
-
-        return array('regex'=>'(?:a{3,5}a)+a',
-                     'tests'=>array($test0));
-    }
-
     function data_for_test_Q_FIN_6_1() {
         $test0 = array('str'=>'aaaaa',
                        'is_match'=>true,
@@ -327,7 +314,15 @@ class qtype_preg_cross_tests_from_backtracking {
     }
 
     function data_for_test_Q_FIN_6_2() {
-        $test0 = array('str'=>'aaaaaaaaaa',
+		$test0 = array('str'=>'aaaaa',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>5),
+                       'left'=>array(0),
+                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test1 = array('str'=>'aaaaaaaaaa',
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
@@ -335,7 +330,7 @@ class qtype_preg_cross_tests_from_backtracking {
                        'left'=>array(0),
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
-        $test1 = array('str'=>'aaaaaaaaaaa',
+        $test2 = array('str'=>'aaaaaaaaaaa',
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
@@ -344,7 +339,7 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(?:a{3,5}a)+a',
-                     'tests'=>array($test0, $test1));
+                     'tests'=>array($test0, $test1, $test2));
     }
 
     function data_for_test_Q_FIN_7() {
@@ -733,10 +728,10 @@ class qtype_preg_cross_tests_from_backtracking {
         $test1 = array('str'=>'abcd',
                        'is_match'=>true,
                        'full'=>false,
-                       'index_first'=>array(0=>0,1=>0),
+                       'index_first'=>array(0=>2,1=>2),
                        'length'=>array(0=>2,1=>2),
                        'left'=>array(2),
-                       'next'=>'a');
+                       'next'=>'c');
 
         return array('regex'=>'(ab|cd)\1',
                      'tests'=>array($test0, $test1));
@@ -796,10 +791,10 @@ class qtype_preg_cross_tests_from_backtracking {
         $test1 = array('str'=>'cdghabghghef',
                        'is_match'=>true,
                        'full'=>false,
-                       'index_first'=>array(0=>0,1=>0,2=>2),
+                       'index_first'=>array(0=>4,1=>4,2=>6),
                        'length'=>array(0=>4,1=>2,2=>2),
                        'left'=>array(4),
-                       'next'=>'c');
+                       'next'=>'a');
 
         return array('regex'=>'(ab|cd)(ef|gh)\1+\2',
                      'tests'=>array($test0, $test1));
