@@ -32,8 +32,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>NOMATCH),
-                        'length'=>array(0=>4,1=>4,2=>NOMATCH),
+                        'index_first'=>array(0=>0,1=>0,2=>4),
+                        'length'=>array(0=>4,1=>4,2=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -136,7 +136,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -144,7 +144,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -159,8 +159,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -181,7 +181,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -189,7 +189,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -204,8 +204,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -287,7 +287,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>3,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(1),
                         'next'=>'a');
 
@@ -316,7 +316,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -339,8 +339,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -361,7 +361,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>NOMATCH),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -376,24 +376,24 @@ class qtype_preg_cross_tests_matching_strategy {
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>3,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + (aa)
+                        'length'=>array(0=>5,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'length'=>array(0=>6,1=>6),
+                        'index_first'=>array(0=>0,1=>4),    // aaaa + (aa)
+                        'length'=>array(0=>6,1=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -406,7 +406,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -421,8 +421,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),    // a + (aa)
-                        'length'=>array(0=>3,1=>2),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -437,8 +437,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'length'=>array(0=>6,1=>1),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -451,30 +451,30 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // (aaaaa) + ''
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
                         'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
@@ -482,8 +482,8 @@ class qtype_preg_cross_tests_matching_strategy {
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'length'=>array(0=>6,1=>1),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -496,39 +496,39 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'length'=>array(0=>6,1=>1),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -541,39 +541,39 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>5),    // aaaaa + (a)
-                        'length'=>array(0=>6,1=>1),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -586,7 +586,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -631,7 +631,7 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -676,39 +676,39 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (a)
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),    // a + ('')
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'length'=>array(0=>6,1=>6),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -721,39 +721,39 @@ class qtype_preg_cross_tests_matching_strategy {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>NOMATCH,1=>NOMATCH),
+                        'length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (a)
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>0,1=>1),    // a + ('')
+                        'length'=>array(0=>1,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'aaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaa)
-                        'length'=>array(0=>3,1=>3),
+                        'index_first'=>array(0=>0,1=>3),    // aaa + ('')
+                        'length'=>array(0=>3,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaa)
-                        'length'=>array(0=>5,1=>5),
+                        'index_first'=>array(0=>0,1=>5),    // aaaaa + ('')
+                        'length'=>array(0=>5,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test4 = array( 'str'=>'aaaaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0),    // (aaaaaa)
-                        'length'=>array(0=>6,1=>6),
+                        'index_first'=>array(0=>0,1=>6),    // aaaaaa + ('')
+                        'length'=>array(0=>6,1=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 

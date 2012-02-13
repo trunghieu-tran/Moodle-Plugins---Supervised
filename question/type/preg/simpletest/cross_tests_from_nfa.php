@@ -374,16 +374,16 @@ class qtype_preg_cross_tests_from_nfa {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>3,2=>1,3=>1,4=>1),
+                        'index_first'=>array(0=>0,1=>3,2=>3,3=>3,4=>3),
+                        'length'=>array(0=>3,1=>0,2=>0,3=>0,4=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3,3=>4,4=>5),
-                        'length'=>array(0=>6,1=>3,2=>1,3=>1,4=>1),
+                        'index_first'=>array(0=>0,1=>6,2=>6,3=>6,4=>6),
+                        'length'=>array(0=>6,1=>0,2=>0,3=>0,4=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -737,14 +737,14 @@ class qtype_preg_cross_tests_from_nfa {
                         'left'=>array(1),
                         'next'=>'h');
 
-        $test3 = array('str'=>'abe',    // different strategies
-                       'results'=>array(array('is_match'=>true,
+        $test3 = array('str'=>'abe',
+                       'results'=>array(array('is_match'=>true,         // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>3,1=>NOMATCH),
                                               'left'=>array(2),
                                               'next'=>'f'),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>2,1=>NOMATCH),
@@ -911,13 +911,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array('str'=>'cdxyabab',
-                       'results'=>array(array('is_match'=>true,        // different strategies
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>6,1=>NOMATCH),
                                               'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                                               'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>4,1=>NOMATCH),
@@ -947,13 +947,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'cbr');
 
         $test2 = array('str'=>'Do cats',
-                       'results'=>array(array('is_match'=>true,        // different strategies
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>7,1=>1),
                                               'left'=>array(10),
                                               'next'=>' '),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>6,1=>0),
@@ -990,14 +990,14 @@ class qtype_preg_cross_tests_from_nfa {
                         'left'=>array(8),
                         'next'=>'b');
 
-        $test3 = array('str'=>'0defab',        // different strategies
-                       'results'=>array(array('is_match'=>true,
+        $test3 = array('str'=>'0defab',
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>4,1=>NOMATCH),
                                               'left'=>array(12),
                                               'next'=>'g'),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>1,1=>NOMATCH),
@@ -1019,13 +1019,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'a');
 
         $test2 = array('str'=>'0aaaaaaz',
-                       'results'=>array(array('is_match'=>true,        // different strategies
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>7,1=>6),
                                               'left'=>array(9),
                                               'next'=>'0123456789'),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>6,1=>5),
@@ -1039,15 +1039,15 @@ class qtype_preg_cross_tests_from_nfa {
 
     function data_for_test_backrefs_subpatt_modifying() {
         $test1 = array('str'=>'ababba',
-                       'results'=>array(array('is_match'=>true,        // different strategies
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>6,1=>3),
                                               'left'=>array(4),
                                               'next'=>'x'),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
-                                              'index_first'=>array(0=>0,1=>0),
+                                              'index_first'=>array(0=>5,1=>5),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
                                               'next'=>'x')
@@ -1062,15 +1062,15 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array('str'=>'abab',
-                       'results'=>array(array('is_match'=>true,        // different strategies
+                       'results'=>array(array('is_match'=>true,        // longest match
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>4,1=>2),
                                               'left'=>array(6),
                                               'next'=>'b'),
-                                        array('is_match'=>true,
+                                        array('is_match'=>true,        // less characters left
                                               'full'=>false,
-                                              'index_first'=>array(0=>0,1=>0),
+                                              'index_first'=>array(0=>2,1=>2),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
                                               'next'=>'x')
