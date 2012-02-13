@@ -89,12 +89,11 @@ $string['pluginname'] = 'Regular expression';
 $string['pluginname_help'] = '<p> Regular expression is a form of writing a pattern to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p>
 <p>This question use php perl-compatible regular expression syntax as default notation. There is many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression there: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p>
 <p>You could also use this question as advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions at all! Just select <b>Moodle shortanswer</b> as notation for you questions.</p>';
+$string['php_preg_matcher'] = 'PHP preg extension';
 $string['pluginname_link'] = 'question/type/preg';
 $string['pluginnameadding'] = 'Adding regular expression question';
 $string['pluginnameediting'] = 'Editing regular expression question';
-$string['pluginnamesummary'] = 'Allows a response of one or a few words that is graded by comparing against several regular expressions. Could do hints like next possible characters. Can be used as shortanswer question with hinting without knowledge of regular expressions.';
-$string['php_preg_matcher'] = 'PHP preg extension';
-$string['pregsummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. In behaviours with multiple tries could give hint by telling next correct character. <br /> You could use it without knowing regular expression to get hinting using \'Moodle shortanswer\' notation.';
+$string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. In behaviours with multiple tries could give hint by telling next correct character. <br /> You could use it without knowing regular expression to get hinting using \'Moodle shortanswer\' notation.';
 $string['quantifieratstart'] = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have operand - nothing to repeat';
 $string['questioneditingheading'] = 'Question editing settings';
 $string['subpattern'] = 'Subpattern';
