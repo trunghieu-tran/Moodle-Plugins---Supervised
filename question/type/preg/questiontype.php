@@ -55,11 +55,6 @@ class qtype_preg extends qtype_shortanswer {
                     );
     }
 
-    //We are a child of shortanswer question
-    function requires_qtypes() {
-        return array('shortanswer');
-    }
-
     function name() {
         return 'preg';
     }
