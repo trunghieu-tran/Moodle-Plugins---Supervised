@@ -29,9 +29,6 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');//Contains ques
 class qbehaviour_adaptivehints extends qbehaviour_adaptive {
     const IS_ARCHETYPAL = false;
 
-    public static function get_required_behaviours() {
-        return array('qbehaviour_adaptive');
-    }
 
     public function is_compatible_question(question_definition $question) {
         return ($question instanceof question_automatically_gradable) && ($question instanceof question_with_qtype_specific_hints);
