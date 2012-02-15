@@ -9,5 +9,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$plugin->component = 'qtype_correctwriting';
 $plugin->version  = 2011121310;
 $plugin->requires = 2011121310;
+$plugin->release = 'Correct Writing 2.2';
+$plugin->maturity = MATURITY_STABLE;
+
+$plugin->dependencies = array(
+    'block_formal_langs' => 2012021400
+};

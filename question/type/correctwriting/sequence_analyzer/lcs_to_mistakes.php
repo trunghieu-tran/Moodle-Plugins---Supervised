@@ -10,7 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
  
-require_once($CFG->dirroot.'/question/type/correctwriting/langs_code/tokens_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/base_token.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/common.php');
  
  /**
