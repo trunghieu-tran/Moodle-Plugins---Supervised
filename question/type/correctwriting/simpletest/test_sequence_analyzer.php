@@ -23,7 +23,7 @@
 function create_tokens($types,$values,$is_answer) {
     $result=array();
     for($i=0;$i<count($types);$i++) {
-      $result[]=new qtype_correctwriting_token_base(null,$types[$i],$values[$i],$is_answer,null);
+      $result[]=new block_formal_langs_token_base(null,$types[$i],$values[$i],$is_answer,null);
     }
     return $result;
 }
