@@ -24,32 +24,28 @@ require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/comm
   *                 key "added" contains array of added lexemes as indexes from response
   */
 function qtype_correctwriting_sequence_analyzer_determine_mistakes($answer,$response,$lcs) {
-    //Determines, whether answer tokens are used in error computation
-    $answer_used=array();
-    $answer_count=qtype_correctwriting_sequence_analyzer_count($answer);
+    // Determines, whether answer tokens are used in error computation
+    $answer_used = array();
+    $answer_count = qtype_correctwriting_sequence_analyzer_count($answer);
     for ($i=0;$i<$answer_count;$i++) {
-        array_push($answer_used,false);
+        $answer_used[] = false;
     }
     
-    //Determines, whether response tokens are used in error computation
+    // Determines, whether response tokens are used in error computation
     $response_used=array();
     $response_count=qtype_correctwriting_sequence_analyzer_count($response);
     for ($i=0;$i<$response_count;$i++) {
-        array_push($response_used,false);
+        $response_used[] = false;
     }
     
     //This result will be returned from function
     $result=array();
-    $result["moved"]=array();
-    $result["removed"]=array();
-    $result["added"]=array();
+    $result['moved']=array();
+    $result['removed']=array();
+    $result['added']=array();
     
     //Scan lcs to mark excluded lexemes
     foreach($lcs as $answer_index => $response_index) {
-        //If lexeme is moved find it
-        if ($answer_index!=$response_index) {
-            $result["moved"][$answer_index]=$response_index;
-        }
         //Mark lexemes as used
         $answer_used[$answer_index]=true;
         $response_used[$response_index]=true;
@@ -70,11 +66,11 @@ function qtype_correctwriting_sequence_analyzer_determine_mistakes($answer,$resp
            $response_used[$j]==true;
           }
         }
-        //Determine type of error (moved or removed)
+        //Determine type of mistake (moved or removed)
         if ($is_moved) {
-            $result["moved"][$i]=$moved_pos;
+            $result['moved'][$i]=$moved_pos;
         } else {
-            array_push($result["removed"],$i);
+            $result['removed'][]=$i;
         }
       }
     }
@@ -82,7 +78,7 @@ function qtype_correctwriting_sequence_analyzer_determine_mistakes($answer,$resp
     //Determine added lexemes from reponse
     for ($i=0;$i<$response_count;$i++) {
         if ($response_used[$i]==false) {
-            array_push($result["added"],$i);            
+            $result['added'][]=$i;            
         }
     }
     
