@@ -52,14 +52,14 @@ function qtype_correctwriting_sequence_analyzer_compute_lcs($answer,$response) {
     
     //Compute temporary lcs data
     for($current_token=$answer_count-1;$current_token>-1;$current_token--) {
-        $newtmplcs=qtype_correctwriting_sequence_analyzer_array_clone($tmplcs);
+        $newtmplcs=$tmplcs;
         for($current_match=0;$current_match<count($matches[$current_token]);$current_match++) {
             //Scan existing suffixes and push match to it if can, changing maxind to current match
             for ($current_cs=0;$current_cs<count($tmplcs);$current_cs++) {
                 //If we can append to current match (found symbol index is lesser then bound)
                 if($tmplcs[$current_cs]["maxind"]>$matches[$current_token][$current_match]) {
                     //Copy suffix and prepend our token to it
-                    $suffix=qtype_correctwriting_sequence_analyzer_array_clone($tmplcs[$current_cs]);
+                    $suffix=$tmplcs[$current_cs];
                     $suffix["maxind"]=$matches[$current_token][$current_match];
                     $suffix["lcs"][$current_token]=$matches[$current_token][$current_match];
                     array_push($newtmplcs,$suffix);
