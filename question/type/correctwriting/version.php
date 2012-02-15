@@ -17,4 +17,4 @@ $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'block_formal_langs' => 2012021400
-};
+);
