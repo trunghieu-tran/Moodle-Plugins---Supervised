@@ -8,23 +8,9 @@
  * @package questions
  */
  
- defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
  
-/**
- * Clones an array recursively. Used for lcs computing to clone array
- * @param object used object
- * @return copy of objects if it's array, otherwise same object.
- */
-function qtype_correctwriting_sequence_analyzer_array_clone($object) {
-    if (!is_array($object)) {
-        return $object;
-    }
-    $result=array();
-    foreach($object as $key => $value) {
-        $result[$key]=qtype_correctwriting_sequence_analyzer_array_clone($value);
-    }
-    return $result;
-}
+
 /**
  * Private implementation of is same function for tokens
  */
