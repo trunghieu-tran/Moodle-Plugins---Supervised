@@ -10,33 +10,36 @@
  * @package questions
  */
  
- require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
 
-class qtype_correctwriting_sequence_analyzer_token_base_is_same extends UnitTestCase {
-    //Test when a tokens are totally equal
+ /**
+  * This class contains the test cases for the is_same() function of token_base.
+  * TODO Move it to formallangs if needed
+  */
+class qtype_correctwriting_token_base_is_same extends UnitTestCase {
+    // Case, when a tokens are totally equal
     public function test_equal_tokens() {
-        $answer=new block_formal_langs_token_base(null,"type","value",true,null);
-        $response=new block_formal_langs_token_base(null,"type","value",false,null);
-        $this->assertTrue( $answer->is_same($response) );
+        $answer = new block_formal_langs_token_base(null, 'type', 'value', true, null);
+        $response = new block_formal_langs_token_base(null, 'type', 'value', false, null);
+        $this->assertTrue($answer->is_same($response), 'Tokens must be equal!');
     }
-    //Test when tokens are totally equal and value is null
+    // Case, when tokens are totally equal and both values is null
     public function test_equal_tokens_is_null() {
-        $answer=new block_formal_langs_token_base(null,"type",null,true,null);
-        $response=new block_formal_langs_token_base(null,"type",null,false,null);
-        $this->assertTrue( $answer->is_same($response) );
+        $answer = new block_formal_langs_token_base(null, 'type', null, true, null);
+        $response = new block_formal_langs_token_base(null, 'type', null, false, null);
+        $this->assertTrue($answer->is_same($response), 'Tokens must be equal!');
     }
-    //Test when tokens are not equal and values are different
+    // Case, when tokens are not equal, because values are different
     public function test_inequal_values() {
-        $answer=new block_formal_langs_token_base(null,"type",null,true,null);
-        $response=new block_formal_langs_token_base(null,"type","test",false,null);
-        $this->assertFalse( $answer->is_same($response) );
+        $answer = new block_formal_langs_token_base(null, 'type', null, true, null);
+        $response = new block_formal_langs_token_base(null, 'type', 'test', false, null);
+        $this->assertFalse($answer->is_same($response), 'Tokens mustn\'t be equal!');
     }
-    //Test when tokens are not equal and types are different
+    // Case, when tokens are not equal, because types are different
     public function test_inequal_types() {
-        $answer=new block_formal_langs_token_base(null,"type","test",true,null);
-        $response=new block_formal_langs_token_base(null,"type2","test",false,null);
-        $this->assertFalse( $answer->is_same($response) );
+        $answer=new block_formal_langs_token_base(null, 'type', 'test', true, null);
+        $response=new block_formal_langs_token_base(null, 'type2', 'test', false, null);
+        $this->assertFalse($answer->is_same($response), 'Tokens mustn\'t be equal!');
     }
-     
 }
  ?>
