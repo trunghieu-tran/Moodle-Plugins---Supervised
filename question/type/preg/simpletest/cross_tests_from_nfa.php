@@ -1047,7 +1047,7 @@ class qtype_preg_cross_tests_from_nfa {
                                               'next'=>'x'),
                                         array('is_match'=>true,        // less characters left
                                               'full'=>false,
-                                              'index_first'=>array(0=>5,1=>5),
+                                              'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
                                               'next'=>'x')
@@ -1070,7 +1070,7 @@ class qtype_preg_cross_tests_from_nfa {
                                               'next'=>'b'),
                                         array('is_match'=>true,        // less characters left
                                               'full'=>false,
-                                              'index_first'=>array(0=>2,1=>2),
+                                              'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
                                               'left'=>array(2),
                                               'next'=>'x')

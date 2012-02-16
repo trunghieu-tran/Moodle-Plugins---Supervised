@@ -728,10 +728,10 @@ class qtype_preg_cross_tests_from_backtracking {
         $test1 = array('str'=>'abcd',
                        'is_match'=>true,
                        'full'=>false,
-                       'index_first'=>array(0=>2,1=>2),
+                       'index_first'=>array(0=>0,1=>0),
                        'length'=>array(0=>2,1=>2),
                        'left'=>array(2),
-                       'next'=>'c');
+                       'next'=>'a');
 
         return array('regex'=>'(ab|cd)\1',
                      'tests'=>array($test0, $test1));
@@ -791,10 +791,10 @@ class qtype_preg_cross_tests_from_backtracking {
         $test1 = array('str'=>'cdghabghghef',
                        'is_match'=>true,
                        'full'=>false,
-                       'index_first'=>array(0=>4,1=>4,2=>6),
+                       'index_first'=>array(0=>0,1=>0,2=>2),
                        'length'=>array(0=>4,1=>2,2=>2),
                        'left'=>array(4),
-                       'next'=>'a');
+                       'next'=>'c');
 
         return array('regex'=>'(ab|cd)(ef|gh)\1+\2',
                      'tests'=>array($test0, $test1));
