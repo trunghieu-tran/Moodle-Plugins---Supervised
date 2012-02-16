@@ -157,9 +157,14 @@ class qtype_preg_matching_results {
      * @param other object of qtype_preg_matching_results
      * @param orequal make it worse-or-equal function
      * @param longestmatch defines what result is preferable - with more characters matched or with less characters to complete match
+     * @param areequal reference to a variable to store boolean value - whether the objects are equal.
      * @return whether @this is worse than $other
      */
-    public function worse_than($other, $orequal = false, $longestmatch = false) {
+    public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
+
+        if ($areequal !== null) {
+            $areequal = false;
+        }
 
         //1. The match is definitely best (full match)
         if (!$this->best() && $other->best()) {
@@ -174,7 +179,6 @@ class qtype_preg_matching_results {
         } elseif ($this->is_match() && !$other->is_match()) {
             return false;
         }
-
 
         if (!$longestmatch) {
             //3. Less characters left
@@ -207,6 +211,9 @@ class qtype_preg_matching_results {
 
         }
 
+        if ($areequal !== null) {
+            $areequal = true;
+        }
         return $orequal;//results are equal
     }
 
