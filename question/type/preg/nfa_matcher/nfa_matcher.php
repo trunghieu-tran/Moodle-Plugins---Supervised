@@ -35,49 +35,34 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->lexemcount = $sourceobj->lexemcount;
     }
 
+    public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
+        $parentresult = parent::worse_than($other, $orequal, $longestmatch, $areequal);
+        if ($areequal === true) {
+            // Leftmost rule
+            foreach ($this->index_first as $key=>$value) {
+                if ($key !== 0 && $value === qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    return true;
+                } else if ($key !== 0 && $value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    return false;
+                }
+            }
+            // Repeating rule
+            foreach ($this->length as $key=>$value) {
+                if ($key !== 0 && $this->index_first[$key] < $other->index_first[$key]) {
+                    return true;
+                } else if ($key !== 0 && $this->index_first[$key] > $other->index_first[$key]) {
+                    return false;
+                }
+            }
+        } else {
+            return $parentresult;
+        }
+    }
+
     public function concatenate_char_to_str($char) {
         $this->str .= $char;
     }
 
-    public function resolve_ambiguity($other) {
-        if ($other === null) {
-            return $this;
-        }
-        // Leftmost rule
-        /*if ($this->last_transitions[count($this->last_transitions) - 1]->priority < $other->last_transitions[count($other->last_transitions) - 1]->priority) {
-            return $this;
-        } else {
-            return $other;
-        }
-        if ($this->index_first[0] > $other->index_first[0]) {
-            return $this;
-        } else {
-            return $other;
-        }*/
-        foreach ($this->index_first as $key=>$value) {
-            if ($key === 0) {
-                continue;
-            }
-            if ($value < $other->index_first[$key] || ($value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] === qtype_preg_matching_results::NO_MATCH_FOUND)) {
-                return $this;
-            } else {
-                return $other;
-            }
-        }
-
-        foreach ($this->length as $key=>$value) {
-            if ($key === 0) {
-                continue;
-            }
-            if ($value < $other->length[$key] || ($value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->length[$key] === qtype_preg_matching_results::NO_MATCH_FOUND)) {
-                return $this;
-            } else {
-                return $other;
-            }
-        }
-
-        return $this;
-    }
 }
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
@@ -355,15 +340,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             }
                         }
                         if (!$skip) {
-                            // Now the state is calculated, time to resolve possible ambiguity
-                            foreach ($newstates as $key=>$tmp) {
-                                if ($newstate->state === $tmp->state && $transition->pregleaf == $tmp->last_transitions[count($tmp->last_transitions) - 1]->pregleaf) {
-                                    $newstates[$key] = $newstate->resolve_ambiguity($tmp);
-                                    $skip = true;
-                                }
-                            }
-                        }
-                        if (!$skip) {
                             array_push($newstates, $newstate);
                         }
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
@@ -393,7 +369,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         }
         // Find the best result.
         foreach ($results as $curresult) {
-            if ($result->worse_than($curresult)) {
+            $eq = false;
+            if ($result->worse_than($curresult, false, false, &$eq)) {
                 $result = $curresult;
                 $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() == true.
             }
