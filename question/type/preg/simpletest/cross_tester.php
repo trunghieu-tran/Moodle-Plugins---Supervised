@@ -265,6 +265,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $enginename = 'qtype_preg_' . $this->engine_name();
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
+            $testdataclassname = get_class($testdataobj);
             foreach ($testmethods as $curtestmethod) {
                 // filtering class methods by names. A test method name should start with 'data_for_test_'
                 if (strpos($curtestmethod, 'data_for_test_') === 0) {
@@ -292,7 +293,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                 $nextpassed = false;
                                 $leftpassed = false;
                                 $this->compare_results($regex, $modifiers, $matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed);
-                                $this->do_assertions($this->engine_name(), $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, get_class($testdataobj));
+                                $this->do_assertions($this->engine_name(), $regex, $str, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $indexlastpassed, $nextpassed, $leftpassed, $testdataclassname);
                             } else {
                                 // compare with multiple results
                                 $ismatchpassed = array();
@@ -322,7 +323,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                     foreach ($indexmatch as $key) {
                                         $number = $key + 1;
                                         echo "Results of comparison for the $number possible result:<br/>";
-                                        $this->do_assertions($this->engine_name(), $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], get_class($testdataobj), true);
+                                        $this->do_assertions($this->engine_name(), $regex, $str, $obtained, $ismatchpassed[$key], $fullpassed[$key], $indexfirstpassed[$key], $indexlastpassed[$key], $nextpassed[$key], $leftpassed[$key], $testdataclassname, true);
                                         echo '<br/>';
                                     }
                                     // if indexes were not matched at all - just print the obtained result
@@ -334,6 +335,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
                                         echo 'length = '; print_r($obtained->length); echo '<br/>';
                                         echo 'correctending = ' . $obtained->extendedmatch->string_extension() . '<br/>';
                                         echo 'left = ' . $obtained->left . '<br/>';
+                                        echo "(test from $testdataclassname)<br/>";
                                     }
                                 }
                             }
