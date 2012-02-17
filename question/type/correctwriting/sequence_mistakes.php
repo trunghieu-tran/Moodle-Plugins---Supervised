@@ -42,7 +42,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_res
         $a->answerposition = $answer[$answerindex]->position()->colstart();
         $a->responseline = $response[$responseindex]->position()->linestart();
         $a->responseposition = $response[$responseindex]->position()->colstart();
-        $this->mistakemsg = get_string('movingmistakemessage','qtype_correctwriting',$a);
+        $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
     }
 }
 
@@ -72,7 +72,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
         $a->type = $response[$responseindex]->type();
         $a->line = $response[$responseindex]->position()->linestart();
         $a->position = $response[$responseindex]->position()->colstart();
-        $this->mistakemsg = get_string('addingmistakemessage','qtype_correctwriting',$a);
+        $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
     }
 }
 
@@ -99,7 +99,7 @@ class qtype_correctwriting_lexeme_skipped_mistake extends qtype_correctwriting_r
         
         //Create a mistake message
         $a = $answer[$answerindex]->type();
-        $this->mistakemsg = get_string('skippingmistakemessage','qtype_correctwriting',$a);
+        $this->mistakemsg = get_string('skippedmistakemessage','qtype_correctwriting',$a);
     }
 }
 
