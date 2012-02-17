@@ -133,7 +133,21 @@ class  qtype_correctwriting_sequence_analyzer {
     public function lcs() {
         return qtype_correctwriting_sequence_analyzer_compute_lcs($this->answer,$this->correctedresponse);
     }
-
+    
+    private function create_moved_mistake($answerindex,$responseindex) {
+        return new qtype_correctwriting_lexeme_moved_mistake($this->language,$this->answer,$answerindex,
+                                                             $this->correctedresponse,$responseindex);
+    }
+    
+    private function create_added_mistake($responseindex) {
+        return new qtype_correctwriting_lexeme_added_mistake($this->language,$this->answer,
+                                                             $this->correctedresponse,$responseindex);
+    }
+    
+    private function create_skipped_mistake($answerindex) {
+        return new qtype_correctwriting_lexeme_skipped_mistake($this->language,$this->answer,$answerindex,
+                                                               $this->correctedresponse);
+    }
     /**
      * Returns an array of mistake objects for given individual lcs array,using syntax_analyzer if needed
      */
@@ -151,30 +165,28 @@ class  qtype_correctwriting_sequence_analyzer {
                                                                               $this->response,
                                                                               $lcs);
             //Compute fitness-function
-            $temporary_fitness=$moved_mistake_weight*count($errors["moved"])
-                              +$removed_mistake_weight*count($errors["removed"])
-                              +$added_mistake_weight*count($errors["added"]);
+            $temporary_fitness=$this->moved_mistake_weight*count($errors['moved'])
+                              +$this->removed_mistake_weight*count($errors['removed'])
+                              +$this->added_mistake_weight*count($errors['added']);
             $temporary_fitness=$temporary_fitness*-1;
 
             //Creates an array of mistake objects
-            $result=array();
+            $result = array();
             
-            //Create a factory
-            $f=new qtype_correctwriting_sequence_error_factory($this->language,$this->response,$this->answer);
-            
+
             //Produce errors, when tokens are moved from their places
-            foreach($result["moved"] as $answer_index => $response_index) {
-               array_push($result,$f->create_moved_error($answer_index,$response_index));
+            foreach($result['moved'] as $answerindex => $responseindex) {
+                $result[] = $this->create_moved_mistake($answerindex,$responseindex);
             }
             
             //Produce errors, when tokens are removed from their places
-            foreach($result["removed"] as $answer_index) {
-                array_push($result,$f->create_removing_error($answer_index));
+            foreach($result['removed'] as $answerindex) {
+                $result[] = $this->create_skipped_mistake($answerindex);
             }
             
             //Produce errors, when an odd tokens are added
-            foreach($result["added"] as $response_index) {
-                 array_push($result,$f->create_added_error($response_index));
+            foreach($result['added'] as $responseindex) {
+                $result[] = $this->create_added_mistake($responseindex);
             }
             
             return $result;
