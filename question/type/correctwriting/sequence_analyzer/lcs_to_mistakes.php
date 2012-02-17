@@ -11,74 +11,73 @@
 defined('MOODLE_INTERNAL') || die();
  
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
-require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer/common.php');
  
  /**
   * Determines a mistakes by scanning lcs , answer and response
-  * @param answer array of tokens, that belong to answer
-  * @param response array of tokens, that belong to student reponse
-  * @param lcs      longest common subsequence as described at sequence_analyzer
-  * @return mixed   key "moved" contains array of moved lexemes as key - index from answer and value -
+  * @param array  $answer   array of tokens, that belong to answer
+  * @param array  $response array of tokens, that belong to student reponse
+  * @param array  $lcs      longest common subsequence as described at sequence_analyzer
+  * @return array   key "moved" contains array of moved lexemes as key - index from answer and value -
   *                 index from response.
   *                 key "removed" contains array of removed lexemes as indexes from answer
   *                 key "added" contains array of added lexemes as indexes from response
   */
 function qtype_correctwriting_sequence_analyzer_determine_mistakes($answer,$response,$lcs) {
     // Determines, whether answer tokens are used in error computation
-    $answer_used = array();
-    $answer_count = qtype_correctwriting_sequence_analyzer_count($answer);
-    for ($i=0;$i<$answer_count;$i++) {
-        $answer_used[] = false;
+    $answerused = array();
+    $answercount = count($answer);
+    for ($i = 0;$i < $answercount;$i++) {
+        $answerused[] = false;
     }
     
     // Determines, whether response tokens are used in error computation
-    $response_used=array();
-    $response_count=qtype_correctwriting_sequence_analyzer_count($response);
-    for ($i=0;$i<$response_count;$i++) {
-        $response_used[] = false;
+    $responseused = array();
+    $responsecount = count($response);
+    for ($i = 0;$i < $responsecount;$i++) {
+        $responseused[] = false;
     }
     
     //This result will be returned from function
-    $result=array();
-    $result['moved']=array();
-    $result['removed']=array();
-    $result['added']=array();
+    $result = array();
+    $result['moved'] = array();
+    $result['removed'] = array();
+    $result['added'] = array();
     
     //Scan lcs to mark excluded lexemes
-    foreach($lcs as $answer_index => $response_index) {
+    foreach($lcs as $answerindex => $responseindex) {
         //Mark lexemes as used
-        $answer_used[$answer_index]=true;
-        $response_used[$response_index]=true;
+        $answerused[$answerindex] = true;
+        $responseused[$responseindex] = true;
     }
     
     //Determine removed and moved lexemes by scanning answer 
-    for ($i=0;$i<$answer_count;$i++) {
+    for ($i = 0;$i < $answercount;$i++) {
       //If this lexeme is not in LCS
-      if ($answer_used[$i]==false) {
+      if ($answerused[$i] == false) {
         //Determine, whether lexeme is simply moved by scanning response or removed
-        $is_moved=false;
-        $moved_pos=-1;
-        for ($j=0;($j<$response_count) && ($is_moved==false);$j++) {
-          if (qtype_correctwriting_sequence_analyzer_is_same($answer[$i],$response[$j])
-              && ($response_used[$j]==false)) {
-           $is_moved=true;
-           $moved_pos=$j;
-           $response_used[$j]==true;
+        $ismoved = false;
+        $movedpos = -1;
+        for ($j = 0;($j < $responsecount) && ($ismoved == false);$j++) {
+          if (($answer[$i]->is_same($response[$j]))
+              && ($responseused[$j] == false)) {
+           $ismoved = true;
+           $movedpos = $j;
+           $responseused[$j] = true;
           }
         }
         //Determine type of mistake (moved or removed)
-        if ($is_moved) {
-            $result['moved'][$i]=$moved_pos;
+        if ($ismoved) {
+            $result['moved'][$i] = $movedpos;
         } else {
-            $result['removed'][]=$i;
+            $result['removed'][] = $i;
         }
       }
     }
     
     //Determine added lexemes from reponse
-    for ($i=0;$i<$response_count;$i++) {
-        if ($response_used[$i]==false) {
-            $result['added'][]=$i;            
+    for ($i = 0;$i < $responsecount;$i++) {
+        if ($responseused[$i] == false) {
+            $result['added'][] = $i;            
         }
     }
     
