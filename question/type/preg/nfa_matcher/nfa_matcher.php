@@ -134,9 +134,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Returns the minimal path to complete a partial match.
      * @param startpos - start position of matching.
      * @param laststate - the last state of the automaton, an object of qtype_preg_nfa_processing_state.
+     * @param fulllastmatch - was the last transition captured fully, not partially?
      * @return - an object of qtype_preg_nfa_processing_state.
      */
-    public function determine_characters_left($startpos, $laststate) {
+    public function determine_characters_left($startpos, $laststate, $fulllastmatch) {
         $curstates = array();    // States which the automaton is in.
         $skipstates = array();
         $result = null;
@@ -145,7 +146,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         if (count($laststate->last_transitions) != 0) {
             $lasttransition = $laststate->last_transitions[count($laststate->last_transitions) - 1];
         }
-        if ($lasttransition === null || !is_a($lasttransition->pregleaf, 'preg_leaf_backref')) {    // The last transition was NOT a backreference.
+        if ($lasttransition === null || $fulllastmatch) {    // The last transition was fully-matched.
             // Check if an asserion $ failed the match and it's possible to remove a few characters.
             foreach ($laststate->state->outgoing_transitions() as $transition) {
                 if ($transition->pregleaf->subtype == preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to === $this->automaton->end_state()) {
@@ -191,6 +192,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             break;
                         }
                     }
+
                     if (!$skip) {
                         if (is_a($transition->pregleaf, 'preg_leaf_backref')) {        // Only generated subpatterns can be passed.
                             if (array_key_exists($transition->pregleaf->number, $curstate->length) && $curstate->length[$transition->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -202,9 +204,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $length = $transition->pregleaf->consumes($curstate);
                         }
                     }
-                    if (!$skip) {
-                        $skip = ($result !== null && $curstate->length[0] + $length > $result->length[0]);        // Is it longer then an existing one?
-                    }
+
+                    $skip |= ($result !== null && $curstate->length[0] + $length > $result->length[0]);        // Is it longer then an existing one?
+
                     if (!$skip) {
                         $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new, $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, $curstate->last_transitions, $length, $curstate);
@@ -244,10 +246,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 }
                 $skipstates[] = $curstate;
             }
-            foreach ($newstates as $state) {
-                array_push($curstates, $state);
-            }
-            $newstates = array();
+            $curstates = $newstates;
         }
         if ($result !== null && $result->is_match()) {
             $result->index_first[0] = $startpos;
@@ -344,23 +343,26 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         }
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
+                        $newresult = clone $curstate;
+                        $fulllastmatch = true;
                         if ($length > 0) {
-                            $curstate->length[0] += $length;
-                            $curstate->last_transitions[] = $transition;
-                            $curstate->last_match_len = $length;
+                            $newresult->length[0] += $length;
+                            $newresult->last_transitions[] = $transition;
+                            $newresult->last_match_len = $length;
+                            $fulllastmatch = false;
                         }
                         // Go to the end state.
-                        $pathstart = clone $curstate;
-                        $pathstart->set_source_info(substr($curstate->str(), 0, $startpos + $curstate->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
 
-                        $path = $this->determine_characters_left($startpos, $pathstart);
+                        $newresult->set_source_info(substr($newresult->str(), 0, $startpos + $newresult->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+
+                        $path = $this->determine_characters_left($startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
-                            $curstate->left = $path->length[0] - $curstate->length[0];
-                            $curstate->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
-                            $curstate->extendedmatch->set_source_info($path->str(), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+                            $newresult->left = $path->length[0] - $newresult->length[0];
+                            $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
+                            $newresult->extendedmatch->set_source_info($path->str(), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
                         }
                         // Finally, save the possible partial match.
-                        array_push($results, $curstate);
+                        array_push($results, $newresult);
                     }
                 }
             }
