@@ -246,7 +246,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return boolean - if the same lexeme
      */
     public function is_same($other) {
-       //TODO: Just verify fields.
+        $result = false;
+        if ($this->type == $other->type) {
+            $result = $this->value == $other->value;
+        }
+        return $result;
     }
 }
 
