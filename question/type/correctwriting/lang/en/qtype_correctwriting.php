@@ -4,4 +4,7 @@
 
 $string['correctwriting'] = 'Correct writing';
 $string['pluginname'] = 'Correct writing';
+$string['movedmistakemessage'] = 'A lexeme "{$a->type}" is moved from {$a->answerline}:{$a->answerposition} to {$a->responseline}:{$a->responseposition}';
+$string['addedmistakemessage'] = 'A lexeme "{$a->type}" at {$a->line}:{$a->position} is odd in response';
+$string['skippedmistakemessage'] = 'A lexeme "{$a}" is skipped';
 ?>

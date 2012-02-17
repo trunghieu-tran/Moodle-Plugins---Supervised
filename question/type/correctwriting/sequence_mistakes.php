@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines an implementation of errors, that are determined by computing LCS
+ * Defines an implementation of mistakes, that are determined by computing LCS and comparing answer and response
  *
  * @copyright &copy; 2011  Oleg Sychev
  * @author Dmitriy Mamontov, Volgograd State Technical University
@@ -12,143 +12,95 @@ defined('MOODLE_INTERNAL') || die();
  
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 
-//A mistake, that consists from moving one lexeme to other
-class qtype_correctwriting_lexeme_moving_mistake extends qtype_correctwriting_response_mistake {
-    /**
-     * Creates a string with position of lexeme
-     */
-    private function get_position($lexeme) {
-        return $lexeme->position()->line() . ", " . $lexeme->position()->column();
-    }
+// A mistake, that consists from moving one lexeme to different position, than original
+class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_response_mistake {
     /**
      * Constructs a new error, filling it with constant message
-     * @param language object a language object
-     * @param answer  array   answer tokens
-     * @param answer_index int   index of answer token
-     * @param response     array response tokens
-     * @param response_index int  index of response index
+     * @param object $language      a language object
+     * @param array  $answer        answer tokens
+     * @param int    $answerindex   index of answer token
+     * @param array  $response      array response tokens
+     * @param int    $responseindex index of response token
      */
-    public function __construct($language,$answer,$answer_index,$response,$response_index) {
-        $this->position=$response[$response_index]->position();
-        $this->languagename=$language;
+    public function __construct($language,$answer,$answerindex,$response,$responseindex) {
+        $this->position = $response[$responseindex]->position();
+        $this->languagename = $language->name();
         
-        $this->answer=$answer;
-        $this->respomse=$response;
+        $this->answer = $answer;
+        $this->response = $response;
         //Fill answer data
-        $this->answermistaken=array();
-        array_push($this->answermistaken,$answer_index);
-        //Fill response part
-        $this->responsemistaken=array();
-        array_push($this->responsemistaken,$response_index);
+        $this->answermistaken = array();
+        $this->answermistaken[] = $answerindex;
+        //Fill response data
+        $this->responsemistaken = array();
+        $this->responsemistaken[] = $responseindex;
         
         //Create a mistake message
-        $this->mistakemsg="A lexeme \"".$answer[$answer_index]->token_type()."\" has been moved from ";
-        $this->mistakemsg=$this->mistakemsg . $this->get_position($answer[$answer_index]);
-        $this->mistakemsg=$this->mistakemsg . "  to  " ;
-        $this->mistakemsg=$this->mistakemsg .  $this->get_position($response[$response_index]);
+        $a = new stdClass;
+        $a->type = $answer[$answerindex]->type();
+        $a->answerline = $answer[$answerindex]->position()->linestart();
+        $a->answerposition = $answer[$answerindex]->position()->colstart();
+        $a->responseline = $response[$responseindex]->position()->linestart();
+        $a->responseposition = $response[$responseindex]->position()->colstart();
+        $this->mistakemsg = get_string('movingmistakemessage','qtype_correctwriting',$a);
     }
 }
 
-//A mistake, that consists from adding a lexeme to response, that is not in an answer
-class qtype_correctwriting_lexeme_adding_mistake extends qtype_correctwriting_response_mistake {
+// A mistake, that consists from adding a lexeme to response, that is not in answer
+class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_response_mistake {
     /**
      * Constructs a new error, filling it with constant message
-     * @param language object a language object
-     * @param answer  array   answer tokens
-     * @param response     array response tokens
-     * @param response_index int  index of response index
+     * @param object $language      a language object
+     * @param array  $answer        answer tokens
+     * @param array  $response      array response tokens
+     * @param int    $responseindex index of response token
      */
-    public function __construct($language,$answer,$response,$response_index) {
-        $this->position=$response[$response_index]->position();
-        $this->languagename=$language;
+    public function __construct($language,$answer,$response,$responseindex) {
+        $this->position = $response[$responseindex]->position();
+        $this->languagename = $language->name();
         
-        $this->answer=$answer;
-        $this->respomse=$response;
+        $this->answer = $answer;
+        $this->response = $response;
         //Fill answer data
-        $this->answermistaken=array();
-        //Fill response part
-        $this->responsemistaken=array();
-        array_push($this->responsemistaken,$response_index);
+        $this->answermistaken = array();
+        //Fill response data
+        $this->responsemistaken = array();
+        $this->responsemistaken[] = $responseindex;
         
         //Create a mistake message
-        $this->mistakemsg="A lexeme \"". $response[$response_index]->token_type(). "\" is odd in answer";
+        $a = new stdClass;
+        $a->type = $response[$responseindex]->type();
+        $a->line = $response[$responseindex]->position()->linestart();
+        $a->position = $response[$responseindex]->position()->colstart();
+        $this->mistakemsg = get_string('addingmistakemessage','qtype_correctwriting',$a);
     }
 }
 
-//A mistake, that  consits of  skipping a lexeme from answer
-class qtype_correctwriting_lexeme_removing_mistake extends qtype_correctwriting_response_mistake {
+// A mistake, that consists of  skipping a lexeme from answer
+class qtype_correctwriting_lexeme_skipped_mistake extends qtype_correctwriting_response_mistake {
     /**
      * Constructs a new error, filling it with constant message
-     * @param language object a language object
-     * @param answer  array   answer tokens
-     * @param answer_index int   index of answer token
-     * @param response     array response tokens
+     * @param object $language      a language object
+     * @param array  $answer        answer tokens
+     * @param int    $answerindex   index of answer token
+     * @param array  $response      array response tokens
      */
-    public function __construct($language,$answer,$answer_index,$response) {
-        $this->position=$response[$response_index]->position();
-        $this->languagename=$language;
+    public function __construct($language,$answer,$answerindex,$response) {
+        $this->position = $answer[$answerindex]->position();
+        $this->languagename = $language->name();
         
-        $this->answer=$answer;
-        $this->respomse=$response;
+        $this->answer = $answer;
+        $this->response = $response;
         //Fill answer data
         $this->answermistaken=array();
-        array_push($this->answermistaken,$answer_index);
-        //Fill response part
-        $this->responsemistaken=array();
+        $this->answermistaken[] = $answer_index;
+        //Fill response data
+        $this->responsemistaken = array();
         
         //Create a mistake message
-        $this->mistakemsg="A lexeme \"". $answer[$answer_index]->token_type(). "\" is missing";
+        $a = $answer[$answerindex]->type();
+        $this->mistakemsg = get_string('skippingmistakemessage','qtype_correctwriting',$a);
     }
 }
 
-//A factory for creating all kinds of these errors
-class qtype_correctwriting_sequence_error_factory {
-    
-    private $language;  //Language object
-    private $answer;    //Array of answer tokens
-    private $response;  //Array of response tokens
-    
-    /**
-     * Constructs a factory for crating sequence errors
-     * @param language object used language
-     * @param answer   array  of answer tokens
-     * @param response array  of response tokens
-     */
-    public function __construct($language,$answer,$respone) {
-        $this->language=$language;
-        $this->answer=$answer;
-        $this->response=$response;
-    }
-    /**
-     * Creates moved lexeme error
-     * @param int answer_index index of lexeme from answer
-     * @param int response_index index of lexeme from response
-     */
-    public function create_moved_error($answer_index,$response_index) {
-        return qtype_correctwriting_lexeme_moving_mistake($this->language,$this->answer,
-                                                          $answer_index,
-                                                          $this->response,
-                                                          $response_index);
-    }
-    /**
-     *  Creates a removed lexeme error
-     *  @param int answer_index index of lexeme from answer
-     */
-    public function create_removing_error($answer_index) {
-        return qtype_correctwriting_lexeme_removing_mistake($this->language,
-                                                            $this->answer,
-                                                            $answer_index,
-                                                            $this->response);
-    }
-    /**
-     * Creates an odd lexeme error
-     * @param int response_index index of lexeme from response
-     */
-    public function create_added_error($response_index) {
-        return qtype_correctwriting_lexeme_adding_mistake($this->language,
-                                                          $this->answer,
-                                                          $this->response,
-                                                          $response_index);
-    }
-}
 ?>
