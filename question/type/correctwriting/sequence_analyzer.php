@@ -133,17 +133,30 @@ class  qtype_correctwriting_sequence_analyzer {
     public function lcs() {
         return qtype_correctwriting_sequence_analyzer_compute_lcs($this->answer,$this->correctedresponse);
     }
-    
+    /**
+     * Creates a new mistake, that represents case, when one lexeme moved to other position
+     * @param int $answerindex   index of lexeme in answer
+     * @param int $responseindex index of lexeme in response
+     * @return object a mistake
+     */
     private function create_moved_mistake($answerindex,$responseindex) {
         return new qtype_correctwriting_lexeme_moved_mistake($this->language,$this->answer,$answerindex,
                                                              $this->correctedresponse,$responseindex);
     }
-    
+    /**
+     * Creates a new mistake, that represents case, when odd lexeme is insert to index
+     * @param int $responseindex index of lexeme in response
+     * @return object a mistake
+     */
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language,$this->answer,
                                                              $this->correctedresponse,$responseindex);
     }
-    
+    /**
+     * Creates a new mistake, that represents case, when lexeme is skipped
+     * @param int $answerindex   index of lexeme in answer
+     * @return object a mistake
+     */
     private function create_skipped_mistake($answerindex) {
         return new qtype_correctwriting_lexeme_skipped_mistake($this->language,$this->answer,$answerindex,
                                                                $this->correctedresponse);
