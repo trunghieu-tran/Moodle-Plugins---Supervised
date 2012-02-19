@@ -55,7 +55,7 @@ class  qtype_correctwriting_sequence_analyzer {
         if ($question != null) {
             $this->language = $language;
             $this->question = $question;
-            if ($corrected_response == null) {
+            if ($correctedresponse == null) {
                 // Scan errors by syntax_analyzer
                 if ($language->could_parse()) {
                     $analyzer = new qtype_correctwriting_syntax_analyzer($answer, $language, null, null);
@@ -63,7 +63,7 @@ class  qtype_correctwriting_sequence_analyzer {
                 } 
             } else {
                 // Scan for errors, computing lcs
-                $this->scan_response_errors();
+                $this->scan_response_mistakes();
             }
         }
         //TODO:
@@ -79,10 +79,10 @@ class  qtype_correctwriting_sequence_analyzer {
         //NOTE: if some stage create errors, stop processing right there (done?)
     }
     /**
-     * Scans for an errors in response, computing lcs and 
+     * Scans for a mistakes in response, computing lcs and 
      * performing syntax analysis
      */
-    private function scan_response_errors() {
+    private function scan_response_mistakes() {
         // TODO Extract these  values from question
         $this->movedmistakeweight = 1;
         $this->skippedmistakeweight = 1;
@@ -91,7 +91,7 @@ class  qtype_correctwriting_sequence_analyzer {
         $alllcs = $this->lcs();
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
-            $this->mistakes = $this->lcs_to_mistakes(null);
+            $this->mistakes = $this->lcs_to_mistakes(array());
         }
         else {
             //Otherwise scan all of lcs
