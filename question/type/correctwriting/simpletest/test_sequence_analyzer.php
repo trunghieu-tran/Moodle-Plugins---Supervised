@@ -103,7 +103,7 @@ function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues)
        $lcs = get_test_lcs($answertypes, $answervalues, $responsetypes, $responsevalues);
        // Check LCS props
        $this->assertTrue($lcs != null,'LCS does not exists!');
-       $this->assertTrue(count($lcs)==1, 'Incorrect amount of LCS found!');
+       $this->assertTrue(count($lcs) == 1, 'Incorrect amount of LCS found!');
        // Check LCS
        $this->assertTrue(count($lcs[0]) == 3, 'Incorrect amount of lexemes in first LCS!');        
        $this->assertTrue($lcs[0][0] == 0, 'LCS must contain 0->0  index pair!');
@@ -120,7 +120,7 @@ function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues)
        $lcs = get_test_lcs($answertypes, $answervalues, $responsetypes, $responsevalues);
        // Check LCS props
        $this->assertTrue($lcs != null, 'LCS does not exists!');
-       $this->assertTrue(count($lcs) ==2, 'Incorrect amount of LCS found!');
+       $this->assertTrue(count($lcs) == 2, 'Incorrect amount of LCS found!');
        // Check first LCS   
        $this->assertTrue(count($lcs[0]) == 4, 'Incorrect amount of lexemes in first LCS!');
        $this->assertTrue($lcs[0][0] == 0, 'First LCS must contain 0->0  index pair!');

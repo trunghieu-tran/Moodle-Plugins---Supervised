@@ -150,8 +150,8 @@ class  qtype_correctwriting_sequence_analyzer {
             return array();
         }
         // An array of found common subsequences, where a subsequence is hash data, to current subsequence,
-        // where ["maxind"] - maximum index, which can be taken when appending 
-        //       ["lcs"]    - array, which is represented an lcs, as described in description of function
+        // where ['maxind'] - maximum index, which can be taken when appending 
+        //       ['lcs']    - array, which is represented an lcs, as described in description of function
         $tmplcs = array();
     
         // Compute temporary lcs data
@@ -161,18 +161,18 @@ class  qtype_correctwriting_sequence_analyzer {
                 // Scan existing suffixes and push match to it if can, changing maxind to current match
                 for ($currentcs = 0;$currentcs < count($tmplcs);$currentcs++) {
                     // If we can append to current match (found symbol index is lesser then bound)
-                    if($tmplcs[$currentcs]["maxind"] > $matches[$currenttoken][$currentmatch]) {
+                    if($tmplcs[$currentcs]['maxind'] > $matches[$currenttoken][$currentmatch]) {
                         // Copy suffix and prepend our token to it
                         $suffix = $tmplcs[$currentcs];
-                        $suffix["maxind"] = $matches[$currenttoken][$currentmatch];
-                        $suffix["lcs"][$currenttoken] = $matches[$currenttoken][$currentmatch];
+                        $suffix['maxind'] = $matches[$currenttoken][$currentmatch];
+                        $suffix['lcs'][$currenttoken] = $matches[$currenttoken][$currentmatch];
                         $newtmplcs[] = $suffix;
                     }
                 }
                 // Create new suffix and add it to a tmplcs
-                $suffix["maxind"] = $matches[$currenttoken][$currentmatch];
-                $suffix["lcs"] = array();
-                $suffix["lcs"][$currenttoken] = $matches[$currenttoken][$currentmatch];
+                $suffix['maxind'] = $matches[$currenttoken][$currentmatch];
+                $suffix['lcs'] = array();
+                $suffix['lcs'][$currenttoken] = $matches[$currenttoken][$currentmatch];
                 $newtmplcs[] = $suffix;
             }
             $tmplcs = $newtmplcs;
@@ -181,16 +181,16 @@ class  qtype_correctwriting_sequence_analyzer {
         // Find length of LCS
         $lcslen = 0;
         for($i = 0;$i < count($tmplcs);$i++) {
-            if (count($tmplcs[$i]["lcs"]) > $lcslen) {
-                $lcslen = count($tmplcs[$i]["lcs"]);
+            if (count($tmplcs[$i]['lcs']) > $lcslen) {
+                $lcslen = count($tmplcs[$i]['lcs']);
             }
         }
     
         // Filter LCS from array of CS
         $lcs = array();
         for($i=0;$i < count($tmplcs);$i++) {
-            if (count($tmplcs[$i]["lcs"]) == $lcslen) {
-                $lcs[] = $tmplcs[$i]["lcs"];
+            if (count($tmplcs[$i]['lcs']) == $lcslen) {
+                $lcs[] = $tmplcs[$i]['lcs'];
             }
         }
     
