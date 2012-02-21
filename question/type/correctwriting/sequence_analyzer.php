@@ -39,11 +39,7 @@ class  qtype_correctwriting_sequence_analyzer {
     private   $fitness;              // Fitness for response
     
     private   $question;             // Used question by analyzer
-    
-    private   $movedmistakeweight;   // Moved lexeme error weight
-    private   $skippedmistakeweight; // Removed lexeme error weight
-    private   $addedmistakeweight;   // Added lexeme error weight
-    
+     
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
@@ -62,8 +58,14 @@ class  qtype_correctwriting_sequence_analyzer {
                     $this->errors = $analyzer->errors();
                 } 
             } else {
+                //Fill weights of sequence errors
+                $weights = new stdClass;
+                // TODO Extract these  values from question
+                $weights->movedweight = 1;
+                $weights->absentweight = 1;
+                $weights->addedweight = 1;
                 // Scan for errors, computing lcs
-                $this->scan_response_mistakes();
+                $this->scan_response_mistakes($weights);
             }
         }
         //TODO:
@@ -81,49 +83,45 @@ class  qtype_correctwriting_sequence_analyzer {
     /**
      * Scans for a mistakes in response, computing lcs and 
      * performing syntax analysis
+     * @param object $weights weights of errors
      */
-    private function scan_response_mistakes() {
-        // TODO Extract these  values from question
-        $this->movedmistakeweight = 1;
-        $this->skippedmistakeweight = 1;
-        $this->addedmistakeweight = 1;
-
+    private function scan_response_mistakes($weights) {
         $alllcs = qtype_correctwriting_sequence_analyzer::lcs($this->answer, $this->correctedresponse);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
-            $this->mistakes = $this->lcs_to_mistakes(array());
+            $alllcs[] = array();
         }
-        else {
+        
+        if ($this->language->could_parse()) {
             //Otherwise scan all of lcs
             $maxmistakes = array();
             $maxfitness = 0;
             $isfirst = true;
-            
-            //Find fitting analyzer
-            foreach($alllcs as $currentlcs) {
-                if ($this->language->could_parse()) {
-                    $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
-                                                                         $this->correctedresponse,
-                                                                         $lcs);
-                    $this->fitness = $analyzer->fitness();
-                    $currentmistakes = $analyzer->mistakes();
-                } else {
-                    $currentmistakes = $this->matches_to_mistakes(lcs);
+            $haserrors = false;
+            for ($i = 0;$i < count($alllcs) and $haserrors == false;$i++) {
+                $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
+                                                                     $this->correctedresponse,
+                                                                     $alllcs[$i]);
+                $fitness = $analyzer->fitness();
+                
+                //If answer has errors stop processing here
+                $haserrors = $analyzer->has_errors();
+                if ($haserrors == true) {
+                 $this->errors = $analyzer->errors();
                 }
                 
-                
-                $currentmistakes = $this->lcs_to_mistakes($currentlcs);
-                if ($isfirst == true or $this-> fitness > $maxfitness) { 
-                    $maxmistakes = $currentmistakes;
+                if (($isfirst == true or $fitness > $maxfitness) and $haserrors==false) { 
+                    $maxmistakes = $analyzer->mistakes();
                     $maxfitness = $fitness;
                     $isfirst = false;
                 }
             }
-
             
             //Set self-properties to return proper values
             $this->mistakes = $maxmistakes;
             $this->fitness = $maxfitness;
+        } else {
+            $this->mistakes = $this->matches_to_mistakes($alllcs[0],$weights);
         }
     }
     /**
@@ -238,9 +236,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * Returns an array of mistakes objects for given individual lcs array.
      * Also sets fitness to fitness, that computed from function.
      * @param array $lcs LCS
+     * @param object $weights weights of errors
      * @return array array of mistake objects
      */	
-    public function matches_to_mistakes($lcs) {
+    public function matches_to_mistakes($lcs,$weights) {
         $answer = &$this->answer;
         $response = &$this->correctedresponse;
         // Determines, whether answer tokens are used in mistake computation
@@ -261,9 +260,10 @@ class  qtype_correctwriting_sequence_analyzer {
         $result = array();
         
         // These are counts of each types of errors, used to compute fitness
-        $movedcount = 0;
-        $addedcount = 0;
-        $skippedcount = 0;
+        $counts = new stdClass;
+        $counts->moved = 0;
+        $counts->added = 0;
+        $counts->absent = 0;
     
         // Scan lcs to mark excluded lexemes
         foreach($lcs as $answerindex => $responseindex) {
@@ -291,10 +291,10 @@ class  qtype_correctwriting_sequence_analyzer {
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
                     $result[] = $this->create_moved_mistake($i, $movedpos);
-                    $movedcount = $movedcount + 1;
+                    $counts->moved  = $counts->moved + 1;
                 } else {
                     $result[] = $this->create_absent_mistake($i);
-                    $skippedcount = $skippedcount + 1;
+                    $counts->absent = $counts->absent + 1;
                 }
             }
         }
@@ -303,18 +303,26 @@ class  qtype_correctwriting_sequence_analyzer {
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
                 $result[] = $this->create_added_mistake($i);
-                $addedcount = $addedcount + 1;          
+                $counts->added = $counts->added + 1;          
             }
         }        
 
         //Compute fitness-function
-        $movedmistakesfitness = $this->movedmistakeweight * $movedcount;
-        $skippedmistakesfitness = $this->skippedmistakeweight * $skippedcount;
-        $addedmistakesfitness = $this->addedmistakeweight * $addedcount;
-        $this->fitness = -1 * ($movedmistakesfitness + $skippedmistakesfitness + $addedmistakesfitness);
+        $this->fitness = compute_fitness($counts,$weights);
         return $result;
     }
-
+    /**
+     * Computes a fitness for counts of errors
+     * @param object $counts count of errors
+     * @param object $weights weight of errors
+     * @return int fitness
+     */
+    private function compute_fitness($counts,$weights) {
+        $movedmistakesfitness = $weights->movedweight * $counts->moved;
+        $absentmistakesfitness = $weights->absentweight * $counts->absent;
+        $addedmistakesfitness = $weights->addedweight * $counts->added;
+        return  -1 * ($movedmistakesfitness + $absentmistakesfitness + $addedmistakesfitness);
+    }
     /**
     * Returns fitness as aggregate measure of how students response fits this particular answer - i.e. more fitness = less mistakes
     * Used to choose best matched answer
