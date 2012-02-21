@@ -56,8 +56,7 @@ function create_response($types,$values) {
 function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues) {
     $answer = create_answer($answertypes, $answervalues);
     $response = create_response($responsetypes, $responsevalues);
-    $analyzer = new qtype_correctwriting_sequence_analyzer(null, $answer, null, $response);
-    return $analyzer->lcs();
+    return qtype_correctwriting_sequence_analyzer::lcs($answer, $response);
 }
 
  /**

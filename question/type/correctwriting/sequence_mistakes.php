@@ -77,7 +77,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
 }
 
 // A mistake, that consists of  skipping a lexeme from answer
-class qtype_correctwriting_lexeme_skipped_mistake extends qtype_correctwriting_response_mistake {
+class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_response_mistake {
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
@@ -99,7 +99,7 @@ class qtype_correctwriting_lexeme_skipped_mistake extends qtype_correctwriting_r
         
         //Create a mistake message
         $a = $answer[$answerindex]->type();
-        $this->mistakemsg = get_string('skippedmistakemessage','qtype_correctwriting',$a);
+        $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
     }
 }
 
