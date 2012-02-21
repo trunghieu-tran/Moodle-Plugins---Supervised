@@ -124,7 +124,7 @@ class qtype_correctwriting_lexical_analyzer {
         return $this->mistakes;
     }
 
-    public function is_errors() {
+    public function has_errors() {
         return !empty($this->errors);
     }
 

@@ -87,8 +87,8 @@ class  qtype_correctwriting_sequence_analyzer {
         $this->movedmistakeweight = 1;
         $this->skippedmistakeweight = 1;
         $this->addedmistakeweight = 1;
-        
-        $alllcs = $this->lcs();
+
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($this->answer, $this->correctedresponse);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
             $this->mistakes = $this->lcs_to_mistakes(array());
@@ -101,10 +101,21 @@ class  qtype_correctwriting_sequence_analyzer {
             
             //Find fitting analyzer
             foreach($alllcs as $currentlcs) {
+                if ($this->language->could_parse()) {
+                    $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
+                                                                         $this->correctedresponse,
+                                                                         $lcs);
+                    $this->fitness = $analyzer->fitness();
+                    $currentmistakes = $analyzer->mistakes();
+                } else {
+                    $currentmistakes = $this->matches_to_mistakes(lcs);
+                }
+                
+                
                 $currentmistakes = $this->lcs_to_mistakes($currentlcs);
-                if ($isfirst == true or $this->fitness > $maxfitness) { 
+                if ($isfirst == true or $this-> fitness > $maxfitness) { 
                     $maxmistakes = $currentmistakes;
-                    $maxfitness = $this->fitness;
+                    $maxfitness = $fitness;
                     $isfirst = false;
                 }
             }
@@ -120,12 +131,11 @@ class  qtype_correctwriting_sequence_analyzer {
      *
      * Array of individual lcs contains answer indexes as keys and response indexes as values.
      * There may be more than one lcs for a given pair of strings.
+     * @param  array $answer  array of answer tokens
+     * @param  array $response array of response tokens 
      * @return array array of individual lcs arrays
      */
-    public function lcs() {
-        $answer = &$this->answer;
-        $response = &$this->correctedresponse;
-
+    public static function lcs($answer, $response) {
         
         // An array of matches, where keys are indexes of answer and values are arrays of 
         // indexes from response
@@ -220,26 +230,9 @@ class  qtype_correctwriting_sequence_analyzer {
      * @param int $answerindex   index of lexeme in answer
      * @return object a mistake
      */
-    private function create_skipped_mistake($answerindex) {
-        return new qtype_correctwriting_lexeme_skipped_mistake($this->language, $this->answer, $answerindex,
-                                                               $this->correctedresponse);
-    }
-    /**
-     * Returns an array of mistakes objects for given individual lcs array, using analyzer if can
-     * Also sets fitness to fitness, that computed from function.
-     * @param array $lcs LCS
-     * @return array array of mistake objects    
-     */
-    private function lcs_to_mistakes($lcs) {
-        if ($this->language->could_parse()) {
-            $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
-                                                                 $this->correctedresponse,
-                                                                 $lcs);
-            $fitness = $analyzer->fitness();
-            return $analyzer->mistakes();
-        } else {
-            return $this->matches_to_mistakes(lcs);
-        }
+    private function create_absent_mistake($answerindex) {
+        return new qtype_correctwriting_lexeme_absent_mistake($this->language, $this->answer, $answerindex,
+                                                              $this->correctedresponse);
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
@@ -300,7 +293,7 @@ class  qtype_correctwriting_sequence_analyzer {
                     $result[] = $this->create_moved_mistake($i, $movedpos);
                     $movedcount = $movedcount + 1;
                 } else {
-                    $result[] = $this->create_skipped_mistake($i);
+                    $result[] = $this->create_absent_mistake($i);
                     $skippedcount = $skippedcount + 1;
                 }
             }
@@ -336,7 +329,7 @@ class  qtype_correctwriting_sequence_analyzer {
         return $this->mistakes;
     }
 
-    public function is_errors() {
+    public function has_errors() {
         return !empty($this->errors);
     }
 

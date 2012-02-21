@@ -68,7 +68,7 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
         return $this->mistakes;
     }
 
-    public function is_errors() {
+    public function has_errors() {
         return !empty($this->errors);
     }
 
