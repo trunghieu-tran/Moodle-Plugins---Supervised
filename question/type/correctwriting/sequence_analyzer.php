@@ -61,9 +61,9 @@ class  qtype_correctwriting_sequence_analyzer {
                 //Fill weights of sequence errors
                 $weights = new stdClass;
                 // TODO Extract these  values from question
-                $weights->movedweight = 1;
-                $weights->absentweight = 1;
-                $weights->addedweight = 1;
+                $weights->movedweight = $question->get_moved_weight();
+                $weights->absentweight = $question->get_absent_weight();
+                $weights->addedweight = $question->get_added_weight();
                 // Scan for errors, computing lcs
                 $this->scan_response_mistakes($weights);
             }
