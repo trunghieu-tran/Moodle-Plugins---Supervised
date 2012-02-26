@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_preg_question /*extends question_graded_automatically
+class qtype_correctwriting_question /*extends question_graded_automatically
         implements question_automatically_gradable*/ {
         //TODO - commented out temporarily to use class as passive container for unit-testing - uncomment when real question class would be implemented
 
@@ -45,5 +45,33 @@ class qtype_preg_question /*extends question_graded_automatically
     //Language id in the languages table
     public $langid = 0;
     //Other necessary question data like penalty for each type of mistakes etc
+    
+    /**
+     * Returns a moved lexeme error to provide computation of fitness in sequence analyzer
+     *
+     * @return int weight of moved lexeme error
+     */
+    public function get_moved_weight() {
+        // TODO Replace it with appropriate value
+        return 1;
+    }
+    /**
+     * Returns a absent lexeme error to provide computation of fitness in sequence analyzer
+     *
+     * @return int weight of absent lexeme error
+     */
+    public function get_absent_weight() {
+        // TODO Replace it with appropriate value
+        return 1;
+    }
+    /**
+     * Returns a added lexeme error to provide computation of fitness in sequence analyzer
+     *
+     * @return int weight of added lexeme error
+     */
+    public function get_added_weight() {
+        // TODO Replace it with appropriate value
+        return 1;
+    }
 }
  ?>
