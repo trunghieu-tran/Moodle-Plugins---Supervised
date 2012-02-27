@@ -44,34 +44,16 @@ class qtype_correctwriting_question /*extends question_graded_automatically
     public $threshold = 0;
     //Language id in the languages table
     public $langid = 0;
+
     //Other necessary question data like penalty for each type of mistakes etc
+
     
-    /**
-     * Returns a moved lexeme error to provide computation of fitness in sequence analyzer
-     *
-     * @return int weight of moved lexeme error
-     */
-    public function get_moved_weight() {
-        // TODO Replace it with appropriate value
-        return 1;
-    }
-    /**
-     * Returns a absent lexeme error to provide computation of fitness in sequence analyzer
-     *
-     * @return int weight of absent lexeme error
-     */
-    public function get_absent_weight() {
-        // TODO Replace it with appropriate value
-        return 1;
-    }
-    /**
-     * Returns a added lexeme error to provide computation of fitness in sequence analyzer
-     *
-     * @return int weight of added lexeme error
-     */
-    public function get_added_weight() {
-        // TODO Replace it with appropriate value
-        return 1;
-    }
+    // @var int weight of error, when one lexeme is moved from one place to another
+    public $movedmistakeweight = 1;
+    // @var int weight of error, when one lexeme in response is absent
+    public $absentmistakeweight = 1;
+     // @var int weight of error, when one lexeme is added to response
+    public $addedmistakeweight = 1;
+    
 }
  ?>
