@@ -61,9 +61,9 @@ class  qtype_correctwriting_sequence_analyzer {
                 //Fill weights of sequence errors
                 $weights = new stdClass;
                 // TODO Extract these  values from question
-                $weights->movedweight = $question->get_moved_weight();
-                $weights->absentweight = $question->get_absent_weight();
-                $weights->addedweight = $question->get_added_weight();
+                $weights->movedweight = $question->movedmistakeweight;
+                $weights->absentweight = $question->absentmistakeweight;
+                $weights->addedweight = $question->addedmistakeweight;
                 // Scan for errors, computing lcs
                 $this->scan_response_mistakes($weights);
             }
@@ -98,7 +98,7 @@ class  qtype_correctwriting_sequence_analyzer {
             $maxfitness = 0;
             $isfirst = true;
             $haserrors = false;
-            for ($i = 0;$i < count($alllcs) and $haserrors == false;$i++) {
+            for ($i = 0;$i < count($alllcs) && $haserrors == false;$i++) {
                 $analyzer = new qtype_correctwriting_syntax_analyzer($this->answer, $this->language,
                                                                      $this->correctedresponse,
                                                                      $alllcs[$i]);
@@ -110,7 +110,7 @@ class  qtype_correctwriting_sequence_analyzer {
                  $this->errors = $analyzer->errors();
                 }
                 
-                if (($isfirst == true or $fitness > $maxfitness) and $haserrors==false) { 
+                if (($isfirst == true || $fitness > $maxfitness) && $haserrors==false) { 
                     $maxmistakes = $analyzer->mistakes();
                     $maxfitness = $fitness;
                     $isfirst = false;
@@ -279,10 +279,10 @@ class  qtype_correctwriting_sequence_analyzer {
                 // Determine, whether lexeme is simply moved by scanning response or removed
                 $ismoved = false;
                 $movedpos = -1;
-                for ($j = 0;$j < $responsecount and $ismoved == false;$j++) {
+                for ($j = 0;$j < $responsecount && $ismoved == false;$j++) {
                     // Check whether lexemes are equal
                     $isequal = $answer[$i]->is_same($response[$j]);
-                    if ($isequal == true and $responseused[$j] == false) {
+                    if ($isequal == true && $responseused[$j] == false) {
                         $ismoved = true;
                         $movedpos = $j;
                         $responseused[$j] = true;
