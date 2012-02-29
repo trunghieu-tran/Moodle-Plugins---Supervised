@@ -65,7 +65,8 @@ class poasassignment_model {
                                     'submission' => 'pages/submission.php',
                                     'taskfieldedit' => 'pages/taskfieldedit.php',
                                     'categoryedit' => 'pages/categoryedit.php',
-                                    'taskedit' => 'pages/taskedit.php'
+                                    'taskedit' => 'pages/taskedit.php',
+                                    'tasksimport' => 'pages/tasksimport.php',
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
