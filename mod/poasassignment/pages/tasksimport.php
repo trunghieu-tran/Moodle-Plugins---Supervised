@@ -69,7 +69,11 @@ class tasksimport_page extends abstract_page {
                             'id');
 
                         // Узнать все варианты для поля уровня сложности
-                        $levels = $DB->get_records('poasassignment_variants', array('fieldid' => $complexityfield->id));
+                        $variants = $DB->get_records('poasassignment_variants', array('fieldid' => $complexityfield->id), 'sortorder');
+                        $levels = array();
+                        foreach ($variants as $id => $level) {
+                            array_push($levels, $level->value);
+                        }
 
                         // Получить все уровни сложности из внешней базы данных
                         $sql = "SELECT * FROM mod_complexities";
@@ -78,9 +82,12 @@ class tasksimport_page extends abstract_page {
                             echo $sql;
                         }
                         else {
+                            $newcomplexities = array();
+                            while($complexity = mysql_fetch_assoc($complexities)) {
+                                array_push($newcomplexities, $complexity);
+                            }
+                            $taskrecords = array();
                             while ($variant = mysql_fetch_assoc($result)) {
-                                echo 'Задание<br/>';
-                                echo '<pre>',print_r($variant),'</pre>';
 
                                 $taskrecord = new stdClass();
                                 $taskrecord->name = get_string('defaulttaskname', 'poasassignment') .' №' . $variant['num'];
@@ -88,24 +95,42 @@ class tasksimport_page extends abstract_page {
 
                                 $kcfieldname = 'field' . $complexityfield->id;
                                 $taskrecord->$kcfieldname = array();
+                                $taskrecord->modifications = array();
                                 // Для каждого задания получить список модификаций
-                                $sql = "SELECT id, kc FROM modifications WHERE variantid=".mysql_real_escape_string($variant['id']);
+                                $sql = "SELECT id, num, kc FROM modifications WHERE variantid=".mysql_real_escape_string($variant['id']);
                                 if (!($modifications = mysql_query($sql))) {
                                     echo get_string('errorcantrunquery', 'poasassignment');
                                     echo $sql;
                                 }
                                 else {
                                     while ($modification = mysql_fetch_assoc($modifications)) {
-                                        while($complexitiy = mysql_fetch_assoc($complexities)) {
-                                            if ($modification['kc'] >= $complexitiy['kcmin']
-                                                && $modification['kc'] <= $complexitiy['kcmax']) {
-                                                echo "это " . $complexitiy['name'];
+                                        array_push(
+                                            $taskrecord->modifications,
+                                            array('id' => $modification['id'], 'num' => $modification['num'], 'kc' => $modification['kc'])
+                                        );
+                                        foreach ($newcomplexities as $complexity) {
+                                            if ($modification['kc'] >= $complexity['kcmin']
+                                                && $modification['kc'] <= $complexity['kcmax']) {
+
+                                                // Узнать id этого уровня сложности в таблице poasassignment_variants
+                                                if (array_search($complexity['name'], $levels) !== false) {
+                                                    if (array_search(array_search($complexity['name'], $levels), $taskrecord->$kcfieldname) === false) {
+                                                        array_push($taskrecord->$kcfieldname, array_search($complexity['name'], $levels));
+                                                    }
+                                                }
                                             }
                                         }
-                                        echo 'Модификация<br/>';
-                                        echo '<pre>',print_r($modification),'</pre>';
                                     }
                                 }
+                                array_push($taskrecords, $taskrecord);
+                            }
+                            //echo '<pre>',print_r($levels),'</pre>';
+                            //echo '<pre>',print_r($taskrecords),'</pre>';
+                            foreach ($taskrecords as $taskrecord) {
+                                $model->add_task($taskrecord);
+                                echo get_string('taskimported', 'poasassignment');
+                                echo " ($taskrecord->name, ".shorten_text($taskrecord->description).")";
+                                echo '<br/>';
                             }
                         }
 
@@ -115,7 +140,6 @@ class tasksimport_page extends abstract_page {
             else {
                 print_error('errorcantconnecttoserver', 'poasassignment');
             }
-            echo '<pre>',print_r($data),'</pre>';
         }
         else {
             $this->mform->display();
@@ -124,7 +148,6 @@ class tasksimport_page extends abstract_page {
 }
 class tasksimport_form extends moodleform {
     function definition(){
-        global $DB;
         $mform = $this->_form;
         $instance = $this->_customdata;
 

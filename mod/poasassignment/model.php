@@ -403,7 +403,6 @@ class poasassignment_model {
      * @return int inserted task id 
      */
     public function add_task($data) {
-        echo '<pre>',print_r($data),'</pre>';
         global $DB;
         $data->poasassignmentid=$this->poasassignment->id;
         //$poasassignment = $DB->get_record('poasassignment',array('id'=>$this->poasassignment->id));
