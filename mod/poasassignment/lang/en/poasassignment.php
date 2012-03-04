@@ -345,3 +345,4 @@ $string['databaseconnected'] = 'Database connected';
 $string['defaulttaskname'] = 'Task';
 $string['kcfieldname'] = 'kc field name';
 $string['errorcantrunquery'] = 'Query contains errors';
+$string['taskimported'] = 'Task imported';
