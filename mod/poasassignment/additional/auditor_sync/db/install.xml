@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/poasassignment/additional/auditor_sync/db" VERSION="20120305" COMMENT="XMLDB file for Moodle mod/poasassignment/additional/auditor_sync"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="auditor_sync_tasks" COMMENT="Default comment for auditor_sync, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="auditorvariantid"/>
+        <FIELD NAME="auditorvariantid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="poasassignmenttaskid"/>
+        <FIELD NAME="poasassignmenttaskid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="auditorvariantid" NEXT="comments"/>
+        <FIELD NAME="comments" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="poasassignmenttaskid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
