@@ -256,3 +256,4 @@ $string['fieldname'] = 'Название поля';
 $string['kcfieldname'] = 'Название поля для хранения коэффициента сложности';
 $string['errorcantrunquery'] = 'Невозможно выполнить запрос';
 $string['taskimported'] = 'Задание импортировано';
+$string['poasassignmentadditional'] = 'Дополнительные плагины';

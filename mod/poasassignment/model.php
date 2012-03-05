@@ -309,7 +309,10 @@ class poasassignment_model {
 
         $this->delete_files($cm->id);
         $DB->delete_records('poasassignment', array('id' => $id));
-        $DB->delete_records('poasassignment_tasks', array('poasassignmentid' => $id));
+        $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $id), 'id');
+        foreach ($tasks as $task) {
+            $this->delete_task($task->id);
+        }
         $types=$DB->get_records('poasassignment_ans_stngs', array('poasassignmentid' => $id));
         foreach ( $types as $type) {
             $DB->delete_records('poasassignment_answers', array('id' => $type->answerid));
@@ -492,6 +495,7 @@ class poasassignment_model {
      */
     function delete_task($taskid) {
         global $DB;
+
         // Delete task record
         $DB->delete_records('poasassignment_tasks',array('id'=>$taskid));
         
@@ -508,7 +512,8 @@ class poasassignment_model {
         // Delete task from students
         $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), '', 'id, taskid');
         $DB->delete_records('poasassignment_assignee', array('taskid' => $taskid));
-        
+
+        $DB->delete_records('auditor_sync_tasks', array('poasassignmenttaskid' => $taskid));
         //TODO удалять попытки и оценки студента по этому заданию
     }
     
@@ -922,12 +927,6 @@ class poasassignment_model {
             if ($data->valuemax == $data->valuemin)
                 $data->random = 0;
         }
-        /*$tasks = $DB->get_records('poasassignment_tasks',array('poasassignmentid'=>$this->poasassignment->id));
-        foreach ($tasks as $task) {
-            $taskvalue->fieldid=$fieldid;
-            $taskvalue->taskid=$task->id;
-            $DB->insert_record('poasassignment_task_values',$taskvalue);
-        }*/
         return $data;
     }
 

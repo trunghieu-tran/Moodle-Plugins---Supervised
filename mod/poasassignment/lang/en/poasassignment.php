@@ -346,3 +346,4 @@ $string['defaulttaskname'] = 'Task';
 $string['kcfieldname'] = 'kc field name';
 $string['errorcantrunquery'] = 'Query contains errors';
 $string['taskimported'] = 'Task imported';
+$string['poasassignmentadditional'] = 'Additional subplugins';

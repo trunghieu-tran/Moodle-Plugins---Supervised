@@ -168,6 +168,12 @@ function poasassignment_print_recent_activity($course, $isteacher, $timestart) {
  * @todo Finish documenting this function
  **/
 function poasassignment_cron () {
+    //TODO Полиморфизм сюда
+    echo dirname(__FILE__);
+    if (file_exists(dirname(__FILE__).'/additional/auditor_sync/auditor_sync.php')) {
+        require_once(dirname(__FILE__).'/additional/auditor_sync/auditor_sync.php');
+        auditor_sync::get_instance()->synchronize();
+    }
     return true;
 }
 
