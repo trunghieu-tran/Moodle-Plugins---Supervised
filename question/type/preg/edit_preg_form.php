@@ -78,6 +78,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
+        //If no correct answer is entered, we should think it is correct to not force techer; otherwise we must check that it match with at least one 100% grade answer.
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $passhintgradeborder = false;
         $fractions = $data['fraction'];
@@ -97,6 +98,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
+                //Not using exactmatch option to not confuse user by things it adds to regex
                 $matcher =& $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();

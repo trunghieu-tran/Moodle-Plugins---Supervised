@@ -29,6 +29,23 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return $result;
     }
 
+    public function correct_response(question_attempt $qa) {
+        $question = $qa->get_question();
+        $response = $qa->get_last_qt_var('answer');
+
+        if ($response) {//Generate response-specific correct answer if there is response
+            $correctanswer = $question->get_correct_response_ext(array('answer' => $response));
+        } else {
+            $correctanswer = $question->get_correct_response();
+        }
+
+        if (!$correctanswer) {
+            return '';
+        }
+
+        return get_string('correctansweris', 'qtype_shortanswer', s($correctanswer['answer']));
+    }
+
     //Overloading feedback to add colored string 
     public function feedback(question_attempt $qa, question_display_options $options) {
 
@@ -123,15 +140,4 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
 
-    public function correct_response(question_attempt $qa) {
-
-        //TODO - If there is complete correct ending for a student's response available, show $correctpart.$hintedending instead of teacher-entered correct answer
-        $correctresponse = $qa->get_question()->get_correct_response(); 
-        $answer = $correctresponse['answer'];
-        if (!$answer) { //Correct answer isn't set by the teacher
-            return '';
-        }
-
-        return get_string('correctansweris', 'qtype_shortanswer', s($answer));
-    }
 }

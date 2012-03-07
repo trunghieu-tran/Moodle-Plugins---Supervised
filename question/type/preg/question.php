@@ -163,13 +163,21 @@ class qtype_preg_question extends question_graded_automatically
 
     /**
     * Calculates and fill $this->bestfitanswer if necessary.
-    * @param $response response to find best fit answer
+    * @param $response Response to find best fit answer
+    * @param $gradeborder float Set this argument if you want to find answer with other border than defined in question, used to get correct answer (100% border)
     * @return array 'answer' => answer object, best fitting student's response, 'match' => matching results object @see{qtype_preg_matching_results}
     */
-    public function get_best_fit_answer(array $response) {
+    public function get_best_fit_answer(array $response, $gradeborder = null) {
         //Check cache for valid results
-        if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array()) {
+        if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array() && $gradeborder === null) {
             return $this->bestfitanswer;
+        }
+
+        //Set $hintgradeborder
+        if ($gradeborder === null) {//No grade border set, use question one
+            $hintgradeborder = $this->hintgradeborder;
+        } else {//We would still need to remember whether gradeborder === null for cache purposes, so use another variable
+            $hintgradeborder = $gradeborder;
         }
 
         $querymatcher = $this->get_query_matcher($this->engine);//this matcher will be used to query engine capabilities
@@ -182,7 +190,7 @@ class qtype_preg_question extends question_graded_automatically
         $bestmatchresult = new qtype_preg_matching_results();
         if ($ispartialmatching) {
             foreach ($this->answers as $answer) {
-                if ($answer->fraction >= $this->hintgradeborder) {
+                if ($answer->fraction >= $hintgradeborder) {
                     $bestfitanswer = $answer;
                     $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
                     $bestmatchresult = $matcher->match($response['answer']);
@@ -212,7 +220,7 @@ class qtype_preg_question extends question_graded_automatically
 
             //When hinting we should use only answers within hint border except full matching case and there is some match at all.
             //If engine doesn't support hinting we shoudn't bother with fitness too.
-            if (!$ispartialmatching || !$matchresults->is_match() || $answer->fraction < $this->hintgradeborder) {
+            if (!$ispartialmatching || !$matchresults->is_match() || $answer->fraction < $hintgradeborder) {
                 continue;
             }
 
@@ -230,11 +238,15 @@ class qtype_preg_question extends question_graded_automatically
             }
         }
 
-        //Save best fitted answer for further uses.
-        $this->bestfitanswer['answer'] = $bestfitanswer;
-        $this->bestfitanswer['match'] = $bestmatchresult;
-        $this->responseforbestfit = $response['answer'];
-        return $this->bestfitanswer;
+        $bestfit = array();
+        $bestfit['answer'] = $bestfitanswer;
+        $bestfit['match'] = $bestmatchresult;
+        //Save best fitted answer for further uses (default grade border only)
+        if ($gradeborder === null) {
+            $this->bestfitanswer = $bestfit;
+            $this->responseforbestfit = $response['answer'];
+        }
+        return $bestfit;
     }
 
     public function get_matching_answer(array $response) {
@@ -321,8 +333,29 @@ class qtype_preg_question extends question_graded_automatically
         return new $engineclass;
     }
 
+    /**
+     * Enchancing base class function with ability to generate correct response closest to student's one when given
+     */
+    public function get_correct_response_ext($response) {
+        $correctanswer = $this->correctanswer;
+        if (trim($correctanswer) == '') {
+            //No correct answer set be the teacher, so try to generate correct response.
+            //TODO - should we default to generate even if teacher entered the correct answer?
+            $bestfit = $this->get_best_fit_answer($response, 1);
+            $matchresults = $bestfit['match'];
+            if (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full) {
+                //Engine generated a full match
+                $correctanswer = $matchresults->correct_before_hint().$matchresults->string_extension();
+            }
+        }
+        return array('answer' => $correctanswer);
+    }
+
+    /**
+     * Standard overloading of base function
+     */
     public function get_correct_response() {
-        return array('answer' => $this->correctanswer);
+        return $this->get_correct_response_ext(array('answer' => ''));
     }
 
     public function summarise_response(array $response) {
