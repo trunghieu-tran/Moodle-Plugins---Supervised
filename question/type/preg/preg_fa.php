@@ -488,8 +488,130 @@ abstract class qtype_preg_finite_automaton {
         fprintf($dotfile, "};");
         fclose($dotfile);
         $regexhandler->execute_dot($dotfn, $jpgfilename);
-        unlink($dotfn);
+        //unlink($dotfn);
     }
+	
+	
+	/**
+	*function read fa from special code and modif current object
+	*code format: i->abc->j;k->charset->l; e.t.c. надеюсь не перепутал английское сокращение
+	*maximum count of subpatterns in reading fa is 9 in current implementation
+	*@param facode string with code of finite automata
+	*/
+	public function input_fa($facode) {
+		$this->read_code_member($facode);
+		$this->set_start_state($this->states[0]);
+		$this->set_end_state($this->states[$this->statecount-1]);
+	}
 
-
+	/**
+	*function read one code member
+	*@param facode string with code of finite automata
+	*@param start index of first character of current member in facode
+	*@param counter priority of transition
+	*/
+	protected function read_code_member($facode, $start=0, &$counter=0) {
+		if ($start >= strlen($facode)) {
+			return;
+		}
+		$end=$start;
+		$tmpstr='';
+		while ($facode[$end]!='-') {
+			$tmpstr .= $facode[$end];
+			$end++;
+		}
+		$end+=2;
+		$fir = (int)$tmpstr;
+		$tmpstr = '';
+		$transition = self::read_transition($facode, $end);
+		$end++;
+		while($facode[$end-2]!='-' || $facode[$end-1]!='>') {
+			$end++;
+		}
+		while ($facode[$end]!=';') {
+			$tmpstr .= $facode[$end];
+			$end++;
+		}
+		$lst = (int)$tmpstr;
+		if (!isset($this->states[$fir])) {
+			$this->states[$fir] = new qtype_preg_fa_state();
+			$this->states[$fir]->set_FA(&$this);
+			$this->statecount++;
+			if ($this->statecount > $this->statelimit) {
+				throw new qtype_preg_toolargefa_exception('');
+			}
+		}
+		if (!isset($this->states[$lst])) {
+			$this->states[$lst] = new qtype_preg_fa_state();
+			$this->states[$lst]->set_FA(&$this);
+			$this->statecount++;
+			if ($this->statecount > $this->statelimit) {
+				throw new qtype_preg_toolargefa_exception('');
+			}
+		}
+		$transition->to =& $this->states[$lst];
+		$end++;
+		$this->states[$fir]->add_transition($transition, $counter);
+		$this->read_code_member($facode, $end, $counter);
+	}
+	
+	/**
+	*function read one leaf of regex from code of finite automata
+	*@param facode string with code of finite automata
+	*@param start index of first character of current leaf in facode
+	*/
+	static protected function read_transition($facode, $start) {
+		$i = $start;
+		$subpattstarts = array();
+		$subpattends = array();
+		$charset = '';
+		$error = false;
+		//input subpatterns
+		if ($facode[$start]=='#') {
+			$i = $start+1;
+			do {
+				if ($i>=strlen($facode)) {
+					$error = true;
+					echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
+					//TODO: error message
+				} else if ($facode[$i]=='s') {
+					$subpattstarts[] = (int)$facode[$i+1];
+				} else if ($facode[$i]=='e') {
+					$subpattends[] = (int)$facode[$i+1];
+				} else {
+					$error = true;
+					echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
+					//TODO: error message
+				}
+				$i+=2;
+			} while (!$error && $i<strlen($facode) && $facode[$i]!='#');
+			$i++;
+		}
+		if ($error || $i>=strlen($facode)) {
+			return;
+		}
+		//input transition leaf
+		while ($facode[$i]!='-' || $facode[$i+1]!='>') {
+			if ($facode[$i]=='\\') {
+				$charset .= $facode[$i+1];
+				$i+=2;
+			} else {
+				$charset .= $facode[$i];
+				$i++;
+			}
+		}
+		$leaf = new preg_leaf_charset();
+		$leaf->charset = $charset;
+		//TODO: input for dfa
+		$trash =  new qtype_preg_fa_state();
+		$transition = new qtype_preg_nfa_transition($trash, $leaf, $trash);
+		$transition->tags = array();
+		foreach ($subpattstarts as $val) {
+			$transition->tags[] = $val*2;
+		}
+		foreach ($subpattends as $val) {
+			$transition->tags[] = $val*2+1;
+		}
+		return $transition;
+	}
 };
