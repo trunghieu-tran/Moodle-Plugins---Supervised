@@ -573,7 +573,7 @@ abstract class qtype_preg_finite_automaton {
 				if ($i>=strlen($facode)) {
 					$error = true;
 					echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
-					//TODO: error message
+					//TODO: correct error message
 				} else if ($facode[$i]=='s') {
 					$subpattstarts[] = (int)$facode[$i+1];
 				} else if ($facode[$i]=='e') {
@@ -581,7 +581,7 @@ abstract class qtype_preg_finite_automaton {
 				} else {
 					$error = true;
 					echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
-					//TODO: error message
+					//TODO: correct error message
 				}
 				$i+=2;
 			} while (!$error && $i<strlen($facode) && $facode[$i]!='#');
