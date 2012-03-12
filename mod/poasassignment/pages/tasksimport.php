@@ -201,6 +201,11 @@ class tasksimport_page extends abstract_page {
         echo '<form action="" method="post">';
         $table->print_html();
         echo '<input type="hidden" name="count" value="'.count($tasks).'"/>';
+        echo '<input type="hidden" name="page" value="tasksimport"/>';
+        $model = poasassignment_model::get_instance();
+        $poasassignmentid = $model->get_poasassignment()->id;
+        echo '<input type="hidden" name="poasassignmentid" value="'.$poasassignmentid.'"/>';
+        echo '<input type="hidden" name="id" value="'.$model->get_cm()->id.'"/>';
         echo '<input type="submit" name="submit" value="Импорт скачанных заданий"/>';
         echo '</form>';
 
