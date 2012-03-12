@@ -116,14 +116,42 @@ class auditor_sync {
         if ($db = mysql_connect($server, $user, $password)) {
             mysql_set_charset('UTF8');
             if (!mysql_select_db($database, $db)) {
-                return get_string('errorcantconnecttodatabase', 'poasassignment');
+                return
+                    get_string('errorcantconnecttodatabase', 'poasassignment').
+                    ' - '.
+                    mysql_error();
             }
             else {
                 return false;
             }
         }
         else {
-            return get_string('errorcantconnecttoserver', 'poasassignment');
+            return
+                get_string('errorcantconnecttoserver', 'poasassignment').
+                ' - '.
+                mysql_error();
         }
+    }
+
+    /**
+     * Получить массив полей экземпляра задания, которые могут хранить уровень сложности.
+     * Такие поля имеют тип MULTILIST
+     *
+     * @access public
+     * @param int $poasassignmentid идентификатор экземпляра задания
+     * @return array массив вида [id] => название поля
+     */
+    public function get_possible_kc_fields($poasassignmentid) {
+        global $DB;
+        $fields = $DB->get_records(
+            'poasassignment_fields',
+            array('poasassignmentid' => $poasassignmentid, 'ftype' => MULTILIST),
+            'id',
+            'id, name'
+        );
+        foreach ($fields as $k => $v) {
+            $fields[$k] = $v->name;
+        }
+        return $fields;
     }
 }
