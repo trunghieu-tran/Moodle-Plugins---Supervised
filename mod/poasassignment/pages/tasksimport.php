@@ -36,7 +36,8 @@ class tasksimport_page extends abstract_page {
             null,
             array(
                 'id' => $model->get_cm()->id,
-                'poasassignmentid' => $poasassignmentid)
+                'poasassignmentid' => $poasassignmentid,
+                'options' => auditor_sync::get_instance()->get_possible_kc_fields($poasassignmentid))
         );
     }
     /**
@@ -55,14 +56,9 @@ class tasksimport_page extends abstract_page {
                     echo $sql;
                 }
                 else{
-                    // Узнать заранее идентификатор поля, в котором poasassignment хранит уровень сложности
-                    $complexityfield = $DB->get_record(
-                        'poasassignment_fields',
-                        array('poasassignmentid' =>$model->get_poasassignment()->id, 'name' => $data->kcfieldname),
-                        'id');
 
                     // Узнать все варианты для поля уровня сложности
-                    $variants = $DB->get_records('poasassignment_variants', array('fieldid' => $complexityfield->id), 'sortorder');
+                    $variants = $DB->get_records('poasassignment_variants', array('fieldid' => $data->kcfield), 'sortorder');
                     $levels = array();
                     foreach ($variants as $id => $level) {
                         array_push($levels, $level->value);
@@ -88,7 +84,7 @@ class tasksimport_page extends abstract_page {
                             $taskrecord->comments = $variant['comments'];
                             $taskrecord->id = $variant['id'];
 
-                            $kcfieldname = 'field' . $complexityfield->id;
+                            $kcfieldname = 'field' . $data->kcfield;
                             $taskrecord->$kcfieldname = array();
                             $taskrecord->modifications = array();
                             // Для каждого задания получить список модификаций
@@ -125,11 +121,12 @@ class tasksimport_page extends abstract_page {
                         }
                         //echo '<pre>',print_r($levels),'</pre>';
                         //echo '<pre>',print_r($taskrecords),'</pre>';
+                        $this->show_preview($taskrecords, $kcfieldname, $levels);
                         foreach ($taskrecords as $taskrecord) {
-                            $taskrecord->id = auditor_sync::get_instance()->import_task($taskrecord);
+                            /*$taskrecord->id = auditor_sync::get_instance()->import_task($taskrecord);
                             echo get_string('taskimported', 'poasassignment');
                             echo " (id=$taskrecord->id, $taskrecord->name, ".shorten_text($taskrecord->description).")";
-                            echo '<br/>';
+                            echo '<br/>';*/
                         }
                     }
                 }
@@ -141,6 +138,72 @@ class tasksimport_page extends abstract_page {
         else {
             $this->mform->display();
         }
+    }
+
+    private function show_preview($tasks, $kcfieldname, $levels) {
+        echo '<pre>',print_r($tasks),'</pre>';
+        global $PAGE, $CFG;
+        require_once($CFG->libdir . '/tablelib.php');
+        $table = new flexible_table('mod-poasassignment-task-import');
+        $table->baseurl = $PAGE->url;
+        $columns = array(
+            'id',
+            'name',
+            'description',
+            'comments',
+            'kc',
+            'modifications');
+        $headers = array(
+            'id',
+            'Название задания',
+            'Описание задания',
+            'Комментарии',
+            'Сложность',
+            'Модификации'
+        );
+        $table->define_columns($columns);
+        $table->define_headers($headers);
+        $table->collapsible(false);
+        $table->initialbars(false);
+        $table->set_attribute('class', 'poasassignment-table task-import');
+
+        $table->setup();
+        for ($i = 0; $i < count($tasks); $i++) {
+            $row = array();
+            // id
+            $row[] = '<input name="id_'.$i.'" type="text" value="'.$tasks[i]->id.'" size="5"/>';
+            // name
+            $row[] = '<input name="name_'.$i.'" type="text" value="'.$tasks[i]->name.'"/>';
+            // description
+            $row[] = '<textarea name="description_'.$i.'"/>'.$tasks[i]->description.'</textarea>';
+            // comments
+            $row[] = '<textarea name="comments_'.$i.'"/>'.$tasks[i]->comments.'</textarea>';
+            // complexity levels
+            $select = '<select name="levels_'.$i.'[]" multiple="multiple">';
+            foreach ($levels as $k=>$level) {
+                if (array_search($k, $tasks[i]->$kcfieldname) !== false) {
+                    $select .= '<option selected="selected" value="'.$k.'">'.$level.'</option>';
+                }
+                else {
+                    $select .= '<option value="'.$k.'">'.$level.'</option>';
+                }
+            }
+            $select .= '</select>';
+            $row[] = $select;
+            // modifications
+            $mod = '';
+            foreach ($tasks[i]->modifications as $modification) {
+                $mod .= '['.$modification['id'].'] с коэффициентом '.$modification['kc'].'<br/>';
+            }
+            $row[] = $mod;
+            $table->add_data($row);
+        }
+        echo '<form action="" method="post">';
+        $table->print_html();
+        echo '<input type="hidden" name="count" value="'.count($tasks).'"/>';
+        echo '<input type="submit" name="submit" value="Импорт скачанных заданий"/>';
+        echo '</form>';
+
     }
 }
 class tasksimport_form extends moodleform {
@@ -170,8 +233,9 @@ class tasksimport_form extends moodleform {
         $mform->addElement('text','lessontypeid','lessontypeid', array('size'=>45));
         $mform->addRule('lessontypeid', null, 'required', null, 'client');
 
-        $mform->addElement('text','kcfieldname',get_string('kcfieldname', 'poasassignment'), array('size'=>45));
-        $mform->addRule('kcfieldname', null, 'required', null, 'client');
+        //$mform->addElement('text','kcfieldname',get_string('kcfieldname', 'poasassignment'), array('size'=>45));
+        //$mform->addRule('kcfieldname', null, 'required', null, 'client');
+        $mform->addElement('select', 'kcfield', 'Поле уровня сложности', $instance['options']);
 
 
         $mform->addElement('hidden', 'id', $instance['id']);
