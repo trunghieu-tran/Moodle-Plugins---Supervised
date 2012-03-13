@@ -90,6 +90,7 @@ class parameterchoice extends taskgiver{
 
                 //echo implode(',',$satisfyingtasks).'<br>';
                 if (count($satisfyingtasks) > 0) {
+                    shuffle($satisfyingtasks);
                     $taskid = $satisfyingtasks[rand(0, count($satisfyingtasks) - 1)];
                     /*$taskid = $satisfyingtasks[0];
                     $tasktimesmet = 1;
