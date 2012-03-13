@@ -118,7 +118,7 @@ class parameterchoice extends taskgiver{
         return $mform;
     }
     
-    function process_after_tasks($cmid, $poasassignment) {
+    function process_before_tasks($cmid, $poasassignment) {
     	if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
 	        $mform = $this->parameter_search($cmid, $poasassignment);
 	        $mform->display();
