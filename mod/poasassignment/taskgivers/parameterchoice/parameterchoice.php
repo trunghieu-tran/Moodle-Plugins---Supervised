@@ -88,9 +88,10 @@ class parameterchoice extends taskgiver{
                     }
                 }
 
-                //echo implode($satisfyingtasks).'<br>';
-                if ($satisfyingtasks) {
-                    $taskid = $satisfyingtasks[0];
+                //echo implode(',',$satisfyingtasks).'<br>';
+                if (count($satisfyingtasks) > 0) {
+                    $taskid = $satisfyingtasks[rand(0, count($satisfyingtasks) - 1)];
+                    /*$taskid = $satisfyingtasks[0];
                     $tasktimesmet = 1;
                     $tmp = 0;
                     for ($i = 0; $i < count($satisfyingtasks); $i++) {
@@ -105,7 +106,7 @@ class parameterchoice extends taskgiver{
                         }
                          $tasktimesmet = $tmp;
                          $tmp = 0;
-                    }
+                    }*/
                     //echo 'task with id'.$taskid.' was met '.$tasktimesmet.' times';
                     $poasmodel->bind_task_to_assignee($USER->id,$taskid);
                     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
