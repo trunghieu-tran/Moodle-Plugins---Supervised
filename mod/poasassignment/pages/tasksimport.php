@@ -9,6 +9,7 @@ require_once(dirname(dirname(__FILE__)).'/additional/auditor_sync/auditor_sync.p
 class tasksimport_page extends abstract_page {
     var $poasassignment;
     var $mform;
+    private $taskrecords = array();
 
     function __construct($cm, $poasassignment) {
         $this->poasassignment = $poasassignment;
@@ -30,6 +31,10 @@ class tasksimport_page extends abstract_page {
     }
 
     function pre_view() {
+        $confirmed = optional_param('confirmed', false, PARAM_ALPHA);
+        if ($confirmed && $confirmed == 'confirmed') {
+            $this->add_tasks_confirmed();
+        }
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
         $this->mform = new tasksimport_form(
@@ -40,12 +45,48 @@ class tasksimport_page extends abstract_page {
                 'options' => auditor_sync::get_instance()->get_possible_kc_fields($poasassignmentid))
         );
     }
+
+    /**
+     * Добавить задания в базу данных
+     *
+     * @access private
+     */
+    private function add_tasks_confirmed() {
+        $count = optional_param('count', 0, PARAM_INTEGER);
+        $this->taskrecords = array();
+        for ($i = 0; $i < $count; $i++) {
+            $taskrecord = new stdClass();
+            $taskrecord->name = htmlspecialchars($_POST['name_'.$i]);
+            $taskrecord->description = htmlspecialchars($_POST['description_'.$i]);
+            $taskrecord->comments = htmlspecialchars($_POST['comments_'.$i]);
+            $taskrecord->id = required_param('id_'.$i, PARAM_INT);
+            $kcfieldname = required_param('kcfieldname', PARAM_ALPHANUMEXT);
+            $taskrecord->$kcfieldname = optional_param('levels_'.$i, array(), PARAM_INT);
+            $this->taskrecords[] = $taskrecord;
+        }
+    }
     /**
      * Показать форму для настройки соединения с сервером
      */
     function view() {
         global $DB;
         $model = poasassignment_model::get_instance();
+        if (count($this->taskrecords) > 0) {
+            foreach ($this->taskrecords as $taskrecord) {
+                $taskrecord->id = auditor_sync::get_instance()->import_task($taskrecord);
+                echo get_string('taskimported', 'poasassignment');
+                echo " (id=$taskrecord->id, $taskrecord->name, ".shorten_text($taskrecord->description).")";
+                echo '<br/>';
+            }
+            $this->taskrecords = array();
+            $url = new moodle_url('view.php',
+                        array(  'page' => 'tasks',
+                                'id' => required_param('id', PARAM_INT)
+                        )
+                    );
+            echo html_writer::link($url, 'К списку заданий');
+            return;
+        }
         if ($this->mform->get_data()) {
             $data = $this->mform->get_data();
             $error = auditor_sync::get_instance()->connect_auditor($data->server, $data->dbuser, $data->dbpass, $data->database);
@@ -56,7 +97,6 @@ class tasksimport_page extends abstract_page {
                     echo $sql;
                 }
                 else{
-
                     // Узнать все варианты для поля уровня сложности
                     $variants = $DB->get_records('poasassignment_variants', array('fieldid' => $data->kcfield), 'sortorder');
                     $levels = array();
@@ -121,13 +161,14 @@ class tasksimport_page extends abstract_page {
                         }
                         //echo '<pre>',print_r($levels),'</pre>';
                         //echo '<pre>',print_r($taskrecords),'</pre>';
+
                         $this->show_preview($taskrecords, $kcfieldname, $levels);
-                        foreach ($taskrecords as $taskrecord) {
+                        /*foreach ($taskrecords as $taskrecord) {*/
                             /*$taskrecord->id = auditor_sync::get_instance()->import_task($taskrecord);
                             echo get_string('taskimported', 'poasassignment');
                             echo " (id=$taskrecord->id, $taskrecord->name, ".shorten_text($taskrecord->description).")";
                             echo '<br/>';*/
-                        }
+                        /*}*/
                     }
                 }
             }
@@ -141,7 +182,8 @@ class tasksimport_page extends abstract_page {
     }
 
     private function show_preview($tasks, $kcfieldname, $levels) {
-        echo '<pre>',print_r($tasks),'</pre>';
+        //echo '<pre>',print_r($tasks),'</pre>';
+        echo '<form action="" method="post">';
         global $PAGE, $CFG;
         require_once($CFG->libdir . '/tablelib.php');
         $table = new flexible_table('mod-poasassignment-task-import');
@@ -171,17 +213,17 @@ class tasksimport_page extends abstract_page {
         for ($i = 0; $i < count($tasks); $i++) {
             $row = array();
             // id
-            $row[] = '<input name="id_'.$i.'" type="text" value="'.$tasks[i]->id.'" size="5"/>';
+            $row[] = $tasks[$i]->id.'<input name="id_'.$i.'" type="hidden" value="'.$tasks[$i]->id.'" size="5"/>';
             // name
-            $row[] = '<input name="name_'.$i.'" type="text" value="'.$tasks[i]->name.'"/>';
+            $row[] = '<input name="name_'.$i.'" type="text" value="'.$tasks[$i]->name.'"/>';
             // description
-            $row[] = '<textarea name="description_'.$i.'"/>'.$tasks[i]->description.'</textarea>';
+            $row[] = '<textarea name="description_'.$i.'"/>'.$tasks[$i]->description.'</textarea>';
             // comments
-            $row[] = '<textarea name="comments_'.$i.'"/>'.$tasks[i]->comments.'</textarea>';
+            $row[] = '<textarea name="comments_'.$i.'"/>'.$tasks[$i]->comments.'</textarea>';
             // complexity levels
             $select = '<select name="levels_'.$i.'[]" multiple="multiple">';
             foreach ($levels as $k=>$level) {
-                if (array_search($k, $tasks[i]->$kcfieldname) !== false) {
+                if (array_search($k, $tasks[$i]->$kcfieldname) !== false) {
                     $select .= '<option selected="selected" value="'.$k.'">'.$level.'</option>';
                 }
                 else {
@@ -192,13 +234,12 @@ class tasksimport_page extends abstract_page {
             $row[] = $select;
             // modifications
             $mod = '';
-            foreach ($tasks[i]->modifications as $modification) {
+            foreach ($tasks[$i]->modifications as $modification) {
                 $mod .= '['.$modification['id'].'] с коэффициентом '.$modification['kc'].'<br/>';
             }
             $row[] = $mod;
             $table->add_data($row);
         }
-        echo '<form action="" method="post">';
         $table->print_html();
         echo '<input type="hidden" name="count" value="'.count($tasks).'"/>';
         echo '<input type="hidden" name="page" value="tasksimport"/>';
@@ -206,6 +247,8 @@ class tasksimport_page extends abstract_page {
         $poasassignmentid = $model->get_poasassignment()->id;
         echo '<input type="hidden" name="poasassignmentid" value="'.$poasassignmentid.'"/>';
         echo '<input type="hidden" name="id" value="'.$model->get_cm()->id.'"/>';
+        echo '<input type="hidden" name="confirmed" value="confirmed"/>';
+        echo '<input type="hidden" name="kcfieldname" value="' . $kcfieldname . '"/>';
         echo '<input type="submit" name="submit" value="Импорт скачанных заданий"/>';
         echo '</form>';
 
