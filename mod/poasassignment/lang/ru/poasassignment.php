@@ -259,3 +259,4 @@ $string['taskimported'] = 'Задание импортировано';
 $string['poasassignmentadditional'] = 'Дополнительные плагины';
 $string['itsyourtask'] = 'Это ваше задание';
 $string['itsnotyourtask'] = 'Это не ваше задание';
+$string['errornotyourtask'] = 'Это не ваше задание';

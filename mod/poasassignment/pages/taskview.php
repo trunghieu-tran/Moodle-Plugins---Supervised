@@ -14,10 +14,36 @@ class taskview_page extends abstract_page {
     
     function has_satisfying_parameters() {
     	//TODO приватность
-        global $DB;
+        global $DB, $USER;
         if(!$this->task = $DB->get_record('poasassignment_tasks', array('id' => $this->taskid))) {        
             $this->lasterror = 'errornonexistenttask';
             return false;
+        }
+        $model = poasassignment_model::get_instance();
+        $poasassignmentid = $model->get_poasassignment()->id;
+        $owntask = $DB->record_exists('poasassignment_assignee',
+            array(
+                'userid' => $USER->id,
+                'taskid' => $this->taskid,
+                'poasassignmentid' => $poasassignmentid,
+                'cancelled' => 0));
+        // If you are student and this is not your task, and you can't see other's student tasks...
+        if (has_capability('mod/poasassignment:havetask', $model->get_context())
+            && !$owntask
+            && !has_capability('mod/poasassignment:seeotherstasks', $model->get_context())) {
+
+            // And you also has your own task
+            $sql = 'SELECT COUNT(*) as cnt from {poasassignment_assignee}
+                where
+                userid=? and
+                poasassignmentid=? and
+                cancelled=0 and
+                taskid>0';
+            $taskscount = $DB->get_record_sql($sql, array($USER->id, $poasassignmentid));
+            if ($taskscount->cnt > 0) {
+                $this->lasterror = 'errornotyourtask';
+                return false;
+            }
         }
         return true;
     }
@@ -45,7 +71,8 @@ class taskview_page extends abstract_page {
         $owntask = $DB->record_exists('poasassignment_assignee',
             array('userid' => $USER->id,
                 'taskid' => $this->taskid,
-                'poasassignmentid' => $poasassignmentid));
+                'poasassignmentid' => $poasassignmentid,
+                'cancelled' => 0));
 
         $html = '';
         $html .= $OUTPUT->box_start();
