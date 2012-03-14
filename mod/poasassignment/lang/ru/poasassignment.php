@@ -257,3 +257,5 @@ $string['kcfieldname'] = 'Название поля для хранения ко
 $string['errorcantrunquery'] = 'Невозможно выполнить запрос';
 $string['taskimported'] = 'Задание импортировано';
 $string['poasassignmentadditional'] = 'Дополнительные плагины';
+$string['itsyourtask'] = 'Это ваше задание';
+$string['itsnotyourtask'] = 'Это не ваше задание';
