@@ -10,6 +10,11 @@ class auditor_sync {
     private function __construct() {
 
     }
+
+    /**
+     * @static
+     * @return auditor_sync
+     */
     public static function get_instance() {
         if (self::$instance == null) {
             self::$instance = new self();

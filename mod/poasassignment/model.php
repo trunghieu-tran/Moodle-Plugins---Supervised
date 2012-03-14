@@ -424,11 +424,11 @@ class poasassignment_model {
                 $fieldvalue->value=null;
             $multilistvalue='';
             if ($field->ftype==MULTILIST) {
-                for($i=0;$i<count($fieldvalue->value);$i++) $multilistvalue.=$fieldvalue->value[$i].',';
-                $fieldvalue->value=$multilistvalue;
+                for($i=0; $i<count($fieldvalue->value); $i++)
+                    $multilistvalue .= $fieldvalue->value[$i].',';
+                $fieldvalue->value = $multilistvalue;
 
             }
-
             $taskvalueid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
             if ($field->ftype==FILE) {
                 $this->save_files($data->$value,'poasassignmenttaskfiles',$taskvalueid);
