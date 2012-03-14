@@ -349,3 +349,4 @@ $string['taskimported'] = 'Task imported';
 $string['poasassignmentadditional'] = 'Additional subplugins';
 $string['itsyourtask'] = "It's your task";
 $string['itsnotyourtask'] = "It's not your task";
+$string['errornotyourtask'] = "It's not your task";
