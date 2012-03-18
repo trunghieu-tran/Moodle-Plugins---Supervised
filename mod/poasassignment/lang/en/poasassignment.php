@@ -350,3 +350,5 @@ $string['poasassignmentadditional'] = 'Additional subplugins';
 $string['itsyourtask'] = "It's your task";
 $string['itsnotyourtask'] = "It's not your task";
 $string['errornotyourtask'] = "It's not your task";
+$string['auditortasks'] = 'Sync with Auditor';
+$string['auditortasks_help'] = 'Sync with Auditor help';
