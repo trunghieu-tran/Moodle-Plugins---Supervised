@@ -43,8 +43,6 @@ class tasks_page extends abstract_page {
         $taskgiver = new $taskgivername();
         $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
 
-
-
         if ($hascapmanage || $taskgivername::show_tasks()) {
             $this->view_table($hascapmanage, $taskgiver);
             $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
@@ -53,7 +51,7 @@ class tasks_page extends abstract_page {
         if ($hascapmanage) {
             $id = $this->cm->id;
             echo '<div align="center">';
-            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addbuttontext','poasassignment'));
+            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addtask','poasassignment'));
             echo '</div>';
         }
 
