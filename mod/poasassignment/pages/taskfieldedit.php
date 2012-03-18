@@ -418,7 +418,10 @@ class taskfieldedit_form extends moodleform {
         $mform->setType('mode', PARAM_TEXT);
         
         $mform->addElement('text','name',get_string('taskfieldname','poasassignment'),array('maxlength' => 45, 'size' => 50));
+        $mform->addHelpButton('name', 'taskfieldname', 'poasassignment');
+
         $mform->addElement('textarea','description',get_string('taskfielddescription','poasassignment'),'rows="5" cols="50"');
+        $mform->addHelpButton('description', 'taskfielddescription', 'poasassignment');
         $mform->addRule('name', null, 'required', null, 'client');
         $ftypes = array(get_string('char','poasassignment'),
                         get_string('text','poasassignment'),
@@ -430,11 +433,17 @@ class taskfieldedit_form extends moodleform {
                         get_string('multilist','poasassignment'));
                         //get_string('category', 'poasassignment'));
         $mform->addElement('select','ftype',get_string('ftype','poasassignment'),$ftypes);
-        $mform->addElement('checkbox','showintable',get_string('showintable','poasassignment'));       
-        
+        $mform->addHelpButton('ftype', 'ftype', 'poasassignment');
+
+        $mform->addElement('checkbox','showintable',get_string('showintable','poasassignment'));
+        $mform->addHelpButton('showintable', 'showintable', 'poasassignment');
+
         $mform->addElement('checkbox','secretfield',get_string('secretfield','poasassignment'));
+        $mform->addHelpButton('secretfield', 'secretfield', 'poasassignment');
         
         $mform->addElement('checkbox','random',get_string('random','poasassignment'));
+        $mform->addHelpButton('random', 'random', 'poasassignment');
+
         $types = array(STR, TEXT, DATE, FILE, MULTILIST, CATEGORY);
         foreach ($types as $type) {
             $mform->disabledIf('random', 'ftype', 'eq', $type);

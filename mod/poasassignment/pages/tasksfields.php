@@ -57,12 +57,12 @@ class tasksfields_page extends abstract_page {
         		'secretfield',
         		'showintable');
         $headers = array(
-        		get_string('taskfieldname','poasassignment'),
-                get_string('ftype','poasassignment'),
-        		get_string('range','poasassignment'),
-        		get_string('random','poasassignment'),
-        		get_string('secretfield','poasassignment'),
-                get_string('showintable','poasassignment'));
+        		get_string('taskfieldname','poasassignment') . $OUTPUT->help_icon('taskfieldname', 'poasassignment'),
+                get_string('ftype','poasassignment') . $OUTPUT->help_icon('ftype', 'poasassignment'),
+        		get_string('range','poasassignment') . $OUTPUT->help_icon('range', 'poasassignment'),
+        		get_string('random','poasassignment') . $OUTPUT->help_icon('random', 'poasassignment'),
+        		get_string('secretfield','poasassignment') . $OUTPUT->help_icon('secretfield', 'poasassignment'),
+                get_string('showintable','poasassignment') . $OUTPUT->help_icon('showintable', 'poasassignment'));
         
         $table->define_columns($columns);
         $table->define_headers($headers);

@@ -352,3 +352,12 @@ $string['itsnotyourtask'] = "It's not your task";
 $string['errornotyourtask'] = "It's not your task";
 $string['auditortasks'] = 'Sync with Auditor';
 $string['auditortasks_help'] = 'Sync with Auditor help';
+
+$string['taskfieldname_help'] = 'Will be displayed as column header';
+$string['ftype_help'] = 'Field type';
+$string['range_help'] = 'All available values (lists and numbers)';
+$string['random_help'] = 'Random field\'s value will be calculated when student takes the task';
+$string['secretfield_help'] = 'Value of secret field can bee seen by student only if this task belongs to him(her)';
+$string['showintable_help'] = 'Set to Yes if you want to see this field in task\'s table. Student\'s wont\'s see secret field in the table';
+$string['taskfielddescription_help'] = 'Notes about field';
+$string['addtask'] = 'Create task';
