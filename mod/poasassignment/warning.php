@@ -47,9 +47,7 @@ switch ($action) {
         if(!isset($assigneeid) ||$assigneeid<1)
             print_error('invalidassigneeid','poasassignment');
         if($poasmodel->can_cancel_task($assigneeid, $context)) {
-        //if(has_capability('mod/poasassignment:managetasks',$context)) {
             $poasmodel->cancel_task($assigneeid);
-            //$DB->delete_records('poasassignment_assignee',array('id'=>$assigneeid));
             $attempts=$DB->get_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
             foreach($attempts as $attempt) {
                 $DB->delete_records('poasassignment_submissions',array('attemptid'=>$attempt->id));

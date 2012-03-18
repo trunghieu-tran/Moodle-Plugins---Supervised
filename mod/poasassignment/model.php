@@ -67,6 +67,7 @@ class poasassignment_model {
                                     'categoryedit' => 'pages/categoryedit.php',
                                     'taskedit' => 'pages/taskedit.php',
                                     'tasksimport' => 'pages/tasksimport.php',
+                                    'auditortasks' => 'pages/auditortasks.php'
                                     );
     private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
@@ -2147,5 +2148,17 @@ class poasassignment_model {
             AND poasassignmentid = ?
             AND taskid <> 0',
             array($assignee->userid, $assignee->poasassignmentid));
+    }
+
+    /**
+     * Get ids and names of instance's tasks
+     *
+     * @access publit
+     * @param $poasassignmentid instance's id
+     * @return array records
+     */
+    public function get_instance_tasks($poasassignmentid) {
+        global $DB;
+        return $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $poasassignmentid), 'id', 'id, name');
     }
 }

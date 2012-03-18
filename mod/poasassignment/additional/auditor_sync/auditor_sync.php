@@ -159,4 +159,77 @@ class auditor_sync {
         }
         return $fields;
     }
+
+    /**
+     * Получить данные для формы о синхронизируемых заданиях
+     *
+     * @access public
+     * @param $poasassignmentid id poasassignment'a
+     * @return stdClass
+     */
+    public function get_auditor_tasks($poasassignmentid) {
+        global $DB;
+        $sql =
+            "SELECT au.*
+            FROM {auditor_sync_tasks} au
+            JOIN {poasassignment_tasks} ts ON au.poasassignmenttaskid = ts.id
+            WHERE ts.poasassignmentid = ?";
+        $records = $DB->get_records_sql($sql, array($poasassignmentid));
+        $data = new stdClass();
+        $i = 0;
+        foreach ($records as $record) {
+            $data->syncid[$i] = $record->id;
+            $data->auditorvariantid[$i] = $record->auditorvariantid;
+            $data->poasassignmenttaskid[$i] = $record->poasassignmenttaskid;
+            $data->comments[$i] = $record->comments;
+            $i++;
+        }
+        return $data;
+    }
+
+    /**
+     * Обновить связи с Аудитором.
+     * @access public
+     * @param $data данные формы
+     * @return string отчет о действиях в формате HTML
+     */
+    public function save_sync_data($data) {
+        global $DB;
+        $html = '';
+        for ($i = 0; $i < $data->option_repeats; $i++) {
+            // Если связь новая
+            if ($data->syncid[$i] == -1) {
+                // Добавить новую связь
+                $record = new stdClass();
+                $record->auditorvariantid = $data->auditorvariantid[$i];
+                $record->poasassignmenttaskid = $data->poasassignmenttaskid[$i];
+                $record->comments = $data->comments[$i];
+                if (!empty($record->auditorvariantid) && !empty($record->poasassignmenttaskid)) {
+                    $id = $DB->insert_record('auditor_sync_tasks', $record);
+                    $html .= "Добавлена связь id=$id ($record->auditorvariantid => $record->poasassignmenttaskid)<br/>";
+                }
+            }
+            // Есди связь старая и удалять ее не требуется
+            if ($data->syncid[$i] > -1 && (!isset($data->delete) || (isset($data->delete) && !isset($data->delete[$i])))) {
+                // Обновить связь
+                $record = new stdClass();
+                $record->id = $data->syncid[$i];
+                $record->auditorvariantid = $data->auditorvariantid[$i];
+                $record->poasassignmenttaskid = $data->poasassignmenttaskid[$i];
+                $record->comments = $data->comments[$i];
+                if (!empty($record->auditorvariantid) && !empty($record->poasassignmenttaskid)) {
+                    $DB->update_record('auditor_sync_tasks', $record);
+                    $html .= "Обновлена связь id=$record->id ($record->auditorvariantid => $record->poasassignmenttaskid)<br/>";
+                }
+            }
+            // Есди связь старая и ее требуется удалить
+            if ($data->syncid[$i] > -1 && isset($data->delete) && isset($data->delete[$i])) {
+                // Удалить связь
+                $id = $data->syncid[$i];
+                $DB->delete_records('auditor_sync_tasks', array('id' => $id));
+                $html .= "Удалена связь id=$id ($record->auditorvariantid => $record->poasassignmenttaskid)<br/>";
+            }
+        }
+        return $html;
+    }
 }

@@ -260,3 +260,5 @@ $string['poasassignmentadditional'] = 'Дополнительные плагин
 $string['itsyourtask'] = 'Это ваше задание';
 $string['itsnotyourtask'] = 'Это не ваше задание';
 $string['errornotyourtask'] = 'Это не ваше задание';
+$string['auditortasks'] = 'Синхронизация заданий с Аудитором';
+$string['auditortasks_help'] = 'Свяжите задания из Аудитора с заданиями в Moodle';

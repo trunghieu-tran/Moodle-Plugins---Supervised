@@ -56,9 +56,9 @@ class tasksimport_page extends abstract_page {
         $this->taskrecords = array();
         for ($i = 0; $i < $count; $i++) {
             $taskrecord = new stdClass();
-            $taskrecord->name = htmlspecialchars($_POST['name_'.$i]);
-            $taskrecord->description = htmlspecialchars($_POST['description_'.$i]);
-            $taskrecord->comments = htmlspecialchars($_POST['comments_'.$i]);
+            $taskrecord->name = $_POST['name_'.$i];
+            $taskrecord->description = $_POST['description_'.$i];
+            $taskrecord->comments = $_POST['comments_'.$i];
             $taskrecord->id = required_param('id_'.$i, PARAM_INT);
             $kcfieldname = required_param('kcfieldname', PARAM_ALPHANUMEXT);
             $taskrecord->$kcfieldname = optional_param('levels_'.$i, array(), PARAM_INT);
