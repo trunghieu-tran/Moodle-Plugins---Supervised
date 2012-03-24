@@ -494,7 +494,7 @@ abstract class qtype_preg_finite_automaton {
 	
 	/**
 	*function read fa from special code and modif current object
-	*code format: i->abc->j;k->charset->l; e.t.c. надеюсь не перепутал английское сокращение
+	*code format: i->abc->j;k->charset->l; e.t.c.
 	*maximum count of subpatterns in reading fa is 9 in current implementation
 	*@param facode string with code of finite automata
 	*/

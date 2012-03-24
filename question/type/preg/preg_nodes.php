@@ -290,6 +290,113 @@ class preg_leaf_charset extends preg_leaf {
 }
 
 /**
+*Character or charcter class
+*/
+class preg_leaf_charset_project extends preg_leaf {
+	public function __construct() {
+        $this->type = preg_node::TYPE_LEAF_CHARSET;
+		$flags = array(array());
+    }
+	protected $flags;//in DNF
+	public $negative;
+
+    public function name() {
+        return 'leaf_charset';
+    }
+	protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
+		return false;
+	}
+	public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
+		return 'implement next_character before use!';
+	}
+	public function tohr() {
+		return 'implement tohr before use!';
+	}
+	public function add_flag(preg_charset_flag $flag) {// for creations charset in lexer
+		echo 'implement add_flag before use!';
+	}
+	public function intersect(preg_lef_charset $other) {
+		echo 'implement intersect before use!';
+	}
+	public function substract(preg_lef_charset $other) {
+		echo 'implement substract before use!';
+	}
+}
+
+/**
+*one requirement to character
+*/
+class preg_charset_flag {
+	//types
+	const SET = 'enumerable_characters';
+	const FLAG = 'functionally_calculated_characters';
+	const UPROP = 'unicode_property';
+	const CIRCUMFLEX = 'circumflex';
+	const DOLLAR = 'dollar';
+	
+	protected $negative;
+	protected $type;
+	protected $value;//value of set/flag/unicode property
+	protected $arg;//second argument for match function, if need, first argument is character
+	
+	public function set_circumflex() {
+		$this->type = self::CIRCUMFLEX;
+	}
+	public function set_dollar() {
+		$this->type = self::DOLLAR;
+	}
+	public function set_set($set) {
+		$this->type = self::SET;
+		$this->value = $set;
+	}
+	public function set_flag($flag) {
+		$this->type = self::FLAG;
+		$this->value = $flag;
+	}
+	public function set_uprop($prop) {
+		$this->type = self::UPROP;
+		$this->value = 'preg_match';
+		$this->arg = '/'.$prop.'/';
+	}
+	public function is_null_length() {
+		return $this->type===self::CIRCUMFLEX || $this->type===self::DOLLAR;
+	}
+	//TODO implement following function of preg_charset_flag
+	public function match($str, $pos) {
+		return false;
+	}
+	/**
+	*intersect this flag with other, if possible
+	*@param other other flag to intersection
+	*@return result of intersection as preg_charset flag, if intersection is possible, null if intersection is empty and false if intersection is impossible
+	*/
+	public function intersect(preg_charset_flag $other) {
+		return false;
+	}
+	/**
+	*substract this flag with other, if possible
+	*@param other other flag to substraction
+	*@return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
+	*/
+	public function substract(preg_charset_flag $other) {
+		return false;
+	}
+	
+	
+	static protected function is_wordchar($char) {
+		if (ctype_alnum($char) || $char === '-') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//TODO write other function for match, which need
+	const WORDCHAR = 'self::is_wordchar';	//\w
+	const ALPHA = 'ctype_alpha';			//[:alpha:]
+	//TODO write other constants for function names
+}
+
+/**
 * Meta-character or escape sequence defining character set that couldn't be enumerated
 */
 class preg_leaf_meta extends preg_leaf {
