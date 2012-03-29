@@ -1833,7 +1833,7 @@ class poasassignment_model {
      */
     public function get_task_owners($taskid) {
     	global $DB;
-    	$assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid), 'userid', 'userid, id');
+    	$assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid, 'cancelled' => 0), 'userid', 'userid, id');
     	return $assignees;
     }
     
