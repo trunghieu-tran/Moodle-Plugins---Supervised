@@ -239,9 +239,9 @@ class view_page extends abstract_page {
                             array('poasassignmentid'=>$this->poasassignment->id,'userid'=>$USER->id))) {
                 if($attempt=$DB->get_record('poasassignment_attempts',
                             array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount))) {
-					$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
-					echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
-					echo attempts_page::show_attempt($attempt, $hascap);
+                    $hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
+                    echo $OUTPUT->heading(get_string('lastattempt','poasassignment'));
+                    echo attempts_page::show_attempt($attempt, $hascap);
 
                     /* If student has several attempts and hasn't final grade */
                     if($this->poasassignment->flags&SEVERAL_ATTEMPTS && $poasmodel->assignee->finalized!=1) {
@@ -255,7 +255,8 @@ class view_page extends abstract_page {
                             }
                     }
                 }
-                if(!$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
+
+                if($poasmodel->assignee->taskid > 0 && !$DB->get_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id))) {
                             echo $OUTPUT->single_button(new moodle_url('view.php',array('id'=>$this->cm->id,'page' => 'submission')),get_string('addsubmission','poasassignment'));
                 }
             }
