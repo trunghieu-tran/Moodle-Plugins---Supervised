@@ -102,46 +102,52 @@ class attempts_page extends abstract_page {
     public static function use_echo() {
         return false;
     }
-	public static function show_attempt($attempt, $showcontent = true) {
-		$poasmodel = poasassignment_model::get_instance();
-		$html = '';
-		$html .= '<table class="poasassignment-table" align="center">';
-		
-		$values = array(
-						'attemptnumber' => $attempt->attemptnumber,
-						'attemptdate' => userdate($attempt->attemptdate),
-						'draft' => $attempt->draft == 1 ? get_string('yes') : get_string('no'),
-						'attemptisfinal' => $attempt->final == 1 ? get_string('yes') : get_string('no'),
-						'attempthaspenalty' => $attempt->disablepenalty == 1 ? get_string('no') : get_string('yes'),
-						'attempttotalpenalty' => $poasmodel->get_penalty($attempt->id));
-		foreach($values as $key => $value) {			
-			$html .= '<tr>';
-			$html .= '<td class="header" >' . get_string($key,'poasassignment') . '</td>';
-			if ($key == 'attempthaspenalty' || $key == 'attempttotalpenalty') {
-				$html .= '<td class="critical" style="text-align:center;">' . $value . '</td>';
-			}
-			else {
-				$html .= '<td style="text-align:center;">' . $value . '</td>';
-			}
-			$html .= '</tr>';
-		}
-		if ($showcontent) {
-			$poasmodel = poasassignment_model::get_instance();
-			$plugins = $poasmodel->get_plugins();
-			$attemptcontent = '';
-			foreach($plugins as $plugin) {
-				require_once($plugin->path);
-				$poasassignmentplugin = new $plugin->name();
-				$attemptcontent .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0, $attempt->id);
-			}
-			$html .= '<tr>';
-			$html .= '<td colspan="2">' . $attemptcontent . '</td>';
-			$html .= '</tr>';
-		}
-		
-		$html .= '</table>';
-		return $html;
-	}
+    public static function show_attempt($attempt, $showcontent = true) {
+        $poasmodel = poasassignment_model::get_instance();
+        $html = '';
+        $html .= '<table class="poasassignment-table" align="center">';
+
+        $values = array(
+                        'attemptnumber' => $attempt->attemptnumber,
+                        'attemptdate' => userdate($attempt->attemptdate),
+                        'draft' => $attempt->draft == 1 ? get_string('yes') : get_string('no'),
+                        'attemptisfinal' => $attempt->final == 1 ? get_string('yes') : get_string('no'),
+                        'attempthaspenalty' => $attempt->disablepenalty == 1 ? get_string('no') : get_string('yes'),
+                        'attempttotalpenalty' => $poasmodel->get_penalty($attempt->id));
+        // hide penalty info if penalty is zero
+        if ($values['attempttotalpenalty'] == 0) {
+            unset($values['attempttotalpenalty']);
+            unset($values['attempthaspenalty']);
+        }
+
+        foreach($values as $key => $value) {
+            $html .= '<tr>';
+            $html .= '<td class="header" >' . get_string($key,'poasassignment') . '</td>';
+            if ($key == 'attempthaspenalty' || $key == 'attempttotalpenalty') {
+                $html .= '<td class="critical" style="text-align:center;">' . $value . '</td>';
+            }
+            else {
+                $html .= '<td style="text-align:center;">' . $value . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        if ($showcontent) {
+            $poasmodel = poasassignment_model::get_instance();
+            $plugins = $poasmodel->get_plugins();
+            $attemptcontent = '';
+            foreach($plugins as $plugin) {
+                require_once($plugin->path);
+                $poasassignmentplugin = new $plugin->name();
+                $attemptcontent .= $poasassignmentplugin->show_assignee_answer($attempt->assigneeid, $poasmodel->get_poasassignment()->id, 0, $attempt->id);
+            }
+            $html .= '<tr>';
+            $html .= '<td colspan="2">' . $attemptcontent . '</td>';
+            $html .= '</tr>';
+        }
+
+        $html .= '</table>';
+        return $html;
+    }
 	public static function show_feedback($attempt, $latestattempt, $showdescription) {
         global $DB,$OUTPUT;
 		$poasmodel = poasassignment_model::get_instance();
