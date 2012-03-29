@@ -1491,15 +1491,15 @@ class poasassignment_model {
 
         $teachers = $this->get_teachers($user);
 
-
+        $eventdata->component = 'mod_poasassignment';
         $eventdata->name = 'poasassignment_updates';
-        $eventdata->fullmessageformat = FORMAT_PLAIN;
+        $eventdata->userfrom = $user;
+        $eventdata->subject = 'Attempt done';
         $eventdata->fullmessage= 'Student '.fullname($user,true).' uploaded his answer' ;
+        $eventdata->fullmessageformat = FORMAT_PLAIN;
         $eventdata->fullmessagehtml   = '<b>'.$eventdata->fullmessage.'</b>';
         $eventdata->smallmessage = '';
-        $eventdata->subject = 'Attempt done';
-        $eventdata->component = 'mod_poasassignment';
-        $eventdata->userfrom = $user;
+        $eventdata->notification = 1;
 
         foreach ($teachers as $teacher) {
             $eventdata->userto = $teacher;
@@ -2160,5 +2160,15 @@ class poasassignment_model {
     public function get_instance_tasks($poasassignmentid) {
         global $DB;
         return $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $poasassignmentid), 'id', 'id, name');
+    }
+
+    /**
+     * Get penalty for next attempt
+     *
+     * @param int $assigneeid - assignee id
+     * @return int penalty for next attempt
+     */
+    public function next_attempt_penalty($assigneeid) {
+        return 0;
     }
 }
