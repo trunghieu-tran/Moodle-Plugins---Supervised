@@ -1340,9 +1340,34 @@ class poasassignment_model {
         return html_writer::tag('span', $output, array('class' => 'helplink'));
     }
 
+    /**
+     * Get list of users, who have active tasks
+     *
+     * @access public
+     * @return array of ids
+     */
+    public function get_users_with_active_tasks() {
+        global $DB;
+        if ($usersid = get_enrolled_users(
+            get_context_instance(CONTEXT_MODULE,$this->cm->id),
+            'mod/poasassignment:havetask',
+            groups_get_activity_group($this->cm, true),
+            'u.id')) {
+
+            $usersid = array_keys($usersid);
+        }
+        // Add users that haven't capability but have task
+        $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id, 'cancelled' => 0), 'id', 'id, userid, taskid');
+        foreach ($assignees as $assignee) {
+            if ($assignee->taskid > 0 && array_search($assignee->userid, $usersid) === false) {
+                array_push($usersid, $assignee->userid);
+            }
+        }
+        return $usersid;
+    }
     function get_statistics() {
         global $DB,$OUTPUT,$CFG;
-        $html;
+        $html = '';
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
@@ -1351,8 +1376,7 @@ class poasassignment_model {
         $notchecked=0;
         $count=0;
 
-        if ($usersid = get_enrolled_users($context, 'mod/poasassignment:havetask', $currentgroup, 'u.id')) {
-            $usersid = array_keys($usersid);
+        if ($usersid = $this->get_users_with_active_tasks()) {
             $count=count($usersid);
             foreach ($usersid as $userid) {
                 if ($assignee = $this->get_assignee($userid, $this->poasassignment->id)) {

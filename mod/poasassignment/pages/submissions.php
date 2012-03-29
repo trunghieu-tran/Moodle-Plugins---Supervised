@@ -49,18 +49,16 @@ class submissions_page extends abstract_page {
         
         $table->setup();
         $poasmodel=poasassignment_model::get_instance($this->poasassignment);
-        $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
+        //$assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
         $plugins=$poasmodel->get_plugins();
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
         groups_print_activity_menu($this->cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id='.$this->cm->id.'&page=submissions');
         $context=get_context_instance(CONTEXT_MODULE,$this->cm->id);
-        /// Get all ppl that are allowed to submit assignments
-        if ($usersid = get_enrolled_users($context, 'mod/poasassignment:havetask', $currentgroup, 'u.id')) {
-            $usersid = array_keys($usersid);
-        }
+
+        $usersid = $poasmodel->get_users_with_active_tasks();
         $indtasks=$this->poasassignment->flags&ACTIVATE_INDIVIDUAL_TASKS;
-        foreach($usersid as $userid) {			
+        foreach($usersid as $userid) {
             $row = $this->get_row($userid, $this->poasassignment->id, $indtasks, $plugins);
             $table->add_data($row);
         }
