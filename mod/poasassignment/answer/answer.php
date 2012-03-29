@@ -86,6 +86,8 @@ class answer_form extends moodleform {
         global $DB;
         $mform = $this->_form;
         $instance = $this->_customdata;
+        $model = poasassignment_model::get_instance();
+        $model->cash_instance($instance['poasassignmentid']);
         $plugins=$DB->get_records('poasassignment_answers');
         foreach($plugins as $plugin) {
             if(poasassignment_answer::used_in_poasassignment($plugin->id, $instance['poasassignmentid'])) {
@@ -100,8 +102,8 @@ class answer_form extends moodleform {
         $mform->addElement('checkbox', 'draft', get_string('draft', 'poasassignment'));
         
         //$poasassignment  = $DB->get_record('poasassignment', array('id' => $instance['poasassignmentid']), '*', MUST_EXIST);
-        $model = poasassignment_model::get_instance();
-        $model->cash_instance($instance['poasassignmentid']);
+
+
         //$model = poasassignment_model::get_instance($poasassignment);
         
         if($model->get_poasassignment()->flags & MATCH_ATTEMPT_AS_FINAL) {
