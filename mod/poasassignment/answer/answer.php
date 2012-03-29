@@ -125,4 +125,9 @@ class answer_form extends moodleform {
         
         $this->add_action_buttons(true,get_string('sendsubmission', 'poasassignment'));
     }
+
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        return true;
+    }
 }

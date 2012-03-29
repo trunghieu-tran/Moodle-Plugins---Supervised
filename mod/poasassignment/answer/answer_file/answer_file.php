@@ -232,6 +232,7 @@ class answer_file extends poasassignment_answer {
                             get_string('loadfiles','poasassignmentanswertypes_answer_file'),
 			        		null,
 			        		$options);
+
         $mform->closeHeaderBefore('answerfileheader');
     }
     function configure_flag($poasassignment) {
