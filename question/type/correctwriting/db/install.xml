@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/correctwriting/db" VERSION="20120402" COMMENT="XMLDB file for CorrectWriting question type"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="qtype_correctwriting" COMMENT="This table contains main options for CorrectWriting question" NEXT="qtype_correctwriting_symbol">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Identifier, for connection for original moodle table to this table structure" PREVIOUS="id" NEXT="langid"/>
+        <FIELD NAME="langid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key, references the formal langs block table of languages" PREVIOUS="questionid" NEXT="absenterrorweight"/>
+        <FIELD NAME="absenterrorweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.33" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for each lexeme, that doesn't contains in student response" PREVIOUS="langid" NEXT="addederrorweight"/>
+        <FIELD NAME="addederrorweight" TYPE="number" LENGTH="12" NOTNULL="false" DEFAULT="0.33" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty, for each added lexeme to student response" PREVIOUS="absenterrorweight" NEXT="movederrorweight"/>
+        <FIELD NAME="movederrorweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.16" SEQUENCE="false" DECIMALS="2" COMMENT="A penalty for error, that consists of moving lexeme in student response." PREVIOUS="addederrorweight" NEXT="lexicalerrorthreshold"/>
+        <FIELD NAME="lexicalerrorthreshold" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.5" SEQUENCE="false" DECIMALS="2" COMMENT="Lexical error threshold for computing Damerau-Levenstein distance" PREVIOUS="movederrorweight"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id" COMMENT="Foreign key, referencing the question table" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_correctwriting_symbol" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="qtype_correctwriting">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="answerid"/>
+        <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Answer index that symbol belongs to" PREVIOUS="id" NEXT="symbolnumber"/>
+        <FIELD NAME="symbolnumber" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique identifier of symbol, that emerges from lexical analyzing" PREVIOUS="answerid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="symbolnumber"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="answerid"/>
+        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="question_answers" REFFIELDS="id" COMMENT="Foreign key reference to answer table" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
