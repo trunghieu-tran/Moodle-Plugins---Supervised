@@ -19,7 +19,7 @@
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id" COMMENT="Foreign key, referencing the question table" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="qtype_correctwriting_symbol" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="qtype_correctwriting">
+    <TABLE NAME="qtype_correctwriting_symbols" COMMENT="An information about symbols, that emerge from lexical and syntax analysis" PREVIOUS="qtype_correctwriting">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="answerid"/>
         <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Answer index that symbol belongs to" PREVIOUS="id" NEXT="symbolnumber"/>
