@@ -1,10 +1,10 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+<?php
 
 /**
  * Unit tests for (some of) question/type/preg/question.php.
  *
- * @copyright &copy; 2011 Oleg Sychev
- * @author Oleg Sychev
+ * @copyright &copy; 2011 Dmitriy Kolesov
+ * @author Dmitriy Kolesov
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package question
  */
@@ -14,8 +14,7 @@ if (!defined("MOODLE_INTERNAL")) {
     die("Direct access to this script is forbidden.");    ///  It must be included from a Moodle page
 }
 require_once($CFG->dirroot . "/question/type/preg/preg_nodes.php");
-//preg_charset_flag
-//preg_leaf_charset
+
 class qtype_preg_charset_test extends UnitTestCase {
 	function setUp() {
 	}
@@ -38,21 +37,6 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertFalse($flag->match("abc015", 4));
 		$this->assertTrue($flag->match("abc015", 5));
 	}
-/*
-	const DIGIT = "ctype_ digit";			//\d AND [:digit:]
-	const XDIGIT = "ctype_ xdigit";			//[:xdigit:]
-	const SPACE = "ctype_ space"; 			//\s AND [:space:]
-	const WORDCHAR = "self::is_wordchar";	//\w AND [:word:]
-	const ALNUM = "ctype_alnum";			//[:alnum:]
-	const ALPHA = "ctype_alpha";			//[:alpha:]
-	const ASCII = "self::is_ascii";			//[:ascii:]
-	const CNTRL = "ctype_ cntrl";			//[:cntrl:]
-	const GRAPH = "ctype_ graph";			//[:graph:]
-	const LOWER = "ctype_ lower";			//[:lower:]
-	const UPPER = "ctype_ upper";			//[:upper:]
-	const PRIN = "ctype_ print";			//[:print:] PRIN, because PRINT is php keyword
-	const PUNCT = "ctype_ punct";			//[:punct:]
-*/
 	function test_flag_d_match() {
 		$flag = new preg_charset_flag;
 		$flag->set_flag(preg_charset_flag::DIGIT);
