@@ -256,5 +256,119 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertTrue($flag->match("abc", 1));
 		$this->assertFalse($flag->match("abc", 2));
 	}
+
+	function test_flag_intersect() {//substract is intersect with negation second operand
+		//form all types of flag with negative and positive variant
+		$digit = new preg_charset_flag;
+		$xdigit = new preg_charset_flag;
+		$space = new preg_charset_flag;
+		$wordchar = new preg_charset_flag;
+		$alnum = new preg_charset_flag;
+		$alpha = new preg_charset_flag;
+		$ascii = new preg_charset_flag;
+		$cntrl = new preg_charset_flag;
+		$graph = new preg_charset_flag;
+		$lower = new preg_charset_flag;
+		$upper = new preg_charset_flag;
+		$print = new preg_charset_flag;
+		$punct = new preg_charset_flag;
+		$ndigit = new preg_charset_flag;
+		$nxdigit = new preg_charset_flag;
+		$nspace = new preg_charset_flag;
+		$nwordchar = new preg_charset_flag;
+		$nalnum = new preg_charset_flag;
+		$nalpha = new preg_charset_flag;
+		$nascii = new preg_charset_flag;
+		$ncntrl = new preg_charset_flag;
+		$ngraph = new preg_charset_flag;
+		$nlower = new preg_charset_flag;
+		$nupper = new preg_charset_flag;
+		$nprint = new preg_charset_flag;
+		$npunct = new preg_charset_flag;
+		$digit->set_flag(preg_charset_flag::DIGIT);
+		$xdigit->set_flag(preg_charset_flag::XDIGIT);
+		$space->set_flag(preg_charset_flag::SPACE);
+		$wordchar->set_flag(preg_charset_flag::WORDCHAR);
+		$alnum->set_flag(preg_charset_flag::ALNUM);
+		$alpha->set_flag(preg_charset_flag::ALPHA);
+		$ascii->set_flag(preg_charset_flag::ASCII);
+		$cntrl->set_flag(preg_charset_flag::CNTRL);
+		$graph->set_flag(preg_charset_flag::GRAPH);
+		$lower->set_flag(preg_charset_flag::LOWER);
+		$upper->set_flag(preg_charset_flag::UPPER);
+		$print->set_flag(preg_charset_flag::PRIN);
+		$punct->set_flag(preg_charset_flag::PUNCT);
+		$ndigit->set_flag(preg_charset_flag::DIGIT);
+		$nxdigit->set_flag(preg_charset_flag::XDIGIT);
+		$nspace->set_flag(preg_charset_flag::SPACE);
+		$nwordchar->set_flag(preg_charset_flag::WORDCHAR);
+		$nalnum->set_flag(preg_charset_flag::ALNUM);
+		$nalpha->set_flag(preg_charset_flag::ALPHA);
+		$nascii->set_flag(preg_charset_flag::ASCII);
+		$ncntrl->set_flag(preg_charset_flag::CNTRL);
+		$ngraph->set_flag(preg_charset_flag::GRAPH);
+		$nlower->set_flag(preg_charset_flag::LOWER);
+		$nupper->set_flag(preg_charset_flag::UPPER);
+		$nprint->set_flag(preg_charset_flag::PRIN);
+		$npunct->set_flag(preg_charset_flag::PUNCT);
+		$ndigit->negative = true;
+		$nxdigit->negative = true;
+		$nspace->negative = true;
+		$nwordchar->negative = true;
+		$nalnum->negative = true;
+		$nalpha->negative = true;
+		$nascii->negative = true;
+		$ncntrl->negative = true;
+		$ngraph->negative = true;
+		$nlower->negative = true;
+		$nupper->negative = true;
+		$nprint->negative = true;
+		$npunct->negative = true;
+		//put them in two array for loop test
+		$flags1 = $flags2 = array($digit, $xdigit, $space, $wordchar, $alnum, $alpha, $ascii, $cntrl, $graph, $lower, $upper, $print, $punct, $ndigit, $nxdigit, $nspace, $nwordchar, $nalnum, $nalpha, $nascii, $ncntrl, $ngraph, $nlower, $nupper, $nprint, $npunct);
+		//form string for test match of getting flag and two src flag
+		$string = '';
+		for ($i=1; $i<256; $i++) {
+			$string .= chr($i);
+		}
+		//try intersect
+		$result = array();
+		foreach ($flags1 as $flag1) {
+			foreach ($flags2 as $flag2) {
+				$result[] = $flag1->intersect($flag2);
+			}
+		}
+		//TODO: form array of correct result
+		//$correct = array(676 values)
+		//compare result and correct values
+		for ($i=0; $i<676; $i++) {
+			if ($correct[$i]===false) {
+				$this->assertTrue($result[$i]===false, "failed: result [ $i ]===false");
+			} else (
+				if ($this->assertFalse($result[$i]===false, "result [ $i ] is false instead preg_charset_flag object")) {
+					$this->compare_match_results($flags1[$i/26], $flags2[$i%26], $result[$i]);
+				}
+			}
+		}
+	}
+	function compare_match_results($src1, $src2, $intersected) {
+		//verify input data
+		if (!$this->assertTrue($intersected===false, 'intersected is false instead preg_charset_flag object, look for error in test')) {
+			return;
+		}
+		//form string for test match of getting flag and two src flag
+		$string = '';
+		for ($i=1; $i<256; $i++) {
+			$string .= chr($i);
+		}
+		$pos=0;
+		while ($pos<strlen($string)) {
+			$name1 = $src1->tohr();
+			$name2 = $src2->tohr();
+			$character = $string[$pos];
+			$this->assertTrue($intersected->match($string, $pos) && (!$src1->match($string, $pos) || !$src2->match($string, $pos)), "False positive result on intersect of '$name1' and '$name2' for character '$character'");
+			$this->assertTrue(!$intersected->match($string, $pos) && $src1->match($string, $pos) || $src2->match($string, $pos), "False negative result on intersect of '$name1' and '$name2' for character '$character'");
+		}
+	}
 }
 ?>
