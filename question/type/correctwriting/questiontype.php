@@ -34,6 +34,26 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_correctwriting extends question_type {
-
-    
+    /** Returns fields, that differ from standard Moodle question fields
+        and table
+        @return array extra fields
+     */
+    public function extra_question_fields() {
+        $result = array('qtype_correctwriting', 'langid', 'absenterrorweight', 'addederrorweight', 'movederrorweight');
+        $result[] = 'lexicalerrorthreshold'; 
+        $result[] = 'lexicalerrorweight'; 
+        return $result;
+    }
+    /** Returns extra tables, needed for question
+        @return array extra tables, needed for question
+     */
+    public function extra_question_tables() {
+        return array('qtype_correctwriting', 'qtype_correctwriting_symbols'); 
+    }
+    /** Returns a name of foreign key columns for question type
+        @return string name of foreign key, that points to question table
+     */
+    public function questionid_column_name() {
+        return 'questionid';
+    }
 }
