@@ -8,6 +8,8 @@
  * @package blocks
  */
 
+require_once($CFG->dirroot.'/blocks/formal_langs/base_token.php');
+
 abstract class block_formal_langs_abstract_language {
 
     /**
