@@ -485,7 +485,7 @@ class poasassignment_model {
                         'assigneeid' => 0
                     ))) {
                 $fieldvalue->id=$getrec->id;
-                $taskvalueid=$DB->update_record('poasassignment_task_values',$fieldvalue);
+                $DB->update_record('poasassignment_task_values',$fieldvalue);
             }
             else
                 $taskid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
@@ -533,12 +533,26 @@ class poasassignment_model {
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($fields as $field) {
             $name='field'.$field->id;
-            if (($field->ftype==STR || $field->ftype==TEXT ||
-                        $field->ftype==FLOATING || $field->ftype==NUMBER ||
-                        $field->ftype==DATE || $field->ftype == LISTOFELEMENTS) && $field->random == 0) {
+            if (($field->ftype==STR
+                || $field->ftype==TEXT
+                || $field->ftype==FLOATING
+                || $field->ftype==NUMBER
+                || $field->ftype==DATE
+                || $field->ftype == LISTOFELEMENTS) && $field->random == 0) {
                 $value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid));
                 if ($value)
                     $task->$name=$value->value;
+            }
+            if ($field->ftype == FILE) {
+                $draftitemid = file_get_submitted_draft_itemid('poasassignmenttaskfiles');
+                file_prepare_draft_area(
+                    $draftitemid,
+                    $this->get_context()->id,
+                    'mod_poasassignment',
+                    'poasassignmenttaskfiles',
+                    $taskid,
+                    array('subdirs'=>true));
+                $task->$name = $draftitemid;
             }
             if ($field->ftype==MULTILIST) {
                 $value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid));
@@ -561,6 +575,7 @@ class poasassignment_model {
         if ($criterions) {
             $i = 0;
             foreach ($criterions as $criterion) {
+                $data = new stdClass();
                 $data->name[$i] = $criterion->name;
                 $data->description[$i] = $criterion->description;
                 $data->weight[$i] = $criterion->weight;
