@@ -48,7 +48,7 @@ class qtype_correctwriting extends question_type {
         @return array extra tables, needed for question
      */
     public function extra_question_tables() {
-        return array('qtype_correctwriting', 'qtype_correctwriting_symbols'); 
+        return array('qtype_correctwriting_symbols'); 
     }
     /** Returns a name of foreign key columns for question type
         @return string name of foreign key, that points to question table
