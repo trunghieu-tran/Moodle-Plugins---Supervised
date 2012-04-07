@@ -287,6 +287,119 @@ class block_formal_langs_matched_tokens_pair {
     public $mistakeweight;
 }
 
+/**
+ * Represents a stream of tokens
+ *
+ * @copyright &copy; 2011 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License 
+ */
+class block_formal_langs_token_stream {
+    /**
+     * Tokens's array
+     *
+     * @var array of block_formal_langs_token_base objects
+     */
+    public $tokens;
+
+    /**
+     * Lexical errors
+     *
+     * @var array of block_formal_langs_lexical_errors object
+     */
+    public $errors;
+
+    public function __clone() {
+        $this->tokens = clone $this->tokens;
+        $this->errors = clone $this->errors;
+    }
+
+    /**
+     * Compares compared stream of tokens with this (correct) stream looking for
+     * matches with possible errors in tokens (but not in their placement)
+     *
+     * @param comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
+     * @param threshold editing distance threshold (in percents to token length)
+     * @return array of block_formal_langs_matched_tokens_pair objects
+     */
+    public function look_for_token_pairs($comparedstream, $threshold) {
+        //TODO Birukova
+        //1. Find matched pairs (typos, typical errors etc) - Birukova
+        //  - look_for_matches function
+        //2. Find best groups of pairs - Birukova
+        //  - group_matches function, with criteria defined by compare_matches_groups function
+    }
+
+    /**
+     * Creates an array of all possible matched pairs using this stream as correct one.
+     *
+     * Uses token's look_for_matches function and fill necessary fields in matched_tokens_pair objects.
+     *
+     * @param comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
+     * @param $threshold threshold as a fraction of token length for creating pairs
+     * @return array array of matched_tokens_pair objects representing all possible pairs within threshold
+     */
+    public function look_for_matches($comparedstream, $threshold) {
+        //TODO Birukova
+    }
+
+    /**
+     * Generates array of best groups of matches representing possible set of mistakes in tokens.
+     *
+     * Use recursive backtracking.
+     * No token from correct or compared stream could appear twice in any group, groups are
+     * compared using compare_matches_groups function
+     *
+     * @param array $matches array of matched_tokens_pair objects representing all possible pairs within threshold
+     * @return array of  block_formal_langs_matches_group objects
+     */
+    public function group_matches($matches) {
+        //TODO Birukova
+    }
+
+    /**
+     * Compares two matches groups.
+     *
+     * Basic strategy is to have as much tokens in both correct and compared streams covered as possible.
+     * If the number of tokens covered are equal, than choose group with less summ of mistake weights.
+     *
+     * @return number <0 if $group1 worse than $group2; 0 if $group1==$group2; >0 if $group1 better than $group2
+     */
+    public function compare_matches_groups($group1, $group2) {
+        //TODO Birukova
+    }
+
+    /**
+     * Create a copy of this stream and correct mistakes in tokens using given array of matched pairs
+     *
+     * @param correctstream object of block_formal_langs_token_stream for correct stream
+     * @param matchedpairsgroup array of block_formal_langs_matched_tokens_pair
+     * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
+     */
+    public function correct_mistakes($correctstream, $matchedpairsgroup) {
+        $newstream = clone $this;
+        //TODO Birukova - change tokens using pairs
+    }
+}
+
+/**
+ * Represents possible set of correspondes between tokens of correct and compared streams
+ */
+class  block_formal_langs_matches_group {
+    /**
+     * Array of matched pairs
+     */
+    public $matchedpairs;
+
+    //Sum of mistake weights
+    public $mistakeweight;
+
+    //Sorted array of all correct token indexes for tokens, covered by pairs from this group
+    public $correctcoverage;
+
+    //Sorted array of all compared token indexes for tokens, covered by pairs from this group
+    public $comparedcoverage;
+}
+
 class block_formal_langs_node_position {
     protected $linestart;
     protected $lineend;
