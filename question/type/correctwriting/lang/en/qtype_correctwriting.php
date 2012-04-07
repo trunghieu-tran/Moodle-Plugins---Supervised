@@ -8,4 +8,5 @@ $string['pluginname_link'] = 'question/type/correctwriting';
 $string['movedmistakemessage'] = 'A lexeme "{$a->type}" is moved from {$a->answerline}:{$a->answerposition} to {$a->responseline}:{$a->responseposition}';
 $string['addedmistakemessage'] = 'A lexeme "{$a->type}" at {$a->line}:{$a->position} is odd in response';
 $string['absentmistakemessage'] = 'A lexeme "{$a}" is skipped';
+$string['pleaseenterananswer'] = 'Please enter an answer.';
 ?>

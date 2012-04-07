@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Represents a preg question.
+ * Represents a correctwriting question.
  *
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -54,6 +54,41 @@ class qtype_correctwriting_question /*extends question_graded_automatically
     public $absentmistakeweight = 1;
      // @var int weight of error, when one lexeme is added to response
     public $addedmistakeweight = 1;
+    
+    /**  Returns expected data from forms for question
+         @return array expected
+     */
+    public function get_expected_data() {
+        return array('response' => PARAM_RAW);
+    }
+    /**  Checks, whether user response is complete
+         @param  array  user response
+         @return bool whether response is complete
+     */
+    public function is_complete_response(array $response) {
+        return array_key_exists('response', $response) &&
+                ($response['response'] || $response['response'] === '0');
+    }
+
+    /** Checks, whether two responses are the same
+        @param array prevresponse previous response
+        @param array newresponse  new response
+        @return bool new user response
+     */
+    public function is_same_response(array $prevresponse, array $newresponse) {
+        return question_utils::arrays_same_at_key_missing_is_blank(
+                $prevresponse, $newresponse, 'response');
+    }
+    /** Returns a validation error for response
+        @param array response user response
+        @return string validation error
+      */
+    public function get_validation_error(array $response) {
+        if ($this->is_gradable_response($response)) {
+            return '';
+        }
+        return get_string('pleaseenterananswer', 'qtype_correctwriting');
+    }
     
 }
  ?>
