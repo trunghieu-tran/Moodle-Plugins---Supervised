@@ -365,6 +365,14 @@ class poasassignment_model {
                     }
     }
 
+    /**
+     * Delete certain files from area
+     *
+     * @param $cmid context id
+     * @param $filearea file area name
+     * @param $itemid
+     * @return bool success
+     */
     function delete_files($cmid,$filearea=false,$itemid=false) {
         global $DB;
         $fs = get_file_storage();
@@ -454,6 +462,7 @@ class poasassignment_model {
         $DB->update_record('poasassignment_tasks',$task);
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$this->poasassignment->id));
         foreach ($fields as $field) {
+            $fieldvalue = new stdClass();
             $fieldvalue->taskid=$taskid;
             $fieldvalue->fieldid=$field->id;
             $value = 'field'.$field->id;
@@ -469,22 +478,22 @@ class poasassignment_model {
             }
 
             if ($getrec = $DB->get_record(
-            		'poasassignment_task_values',
-            		array(
-            				'taskid' => $taskid,
-            				'fieldid' => $field->id,
-            				'assigneeid' => 0
-            		))) {
+                    'poasassignment_task_values',
+                    array(
+                        'taskid' => $taskid,
+                        'fieldid' => $field->id,
+                        'assigneeid' => 0
+                    ))) {
                 $fieldvalue->id=$getrec->id;
                 $taskvalueid=$DB->update_record('poasassignment_task_values',$fieldvalue);
             }
             else
-                $taskvalueid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
+                $taskid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
 
-            if ($field->ftype==5) {
+            if ($field->ftype==FILE) {
                 $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
-                //$this->delete_files($cm->id,'poasassignmenttaskfiles',$taskvalueid);
-                //$this->save_files($task->$value,'poasassignmenttaskfiles',$taskvalueid);
+                $this->delete_files($cm->id,'poasassignmenttaskfiles', $taskid);
+                $this->save_files($task->$value,'poasassignmenttaskfiles', $taskid);
             }
 
         }
