@@ -58,6 +58,65 @@ class block_formal_langs_ast {
     }
 }
 
+/**
+ * Describes a position of AST node (terminal or non-terminal) in the original text
+ */
+class block_formal_langs_node_position {
+    protected $linestart;
+    protected $lineend;
+    protected $colstart;
+    protected $colend;
+
+    public function linestart(){
+        return $this->linestart;
+    }
+
+    public function lineend(){
+        return $this->lineend;
+    }
+    
+    public function colstart(){
+        return $this->colstart;
+    }
+    
+    public function colend(){
+        return $this->colend;
+    }
+    
+    public function __construct($linestart, $lineend, $colstart, $colend) {
+        $this->linestart = $linestart;
+        $this->lineend = $lineend;
+        $this->colstart = $colstart;
+        $this->colend = $colend;
+    }
+
+    /**
+     * Summ positions of array of nodes into one position
+     *
+     * Resulting position is defined from minimum to maximum postion of nodes
+     *
+     * @param array $nodepositions positions of adjanced nodes
+     */
+    public function summ($nodepositions) {
+        $minlinestart = $nodepositions[0]->linestart;
+        $maxlineend = $nodepositions[0]->lineend;
+        $mincolstart = $nodepositions[0]->colstart;
+        $maxcolend = $nodepositions[0]->colend;
+
+        foreach ($nodepositions as $node) {
+            if ($node->linestart < $minlinestart)
+                $minlinestart = $node->linestart;
+            if ($node->colstart < $mincolstart)
+                $mincolstart = $node->colstart;
+            if ($node->lineend > $maxlineend)
+                $maxlineend = $node->lineend;
+            if ($node->colend > $maxcolend)
+                $maxcolend = $node->colend;
+        }
+
+        return new block_formal_langs_node_position($minlinestart, $maxlinened, $mincolstart, $maxcolend);
+    }
+}
 
 class block_formal_langs_ast_node_base {
 
@@ -166,9 +225,24 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $value;
 
-    
+    /**
+     * Index of token in the stream it belongs to.
+     *
+     * For tokens it's often important to know index in the stream array, not just position in the text
+     * @var integer
+     */
+    protected $tokenindex;
+
     public function value() {
         return $this->value;
+    }
+
+    public function token_index() {
+        return $this->tokenindex;
+    }
+
+    public function set_token_index($newindex) {
+        $this->tokenindex = $newindex;
     }
 
     /**
@@ -178,11 +252,12 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param string $value - semantic value of lexeme
      * @return base_token
      */
-    public function __construct($number, $type, $value, $position) {
+    public function __construct($number, $type, $value, $position, $index) {
         $this->if = $number;
         $this->type = $type;
         $this->value = $value;
         $this->position = $position;
+        $this->tokenindex = $index;
     }
 
     /**
@@ -297,7 +372,7 @@ class block_formal_langs_token_stream {
     /**
      * Tokens's array
      *
-     * @var array of block_formal_langs_token_base objects
+     * @var array of block_formal_langs_token_base childs
      */
     public $tokens;
 
@@ -311,6 +386,15 @@ class block_formal_langs_token_stream {
     public function __clone() {
         $this->tokens = clone $this->tokens;
         $this->errors = clone $this->errors;
+    }
+
+    /**
+     * Set token indexes traversing array of tokens from left to right
+     *
+     * Use to restore indexes after inserting or removing tokens (c.e. correct_mistakes)
+     */
+    public function set_token_indexes() {
+        //TODO Birukova
     }
 
     /**
@@ -400,60 +484,4 @@ class  block_formal_langs_matches_group {
     public $comparedcoverage;
 }
 
-class block_formal_langs_node_position {
-    protected $linestart;
-    protected $lineend;
-    protected $colstart;
-    protected $colend;
-
-    public function linestart(){
-        return $this->linestart;
-    }
-
-    public function lineend(){
-        return $this->lineend;
-    }
-    
-    public function colstart(){
-        return $this->colstart;
-    }
-    
-    public function colend(){
-        return $this->colend;
-    }
-    
-    public function __construct($linestart, $lineend, $colstart, $colend) {
-        $this->linestart = $linestart;
-        $this->lineend = $lineend;
-        $this->colstart = $colstart;
-        $this->colend = $colend;
-    }
-
-    /**
-     * Summ positions of array of nodes into one position
-     *
-     * Resulting position is defined from minimum to maximum postion of nodes
-     *
-     * @param array $nodepositions positions of adjanced nodes
-     */
-    public function summ($nodepositions) {
-        $minlinestart = $nodepositions[0]->linestart;
-        $maxlineend = $nodepositions[0]->lineend;
-        $mincolstart = $nodepositions[0]->colstart;
-        $maxcolend = $nodepositions[0]->colend;
-
-        foreach ($nodepositions as $node) {
-            if ($node->linestart < $minlinestart)
-                $minlinestart = $node->linestart;
-            if ($node->colstart < $mincolstart)
-                $mincolstart = $node->colstart;
-            if ($node->lineend > $maxlineend)
-                $maxlineend = $node->lineend;
-            if ($node->colend > $maxcolend)
-                $maxcolend = $node->colend;
-        }
-
-        return new block_formal_langs_node_position($minlinestart, $maxlinened, $mincolstart, $maxcolend);
-    }
-}
 ?>
