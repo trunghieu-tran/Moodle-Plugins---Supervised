@@ -62,12 +62,6 @@ class block_formal_langs_ast {
 class block_formal_langs_ast_node_base {
 
     /**
-     * Is this node from correct answer or response.
-     * @var boolean
-     */
-    protected $isanswer;
-    
-    /**
      * Type of node.
      * @var string
      */
@@ -96,12 +90,10 @@ class block_formal_langs_ast_node_base {
      */
     protected $description;
 
-    public function __construct($type, $value, $position, $number, $isanswer) {
+    public function __construct($type, $position, $number) {
         $this->number = $number;
         $this->type = $type;
-        $this->value = $value;
         $this->position = $position;
-        $this->isanswer = $isanswer;
 
         $this->childs = array();
         $this->description = '';
@@ -131,10 +123,6 @@ class block_formal_langs_ast_node_base {
         } else {
             return $this->description;
         }
-    }
-
-    public function is_answer() {
-        return $this->isanswer;
     }
 
     public function set_description($str) {
@@ -190,11 +178,10 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param string $value - semantic value of lexeme
      * @return base_token
      */
-    public function __construct($number, $type, $value, $isanswer, $position) {
+    public function __construct($number, $type, $value, $position) {
         $this->if = $number;
         $this->type = $type;
         $this->value = $value;
-        $this->isanswer = $isanswer;
         $this->position = $position;
     }
 
@@ -236,17 +223,18 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * token in other answer and return an array of them.
      *
      * The functions works differently depending on token of which answer it's called.
-     * For correct _answer_ it looks for typos, extra separators,
-     * typical mistakes (in particular subclasses) etc - i.e. all mistakes with one token from answer.
-     * For student's _response_ it looks for missing separators, extra quotes etc, i.e. mistakes which
-     * have more than one token from answer, but only one from response.
+     * For correct text (e.g. _answer_) $iscorrect == true and it looks for typos, extra separators,
+     * typical mistakes (in particular subclasses) etc - i.e. all mistakes with one token from correct text.
+     * For compared text (e.g. student's _response_) it looks for missing separators, extra quotes etc,
+     * i.e. mistakes which have more than one token from correct, but only one from compared text.
      *
-     * @param array $other - array of tokens  (other answer)
+     * @param array $other - array of tokens  (other text)
      * @param integer $threshold - lexical mistakes threshold
+     * @param boolean $iscorrect - true if type of token is correct and we should perform full search, false for compared text
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold) {
+    public function look_for_matches($other, $threshold, $iscorrect) {
         // TODO: generic mistakes handling
     }
     
@@ -278,19 +266,19 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
 class block_formal_langs_matched_tokens_pair {
 
     /**
-     * Indexes of the correct answer tokens.
+     * Indexes of the correct text tokens.
      * @var array
      */
-    public $answertokens;
+    public $correcttokens;
 
     /**
-     * Indexes of the student response tokens.
+     * Indexes of the compared text tokens.
      * @var array
      */
-    public $responsetokens;
+    public $comparedtokens;
 
     /**
-     * Mistake weight (Levenshtein distance, for example).
+     * Mistake weight (Damerau-Levenshtein distance, for example).
      *
      * Zero is no mistake.
      *
