@@ -484,4 +484,20 @@ class  block_formal_langs_matches_group {
     public $comparedcoverage;
 }
 
+/**
+ * Represents a lexical error in the token
+ *
+ * A lexical error is a rare case where single lexem violates the rules of the language
+ * and can not be interpreted.
+ */
+class  block_formal_langs_lexical_error() {
+
+    public $tokenindex;
+
+    /** @var User interface string (i.e. received using get_string) describing error to the user*/
+    public $errormessage;
+
+    /** @var Corrected token object if possible, null otherwise */
+   public $correctedtoken; 
+}
 ?>
