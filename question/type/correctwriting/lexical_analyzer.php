@@ -57,10 +57,8 @@ class qtype_correctwriting_lexical_analyzer {
         //1. Scan answer and response - Pashaev
         //  - call language object to do it
         //2. Check for full match - stop processing if answer and response arrays are equal - Pashaev
-        //3. Find matched pairs (typos, typical errors etc) - Birukova
-        //  - look_for_matches function
-        //4. Find best groups of pairs - Birukova
-        //  - group_matches function, with criteria defined by compare_matches_groups function
+        //3. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
+        //4. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
         //5. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Pashaev
         //6. Select best fitted sequence analyzer using their fitness method - Birukova or Pashaev
         //7. Set array of mistakes accordingly - Birukova
@@ -68,41 +66,6 @@ class qtype_correctwriting_lexical_analyzer {
         //NOTE: if responsestr is null just check for errors - Pashaev
         //NOTE: if some stage create errors, stop processing right there
         //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
-    }
-
-    /**
-     * Creates an array of all possible matched pairs.
-     *
-     * Uses token's look_for_matches function and fill necessary fields in matched_tokens_pair objects.
-     *
-     * @param double $threshold threshold as a fraction of token length for creating pairs
-     * @return array array of matched_tokens_pair objects representing all possible pairs within threshold
-     */
-    public function look_for_matches($threshold) {
-    }
-
-    /**
-     * Generates array of best groups of matches representing possible set of student's mistakes.
-     *
-     * Use recursive backtracking.
-     * No token from answer or response could appear twice in any group, otherwise groups are
-     * compared using compare_matches_groups function
-     *
-     * @param array $matches array of matched_tokens_pair objects representing all possible pairs within threshold
-     * @return array array of matches_group objects
-     */
-    public function group_matches($matches) {
-    }
-
-    /**
-     * Compares two matches groups.
-     *
-     * Basic strategy is to have as much tokens in both answer and response covered,
-     * if the number of tokens covered are equal, than choose group with less summ of mistake weights.
-     *
-     * @return number <0 if $group1 worse than $group2; 0 if $group1==$group2; >0 if $group1 better than $group2
-     */
-    public function compare_matches_groups($group1, $group2) {
     }
 
     /**
@@ -133,25 +96,6 @@ class qtype_correctwriting_lexical_analyzer {
     }
 
     //Other necessary access methods
-}
-
-/**
- * Represents possible set of student's lexical mistakes
- */
-class qtype_correctwriting_matches_group {
-    /**
-     * Array of matched pairs
-     */
-    public $matchedpairs;
-
-    //Sum of mistake weight
-    public $mistakeweight;
-
-    //Sorted array of all answer token indexes for tokens, covered by pairs from this group
-    public $answercoverage;
-
-    //Sorted array of all response token indexes for tokens, covered by pairs from this group
-    public $responsecoverage;
 }
 
 ?>
