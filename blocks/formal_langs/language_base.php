@@ -70,16 +70,14 @@ abstract class block_formal_langs_abstract_language {
     }
 
     /**
-     * Returns array of tokens.
+     * Returns stream of tokens.
      *
-     * Add errors for answer scanning
+     * Add lexical errors if any exists.
      * @param $text - input text.
-     * @param $isanswer - this flag indicates passed text as student
-     * response, otherwise - teacher answer.
-     * @return array of tokens
+     * @return block_formal_langs_token_stream object, containing a list of tokens and lexical errors
      */
-    public function scan($text, $isanswer) {
-        $this->scaner->tokenize($text, $isanswer);
+    public function scan($text) {
+        $this->scaner->tokenize($text);
     }
     
     /**
@@ -87,11 +85,11 @@ abstract class block_formal_langs_abstract_language {
      *
      * Add errors for answer parsing
      * @param $tokens - input array of tokens
-     * @param $isanswer boolean true if we need to reduce to start symbol (answer parsing), false if not (response parts parsing)
+     * @param $iscorrect boolean true if we need to reduce to start symbol (correct text parsing), false if not (compared text parts parsing)
      * @return array of objects of ast (or tree roots) - should contain one element for answer parsing
      */
-    public function parse($tokens, $isanswer) {
-        $this->parser->parse($tokens);
+    public function parse($tokens, $iscorrect) {
+        $this->parser->parse($tokens, $iscorrect);
     }
 
     /**
@@ -182,7 +180,6 @@ abstract class block_formal_langs_abstract_language {
             return $this->scaner->token_name_list();
         }
     }
-
 }
 
 /**
