@@ -199,7 +199,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     }
 
     /**
-     * This function returns true if Damerau-Levenshtein distance is
+     * This function returns true if editing distance is
      * applicable to this type of tokens as lexical error weight and
      * threshold.
      *
@@ -208,15 +208,27 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      *
      * @return boolean
      */
-    public function use_levenshtein() {
+    public function use_editing_distance() {
         return true;
+    }
+
+    /**
+     * Calculates and return editing distance from
+     * $this to $token
+     */
+    public function editing_distance($token) {
+        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now
+            $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value());
+        } else {//Distance not applicable, so return a big number 
+            $distance = strlen($this->value()) + strlen($token->value());
+        }
     }
 
     /* Calculates Damerau-Levenshtein distance between two strings.  
      *
      * @return int Damerau-Levenshtein distance
      */
-    public function damerau_levenshtein($str1, $str2) {
+    static public function damerau_levenshtein($str1, $str2) {
     }
 
     /**
