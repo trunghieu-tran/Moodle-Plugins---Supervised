@@ -1384,7 +1384,8 @@ class poasassignment_model {
         $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id, 'cancelled' => 0), 'id', 'id, userid, taskid');
         foreach ($assignees as $assignee) {
             if ($assignee->taskid > 0 && array_search($assignee->userid, $usersid) === false) {
-                array_push($usersid, $assignee->userid);
+                if (!has_capability('mod/poasassignment:havetask', $this->get_context(), $assignee->userid))
+                    array_push($usersid, $assignee->userid);
             }
         }
         return $usersid;
