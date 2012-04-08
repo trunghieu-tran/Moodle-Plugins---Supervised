@@ -27,7 +27,7 @@ class auditor_sync {
      *
      * @access public
      * @param $taskrecord данные о задании. Соответствуют записям таблицы poasassignment_tasks
-     * с двумя дополнительными полями - auditorvariantid и comments     *
+     * с двумя дополнительными полями - id в базе данных Аудитора и comments
      * @return mixed идентификатор вставленной записи
      */
     public function import_task($taskrecord) {
@@ -52,6 +52,7 @@ class auditor_sync {
      */
     public function synchronize() {
         // Подключить файл с конфигурацией соединения с внешней базой данных
+        $config = array('server'=>'', 'database' => '', 'dbuser' => '', 'dbpass' => '');
         require_once('config.php');
         $error = $this->connect_auditor($config['server'], $config['dbuser'], $config['dbpass'], $config['database']);
         if ($error == false) {
@@ -97,7 +98,7 @@ class auditor_sync {
      * @param $storedtasks все импортированные задания
      * @return array задания poasassignment, базирующиеся на указанном задании Аудитора
      */
-    private function get_stored_tasks_by_auditor_variant_id($id, $storedtasks) {
+    public function get_stored_tasks_by_auditor_variant_id($id, $storedtasks) {
         $tasks = array();
         foreach ($storedtasks as $storedtask) {
             if ($storedtask->auditorvariantid == $id) {

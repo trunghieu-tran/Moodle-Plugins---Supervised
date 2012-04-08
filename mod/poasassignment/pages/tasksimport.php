@@ -89,6 +89,10 @@ class tasksimport_page extends abstract_page {
         }
         if ($this->mform->get_data()) {
             $data = $this->mform->get_data();
+            if ($data->submitbutton == get_string('sync', 'poasassignment')) {
+                $this->synchronize($data);
+                return;
+            }
             $error = auditor_sync::get_instance()->connect_auditor($data->server, $data->dbuser, $data->dbpass, $data->database);
             if (($error == false)) {
                 $sql = "SELECT * FROM variants WHERE lessontypeid=".mysql_real_escape_string($data->lessontypeid);
@@ -178,6 +182,124 @@ class tasksimport_page extends abstract_page {
         }
         else {
             $this->mform->display();
+        }
+    }
+
+    private function synchronize($data) {
+        global $DB;
+        $error = auditor_sync::get_instance()->connect_auditor($data->server, $data->dbuser, $data->dbpass, $data->database);
+        if (($error == false)) {
+            // Получить все уровни сложности из внешней базы данных
+            $newcomplexities = array();
+            $sql = "SELECT * FROM mod_complexities";
+            if (!($complexities = mysql_query($sql))) {
+                echo get_string('errorcantrunquery', 'poasassignment');
+                echo $sql;
+                return;
+            }
+            else {
+                while($complexity = mysql_fetch_assoc($complexities)) {
+                    array_push($newcomplexities, $complexity);
+                }
+            }
+
+            // Узнать все варианты для поля уровня сложности
+            $variants = $DB->get_records('poasassignment_variants', array('fieldid' => $data->kcfield), 'sortorder');
+            $levels = array();
+            foreach ($variants as $id => $level) {
+                array_push($levels, $level->value);
+            }
+
+            $sql = 'SELECT * FROM variants WHERE lessontypeid='.mysql_real_escape_string($data->lessontypeid);
+            if (!($result = mysql_query($sql))) {
+                echo get_string('errorcantrunquery', 'poasassignment');
+                echo $sql;
+                return;
+            }
+            else{
+                $storedtasks = $DB->get_records('auditor_sync_tasks');
+                // Для каждого задания из аудитора
+                while ($actualtask = mysql_fetch_assoc($result)) {
+                    // найти те задания poasassignment, которые были импортироаны из него
+                    $taskstosync = auditor_sync::get_instance()->get_stored_tasks_by_auditor_variant_id($actualtask['id'], $storedtasks);
+
+                    // Если задания есть
+                    if ($taskstosync) {
+                        echo '<br/> Обновление задания '.$actualtask['id'];
+                        // и для всех таких заданий обновить комментарии и описание задачи
+                        foreach ($taskstosync as $tasktosync) {
+                            if ($tasktosync->comments != $actualtask['comments']) {
+                                $tasktosync->comments = $actualtask['comments'];
+                                //echo '<br/>UPDATE RECORD auditor_sync_tasks ',print_r($tasktosync);
+                                $DB->update_record('auditor_sync_tasks', $tasktosync);
+                            }
+                            $poasassignmenttask = $DB->get_record('poasassignment_tasks', array('id' => $tasktosync->poasassignmenttaskid), 'id, description');
+                            if ($poasassignmenttask) {
+                                if ($poasassignmenttask->description != $actualtask['description']) {
+                                    $poasassignmenttask->description = $actualtask['description'];
+                                    //echo '<br/>UPDATE RECORD poasassignment_tasks ',print_r($poasassignmenttask);
+                                    $DB->update_record('poasassignment_tasks', $poasassignmenttask);
+                                }
+                            }
+                        }
+                    }
+                    // Если такого задания в moodle нет, добавить его
+                    else {
+                        echo '<br/> Импорт задания '.$actualtask['id'];
+                        $taskrecord = new stdClass();
+                        $taskrecord->name = get_string('defaulttaskname', 'poasassignment') .' №' . $actualtask['num'];
+                        $taskrecord->description = $actualtask['description'];
+                        $taskrecord->comments = $actualtask['comments'];
+                        $taskrecord->id = $actualtask['id'];
+
+                        $kcfieldname = 'field' . $data->kcfield;
+                        $taskrecord->$kcfieldname = array();
+                        $taskrecord->modifications = array();
+
+                        // Для каждого задания получить список модификаций
+                        $sql = "SELECT id, num, kc FROM modifications WHERE variantid=".mysql_real_escape_string($actualtask['id']);
+                        if (!($modifications = mysql_query($sql))) {
+                            echo get_string('errorcantrunquery', 'poasassignment');
+                            echo $sql;
+                            return;
+                        }
+                        else {
+                            while ($modification = mysql_fetch_assoc($modifications)) {
+                                array_push(
+                                    $taskrecord->modifications,
+                                    array('id' => $modification['id'], 'num' => $modification['num'], 'kc' => $modification['kc'])
+                                );
+                                foreach ($newcomplexities as $complexity) {
+                                    if ($modification['kc'] >= $complexity['kcmin']
+                                        && $modification['kc'] <= $complexity['kcmax']) {
+
+                                        // Узнать id этого уровня сложности в таблице poasassignment_variants
+                                        // Иногда последний символ в таблице - №13. Учитывать это
+                                        if (($index = array_search($complexity['name'], $levels)) === false) {
+                                            $index = array_search($complexity['name'].chr(13), $levels);
+                                        }
+                                        if ( $index !== false) {
+                                            if (array_search($index, $taskrecord->$kcfieldname) === false) {
+                                                array_push($taskrecord->$kcfieldname, $index);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        auditor_sync::get_instance()->import_task($taskrecord);
+                    }
+                }
+                $url = new moodle_url('view.php',
+                    array(  'page' => 'tasks',
+                            'id' => required_param('id', PARAM_INT)
+                    )
+                );
+                echo '<br/>'.html_writer::link($url, 'К списку заданий');
+            }
+        }
+        else {
+            echo $error;
         }
     }
 
@@ -281,8 +403,6 @@ class tasksimport_form extends moodleform {
         $mform->addElement('text','lessontypeid','lessontypeid', array('size'=>45));
         $mform->addRule('lessontypeid', null, 'required', null, 'client');
 
-        //$mform->addElement('text','kcfieldname',get_string('kcfieldname', 'poasassignment'), array('size'=>45));
-        //$mform->addRule('kcfieldname', null, 'required', null, 'client');
         $mform->addElement('select', 'kcfield', 'Поле уровня сложности', $instance['options']);
 
 
@@ -295,6 +415,8 @@ class tasksimport_form extends moodleform {
         $mform->addElement('hidden', 'page', 'tasksimport');
         $mform->setType('page', PARAM_TEXT);
 
+
         $this->add_action_buttons(true, get_string('import', 'poasassignment'));
+        $mform->addElement('submit', 'submitbutton', get_string('sync', 'poasassignment'));
     }
 }
