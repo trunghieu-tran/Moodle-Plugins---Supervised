@@ -440,6 +440,7 @@ class poasassignment_model {
             }
             $taskvalueid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
             if ($field->ftype==FILE) {
+                echo 'saveing in '.$taskvalueid;
                 $this->save_files($data->$value,'poasassignmenttaskfiles',$taskvalueid);
             }
         }
@@ -486,15 +487,16 @@ class poasassignment_model {
                     ))) {
                 $fieldvalue->id=$getrec->id;
                 $DB->update_record('poasassignment_task_values',$fieldvalue);
+                $taskvalueid = $getrec->id;
             }
             else
-                $taskid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
+                $taskvalueid = $DB->insert_record('poasassignment_task_values',$fieldvalue);
 
             if ($field->ftype==FILE) {
                 $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
-                $this->delete_files($cm->id,'poasassignmenttaskfiles', $taskid);
-                echo 'saving files in poasassignmenttaskfiles, '.$taskid;
-                $this->save_files($task->$value,'poasassignmenttaskfiles', $taskid);
+                $this->delete_files($cm->id,'poasassignmenttaskfiles', $taskvalueid);
+                echo 'saving files in poasassignmenttaskfiles, '.$taskvalueid;
+                $this->save_files($task->$value,'poasassignmenttaskfiles', $taskvalueid);
             }
 
         }
@@ -546,14 +548,16 @@ class poasassignment_model {
             }
             if ($field->ftype == FILE) {
                 $draftitemid = file_get_submitted_draft_itemid('poasassignmenttaskfiles');
-                file_prepare_draft_area(
-                    $draftitemid,
-                    $this->get_context()->id,
-                    'mod_poasassignment',
-                    'poasassignmenttaskfiles',
-                    $taskid,
-                    array('subdirs'=>true));
-                $task->$name = $draftitemid;
+                if ($value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid))) {
+                    file_prepare_draft_area(
+                        $draftitemid,
+                        $this->get_context()->id,
+                        'mod_poasassignment',
+                        'poasassignmenttaskfiles',
+                        $value->id,
+                        array('subdirs'=>true));
+                    $task->$name = $draftitemid;
+                }
             }
             if ($field->ftype==MULTILIST) {
                 $value = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,'taskid'=>$taskid));
