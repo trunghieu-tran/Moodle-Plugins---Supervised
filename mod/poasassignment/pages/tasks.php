@@ -206,7 +206,7 @@ class tasks_page extends abstract_page {
                                 			break;
                                 		case FILE:
                                 			$context = get_context_instance(CONTEXT_MODULE, $this->cm->id);
-                                			$value = $poasmodel->view_files($context->id,'poasassignmenttaskfiles',$task->id);
+                                			$value = $poasmodel->view_files($context->id,'poasassignmenttaskfiles',$taskvalue->id);
                                 			break;
                                 		default:
                                 			$value = $taskvalue->value; 
