@@ -125,7 +125,7 @@ class taskview_page extends abstract_page {
                         $str = userdate($taskvalue->value, get_string('strftimedaydate', 'langconfig'));
                     }
                     if ($field->ftype == FILE ) {
-                        $str = $model->view_files($model->get_context()->id,'poasassignmenttaskfiles', $taskvalue->id);
+                        $str = $model->view_files($model->get_context()->id,'poasassignmenttaskfiles', $this->taskid);
                     }
                     if ($field->ftype == LISTOFELEMENTS ) {
                     	$variants = $model->get_variants($field->id);
