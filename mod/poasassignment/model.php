@@ -493,6 +493,7 @@ class poasassignment_model {
             if ($field->ftype==FILE) {
                 $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
                 $this->delete_files($cm->id,'poasassignmenttaskfiles', $taskid);
+                echo 'saving files in poasassignmenttaskfiles, '.$taskid;
                 $this->save_files($task->$value,'poasassignmenttaskfiles', $taskid);
             }
 
