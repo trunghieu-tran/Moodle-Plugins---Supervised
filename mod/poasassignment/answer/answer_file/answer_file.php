@@ -206,23 +206,23 @@ class answer_file extends poasassignment_answer {
                                                         'answerid' => $this->answerid,
                                                         'name'=>'fileamount'));  
         $plugin_settings_types = $DB->get_record('poasassignment_ans_stngs',
-								        		 array('poasassignmentid' => $poasassignmentid,
-								        				'answerid' => $this->answerid,
-								        				'name' => 'fileextensions'));
+                                                array('poasassignmentid' => $poasassignmentid,
+                                                        'answerid' => $this->answerid,
+                                                        'name' => 'fileextensions'));
         if ($plugin_settings_size) {
-        	$options['maxbytes'] = $plugin_settings_size->value;
+            $options['maxbytes'] = $plugin_settings_size->value;
         }
         if ($plugin_settings_amount) {
-        	$options['maxfiles'] = $plugin_settings_amount->value;
+            $options['maxfiles'] = $plugin_settings_amount->value;
         }
         if ($plugin_settings_types) {
-        	$options['accepted_types'] = explode(',', $plugin_settings_types->value);
+            $options['accepted_types'] = explode(',', $plugin_settings_types->value);
         }
         if ($plugin_settings_amount->value == -1) {
-        	$mform->addElement(	'static', 
-        					   	'filescount', 
-        						get_string('filescount', 'poasassignmentanswertypes_answer_file'), 
-        						get_string('any', 'poasassignmentanswertypes_answer_file'));
+            $mform->addElement(	'static',
+                                'filescount',
+                                get_string('filescount', 'poasassignmentanswertypes_answer_file'),
+                                get_string('any', 'poasassignmentanswertypes_answer_file'));
         }
         else {
         	$mform->addElement('static', 'filetypes', get_string('filestypes', 'poasassignmentanswertypes_answer_file'), $plugin_settings_types->value);
@@ -289,23 +289,33 @@ class answer_file extends poasassignment_answer {
         $poasmodel=poasassignment_model::get_instance();
         $filemanager_options = array('subdirs'=>0);
         if($poasmodel->assignee) {
-                $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
-                $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount));
-                if($attempt) {
-                    $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
-                    if($submission) {
-                        $data = file_prepare_standard_filemanager($data, 'answerfiles', $filemanager_options, $context, 'mod_poasassignment', 'submissionfiles', $submission->id);    
-                    }
+            $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id));
+            $attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$poasmodel->assignee->id,'attemptnumber'=>$attemptscount));
+            if($attempt) {
+                $submission=$DB->get_record('poasassignment_submissions',array('answerid'=>$this->answerid,'attemptid'=>$attempt->id));
+                if($submission) {
+                    $data = file_prepare_standard_filemanager(
+                        $data,
+                        'answerfiles',
+                        $filemanager_options,
+                        $context,
+                        'mod_poasassignment',
+                        'submissionfiles',
+                        $submission->id,
+                        array('subdirs' => true));
                 }
+            }
             }
         return $data;
     // set file manager itemid, so it will find the files in draft area
     }
-}
-/* class answer_form_file extends moodleform
-{
-    function definition() {        
-        $mform = $this->_form;
-        $mform->addElement('filemanager', 'answerfiles', 'answerfiles');
+
+    public static function validate_submission($data, $files) {
+        $errors = array();
+        $fileinfo = file_get_draft_area_info($data['answerfiles_filemanager']);
+        if ($fileinfo['filecount'] == 0) {
+            $errors['answerfiles_filemanager'] = get_string('nofilesadded', 'poasassignmentanswertypes_answer_file');
+        }
+        return $errors;
     }
-} */
+}

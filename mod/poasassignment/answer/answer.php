@@ -77,6 +77,17 @@ class poasassignment_answer {
     }
 	public function show_attempt_submission($attemptid) {
 	}
+
+    /**
+     * Validate user's submission.
+     *
+     * @param array $data data
+     * @param array $files files
+     * @return true | array of errors
+     */
+    public static function validate_submission($data, $files) {
+        return array();
+    }
     
     
 }
@@ -127,7 +138,15 @@ class answer_form extends moodleform {
     }
 
     function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        return true;
+        $errors = array();
+        $plugins = poasassignment_model::get_instance()->get_plugins();
+        foreach($plugins as $plugin) {
+            if(poasassignment_answer::used_in_poasassignment($plugin->id, $data['poasassignmentid'])) {
+                require_once($plugin->path);
+                $pluginname = $plugin->name;
+                $errors = array_merge($errors, $pluginname::validate_submission($data, $files));
+            }
+        }
+        return $errors;
     }
 }

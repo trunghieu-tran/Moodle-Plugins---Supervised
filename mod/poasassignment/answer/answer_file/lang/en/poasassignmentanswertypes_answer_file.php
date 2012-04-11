@@ -15,3 +15,4 @@ $string['any'] = 'Any';
 $string['filescount'] = 'Files amount';
 $string['filestypes'] = 'Files types';
 $string['loadfiles'] = 'Load files';
+$string['nofilesadded'] = 'No files added';

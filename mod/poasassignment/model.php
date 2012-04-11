@@ -162,8 +162,9 @@ class poasassignment_model {
      * @return array
      */
     public function get_plugins() {
+        global $DB;
         if (!$this->plugins)
-            $this->plugins=$DB->get_records('poasassignment_answers');
+            $this->plugins = $DB->get_records('poasassignment_answers');
         return $this->plugins;
     }
 
@@ -357,12 +358,14 @@ class poasassignment_model {
         }
         //$this->context = get_context_instance(CONTEXT_MODULE, $this->poasassignment->coursemodule);
         if ($draftitemid) {
-            file_save_draft_area_files($draftitemid, $this->context->id,
-                    'mod_poasassignment',
-                    $filearea,
-                    $itemid,
-                    array('subdirs'=>true));
-                    }
+            file_save_draft_area_files(
+                $draftitemid,
+                $this->context->id,
+                'mod_poasassignment',
+                $filearea,
+                $itemid,
+                array('subdirs'=>true));
+        }
     }
 
     /**
