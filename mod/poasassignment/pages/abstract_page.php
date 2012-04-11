@@ -28,7 +28,13 @@ class abstract_page {
      */
     function require_ability_to_view() {
         if(!$this->has_satisfying_parameters())
-            print_error($this->lasterror, 'poasassignment');
+            print_error(
+                $this->lasterror,
+                'poasassignment',
+                new moodle_url('/mod/poasassignment/view.php',
+                    array(
+                        'id'=>poasassignment_model::get_instance()->get_cm()->id,
+                        'page' => 'view')));
         $this->require_cap();
     }
 

@@ -274,3 +274,7 @@ $string['addtask'] = 'Добавить задание';
 $string['taskssync'] = 'Синхронизация заданий';
 $string['taskssync_help'] = 'Загрузить новые задания и обновить текущие из базы Аудитора';
 $string['sync'] = 'Синхронизовать';
+$string['thismoduleisntopenedyet'] = 'Это задание еще не открыто';
+$string['errorunknownpage'] = 'Такой страницы не существует';
+$string['invalidtaskid'] = 'Задания с таким id не существует';
+$string['errornonexistenttask'] = 'Такого задания нет';
