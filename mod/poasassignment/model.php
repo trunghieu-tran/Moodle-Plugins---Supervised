@@ -440,7 +440,6 @@ class poasassignment_model {
             }
             $taskvalueid=$DB->insert_record('poasassignment_task_values',$fieldvalue);
             if ($field->ftype==FILE) {
-                echo 'saveing in '.$taskvalueid;
                 $this->save_files($data->$value,'poasassignmenttaskfiles',$taskvalueid);
             }
         }
@@ -495,7 +494,6 @@ class poasassignment_model {
             if ($field->ftype==FILE) {
                 $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
                 $this->delete_files($cm->id,'poasassignmenttaskfiles', $taskvalueid);
-                echo 'saving files in poasassignmenttaskfiles, '.$taskvalueid;
                 $this->save_files($task->$value,'poasassignmenttaskfiles', $taskvalueid);
             }
 

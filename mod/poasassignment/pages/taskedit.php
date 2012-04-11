@@ -46,7 +46,13 @@ class taskedit_page extends abstract_page {
                 redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
             }
             else {
-                print_error('invalidtaskid','poasassignment');
+                print_error(
+                    'invalidtaskid',
+                    'poasassignment',
+                    new moodle_url('/mod/poasassignment/view.php',
+                        array(
+                            'id'=>poasassignment_model::get_instance()->get_cm()->id,
+                            'page' => 'tasks')));
             }
         }
         if ($this->mode == 'changeconfirmed') {

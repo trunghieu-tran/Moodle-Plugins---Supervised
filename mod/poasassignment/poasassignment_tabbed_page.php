@@ -50,7 +50,13 @@ class poasassignment_tabbed_page {
     private function include_page($page) {
         $pagetype = $page . '_page';
         if(!array_key_exists($page, poasassignment_model::$extpages)) {
-			print_error('errorunknownpage','poasassignment');            
+            print_error(
+                'errorunknownpage',
+                'poasassignment',
+                new moodle_url('/mod/poasassignment/view.php',
+                    array(
+                        'id'=>poasassignment_model::get_instance()->get_cm()->id,
+                        'page' => 'view')));
         }
         $currentpath = poasassignment_model::$extpages[$page];
 		require_once($currentpath);
@@ -70,15 +76,15 @@ class poasassignment_tabbed_page {
 		
         // Check available date or students
         if (!$model->is_opened()) {
-        	print_error('thismoduleisntopenedyet', 
-        			'poasassignment',
-        			'', 
-        			null, 
-        			userdate(time()).'<'.userdate($model->get_poasassignment()->availabledate));
+            print_error('thismoduleisntopenedyet',
+                    'poasassignment',
+                    new moodle_url('/course/view.php', array('id'=>$model->get_cm()->course)),
+                    null,
+                    userdate(time()).' < '.userdate($model->get_poasassignment()->availabledate));
         }
-        	
+
         if ($error = $model->check_dates()) {
-        	print_error($error, 'poasassignment');
+            print_error($error, 'poasassignment', new moodle_url('/course/view.php', array('id'=>$model->get_cm()->course)));
         }
         
         // Check abilities and execute page's logic
