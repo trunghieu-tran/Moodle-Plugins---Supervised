@@ -14,3 +14,4 @@ $string['any'] = 'Любое';
 $string['filescount'] = 'Количество файлов';
 $string['filestypes'] = 'Типы файлов';
 $string['loadfiles'] = 'Загрузить файлы';
+$string['nofilesadded'] = 'Вы не прикрепили ни одного файла';

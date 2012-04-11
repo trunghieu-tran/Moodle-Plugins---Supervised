@@ -42,7 +42,7 @@ class taskedit_page extends abstract_page {
         $model = poasassignment_model::get_instance();
         if ($this->mode == SHOW_MODE || $this->mode == HIDE_MODE) {
             if (isset($this->taskid) && $this->taskid > 0) {            	
-            	$model->set_task_visibility($this->taskid, $this->mode == SHOW_MODE);
+                $model->set_task_visibility($this->taskid, $this->mode == SHOW_MODE);
                 redirect(new moodle_url('view.php',array('id'=>$model->get_cm()->id, 'page'=>'tasks')), null, 0);
             }
             else {
@@ -241,7 +241,7 @@ class taskedit_page extends abstract_page {
     }
     /**
      * Show confirm update screen.
-     * If noone took the task, it seems like ordinary confirm screen 
+     * If no one took the task, it seems like ordinary confirm screen
      * - are you sure? - yes/no.
      * If someone took the task, page shows table 
      * of taskowners and offer what to do with each student

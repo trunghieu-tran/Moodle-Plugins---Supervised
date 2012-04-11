@@ -131,4 +131,12 @@ class answer_text extends poasassignment_answer {
         }
         return $data;
     }
+
+    public static function validate_submission($data, $files) {
+        $errors = array();
+        if (strlen($data['text_editor']) == 0){
+            $errors['text_editor'] = get_string('notext', 'poasassignmentanswertypes_answer_text');
+        }
+        return $errors;
+    }
 }
