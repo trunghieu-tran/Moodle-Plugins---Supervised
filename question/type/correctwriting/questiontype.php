@@ -97,4 +97,57 @@ class qtype_correctwriting extends question_type {
             $answer->symbols = $symbols;
         }
     }
+    
+    /** Saves a question 
+        @param object $question question data
+      */
+    public function save_question_options($question) {
+        global $DB;
+        
+        // Result of saving
+        $result = new stdClass();
+
+        //Context, where question belongs to
+        $context = $question->context;
+        
+        // Save main question data
+        parent::save_question_options($question);
+        
+        // Get old answers
+        $oldanswers = $DB->get_records('question_answers',array('question' => $question->id));
+        foreach($oldanswers as $id => $oldanswer)
+        {
+            // Remove symbols from old answers
+            $DB->delete_records('qtype_correctwriting_symbols',array('answerid' => $id));
+        }
+        
+        //Remove old answers
+        $DB->delete_records('question_answers',array('question' => $question->id));
+        
+        //Insert all new answers
+        foreach ($question->answer as $key => $answerdata) {
+            // Check for, and ignore, completely blank answer from the form.
+            if (trim($answerdata->answer) == '') {
+                continue;
+            }
+            
+            $answer = new stdClass();
+            $answer->answer = $answerdata->answer;
+            $answer->question = $question->id;
+            $answer->feedback = $answerdata->feedback;
+            $answer->fraction = $answerdata->fraction;
+            //Insert new record and save it's id
+            $answerdata->id = $DB->insert_record('question_answers', $answer);
+            
+            //Insert symbols for each answer
+            foreach($answerdata->symbols as $number => $symboldata)
+            {
+                $symbol = new stdClass();
+                $symbol->number = $number;
+                $symbol->name = $symboldata->name;
+                $symbol->answerid = $answerdata->id;
+                $symboldata->id = $DB->insert_record('qtype_correctwriting_symbols', $symbol);
+            }
+        }
+    }
 }
