@@ -490,7 +490,7 @@ class  block_formal_langs_matches_group {
  * A lexical error is a rare case where single lexem violates the rules of the language
  * and can not be interpreted.
  */
-class  block_formal_langs_lexical_error() {
+class  block_formal_langs_lexical_error {
 
     public $tokenindex;
 
