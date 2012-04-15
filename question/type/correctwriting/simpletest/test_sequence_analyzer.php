@@ -20,10 +20,12 @@ require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php'
   *  @return array array of tokens
   */
 function create_tokens($types,$values,$isanswer) {
-    $result = array();
+    $tokens = array();
     for($i = 0;$i < count($types);$i++) {
-      $result[] = new block_formal_langs_token_base(null, $types[$i], $values[$i], $isanswer, null);
+      $tokens[] = new block_formal_langs_token_base(null, $types[$i], $values[$i], $isanswer, null);
     }
+    $result = new block_formal_langs_token_stream();
+    $result->tokens = $tokens;
     return $result;
 }
 
