@@ -41,7 +41,8 @@ class qtype_correctwriting extends question_type {
     public function extra_question_fields() {
         $result = array('qtype_correctwriting', 'langid', 'absenterrorweight', 'addederrorweight', 'movederrorweight');
         $result[] = 'lexicalerrorthreshold'; 
-        $result[] = 'lexicalerrorweight'; 
+        $result[] = 'lexicalerrorweight';
+        $result[] = 'casesensivity';        
         return $result;
     }
     /** Returns extra tables, needed for question
@@ -56,4 +57,6 @@ class qtype_correctwriting extends question_type {
     public function questionid_column_name() {
         return 'questionid';
     }
+    
+
 }
