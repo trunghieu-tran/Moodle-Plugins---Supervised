@@ -58,5 +58,26 @@ class qtype_correctwriting extends question_type {
         return 'questionid';
     }
     
-
+    /** Loads a question type specific options for  the question
+        @return bool              Indicates success or failure
+        @param  object $question  The  question object, which must be filled with appropriate data
+     */
+    public function get_question_options($question) {
+        global $DB;
+        
+        // Extra question fields will do job, like loading some answers for question
+        if (!parent::get_question_options($options)) {
+            return false;
+        }
+      
+        // Our task is to load some symbols for each answer from lexeme tables
+        // Option answers is loaded as an associative array of id => stdClass of answer
+        // So we just need to load some answer symbols, which belongs to an array
+        // They also are loaded as stdClass
+        foreach($question->options->answers as $id => $answer) {
+            $answer->symbols = $DB->get_records('{qtype_correctwriting_symbols}', array('answerid' => $id)); 
+        }
+        
+        return true;
+    }
 }
