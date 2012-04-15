@@ -129,11 +129,14 @@ class  qtype_correctwriting_sequence_analyzer {
      *
      * Array of individual lcs contains answer indexes as keys and response indexes as values.
      * There may be more than one lcs for a given pair of strings.
-     * @param  array $answer  array of answer tokens
-     * @param  array $response array of response tokens 
+     * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
+     * @param  block_formal_langs_token_stream $responsestream array of response tokens 
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answer, $response) {
+    public static function lcs($answerstream, $responsestream) {
+        // Extract answer and response array of stream
+        $answer = $answerstream->tokens;
+        $response = $responsestream->tokens;
         
         // An array of matches, where keys are indexes of answer and values are arrays of 
         // indexes from response
@@ -240,8 +243,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of mistake objects
      */	
     public function matches_to_mistakes($lcs,$weights) {
-        $answer = &$this->answer;
-        $response = &$this->correctedresponse;
+        $answer = &$this->answer->tokens;
+        $response = &$this->correctedresponse->tokens;
         // Determines, whether answer tokens are used in mistake computation
         $answerused = array();
         $answercount = count($answer);
