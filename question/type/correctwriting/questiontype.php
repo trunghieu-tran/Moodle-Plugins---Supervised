@@ -80,4 +80,12 @@ class qtype_correctwriting extends question_type {
         
         return true;
     }
+    
+    /** Initializes instance of question
+        @param  object $question     The question object instance
+        @param  object $questiondata The user question data 
+      */
+    protected function initialise_question_instance(question_definition $question, $questiondata) {
+        parent::initialise_question_instance($question, $questiondata);
+    }
 }
