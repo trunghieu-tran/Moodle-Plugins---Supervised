@@ -87,5 +87,14 @@ class qtype_correctwriting extends question_type {
       */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
+        //Rearrange lexemes arrays, arrange it as number => symbol
+        foreach($question->answers as $id => $answer) {
+            $symbols = array();
+            foreach ($answer->symbols as $symid => $symbol) {
+                $symbols[$symbol->number] = $symbol;
+                $symbol->id = $symid;
+            }
+            $answer->symbols = $symbols;
+        }
     }
 }
