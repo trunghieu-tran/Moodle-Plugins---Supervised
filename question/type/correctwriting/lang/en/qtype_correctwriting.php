@@ -9,4 +9,8 @@ $string['movedmistakemessage'] = 'A lexeme "{$a->type}" is moved from {$a->answe
 $string['addedmistakemessage'] = 'A lexeme "{$a->type}" at {$a->line}:{$a->position} is odd in response';
 $string['absentmistakemessage'] = 'A lexeme "{$a}" is skipped';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
+$string['caseyes'] = 'Yes, case is important';
+$string['caseno'] = 'No, case is unimportant';
+$string['casesensitive'] = 'Case sensitivity';
+
 ?>
