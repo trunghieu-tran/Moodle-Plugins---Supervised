@@ -40,9 +40,45 @@ defined('MOODLE_INTERNAL') || die();
             get_string('caseno', 'qtype_correctwriting'),
             get_string('caseyes', 'qtype_correctwriting')
         );
-        
+        // Add case sensivity field field
         $mform->addElement('select', 'casesensivity',
                 get_string('casesensitive', 'qtype_shortanswer'), $menu);
+        // Add lexical error threshold field     
+        $mform->addElement('text', 'lexicalerrorthreshold', 
+                           get_string('lexicalerrorthreshold', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('lexicalerrorthreshold', PARAM_FLOAT);
+        $mform->setDefault('lexicalerrorthreshold', 0.33);
+        $mform->addRule('lexicalerrorthreshold', null, 'required', null, 'client');
+        // Add lexical error weight field
+        $mform->addElement('text', 'lexicalerrorweight', 
+                           get_string('lexicalerrorweight', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('lexicalerrorweight', PARAM_FLOAT);
+        $mform->setDefault('lexicalerrorweight', 0.05);
+        $mform->addRule('lexicalerrorweight', null, 'required', null, 'client');
+        // Add absent mistake weight field
+        $mform->addElement('text', 'absentmistakeweight', 
+                           get_string('absentmistakeweight', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('absentmistakeweight', PARAM_FLOAT);
+        $mform->setDefault('absentmistakeweight', 0.1);
+        $mform->addRule('absentmistakeweight', null, 'required', null, 'client');
+        // Add added mistake weight field
+        $mform->addElement('text', 'addedmistakeweight', 
+                           get_string('addedmistakeweight', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('addedmistakeweight', PARAM_FLOAT);
+        $mform->setDefault('addedmistakeweight', 0.1);
+        $mform->addRule('addedmistakeweight', null, 'required', null, 'client');
+        // Add moved mistake weight field
+        $mform->addElement('text', 'movedmistakeweight', 
+                           get_string('movedmistakeweight', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('movedmistakeweight', PARAM_FLOAT);
+        $mform->setDefault('movedmistakeweight', 0.05);
+        $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
+        
     }
  
     public function qtype() {
