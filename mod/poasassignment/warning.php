@@ -54,7 +54,12 @@ switch ($action) {
                 $DB->delete_records('poasassignment_rating_values',array('attemptid'=>$attempt->id));
             }
             $DB->delete_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
-            redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
+            if (has_capability('mod/poasassignment:managetasks',$context)) {
+                redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions')),null,0);
+            }
+            else {
+                redirect(new moodle_url('view.php',array('id'=>$cm->id,'page'=>'view')),null,0);
+            }
         }
     case 'deletefield':
         require_capability('mod/poasassignment:managetasksfields',$context);
@@ -185,7 +190,13 @@ switch ($action) {
         echo $OUTPUT->header();
         echo $OUTPUT->heading($poasassignment->name);
         echo $OUTPUT->box_start();
-        echo get_string('taketaskconfirmation','poasassignment');
+        global $USER;
+        if ($USER->id == $userid) {
+            echo get_string('taketaskconfirmation','poasassignment');
+        }
+        else {
+            echo get_string('providetaskconfirmation','poasassignment');
+        }
         echo $OUTPUT->box_end();
         echo '<div class="poasassignment-confirmation-buttons">';
         echo $OUTPUT->single_button(new moodle_url('warning.php',
@@ -209,7 +220,10 @@ switch ($action) {
         if(!isset($userid) || $userid<1)
             print_error('invaliduserid','poasassignment');
         
-        $assignee = $DB->get_record('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$poasassignment->id));
+        $assignee = $DB->get_record('poasassignment_assignee',array(
+            'userid'=>$userid,
+            'poasassignmentid'=>$poasassignment->id,
+            'cancelled' => 0));
         if($assignee && $assignee->taskid > 0) {
         //if($DB->record_exists('poasassignment_assignee',array('userid'=>$userid,'poasassignmentid'=>$poasassignment->id)))
             print_error('alreadyhavetask','poasassignment');

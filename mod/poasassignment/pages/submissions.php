@@ -91,18 +91,23 @@ class submissions_page extends abstract_page {
 
                 $row[]=html_writer::link($taskurl,$task->name).' '.$deleteicon;
             }
-            else
-                $row[]=get_string('notask','poasassignment');
+            else {
+                $providetask = new moodle_url('view.php',array('page' => 'tasks', 'userid' => $assignee->userid, 'id' => $this->cm->id));
+                $row[] = html_writer::link($providetask, get_string('notask','poasassignment'), array('title' => get_string('providetask','poasassignment')));
+                //$row[]=get_string('notask','poasassignment');
+            }
         }
         // Add last submission to the row
-        $submis='';
+        $submis = '';
         if($assignee) {
             foreach($plugins as $plugin) {
                 require_once($plugin->path);
                 $poasassignmentplugin = new $plugin->name();
-                $submis.=$poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);
+                $submis .= $poasassignmentplugin->show_assignee_answer($assignee->id,$this->poasassignment->id,0);
             }
-		}
+        }
+        if (strlen($submis) == 0)
+            $submis = get_string('nosubmission', 'poasassignment');
 		//$submis = shorten_text($submis);
         $row[]=$submis;
         
@@ -131,10 +136,10 @@ class submissions_page extends abstract_page {
                 $row[]=userdate($attempt->attemptdate);
             }
             else    
-                $row[]='-';
+                $row[] = get_string('nosubmission', 'poasassignment');
         }
         else    
-            $row[]='-';
+            $row[] = get_string('nosubmission', 'poasassignment');
         
         // Add rating date to the row
         // Add rating to the row

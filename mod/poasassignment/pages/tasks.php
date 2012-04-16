@@ -6,10 +6,20 @@ require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;
-
+    private $userid = -1;
     function tasks_page($cm,$poasassignment) {
         $this->poasassignment = $poasassignment;
         $this->cm=$cm;
+    }
+
+    /**
+     * Checks, if the user is providing a task to student (and has capability for doing this)
+     */
+    function is_providing_task() {
+        $correctuserid = $this->userid > 0;
+        $hascapmanage = has_capability('mod/poasassignment:managetasks', get_context_instance(CONTEXT_MODULE, $this->cm->id));
+        $userhavetask = poasassignment_model::user_have_active_task($this->userid, $this->poasassignment->id);
+        return ($correctuserid && $hascapmanage && !$userhavetask);
     }
 
     function has_satisfying_parameters() {
@@ -33,26 +43,35 @@ class tasks_page extends abstract_page {
     }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
-
-        $hascapmanage=has_capability('mod/poasassignment:managetasks',
+        $this->userid = optional_param('userid', -1, PARAM_INT);
+        $hascapmanage = has_capability('mod/poasassignment:managetasks',
                             get_context_instance(CONTEXT_MODULE, $this->cm->id));
 
-        $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
-        require_once ($tg->path);
-        $taskgivername = $tg->name;
-        $taskgiver = new $taskgivername();
-        $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
-
-        if ($hascapmanage || $taskgivername::show_tasks()) {
-            $this->view_table($hascapmanage, $taskgiver);
-            $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
+        // Use taskgiver, if user doesn't provides a task for a student
+        if ($this->is_providing_task()) {
+            $user = $DB->get_record('user', array('id' => $this->userid));
+            $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+            $student = html_writer::link($userurl,fullname($user, true));
+            echo $OUTPUT->heading(get_string('providetaskto', 'poasassignment'). ' ' . $student);
+            $this->view_table($hascapmanage, false);
         }
+        else {
+            $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
+            require_once ($tg->path);
+            $taskgivername = $tg->name;
+            $taskgiver = new $taskgivername();
+            $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
+            if ($hascapmanage || $taskgivername::show_tasks()) {
+                $this->view_table($hascapmanage, $taskgiver);
+                $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
+            }
 
-        if ($hascapmanage) {
-            $id = $this->cm->id;
-            echo '<div align="center">';
-            echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addtask','poasassignment'));
-            echo '</div>';
+            if ($hascapmanage) {
+                $id = $this->cm->id;
+                echo '<div align="center">';
+                echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addtask','poasassignment'));
+                echo '</div>';
+            }
         }
 
     }
@@ -93,81 +112,100 @@ class tasks_page extends abstract_page {
         if(has_capability('mod/poasassignment:managetasks',
                           get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
             $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
+
+            $availabletasks = $poasmodel->get_available_tasks($USER->id);
         }
         // Else show available for user tasks
         else {
             $tasks = $poasmodel->get_available_tasks($USER->id);
         }
         foreach ($tasks as $task) {
+            // Hide hidden tasks from students
             if (!$hascapmanage && $task->hidden)
                 continue;
+
             $row = array();
 
-            $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
-            if ($task->hidden) {
-                $namecolumn = html_writer::link(
-                    $viewurl,
-                    $task->name,
-                    array('title' => get_string('view'), 'class' => 'hiddentask'));
+            if ($this->is_providing_task()) {
+                // If task is unavailable, note teacher
+                $namecolumn = $task->name;
+                if (!array_key_exists($task->id, $availabletasks)) {
+                    $namecolumn = '<span class="critical">'.get_string('taskistaken', 'poasassignment').' - </span>' . $namecolumn;
+                }
+
+                $takeurl = new moodle_url('warning.php?id=' . $this->cm->id . '&action=taketask&taskid=' . $task->id . '&userid=' . $this->userid);
+                $namecolumn .= ' ' . html_writer::link(
+                    $takeurl,
+                    '(' . get_string('providetask', 'poasassignment') . ')',
+                    array('title' => get_string('providetask', 'poasassignment')));
             }
             else {
-                $namecolumn = html_writer::link(
-                    $viewurl,
-                    $task->name,
-                    array('title' => get_string('view')));
-            }
-
-            $namecolumn.=$taskgiver->get_task_extra_string($task->id,$this->cm->id);
-
-            if ($hascapmanage) {
-
-                $updateurl = new moodle_url('view.php',
-                                            array('taskid'=>$task->id,'id'=>$this->cm->id,'page' => 'taskedit'),'u','get');
-                $deleteurl = new moodle_url('warning.php',
-                                            array('taskid'=>$task->id,
-                                            		'action'=>'deletetask',
-                                            		'id'=>$this->cm->id
-                                            		),
-                							'd',
-                							'get');
-
-                $showicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
-                            '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
-                $hideicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
-                            '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
-                $updateicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/edit').
-                            '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
-                $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
-                            '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id),'v','get');
                 if ($task->hidden) {
-                    $showurl = new moodle_url('view.php',
-                                              array('taskid' => $task->id,
-                                                    'mode' => SHOW_MODE,
-                                                    'id' => $this->cm->id,
-                                                    'page' => 'taskedit'),
-                                              'u',
-                                              'get');
-                    $showicon = '<a href="'.$showurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
-                            '" class="iconsmall" alt="'.get_string('show').'" title="'.get_string('show').'" /></a>';
-                    $namecolumn .= '&nbsp;' . $showicon;
+                    $namecolumn = html_writer::link(
+                        $viewurl,
+                        $task->name,
+                        array('title' => get_string('view'), 'class' => 'hiddentask'));
                 }
                 else {
-                    $hideurl = new moodle_url('view.php',
-                                              array('taskid' => $task->id,
-                                                    'mode' => HIDE_MODE,
-                                                    'id' => $this->cm->id,
-                                                    'page' => 'taskedit'),
-                                              'u',
-                                              'get');
-                    $hideicon = '<a href="'.$hideurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
-                            '" class="iconsmall" alt="'.get_string('hide').'" title="'.get_string('hide').'" /></a>';
-                    $namecolumn .= '&nbsp;' . $hideicon;
+                    $namecolumn = html_writer::link(
+                        $viewurl,
+                        $task->name,
+                        array('title' => get_string('view')));
                 }
-                $namecolumn.='&nbsp;'.$updateicon.'&nbsp;'.$deleteicon;
 
+                if ($taskgiver) {
+                    $namecolumn .= $taskgiver->get_task_extra_string($task->id,$this->cm->id);
+                }
+
+                if ($hascapmanage) {
+
+                    $updateurl = new moodle_url('view.php',
+                                                array('taskid'=>$task->id,'id'=>$this->cm->id,'page' => 'taskedit'),'u','get');
+                    $deleteurl = new moodle_url('warning.php',
+                                                array('taskid'=>$task->id,
+                                                        'action'=>'deletetask',
+                                                        'id'=>$this->cm->id
+                                                        ),
+                                                'd',
+                                                'get');
+
+                    $showicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
+                                '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+                    $hideicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
+                                '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+                    $updateicon = '<a href="'.$updateurl.'">'.'<img src="'.$OUTPUT->pix_url('t/edit').
+                                '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+                    $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
+                                '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                    if ($task->hidden) {
+                        $showurl = new moodle_url('view.php',
+                                                  array('taskid' => $task->id,
+                                                        'mode' => SHOW_MODE,
+                                                        'id' => $this->cm->id,
+                                                        'page' => 'taskedit'),
+                                                  'u',
+                                                  'get');
+                        $showicon = '<a href="'.$showurl.'">'.'<img src="'.$OUTPUT->pix_url('t/show').
+                                '" class="iconsmall" alt="'.get_string('show').'" title="'.get_string('show').'" /></a>';
+                        $namecolumn .= '&nbsp;' . $showicon;
+                    }
+                    else {
+                        $hideurl = new moodle_url('view.php',
+                                                  array('taskid' => $task->id,
+                                                        'mode' => HIDE_MODE,
+                                                        'id' => $this->cm->id,
+                                                        'page' => 'taskedit'),
+                                                  'u',
+                                                  'get');
+                        $hideicon = '<a href="'.$hideurl.'">'.'<img src="'.$OUTPUT->pix_url('t/hide').
+                                '" class="iconsmall" alt="'.get_string('hide').'" title="'.get_string('hide').'" /></a>';
+                        $namecolumn .= '&nbsp;' . $hideicon;
+                    }
+                    $namecolumn.='&nbsp;'.$updateicon.'&nbsp;'.$deleteicon;
+
+                }
             }
-            if ($task->hidden)
-                $namecolumn.='</font>';
             $row[]=$namecolumn;
             $row[]=shorten_text($task->description);
             foreach ($fields as $field) {
