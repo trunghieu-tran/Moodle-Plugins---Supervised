@@ -1592,9 +1592,11 @@ class poasassignment_model {
     static function user_have_active_task($userid, $poasassignmentid) {
 		global $DB;
         if ($DB->record_exists('poasassignment_assignee',
-                    array('userid'=>$userid,'poasassignmentid'=>$poasassignmentid))) {
-            $assignee=$DB->get_record('poasassignment_assignee', array('userid'=>$userid,
-                                                                            'poasassignmentid'=>$poasassignmentid));
+                    array('userid'=>$userid,'poasassignmentid'=>$poasassignmentid, 'cancelled' => '0'))) {
+            $assignee=$DB->get_record('poasassignment_assignee', array(
+                'userid'=>$userid,
+                'poasassignmentid'=>$poasassignmentid,
+                'cancelled' => '0'));
             return ($assignee && $assignee->taskid>0);
         }
         return false;
@@ -1648,7 +1650,8 @@ class poasassignment_model {
         }
         return $ret;
     }
-    /* Get all tasks that are available for current user
+    /* Get all tasks that are available for current user.
+     *
      * Method checks instance's uniqueness, visibility of all tasks
      * @param int $poasassignmentid
      * @param int $userid
