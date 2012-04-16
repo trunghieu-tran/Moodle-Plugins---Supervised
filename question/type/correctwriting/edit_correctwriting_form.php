@@ -31,7 +31,19 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  class qtype_correctwriting_edit_form extends question_edit_form {
- 
+    
+    /**  Fills an inner definition of form fields
+         @param object mform form data
+     */
+    protected function definition_inner($mform) {
+        $menu = array(
+            get_string('caseno', 'qtype_correctwriting'),
+            get_string('caseyes', 'qtype_correctwriting')
+        );
+        
+        $mform->addElement('select', 'casesensivity',
+                get_string('casesensitive', 'qtype_shortanswer'), $menu);
+    }
  
     public function qtype() {
         return 'correctwriting';
