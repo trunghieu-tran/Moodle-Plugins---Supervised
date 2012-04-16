@@ -5,6 +5,7 @@
 $string['correctwriting'] = 'Correct writing';
 $string['pluginname'] = 'Correct writing';
 $string['pluginname_link'] = 'question/type/correctwriting';
+$string['pluginnamesummary'] = 'Question type that can automatically find errors int student response and grade it by penalty.';
 $string['movedmistakemessage'] = 'A lexeme "{$a->type}" is moved from {$a->answerline}:{$a->answerposition} to {$a->responseline}:{$a->responseposition}';
 $string['addedmistakemessage'] = 'A lexeme "{$a->type}" at {$a->line}:{$a->position} is odd in response';
 $string['absentmistakemessage'] = 'A lexeme "{$a}" is skipped';
