@@ -25,8 +25,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="answerid"/>
         <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Answer index that symbol belongs to" PREVIOUS="id" NEXT="number"/>
-        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique identifier of symbol, that emerges from lexical analyzing" PREVIOUS="answerid" NEXT="name"/>
-        <FIELD NAME="name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
+        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique identifier of symbol, that emerges from lexical analyzing" PREVIOUS="answerid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="answerid"/>
