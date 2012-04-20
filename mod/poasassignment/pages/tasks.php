@@ -51,7 +51,7 @@ class tasks_page extends abstract_page {
         if ($this->is_providing_task()) {
             $user = $DB->get_record('user', array('id' => $this->userid));
             $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
-            $student = html_writer::link($userurl,fullname($user, true));
+            $student = html_writer::link($userurl, fullname($user, true));
             echo $OUTPUT->heading(get_string('providetaskto', 'poasassignment'). ' ' . $student);
             $this->view_table($hascapmanage, false);
         }
@@ -113,7 +113,7 @@ class tasks_page extends abstract_page {
                           get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
             $tasks = $DB->get_records('poasassignment_tasks', array('poasassignmentid' => $this->poasassignment->id));
 
-            $availabletasks = $poasmodel->get_available_tasks($USER->id);
+            $availabletasks = $poasmodel->get_available_tasks($USER->id, 1);
         }
         // Else show available for user tasks
         else {
@@ -128,7 +128,13 @@ class tasks_page extends abstract_page {
 
             if ($this->is_providing_task()) {
                 // If task is unavailable, note teacher
-                $namecolumn = $task->name;
+                $viewurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$task->id,'id'=>$this->cm->id));
+                $attributes = array('title' => get_string('view'));
+                if ($task->hidden) {
+                    $attributes['class'] = 'hiddentask';
+                }
+                $namecolumn = html_writer::link($viewurl, $task->name, $attributes);
+
                 if (!array_key_exists($task->id, $availabletasks)) {
                     $namecolumn = '<span class="critical">'.get_string('taskistaken', 'poasassignment').' - </span>' . $namecolumn;
                 }
