@@ -26,14 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
-
+equire_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
 /**
  * Represents a correctwriting question type.
  *
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting extends question_type {
+class qtype_correctwriting extends qtype_shortanswer {
     /** Returns fields, that differ from standard Moodle question fields
         and table
         @return array extra fields
