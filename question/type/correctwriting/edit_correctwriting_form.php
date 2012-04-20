@@ -24,25 +24,21 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+
+require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
+
 /**
  * Correctwriting question editing form definition.
  *
  * @copyright  2011 Sychev Oleg, Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- class qtype_correctwriting_edit_form extends question_edit_form {
+ class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
     
     /**  Fills an inner definition of form fields
          @param object mform form data
      */
     protected function definition_inner($mform) {
-        $menu = array(
-            get_string('caseno', 'qtype_correctwriting'),
-            get_string('caseyes', 'qtype_correctwriting')
-        );
-        // Add case sensivity field field
-        $mform->addElement('select', 'casesensivity',
-                get_string('casesensitive', 'qtype_shortanswer'), $menu);
         // Add lexical error threshold field     
         $mform->addElement('text', 'lexicalerrorthreshold', 
                            get_string('lexicalerrorthreshold', 'qtype_correctwriting'),
@@ -79,8 +75,20 @@ defined('MOODLE_INTERNAL') || die();
         $mform->setDefault('movedmistakeweight', 0.05);
         $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
         
+        parent::definition_inner($mform);
     }
- 
+    
+    function get_per_answer_fields($mform, $label, $gradeoptions,
+            &$repeatedoptions, &$answersoption)
+    {
+        $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
+        $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
+                                            get_string('lexemedescriptions', 'qtype_correctwriting'), 
+                                            array('rows' => 12, 'cols' => 80));
+        $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
+        
+        return $repeated;
+    }
     public function qtype() {
         return 'correctwriting';
     }
