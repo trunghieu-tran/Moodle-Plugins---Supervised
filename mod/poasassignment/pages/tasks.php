@@ -41,6 +41,17 @@ class tasks_page extends abstract_page {
         }
         return true;
     }
+
+    function pre_view() {
+        global $DB;
+        if (!$this->is_providing_task()) {
+            $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
+            require_once ($tg->path);
+            $taskgivername = $tg->name;
+            $taskgiver = new $taskgivername();
+            $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
+        }
+    }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
         $this->userid = optional_param('userid', -1, PARAM_INT);
@@ -56,11 +67,12 @@ class tasks_page extends abstract_page {
             $this->view_table($hascapmanage, false);
         }
         else {
+
             $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
             require_once ($tg->path);
             $taskgivername = $tg->name;
             $taskgiver = new $taskgivername();
-            $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
+            //$taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
             if ($hascapmanage || $taskgivername::show_tasks()) {
                 $this->view_table($hascapmanage, $taskgiver);
                 $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);

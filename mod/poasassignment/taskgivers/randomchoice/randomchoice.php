@@ -17,7 +17,8 @@ class randomchoice extends taskgiver {
         //    return;
         //}
         if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
-	        if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id,'userid'=>$USER->id))) {
+            if (!poasassignment_model::user_have_active_task($USER->id, $poasassignment->id)) {
+	        //if(!$DB->record_exists('poasassignment_assignee',array('poasassignmentid'=>$poasassignment->id, 'userid'=>$USER->id, 'taskid' => 0))) {
 	            $model = poasassignment_model::get_instance();
 	            $tasks = $model->get_available_tasks($USER->id);
 				$taskid = poasassignment_model::get_random_task_id($tasks);
