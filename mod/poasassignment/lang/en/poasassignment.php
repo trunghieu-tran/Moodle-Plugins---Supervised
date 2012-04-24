@@ -369,3 +369,4 @@ $string['nosubmission'] = 'No submission';
 $string['taskistaken'] = 'Task is taken by another student';
 $string['providetaskconfirmation'] = 'Are you sure you want to provide this task to student?';
 $string['providetaskto'] = 'Provide task to';
+$string['erroryoucannothavetask'] = 'You cannot have task';
