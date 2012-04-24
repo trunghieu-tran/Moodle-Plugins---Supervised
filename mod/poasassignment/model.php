@@ -2229,4 +2229,41 @@ class poasassignment_model {
     public function next_attempt_penalty($assigneeid) {
         return 0;
     }
+
+    /**
+     * Get array of poasassignment instance's id in same course with mentioned instace.
+     *
+     * @static
+     * @param int $poasassignmentid instance id
+     * @return array
+     */
+    public static function get_sibling_instances($poasassignmentid) {
+        global $DB;
+        $instances = array();
+
+        $sql = 'SELECT id FROM {modules} WHERE name="poasassignment"';
+        $moudleid = $DB->get_record_sql($sql)->id;
+
+        $sql = 'SELECT course FROM {course_modules} WHERE module=? AND instance=?';
+        $courseid = $DB->get_record_sql($sql, array($moudleid, $poasassignmentid))->course;
+
+        $sql = 'SELECT instance FROM {course_modules} WHERE module=? AND course=? AND instance<>?';
+        $result = $DB->get_records_sql($sql, array($moudleid, $courseid, $poasassignmentid));
+        foreach($result as $record) {
+            $instances[] = $record->instance;
+        }
+        return $instances;
+    }
+
+    /**
+     * Get poasassignment instance by its id.
+     *
+     * @static
+     * @param int $poasassignmentid poasassignment id
+     * @return mixed record
+     */
+    public static function get_poasassignment_by_id($poasassignmentid) {
+        global $DB;
+        return $DB->get_record('poasassignment', array('id' => $poasassignmentid));
+    }
 }
