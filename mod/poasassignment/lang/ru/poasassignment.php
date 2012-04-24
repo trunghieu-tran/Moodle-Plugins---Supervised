@@ -283,3 +283,4 @@ $string['nosubmission'] = 'Нет ответа';
 $string['taskistaken'] = 'Занято';
 $string['providetaskconfirmation'] = 'Выдать это задание студенту?';
 $string['providetaskto'] = 'Выдать задание студенту';
+$string['erroryoucannothavetask'] = 'Вы не можете получать задания';
