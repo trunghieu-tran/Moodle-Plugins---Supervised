@@ -702,7 +702,7 @@ class preg_leaf_backref extends preg_leaf {
 
     public function consumes($matcherstateobj = null) {
         if (!$matcherstateobj->is_subpattern_captured($this->number)) {
-            return 0;
+            return qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         }
         return $matcherstateobj->length($this->number);
     }
