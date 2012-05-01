@@ -110,44 +110,23 @@ class qtype_correctwriting extends qtype_shortanswer {
         //Context, where question belongs to
         $context = $question->context;
         
+        //Remove symbols from old answers
+        $sqlwheredelete = " answer IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
+        
+        $answers = $question->answers;
         // Save main question data
-        parent::save_question_options($question);
+        $result = parent::save_question_options($question);
         
-        // Get old answers
-        $oldanswers = $DB->get_records('question_answers',array('question' => $question->id));
-        foreach($oldanswers as $id => $oldanswer)
-        {
-            // Remove symbols from old answers
-            $DB->delete_records('qtype_correctwriting_symbols',array('answerid' => $id));
-        }
-        
-        //Remove old answers
-        $DB->delete_records('question_answers',array('question' => $question->id));
-        
-        //Insert all new answers
-        foreach ($question->answer as $key => $answerdata) {
-            // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata->answer) == '') {
-                continue;
-            }
-            
-            $answer = new stdClass();
-            $answer->answer = $answerdata->answer;
-            $answer->question = $question->id;
-            $answer->feedback = $answerdata->feedback;
-            $answer->fraction = $answerdata->fraction;
-            //Insert new record and save it's id
-            $answerdata->id = $DB->insert_record('question_answers', $answer);
-            
-            //Insert symbols for each answer
-            foreach($answerdata->symbols as $number => $symboldata)
-            {
-                $symbol = new stdClass();
-                $symbol->number = $number;
-                $symbol->name = $symboldata->name;
-                $symbol->answerid = $answerdata->id;
-                $symboldata->id = $DB->insert_record('qtype_correctwriting_symbols', $symbol);
+        // Insert symbols to tables
+        $insertedanswerids = explode(',',$question->answers);
+        for ($i = 0;$i < count($answers);$i++ ) {
+            $currentanswerid = $insertedanswerids[$i];
+            foreach($answer[$i] as $currentanswer) {
+                $currentanswer->answerid = $currentanswerid; 
+                $DB->insert_record('qtype_correctwriting_symbols', $currentanswer);
             }
         }
+        return $result;
     }
 }
