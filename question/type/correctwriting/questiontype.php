@@ -69,13 +69,22 @@ class qtype_correctwriting extends qtype_shortanswer {
         if (!parent::get_question_options($options)) {
             return false;
         }
-      
+        
+        // Fetch all symbols, that belongs to question
+        list($idsql, $params) = $DB->get_in_or_equal(array_keys($question->options->answers));
+        $symsql = 'SELECT * FROM {qtype_correctwriting_symbols} WHERE answerid {$idsql}';
+        $allsymbols = $DB->get_records_select('{qtype_correctwriting_symbols}', '$symsql');
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
         // They also are loaded as stdClass
         foreach($question->options->answers as $id => $answer) {
-            $answer->symbols = $DB->get_records('{qtype_correctwriting_symbols}', array('answerid' => $id)); 
+            //Fill answer symbols
+            foreach($allsymbols as $symbol) {
+                if ($symbol->answerid == $id) {
+                    $answer->symbols[] = $symbol; 
+                }
+            }
         }
         
         return true;
