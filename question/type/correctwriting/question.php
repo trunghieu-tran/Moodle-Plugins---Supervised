@@ -36,10 +36,10 @@ class qtype_correctwriting_question /*extends question_graded_automatically
 
     //Fields defining a question
     /** @var array of question_answer objects. */
+    public $answers = array();
     //Typical answer objects usually contains answer (string), fraction and feedback fields
     //Our answer object should also contain elementnames array, with teacher-given sematic names 
     //for either important nodes (when syntax analysis is posssible) or all tokens (otherwise).
-    public $answers = array();
     //Whether question is casesensitivity
     public $casesensivity = true;
     //Threshold, defining maximum percent of token length mistake weight could be to provide a valid matched pair
