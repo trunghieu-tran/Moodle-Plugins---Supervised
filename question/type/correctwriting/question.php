@@ -40,20 +40,26 @@ class qtype_correctwriting_question /*extends question_graded_automatically
     //Our answer object should also contain elementnames array, with teacher-given sematic names 
     //for either important nodes (when syntax analysis is posssible) or all tokens (otherwise).
     public $answers = array();
+    //Whether question is casesensitivity
+    public $casesensivity = true;
     //Threshold, defining maximum percent of token length mistake weight could be to provide a valid matched pair
-    public $threshold = 0;
+    public $lexicalerrorthreshold = 0;
+    //Weight of lexical error 
+    public $lexicalerrorweight = 0.1;
+    
     //Language id in the languages table
     public $langid = 0;
-
+    
+    
     //Other necessary question data like penalty for each type of mistakes etc
 
     
     // @var int weight of error, when one lexeme is moved from one place to another
-    public $movedmistakeweight = 1;
+    public $movedmistakeweight = 0.1;
     // @var int weight of error, when one lexeme in response is absent
-    public $absentmistakeweight = 1;
+    public $absentmistakeweight = 0.1;
      // @var int weight of error, when one lexeme is added to response
-    public $addedmistakeweight = 1;
+    public $addedmistakeweight = 0.1;
     
     /**  Returns expected data from forms for question
          @return array expected
