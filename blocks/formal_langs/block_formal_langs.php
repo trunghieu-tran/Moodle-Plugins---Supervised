@@ -9,6 +9,7 @@
 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/simple_english_language.php');
+require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 
 class block_formal_langs extends block_base {
     //TODO: Implement this
@@ -24,7 +25,7 @@ class block_formal_langs extends block_base {
      */
     public static function available_langs($contextid = null) {
         //TODO: Replace it with actual code
-        return array( 0 => block_formal_langs_simple_english_language::ui_name() );
+        return array( 2 => 'Simple english' );
     }
 
     /**
