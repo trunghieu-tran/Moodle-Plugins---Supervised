@@ -22,13 +22,15 @@ class block_formal_langs_predefined_simple_english_scaner extends block_formal_l
         parent::__construct(null);
     }
     
+
     /**
-     * This function returns array of tokens which was exracted from
-     * input buffer.
-     *
-     * @return array - array of base_token objects
+     *  This method is added due to inconsistency between  two interfaces,
+     *  one described in scaners.php and $this->scaner->tokenize($text,$isanswer) string
+     *  in language_base.php. Also $isanswer in language_base.php is literally taken out of nowhere,
+     *  so I decided to support both. If some inconsistencies will be removed, I gladly remove 
+     *  one of methods.
      */
-    public function tokenize($text) {
+    public function tokenize($text,$isanswer) {
         $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($text), 'r'));
         //Now, we are splitting text into lexemes
         $result = array();
@@ -38,20 +40,14 @@ class block_formal_langs_predefined_simple_english_scaner extends block_formal_l
         
         return $result;
     }
-    /**
-     *  This method is added due to inconsistency between  two interfaces,
-     *  one described in scaners.php and $this->scaner->tokenize($text,$isanswer) string
-     *  in language_base.php. Also $isanswer in language_base.php is literally taken out of nowhere,
-     *  so I decided to support both. If some inconsistencies will be removed, I gladly remove 
-     *  one of methods.
-     */
-    public function tokenize($text,$isanswer) {
-        return $this->tokenize($text);
-    }
 }
 
 class block_formal_langs_simple_english_language extends block_formal_langs_predefined_language
 {
+    public function __construct() {
+        parent::__construct(null,null);
+    }
+    
     
     public function name() {
         return 'simple_english';
