@@ -8,3 +8,6 @@
  */
  
  $string['pluginname'] = 'Formal languages block';
+ $string['lang_simple_english'] = 'Simple English';
+ $string['lang_simple_english_help'] = 'Simple English Language (only scanner)';
+ 
