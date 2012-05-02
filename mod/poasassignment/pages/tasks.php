@@ -225,7 +225,7 @@ class tasks_page extends abstract_page {
                 }
             }
             $row[]=$namecolumn;
-            $row[]=shorten_text($task->description);
+            $row[]=shorten_text(strip_tags($task->description));
             foreach ($fields as $field) {
             	$value = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
                 if ($field->showintable>0) {
