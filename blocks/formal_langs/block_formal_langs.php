@@ -8,6 +8,7 @@
  */
 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/simple_english_language.php');
 
 class block_formal_langs extends block_base {
     //TODO: Implement this
@@ -22,6 +23,8 @@ class block_formal_langs extends block_base {
      * @return array where key is language id and value is user interface language name (received throught get_string)
      */
     public static function available_langs($contextid = null) {
+        //TODO: Replace it with actual code
+        return array( 0 => block_formal_langs_simple_english_language::ui_name() );
     }
 
     /**
@@ -31,5 +34,7 @@ class block_formal_langs extends block_base {
      * @return an intialised object of the child of the block_formal_langs_abstract_language class
      */
     public static function lang_object($langid) {
+        //TODO: Replace it with actual code
+        return new block_formal_langs_simple_english_language();
     }
 }
