@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
-equire_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
 /**
  * Represents a correctwriting question type.
  *
@@ -113,6 +113,11 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function save_question_options($question) {
         global $DB;
         
+        // These are for debug. TODO: Remove it.
+        // echo "========= save_question_options =========\n";
+        // print_r($question);
+        // echo "=========================================\n";
+        
         // Result of saving
         $result = new stdClass();
 
@@ -120,7 +125,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         $context = $question->context;
         
         //Remove symbols from old answers
-        $sqlwheredelete = " answer IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $sqlwheredelete = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
         $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
         
         $answers = $question->answers;
