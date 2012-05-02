@@ -302,7 +302,7 @@ class taskedit_page extends abstract_page {
     	// Add updated task in hidden elements
     	foreach ((array)$data as $name => $field) {
     		if (!is_array($field)) {
-    			echo '<input type="hidden" name="'.$name.'" value="'.$field.'"/>';
+    			echo '<input type="hidden" name="'.$name.'" value="'.htmlspecialchars($field).'"/>';
     		}
     		else {
     			foreach ($field as $key => $value) {
