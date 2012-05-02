@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
-
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 /**
  * Correctwriting question editing form definition.
  *
@@ -75,6 +75,11 @@ require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.p
         $mform->setDefault('movedmistakeweight', 0.05);
         $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
         
+        $languages = block_formal_langs::available_langs();
+        
+        $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
+        $mform->addRule('langid', null, 'required', null, 'client');
+        
         parent::definition_inner($mform);
     }
     
@@ -88,6 +93,19 @@ require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.p
         $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
         
         return $repeated;
+    }
+    
+    protected function data_preprocessing($question) {
+        print_r($question);
+        $question = parent::data_preprocessing($question);
+        
+        return $question;
+    }
+    
+    public function validation($data, $files) {
+        $errors = parent::validation($data,$files);
+        
+        return $errors;
     }
     public function qtype() {
         return 'correctwriting';
