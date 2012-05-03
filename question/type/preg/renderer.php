@@ -76,7 +76,9 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         } elseif ($options->feedback == question_display_options::VISIBLE) {//specific feedback is possible, render correctness - TODO - decide when to render correctness
             $hintobj =  $question->hint_object('hintmatchingpart');
             $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
-            $hintmessage .= html_writer::empty_tag('br');
+            if (strlen($hintmessage) > 0) {
+                $hintmessage .= html_writer::empty_tag('br');
+            }
         }
 
         $output = parent::feedback($qa, $options);
