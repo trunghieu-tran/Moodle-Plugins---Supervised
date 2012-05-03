@@ -39,10 +39,10 @@ class qtype_correctwriting extends qtype_shortanswer {
         @return array extra fields
      */
     public function extra_question_fields() {
-        $result = array('qtype_correctwriting', 'langid', 'absenterrorweight', 'addederrorweight', 'movederrorweight');
+        $result = array('qtype_correctwriting', 'langid', 'absentmistakeweight', 'addedmistakeweight', 'movedmistakeweight');
         $result[] = 'lexicalerrorthreshold'; 
         $result[] = 'lexicalerrorweight';
-        $result[] = 'casesensivity';        
+        $result[] = 'usecase';        
         return $result;
     }
     /** Returns extra tables, needed for question
@@ -114,10 +114,11 @@ class qtype_correctwriting extends qtype_shortanswer {
         global $DB;
         
         // These are for debug. TODO: Remove it.
-        // echo "========= save_question_options =========\n";
-        // print_r($question);
-        // echo "=========================================\n";
-        
+         echo "<pre>";
+         echo "========= save_question_options =========\n";
+         print_r($question);
+         echo "=========================================\n";
+         echo "</pre>";
         // Result of saving
         $result = new stdClass();
 

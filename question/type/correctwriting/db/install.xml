@@ -13,8 +13,8 @@
         <FIELD NAME="addedmistakeweight" TYPE="number" LENGTH="12" NOTNULL="false" DEFAULT="0.33" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty, for each added lexeme to student response" PREVIOUS="absentmistakeweight" NEXT="movedmistakeweight"/>
         <FIELD NAME="movedmistakeweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.16" SEQUENCE="false" DECIMALS="2" COMMENT="A penalty for error, that consists of moving lexeme in student response." PREVIOUS="addedmistakeweight" NEXT="lexicalerrorthreshold"/>
         <FIELD NAME="lexicalerrorthreshold" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.5" SEQUENCE="false" DECIMALS="2" COMMENT="Lexical error threshold for computing Damerau-Levenstein distance" PREVIOUS="movedmistakeweight" NEXT="lexicalerrorweight"/>
-        <FIELD NAME="lexicalerrorweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.08" SEQUENCE="false" DECIMALS="2" COMMENT="A penalty for lexical error." PREVIOUS="lexicalerrorthreshold" NEXT="casesensivity" />
-        <FIELD NAME="casesensivity" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether, analysis of question should be case-sensitive" PREVIOUS="lexicalerrorweight" />
+        <FIELD NAME="lexicalerrorweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.08" SEQUENCE="false" DECIMALS="2" COMMENT="A penalty for lexical error." PREVIOUS="lexicalerrorthreshold" NEXT="usecase" />
+        <FIELD NAME="usecase" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether, analysis of question should be case-sensitive" PREVIOUS="lexicalerrorweight" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>
