@@ -113,12 +113,6 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function save_question_options($question) {
         global $DB;
         
-        // These are for debug. TODO: Remove it.
-         echo "<pre>";
-         echo "========= save_question_options =========\n";
-         print_r($question);
-         echo "=========================================\n";
-         echo "</pre>";
         // Result of saving
         $result = new stdClass();
 
@@ -129,19 +123,33 @@ class qtype_correctwriting extends qtype_shortanswer {
         $sqlwheredelete = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
         $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
         
-        $answers = $question->answers;
+        $answers = $question->answer;
         // Save main question data
         $result = parent::save_question_options($question);
         
-        // Insert symbols to tables
+        // Answers contains an array of answer ids
         $insertedanswerids = explode(',',$question->answers);
-        for ($i = 0;$i < count($answers);$i++ ) {
-            $currentanswerid = $insertedanswerids[$i];
-            foreach($answer[$i] as $currentanswer) {
-                $currentanswer->answerid = $currentanswerid; 
-                $DB->insert_record('qtype_correctwriting_symbols', $currentanswer);
+        // Used lexeme descriptions for symbols
+        $descriptions = $question->lexemedescriptions;
+        $currentdescription = 0;
+        
+        // Insert all the new answers
+        foreach ($question->answer as $key => $answerdata) {
+            // Check for, and ignore, completely blank answer from the form.
+            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
+                    html_is_blank($question->feedback[$key]['text'])) {
+                continue;
             }
+            
+            $currentdescription = $currentdescription + 1;
         }
+        //for ($i = 0;$i < count($answers);$i++ ) {
+        //    $currentanswerid = $insertedanswerids[$i];
+        //    foreach($answer[$i] as $currentanswer) {
+        //        $currentanswer->answerid = $currentanswerid; 
+        //        $DB->insert_record('qtype_correctwriting_symbols', $currentanswer);
+        //    }
+        //}
         return $result;
     }
 }
