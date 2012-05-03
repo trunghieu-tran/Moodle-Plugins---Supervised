@@ -96,7 +96,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     }
     
     protected function data_preprocessing($question) {
-        print_r($question);
+        //print_r($question);
         $question = parent::data_preprocessing($question);
         
         return $question;
