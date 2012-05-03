@@ -127,29 +127,34 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Save main question data
         $result = parent::save_question_options($question);
         
+        
         // Answers contains an array of answer ids
         $insertedanswerids = explode(',',$question->answers);
         // Used lexeme descriptions for symbols
         $descriptions = $question->lexemedescriptions;
+        $currentid = 0;
         $currentdescription = 0;
+        $language  = block_formal_langs::lang_object($question->langid);
+        
         
         // Insert all the new answers
         foreach ($question->answer as $key => $answerdata) {
             // Check for, and ignore, completely blank answer from the form.
             if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
                     html_is_blank($question->feedback[$key]['text'])) {
+                $currentdescription = $currentdescription + 1;
                 continue;
             }
             
+            //Extract current lexeme descriptions
+            $description = $descriptions[$currentdescription];
+            $answerid = $insertedanswerids[$currentid];
+            
+            
+            $currentid = $currentid + 1;
             $currentdescription = $currentdescription + 1;
         }
-        //for ($i = 0;$i < count($answers);$i++ ) {
-        //    $currentanswerid = $insertedanswerids[$i];
-        //    foreach($answer[$i] as $currentanswer) {
-        //        $currentanswer->answerid = $currentanswerid; 
-        //        $DB->insert_record('qtype_correctwriting_symbols', $currentanswer);
-        //    }
-        //}
+        
         return $result;
     }
 }
