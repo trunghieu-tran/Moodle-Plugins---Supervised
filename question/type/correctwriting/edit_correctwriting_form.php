@@ -35,6 +35,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
  class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
     
+    /** Determines, whether lexeme descriptions is shown
+        @var boolean
+     */
+    private $hasdescriptions = false;
     /**  Fills an inner definition of form fields
          @param object mform form data
      */
@@ -83,21 +87,65 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         parent::definition_inner($mform);
     }
     
+    function definition_after_data() {
+        parent::definition_after_data();
+        echo 'definition_after_data()<BR />';
+        
+        //Get information about field data
+        if ($this->hasdescriptions == true) {
+            $mform =& $this->_form;
+            $data = $mform->exportValues();
+         
+            // Field function code (because we cannot handle directly output of
+            // repeated fields (only by replace repeat_elements, which is no good).
+            // We add a small JS functions to set  text accordingly
+            $field_id = 'id_lexemedescriptions_';
+            $functioncode = ' var id_string = "' . $field_id . '";\n';
+            $functioncode = $functioncode . ' id_string = id_string . concat(String(id));\n';
+            $functioncode = $functioncode . ' var element = document.getElementById(id_string).parentNode\n';
+            $functioncode = $functioncode . ' element.previousSibling.childNodes(0).innerHTML = text;';
+            $functiondefinition = 'function set_label_for_ld(id,text) {\n ' . $functioncode . '\n}\n';
+            $scriptcodes = array();
+            $lang = block_formal_langs::lang_object($data['langid']);
+            if ($lang!=null) {
+                //Parse descriptions to populate script
+                foreach($data['answer'] as $key => $value) {
+                    $tokens = $lang->scan($value);
+                    $textdata = array();
+                    foreach($tokens as $token) {
+                        $textdata[] = $token->value();
+                    }
+                    $newtext = implode('<br />', $textdata);
+                    //Write some description
+                    $scriptcodes[] = 'set_label_for_ld(' . $key . ',"' . $newtext . '");';
+                }
+         
+                $script = implode('\n',$scriptcodes);
+                $total_text = '<script language ="javascript">\n '. $functiondefinition . $script . ' \n</script>';
+                $mform->addElement('html', str_replace('\n', PHP_EOL, $total_text));
+            }
+        }
+    }
+    
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
         global $_REQUEST;
         
+        echo 'get_per_answer_fields()';
+        
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
         // We use this, because this method is called before validation
-         
+        // But we still can look into request to find out what we are looking to 
         $show_lexeme_descriptions = array_key_exists('lexemedescriptions', $_REQUEST);
         $second_time_form = array_key_exists('name', $_REQUEST) && 
                             !array_key_exists('lexemedescriptions', $_REQUEST);
         $show_lexeme_descriptions = $show_lexeme_descriptions || $second_time_form;
         $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers',$this->question);
+        
         if ($show_lexeme_descriptions) {
+            $this->hasdescriptions = true;
             $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                                 get_string('lexemedescriptions', 'qtype_correctwriting'), 
                                                 array('rows' => 12, 'cols' => 80));
@@ -118,8 +166,13 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $errors = parent::validation($data,$files);
         if (array_key_exists('lexemedescriptions', $data) == false) {
             $this->first_time = false;
-            $errors['lexemedescriptions[0]'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+            // We place it here, because it will look nicer and won't shift any of strings 
+            // in lexeme descriptions field
+            $errors['category'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+        } else {
+        
         }
+        
         // If errors don't found - exit
         if (count($errors) !=0 ) {
             return $errors;
