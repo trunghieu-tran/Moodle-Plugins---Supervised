@@ -24,3 +24,6 @@ $string['pluginnameediting'] = 'Editing a correct writing  question';
 $string['pluginnamesummary'] = 'Question type that can automatically find errors int student response and grade it by penalty.';
 $string['langid'] = 'Language of answer';
 $string['enterlexemedescriptions']  = 'Please enter lexeme descriptions';
+$string['writemoredescriptions']  = 'Supplied amount of descriptions are less than amount of tokens';
+$string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
+
