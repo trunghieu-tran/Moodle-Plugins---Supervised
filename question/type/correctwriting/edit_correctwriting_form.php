@@ -89,7 +89,6 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     
     function definition_after_data() {
         parent::definition_after_data();
-        echo 'definition_after_data()<BR />';
         
         //Get information about field data
         if ($this->hasdescriptions == true) {
@@ -132,7 +131,6 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     {
         global $_REQUEST;
         
-        echo 'get_per_answer_fields()';
         
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
@@ -170,7 +168,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             // in lexeme descriptions field
             $errors['category'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
         } else {
-        
+            $lang = block_formal_langs::lang_object($data['langid']);
+            foreach($data['answer'] as $key => $value) {
+                $tokens = $lang->scan($value);
+                $descriptions = explode('\n',$data['lexemedescriptions'][$key]);
+                if (strlen($value) != 0 && count($descriptions)!=0 ) {
+                    if (count($tokens)>count($descriptions)) {
+                        $errors["lexemedescriptions[$key]"] = get_string('writemoredescriptions', 'qtype_correctwriting');
+                    }
+                    if (count($tokens)<count($descriptions)) {
+                        $errors["lexemedescriptions[$key]"] = get_string('writelessdescriptions', 'qtype_correctwriting');
+                    }
+                }
+            }
         }
         
         // If errors don't found - exit
