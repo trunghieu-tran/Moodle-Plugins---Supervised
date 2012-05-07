@@ -86,24 +86,44 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
-        $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
-        $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
-                                            get_string('lexemedescriptions', 'qtype_correctwriting'), 
-                                            array('rows' => 12, 'cols' => 80));
-        $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
+        global $_REQUEST;
         
+        $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
+
+        // We use this, because this method is called before validation
+         
+        $show_lexeme_descriptions = array_key_exists('lexemedescriptions', $_REQUEST);
+        $second_time_form = array_key_exists('name', $_REQUEST) && 
+                            !array_key_exists('lexemedescriptions', $_REQUEST);
+        $show_lexeme_descriptions = $show_lexeme_descriptions || $second_time_form;
+        $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers',$this->question);
+        if ($show_lexeme_descriptions) {
+            $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
+                                                get_string('lexemedescriptions', 'qtype_correctwriting'), 
+                                                array('rows' => 12, 'cols' => 80));
+            $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
+        }
         return $repeated;
     }
     
     protected function data_preprocessing($question) {
-        //print_r($question);
+        
         $question = parent::data_preprocessing($question);
         
         return $question;
     }
     
     public function validation($data, $files) {
+        
         $errors = parent::validation($data,$files);
+        if (array_key_exists('lexemedescriptions', $data) == false) {
+            $this->first_time = false;
+            $errors['lexemedescriptions[0]'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+        }
+        // If errors don't found - exit
+        if (count($errors) !=0 ) {
+            return $errors;
+        }
         
         return $errors;
     }

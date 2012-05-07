@@ -23,3 +23,4 @@ $string['pluginnameadding'] = 'Adding a correct writing  question';
 $string['pluginnameediting'] = 'Editing a correct writing  question';
 $string['pluginnamesummary'] = 'Question type that can automatically find errors int student response and grade it by penalty.';
 $string['langid'] = 'Language of answer';
+$string['enterlexemedescriptions']  = 'Please enter lexeme descriptions';
