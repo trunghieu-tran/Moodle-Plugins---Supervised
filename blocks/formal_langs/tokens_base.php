@@ -56,6 +56,17 @@ class block_formal_langs_ast {
             traverse($child, $callback);
         }
     }
+
+    /**
+     * Returns list of node objects which requires description.
+     *
+     * @param $answer - moodle answer object
+     * @return array of node objects
+     */
+    public function nodes_requiring_description_list() {
+        // TODO: return node objects
+        // TODO - get only nodes requiring user-defined description from the trees
+    }
 }
 
 /**
