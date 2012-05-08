@@ -144,15 +144,22 @@ class block_formal_langs_ast_node_base {
     public $childs;
 
     /**
+     * True if this node needs user-defined description
+     * @var bool
+     */
+    protected $needuserdescription;
+
+    /**
      * Node description.
      * @var string
      */
     protected $description;
 
-    public function __construct($type, $position, $number) {
+    public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
         $this->type = $type;
         $this->position = $position;
+        $this->needuserdescription = $needuserdescription;
 
         $this->childs = array();
         $this->description = '';
@@ -175,8 +182,12 @@ class block_formal_langs_ast_node_base {
         return $this->position;
     }
 
+    public function need_user_description() {
+        return $this->needuserdescription;
+    }
+
     public function description() {
-        if ('' == $this->description) {
+        if (!$this->needuserdescription) {
             // TODO: calc description
             return $this->description;
         } else {
