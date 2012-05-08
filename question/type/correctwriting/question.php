@@ -24,13 +24,16 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+
+require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+
 /**
  * Represents a correctwriting question.
  *
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_question /*extends question_graded_automatically
+class qtype_correctwriting_question extends qtype_shortanswer_question /*extends question_graded_automatically
         implements question_automatically_gradable*/ {
         //TODO - commented out temporarily to use class as passive container for unit-testing - uncomment when real question class would be implemented
 
