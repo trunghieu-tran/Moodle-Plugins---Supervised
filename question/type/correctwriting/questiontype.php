@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
+
 /**
  * Represents a correctwriting question type.
  *
@@ -75,8 +77,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         
         
         // Fetch all symbols, that belongs to question
-        $sqlwhereget = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
-        $allsymbols = $DB->get_records_select('qtype_correctwriting_symbols', $sqlwhereget);
+        $sqlwhereget = " tableid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $allsymbols = block_formal_langs::get_descriptions_select('question_answers', $sqlwhereget);
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
@@ -85,10 +87,11 @@ class qtype_correctwriting extends qtype_shortanswer {
             //Fill answer symbols
             $descriptions =array();
             foreach($allsymbols as $symbol) {
-                if ($symbol->answerid == $id) {
+                if ($symbol->tableid == $id) {
                     $descriptions[] = $symbol->description; 
                 }
             }
+           
             // Set field according to data
             $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $descriptions);
         }
@@ -126,8 +129,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $context = $question->context;
         
         //Remove symbols from old answers
-        $sqlwhereget = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
-        $oldsymbols = $DB->get_records_select('qtype_correctwriting_symbols', $sqlwhereget);
+        $sqlwhereget = " 'tableid' IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $oldsymbols = block_formal_langs::get_descriptions_select('question_answers', $sqlwhereget);
         
         $answers = $question->answer;
         // Save main question data
@@ -159,20 +162,24 @@ class qtype_correctwriting extends qtype_shortanswer {
             $tokdescrs = explode(PHP_EOL, $description);
             $tokenindex = 0; 
             foreach ($tokdescrs as $newdescription) {
-                $olddescription = array_shift($oldsymbols);
+                $olddescription = null;
+                if ($oldsymbols != null) {
+                    $olddescription = array_shift($oldsymbols);
+                }
                 $mustinsert  = ($olddescription == null);
                 if ($olddescription == null) {
                     $olddescription = new stdClass();
-                    //$olddescription->id = null;
+                    
                 }
-                $olddescription->answerid = $answerid;
+           
+                $olddescription->tableid = $answerid;
                 $olddescription->number = $tokenindex;
                 $olddescription->description = $newdescription;
                 
                 if ($mustinsert) {
-                    $DB->insert_record('qtype_correctwriting_symbols',$olddescription);
+                    block_formal_langs::insert_description('question_answers',$olddescription);
                 } else {
-                    $DB->update_record('qtype_correctwriting_symbols',$olddescription);
+                    block_formal_langs::update_description('question_answers',$olddescription);
                 }
                 $tokenindex = $tokenindex + 1;
             }
@@ -189,7 +196,7 @@ class qtype_correctwriting extends qtype_shortanswer {
                 $oldsymboldids[] = $oldsymbol->id;    
             }
             $oldsymbolin = implode(',',$oldsymboldids);
-            $DB->delete_records_select('{qtype_correctwriting_symbols}', " id IN ($oldsymbolin) ");
+            block_formal_langs::delete_descriptions_select('question_answers'," id IN ($oldsymbolin) ");
         }
         return $result;
     }
@@ -201,8 +208,8 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function delete_question($questionid, $contextid) {
         global $DB;
         
-        $sqlwheredelete = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$questionid})";
-        $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
+        $sqlwheredelete = " tableid IN (SELECT id FROM {question_answers} WHERE question  = {$questionid}) ";
+        block_formal_langs::delete_descriptions_select('question_answers',$sqlwheredelete);
         
         parent::delete_question($questionid, $contextid);
     }

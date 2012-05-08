@@ -171,7 +171,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     protected function data_preprocessing_answers($question, $withanswerfiles = false) {        
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
         $key = 0;
-        if (array_key_exists('options',$question) && array_key_exists('options',$question->options)) {
+        if (array_key_exists('options',$question) && array_key_exists('answers',$question->options)) {
             foreach ($question->options->answers as $answer) {
                 $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
                 $key++;
