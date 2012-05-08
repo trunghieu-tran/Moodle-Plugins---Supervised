@@ -109,7 +109,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             if ($lang!=null) {
                 //Parse descriptions to populate script
                 foreach($data['answer'] as $key => $value) {
-                    $tokens = $lang->scan($value)->tokens;
+                    $processedstring = new block_formal_langs_processed_string();
+                    $processedstring->string = $value;
+                    $lang->scan($processedstring);
+                    $tokens = $processedstring->tokenstream->tokens;
                     $textdata = array();
                     foreach($tokens as $token) {
                         $textdata[] = $token->value();
@@ -168,9 +171,11 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     protected function data_preprocessing_answers($question, $withanswerfiles = false) {        
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
         $key = 0;
-        foreach ($question->options->answers as $answer) {
-            $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
-            $key++;
+        if (array_key_exists('options',$question) && array_key_exists('options',$question->options)) {
+            foreach ($question->options->answers as $answer) {
+                $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
+                $key++;
+            }
         }
         return $question;
     }
@@ -186,7 +191,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         } else {
             $lang = block_formal_langs::lang_object($data['langid']);
             foreach($data['answer'] as $key => $value) {
-                $tokens = $lang->scan($value)->tokens;
+                $processedstring = new block_formal_langs_processed_string();
+                $processedstring->string = $value;
+                $lang->scan($processedstring);
+                $tokens = $processedstring->tokenstream->tokens;
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
                     if (count($tokens) > count($descriptions)) {
