@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/correctwriting/db" VERSION="20120402" COMMENT="XMLDB file for CorrectWriting question type"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_formal_langs_descrs" COMMENT="An information about symbols, that emerge from lexical and syntax analysis">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="table"/>
+        <FIELD NAME="table" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
+        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="table" NEXT="number"/>
+        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

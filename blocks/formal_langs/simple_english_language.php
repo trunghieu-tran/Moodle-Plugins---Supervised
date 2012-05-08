@@ -9,12 +9,11 @@
  * @copyright &copy; 2011 Dmitry Mamontov, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-require_once($CFG->dirroot.'/blocks/formal_langs/langs_code/predefined/scaners.php'); 
 require_once($CFG->dirroot.'/blocks/formal_langs/langs_code/predefined/eng_simple_lexer.php'); 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php'); 
  
   
-class block_formal_langs_predefined_simple_english_scaner extends block_formal_langs_scaner {
+class block_formal_langs_predefined_simple_english_scaner {
     
     /*! We must directly specify constructor for this one
      */
