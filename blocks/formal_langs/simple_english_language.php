@@ -13,20 +13,13 @@ require_once($CFG->dirroot.'/blocks/formal_langs/langs_code/predefined/eng_simpl
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php'); 
  
   
-class block_formal_langs_predefined_simple_english_scaner {
+class block_formal_langs_predefined_simple_english_lexer {
     
-    /*! We must directly specify constructor for this one
-     */
-    public function __construct() {
-        parent::__construct(null);
-    }
-    
-
     /**
      *  Performs lexical analysis of text
      */
-    public function tokenize($text) {
-        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($text), 'r'));
+    public function tokenize($processedstring) {
+        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
         //Now, we are splitting text into lexemes
         $tokens = array();
         $counter = 0;
@@ -35,9 +28,8 @@ class block_formal_langs_predefined_simple_english_scaner {
             $tokens[] = $token;
             $counter = $counter + 1; 
         }
-        $result = new block_formal_langs_token_stream();
-        $result->tokens = $tokens; 
-        return $result;
+        $processedstring->tokenstream = new block_formal_langs_token_stream();
+        $processedstring->tokenstream->tokens = $tokens;
     }
 }
 
