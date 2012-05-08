@@ -72,26 +72,27 @@ abstract class block_formal_langs_abstract_language {
     }
 
     /**
-     * Returns stream of tokens.
+     * Fills token stream field of the processed string objects
      *
      * Add lexical errors if any exists.
-     * @param $text - input text.
-     * @return block_formal_langs_token_stream object, containing a list of tokens and lexical errors
+     * @param object block_formal_langs_processed_string object with string filled
+     *
      */
-    public function scan($text) {
-        $this->scaner->tokenize($text);
+    public function scan($processedstring) {
+        $this->scaner->tokenize($processedstring);
     }
     
     /**
-     * Returns Abstract Syntax Tree.
+     * Fills syntax tree field of the processed string objects.
      *
      * Add errors for answer parsing
-     * @param $tokens - input array of tokens
+     * @param $processedstring - block_formal_langs_processed_string object with string filled
      * @param $iscorrect boolean true if we need to reduce to start symbol (correct text parsing), false if not (compared text parts parsing)
-     * @return array of objects of ast (or tree roots) - should contain one element for answer parsing
      */
-    public function parse($tokens, $iscorrect) {
-        $this->parser->parse($tokens, $iscorrect);
+    public function parse($processedstring, $iscorrect) {
+        //TODO - think about how should be done compared string parsing and what additional info is needed
+        //TODO check if string isn't scanned and scan if necessary
+        $this->parser->parse($processedstring, $iscorrect);
     }
 
     /**
