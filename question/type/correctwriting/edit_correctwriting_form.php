@@ -140,7 +140,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $second_time_form = array_key_exists('name', $_REQUEST) && 
                             !array_key_exists('lexemedescriptions', $_REQUEST);
         $show_lexeme_descriptions = $show_lexeme_descriptions || $second_time_form;
-        $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers',$this->question);
+        $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers', $this->question);
         
         if ($show_lexeme_descriptions) {
             $this->hasdescriptions = true;
@@ -161,7 +161,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     
     public function validation($data, $files) {
         
-        $errors = parent::validation($data,$files);
+        $errors = parent::validation($data, $files);
         if (array_key_exists('lexemedescriptions', $data) == false) {
             $this->first_time = false;
             // We place it here, because it will look nicer and won't shift any of strings 
@@ -171,12 +171,12 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $lang = block_formal_langs::lang_object($data['langid']);
             foreach($data['answer'] as $key => $value) {
                 $tokens = $lang->scan($value)->tokens;
-                $descriptions = explode('\n',$data['lexemedescriptions'][$key]);
+                $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
-                    if (count($tokens)>count($descriptions)) {
+                    if (count($tokens) > count($descriptions)) {
                         $errors["lexemedescriptions[$key]"] = get_string('writemoredescriptions', 'qtype_correctwriting');
                     }
-                    if (count($tokens)<count($descriptions)) {
+                    if (count($tokens) < count($descriptions)) {
                         $errors["lexemedescriptions[$key]"] = get_string('writelessdescriptions', 'qtype_correctwriting');
                     }
                 }
