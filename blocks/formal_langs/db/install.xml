@@ -6,9 +6,9 @@
   <TABLES>
     <TABLE NAME="block_formal_langs_descrs" COMMENT="An information about symbols, that emerge from lexical and syntax analysis">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="table"/>
-        <FIELD NAME="table" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
-        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="table" NEXT="number"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="tablename"/>
+        <FIELD NAME="tablename" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Name of source table" PREVIOUS="id" NEXT="tableid" />
+        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of entry in table" PREVIOUS="tablename" NEXT="number"/>
         <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A unique description" PREVIOUS="tableid" NEXT="description"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Semantic name of lexeme" PREVIOUS="number"/>
       </FIELDS>
