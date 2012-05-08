@@ -522,4 +522,97 @@ class  block_formal_langs_lexical_error {
     /** @var Corrected token object if possible, null otherwise */
    public $correctedtoken; 
 }
+
+/**
+ * Represents a processed string
+ *
+ * Contains a string, a token stream (if the string is tokenized) and a syntax tree (or array of trees) if parsed
+ * This class is needed to encapsulate a processed string and centralize a code for it's handling while having
+ *   language, lexer and parser objects stateless.
+ */
+class block_formal_langs_processed_string {
+
+    /**
+     *@var string a string to process
+     */
+    public $string='';
+
+    /**
+     *@var integer an id to load/store user descriptions
+     */
+    public $stringid;
+
+    /**
+     *@var object a link to the language object
+     */
+    public $language;
+
+    /**
+     *@var object a token stream if the string is tokenized
+     */
+    public $tokenstream=null;
+
+    /**
+     *@var object a syntax tree if the string is parsed
+     */
+    public $syntaxtree=null;
+
+    /**
+     * Returns count of nodes which needs description or special name.
+     *
+     * @return integer
+     */
+    public function nodes_requiring_description_count() {//TODO - name
+        if ($this->language->could_parse()) {
+            return count($this->syntaxtree->nodes_requiring_description_list());
+        } else {
+            return count($this->tokenstream->tokens);
+        }
+    }
+
+    /**
+     * Returns list of node objects which requires description.
+     *
+     * @param $answer - moodle answer object
+     * @return array of node objects
+     */
+    public function nodes_requiring_description_list() {
+        // TODO: return node objects
+        if ($this->language->could_parse()) {
+            return $this->syntaxtree->nodes_requiring_description_list();
+        } else {
+            return $this->tokenstream->tokens;
+        }
+    }
+
+    /**
+     * Returns description string for passed node.
+     *
+     * @param $nodenumber number of node
+     * @return string - description of node
+     */
+    public function node_description($nodenumber) {
+        // TODO: change SELECT to adapt to new circumstances
+        // connect moodle DB
+        // SELECT description FROM moodle_descriptions_table
+        // AS mtul WHERE mtut.langid == $this->id AND mtut.number
+        // == $node->id AND mtut.answerid == $this->answerid;
+        //cache descriptions
+        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
+        $desc = '';
+        return $desc;
+    }
+
+    /**
+     * Returns list of node descriptions.
+     *
+     * @return array of strings, keys are node numbers
+     */
+    public function node_descriptions_list() {
+        // connect moodle DB by answerid
+        //cache descriptions
+        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
+        //TODO - should the function return only nodes with user-defined description or descpriptions for all nodes? Probably first...
+    }
+}
 ?>
