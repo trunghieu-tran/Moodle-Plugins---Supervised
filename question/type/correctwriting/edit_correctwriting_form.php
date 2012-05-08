@@ -147,7 +147,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $this->hasdescriptions = true;
             $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                                 get_string('lexemedescriptions', 'qtype_correctwriting'), 
-                                                array('rows' => 12, 'cols' => 80));
+                                                array('rows' => 25, 'cols' => 80));
             $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
         }
         return $repeated;
@@ -157,6 +157,21 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         
         $question = parent::data_preprocessing($question);
         
+        return $question;
+    }
+    
+    /**
+     * Perform setting data for lexemes
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
+    protected function data_preprocessing_answers($question, $withanswerfiles = false) {        
+        $question = parent::data_preprocessing_answers($question, $withanswerfiles);
+        $key = 0;
+        foreach ($question->options->answers as $answer) {
+            $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
+            $key++;
+        }
         return $question;
     }
     
