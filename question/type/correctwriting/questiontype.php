@@ -34,6 +34,8 @@ require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_correctwriting extends qtype_shortanswer {
+
+    
     /** Returns fields, that differ from standard Moodle question fields
         and table
         @return array extra fields
@@ -65,30 +67,31 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function get_question_options($question) {
         global $DB;
         
+        
         // Extra question fields will do job, like loading some answers for question
         if (!parent::get_question_options($question)) {
             return false;
         }
-       
+        
         
         // Fetch all symbols, that belongs to question
         $sqlwhereget = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
         $allsymbols = $DB->get_records_select('qtype_correctwriting_symbols', $sqlwhereget);
-        //print_r($allsymbols);
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
         // They also are loaded as stdClass
-        /*
         foreach($question->options->answers as $id => $answer) {
             //Fill answer symbols
+            $descriptions =array();
             foreach($allsymbols as $symbol) {
                 if ($symbol->answerid == $id) {
-                    $answer->symbols[] = $symbol; 
+                    $descriptions[] = $symbol->description; 
                 }
             }
+            // Set field according to data
+            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $descriptions);
         }
-        */
         return true;
     }
     
