@@ -140,8 +140,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $second_time_form = array_key_exists('name', $_REQUEST) && 
                             !array_key_exists('lexemedescriptions', $_REQUEST);
         $show_lexeme_descriptions = $show_lexeme_descriptions || $second_time_form;
-        $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers', $this->question);
-        
+        if (array_key_exists('options', $this->question)) {
+            $show_lexeme_descriptions = $show_lexeme_descriptions || array_key_exists('answers', $this->question->options);
+        }
         if ($show_lexeme_descriptions) {
             $this->hasdescriptions = true;
             $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',

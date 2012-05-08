@@ -66,18 +66,20 @@ class qtype_correctwriting extends qtype_shortanswer {
         global $DB;
         
         // Extra question fields will do job, like loading some answers for question
-        if (!parent::get_question_options($options)) {
+        if (!parent::get_question_options($question)) {
             return false;
         }
+       
         
         // Fetch all symbols, that belongs to question
-        list($idsql, $params) = $DB->get_in_or_equal(array_keys($question->options->answers));
-        $symsql = 'SELECT * FROM {qtype_correctwriting_symbols} WHERE answerid {$idsql}';
-        $allsymbols = $DB->get_records_select('{qtype_correctwriting_symbols}', $symsql);
+        $sqlwhereget = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $allsymbols = $DB->get_records_select('qtype_correctwriting_symbols', $sqlwhereget);
+        //print_r($allsymbols);
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
         // They also are loaded as stdClass
+        /*
         foreach($question->options->answers as $id => $answer) {
             //Fill answer symbols
             foreach($allsymbols as $symbol) {
@@ -86,7 +88,7 @@ class qtype_correctwriting extends qtype_shortanswer {
                 }
             }
         }
-        
+        */
         return true;
     }
     
@@ -95,6 +97,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         @param  object $questiondata The user question data 
       */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
+        echo "initialise_question_instance<br/>";
         parent::initialise_question_instance($question, $questiondata);
         //Rearrange lexemes arrays, arrange it as number => symbol
         foreach($question->answers as $id => $answer) {
