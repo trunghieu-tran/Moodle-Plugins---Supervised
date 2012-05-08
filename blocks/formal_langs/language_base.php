@@ -135,10 +135,10 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             // TODO: via DB get $name, $techname, $isparserenabled, $version
         }
 
-        $scanerclass = 'qtype_correctwriting_predefined_' . $this->name() . '_scaner';
+        $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer';
         $this->scaner = new $scanerclass();
         if ($this->could_parse()) {
-            $parserclass = 'qtype_correctwriting_predefined_' . $this->name() . '_parser';
+            $parserclass = 'block_formal_langs_predefined_' . $this->name() . '_parser';
             $this->parser = new $parserclass();
         }
     }
