@@ -24,20 +24,20 @@ class block_formal_langs_predefined_simple_english_scaner extends block_formal_l
     
 
     /**
-     *  This method is added due to inconsistency between  two interfaces,
-     *  one described in scaners.php and $this->scaner->tokenize($text,$isanswer) string
-     *  in language_base.php. Also $isanswer in language_base.php is literally taken out of nowhere,
-     *  so I decided to support both. If some inconsistencies will be removed, I gladly remove 
-     *  one of methods.
+     *  Performs lexical analysis of text
      */
-    public function tokenize($text,$isanswer) {
+    public function tokenize($text) {
         $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($text), 'r'));
         //Now, we are splitting text into lexemes
-        $result = array();
+        $tokens = array();
+        $counter = 0;
         while ($token = $lexer->next_token()) {
-            $result[] = $token;
+            $token->set_token_index($counter);
+            $tokens[] = $token;
+            $counter = $counter + 1; 
         }
-        
+        $result = new block_formal_langs_token_stream();
+        $result->tokens = $tokens; 
         return $result;
     }
 }
