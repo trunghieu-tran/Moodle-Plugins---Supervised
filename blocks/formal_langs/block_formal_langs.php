@@ -38,4 +38,45 @@ class block_formal_langs extends block_base {
         //TODO: Replace it with actual code
         return new block_formal_langs_simple_english_language();
     }
+    
+    /**
+     * Insert new record to a description table
+     * @param string $sourcetable source table field
+     * @param object $dataobject  object to be inserted
+     */
+    public static function insert_description($sourcetable, $dataobject) {
+        global $DB;
+        $dataobject->tablename = $sourcetable; 
+        return $DB->insert_record('block_formal_langs_descrs',$dataobject);
+    }
+    
+    /**
+     * Update record in a description table
+     * @param string $sourcetable source table field
+     * @param object $dataobject object to be inserted
+     */
+    public static function update_description($sourcetable, $dataobject) {
+        global $DB;
+        $dataobject->tablename = $sourcetable; 
+        return $DB->update_record('block_formal_langs_descrs',$dataobject);
+    }
+    
+    /**
+     * Deletes records, using particular WHERE clause 
+     * @param string $sourcetable source table field
+     * @param $where  WHERE clause
+     */
+    public static function delete_descriptions_select($sourcetable,  $where) {
+        global $DB;
+        $DB->delete_records_select('block_formal_langs_descrs', $where . " AND tablename = '$sourcetable' ");
+    }
+    /**
+     * Returns a descriptions from table, using particular WHERE clause 
+     * @param string $sourcetable source table field
+     * @param $where  WHERE clause
+     */
+    public static function get_descriptions_select($sourcetable, $where) {
+        global $DB;
+        return $DB->get_records_select('block_formal_langs_descrs', $where . " AND tablename = '$sourcetable'");
+    }
 }
