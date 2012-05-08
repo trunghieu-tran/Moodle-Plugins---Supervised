@@ -73,7 +73,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Fetch all symbols, that belongs to question
         list($idsql, $params) = $DB->get_in_or_equal(array_keys($question->options->answers));
         $symsql = 'SELECT * FROM {qtype_correctwriting_symbols} WHERE answerid {$idsql}';
-        $allsymbols = $DB->get_records_select('{qtype_correctwriting_symbols}', '$symsql');
+        $allsymbols = $DB->get_records_select('{qtype_correctwriting_symbols}', $symsql);
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
@@ -120,8 +120,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $context = $question->context;
         
         //Remove symbols from old answers
-        $sqlwheredelete = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
-        $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
+        $sqlwhereget = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$question->id})";
+        $oldsymbols = $DB->get_records_select('qtype_correctwriting_symbols', $sqlwhereget);
         
         $answers = $question->answer;
         // Save main question data
@@ -134,7 +134,6 @@ class qtype_correctwriting extends qtype_shortanswer {
         $descriptions = $question->lexemedescriptions;
         $currentid = 0;
         $currentdescription = 0;
-        $language  = block_formal_langs::lang_object($question->langid);
         
         
         // Insert all the new answers
@@ -146,15 +145,46 @@ class qtype_correctwriting extends qtype_shortanswer {
                 continue;
             }
             
-            //Extract current lexeme descriptions
+            // Extract current lexeme descriptions
             $description = $descriptions[$currentdescription];
             $answerid = $insertedanswerids[$currentid];
+            
+            //Token array description data
+            $tokdescrs = explode(PHP_EOL, $description);
+            $tokenindex = 0; 
+            foreach ($tokdescrs as $newdescription) {
+                $olddescription = array_shift($oldsymbols);
+                $mustinsert  = ($olddescription == null);
+                if ($olddescription == null) {
+                    $olddescription = new stdClass();
+                    //$olddescription->id = null;
+                }
+                $olddescription->answerid = $answerid;
+                $olddescription->number = $tokenindex;
+                $olddescription->description = $newdescription;
+                
+                if ($mustinsert) {
+                    $DB->insert_record('qtype_correctwriting_symbols',$olddescription);
+                } else {
+                    $DB->update_record('qtype_correctwriting_symbols',$olddescription);
+                }
+                $tokenindex = $tokenindex + 1;
+            }
             
             
             $currentid = $currentid + 1;
             $currentdescription = $currentdescription + 1;
         }
         
+        //If some old symbols left - delete it
+        if ($oldsymbols !=null) {
+            $oldsymboldids = array();
+            foreach($oldsymbols as $oldsymbol) {
+                $oldsymboldids[] = $oldsymbol->id;    
+            }
+            $oldsymbolin = implode(',',$oldsymboldids);
+            $DB->delete_records_select('{qtype_correctwriting_symbols}', " id IN ($oldsymbolin) ");
+        }
         return $result;
     }
 }
