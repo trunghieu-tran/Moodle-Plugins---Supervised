@@ -187,4 +187,17 @@ class qtype_correctwriting extends qtype_shortanswer {
         }
         return $result;
     }
+    
+    /** Removes a symbols from tables and everything about question. 
+     * @param int $questionid the question being deleted.
+     * @param int $contextid the context this question belongs to. 
+     */
+    public function delete_question($questionid, $contextid) {
+        global $DB;
+        
+        $sqlwheredelete = " answerid IN (SELECT id FROM {question_answers} WHERE question  = {$questionid})";
+        $DB->delete_records_select('qtype_correctwriting_symbols', $sqlwheredelete);
+        
+        parent::delete_question($questionid, $contextid);
+    }
 }
