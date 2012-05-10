@@ -531,7 +531,11 @@ class  block_formal_langs_lexical_error {
  *   language, lexer and parser objects stateless.
  */
 class block_formal_langs_processed_string {
-
+   
+    /**
+     * @var string table, where string belongs
+     */
+    public $table;
     /**
      *@var string a string to process
      */
@@ -557,6 +561,12 @@ class block_formal_langs_processed_string {
      */
     public $syntaxtree=null;
 
+    /**
+     * @var array strings of token descriptions
+     */
+    public $descriptions=null;
+    
+    
     /**
      * Returns count of nodes which needs description or special name.
      *
