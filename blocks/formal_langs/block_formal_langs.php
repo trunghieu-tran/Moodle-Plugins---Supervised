@@ -38,45 +38,64 @@ class block_formal_langs extends block_base {
         //TODO: Replace it with actual code
         return new block_formal_langs_simple_english_language();
     }
-    
-    /**
-     * Insert new record to a description table
-     * @param string $sourcetable source table field
-     * @param object $dataobject  object to be inserted
-     */
-    public static function insert_description($sourcetable, $dataobject) {
+    /**  Inserts or updates descriptions in a DB with values from processed string
+      *  @param object block_formal_langs_processed_string object with stringid, table and descriptions filled
+      */
+    public static function update_descriptions($processedstring) {
         global $DB;
-        $dataobject->tablename = $sourcetable; 
-        return $DB->insert_record('block_formal_langs_descrs',$dataobject);
+        $conditions = array(" tableid='{$processedstring->stringid}' ", "tablename = '{$processedstring->table}' ");
+        $oldrecords = $DB->get_records_select('block_formal_langs_descrs', implode(' AND ', $conditions));
+        $index = 0;
+        foreach($processedstring->descriptions as $description) {
+            $record = null;
+            if ($oldrecords != null) {
+                $record = array_shift($oldrecords);
+            }
+            $mustinsert  = ($oldrecords == null);
+            if ($record == null) {
+                $record = new stdClass();        
+            }
+            $record->tablename = $processedstring->table;
+            $record->tableid = $processedstring->stringid;
+            $record->number = $index;
+            $record->description = $description;
+            
+            if ($mustinsert) {
+                $DB->insert_record('block_formal_langs_descrs',$record);
+            } else {
+                $DB->update_record('block_formal_langs_descrs',$record);
+            }
+            
+            $index = $index + 1;
+        }
+        
+        //If some old descriptions left - delete it
+        if ($oldrecords != null) {
+            $oldrecordids = array();
+            foreach($oldrecords as $oldrecord) {
+                $oldrecordids[] = $oldrecord->id;    
+            }
+            $oldrecordin = implode(',',$oldrecordids);
+            $DB->delete_records_select('block_formal_langs_descrs', " id IN ({$oldrecordin}) AND tablename = '{$processedstring->table}' ");
+        }
     }
-    
-    /**
-     * Update record in a description table
-     * @param string $sourcetable source table field
-     * @param object $dataobject object to be inserted
-     */
-    public static function update_description($sourcetable, $dataobject) {
+    /**  Returns a descriptions from a DB
+      *  @param object block_formal_langs_processed_string  object with stringid and table filled
+      */
+    public static function get_descriptions($processedstring) {
         global $DB;
-        $dataobject->tablename = $sourcetable; 
-        return $DB->update_record('block_formal_langs_descrs',$dataobject);
+        $conditions = array(" tableid='{$processedstring->stringid}' ", "tablename = '{$processedstring->table}' ");
+        $records = $DB->get_records_select('block_formal_langs_descrs', implode(' AND ', $conditions));
+        foreach($records as $record) {
+            $processedstring->descriptions[$record->number] = $record->description; 
+        }
     }
-    
-    /**
-     * Deletes records, using particular WHERE clause 
-     * @param string $sourcetable source table field
-     * @param $where  WHERE clause
-     */
-    public static function delete_descriptions_select($sourcetable,  $where) {
+    /** Removes a descriptions from a DB
+      * @param object block_formal_langs_processed_string  object with stringid and table filled
+      */
+    public static function delete_descriptions($processedstring) {
         global $DB;
-        $DB->delete_records_select('block_formal_langs_descrs', $where . " AND tablename = '$sourcetable' ");
-    }
-    /**
-     * Returns a descriptions from table, using particular WHERE clause 
-     * @param string $sourcetable source table field
-     * @param $where  WHERE clause
-     */
-    public static function get_descriptions_select($sourcetable, $where) {
-        global $DB;
-        return $DB->get_records_select('block_formal_langs_descrs', $where . " AND tablename = '$sourcetable'");
+        $conditions = array(" tableid='{$processedstring->stringid}' ", "tablename = '{$processedstring->table}' ");
+        return $DB->delete_records_select('block_formal_langs_descrs', implode(' AND ', $conditions));
     }
 }
