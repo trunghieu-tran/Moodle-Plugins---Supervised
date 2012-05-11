@@ -95,16 +95,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform =& $this->_form;
             $data = $mform->exportValues();
          
-            // Field function code (because we cannot handle directly output of
-            // repeated fields (only by replace repeat_elements, which is no good).
-            // We add a small JS functions to set  text accordingly
-            $field_id = 'id_lexemedescriptions_';
-            $functioncode = ' var id_string = "' . $field_id . '";\n';
-            $functioncode = $functioncode . ' id_string = id_string . concat(String(id));\n';
-            $functioncode = $functioncode . ' var element = document.getElementById(id_string).parentNode\n';
-            $functioncode = $functioncode . ' element.previousSibling.childNodes(0).innerHTML = text;';
-            $functiondefinition = 'function set_label_for_ld(id,text) {\n ' . $functioncode . '\n}\n';
-            $scriptcodes = array();
+            
             $lang = block_formal_langs::lang_object($data['langid']);
             if ($lang!=null) {
                 //Parse descriptions to populate script
@@ -118,13 +109,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         $textdata[] = $token->value();
                     }
                     $newtext = implode('<br />', $textdata);
-                    //Write some description
-                    $scriptcodes[] = 'set_label_for_ld(' . $key . ',"' . $newtext . '");';
+                    $element=$mform->getElement('lexemedescriptions[' . $key . ']');
+                    $element->setLabel($newtext);
                 }
          
-                $script = implode('\n',$scriptcodes);
-                $total_text = '<script language ="javascript">\n '. $functiondefinition . $script . ' \n</script>';
-                $mform->addElement('html', str_replace('\n', PHP_EOL, $total_text));
             }
         }
     }
