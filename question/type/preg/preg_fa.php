@@ -26,8 +26,7 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
-    /** @var integer priority of this transitions over other - 0 means the highest priority. */
-    public $priority;
+
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
