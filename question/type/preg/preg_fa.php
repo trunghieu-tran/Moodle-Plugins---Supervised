@@ -26,16 +26,18 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
-
+    /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
+    public $consumechars;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to) {
+    public function __construct(&$from, &$pregleaf, &$to, $consumechars=true) {
         $this->from =& $from;
         $this->pregleaf = clone $pregleaf;
         $this->to =& $to;
+        $this->consumechars = $consumechars;
     }
 }
 
