@@ -19,6 +19,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
 
         // Adding the standard "name" field
         $mform->addElement('text', 'name', get_string('poasassignmentname', 'poasassignment'), array('size'=>'64'));
+        $mform->addHelpButton('name', 'instancename', 'poasassignment');
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -32,25 +33,30 @@ class mod_poasassignment_mod_form extends moodleform_mod {
 
         // Adding filemanager field where teracher can attach file to the assignment
         $mform->addElement('filemanager', 'poasassignmentfiles', get_string('poasassignmentfiles', 'poasassignment'));
-
+        $mform->addHelpButton('poasassignmentfiles', 'poasassignmentfiles', 'poasassignment');
 
         $mform->addElement('date_time_selector', 'availabledate', get_string('availabledate', 'poasassignment'), array('optional'=>true));
+        $mform->addHelpButton('availabledate', 'availabledate', 'poasassignment');
         $mform->setDefault('availabledate', time());
 
         $mform->addElement('date_time_selector', 'choicedate', get_string('choicedate', 'poasassignment'), array('optional'=>true));
+        $mform->addHelpButton('choicedate', 'choicedate', 'poasassignment');
         $mform->setDefault('choicedate', time()+2*24*3600); // By default student have 2 days to choose task
         $mform->disabledIf('choicedate', 'activateindividualtasks');
 
         
         $mform->addElement('checkbox', 'preventlatechoice', get_string('preventlatechoice', 'poasassignment'));
+        $mform->addHelpButton('preventlatechoice', 'preventlatechoice', 'poasassignment');
 
         $mform->addElement('checkbox', 'randomtasksafterchoicedate', get_string('randomtasksafterchoicedate', 'poasassignment'));
+        $mform->addHelpButton('randomtasksafterchoicedate', 'randomtasksafterchoicedate', 'poasassignment');
 
         $mform->addElement('date_time_selector', 'deadline', get_string('deadline', 'poasassignment'), array('optional'=>true));
+        $mform->addHelpButton('deadline', 'deadline', 'poasassignment');
         $mform->setDefault('deadline', time()+7*24*3600); // By default student have 7 days to complete task
 
         $mform->addElement('checkbox', 'preventlate', get_string('preventlate', 'poasassignment'));
-        
+        $mform->addHelpButton('preventlate', 'preventlate', 'poasassignment');
         // Adding answers fieldset
         //----------------------------------------------------------------------
         global $COURSE, $CFG,$DB;
@@ -61,21 +67,25 @@ class mod_poasassignment_mod_form extends moodleform_mod {
         
         $mform->addElement('checkbox', 'newattemptbeforegrade', get_string('newattemptbeforegrade', 'poasassignment'));
         $mform->addHelpButton('newattemptbeforegrade', 'newattemptbeforegrade', 'poasassignment');
+        $mform->setAdvanced('newattemptbeforegrade');
         
         $mform->addElement('text', 'penalty', get_string('penalty', 'poasassignment'));
+        $mform->addHelpButton('penalty', 'penalty', 'poasassignment');
         $mform->setDefault('penalty', 0);
         $mform->disabledIf('penalty', 'severalattempts', 'notchecked');
-        $mform->addHelpButton('penalty', 'penalty', 'poasassignment');
         
         $mform->addElement('checkbox','finalattempts',get_string('finalattempts','poasassignment'));
         $mform->addHelpButton('finalattempts','finalattempts','poasassignment');
+        $mform->setAdvanced('finalattempts');
         $mform->disabledIf('finalattempts', 'severalattempts', 'notchecked');
         
         $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'poasassignment'));
         $mform->addHelpButton('notifyteachers', 'notifyteachers', 'poasassignment');
+        $mform->setAdvanced('notifyteachers');
         
         $mform->addElement('checkbox', 'notifystudents', get_string('notifystudents', 'poasassignment'));
         $mform->addHelpButton('notifystudents', 'notifystudents', 'poasassignment');
+        $mform->setAdvanced('notifystudents');
         
         // Adding answers fieldsets
         //----------------------------------------------------------------------
