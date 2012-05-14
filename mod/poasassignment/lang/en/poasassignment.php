@@ -379,3 +379,4 @@ $string['preventlatechoice_help'] = 'Prevent student\'s task choosing afrer choi
 $string['randomtasksafterchoicedate_help'] = 'Set free random task to student after choice date';
 $string['deadline_help'] = 'Due date';
 $string['preventlate_help'] = 'Prevent late submissions';
+$string['taskhidden_help'] = 'Task cannot be taken.';

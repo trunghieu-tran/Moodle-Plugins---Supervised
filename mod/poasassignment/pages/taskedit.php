@@ -335,8 +335,12 @@ class taskedit_form extends moodleform {
         
         $mform->addElement('text','name',get_string('taskname','poasassignment'),array('size'=>45));
         $mform->addRule('name', null, 'required', null, 'client');
+
         $mform->addElement('htmleditor','description',get_string('taskintro', 'poasassignment'));
+
         $mform->addElement('checkbox','hidden',get_string('taskhidden', 'poasassignment'));
+        $mform->addHelpButton('hidden','taskhidden', 'poasassignment');
+
         $fields=$DB->get_records('poasassignment_fields',array('poasassignmentid'=>$instance['poasassignmentid']));
         $poasmodel= poasassignment_model::get_instance();
         foreach($fields as $field) {
