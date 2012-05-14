@@ -76,11 +76,13 @@ class taskview_page extends abstract_page {
 
         $html = '';
         $html .= $OUTPUT->box_start();
-        if ($owntask) {
-            echo $OUTPUT->heading(get_string('itsyourtask', 'poasassignment'));
-        }
-        else {
-            echo $OUTPUT->heading(get_string('itsnotyourtask', 'poasassignment'));
+        if(has_capability('mod/poasassignment:havetask', $model->get_context())) {
+            if ($owntask) {
+                echo $OUTPUT->heading(get_string('itsyourtask', 'poasassignment'));
+            }
+            else {
+                echo $OUTPUT->heading(get_string('itsnotyourtask', 'poasassignment'));
+            }
         }
         $html .= '<table>';
         $html .= '<tr><td align="right"><b>'.get_string('taskname','poasassignment').'</b>:</td>';
