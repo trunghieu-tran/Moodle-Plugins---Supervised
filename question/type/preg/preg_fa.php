@@ -73,9 +73,8 @@ class qtype_preg_fa_state {
      *
      * @param transtion a reference to an object of child class of qtype_preg_fa_transition.
      */
-    public function add_transition(&$transition, &$priority_counter) {
+    public function add_transition(&$transition) {
         $transition->from =& $this;
-        $transition->priority = $priority_counter++;
         $this->outtransitions[] = $transition;
         //TODO - check whether it makes a node non-deterministic
         //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
@@ -481,7 +480,6 @@ abstract class qtype_preg_finite_automaton {
                             $lab = $lab."$num,";
                         }
                     }
-                    $lab = $lab."priority=$curtransition->priority";
                     fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
                 }
             }
