@@ -3,10 +3,13 @@ require_once($CFG->dirroot . '/question/type/preg/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
+// TODO find an equivalent of ord().
+
 %%
 %class qtype_preg_lexer
 %function nextToken
 %char
+%unicode
 %state CHARCLASS
 %init{
     $this->errors = array();
@@ -16,11 +19,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->lexemcount = 0;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
-    //set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis
+    // Set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis.
     $this->optstack[0]->i = false;
     $this->optstack[0]->subpattnum = -1;
     $this->optstack[0]->parennum = -1;
     $this->optcount = 1;
+    // This class inherits JLexBase which is modified to have a textlib object to avoid unicode problems.
 %init}
 %{
     protected $errors;
@@ -31,12 +35,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     protected $optstack;
     protected $optcount;
 
-    //A reference to the matcher object to be passed to some nodes
+    // A reference to the matcher object to be passed to some nodes.
     public $matcher = null;
-    //Global modifiers as a string - defined for entire expression
+    // Global modifiers as a string - defined for entire expression.
     public $globalmodifiers = '';
-    //Local modifiers - turned on (or off) using options in the expression
-    //It's contains copy of a global modifiers at start, but could be changed later
+    // Local modifiers - turned on (or off) using options in the expression.
+    // It's contains copy of a global modifiers at start, but could be changed later.
     public $localmodifiers ='';
 
     public function get_errors() {
@@ -60,7 +64,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         if ($subtype !== null) {
             $result->subtype = $subtype;
         }
-        //Set i modifier for leafs
+        // Set i modifier for leafs.
         if (is_a($result, 'preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
             $result->caseinsensitive = true;
         }
@@ -78,20 +82,20 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
             $result->leftborder = $leftborder;
             break;
         case 'preg_leaf_option':
-            $text = substr($data, 2, strlen($data) - 3);
-            $index = strpos($text, '-');
+            $text = $this->textlib->substr($data, 2, $this->textlib->strlen($data) - 3);
+            $index = $this->textlib->strpos($text, '-');
             if ($index === false) {
                 $result->posopt = $text;
             } else {
-                $result->posopt = substr($text, 0, $index);
-                $result->negopt = substr($text, $index + 1);
+                $result->posopt = $this->textlib->substr($text, 0, $index);
+                $result->negopt = $this->textlib->substr($text, $index + 1);
             }
             break;
         case 'preg_leaf_recursion':
             if ($data[2] == 'R') {
                 $result->number = 0;
             } else {
-                $result->number = substr($data, 2, strlen($data) - 3);
+                $result->number = $this->textlib->substr($data, 2, $this->textlib->strlen($data) - 3);
             }
             break;
         }
@@ -111,7 +115,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         if(ord($startchar) < ord($endchar)) {
             $char = ord($startchar);
             while($char <= ord($endchar)) {
-                $cc->charset .= chr($char);
+                $cc->charset .= $this->textlib->code2utf8($char);
                 $char++;
             }
         } else {
@@ -134,11 +138,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         if ($this->optcount > 0) {
             $item = $this->optstack[$this->optcount - 1];
             $this->optcount--;
-            //Is it a pair for (?|
+            // Is it a pair for (?|
             if ($item->parennum == $this->optcount) {
-                //Are we out of a (?|...) block?
+                // Are we out of a (?|...) block?
                 if ($this->optstack[$this->optcount - 1]->subpattnum != -1) {
-                    $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    //Reset subpattern numeration
+                    $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    // Reset subpattern numeration.
                 } else {
                     $this->lastsubpatt = $this->maxsubpatt;
                 }
@@ -146,24 +150,26 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
         }
     }
     public function mod_top_opt($set, $unset) {
-        for ($i = 0; $i < strlen($set); $i++) {
-            if (strpos($unset, $set[$i])) {//Setting and unsetting modifier at the same time is error
+        for ($i = 0; $i < $this->textlib->strlen($set); $i++) {
+            if ($this->textlib->strpos($unset, $this->textlib->substr($set, $i, 1))) {// Setting and unsetting modifier at the same time is error.
                 $text = $this->yytext;
-                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - strlen($text), $this->yychar - 1);
+                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - $this->textlib->strlen($text), $this->yychar - 1);
                 return;
             }
         }
-        //If error does not exist, set and unset local modifiers
-        for ($i = 0; $i < strlen($set); $i++) {
-            $this->optstack[$this->optcount - 1]->$set[$i] = true;
+        // If error does not exist, set and unset local modifiers.
+        for ($i = 0; $i < $this->textlib->strlen($set); $i++) {
+            $tmp = $this->textlib->substr($set, $i, 1);
+            $this->optstack[$this->optcount - 1]->$tmp = true;
         }
-        for ($i = 0; $i < strlen($unset); $i++) {
-            $this->optstack[$this->optcount - 1]->$unset[$i] = false;
+        for ($i = 0; $i < $this->textlib->strlen($unset); $i++) {
+            $tmp = $this->textlib->substr($unset, $i, 1);
+            $this->optstack[$this->optcount - 1]->$tmp = false;
         }
     }
 %}
 %eof{
-        if (isset($this->cc) && is_object($this->cc)) {//End of the expression inside a character class
+        if (isset($this->cc) && is_object($this->cc)) {// End of the expression inside a character class.
             $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1);
             $this->cc = null;
         }
@@ -196,42 +202,42 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, strpos($text, ',') + 1, strlen($text) - 2 - strpos($text, ','))));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), $this->textlib->substr($text, $this->textlib->strpos($text, ',') + 1, $this->textlib->strlen($text) - 2 - $this->textlib->strpos($text, ','))));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') - 1)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1)));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, substr($text, 2, strlen($text) - 3)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $this->textlib->substr($text, 2, $this->textlib->strlen($text) - 3)));
     return $res;
 }
 <YYINITIAL> \{[0-9]+\} {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, 1, strpos($text, ',') - 1)));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1)));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, strpos($text, ',') + 1, strlen($text) - 2 - strpos($text, ',')), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), $this->textlib->substr($text, $this->textlib->strpos($text, ',') + 1, $this->textlib->strlen($text) - 2 - $this->textlib->strpos($text, ',')), false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), null, false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), null, false));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, substr($text, 2, strlen($text) - 3), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $this->textlib->substr($text, 2, $this->textlib->strlen($text) - 3), false));
     return $res;
 }
 <YYINITIAL> \{[0-9]+\}\? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, substr($text, 1, strpos($text, ',') - 1), substr($text, 1, strpos($text, ',') - 1), false));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), $this->textlib->substr($text, 1, $this->textlib->strpos($text, ',') - 1), false));
     return $res;
 }
 <YYINITIAL> \[ {
@@ -248,7 +254,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
     return $res;
 }
-<YYINITIAL> \(\?\#\{\{\) {        // beginning of a lexem
+<YYINITIAL> \(\?\#\{\{\) {        // Beginning of a lexem.
     $this->push_opt_lvl();
     $this->lexemcount++;
     $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, -$this->lexemcount));
@@ -259,12 +265,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
     return $res;
 }
-<YYINITIAL> \(\?\#\}\}\) {        // ending of a lexem
+<YYINITIAL> \(\?\#\}\}\) {        // Ending of a lexem.
     $this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
-<YYINITIAL> \(\?\#[^)]*\) {        // comment
+<YYINITIAL> \(\?\#[^)]*\) {        // Comment.
     return $this->nextToken();
 }
 <YYINITIAL> \(\?> {
@@ -274,46 +280,46 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->lastsubpatt));
     return $res;
 }
-<YYINITIAL> \(\?\<[a-zA-Z_0-9]+\> {    // named subpattern (?<name>...)
+<YYINITIAL> \(\?\<[a-zA-Z_0-9]+\> {    // Named subpattern (?<name>...).
     $this->push_opt_lvl();
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
-    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // This subpattern does not exists.
         $num = ++$this->lastsubpatt;
         $this->subpatternmap[$str] = $num;
-    } else {                                                // subpatterns with same names should have same numbers
+    } else {                                                // Subpatterns with same names should have same numbers.
         $num = $this->subpatternmap[$str];
-        // TODO check if we are inside a (?|...) group
+        // TODO check if we are inside a (?|...) group.
     }
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
     return $res;
 }
-<YYINITIAL> \(\?\'[a-zA-Z_0-9]+\' {    // named subpattern (?'name'...)
+<YYINITIAL> \(\?\'[a-zA-Z_0-9]+\' {    // Named subpattern (?'name'...).
     $this->push_opt_lvl();
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
-    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // This subpattern does not exists.
         $num = ++$this->lastsubpatt;
         $this->subpatternmap[$str] = $num;
-    } else {                                                // subpatterns with same names should have same numbers
+    } else {                                                // Subpatterns with same names should have same numbers.
         $num = $this->subpatternmap[$str];
-        // TODO check if we are inside a (?|...) group
+        // TODO check if we are inside a (?|...) group.
     }
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
     return $res;
 }
-<YYINITIAL> \(\?P\<[a-zA-Z_0-9]+\> {   // named subpattern (?P<name>...)
+<YYINITIAL> \(\?P\<[a-zA-Z_0-9]+\> {   // Named subpattern (?P<name>...).
     $this->push_opt_lvl();
-    $str = substr($this->yytext(), 4);
-    $str = substr($str, 0, strlen($str) - 1);
-    if (!array_key_exists($str, $this->subpatternmap)) {    // this subpattern does not exists
+    $str = $this->textlib->substr($this->yytext(), 4);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
+    if (!array_key_exists($str, $this->subpatternmap)) {    // This subpattern does not exists.
         $num = ++$this->lastsubpatt;
         $this->subpatternmap[$str] = $num;
-    } else {                                                // subpatterns with same names should have same numbers
+    } else {                                                // Subpatterns with same names should have same numbers.
         $num = $this->subpatternmap[$str];
-        // TODO check if we are inside a (?|...) group
+        // TODO check if we are inside a (?|...) group.
     }
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
@@ -325,7 +331,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \(\?\| {
-    $this->push_opt_lvl($this->lastsubpatt);    //Save the top-level subpattern number
+    $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -381,7 +387,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \| {
-    //Reset subpattern numeration inside a (?|...) group
+    // Reset subpattern numeration inside a (?|...) group.
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
@@ -390,56 +396,57 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \\[\[\]?*+{}|().] {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $text[1]));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->substr($text, 1, 1)));
     return $res;
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
-    $numstr = substr($this->yytext(), 1);
+    $numstr = $this->textlib->substr($this->yytext(), 1);
     $numdec = intval($numstr, 10);
     if ($numdec < 10 || ($numdec <= $this->maxsubpatt && $numdec < 100)) {
-        //Return a backreference
+        // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
     } else {
-        //Return a character
+        // Return a character.
         $octal = '';
         $failed = false;
-        for ($i = 0; !$failed && $i < strlen($numstr); $i++) {
-            if (intval($numstr[$i]) < 8) {
-                $octal = $octal . $numstr[$i];
+        for ($i = 0; !$failed && $i < $this->textlib->strlen($numstr); $i++) {
+            $tmp = $this->textlib->substr($numstr, $i, 1);
+            if (intval($tmp) < 8) {
+                $octal = $octal . $tmp;
             } else {
                 $failed = true;
             }
         }
-        if (strlen($octal) == 0) {    //If no octal digits found, it should be 0
+        if ($this->textlib->strlen($octal) == 0) {    // If no octal digits found, it should be 0.
             $octal = '0';
             $tail = $numstr;
-        } else {                      //Octal digits found
-            $tail = substr($numstr, strlen($octal));
+        } else {                      // Octal digits found.
+            $tail = $this->textlib->substr($numstr, $this->textlib->strlen($octal));
         }
-        //Return a single lexem if all digits are octal, an array of lexems otherwise
-        if (strlen($tail) == 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($octal))));
+        // Return a single lexem if all digits are octal, an array of lexems otherwise.
+        if ($this->textlib->strlen($tail) == 0) {
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec($octal))));
-            for ($i = 0; $i < strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $tail[$i]));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8(octdec($octal))));
+            for ($i = 0; $i < $this->textlib->strlen($tail); $i++) {
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->substr($tail, $i, 1)));
             }
         }
     }
     return $res;
 }
 <YYINITIAL> \\g[0-9][0-9]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, substr($this->yytext(), 2)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $this->textlib->substr($this->yytext(), 2)));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\g\{-?[0-9][0-9]?\} {
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $numdec = intval($str, 10);
-    //Is it a relative backreference? Is so, convert it to an absolute one
+    // Is it a relative backreference? Is so, convert it to an absolute one.
     if ($numdec < 0) {
         $numdec = $this->lastsubpatt + $numdec + 1;
     }
@@ -447,62 +454,62 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {    // named backreference
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+<YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {    // Named backreference.
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {    // named backreference
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+<YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {    // Named backreference.
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {    // named backreference
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+<YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {    // Named backreference.
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {    // named backreference
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+<YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {    // Named backreference.
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
-<YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {    // named backreference
-    $str = substr($this->yytext(), 4);
-    $str = substr($str, 0, strlen($str) - 1);
+<YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {    // Named backreference.
+    $str = $this->textlib->substr($this->yytext(), 4);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
     return $res;
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(octdec(substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8(octdec($this->textlib->substr($this->yytext(), 1)))));
     return $res;
 }
 <YYINITIAL> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
     $code = 0;
     $str = $this->yytext();
-    if (strlen($str) > 1) {
-        $code = hexdec(substr($str, 1));
+    if ($this->textlib->strlen($str) > 1) {
+        $code = hexdec($this->textlib->substr($str, 1));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr($code)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8($code)));
     return $res;
 }
 <YYINITIAL> \\x\{[0-9a-fA-F]*\} {
-    $str = substr($this->yytext(), 3);
-    $str = substr($str, 0, strlen($str) - 1);
+    $str = $this->textlib->substr($this->yytext(), 3);
+    $str = $this->textlib->substr($str, 0, $this->textlib->strlen($str) - 1);
     $code = 0;
-    if (strlen($str) > 1) {
+    if ($this->textlib->strlen($str) > 1) {
         $code = hexdec($str);
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr($code)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8($code)));
     return $res;
 }
 <YYINITIAL> \\\\ {
@@ -549,7 +556,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     return $res;
 }
 <YYINITIAL> \\t {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, chr(9)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->textlib->code2utf8(9)));
     return $res;
 }
 <YYINITIAL> "^" {
@@ -592,7 +599,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <YYINITIAL> \\[^0-9a-zA-Z] {
     $text = $this->yytext();
-    $leaf = $this->form_node('preg_leaf_charset', null, $text[1]);
+    $leaf = $this->form_node('preg_leaf_charset', null, $this->textlib->substr($text, 1, 1));
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $leaf);
     return $res;
 }
@@ -609,12 +616,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     $this->cccharnumber++;
 }
 <CHARCLASS> \\0[0-9][0-9]|[0-9][0-9][0-9] {
-    $this->cc->charset .= chr(octdec(substr($this->yytext(), 1)));
+    $this->cc->charset .= $this->textlib->code2utf8(octdec($this->textlib->substr($this->yytext(), 1)));
     $this->cccharnumber++;
 }
 <CHARCLASS> \\x[0-9][0-9] {
     $this->cccharnumber++;
-    $this->cc->charset .= chr(hexdec(substr($this->yytext(), 1)));
+    $this->cc->charset .= $this->textlib->code2utf8(hexdec($this->textlib->substr($this->yytext(), 1)));
 }
 <CHARCLASS> \\d {
     $this->cccharnumber++;
@@ -632,7 +639,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <CHARCLASS> \\t {
     $this->cccharnumber++;
-    $this->cc->charset .= chr(9);
+    $this->cc->charset .= $this->textlib->code2utf8(9);
 }
 <CHARCLASS> "^" {
     if ($this->cccharnumber) {
@@ -657,7 +664,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 }
 <CHARCLASS> [0-9]-[0-9]|[a-z]-[a-z]|[A-Z]-[A-Z] {
     $text = $this->yytext();
-    $this->form_num_interval($this->cc, $text[0], $text[2]);
+    $this->form_num_interval($this->cc, $this->textlib->substr($text, 0, 1), $this->textlib->substr($text, 2, 1));
 }
 <CHARCLASS> \\- {
     $this->cc->charset .= '-';
