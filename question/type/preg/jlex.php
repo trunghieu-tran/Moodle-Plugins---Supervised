@@ -4,7 +4,7 @@
   Based on JLex which is:
 
        JLEX COPYRIGHT NOTICE, LICENSE, AND DISCLAIMER
-  Copyright 1996-2000 by Elliot Joel Berk and C. Scott Ananian 
+  Copyright 1996-2000 by Elliot Joel Berk and C. Scott Ananian
 
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
@@ -40,6 +40,7 @@ class JLexToken {
 }
 
 class JLexBase {
+  protected $textlib;
   protected $yy_reader;
   protected $yy_buffer;
   protected $yy_buffer_read;
@@ -58,6 +59,7 @@ class JLexBase {
   protected $yy_eof_done = false;
 
   function __construct($stream) {
+    $this->textlib = textlib_get_instance();
     $this->yy_reader = $stream;
     $meta = stream_get_meta_data($stream);
     if (!isset($meta['uri'])) {
@@ -87,23 +89,23 @@ class JLexBase {
     if ($this->yy_buffer_start != 0) {
       /* shunt */
       $j = $this->yy_buffer_read - $this->yy_buffer_start;
-      $this->yy_buffer = substr($this->yy_buffer, $this->yy_buffer_start, $j);
+      $this->yy_buffer = $this->textlib->substr($this->yy_buffer, $this->yy_buffer_start, $j);
       $this->yy_buffer_end -= $this->yy_buffer_start;
       $this->yy_buffer_start = 0;
       $this->yy_buffer_read = $j;
       $this->yy_buffer_index = $j;
 
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !strlen($data)) return $this->YY_EOF;
+      if ($data === false || !$this->textlib->strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= strlen($data);
+      $this->yy_buffer_read .= $this->textlib->strlen($data);
     }
 
     while ($this->yy_buffer_index >= $this->yy_buffer_read) {
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !strlen($data)) return $this->YY_EOF;
+      if ($data === false || !$this->textlib->strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= strlen($data);
+      $this->yy_buffer_read .= $this->textlib->strlen($data);
     }
     return ord($this->yy_buffer[$this->yy_buffer_index++]);
   }
@@ -157,7 +159,7 @@ class JLexBase {
   }
 
   protected function yytext() {
-    return substr($this->yy_buffer, $this->yy_buffer_start, 
+    return $this->textlib->substr($this->yy_buffer, $this->yy_buffer_start,
           $this->yy_buffer_end - $this->yy_buffer_start);
   }
 
