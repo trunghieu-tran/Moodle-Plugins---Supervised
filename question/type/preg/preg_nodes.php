@@ -218,7 +218,7 @@ abstract class preg_leaf extends preg_node {
 * I.e. \n, \s, \v, \h and \d and their negative counterparts since they are not support unicode by default and so can be enumerated
 * \w is too large to be handled by full character set
 */
-class preg_leaf_charset extends preg_leaf {
+class preg_leaf_charset_old extends preg_leaf {
 
     //Character set, any of which could (not) match with this node
     public $charset = '';
@@ -292,19 +292,46 @@ class preg_leaf_charset extends preg_leaf {
 /**
 *Character or charcter class
 */
-class preg_leaf_charset_project extends preg_leaf {
+class preg_leaf_charset extends preg_leaf {
 	public function __construct() {
         $this->type = preg_node::TYPE_LEAF_CHARSET;
-		$flags = array(array());
+		$this->flags = array(array());
+		$this->ranges = array(array());
+		$this->israngecalculated = true;//empty ranges for empty leaf is correct!
     }
-	protected $flags;//in DNF
+	protected $flags;//simple flags in disjunctive normal form
+	/*
+	*simple ranges, range is pair of integer, ranges is 3d array of integer
+	*or 2d array of pair (DNF of pair)
+	*/
+	protected $ranges;
+	protected $asserts;//array of assert flag (assert impossible to calculate as range), each asserts[i] is array of 0/1/2 asserts as flag; for ranges[i]
 	public $negative;
+	//true if charset is DNF range matrix, false if charset is DNF of flags
+	public $israngecalculated;
 
     public function name() {
         return 'leaf_charset';
     }
+	protected function calc_ranges() {
+		$this->israngecalculated = true;
+		die('implement range calulate before use it!');
+	}
 	protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-		return false;
+		$result = false;
+		foreach ($this->flags as $variant) {
+			$varres = true;
+			foreach ($variant as $flag) {
+				$varres = $varres && $flag->match($str, $pos);
+			}
+			if ($varres) {
+				$result = true;
+				break;
+			}
+		}
+		if ($this->negative) {
+			$result = !$result;
+		}
 	}
 	public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
 		return 'implement next_character before use!';
@@ -312,8 +339,14 @@ class preg_leaf_charset_project extends preg_leaf {
 	public function tohr() {
 		return 'implement tohr before use!';
 	}
-	public function add_flag(preg_charset_flag $flag) {// for creations charset in lexer
+	public function add_flag_dis(preg_charset_flag $flag) {
 		echo 'implement add_flag before use!';
+	}
+	public function add_flag_con(preg_charset_flag $flag) {
+		echo 'implement add_flag before use!';
+	}
+	protected function push_negative() {
+		echo 'implement push_negative before use!';
 	}
 	public function intersect(preg_lef_charset $other) {
 		echo 'implement intersect before use!';
@@ -321,6 +354,13 @@ class preg_leaf_charset_project extends preg_leaf {
 	public function substract(preg_lef_charset $other) {
 		echo 'implement substract before use!';
 	}
+	/**
+     * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
+     * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
+     */
+    public function consumes($matcherstateobj = null) {
+        echo 'implement consumes before use!';
+    }
 }
 
 /**
@@ -334,11 +374,13 @@ class preg_charset_flag {
 	const CIRCUMFLEX = 'circumflex';
 	const DOLLAR = 'dollar';
 	
-	protected $negative;
+	public $negative;
 	protected $type;
-	protected $value;//value of set/flag/unicode property
-	protected $arg;//second argument for match function, if need, first argument is character
+	protected $set;
+	protected $flag;//as name of character verify function, see constants bellow
+	protected $uniprop;
 	
+		
 	public function set_circumflex() {
 		$this->type = self::CIRCUMFLEX;
 	}
@@ -347,23 +389,56 @@ class preg_charset_flag {
 	}
 	public function set_set($set) {
 		$this->type = self::SET;
-		$this->value = $set;
+		$this->set = $set;
 	}
 	public function set_flag($flag) {
 		$this->type = self::FLAG;
-		$this->value = $flag;
+		$this->flag = $flag;
 	}
 	public function set_uprop($prop) {
 		$this->type = self::UPROP;
-		$this->value = 'preg_match';
-		$this->arg = '/'.$prop.'/';
+		$this->uniprop = '/\\p{'.$prop.'}/';
 	}
 	public function is_null_length() {
 		return $this->type===self::CIRCUMFLEX || $this->type===self::DOLLAR;
 	}
 	//TODO implement following function of preg_charset_flag
 	public function match($str, $pos) {
-		return false;
+		if ($pos<0 || $pos>=strlen($str)) { 
+			return false;// string index out of border
+		}
+		switch ($this->type) {
+			case self::CIRCUMFLEX:
+				$result = $pos==0;
+				break;
+			case self::DOLLAR:
+				$result = $pos==strlen($str)-1;
+				break;
+			case self::SET:
+				$textlib = textlib_get_instance();//use textlib to avoid unicode problems
+				if ($pos>=$textlib->strlen($str)) {
+					return false;
+				}
+				$charsetcopy = $this->charset;
+				$strcopy = $str;
+				if (!$cs) {
+					$charsetcopy = $textlib->strtolower($charsetcopy);
+					$strcopy = $textlib->strtolower($strcopy);
+				}
+				$result = ($textlib->strpos($charsetcopy, $strcopy[$pos]) !== false);
+				break;
+			case self::FLAG:
+				$result = call_user_func_array($this->flag, array($str[$pos]));
+				break;
+			case self::UPROP:
+				$result = call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
+				$result = (bool)$result;
+				break;
+		}
+		if ($this->negative) {
+			$result = !$result;
+		}
+		return $result;
 	}
 	/**
 	*intersect this flag with other, if possible
@@ -382,18 +457,38 @@ class preg_charset_flag {
 		return false;
 	}
 	
+	/**
+	*function get and return char code range for this flag
+	*@return range as array[2] of integer or array of ranges (for set) as array[size][2] of integer
+	*/
+	public function get_range() {
+		die('implement get_range before use i1!');
+	}
 	
 	static protected function is_wordchar($char) {
-		if (ctype_alnum($char) || $char === '-') {
+		if (ctype_alnum($char) || $char === '_') {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	//TODO write other function for match, which need
-	const WORDCHAR = 'self::is_wordchar';	//\w
+	static protected function is_ascii($char) {
+		return ord($char)>=0 && ord($char)<=127;
+	}
+
+	const DIGIT = 'ctype_ digit';			//\d AND [:digit:]
+	const XDIGIT = 'ctype_ xdigit';			//[:xdigit:]
+	const SPACE = 'ctype_ space'; 			//\s AND [:space:]
+	const WORDCHAR = 'self::is_wordchar';	//\w AND [:word:]
+	const ALNUM = 'ctype_alnum';			//[:alnum:]
 	const ALPHA = 'ctype_alpha';			//[:alpha:]
-	//TODO write other constants for function names
+	const ASCII = 'self::is_ascii';			//[:ascii:]
+	const CNTRL = 'ctype_ cntrl';			//[:cntrl:]
+	const GRAPH = 'ctype_ graph';			//[:graph:]
+	const LOWER = 'ctype_ lower';			//[:lower:]
+	const UPPER = 'ctype_ upper';			//[:upper:]
+	const PRIN = 'ctype_ print';			//[:print:] PRIN, because PRINT is php keyword
+	const PUNCT = 'ctype_ punct';			//[:punct:]
 }
 
 /**
@@ -414,6 +509,8 @@ class preg_leaf_meta extends preg_leaf {
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
     //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
     public $propname = '';
+	//true if charset is DNF range matrix, false if charset is DNF of flags
+	public $israngecalculated;
 
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_META;
