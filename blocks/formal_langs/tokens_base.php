@@ -661,5 +661,25 @@ class block_formal_langs_processed_string {
         //Parser, if enabled, could generate descriptions for the nodes not stored in DB
         //TODO - should the function return only nodes with user-defined description or descpriptions for all nodes? Probably first...
     }
+    
+    /**
+     *  Returns a stream of tokens
+     *  @return stream of tokens
+     */
+    public function get_tokens() {
+        if ($this->tokenstream == null)
+            $this->language->scan($this);
+        return $this->tokenstream;
+    }
+
+    public function get_syntax_tree() {
+        if ($this->syntaxtree == null && $this->language->could_parse())
+            $this->language->parse($this);
+        return $this->syntaxtree;
+    }
+    
+    public function get_string() {
+        return $this->string;
+    }
 }
 ?>
