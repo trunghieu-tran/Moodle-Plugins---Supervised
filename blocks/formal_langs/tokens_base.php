@@ -594,6 +594,10 @@ class block_formal_langs_processed_string {
     }
     
     public function set_descriptions($descriptions)  {
+        $this->descriptions = $descriptions;
+    }
+    
+    public function save_descriptions($descriptions)  {
         //TODO: Connect here to DB and insert/update descriptions
         $this->descriptions = $descriptions;
     }
