@@ -309,7 +309,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function add_state(&$state) {
         $this->states[] =& $state;
-        $state->set_FA(&$this);
+        $state->set_FA($this);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
             throw new qtype_preg_toolargefa_exception('');

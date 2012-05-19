@@ -174,7 +174,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
     }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum;
-        $connection[$maxnum] = &$this;
+        $connection[$maxnum] = $this;
     }
     public function nullable() {
         $this->nullable = false;
@@ -258,7 +258,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
     public function number(&$connection, &$maxnum) {
         if ($this->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
             $this->number = dfa_preg_leaf_meta::ENDREG;
-            $connection[dfa_preg_leaf_meta::ENDREG] = &$this;
+            $connection[dfa_preg_leaf_meta::ENDREG] = $this;
         } else {
             parent::number($connection, $maxnum);
         }
@@ -412,7 +412,7 @@ abstract class dfa_preg_operator extends dfa_preg_node {
     }
     public function find_asserts(&$roots) {
         foreach ($this->pregnode->operands as $key=>$operand) {
-            $this->pregnode->operands[$key]->find_asserts(&$roots);
+            $this->pregnode->operands[$key]->find_asserts($roots);
         }
     }
     public function print_tree($indent) {
@@ -485,7 +485,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $this->lastpos;
     }
     public function followpos(&$fpmap) {
-        parent::followpos(&$fpmap);
+        parent::followpos($fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $key) {
             dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
         }
@@ -551,7 +551,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     }
     public function number(&$connection, &$maxnum) {
         $this->number = ++$maxnum + dfa_preg_node_assert::ASSERT_MIN_NUM;
-        $connection[$this->number] = &$this;
+        $connection[$this->number] = $this;
     }
     public function nullable() {
         $this->nullable = false;
@@ -569,7 +569,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         ;//do nothing, because not need for assert
     }
     public function find_asserts(&$roots) {
-        $roots[$this->number] = &$this;
+        $roots[$this->number] = $this;
     }
     public function print_self($indent) {
         $this->print_indent($indent);
@@ -643,7 +643,7 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
     }
 
     public function followpos(&$fpmap) {
-        parent::followpos(&$fpmap);
+        parent::followpos($fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
             dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
         }
@@ -683,7 +683,7 @@ class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
 
 
     public function followpos(&$fpmap) {
-        dfa_preg_operator::followpos(&$fpmap);
+        dfa_preg_operator::followpos($fpmap);
     }
 
     public function print_self($indent) {

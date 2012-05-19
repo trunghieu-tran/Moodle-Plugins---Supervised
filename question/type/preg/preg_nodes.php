@@ -562,8 +562,8 @@ class preg_leaf_combo extends preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        $match0 = $this->childs[0]->match($str, $pos, &$length0, $cs);
-        $match1 = $this->childs[1]->match($str, $pos, &$length1, $cs);
+        $match0 = $this->childs[0]->match($str, $pos, $length0, $cs);
+        $match1 = $this->childs[1]->match($str, $pos, $length1, $cs);
         if ($this->subtype == preg_leaf_combo::SUBTYPE_UNITE) {
             if ($match0 && $match1) {
                 $length = max($length0, $length1);
