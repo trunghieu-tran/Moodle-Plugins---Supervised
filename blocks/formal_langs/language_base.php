@@ -83,6 +83,42 @@ abstract class block_formal_langs_abstract_language {
     }
     
     /**
+     *  Creates a processed string from string
+     *  @param string $string string
+     */
+     public function create_from_string($string) {
+        $result = new block_formal_langs_processed_string();
+        $result->set_string($string);
+        $result->language=$this;
+        return $result;
+     }
+     /**
+      *  Creates a processed string from table and id in BD (string optional)
+      *  @param string $table table name
+      *  @param string $id    id of source table
+      *  @param string $string string data
+      */
+    public function create_from_db($tablename, $tableid, $string) {
+        $result = new block_formal_langs_processed_string();
+        $result->set_table_params($tablename,$tableid);
+        $result->set_string($string);
+        $result->language=$this;
+        return $result;
+    }
+    
+    /**
+     *  Removes a descriptions  by tablename and tableid
+     *  @param string $tablename name of table
+     *  @param mixed  $tableid    id of table or array of ids
+     */
+    public static function get_descriptions($tablename, $tableid) {
+       //TODO: Connect to DB here
+    }
+    
+    
+    
+    
+    /**
      * Fills syntax tree field of the processed string objects.
      *
      * Add errors for answer parsing
