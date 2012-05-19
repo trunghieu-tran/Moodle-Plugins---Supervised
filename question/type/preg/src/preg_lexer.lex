@@ -106,6 +106,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     }
 
     protected function form_res($type, $value) {
+        $result = new stdClass();
         $result->type = $type;
         $result->value = $value;
         return $result;
