@@ -254,7 +254,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
-                    $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, &$length, $casesens);
+                    $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, $length, $casesens);
                 }
                 if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_META) {
                     $mfound = true;
