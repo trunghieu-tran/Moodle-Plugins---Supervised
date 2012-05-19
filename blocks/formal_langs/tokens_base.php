@@ -535,16 +535,16 @@ class block_formal_langs_processed_string {
     /**
      * @var string table, where string belongs
      */
-    public $table;
-    /**
-     *@var string a string to process
-     */
-    public $string='';
-
+    public $tablename;
     /**
      *@var integer an id to load/store user descriptions
      */
-    public $stringid;
+    public $tableid;
+    
+    /**
+     *@var string a string to process
+     */
+    protected $string='';
 
     /**
      *@var object a link to the language object
@@ -554,18 +554,43 @@ class block_formal_langs_processed_string {
     /**
      *@var object a token stream if the string is tokenized
      */
-    public $tokenstream=null;
+    protected $tokenstream=null;
 
     /**
      *@var object a syntax tree if the string is parsed
      */
-    public $syntaxtree=null;
+    protected $syntaxtree=null;
 
     /**
      * @var array strings of token descriptions
      */
-    public $descriptions=null;
+    protected $descriptions=null;
     
+    
+    public function set_string($string)  {
+        $this->string=$string;
+        $this->tokenstream=null;
+        $this->syntaxtree=null;
+        $this->descriptions=null;
+    }
+    
+    public function set_stream($stream) {
+        //TODO: What we do with a stream and string
+        $this->tokenstream = $stream;
+    }
+    
+    public function set_syntax_tree($tree) {
+    
+    }
+    
+    public function set_descriptions($descriptions)  {
+        //TODO: Connect here to DB and insert/update descriptions
+    }
+    
+    public function set_table_params($tablename, $tableid) {
+        $this->tablename=$tablename;
+        $this->tableid=$tableid;
+    }
     
     /**
      * Returns count of nodes which needs description or special name.
@@ -619,6 +644,7 @@ class block_formal_langs_processed_string {
      * @return array of strings, keys are node numbers
      */
     public function node_descriptions_list() {
+        //TODO: Connect here to DB and list descriptions
         // connect moodle DB by answerid
         //cache descriptions
         //Parser, if enabled, could generate descriptions for the nodes not stored in DB
