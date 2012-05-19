@@ -25,6 +25,16 @@ class block_formal_langs extends block_base {
      */
     public static function available_langs($contextid = null) {
         //TODO: Replace it with actual code
+        global $DB;
+        
+        $records = $DB->get_records('block_formal_langs');
+        
+        $result = array();
+        for($i = 0;$i < $records;$i++) {
+            //TODO: Check, whether lang exists already and add version
+            $result[$record->id] = $record->ui_name;
+        }
+        
         return array( 2 => 'Simple english' );
     }
 
@@ -35,8 +45,18 @@ class block_formal_langs extends block_base {
      * @return an intialised object of the child of the block_formal_langs_abstract_language class
      */
     public static function lang_object($langid) {
+        global $DB;
+        $record = $DB->get_record('block_formal_langs', $langid);
+        if (((array)$record)['name'] == null) {
+            // TODO: Create user-defined language
+            return null;
+        } else {
+           require_once($CFG->dirroot.'/blocks/formal_langs/language_' . $record->name . '.php');
+           $langname = 'block_formal_langs_language' . $record->name;
+           return new $langname();
+        }
         //TODO: Replace it with actual code
-        return new block_formal_langs_simple_english_language();
+        return null;
     }
     /**  Inserts or updates descriptions in a DB with values from processed string
       *  @param object block_formal_langs_processed_string object with stringid, table and descriptions filled
