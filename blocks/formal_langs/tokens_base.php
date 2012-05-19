@@ -535,11 +535,11 @@ class block_formal_langs_processed_string {
     /**
      * @var string table, where string belongs
      */
-    public $tablename;
+    protected $tablename;
     /**
      *@var integer an id to load/store user descriptions
      */
-    public $tableid;
+    protected $tableid;
     
     /**
      *@var string a string to process
@@ -549,7 +549,7 @@ class block_formal_langs_processed_string {
     /**
      *@var object a link to the language object
      */
-    public $language;
+    protected $language;
 
     /**
      *@var object a token stream if the string is tokenized
@@ -567,24 +567,35 @@ class block_formal_langs_processed_string {
     protected $descriptions=null;
     
     
+    public function set_language($lang) {
+        $this->language = $lang;
+    }
+    
+    
     public function set_string($string)  {
         $this->string=$string;
         $this->tokenstream=null;
         $this->syntaxtree=null;
         $this->descriptions=null;
     }
-    
-    public function set_stream($stream) {
-        //TODO: What we do with a stream and string
+    //This setter is used by lexical analyzer
+    public function set_corrected_stream($stream) {
         $this->tokenstream = $stream;
+        $this->syntaxtree=null;
+    }
+    // This setter is used by lexer
+    public function set_stream($stream) {
+        $this->tokenstream = $stream;
+        $this->syntaxtree=null;
     }
     
     public function set_syntax_tree($tree) {
-    
+         $this->syntaxtree = $tree;
     }
     
     public function set_descriptions($descriptions)  {
         //TODO: Connect here to DB and insert/update descriptions
+        $this->descriptions = $descriptions;
     }
     
     public function set_table_params($tablename, $tableid) {
