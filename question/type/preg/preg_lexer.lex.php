@@ -88,6 +88,7 @@ class qtype_preg_lexer extends JLexBase  {
         return $result;
     }
     protected function form_res($type, $value) {
+        $result = new stdClass();
         $result->type = $type;
         $result->value = $value;
         return $result;
