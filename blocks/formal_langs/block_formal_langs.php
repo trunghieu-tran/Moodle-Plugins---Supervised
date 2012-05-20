@@ -27,15 +27,29 @@ class block_formal_langs extends block_base {
         //TODO: Replace it with actual code
         global $DB;
         
-        $records = $DB->get_records('block_formal_langs');
+        //Get all visible records
+        $records = $DB->get_records('block_formal_langs', array('visible' => '1'));
         
-        $result = array();
-        for($i = 0;$i < $records;$i++) {
-            //TODO: Check, whether lang exists already and add version
-            $result[$record->id] = $record->ui_name;
+        //Map, that checks amount of unique names in table. Populate it with values
+        $counts = array();
+        foreach($records as $record) {
+            if (array_key_exists($record->ui_name, $counts)) {
+                $counts[$record->ui_name] = $counts[$record->ui_name] + 1;
+            } else {
+                $counts[$record->ui_name] = 1;
+            }
         }
         
-        return array( 2 => 'Simple english' );
+        $result = array();
+        foreach($records as $record) {
+            if ($counts[$record->ui_name] > 1) {
+                $result[$record->id] = $record->ui_name . ' ' . $record->version;
+            } else {
+                $result[$record->id] = $record->ui_name;
+            }
+        }
+        
+        return $result;
     }
 
     /**
