@@ -28,8 +28,9 @@ class block_formal_langs_predefined_simple_english_lexer {
             $tokens[] = $token;
             $counter = $counter + 1; 
         }
-        $processedstring->tokenstream = new block_formal_langs_token_stream();
-        $processedstring->tokenstream->tokens = $tokens;
+        $stream = new block_formal_langs_token_stream();
+        $stream->tokens = $tokens;
+        $processedstring->set_stream($stream);
     }
 }
 
