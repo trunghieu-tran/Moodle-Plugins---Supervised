@@ -598,8 +598,45 @@ class block_formal_langs_processed_string {
     }
     
     public function save_descriptions($descriptions)  {
+        global $DB;
         //TODO: Connect here to DB and insert/update descriptions
         $this->descriptions = $descriptions;
+
+        $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
+        $oldrecords = $DB->get_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
+        $index = 0;
+        foreach($this->descriptions as $description) {
+            $record = null;
+            if ($oldrecords != null) {
+                $record = array_shift($oldrecords);
+            }
+            $mustinsert  = ($oldrecords == null);
+            if ($record == null) {
+                $record = new stdClass();        
+            }
+            $record->tablename = $processedstring->table;
+            $record->tableid = $processedstring->stringid;
+            $record->number = $index;
+            $record->description = $description;
+            
+            if ($mustinsert) {
+                $DB->insert_record('block_formal_langs_dscr',$record);
+            } else {
+                $DB->update_record('block_formal_langs_dscr',$record);
+            }
+            
+            $index = $index + 1;
+        }
+        
+        //If some old descriptions left - delete it
+        if ($oldrecords != null) {
+            $oldrecordids = array();
+            foreach($oldrecords as $oldrecord) {
+                $oldrecordids[] = $oldrecord->id;    
+            }
+            $oldrecordin = implode(',',$oldrecordids);
+            $DB->delete_records_select('block_formal_langs_dscr', " id IN ({$oldrecordin}) AND tablename = '{$processedstring->table}' ");
+        }
     }
     
     public function set_table_params($tablename, $tableid) {
