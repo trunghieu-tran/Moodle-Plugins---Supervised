@@ -170,7 +170,8 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         } else {
             // TODO: via DB get $name, $techname, $isparserenabled, $version
         }
-
+        
+        
         $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer';
         $this->scaner = new $scanerclass();
         if ($this->could_parse()) {

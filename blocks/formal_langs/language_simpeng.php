@@ -34,10 +34,10 @@ class block_formal_langs_predefined_simple_english_lexer {
     }
 }
 
-class block_formal_langs_simple_english_language extends block_formal_langs_predefined_language
+class block_formal_langs_language_simpeng extends block_formal_langs_predefined_language
 {
-    public function __construct() {
-        parent::__construct(null,null);
+    public function __construct($id, $langdbrecord) {
+        parent::__construct($id, $langdbrecord);
     }
     
     
