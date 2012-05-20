@@ -116,7 +116,15 @@ abstract class block_formal_langs_abstract_language {
     }
     
     
-    
+    /** Removes a descriptions from a DB
+      * @param string $tableid    id in table
+      * @param string $tablename  name of source table
+      */
+    public static function delete_descriptions($tableid,$tablename) {
+        global $DB;
+        $conditions = array(" tableid='{$tableid}' ", "tablename = '{$tablename}' ");
+        return $DB->delete_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
+    }
     
     /**
      * Fills syntax tree field of the processed string objects.
@@ -170,8 +178,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         } else {
             // TODO: via DB get $name, $techname, $isparserenabled, $version
         }
-        
-        
+
         $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer';
         $this->scaner = new $scanerclass();
         if ($this->could_parse()) {

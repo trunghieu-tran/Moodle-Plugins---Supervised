@@ -600,7 +600,7 @@ class block_formal_langs_processed_string {
     public function save_descriptions($descriptions)  {
         global $DB;
         //TODO: Connect here to DB and insert/update descriptions
-        $this->descriptions = $descriptions;
+        $this->set_descriptions($descriptions);
 
         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
         $oldrecords = $DB->get_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
