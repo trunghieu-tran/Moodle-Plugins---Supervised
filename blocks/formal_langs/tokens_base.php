@@ -642,15 +642,8 @@ class block_formal_langs_processed_string {
      * @return string - description of node
      */
     public function node_description($nodenumber) {
-        // TODO: change SELECT to adapt to new circumstances
-        // connect moodle DB
-        // SELECT description FROM moodle_descriptions_table
-        // AS mtul WHERE mtut.langid == $this->id AND mtut.number
-        // == $node->id AND mtut.answerid == $this->answerid;
-        //cache descriptions
-        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
-        $desc = '';
-        return $desc;
+       $this->node_descriptions_list()
+        return $this->descriptions[$nodenumber];
     }
 
     /**
@@ -659,11 +652,16 @@ class block_formal_langs_processed_string {
      * @return array of strings, keys are node numbers
      */
     public function node_descriptions_list() {
-        //TODO: Connect here to DB and list descriptions
-        // connect moodle DB by answerid
-        //cache descriptions
-        //Parser, if enabled, could generate descriptions for the nodes not stored in DB
-        //TODO - should the function return only nodes with user-defined description or descpriptions for all nodes? Probably first...
+        global $DB;
+        if ($this->descriptions == null)
+        {
+         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
+         $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
+         foreach($records as $record) {
+            $this->descriptions[$record->number] = $record->description; 
+         }
+        }
+        return $this->descriptions;
     }
     
     /**
