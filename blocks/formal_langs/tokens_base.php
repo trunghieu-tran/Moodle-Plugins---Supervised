@@ -670,7 +670,7 @@ class block_formal_langs_processed_string {
      *  Returns a stream of tokens
      *  @return stream of tokens
      */
-    public function get_tokens() {
+    public function get_stream() {
         if ($this->tokenstream == null)
             $this->language->scan($this);
         return $this->tokenstream;

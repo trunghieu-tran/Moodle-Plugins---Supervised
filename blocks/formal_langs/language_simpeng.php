@@ -19,7 +19,7 @@ class block_formal_langs_predefined_simple_english_lexer {
      *  Performs lexical analysis of text
      */
     public function tokenize($processedstring) {
-        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
+        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($processedstring->get_string()), 'r'));
         //Now, we are splitting text into lexemes
         $tokens = array();
         $counter = 0;
@@ -36,8 +36,8 @@ class block_formal_langs_predefined_simple_english_lexer {
 
 class block_formal_langs_language_simpeng extends block_formal_langs_predefined_language
 {
-    public function __construct($id, $langdbrecord) {
-        parent::__construct($id, $langdbrecord);
+    public function __construct() {
+        parent::__construct(null,null);
     }
     
     
