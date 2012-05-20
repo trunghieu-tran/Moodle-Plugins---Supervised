@@ -566,37 +566,59 @@ class block_formal_langs_processed_string {
      */
     protected $descriptions=null;
     
-    
+    /**
+     *  Sets a language for a string
+     *  @param block_formal_langs_abstract_language $lang  language
+     */
     public function set_language($lang) {
         $this->language = $lang;
     }
     
-    
+    /**
+     *  Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
+     *  @param string $string inner string
+     */
     public function set_string($string)  {
         $this->string=$string;
         $this->tokenstream=null;
         $this->syntaxtree=null;
         $this->descriptions=null;
     }
-    //This setter is used by lexical analyzer
+    /**
+     * Sets a token stream. Must be used by lexical analyzer, to set a corrected stream for a string
+     * @param block_formal_langs_token_stream $stream stream of lexemes     
+     */
     public function set_corrected_stream($stream) {
         $this->tokenstream = $stream;
         $this->syntaxtree=null;
     }
-    // This setter is used by lexer
+    /**
+     * Sets a token stream. Must be used by lexer, to set a stream for scan
+     * @param block_formal_langs_token_stream $stream stream of lexemes     
+     */
     public function set_stream($stream) {
         $this->tokenstream = $stream;
         $this->syntaxtree=null;
     }
-    
+    /**
+     *  Sets a syntax tree.
+     *  @param object $tree syntax tree 
+     */
     public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
     
+    /**
+     *  Sets a descriptions for a string. 
+     *  @param array $descriptions descriptions array
+     */
     public function set_descriptions($descriptions)  {
         $this->descriptions = $descriptions;
     }
-    
+    /**
+     *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
+     *  @param array $descriptions descriptions array
+     */
     public function save_descriptions($descriptions)  {
         global $DB;
         //TODO: Connect here to DB and insert/update descriptions
@@ -639,6 +661,11 @@ class block_formal_langs_processed_string {
         }
     }
     
+    /**
+     *  Set table parameters for string. Used by language.
+     *  @param string $tablename source table name
+     *  @param string $tableid   source id
+     */
     public function set_table_params($tablename, $tableid) {
         $this->tablename=$tablename;
         $this->tableid=$tableid;
@@ -702,7 +729,7 @@ class block_formal_langs_processed_string {
     }
     
     /**
-     *  Returns a stream of tokens
+     *  Returns a stream of tokens.
      *  @return stream of tokens
      */
     public function get_stream() {
@@ -710,13 +737,19 @@ class block_formal_langs_processed_string {
             $this->language->scan($this);
         return $this->tokenstream;
     }
-
+    /**
+     *  Returns a syntax tree
+     *  @return syntax tree
+     */
     public function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse())
             $this->language->parse($this);
         return $this->syntaxtree;
     }
-    
+    /**
+     *  Returns inner string
+     *  @return inner string
+     */
     public function get_string() {
         return $this->string;
     }
