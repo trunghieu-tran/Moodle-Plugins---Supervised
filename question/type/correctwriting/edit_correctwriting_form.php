@@ -100,10 +100,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             if ($lang!=null) {
                 //Parse descriptions to populate script
                 foreach($data['answer'] as $key => $value) {
-                    $processedstring = new block_formal_langs_processed_string();
-                    $processedstring->string = $value;
-                    $lang->scan($processedstring);
-                    $tokens = $processedstring->tokenstream->tokens;
+                    $processedstring = $lang->create_from_string($value);
+                    $tokens = $processedstring->get_stream()->tokens;
                     $textdata = array();
                     foreach($tokens as $token) {
                         $textdata[] = $token->value();
@@ -179,10 +177,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         } else {
             $lang = block_formal_langs::lang_object($data['langid']);
             foreach($data['answer'] as $key => $value) {
-                $processedstring = new block_formal_langs_processed_string();
-                $processedstring->string = $value;
-                $lang->scan($processedstring);
-                $tokens = $processedstring->tokenstream->tokens;
+                $processedstring = $lang->create_from_string($value);
+                $tokens = $processedstring->get_stream()->tokens;
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
                     if (count($tokens) > count($descriptions)) {
