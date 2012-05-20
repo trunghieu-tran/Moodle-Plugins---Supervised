@@ -58,7 +58,7 @@ class block_formal_langs extends block_base {
      * @return an intialised object of the child of the block_formal_langs_abstract_language class
      */
     public static function lang_object($langid) {
-        global $DB;
+        global $DB, $CFG;
         $record = $DB->get_record('block_formal_langs', array('id' => $langid));
         $result = null;
         $arrayrecord = (array)$record;
