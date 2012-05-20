@@ -8,7 +8,6 @@
  */
 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/simple_english_language.php');
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 
 class block_formal_langs extends block_base {
