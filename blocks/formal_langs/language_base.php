@@ -125,7 +125,7 @@ abstract class block_formal_langs_abstract_language {
         $conditions[] = array();
         $conditions[] = "tablename = '{$tablename}' ";
         if (is_array($tableid)) {
-            $in = implode(',' $tableid);
+            $in = implode(',', $tableid);
             $conditions[] = " tableid IN ($in) ";
         } else {
             $conditions[] = " tableid='{$tableid}' ";
