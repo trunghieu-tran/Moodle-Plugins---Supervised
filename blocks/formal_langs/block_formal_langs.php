@@ -47,7 +47,8 @@ class block_formal_langs extends block_base {
     public static function lang_object($langid) {
         global $DB;
         $record = $DB->get_record('block_formal_langs', $langid);
-        if (((array)$record)['name'] == null) {
+        $arrayrecord = (array)$record;
+        if ($arrayrecord['name'] == null) {
             // TODO: Create user-defined language
             return null;
         } else {
