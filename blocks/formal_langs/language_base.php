@@ -122,7 +122,7 @@ abstract class block_formal_langs_abstract_language {
       */
     public static function delete_descriptions($tablename, $tableid ) {
         global $DB;
-        $conditions[] = array();
+        $conditions = array();
         $conditions[] = "tablename = '{$tablename}' ";
         if (is_array($tableid)) {
             $in = implode(',', $tableid);
@@ -130,7 +130,7 @@ abstract class block_formal_langs_abstract_language {
         } else {
             $conditions[] = " tableid='{$tableid}' ";
         }
-        return $DB->delete_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
+        return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
     }
     
     /**

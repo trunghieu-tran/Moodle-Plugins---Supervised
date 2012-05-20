@@ -625,7 +625,7 @@ class block_formal_langs_processed_string {
         $this->set_descriptions($descriptions);
 
         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
-        $oldrecords = $DB->get_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
+        $oldrecords = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
         $index = 0;
         foreach($this->descriptions as $description) {
             $record = null;
@@ -636,15 +636,15 @@ class block_formal_langs_processed_string {
             if ($record == null) {
                 $record = new stdClass();        
             }
-            $record->tablename = $processedstring->table;
-            $record->tableid = $processedstring->stringid;
+            $record->tablename = $this->tablename;
+            $record->tableid = $this->tableid;
             $record->number = $index;
             $record->description = $description;
             
             if ($mustinsert) {
-                $DB->insert_record('block_formal_langs_dscr',$record);
+                $DB->insert_record('block_formal_langs_node_dscr',$record);
             } else {
-                $DB->update_record('block_formal_langs_dscr',$record);
+                $DB->update_record('block_formal_langs_node_dscr',$record);
             }
             
             $index = $index + 1;
@@ -657,7 +657,7 @@ class block_formal_langs_processed_string {
                 $oldrecordids[] = $oldrecord->id;    
             }
             $oldrecordin = implode(',',$oldrecordids);
-            $DB->delete_records_select('block_formal_langs_dscr', " id IN ({$oldrecordin}) AND tablename = '{$processedstring->table}' ");
+            $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$processedstring->table}' ");
         }
     }
     
