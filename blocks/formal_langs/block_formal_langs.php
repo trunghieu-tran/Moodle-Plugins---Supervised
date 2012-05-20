@@ -39,7 +39,7 @@ class block_formal_langs extends block_base {
                 $counts[$record->ui_name] = 1;
             }
         }
-        
+        //Populate result array
         $result = array();
         foreach($records as $record) {
             if ($counts[$record->ui_name] > 1) {
@@ -60,18 +60,17 @@ class block_formal_langs extends block_base {
      */
     public static function lang_object($langid) {
         global $DB;
-        $record = $DB->get_record('block_formal_langs', $langid);
+        $record = $DB->get_record('block_formal_langs', array('id' => $langid));
+        $result = null;
         $arrayrecord = (array)$record;
         if ($arrayrecord['name'] == null) {
-            // TODO: Create user-defined language
-            return null;
+            $result = new block_formal_langs_userdefined_language($langid, $record->version, $record);
         } else {
-           require_once($CFG->dirroot.'/blocks/formal_langs/language_' . $record->name . '.php');
-           $langname = 'block_formal_langs_language' . $record->name;
-           return new $langname();
+            require_once($CFG->dirroot.'/blocks/formal_langs/language_' . $record->name . '.php');
+            $langname = 'block_formal_langs_language_' . $record->name;
+            $result = new $langname($langid, $record);
         }
-        //TODO: Replace it with actual code
-        return null;
+        return $result;
     }
     /**  Inserts or updates descriptions in a DB with values from processed string
       *  @param object block_formal_langs_processed_string object with stringid, table and descriptions filled
