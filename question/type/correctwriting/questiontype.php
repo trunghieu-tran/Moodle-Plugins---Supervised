@@ -75,22 +75,16 @@ class qtype_correctwriting extends qtype_shortanswer {
             return false;
         }
         
+        $lang = block_formal_langs::lang_object($question->options->langid);
         
-        $processedstring = new block_formal_langs_processed_string();
-        $processedstring->table = 'question_answers';
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
         // They also are loaded as stdClass
         foreach($question->options->answers as $id => $answer) {
-        
-            $answers = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
-            $processedstring->stringid = $id;
-            
-            block_formal_langs::get_descriptions($processedstring);
-           
+            $string = $lang->create_from_db('question_answers',$id);
             // Set field according to data
-            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $processedstring->descriptions);
+            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $string->node_descriptions_list());
         }
         return true;
     }
@@ -130,6 +124,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Save main question data
         $result = parent::save_question_options($question);
         
+        $lang = block_formal_langs::lang_object($question->langid);
+         
         
         // Answers contains an array of answer ids
         $insertedanswerids = explode(',',$question->answers);
@@ -138,8 +134,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         $currentid = 0;
         $currentdescription = 0;
         
-        $processedstring = new block_formal_langs_processed_string();
-        $processedstring->table = 'question_answers';
+        
         // Insert all the new answers
         foreach ($question->answer as $key => $answerdata) {
             // Check for, and ignore, completely blank answer from the form.
@@ -148,16 +143,9 @@ class qtype_correctwriting extends qtype_shortanswer {
                 $currentdescription = $currentdescription + 1;
                 continue;
             }
-            
-            // Extract current lexeme descriptions
             $description = $descriptions[$currentdescription];
-            $processedstring->stringid = $insertedanswerids[$currentid];
-            
-            //Token array description data
-            $processedstring->descriptions = explode(PHP_EOL, $description);
-            
-            //Insert or update a records
-            block_formal_langs::update_descriptions($processedstring);
+            $string = $lang->create_from_db('question_answers',$insertedanswerids[$currentid]);
+            $string->save_descriptions(explode(PHP_EOL, $description));
             
             $currentid = $currentid + 1;
             $currentdescription = $currentdescription + 1;
@@ -173,14 +161,9 @@ class qtype_correctwriting extends qtype_shortanswer {
      */
     public function delete_question($questionid, $contextid) {
         global $DB;
-        $answers = $DB->get_fieldset_select('question_answers', 'id', " question = '$questionid' ");
-        $processedstring = new block_formal_langs_processed_string();
-        $processedstring->table = 'question_answers';
-        foreach ($answerids as $id) {
-            $processedstring->stringid = $id;
-            block_formal_langs::delete_descriptions($processedstring);
-        }
-        
+        $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '$questionid' ");
+        block_formal_langs_abstract_language::delete_descriptions("question_answers",$answerids);
+
         parent::delete_question($questionid, $contextid);
     }
 }
