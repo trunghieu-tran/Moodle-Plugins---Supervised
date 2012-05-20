@@ -98,7 +98,7 @@ abstract class block_formal_langs_abstract_language {
       *  @param string $id    id of source table
       *  @param string $string string data
       */
-    public function create_from_db($tablename, $tableid, $string) {
+    public function create_from_db($tablename, $tableid, $string = null) {
         $result = new block_formal_langs_processed_string();
         $result->set_table_params($tablename,$tableid);
         $result->set_string($string);
