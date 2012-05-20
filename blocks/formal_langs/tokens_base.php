@@ -629,10 +629,11 @@ class block_formal_langs_processed_string {
         $index = 0;
         foreach($this->descriptions as $description) {
             $record = null;
+            $mustinsert  = ($oldrecords == null);
             if ($oldrecords != null) {
                 $record = array_shift($oldrecords);
             }
-            $mustinsert  = ($oldrecords == null);
+            
             if ($record == null) {
                 $record = new stdClass();        
             }
