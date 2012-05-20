@@ -706,7 +706,7 @@ class block_formal_langs_processed_string {
      * @return string - description of node
      */
     public function node_description($nodenumber) {
-       $this->node_descriptions_list()
+       $this->node_descriptions_list();
         return $this->descriptions[$nodenumber];
     }
 
