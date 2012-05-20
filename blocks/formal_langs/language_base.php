@@ -120,7 +120,7 @@ abstract class block_formal_langs_abstract_language {
       * @param string $tableid    id in table
       * @param string $tablename  name of source table
       */
-    public static function delete_descriptions($tableid,$tablename) {
+    public static function delete_descriptions($tableid, $tablename) {
         global $DB;
         $conditions = array(" tableid='{$tableid}' ", "tablename = '{$tablename}' ");
         return $DB->delete_records_select('block_formal_langs_dscr', implode(' AND ', $conditions));
