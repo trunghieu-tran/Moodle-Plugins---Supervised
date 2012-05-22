@@ -15,6 +15,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
@@ -52,7 +53,7 @@ class qtype_preg_regex_handler {
         $this->errors = array();
         $this->maxsubpatt = 0;
         $this->subpatternmap = array();
-		$this->lexemcount = 0;
+        $this->lexemcount = 0;
         if ($regex === null) {
             return;
         }
@@ -60,9 +61,10 @@ class qtype_preg_regex_handler {
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
             $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i=0; $i < strlen($modifiers); $i++) {
-                if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $modifiers[$i]);
+            for ($i = 0; $i < qtype_preg_strlen($modifiers); $i++) {
+                $mod = qtype_preg_substr($modifiers, $i, 1);
+                if (qtype_preg_strpos($supportedmodifiers, $mod) === false) {
+                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod);
                 }
             }
         }
@@ -179,7 +181,7 @@ class qtype_preg_regex_handler {
 
         $this->maxsubpatt = $lexer->get_max_subpattern();
         $this->subpatternmap = $lexer->get_subpattern_map();
-		$this->lexemcount = $lexer->get_lexem_count();
+        $this->lexemcount = $lexer->get_lexem_count();
         $lexerrors = $lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
