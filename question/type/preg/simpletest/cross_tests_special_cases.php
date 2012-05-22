@@ -75,13 +75,13 @@ class qtype_preg_cross_tests_special_cases {
     function data_for_test_unicode() {
         $test1 = array( 'str'=>'абв',
                         'is_match'=>true,
-                        'full'=>true,
+                        'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'left'=>array(1),
+                        'next'=>'é');
 
-        return array('regex'=>'абв',
+        return array('regex'=>'абвé',
                      'tests'=>array($test1));
     }
 }
