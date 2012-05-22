@@ -239,8 +239,7 @@ class preg_leaf_charset extends preg_leaf {
 
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        $textlib = textlib_get_instance();//use textlib to avoid unicode problems
-        if ($pos>=$textlib->strlen($str)) {
+        if ($pos >= qtype_preg_strlen($str)) {
             $length = 0;
             return false;
         }
@@ -248,11 +247,11 @@ class preg_leaf_charset extends preg_leaf {
         $strcopy = $str;
 
         if (!$cs) {
-            $charsetcopy = $textlib->strtolower($charsetcopy);
-            $strcopy = $textlib->strtolower($strcopy);
+            $charsetcopy = qtype_preg_strtolower($charsetcopy);
+            $strcopy = qtype_preg_strtolower($strcopy);
         }
 
-        $result = ($textlib->strpos($charsetcopy, $strcopy[$pos]) !== false);
+        $result = (qtype_preg_strpos($charsetcopy, qtype_preg_substr($strcopy, $pos, 1)) !== false);
 
         if ($this->negative) {
             $result = ! $result;
@@ -267,14 +266,14 @@ class preg_leaf_charset extends preg_leaf {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         if ($this->negative) {
-            $i = ord(' ');
-            while (strchr(chr($i), $this->charset) !== false) {
+            $i = qtype_preg_ord(' ');
+            while (qtype_preg_strpos($this->charset, qtype_preg_chr($i)) !== false) {
                 $i++;
             }
-            $res = chr($i);
+            $res = qtype_preg_chr($i);
             return $res;
         } else {
-            return $this->charset[0];
+            return qtype_preg_substr($this->charset, 0, 1);
         }
     }
 
@@ -340,19 +339,19 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
+
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
             $length = 0;
             return true;
         }
-        $textlib = textlib_get_instance();
-        if ($pos>=$textlib->strlen($str)) {
+        if ($pos >= qtype_preg_strlen($str)) {
             $length = 0;
             return false;
         }
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
-                if ($pos < $textlib->strlen($str) && $str[$pos] != "\n") {
+                if ($pos < qtype_preg_strlen($str) && qtype_preg_substr($str, $pos, 1) != "\n") {
                     $length = 1;
                     return true;
                 } else {
@@ -362,7 +361,7 @@ class preg_leaf_meta extends preg_leaf {
                 break;
             //TODO: unicode property
             case preg_leaf_meta::SUBTYPE_WORD_CHAR:
-                if (ctype_alnum($str[$pos]) || $str[$pos] === '_') {
+                if (ctype_alnum(qtype_preg_substr($str, $pos, 1)) || qtype_preg_substr($str, $pos, 1) === '_') {
                     $result =  true;
                 } else {
                     $result =  false;
@@ -383,6 +382,7 @@ class preg_leaf_meta extends preg_leaf {
         }
         return $result;
     }
+
     public function tohr() {
         if ($this->negative) {
             $direction = '!';
@@ -444,7 +444,6 @@ class preg_leaf_assert extends preg_leaf {
 
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        $textlib = textlib_get_instance();
         $length = 0;
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
@@ -458,22 +457,22 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($pos == $textlib->strlen($str)) {
+                if ($pos == qtype_preg_strlen($str)) {
                     $result = true;
                 } else {
                     $result = false;
                 }
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
-                $start = $pos==0 && ($str[0]=='_' || ctype_alnum($str[0]));
-                $end = $pos == $textlib->strlen($str) && ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1]));
-                if ($pos>0 && $pos < $textlib->strlen($str)) {
-                    $wW = ($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && !($str[$pos]=='_' || ctype_alnum($str[$pos]));
-                    $Ww = !($str[$pos-1]=='_' || ctype_alnum($str[$pos-1])) && ($str[$pos]=='_' || ctype_alnum($str[$pos]));
+                $start = $pos == 0 && (qtype_preg_substr($str, 0, 1) == '_' || ctype_alnum(qtype_preg_substr($str, 0, 1)));
+                $end = $pos == qtype_preg_strlen($str) && (qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1)));
+                if ($pos > 0 && $pos < qtype_preg_strlen($str)) {
+                    $wW = (qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1))) && !(qtype_preg_substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos, 1)));
+                    $Ww = !(qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1))) && (qtype_preg_substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos, 1)));
                 } else {
                     $wW = $Ww = false;
                 }
-                if ($start||$end||$wW||$Ww) {
+                if ($start || $end || $wW || $Ww) {
                     $result = true;
                 } else {
                     $result = false;
@@ -661,9 +660,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function cross_charsets($charset0, $charset1) {
         $result = '';
-        $textlib = textlib_get_instance();
-        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
-            if ($textlib->strpos($charset1, $charset0[$i])!==false) {
+        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
+            if (qtype_preg_strpos($charset1, $charset0[$i])!==false) {
                 $result.=$charset0[$i];
             }
         }
@@ -671,9 +669,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function sub_charsets($charset0, $charset1) {
         $result = '';
-        $textlib = textlib_get_instance();
-        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
-            if ($textlib->strpos($charset1, $charset0[$i])===false) {
+        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
+            if (qtype_preg_strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -681,9 +678,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function unite_charsets($charset0, $charset1) {
         $result = $charset1;
-        $textlib = textlib_get_instance();
-        for ($i=0; $i < $textlib->strlen($charset0); $i++) {
-            if ($textlib->strpos($charset1, $charset0[$i])===false) {
+        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
+            if (qtype_preg_strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -712,8 +708,7 @@ class preg_leaf_backref extends preg_leaf {
             $length = 0;
             return false;
         }
-        $textlib = textlib_get_instance();
-        $len = $textlib->strlen($str);
+        $len = qtype_preg_strlen($str);
         $subpattlen = $matcherstateobj->length($this->number);
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $subpattlen - 1;
@@ -727,13 +722,13 @@ class preg_leaf_backref extends preg_leaf {
 
         $strcopy = $str;
         if (!$cs) {
-            $strcopy = $textlib->strtolower($strcopy);
+            $strcopy = qtype_preg_strtolower($strcopy);
         }
         $matchlen = 0;
         $result = true;
         // check char by char
         for ($i = $start; $result && $i <= $end && $matchlen + $pos < $len; $i++) {
-            $result = $result && ($strcopy[$i] === $strcopy[$pos + $matchlen]);
+            $result = $result && (qtype_preg_substr($strcopy, $i, 1) === qtype_preg_substr($strcopy, $pos + $matchlen, 1));
             if ($result) {
                 $matchlen++;
             }
@@ -757,14 +752,11 @@ class preg_leaf_backref extends preg_leaf {
         }
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $matcherstateobj->length($this->number);
-        $textlib = textlib_get_instance();
-        if ($end > $textlib->strlen($str)) {
+        if ($end > qtype_preg_strlen($str)) {
             return '';
         }
         $res = '';
-        for ($i = $start + $length; $i < $end; $i++) {
-            $res .= $str[$i];
-        }
+        $res .= qtype_preg_substr($str, $start + $length, $end - $start - $length);
         return $res;
     }
 
