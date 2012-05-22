@@ -8,12 +8,12 @@ class qtype_preg_error {
     public $index_first;
     //
     public $index_last;
-    
+
     protected function highlight_regex($regex, $indfirst, $indlast) {
-        return substr($regex, 0, $indfirst) . '<b>' . substr($regex, $indfirst, $indlast-$indfirst+1) . '</b>' . substr($regex, $indlast + 1);
+        return qtype_preg_substr($regex, 0, $indfirst) . '<b>' . qtype_preg_substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_preg_substr($regex, $indlast + 1);
     }
 
-     public function __construct($errormsg, $regex='', $index_first=-2, $index_last=-2) {
+     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2) {
         $this->index_first = $index_first;
         $this->index_last = $index_last;
         if ($index_first != -2) {
@@ -42,9 +42,8 @@ class qtype_preg_accepting_error extends qtype_preg_error {
      * Returns a string with first character converted to upper case.
      */
     public function uppercase_first_letter($str) {
-        $textlib = textlib_get_instance();
-        $firstchar = $textlib->strtoupper($textlib->substr($str, 0, 1));
-        $rest = $textlib->substr($str, 1, $textlib->strlen($str));
+        $firstchar = qtype_preg_strtoupper(qtype_preg_substr($str, 0, 1));
+        $rest = qtype_preg_substr($str, 1, qtype_preg_strlen($str));
         return $firstchar.$rest;
     }
 
@@ -56,7 +55,7 @@ class qtype_preg_accepting_error extends qtype_preg_error {
         $a->engine = get_string($matchername, 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported','qtype_preg',$a);
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported', 'qtype_preg', $a);
     }
 
 }
@@ -68,7 +67,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
         $a = new stdClass;
         $a->modifier = $modifier;
         $a->classname = $matchername;
-        $this->errormsg = get_string('unsupportedmodifier','qtype_preg',$a);
+        $this->errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
     }
 
 }
@@ -79,9 +78,8 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
     public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
         $a = new stdClass;
         if ($indexes['start'] == -1 && $indexes['end'] == -2) {
-            $textlib = textlib_get_instance();
             $a->indfirst = 0;
-            $a->indlast = $textlib->strlen($regex) - 1;
+            $a->indlast = qtype_preg_strlen($regex) - 1;
         } else {
             $a->indfirst = $indexes['start'];
             $a->indlast = $indexes['end'];
@@ -89,7 +87,7 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('toolargefa','qtype_preg',$a);
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('toolargefa', 'qtype_preg', $a);
     }
 
 }
