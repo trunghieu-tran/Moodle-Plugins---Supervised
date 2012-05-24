@@ -81,7 +81,21 @@ abstract class block_formal_langs_abstract_language {
     public function scan($processedstring) {
         $this->scaner->tokenize($processedstring);
     }
-    
+
+    /**
+     * Fills syntax tree field of the processed string objects.
+     *
+     * Add errors for answer parsing
+     * @param $processedstring - block_formal_langs_processed_string object with string filled
+     * @param $iscorrect boolean true if we need to reduce to start symbol (correct text parsing), false if not (compared text parts parsing)
+     */
+    public function parse($processedstring, $iscorrect) {
+        //TODO - think about how should be done compared string parsing and what additional info is needed
+        //TODO check if string isn't scanned and scan if necessary
+        $this->parser->parse($processedstring, $iscorrect);
+    }
+
+
     /**
      *  Creates a processed string from string
      *  @param string $string string
@@ -92,6 +106,7 @@ abstract class block_formal_langs_abstract_language {
         $result->set_language($this);
         return $result;
      }
+
      /**
       *  Creates a processed string from table and id in BD (string optional)
       *  @param string $table table name
@@ -105,7 +120,7 @@ abstract class block_formal_langs_abstract_language {
         $result->set_language($this);
         return $result;
     }
-    
+
     /**
      *  Removes a descriptions  by tablename and tableid
      *  @param string $tablename name of table
@@ -114,8 +129,7 @@ abstract class block_formal_langs_abstract_language {
     public static function get_descriptions($tablename, $tableid) {
        //TODO: Connect to DB here
     }
-    
-    
+
     /** Removes a descriptions from a DB
       * @param string $tablename  name of source table
       * @param mixed $tableid    id or ids in table      
@@ -132,20 +146,6 @@ abstract class block_formal_langs_abstract_language {
         }
         return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
     }
-    
-    /**
-     * Fills syntax tree field of the processed string objects.
-     *
-     * Add errors for answer parsing
-     * @param $processedstring - block_formal_langs_processed_string object with string filled
-     * @param $iscorrect boolean true if we need to reduce to start symbol (correct text parsing), false if not (compared text parts parsing)
-     */
-    public function parse($processedstring, $iscorrect) {
-        //TODO - think about how should be done compared string parsing and what additional info is needed
-        //TODO check if string isn't scanned and scan if necessary
-        $this->parser->parse($processedstring, $iscorrect);
-    }
-
 }
 
 /**
