@@ -570,7 +570,7 @@ class block_formal_langs_processed_string {
      *  Sets a language for a string
      *  @param block_formal_langs_abstract_language $lang  language
      */
-    public function set_language($lang) {
+    public function __construct($lang) {
         $this->language = $lang;
     }
     
