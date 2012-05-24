@@ -61,9 +61,9 @@ class qtype_preg_regex_handler {
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
             $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i = 0; $i < qtype_preg_strlen($modifiers); $i++) {
-                $mod = qtype_preg_substr($modifiers, $i, 1);
-                if (qtype_preg_strpos($supportedmodifiers, $mod) === false) {
+            for ($i = 0; $i < qtype_preg_unicode::strlen($modifiers); $i++) {
+                $mod = qtype_preg_unicode::substr($modifiers, $i, 1);
+                if (qtype_preg_unicode::strpos($supportedmodifiers, $mod) === false) {
                     $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod);
                 }
             }

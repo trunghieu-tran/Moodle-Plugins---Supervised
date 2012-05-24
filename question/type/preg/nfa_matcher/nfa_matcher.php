@@ -400,7 +400,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info(qtype_preg_substr($newresult->str(), 0, $startpos + $newresult->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+                        $newresult->set_source_info(qtype_preg_unicode::substr($newresult->str(), 0, $startpos + $newresult->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
                             $newresult->left = $path->length[0] - $newresult->length[0];
