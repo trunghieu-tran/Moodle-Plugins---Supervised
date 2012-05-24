@@ -275,7 +275,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return base_token
      */
     public function __construct($number, $type, $value, $position, $index) {
-        $this->if = $number;
+        $this->number = $number;
         $this->type = $type;
         $this->value = $value;
         $this->position = $position;
@@ -589,6 +589,7 @@ class block_formal_langs_processed_string {
      * @param block_formal_langs_token_stream $stream stream of lexemes     
      */
     public function set_corrected_stream($stream) {
+        //TODO - define, how it should differs from set_stream
         $this->tokenstream = $stream;
         $this->syntaxtree=null;
     }
