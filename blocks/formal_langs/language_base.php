@@ -146,27 +146,6 @@ abstract class block_formal_langs_abstract_language {
         $this->parser->parse($processedstring, $iscorrect);
     }
 
-    /**
-     * Returns object of language created by id from lang_table.
-     *
-     * @param $id language id in lang_table
-     * @param $version language version in lang_table
-     * @return object of custom or predefined language class
-     */
-    public static function factory($id, $version=1) {
-        //TODO: get via DB $techname, $ispredefined.
-        //TODO - implement version support
-
-        if ($this->ispredefined) {
-            require_once('langs_code/predefined/' . $this->name() . '.php');
-            $classname = 'qtype_correctwriting_predefined_' . $this->name() . '_language';
-            return new $classname($id);
-        } else {
-            $classname = 'qtype_correctwriting_userdefined_language';
-            return new $classname($id, $version);
-        }
-    }
-
 }
 
 /**
