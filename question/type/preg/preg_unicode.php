@@ -1,10 +1,8 @@
 <?php
 
-    /*
-    global $RANGES;
+class qtype_preg_unicode extends textlib {
 
-    $RANGES = array(
-
+    var $RANGES = array(
     'Basic Latin'                               => array(0x0000, 0x007F),
     'C1 Controls and Latin-1 Supplement'        => array(0x0080, 0x00FF),
     'Latin Extended-A'                          => array(0x0100, 0x017F),
@@ -156,9 +154,7 @@
     'Supplementary Private Use Area-B'          => array(0x100000, 0x10FFFD)
     );
 
-    */
-
-    function qtype_preg_ord($utf8chr)
+    public static function ord($utf8chr)
     {
         $ord0 = ord($utf8chr{0});
         if ($ord0 >= 0 && $ord0 <= 127) {
@@ -183,43 +179,15 @@
         return false;
     }
 
-    function qtype_preg_chr($num) {
-        return textlib::code2utf8($num);
-    }
-
-    function qtype_preg_strlen($text) {
-        return textlib::strlen($text);
-    }
-
-    function qtype_preg_strtolower($text) {
-        return textlib::strtolower($text);
-    }
-
-    function qtype_preg_strtoupper($text) {
-        return textlib::strtoupper($text);
-    }
-
-    function qtype_preg_strpos($haystack, $needle, $offset = 0) {
-        return textlib::strpos($haystack, $needle, $offset);
-    }
-
-    function qtype_preg_substr($text, $start, $len = null) {
-        return textlib::substr($text, $start, $len);
-    }
-
-    /*function qtype_preg_ctype_alnum($str)
+    /*public static function ctype_alnum($str)
     {
-        global $RANGES;
-        $textlib = textlib_get_instance();
-        $ord = uniord($str);
-        echo $ord.'<br/>';
-        foreach ($RANGES as $name => $range) {
+        $ord = self::ord($str);
+        foreach ($this->RANGES as $name => $range) {
             if ($ord >= $range[0] && $ord <= $range[1]) {
                 echo $name;
             }
         }
-        //print_r($str);
-        //echo 'done<br/>';
     }*/
+}
 
 ?>
