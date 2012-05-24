@@ -269,8 +269,8 @@ class qtype_preg_matching_results {
             $str2 = $this->extendedmatch->str;
             for ($i = 0; $i <= $this->length[0]; $i++) {
                 //One of the string ended or characters are different
-                if ($this->extendedmatch->index_first[0] + $i >= qtype_preg_strlen($str2) || $this->index_first[0] + $i >= qtype_preg_strlen($str1)
-                    || qtype_preg_substr($str1, $this->index_first[0] + $i, 1) != qtype_preg_substr($str2, $this->extendedmatch->index_first[0] + $i, 1)) {
+                if ($this->extendedmatch->index_first[0] + $i >= qtype_preg_unicode::strlen($str2) || $this->index_first[0] + $i >= qtype_preg_unicode::strlen($str1)
+                    || qtype_preg_unicode::substr($str1, $this->index_first[0] + $i, 1) != qtype_preg_unicode::substr($str2, $this->extendedmatch->index_first[0] + $i, 1)) {
                     $this->extensionstart = $this->index_first[0] + $i;
                     $this->extendedmatch->extensionstart = $this->extendedmatch->index_first[0] + $i;
                     break;
@@ -293,7 +293,7 @@ class qtype_preg_matching_results {
         $wronghead = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
-                $wronghead = qtype_preg_substr($this->str, 0, $this->index_first[$subpattern]);
+                $wronghead = qtype_preg_unicode::substr($this->str, 0, $this->index_first[$subpattern]);
             }
         } else {//No match, assuming all string is wrong heading (to display hint after it)
             $wronghead = $this->str;
@@ -309,7 +309,7 @@ class qtype_preg_matching_results {
         $correctpart = '';
         if ($this->is_match()) {//There is match
             if ( isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $correctpart = qtype_preg_substr($this->str, $this->index_first[$subpattern], $this->length[$subpattern]);
+                $correctpart = qtype_preg_unicode::substr($this->str, $this->index_first[$subpattern], $this->length[$subpattern]);
             }
         }
         return $correctpart;
@@ -322,8 +322,8 @@ class qtype_preg_matching_results {
         $subpattern = $this->subpattern_number($subpattern);
         $wrongtail = '';
         if ($this->is_match()) {//There is match
-            if ($this->index_first[$subpattern] + $this->length[$subpattern] < qtype_preg_strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail =  qtype_preg_substr($this->str, $this->index_first[$subpattern] + $this->length[$subpattern], qtype_preg_strlen($this->str) - $this->index_first[$subpattern] - $this->length[$subpattern]);
+            if ($this->index_first[$subpattern] + $this->length[$subpattern] < qtype_preg_unicode::strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail =  qtype_preg_unicode::substr($this->str, $this->index_first[$subpattern] + $this->length[$subpattern], qtype_preg_unicode::strlen($this->str) - $this->index_first[$subpattern] - $this->length[$subpattern]);
             }
         }
         return $wrongtail;
@@ -335,7 +335,7 @@ class qtype_preg_matching_results {
     public function correct_before_hint() {
         $correctbeforehint = '';
         if ($this->is_match()) {//There is match
-            $correctbeforehint = qtype_preg_substr($this->str, $this->index_first[0], $this->extensionstart - $this->index_first[0]);
+            $correctbeforehint = qtype_preg_unicode::substr($this->str, $this->index_first[0], $this->extensionstart - $this->index_first[0]);
         }
         return $correctbeforehint;
     }
@@ -346,8 +346,8 @@ class qtype_preg_matching_results {
     public function tail_to_delete() {
         $wrongtail = '';
         if ($this->is_match()) {//There is match
-            if ($this->extensionstart < qtype_preg_strlen($this->str) && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail = qtype_preg_substr($this->str, $this->extensionstart, qtype_preg_strlen($this->str) - $this->extensionstart);
+            if ($this->extensionstart < qtype_preg_unicode::strlen($this->str) && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail = qtype_preg_unicode::substr($this->str, $this->extensionstart, qtype_preg_unicode::strlen($this->str) - $this->extensionstart);
             }
         }
         return $wrongtail;
@@ -360,8 +360,8 @@ class qtype_preg_matching_results {
         $extension = '';
         if ($this->extendedmatch !== null) {
             $extendedstr = $this->extendedmatch->str();
-            if ($this->extendedmatch->extensionstart < qtype_preg_strlen($extendedstr)) {
-                $extension = qtype_preg_substr($extendedstr, $this->extendedmatch->extensionstart, qtype_preg_strlen($extendedstr) - $this->extendedmatch->extensionstart);
+            if ($this->extendedmatch->extensionstart < qtype_preg_unicode::strlen($extendedstr)) {
+                $extension = qtype_preg_unicode::substr($extendedstr, $this->extendedmatch->extensionstart, qtype_preg_unicode::strlen($extendedstr) - $this->extendedmatch->extensionstart);
             }
         }
         return $extension;
@@ -495,7 +495,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Results for other offsets would be same.
             $rightborder = 1;
         } else {
-            $len = qtype_preg_strlen($str);
+            $len = qtype_preg_unicode::strlen($str);
             // Match from all indexes
             $rightborder = $len;
             //Try matching an empty string at least once

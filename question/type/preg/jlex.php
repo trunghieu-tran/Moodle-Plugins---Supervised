@@ -87,23 +87,23 @@ class JLexBase {
     if ($this->yy_buffer_start != 0) {
       /* shunt */
       $j = $this->yy_buffer_read - $this->yy_buffer_start;
-      $this->yy_buffer = qtype_preg_substr($this->yy_buffer, $this->yy_buffer_start, $j);
+      $this->yy_buffer = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_start, $j);
       $this->yy_buffer_end -= $this->yy_buffer_start;
       $this->yy_buffer_start = 0;
       $this->yy_buffer_read = $j;
       $this->yy_buffer_index = $j;
 
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !qtype_preg_strlen($data)) return $this->YY_EOF;
+      if ($data === false || !qtype_preg_unicode::strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= qtype_preg_strlen($data);
+      $this->yy_buffer_read .= qtype_preg_unicode::strlen($data);
     }
 
     while ($this->yy_buffer_index >= $this->yy_buffer_read) {
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !qtype_preg_strlen($data)) return $this->YY_EOF;
+      if ($data === false || !qtype_preg_unicode::strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= qtype_preg_strlen($data);
+      $this->yy_buffer_read .= qtype_preg_unicode::strlen($data);
     }
     return ord($this->yy_buffer[$this->yy_buffer_index++]);
   }
@@ -157,7 +157,7 @@ class JLexBase {
   }
 
   protected function yytext() {
-    return qtype_preg_substr($this->yy_buffer, $this->yy_buffer_start,
+    return qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_start,
           $this->yy_buffer_end - $this->yy_buffer_start);
   }
 

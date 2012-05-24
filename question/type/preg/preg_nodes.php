@@ -239,7 +239,7 @@ class preg_leaf_charset extends preg_leaf {
 
     //TODO - ui_nodename()
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        if ($pos >= qtype_preg_strlen($str)) {
+        if ($pos >= qtype_preg_unicode::strlen($str)) {
             $length = 0;
             return false;
         }
@@ -247,11 +247,11 @@ class preg_leaf_charset extends preg_leaf {
         $strcopy = $str;
 
         if (!$cs) {
-            $charsetcopy = qtype_preg_strtolower($charsetcopy);
-            $strcopy = qtype_preg_strtolower($strcopy);
+            $charsetcopy = qtype_preg_unicode::strtolower($charsetcopy);
+            $strcopy = qtype_preg_unicode::strtolower($strcopy);
         }
 
-        $result = (qtype_preg_strpos($charsetcopy, qtype_preg_substr($strcopy, $pos, 1)) !== false);
+        $result = (qtype_preg_unicode::strpos($charsetcopy, qtype_preg_unicode::substr($strcopy, $pos, 1)) !== false);
 
         if ($this->negative) {
             $result = ! $result;
@@ -266,14 +266,14 @@ class preg_leaf_charset extends preg_leaf {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         if ($this->negative) {
-            $i = qtype_preg_ord(' ');
-            while (qtype_preg_strpos($this->charset, qtype_preg_chr($i)) !== false) {
+            $i = qtype_preg_unicode::ord(' ');
+            while (qtype_preg_unicode::strpos($this->charset, qtype_preg_unicode::code2utf8($i)) !== false) {
                 $i++;
             }
-            $res = qtype_preg_chr($i);
+            $res = qtype_preg_unicode::code2utf8($i);
             return $res;
         } else {
-            return qtype_preg_substr($this->charset, 0, 1);
+            return qtype_preg_unicode::substr($this->charset, 0, 1);
         }
     }
 
@@ -345,13 +345,13 @@ class preg_leaf_meta extends preg_leaf {
             $length = 0;
             return true;
         }
-        if ($pos >= qtype_preg_strlen($str)) {
+        if ($pos >= qtype_preg_unicode::strlen($str)) {
             $length = 0;
             return false;
         }
         switch ($this->subtype) {
             case preg_leaf_meta::SUBTYPE_DOT:
-                if ($pos < qtype_preg_strlen($str) && qtype_preg_substr($str, $pos, 1) != "\n") {
+                if ($pos < qtype_preg_unicode::strlen($str) && qtype_preg_unicode::substr($str, $pos, 1) != "\n") {
                     $length = 1;
                     return true;
                 } else {
@@ -361,7 +361,7 @@ class preg_leaf_meta extends preg_leaf {
                 break;
             //TODO: unicode property
             case preg_leaf_meta::SUBTYPE_WORD_CHAR:
-                if (ctype_alnum(qtype_preg_substr($str, $pos, 1)) || qtype_preg_substr($str, $pos, 1) === '_') {
+                if (ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)) || qtype_preg_unicode::substr($str, $pos, 1) === '_') {
                     $result =  true;
                 } else {
                     $result =  false;
@@ -457,18 +457,18 @@ class preg_leaf_assert extends preg_leaf {
                 break;
             case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($pos == qtype_preg_strlen($str)) {
+                if ($pos == qtype_preg_unicode::strlen($str)) {
                     $result = true;
                 } else {
                     $result = false;
                 }
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
-                $start = $pos == 0 && (qtype_preg_substr($str, 0, 1) == '_' || ctype_alnum(qtype_preg_substr($str, 0, 1)));
-                $end = $pos == qtype_preg_strlen($str) && (qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1)));
-                if ($pos > 0 && $pos < qtype_preg_strlen($str)) {
-                    $wW = (qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1))) && !(qtype_preg_substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos, 1)));
-                    $Ww = !(qtype_preg_substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos - 1, 1))) && (qtype_preg_substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_substr($str, $pos, 1)));
+                $start = $pos == 0 && (qtype_preg_unicode::substr($str, 0, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, 0, 1)));
+                $end = $pos == qtype_preg_unicode::strlen($str) && (qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1)));
+                if ($pos > 0 && $pos < qtype_preg_unicode::strlen($str)) {
+                    $wW = (qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1))) && !(qtype_preg_unicode::substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)));
+                    $Ww = !(qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1))) && (qtype_preg_unicode::substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)));
                 } else {
                     $wW = $Ww = false;
                 }
@@ -660,8 +660,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function cross_charsets($charset0, $charset1) {
         $result = '';
-        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
-            if (qtype_preg_strpos($charset1, $charset0[$i])!==false) {
+        for ($i=0; $i < qtype_preg_unicode::strlen($charset0); $i++) {
+            if (qtype_preg_unicode::strpos($charset1, $charset0[$i])!==false) {
                 $result.=$charset0[$i];
             }
         }
@@ -669,8 +669,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function sub_charsets($charset0, $charset1) {
         $result = '';
-        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
-            if (qtype_preg_strpos($charset1, $charset0[$i])===false) {
+        for ($i=0; $i < qtype_preg_unicode::strlen($charset0); $i++) {
+            if (qtype_preg_unicode::strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -678,8 +678,8 @@ class preg_leaf_combo extends preg_leaf {
     }
     static public function unite_charsets($charset0, $charset1) {
         $result = $charset1;
-        for ($i=0; $i < qtype_preg_strlen($charset0); $i++) {
-            if (qtype_preg_strpos($charset1, $charset0[$i])===false) {
+        for ($i=0; $i < qtype_preg_unicode::strlen($charset0); $i++) {
+            if (qtype_preg_unicode::strpos($charset1, $charset0[$i])===false) {
                 $result.=$charset0[$i];
             }
         }
@@ -708,7 +708,7 @@ class preg_leaf_backref extends preg_leaf {
             $length = 0;
             return false;
         }
-        $len = qtype_preg_strlen($str);
+        $len = qtype_preg_unicode::strlen($str);
         $subpattlen = $matcherstateobj->length($this->number);
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $subpattlen - 1;
@@ -722,13 +722,13 @@ class preg_leaf_backref extends preg_leaf {
 
         $strcopy = $str;
         if (!$cs) {
-            $strcopy = qtype_preg_strtolower($strcopy);
+            $strcopy = qtype_preg_unicode::strtolower($strcopy);
         }
         $matchlen = 0;
         $result = true;
         // check char by char
         for ($i = $start; $result && $i <= $end && $matchlen + $pos < $len; $i++) {
-            $result = $result && (qtype_preg_substr($strcopy, $i, 1) === qtype_preg_substr($strcopy, $pos + $matchlen, 1));
+            $result = $result && (qtype_preg_unicode::substr($strcopy, $i, 1) === qtype_preg_unicode::substr($strcopy, $pos + $matchlen, 1));
             if ($result) {
                 $matchlen++;
             }
@@ -752,11 +752,11 @@ class preg_leaf_backref extends preg_leaf {
         }
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $matcherstateobj->length($this->number);
-        if ($end > qtype_preg_strlen($str)) {
+        if ($end > qtype_preg_unicode::strlen($str)) {
             return '';
         }
         $res = '';
-        $res .= qtype_preg_substr($str, $start + $length, $end - $start - $length);
+        $res .= qtype_preg_unicode::substr($str, $start + $length, $end - $start - $length);
         return $res;
     }
 
