@@ -438,6 +438,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             return;
         }
 
+        //TODO - set $this->options->capturesubpatterns true if there is at least one backreference in the regex
+
         //Invalidate match called later to allow parser to count subpatterns
         $this->matchresults->set_source_info('', $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
         $this->matchresults->invalidate_match();
