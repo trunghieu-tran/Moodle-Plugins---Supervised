@@ -82,7 +82,8 @@ class JLexBase {
 
   protected function yy_advance() {
     if ($this->yy_buffer_index < $this->yy_buffer_read) {
-      return ord($this->yy_buffer[$this->yy_buffer_index++]);
+      $char = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+      return qtype_preg_unicode::ord($char);
     }
     if ($this->yy_buffer_start != 0) {
       /* shunt */
@@ -105,7 +106,8 @@ class JLexBase {
       $this->yy_buffer .= $data;
       $this->yy_buffer_read .= qtype_preg_unicode::strlen($data);
     }
-    return ord($this->yy_buffer[$this->yy_buffer_index++]);
+    $char = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+    return qtype_preg_unicode::ord($char);
   }
 
   protected function yy_move_end() {
