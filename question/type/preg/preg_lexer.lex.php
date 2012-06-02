@@ -21,6 +21,7 @@ class qtype_preg_lexer extends JLexBase  {
     protected $maxsubpatt;
     protected $subpatternmap;
     protected $lexemcount;
+    protected $backrefsexist;
     protected $optstack;
     protected $optcount;
     // A reference to the matcher object to be passed to some nodes.
@@ -41,6 +42,9 @@ class qtype_preg_lexer extends JLexBase  {
     }
     public function get_lexem_count() {
         return $this->lexemcount;
+    }
+    public function backrefs_exist() {
+        return $this->backrefsexist;
     }
     protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
         $result = new $name;
@@ -159,6 +163,7 @@ class qtype_preg_lexer extends JLexBase  {
     $this->maxsubpatt = 0;
     $this->subpatternmap = array();
     $this->lexemcount = 0;
+    $this->backrefsexist = false;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
     // Set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis.
@@ -4211,6 +4216,7 @@ array(
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
+        $this->backrefsexist = true;
     } else {
         // Return a character.
         $octal = '';
@@ -4380,6 +4386,7 @@ array(
                             {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -38:
@@ -4574,6 +4581,7 @@ array(
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numdec));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -58:
@@ -4584,6 +4592,7 @@ array(
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -59:
@@ -4594,6 +4603,7 @@ array(
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -60:
@@ -4604,6 +4614,7 @@ array(
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -61:
@@ -4614,6 +4625,7 @@ array(
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -62:
@@ -4685,6 +4697,7 @@ array(
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -69:
@@ -4833,6 +4846,7 @@ array(
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
+        $this->backrefsexist = true;
     } else {
         // Return a character.
         $octal = '';
@@ -4882,6 +4896,7 @@ array(
                             {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
                         case -90:
@@ -4927,6 +4942,7 @@ array(
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
+        $this->backrefsexist = true;
     } else {
         // Return a character.
         $octal = '';
