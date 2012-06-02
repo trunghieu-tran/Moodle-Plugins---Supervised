@@ -24,6 +24,8 @@ class qtype_preg_regex_handler {
     protected $regex;
     //Modifiers for regular expression
     protected $modifiers;
+    //Regular expression handling options, may be different for different handlers
+    protected $options;
     //Max number of a subpattern available in regular expression
     protected $maxsubpatt;
     //A map where keys are subpattern names and values are their numbers
@@ -46,10 +48,11 @@ class qtype_preg_regex_handler {
 
     /**
     * Parse regex and do all necessary preprocessing
-    @param regex - regular expression for which will be build finite automate
-    @param modifiers - modifiers of regular expression
+    * @param regex - regular expression to handle
+    * @param modifiers - modifiers of regular expression
+    * @param options - options to handle regex, i.e. any necessary additional parameters
     */
-    public function __construct($regex = null, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         $this->errors = array();
         $this->maxsubpatt = 0;
         $this->subpatternmap = array();
@@ -71,6 +74,7 @@ class qtype_preg_regex_handler {
 
         $this->regex = $regex;
         $this->modifiers = $modifiers;
+        $this->options = $options;
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
