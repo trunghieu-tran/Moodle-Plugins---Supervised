@@ -72,7 +72,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $answer00->fraction = 0;
         $answer00->feedback = 'Oh my, that\'s another story...';
 
-        $regular->answers = array($answer100, $answer90, $answer50, $answer0, $answer00);
+        $regular->answers = array(100=>$answer100, 101=>$answer90, 102=>$answer50, 103=>$answer0, 104=>$answer00);
         $this->testquestion = $regular;
 
         //Special question to test subpattern capturing and inserting
@@ -115,7 +115,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $answer4->fraction = 100;
         $answer4->feedback = '{$name}';
 
-        $subpatt->answers = array($answer1, $answer2, $answer3, $answer4);
+        $subpatt->answers = array(200=>$answer1, 201=>$answer2, 202=>$answer3, 203=>$answer4);
         $this->subpattquestion = $subpatt;
 
 

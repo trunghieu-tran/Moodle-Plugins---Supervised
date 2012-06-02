@@ -314,7 +314,17 @@ class qtype_preg_question extends question_graded_automatically
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
-            $matcher = new $engineclass($for_regexp, $modifiers);
+            //Create and fill options object
+            $matchingoptions = new qtype_preg_matching_options;
+            $matchingoptions->extensionneeded = $this->usehint;
+            if($answerid !== null) {
+                $feedback = $this->answers[$answerid]->feedback;
+                if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
+                    $matchingoptions->capturesubpatterns = false;
+                }
+            }
+
+            $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
             if ($answerid !== null) {
                 $this->matchers_cache[$answerid] =& $matcher;
             }

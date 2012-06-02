@@ -369,6 +369,26 @@ class qtype_preg_matching_results {
 
 }
 
+/**
+ * Options, used to specify matching process
+ */
+class qtype_preg_matching_options {
+
+    /** @var boolean Should matcher try to generate extension? */
+    public $extensionneeded = true;
+    /** @var string Unicode property name for preferred alphabet for \w when generating extension*/
+    public $preferredalphabet = null;
+    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension*/
+    public $preferfordot = null;
+
+    /** @var boolean Should matcher look for subpattern captures or the whole match only? */
+    //TODO - does we need to specify subpatterns we are looking for or there is no sense in it?
+    public $capturesubpatterns = true;
+}
+
+/**
+ * Abstract base class for regular expression matcher
+ */
 class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     //Constants for the capabilities which could (or could not) be supported by matching engine
@@ -402,12 +422,12 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-    * Parse regex and do all necessary preprocessing.
-    *
-    * @param regex - regular expression for which will be build finite automate
+    * Parse regex and do all necessary preprocessing
+    * @param regex - regular expression to handle
     * @param modifiers - modifiers of regular expression
+    * @param options - options to handle regex, object of qtype_preg_matching_options class
     */
-    public function __construct($regex = null, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         //Set matching data empty
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
@@ -417,6 +437,8 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         if ($regex === null) {
             return;
         }
+
+        //TODO - set $this->options->capturesubpatterns true if there is at least one backreference in the regex
 
         //Invalidate match called later to allow parser to count subpatterns
         $this->matchresults->set_source_info('', $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
@@ -511,7 +533,6 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
                 $result = $tmp;
             }
         }
-
         return $result;
     }
 
