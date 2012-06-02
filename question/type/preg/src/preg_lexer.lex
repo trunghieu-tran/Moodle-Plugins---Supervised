@@ -16,6 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $this->maxsubpatt = 0;
     $this->subpatternmap = array();
     $this->lexemcount = 0;
+    $this->backrefsexist = false;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
     // Set all modifier's fields to false, it must be set to correct values before initializing lexer and doing lexical analysis.
@@ -30,6 +31,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     protected $maxsubpatt;
     protected $subpatternmap;
     protected $lexemcount;
+    protected $backrefsexist;
     protected $optstack;
     protected $optcount;
 
@@ -55,6 +57,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
     public function get_lexem_count() {
         return $this->lexemcount;
+    }
+
+    public function backrefs_exist() {
+        return $this->backrefsexist;
     }
 
     protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
@@ -405,6 +411,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numstr));
         $res->value->matcher =& $this->matcher;
+        $this->backrefsexist = true;
     } else {
         // Return a character.
         $octal = '';
@@ -439,6 +446,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 <YYINITIAL> \\g[0-9][0-9]? {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\g\{-?[0-9][0-9]?\} {
@@ -451,6 +459,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $numdec));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\g\{[a-zA-Z_0-9]+\} {    // Named backreference.
@@ -458,6 +467,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\{[a-zA-Z_0-9]+\} {    // Named backreference.
@@ -465,6 +475,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\'[a-zA-Z_0-9]+\' {    // Named backreference.
@@ -472,6 +483,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\<[a-zA-Z_0-9]+\> {    // Named backreference.
@@ -479,6 +491,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \(\?P=[a-zA-Z_0-9]+\) {    // Named backreference.
@@ -486,6 +499,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $str = qtype_preg_unicode::substr($str, 0, qtype_preg_unicode::strlen($str) - 1);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
     $res->value->matcher =& $this->matcher;
+    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
