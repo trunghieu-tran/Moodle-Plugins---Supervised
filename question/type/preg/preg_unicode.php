@@ -154,8 +154,11 @@ class qtype_preg_unicode extends textlib {
     'Supplementary Private Use Area-B'          => array(0x100000, 0x10FFFD)
     );
 
-    public static function ord($utf8chr)
-    {
+    public static function ord($utf8chr) {
+        if ($utf8chr === '') {
+            return 0;
+        }
+
         $ord0 = ord($utf8chr{0});
         if ($ord0 >= 0 && $ord0 <= 127) {
             return $ord0;
@@ -179,8 +182,7 @@ class qtype_preg_unicode extends textlib {
         return false;
     }
 
-    /*public static function ctype_alnum($str)
-    {
+    /*public static function ctype_alnum($str) {
         $ord = self::ord($str);
         foreach ($this->RANGES as $name => $range) {
             if ($ord >= $range[0] && $ord <= $range[1]) {
