@@ -133,6 +133,11 @@ class mod_poasassignment_mod_form extends moodleform_mod {
                                 get_string('uniquewithincourse', 'poasassignment')));
         $mform->disabledIf('uniqueness', 'activateindividualtasks');
         $mform->addHelpButton('uniqueness', 'uniqueness', 'poasassignment');
+
+        $mform->addElement('checkbox', 'cyclicrandom', get_string('cyclicrandom', 'poasassignment'));
+        $mform->disabledIf('cyclicrandom', 'activateindividualtasks');
+        $mform->disabledIf('cyclicrandom', 'uniqueness', 'eq', 0);
+        $mform->addHelpButton('cyclicrandom', 'cyclicrandom', 'poasassignment');
         
         $mform->addElement('checkbox', 'teacherapproval', get_string('teacherapproval', 'poasassignment'));
         $mform->disabledIf('teacherapproval', 'activateindividualtasks');
@@ -182,6 +187,7 @@ class mod_poasassignment_mod_form extends moodleform_mod {
             $default_values['teacherapproval'] = $flags & TEACHER_APPROVAL;
             $default_values['newattemptbeforegrade'] = $flags & ALL_ATTEMPTS_AS_ONE;
             $default_values['finalattempts'] = $flags & MATCH_ATTEMPT_AS_FINAL;
+            $default_values['cyclicrandom'] = $flags & POASASSIGNMENT_CYCLIC_RANDOM;
         }
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('poasassignmentfiles');

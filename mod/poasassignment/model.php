@@ -69,17 +69,19 @@ class poasassignment_model {
                                     'tasksimport' => 'pages/tasksimport.php',
                                     'auditortasks' => 'pages/auditortasks.php',
                                     );
-    private static $flags = array('preventlatechoice' => PREVENT_LATE_CHOICE,
-                           'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
-                           'preventlate' => PREVENT_LATE,
-                           'severalattempts' => SEVERAL_ATTEMPTS,
-                           'notifyteachers' => NOTIFY_TEACHERS,
-                           'notifystudents' => NOTIFY_STUDENTS,
-                           'activateindividualtasks' => ACTIVATE_INDIVIDUAL_TASKS,
-                           'secondchoice' => SECOND_CHOICE,
-                           'teacherapproval' => TEACHER_APPROVAL,
-                           'newattemptbeforegrade' => ALL_ATTEMPTS_AS_ONE,
-                           'finalattempts' => MATCH_ATTEMPT_AS_FINAL);
+    private static $flags = array(
+                            'preventlatechoice' => PREVENT_LATE_CHOICE,
+                            'randomtasksafterchoicedate' => RANDOM_TASKS_AFTER_CHOICEDATE,
+                            'preventlate' => PREVENT_LATE,
+                            'severalattempts' => SEVERAL_ATTEMPTS,
+                            'notifyteachers' => NOTIFY_TEACHERS,
+                            'notifystudents' => NOTIFY_STUDENTS,
+                            'activateindividualtasks' => ACTIVATE_INDIVIDUAL_TASKS,
+                            'secondchoice' => SECOND_CHOICE,
+                            'teacherapproval' => TEACHER_APPROVAL,
+                            'newattemptbeforegrade' => ALL_ATTEMPTS_AS_ONE,
+                            'finalattempts' => MATCH_ATTEMPT_AS_FINAL,
+                            'cyclicrandom' => POASASSIGNMENT_CYCLIC_RANDOM);
 
     /**
      * Constructor. Cannot be called outside of the class
@@ -1727,6 +1729,15 @@ class poasassignment_model {
 
         }
 
+    }
+
+    /**
+     * Get students, who are in similiar group/grouping/course with current user.
+     *
+     * @return array user ids
+     */
+    public function get_unique_neighbors() {
+        return array();
     }
     
     /**
