@@ -342,7 +342,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $fullmatchfound = false;
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
         $result->invalidate_match();
 
         // Creating identifiers for states
@@ -400,12 +400,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info(qtype_preg_unicode::substr($newresult->str(), 0, $startpos + $newresult->length[0]), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+                        $newresult->set_source_info(qtype_preg_unicode::substr($newresult->str(), 0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
                             $newresult->left = $path->length[0] - $newresult->length[0];
                             $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
-                            $newresult->extendedmatch->set_source_info($path->str(), $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+                            $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
                         }
                         // Finally, save the possible partial match.
                         array_push($partialmatches, $newresult);

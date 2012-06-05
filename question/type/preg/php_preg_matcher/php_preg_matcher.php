@@ -69,7 +69,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     protected function match_inner($str) {
         //Prepare results
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->invalidate_match($this->maxsubpatt);
+        $matchresults->invalidate_match($this->get_max_subpattern());
 
         //Preparing regexp
         $for_regexp = $this->regex;
