@@ -70,7 +70,6 @@ class poasassignment_tabbed_page {
         global $PAGE;
         $pagetype = $this->currentpage . "_page";
         $model = poasassignment_model::get_instance();
-		
 		// Проверка стандартной capability на просмотр модуля
         require_capability('mod/poasassignment:view', $model->get_context());
 		

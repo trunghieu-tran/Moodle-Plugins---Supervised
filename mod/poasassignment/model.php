@@ -1277,7 +1277,8 @@ class poasassignment_model {
         	
             if ($field->random == 1) {
             	$field->variants = $this->get_variants($field->id);
-            	
+
+                $randrec = new stdClass();
             	$randrec->value = $this->get_random_value($field);
                 $randrec->taskid = $taskid;
                 $randrec->fieldid = $field->id;                
@@ -1654,13 +1655,14 @@ class poasassignment_model {
     }
     /* Get all tasks that are available for current user.
      *
-     * Method checks instance's uniqueness, visibility of all tasks
+     * Method checks instance's uniqueness, visibility of all tasks.
      * @param int $poasassignmentid
      * @param int $userid
      * @param int $givehidden
-     * @return array array of available tasks
+     * @return array available tasks
      */
     public function get_available_tasks($userid, $givehidden = 0) {
+
         // Get all tasks in instance at first
         global $DB;
         $values = array();
@@ -1672,17 +1674,17 @@ class poasassignment_model {
 
         // If there is no tasks at this stage - return empty array
         if(count($tasks) == 0) {
-            return $tasks;
+            return array();
         }
 
         // Filter tasks using 'uniqueness' field in poasassignment instance
         if($instance = $DB->get_record('poasassignment', array('id' => $this->poasassignment->id))) {
             // If no uniqueness required, return $tasks without changes
             if($instance->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
-                return $tasks;
+                //return $tasks;
             }
             // If uniqueness within groups or groupings required, filter tasks
-            if($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS ||
+            elseif($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS ||
                $instance->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
                 foreach($tasks as $key => $task) {
                     // Get all assignees that have this task
@@ -1716,19 +1718,23 @@ class poasassignment_model {
                         }
                     }
                 }
-                return $tasks;
+                //return $tasks;
             }
-            if ($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_COURSE) {
+            elseif ($instance->uniqueness == POASASSIGNMENT_UNIQUENESS_COURSE) {
                 foreach ($tasks as $key => $task) {
                     if ($DB->record_exists('poasassignment_assignee', array('taskid' => $task->id, 'cancelled' => 0))) {
                         unset($tasks[$key]);
                     }
                 }
-                return $tasks;
+                //return $tasks;
             }
-
+            // If there is no available tasks, check cyclic random option
+            if (count($tasks) == 0 && $this->has_flag(POASASSIGNMENT_CYCLIC_RANDOM)) {
+                $cyclictasks = $this->get_cyclic_available_tasks($userid, $givehidden);
+                return $cyclictasks;
+            }
+            return $tasks;
         }
-
     }
 
     /**
@@ -1737,6 +1743,93 @@ class poasassignment_model {
      * @return array user ids
      */
     public function get_unique_neighbors() {
+        global $USER;
+        if ($this->poasassignment->uniqueness == POASASSIGNMENT_NO_UNIQUENESS) {
+            return array();
+        }
+        elseif ($this->poasassignment->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPS) {
+            $groups = $this->get_user_groups($USER->id, $this->poasassignment->course);
+            if (!$groups) {
+                return false;
+            }
+            $neighbors = array();
+            foreach ($groups as $groupid) {
+               $groupusers = groups_get_members($groupid, 'u.id', 'RAND()');
+                if ($groupusers) {
+                    $neighbors = array_merge($neighbors, $groupusers);
+                }
+            }
+            return $neighbors;
+        }
+        elseif ($this->poasassignment->uniqueness == POASASSIGNMENT_UNIQUENESS_GROUPINGS) {
+            $groupings = $this->get_user_groupings($USER->id, $this->poasassignment->course);
+            if (!$groupings) {
+                return false;
+            }
+            $neighbors = array();
+            foreach ($groupings as $groupingid) {
+                $groupingusers = groups_get_grouping_members($groupingid, 'u.id', 'RAND()');
+                if ($groupingusers) {
+                    $neighbors = array_merge($neighbors, $groupingusers);
+                }
+            }
+            return $neighbors;
+        }
+        elseif ($this->poasassignment->uniqueness == POASASSIGNMENT_UNIQUENESS_COURSE) {
+            global $DB;
+            $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid' => $this->poasassignment->id, 'cancelled' => 0), 'RAND()', 'userid as id');
+            return $assignees;
+        }
+        return array();
+    }
+
+    /**
+     * Get cyclic available tasks
+     * @param $userid
+     * @param int $givehidden
+     * @return array
+     */
+    public function get_cyclic_available_tasks($userid, $givehidden = 0) {
+        global $DB;
+
+        $neighbors = $this->get_unique_neighbors();
+        $neighborsid = array();
+        if ($neighbors) {
+            foreach ($neighbors  as $neighbor) {
+                $neighborsid[] = (int)$neighbor->id;
+            }
+            $neighborsid = implode(',', $neighborsid);
+
+            $sql = "
+                SELECT t.*, COUNT(a.taskid) as count
+                FROM {poasassignment_assignee} AS a
+                JOIN {poasassignment_tasks} AS t ON t.id = a.taskid
+                WHERE
+                    a.userid in ($neighborsid)
+                    AND
+                    a.poasassignmentid = ?
+                    AND
+                    taskid <> 0
+                    AND
+                    cancelled = 0
+                GROUP BY a.taskid
+                ORDER BY count, RAND()
+            ";
+            //echo '<pre>',print_r($neighborsid, true),'</pre>';
+            $tasks = $DB->get_records_sql($sql, array($this->poasassignment->id));
+            $min = 2000;
+            foreach ($tasks as $task) {
+                if ($task->count < $min) {
+                    $min = $task->count;
+                }
+            }
+            foreach ($tasks as $key => $task) {
+                if ($task->count !== $min) {
+                    unset($tasks[$key]);
+                }
+            }
+            return $tasks;
+        }
         return array();
     }
     
