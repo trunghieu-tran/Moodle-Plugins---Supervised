@@ -8,15 +8,11 @@
  * @package questions
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-if (!defined('NOMATCH')) {
-    define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-}
+defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
 class qtype_preg_cross_tests_from_dfa {
 

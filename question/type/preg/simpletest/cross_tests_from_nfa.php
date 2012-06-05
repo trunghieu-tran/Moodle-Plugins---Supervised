@@ -8,19 +8,15 @@
  * @package questions
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-if (!defined('NOMATCH')) {
-    define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-}
+defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
 class qtype_preg_cross_tests_from_nfa {
 
-    //-----------------------------------------------------------------------tests for general cases----------------------------------------------------------//
+    // Tests for general cases.
     function data_for_test_concat() {
         $test1 = array( 'str'=>'the matcher works',
                         'is_match'=>true,
@@ -246,7 +242,7 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1));
     }
 
-    //-----------------------------------------------tests for cases with ambiguity - subpatterns, quantifiers and backreferences-----------------------------//
+    // Tests for cases with ambiguity - subpatterns, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
@@ -280,7 +276,7 @@ class qtype_preg_cross_tests_from_nfa {
         $test2 = array( 'str'=>'ad',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1,2=>NOMATCH,3=>NOMATCH),    // the quantifier is outside subpatterns 2 and 3 so they are not matched!
+                        'index_first'=>array(0=>0,1=>1,2=>NOMATCH,3=>NOMATCH),    // The quantifier is outside subpatterns 2 and 3 so they are not matched!
                         'length'=>array(0=>2,1=>0,2=>NOMATCH,3=>NOMATCH),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
@@ -502,7 +498,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
-                        'left'=>array(1),    // 'left' takes priority
+                        'left'=>array(1),    // Less characters left.
                         'next'=>'ab');
 
         $test2 = array( 'str'=>'abb',
@@ -651,13 +647,13 @@ class qtype_preg_cross_tests_from_nfa {
 
     function data_for_test_quant_greedy() {
         $test1 = array('str'=>'abacd',
-                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                       'results'=>array(array('is_match'=>true,    // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(4),
                                               'next'=>'b'),
-                                        array('is_match'=>true,    // result for fa engine
+                                        array('is_match'=>true,    // Result for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>5),
@@ -665,13 +661,13 @@ class qtype_preg_cross_tests_from_nfa {
                                               'next'=>'b')
                                         ));
         $test2 = array('str'=>'ababac',
-                       'results'=>array(array('is_match'=>true,    // result for backtracking engine
+                       'results'=>array(array('is_match'=>true,    // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(4),
                                               'next'=>'b'),
-                                        array('is_match'=>true,    // result for fa engine
+                                        array('is_match'=>true,    // Result for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>6),
@@ -738,13 +734,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'h');
 
         $test3 = array('str'=>'abe',
-                       'results'=>array(array('is_match'=>true,         // longest match
+                       'results'=>array(array('is_match'=>true,         // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>3,1=>NOMATCH),
                                               'left'=>array(2),
                                               'next'=>'f'),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>2,1=>NOMATCH),
@@ -771,7 +767,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>6,1=>6,2=>3),
                         'left'=>array(6),
-                        'next'=>'a');    // backref #1 not captured at all
+                        'next'=>'a');    // Backref #1 not captured at all.
 
         $test3 = array( 'str'=>'abcabcab',
                         'is_match'=>true,
@@ -779,7 +775,7 @@ class qtype_preg_cross_tests_from_nfa {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>8,1=>6,2=>3),
                         'left'=>array(4),
-                        'next'=>'c');    // backref #1 captured partially
+                        'next'=>'c');    // Backref #1 captured partially.
 
         return array('regex'=>'((abc)\2)\1',
                      'tests'=>array($test1, $test2, $test3));
@@ -911,13 +907,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array('str'=>'cdxyabab',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>6,1=>NOMATCH),
                                               'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                                               'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>4,1=>NOMATCH),
@@ -947,13 +943,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'cbr');
 
         $test2 = array('str'=>'Do cats',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>7,1=>1),
                                               'left'=>array(10),
                                               'next'=>' '),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>6),
                                               'length'=>array(0=>6,1=>0),
@@ -991,13 +987,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'b');
 
         $test3 = array('str'=>'0defab',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>4,1=>NOMATCH),
                                               'left'=>array(12),
                                               'next'=>'g'),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>NOMATCH),
                                               'length'=>array(0=>1,1=>NOMATCH),
@@ -1019,13 +1015,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>'a');
 
         $test2 = array('str'=>'0aaaaaaz',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>7,1=>6),
                                               'left'=>array(9),
                                               'next'=>'0123456789'),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>6,1=>5),
@@ -1039,13 +1035,13 @@ class qtype_preg_cross_tests_from_nfa {
 
     function data_for_test_backrefs_subpatt_modifying() {
         $test1 = array('str'=>'ababba',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>6,1=>3),
                                               'left'=>array(4),
                                               'next'=>'x'),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
@@ -1062,13 +1058,13 @@ class qtype_preg_cross_tests_from_nfa {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test3 = array('str'=>'abab',
-                       'results'=>array(array('is_match'=>true,        // longest match
+                       'results'=>array(array('is_match'=>true,        // Longest match.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>1),
                                               'length'=>array(0=>4,1=>2),
                                               'left'=>array(6),
                                               'next'=>'b'),
-                                        array('is_match'=>true,        // less characters left
+                                        array('is_match'=>true,        // Less characters left.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>0),
                                               'length'=>array(0=>1,1=>1),
@@ -1176,7 +1172,7 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    //-----------------------------------------------------------------tests for acceptance-------------------------------------------------------------------//
+    // Tests for acceptance.
     function data_for_test_node_assert() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
@@ -1229,4 +1225,3 @@ class qtype_preg_cross_tests_from_nfa {
                      'tests'=>array($test1));
     }*/
 }
-?>

@@ -1,12 +1,14 @@
 <?php
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+
+defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
 class qtype_preg_cross_tests_future {
 
-    // from nfa
+    // From NFA.
     function data_for_test_assertions_simple_2() {
         $test1 = array( 'str'=>'abc?z',
                         'is_match'=>true,
@@ -22,10 +24,9 @@ class qtype_preg_cross_tests_future {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
                         'left'=>array(1),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);    // can't generate a character
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);    // Can't generate a character.
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2));
     }
 }
-?>
