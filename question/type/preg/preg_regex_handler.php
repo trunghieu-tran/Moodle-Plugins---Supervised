@@ -26,12 +26,6 @@ class qtype_preg_regex_handler {
     protected $modifiers;
     //Regular expression handling options, may be different for different handlers
     protected $options;
-    //Max number of a subpattern available in regular expression
-    protected $maxsubpatt;
-    //A map where keys are subpattern names and values are their numbers
-    protected $subpatternmap;
-    //Number of lexems (defined by user) in regular expression
-    protected $lexemcount;
 
     protected $lexer;
 
@@ -58,9 +52,6 @@ class qtype_preg_regex_handler {
     */
     public function __construct($regex = null, $modifiers = null, $options = null) {
         $this->errors = array();
-        $this->maxsubpatt = 0;
-        $this->subpatternmap = array();
-        $this->lexemcount = 0;
         $this->lexer = null;
         $this->parser = null;
 
@@ -98,17 +89,43 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * returns notation, actually used by matcher
-    */
+     * Returns notation, actually used by matcher.
+     */
     public function used_notation() {
         return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
     }
 
     /**
-    * returns subpatterns map
-    */
+     * Returns subpatterns map.
+     */
     public function get_subpattern_map() {
-        return $this->subpatternmap;
+        if ($this->lexer !== null) {
+            return $this->lexer->get_subpattern_map();
+        } else {
+            return array();
+        }
+    }
+
+    /**
+     * Returns max subpattern number.
+     */
+    public function get_max_subpattern() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_max_subpattern();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns number of lexems.
+     */
+    public function get_lexem_count() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_lexem_count();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -185,9 +202,6 @@ class qtype_preg_regex_handler {
                 }
             }
         }
-        $this->maxsubpatt = $this->lexer->get_max_subpattern();
-        $this->subpatternmap = $this->lexer->get_subpattern_map();
-        $this->lexemcount = $this->lexer->get_lexem_count();
         $lexerrors = $this->lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
             $this->parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);

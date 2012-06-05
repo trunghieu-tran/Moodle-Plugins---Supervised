@@ -180,26 +180,26 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 
     public function match_from_pos($str, $offset) {
         $result = $this->compare($str, 0, $offset, false);
-		if ($result===false) {
-			$errres = new qtype_preg_matching_results(false, array(0), array(0), qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null);
-			$errres->set_source_info('', $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-			return $errres;
-		}
-		$extstr = substr($str, 0, $result->offset + $result->index+1);
-		if ($result->next===0) {
-		} else {
-			$extstr .= $result->next;
-		}
-		if ($result->full) {
-			$extmatch = null;
-		} else {
-		$ext=$result;
-			$extmatch = new qtype_preg_matching_results($ext->full, array($ext->offset), array($ext->index+1), $ext->left-1, null);
-			$extmatch->set_source_info($extstr, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-		}
-		$res = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->left, $extmatch);
-		$res->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
-		return $res;
+        if ($result===false) {
+            $errres = new qtype_preg_matching_results(false, array(0), array(0), qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null);
+            $errres->set_source_info('', $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+            return $errres;
+        }
+        $extstr = substr($str, 0, $result->offset + $result->index+1);
+        if ($result->next===0) {
+        } else {
+            $extstr .= $result->next;
+        }
+        if ($result->full) {
+            $extmatch = null;
+        } else {
+        $ext=$result;
+            $extmatch = new qtype_preg_matching_results($ext->full, array($ext->offset), array($ext->index+1), $ext->left-1, null);
+            $extmatch->set_source_info($extstr, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+        }
+        $res = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->left, $extmatch);
+        $res->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+        return $res;
     }
 
     /**
