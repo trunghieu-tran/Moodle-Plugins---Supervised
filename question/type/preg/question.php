@@ -316,7 +316,8 @@ class qtype_preg_question extends question_graded_automatically
 
             //Create and fill options object
             $matchingoptions = new qtype_preg_matching_options;
-            $matchingoptions->extensionneeded = $this->usehint;
+            //We need extension to hint next character or to generate correct answer if none is supplied
+            $matchingoptions->extensionneeded = $this->usehint || trim($this->correctanswer) == '';
             if($answerid !== null) {
                 $feedback = $this->answers[$answerid]->feedback;
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
