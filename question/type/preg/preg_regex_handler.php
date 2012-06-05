@@ -33,6 +33,10 @@ class qtype_preg_regex_handler {
     //Number of lexems (defined by user) in regular expression
     protected $lexemcount;
 
+    protected $lexer;
+
+    protected $parser;
+
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
     //The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name
@@ -57,6 +61,9 @@ class qtype_preg_regex_handler {
         $this->maxsubpatt = 0;
         $this->subpatternmap = array();
         $this->lexemcount = 0;
+        $this->lexer = null;
+        $this->parser = null;
+
         if ($regex === null) {
             return;
         }
@@ -163,36 +170,31 @@ class qtype_preg_regex_handler {
     @param $regex - regular expression for building tree
     */
     protected function build_tree($regex) {
-
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
-        $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
-        /*old-style modifier support
-        $lexer->globalmodifiers = $this->modifiers;
-        $lexer->localmodifiers = $this->modifiers;*/
-        $lexer->mod_top_opt($this->modifiers, '');
-        $parser = new preg_parser_yyParser;
-        while ($token = $lexer->nextToken()) {
+        $this->lexer = new qtype_preg_lexer($pseudofile);
+        $this->lexer->matcher =& $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
+        $this->lexer->mod_top_opt($this->modifiers, '');
+        $this->parser = new preg_parser_yyParser;
+        while ($token = $this->lexer->nextToken()) {
             if (!is_array($token)) {
-                $parser->doParse($token->type, $token->value);
+                $this->parser->doParse($token->type, $token->value);
             } else {
                 foreach ($token as $curtoken) {
-                    $parser->doParse($curtoken->type, $curtoken->value);
+                    $this->parser->doParse($curtoken->type, $curtoken->value);
                 }
             }
         }
-
-        $this->maxsubpatt = $lexer->get_max_subpattern();
-        $this->subpatternmap = $lexer->get_subpattern_map();
-        $this->lexemcount = $lexer->get_lexem_count();
-        $lexerrors = $lexer->get_errors();
+        $this->maxsubpatt = $this->lexer->get_max_subpattern();
+        $this->subpatternmap = $this->lexer->get_subpattern_map();
+        $this->lexemcount = $this->lexer->get_lexem_count();
+        $lexerrors = $this->lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
-            $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
+            $this->parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
         }
-        $parser->doParse(0, 0);
-        if ($parser->get_error()) {
-            $errornodes = $parser->get_error_nodes();
+        $this->parser->doParse(0, 0);
+        if ($this->parser->get_error()) {
+            $errornodes = $this->parser->get_error_nodes();
             $parseerrors = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
@@ -200,7 +202,7 @@ class qtype_preg_regex_handler {
             }
             $this->errors = array_merge($this->errors, $parseerrors);
         } else {
-            $this->ast_root = $parser->get_root();
+            $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
         }
