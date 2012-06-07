@@ -33,5 +33,7 @@ abstract class  qtype_correctwriting_response_mistake {
     public $answermistaken;
     //Indexes of response tokens involved (if applicable)
     public $responsemistaken;
+    //Weight of mistake used in mark computation
+    public $weight;
 }
 ?>
