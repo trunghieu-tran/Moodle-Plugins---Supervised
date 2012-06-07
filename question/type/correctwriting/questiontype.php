@@ -121,6 +121,14 @@ class qtype_correctwriting extends qtype_shortanswer {
         
         
         $answers = $question->answer;
+        
+        //We need an old answers in order to delete some old records
+        echo 'ID of question is ' . $question->id;
+        $oldanswers = $DB->get_records('question_answers', array('question' => $question->id));
+        $oldanswerunused = array();
+        foreach($oldanswers as $answer) {
+            $oldanswerunused[] = $answer->id;
+        }
         // Save main question data
         $result = parent::save_question_options($question);
         
@@ -134,7 +142,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         $currentid = 0;
         $currentdescription = 0;
         
-        
+        $oldanswerused = array();
         // Insert all the new answers
         foreach ($question->answer as $key => $answerdata) {
             // Check for, and ignore, completely blank answer from the form.
@@ -147,11 +155,15 @@ class qtype_correctwriting extends qtype_shortanswer {
             $string = $lang->create_from_db('question_answers',$insertedanswerids[$currentid]);
             $string->save_descriptions(explode(PHP_EOL, $description));
             
+            $oldanswerused[] = $insertedanswerids[$currentid];
             $currentid = $currentid + 1;
             $currentdescription = $currentdescription + 1;
         }
-        
-        
+        // Remove old unused descriptions
+        $oldanswerunused = array_diff($oldanswerunused, $oldanswerused);
+        if ($oldanswerunused !=null) {
+            block_formal_langs_abstract_language::delete_descriptions("question_answers", $oldanswerunused);
+        }
         return $result;
     }
     
