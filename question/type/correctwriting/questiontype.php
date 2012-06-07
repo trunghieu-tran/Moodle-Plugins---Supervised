@@ -77,6 +77,11 @@ class qtype_correctwriting extends qtype_shortanswer {
         
         $lang = block_formal_langs::lang_object($question->options->langid);
         
+        $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
+        $descriptions = array();
+        if ($answerids != null) {
+            $descriptions = block_formal_langs_processed_string::get_descriptions_as_array('question_answers', $answerids);
+        }
         // Our task is to load some symbols for each answer from lexeme tables
         // Option answers is loaded as an associative array of id => stdClass of answer
         // So we just need to load some answer symbols, which belongs to an array
@@ -84,7 +89,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         foreach($question->options->answers as $id => $answer) {
             $string = $lang->create_from_db('question_answers',$id);
             // Set field according to data
-            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $string->node_descriptions_list());
+            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $descriptions[$id]);
         }
         return true;
     }
@@ -123,11 +128,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $answers = $question->answer;
         
         //We need an old answers in order to delete some old records
-        $oldanswers = $DB->get_records('question_answers', array('question' => $question->id));
-        $oldanswerunused = array();
-        foreach($oldanswers as $answer) {
-            $oldanswerunused[] = $answer->id;
-        }
+        $oldanswerunused = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
+        
         // Save main question data
         $result = parent::save_question_options($question);
         
@@ -161,7 +163,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Remove old unused descriptions
         $oldanswerunused = array_diff($oldanswerunused, $oldanswerused);
         if ($oldanswerunused !=null) {
-            block_formal_langs_abstract_language::delete_descriptions("question_answers", $oldanswerunused);
+            block_formal_langs_processed_string::delete_descriptions_by_id("question_answers", $oldanswerunused);
         }
         return $result;
     }
@@ -173,7 +175,7 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function delete_question($questionid, $contextid) {
         global $DB;
         $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '$questionid' ");
-        block_formal_langs_abstract_language::delete_descriptions("question_answers",$answerids);
+        block_formal_langs_processed_string::delete_descriptions_by_id("question_answers",$answerids);
 
         parent::delete_question($questionid, $contextid);
     }
