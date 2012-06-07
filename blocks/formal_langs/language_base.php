@@ -102,7 +102,7 @@ abstract class block_formal_langs_abstract_language {
      */
      public function create_from_string($string) {
         $result = new block_formal_langs_processed_string($this);
-        $result->set_string($string);
+        $result->string = $string;
         return $result;
      }
 
@@ -115,7 +115,7 @@ abstract class block_formal_langs_abstract_language {
     public function create_from_db($tablename, $tableid, $string = null) {
         $result = new block_formal_langs_processed_string($this);
         $result->set_table_params($tablename,$tableid);
-        $result->set_string($string);
+        $result->string  = $string;
         return $result;
     }
 
