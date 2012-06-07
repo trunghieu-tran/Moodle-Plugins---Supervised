@@ -43,7 +43,14 @@ class tasks_page extends abstract_page {
     }
 
     function pre_view() {
-        global $DB;
+        //global $DB;
+
+    }
+    function view() {
+        global $DB,$OUTPUT,$USER,$PAGE;
+        $this->userid = optional_param('userid', -1, PARAM_INT);
+        $hascapmanage = has_capability('mod/poasassignment:managetasks',
+                            get_context_instance(CONTEXT_MODULE, $this->cm->id));
         if (!$this->is_providing_task()) {
             $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
             require_once ($tg->path);
@@ -51,13 +58,6 @@ class tasks_page extends abstract_page {
             $taskgiver = new $taskgivername();
             $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
         }
-    }
-    function view() {
-        global $DB,$OUTPUT,$USER,$PAGE;
-        $this->userid = optional_param('userid', -1, PARAM_INT);
-        $hascapmanage = has_capability('mod/poasassignment:managetasks',
-                            get_context_instance(CONTEXT_MODULE, $this->cm->id));
-
         // Use taskgiver, if user doesn't provides a task for a student
         if ($this->is_providing_task()) {
             $user = $DB->get_record('user', array('id' => $this->userid));
