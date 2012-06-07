@@ -26,4 +26,5 @@ $string['langid'] = 'Language of answer';
 $string['enterlexemedescriptions']  = 'Please enter lexeme descriptions';
 $string['writemoredescriptions']  = 'Supplied amount of descriptions are less than amount of tokens';
 $string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
+$string['foundlexicalerrors']  = 'There are lexical errors in your answer. Please consider fixing following errors: ';
 

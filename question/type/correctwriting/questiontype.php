@@ -123,7 +123,6 @@ class qtype_correctwriting extends qtype_shortanswer {
         $answers = $question->answer;
         
         //We need an old answers in order to delete some old records
-        echo 'ID of question is ' . $question->id;
         $oldanswers = $DB->get_records('question_answers', array('question' => $question->id));
         $oldanswerunused = array();
         foreach($oldanswers as $answer) {
