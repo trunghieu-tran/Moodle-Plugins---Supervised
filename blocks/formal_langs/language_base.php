@@ -119,31 +119,6 @@ abstract class block_formal_langs_abstract_language {
         return $result;
     }
 
-    /**
-     *  Removes a descriptions  by tablename and tableid
-     *  @param string $tablename name of table
-     *  @param mixed  $tableid    id of table or array of ids
-     */
-    public static function get_descriptions($tablename, $tableid) {
-       //TODO: Connect to DB here
-    }
-
-    /** Removes a descriptions from a DB
-      * @param string $tablename  name of source table
-      * @param mixed $tableid    id or ids in table      
-      */
-    public static function delete_descriptions($tablename, $tableid ) {
-        global $DB;
-        $conditions = array();
-        $conditions[] = "tablename = '{$tablename}' ";
-        if (is_array($tableid)) {
-            $in = implode(',', $tableid);
-            $conditions[] = " tableid IN ($in) ";
-        } else {
-            $conditions[] = " tableid='{$tableid}' ";
-        }
-        return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
-    }
 }
 
 /**
