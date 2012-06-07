@@ -1813,7 +1813,7 @@ class poasassignment_model {
                     AND
                     cancelled = 0
                 GROUP BY a.taskid
-                ORDER BY count, RAND()
+                ORDER BY count, a.taskid
             ";
             //echo '<pre>',print_r($neighborsid, true),'</pre>';
             $tasks = $DB->get_records_sql($sql, array($this->poasassignment->id));
