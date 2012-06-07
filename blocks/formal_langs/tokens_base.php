@@ -619,6 +619,48 @@ class block_formal_langs_processed_string {
             trigger_error($error, E_USER_NOTICE);
         }
     }
+    
+    
+    /** Removes a descriptions from a DB
+      * @param string $tablename  name of source table
+      * @param mixed $tableid    id or ids in table      
+      */
+    public static function delete_descriptions_by_id($tablename, $tableid ) {
+        global $DB;
+        $conditions = array();
+        $conditions[] = "tablename = '{$tablename}' ";
+        if (is_array($tableid)) {
+            $in = implode(',', $tableid);
+            $conditions[] = " tableid IN ($in) ";
+        } else {
+            $conditions[] = " tableid='{$tableid}' ";
+        }
+        return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
+    }
+    
+    /** Returns a descriptions from a DB
+      * @param string $tablename  name of source table
+      * @param mixed $tableid     ids in table
+      * @return array like ['id'] => array( number => description)      
+      */
+    public static function get_descriptions_as_array($tablename, $tableid ) {
+        global $DB;
+        $conditions = array();
+        $conditions[] = "tablename = '{$tablename}' ";
+        if (is_array($tableid)) {
+            $in = implode(',', $tableid);
+            $conditions[] = " tableid IN ($in) ";
+        } else {
+            $conditions[] = " tableid='{$tableid}' ";
+        }
+        $records = $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
+        $result = array();
+        foreach($records as $record) {
+            $result[$record->tableid][$record->number] = $record->description;
+        }
+        return $result;
+    }
+    
     /**
      *  Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
      *  @param string $string inner string
