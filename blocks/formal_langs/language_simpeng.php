@@ -19,7 +19,7 @@ class block_formal_langs_predefined_simple_english_lexer {
      *  Performs lexical analysis of text
      */
     public function tokenize($processedstring) {
-        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($processedstring->get_string()), 'r'));
+        $lexer = new eng_simple_lexer(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
         //Now, we are splitting text into lexemes
         $tokens = array();
         $counter = 0;
@@ -30,7 +30,7 @@ class block_formal_langs_predefined_simple_english_lexer {
         }
         $stream = new block_formal_langs_token_stream();
         $stream->tokens = $tokens;
-        $processedstring->set_stream($stream);
+        $processedstring->stream = $stream;
     }
 }
 

@@ -575,10 +575,55 @@ class block_formal_langs_processed_string {
     }
     
     /**
+     *  Called, when user assigns field to a class
+     *  @param string $name   name of field
+     *  @param mixed  $value  value of string
+     */
+    public function __set($name, $value) {
+        $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
+        $settertable['descriptions'] = 'set_descriptions';
+        
+        if (array_key_exists($name, $settertable)) {
+            $method = $settertable[$name];
+            $this->$method($value);
+        } else {
+            $trace = debug_backtrace();
+            $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
+            trigger_error($error, E_USER_NOTICE);
+        }
+        
+    }
+    /**
+     *  Called when need to determine, whether field exists
+     *  @param string $name   name of field
+     *  @return bool whether field exists
+     */
+    public function __isset($name) {
+        $getters = array('string', 'stream', 'syntaxtree', 'descriptions');
+        return in_array($name, $getters);
+    }
+    /**
+     *  Called when need to get field
+     *  @param string $name   name of field
+     *  @return mixed field
+     */
+    public function __get($name) {
+        $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
+        $gettertable['descriptions'] = 'get_descriptions';
+        if (array_key_exists($name, $gettertable)) {
+            $method = $gettertable[$name];
+            return $this->$method();
+        } else {
+            $trace = debug_backtrace();
+            $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
+            trigger_error($error, E_USER_NOTICE);
+        }
+    }
+    /**
      *  Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
      *  @param string $string inner string
      */
-    public function set_string($string)  {
+    protected function set_string($string)  {
         $this->string=$string;
         $this->tokenstream=null;
         $this->syntaxtree=null;
@@ -590,14 +635,13 @@ class block_formal_langs_processed_string {
      */
     public function set_corrected_stream($stream) {
         //TODO - define, how it should differs from set_stream
-        $this->tokenstream = $stream;
-        $this->syntaxtree=null;
+        $this->stream = $stream;
     }
     /**
      * Sets a token stream. Must be used by lexer, to set a stream for scan
      * @param block_formal_langs_token_stream $stream stream of lexemes     
      */
-    public function set_stream($stream) {
+    protected function set_stream($stream) {
         $this->tokenstream = $stream;
         $this->syntaxtree=null;
     }
@@ -605,7 +649,7 @@ class block_formal_langs_processed_string {
      *  Sets a syntax tree.
      *  @param object $tree syntax tree 
      */
-    public function set_syntax_tree($tree) {
+    protected function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
     
@@ -613,7 +657,7 @@ class block_formal_langs_processed_string {
      *  Sets a descriptions for a string. 
      *  @param array $descriptions descriptions array
      */
-    public function set_descriptions($descriptions)  {
+    protected function set_descriptions($descriptions)  {
         $this->descriptions = $descriptions;
     }
     /**
@@ -734,7 +778,7 @@ class block_formal_langs_processed_string {
      *  Returns a stream of tokens.
      *  @return stream of tokens
      */
-    public function get_stream() {
+    protected function get_stream() {
         if ($this->tokenstream == null)
             $this->language->scan($this);
         return $this->tokenstream;
@@ -743,7 +787,7 @@ class block_formal_langs_processed_string {
      *  Returns a syntax tree
      *  @return syntax tree
      */
-    public function get_syntax_tree() {
+    protected function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse())
             $this->language->parse($this);
         return $this->syntaxtree;
@@ -752,7 +796,7 @@ class block_formal_langs_processed_string {
      *  Returns inner string
      *  @return inner string
      */
-    public function get_string() {
+    protected function get_string() {
         return $this->string;
     }
 }
