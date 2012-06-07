@@ -653,7 +653,7 @@ class block_formal_langs_processed_string {
         } else {
             $conditions[] = " tableid='{$tableid}' ";
         }
-        $records = $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
+        $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
         $result = array();
         foreach($records as $record) {
             $result[$record->tableid][$record->number] = $record->description;
