@@ -317,14 +317,15 @@ class  qtype_correctwriting_sequence_analyzer {
         //Determine added lexemes from reponse
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
-                $result[] = $this->create_added_mistake($i);
+                $mistake = $this->create_added_mistake($i);
+                $result[] = $mistake;
                 $mistake->weight = $weights->addedweight;
                 $counts->added = $counts->added + 1;          
             }
         }        
 
         //Compute fitness-function
-        $this->fitness = compute_fitness($counts,$weights);
+        $this->fitness = $this->compute_fitness($counts,$weights);
         return $result;
     }
     /**

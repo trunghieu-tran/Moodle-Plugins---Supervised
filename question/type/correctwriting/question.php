@@ -118,7 +118,7 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         $this->gradecachevalid = true;
         $this->matchedanswerid = null;
         $maxfraction = 0.0;
-        $language = block_formal_langs::lang_object($this->langid)
+        $language = block_formal_langs::lang_object($this->langid);
         // Scan every answer
         foreach($this->answers as $id => $answer) {
             $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response['answer']);
@@ -128,12 +128,12 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             // Check, whether response has mistakes
             $hasmistakes = count($analyzer->mistakes()) != 0 ; 
             // Check whether mistakes more than percentage of lexemes
-            $language = block_formal_langs::lang_object($question->langid);
+            $language = block_formal_langs::lang_object($this->langid);
             $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
             $answertokencount = count($answerstring->stream->tokens);
             $fullyincorrect = count($analyzer->mistakes())  > $this->maxmistakepercentage * $answertokencount;
             // Check, whether we could use it
-            if (($allowsnonexactmatch || !$hasmistakes) && !fullyincorrect) {
+            if (($allowsnonexactmatch || !$hasmistakes) && !$fullyincorrect) {
                 //Compute fraction
                 $fraction = $this->compute_fraction($answer->fraction, $analyzer);
                 // 0.000001 stands for precision control
