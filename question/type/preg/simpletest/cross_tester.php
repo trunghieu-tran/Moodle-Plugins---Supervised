@@ -82,6 +82,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
+
 /**
  * Represents auxiliary class for extra checks. The extra checks are performed by cross-tester
  * on tests with partial matching: cross-tester concatenates correct heading and returned ending, then
@@ -160,7 +162,27 @@ class qtype_preg_cross_tester extends UnitTestCase {
         return false;
     }
 
-    function do_extra_check($regex, $modifiers, &$obtained) {
+    /**
+     * Generates an array representing array of indexes with no match found.
+     * Can be considered as both index_first and length.
+     * @param $count - number of elements in the resulting array.
+     * @return - array in the form of (0 => qtype_preg_matching_results::NO_MATCH_FOUND, ..., $count - 1 => qtype_preg_matching_results::NO_MATCH_FOUND).
+     */
+    function generate_empty_match_indexes($count) {
+        $result = array();
+        for ($i = 0; $i < $count; $i++) {
+            $result[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
+        }
+        return $result;
+    }
+
+    /**
+     * Performs some extra checks on results which contain generated ending of a partial match.
+     * @param $regex - regular expression.
+     * @param $modifiers - modifiers.
+     * @param $obtained - a result to check.
+     */
+    function do_extra_check($regex, $modifiers, $obtained) {
         $boolstr = array(false => 'FALSE', true => 'TRUE');
         if ($obtained->extendedmatch === null) {
             return;
@@ -169,16 +191,18 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $thisenginename = $this->engine_name();
         foreach ($this->extracheckobjects as $obj) {
             $enginename = 'qtype_preg_' . $obj->engine_name();
-            if (!($enginename === 'qtype_preg_php_preg_matcher' && $obtained->extendedmatch->full === false)) {
-                $matcher = new $enginename($regex, $modifiers);
+            $matcher = new $enginename($regex, $modifiers);
+            if ($obtained->extendedmatch->full || $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
                 $matcher->match($str);
                 $newresults = $matcher->get_match_results();
+
                 // Length + left should remain the same.
                 $sum1 = $obtained->length() + $obtained->left;
                 $sum2 = $obtained->extendedmatch->length() + $obtained->extendedmatch->left;
                 if ($obtained->length() === qtype_preg_matching_results::NO_MATCH_FOUND) {
                     $sum1++;
                 }
+
                 // Do assertions.
                 $full = $this->assertTrue($newresults->full === $obtained->extendedmatch->full, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
                 $sum = $this->assertTrue($sum1 === $sum2, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
@@ -199,13 +223,22 @@ class qtype_preg_cross_tester extends UnitTestCase {
         $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
         $fullpassed = ($expected['full'] === $obtained->full);
 
+        // If no match found, generate arrays of qtype_preg_matching_results::NO_MATCH_FOUND; use $expected otherwise.
+        if ($obtained->is_match()) {
+            $index_first_expected = $expected['index_first'];
+            $length_expected = $expected['length'];
+        } else {
+            $index_first_expected = $this->generate_empty_match_indexes(count($expected['index_first']));
+            $length_expected = $index_first_expected;
+        }
+
         // Checking indexes.
         if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
-            $indexfirstpassed = ($expected['index_first'] === $obtained->index_first);
-            $indexlastpassed = ($expected['length'] === $obtained->length);
+            $indexfirstpassed = ($index_first_expected === $obtained->index_first);
+            $indexlastpassed = ($length_expected === $obtained->length);
         } else {
-            $indexfirstpassed = ($expected['index_first'][0] === $obtained->index_first[0]);
-            $indexlastpassed = ($expected['length'][0] === $obtained->length[0]);
+            $indexfirstpassed = ($index_first_expected[0] === $obtained->index_first[0]);
+            $indexlastpassed = ($length_expected[0] === $obtained->length[0]);
         }
 
         // Checking next possible character.
@@ -216,7 +249,8 @@ class qtype_preg_cross_tester extends UnitTestCase {
                 $str = $obtained->string_extension();
             }
             $nextpassed = (($expected['next'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && strpos($expected['next'], $str[0]) !== false));    // expected 'next' contains obtained 'next'
+                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER &&
+                            qtype_preg_unicode::strpos($expected['next'], qtype_preg_unicode::substr($str, 0, 1)) !== false));    // Expected 'next' contains obtained 'next'.
         }
 
         // Checking number of characters left.
@@ -348,5 +382,3 @@ class qtype_preg_cross_tester extends UnitTestCase {
         }
     }
 }
-
-?>
