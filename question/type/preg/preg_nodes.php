@@ -322,7 +322,7 @@ class preg_leaf_charset extends preg_leaf {
 		foreach ($this->flags as $variant) {
 			$varres = true;
 			foreach ($variant as $flag) {
-				$varres = $varres && $flag->match($str, $pos);
+				$varres = $varres && $flag->match($str, $pos, $cs);
 			}
 			if ($varres) {
 				$result = true;
@@ -375,10 +375,10 @@ class preg_charset_flag {
 	const DOLLAR = 'dollar';
 	
 	public $negative;
-	protected $type;
-	protected $set;
-	protected $flag;//as name of character verify function, see constants bellow
-	protected $uniprop;
+	public $type;
+	public $set;
+	public $flag;//as name of character verify function, see constants bellow
+	public $uniprop;
 	
 		
 	public function set_circumflex() {
@@ -403,7 +403,7 @@ class preg_charset_flag {
 		return $this->type===self::CIRCUMFLEX || $this->type===self::DOLLAR;
 	}
 	//TODO implement following function of preg_charset_flag
-	public function match($str, $pos) {
+	public function match($str, $pos, $cs=true) {
 		if ($pos<0 || $pos>=strlen($str)) { 
 			return false;// string index out of border
 		}
@@ -419,7 +419,7 @@ class preg_charset_flag {
 				if ($pos>=$textlib->strlen($str)) {
 					return false;
 				}
-				$charsetcopy = $this->charset;
+				$charsetcopy = $this->set;
 				$strcopy = $str;
 				if (!$cs) {
 					$charsetcopy = $textlib->strtolower($charsetcopy);
@@ -476,19 +476,19 @@ class preg_charset_flag {
 		return ord($char)>=0 && ord($char)<=127;
 	}
 
-	const DIGIT = 'ctype_ digit';			//\d AND [:digit:]
-	const XDIGIT = 'ctype_ xdigit';			//[:xdigit:]
-	const SPACE = 'ctype_ space'; 			//\s AND [:space:]
+	const DIGIT = 'ctype_digit';			//\d AND [:digit:]
+	const XDIGIT = 'ctype_xdigit';			//[:xdigit:]
+	const SPACE = 'ctype_space'; 			//\s AND [:space:]
 	const WORDCHAR = 'self::is_wordchar';	//\w AND [:word:]
 	const ALNUM = 'ctype_alnum';			//[:alnum:]
 	const ALPHA = 'ctype_alpha';			//[:alpha:]
 	const ASCII = 'self::is_ascii';			//[:ascii:]
-	const CNTRL = 'ctype_ cntrl';			//[:cntrl:]
-	const GRAPH = 'ctype_ graph';			//[:graph:]
-	const LOWER = 'ctype_ lower';			//[:lower:]
-	const UPPER = 'ctype_ upper';			//[:upper:]
-	const PRIN = 'ctype_ print';			//[:print:] PRIN, because PRINT is php keyword
-	const PUNCT = 'ctype_ punct';			//[:punct:]
+	const CNTRL = 'ctype_cntrl';			//[:cntrl:]
+	const GRAPH = 'ctype_graph';			//[:graph:]
+	const LOWER = 'ctype_lower';			//[:lower:]
+	const UPPER = 'ctype_upper';			//[:upper:]
+	const PRIN = 'ctype_print';			//[:print:] PRIN, because PRINT is php keyword
+	const PUNCT = 'ctype_punct';			//[:punct:]
 }
 
 /**
