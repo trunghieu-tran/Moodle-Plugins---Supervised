@@ -86,7 +86,9 @@ class  qtype_correctwriting_sequence_analyzer {
      * @param object $weights weights of errors
      */
     private function scan_response_mistakes($weights) {
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($this->answer, $this->correctedresponse);
+        $answertokens = $this->answer->stream;
+        $responsetokens = $this->correctedresponse->stream;
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
             $alllcs[] = array();
@@ -214,8 +216,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_moved_mistake($answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer, $answerindex,
-                                                             $this->correctedresponse, $responseindex);
+        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer->stream->tokens, 
+                                                             $answerindex,
+                                                             $this->correctedresponse->stream->tokens, 
+                                                             $responseindex);
     }
     /**
      * Creates a new mistake, that represents case, when odd lexeme is insert to index
@@ -223,8 +227,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_added_mistake($responseindex) {
-        return new qtype_correctwriting_lexeme_added_mistake($this->language, $this->answer,
-                                                             $this->correctedresponse, $responseindex);
+        return new qtype_correctwriting_lexeme_added_mistake($this->language, 
+                                                             $this->answer->stream->tokens,
+                                                             $this->correctedresponse->stream->tokens, 
+                                                             $responseindex);
     }
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped
@@ -232,8 +238,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_absent_mistake($answerindex) {
-        return new qtype_correctwriting_lexeme_absent_mistake($this->language, $this->answer, $answerindex,
-                                                              $this->correctedresponse);
+        return new qtype_correctwriting_lexeme_absent_mistake($this->language, 
+                                                              $this->answer->stream->tokens, 
+                                                              $answerindex,
+                                                              $this->correctedresponse->stream->tokens);
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
@@ -243,8 +251,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of mistake objects
      */	
     public function matches_to_mistakes($lcs,$weights) {
-        $answer = &$this->answer->tokens;
-        $response = &$this->correctedresponse->tokens;
+        $answer = &$this->answer->stream->tokens;
+        $response = &$this->correctedresponse->stream->tokens;
         // Determines, whether answer tokens are used in mistake computation
         $answerused = array();
         $answercount = count($answer);
@@ -293,10 +301,14 @@ class  qtype_correctwriting_sequence_analyzer {
                 }
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
-                    $result[] = $this->create_moved_mistake($i, $movedpos);
+                    $mistake = $this->create_moved_mistake($i, $movedpos);
+                    $mistake->weight = $weights->movedweight;
+                    $result[] = $mistake;
                     $counts->moved  = $counts->moved + 1;
                 } else {
-                    $result[] = $this->create_absent_mistake($i);
+                    $mistake = $this->create_absent_mistake($i);
+                    $mistake->weight = $weights->absentweight;
+                    $result[] = $mistake;
                     $counts->absent = $counts->absent + 1;
                 }
             }
@@ -306,6 +318,7 @@ class  qtype_correctwriting_sequence_analyzer {
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
                 $result[] = $this->create_added_mistake($i);
+                $mistake->weight = $weights->addedweight;
                 $counts->added = $counts->added + 1;          
             }
         }        
