@@ -440,22 +440,45 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Constructs an NFA corresponding to the given node.
      * @param $node - object of nfa_preg_node child class.
+     * @param $isassertion - will the result be a lookaround-assertion automaton.
      * @return - object of qtype_preg_nondeterministic_fa in case of success, an error object otherwise.
      */
-    public function build_nfa($node) {
+    public function build_nfa($node, $isassertion = false) {
         $result = new qtype_preg_nondeterministic_fa();
 
-        // Create_automaton can throw an exception in case of too large finite automaton (see qtype_preg_finite_automaton::set_limits()).
+        // create_automaton() can throw an exception in case of too large finite automaton (see qtype_preg_finite_automaton::set_limits()).
         try {
             $stack = array();
             $node->create_automaton($this, $result, $stack);
+
+            if (!$isassertion) {
+                /*
+                // Add a dummy transitions to the beginning of the NFA.
+                $start =& new qtype_preg_fa_state($result);
+                $epsleaf =& new preg_leaf_meta;
+                $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+                $start->add_transition(new qtype_preg_nfa_transition($start, $epsleaf, $result->start_state(), false));
+                $result->add_state($start);
+                $result->set_start_state($start);
+
+                // Add a dummy transitions to the end of the NFA.
+                $end =& new qtype_preg_fa_state($result);
+                $epsleaf =& new preg_leaf_meta;
+                $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+                $result->end_state()->add_transition(new qtype_preg_nfa_transition($result->end_state(), $epsleaf, $end, false));
+                $result->add_state($end);
+                $result->set_end_state($end);
+                */
+            } else {
+                // TODO - all transitions should not consume characters.
+            }
         }
         catch (Exception $e) {
             $result = false;    // This way for now.
             // TODO
             //$this->errors[] = new qtype_preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
         }
-		return $result;
+        return $result;
     }
 
     public function __construct($regex = null, $modifiers = null) {
