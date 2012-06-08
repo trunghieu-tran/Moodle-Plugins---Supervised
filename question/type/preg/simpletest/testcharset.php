@@ -15,7 +15,7 @@ if (!defined("MOODLE_INTERNAL")) {
 }
 require_once($CFG->dirroot . "/question/type/preg/preg_nodes.php");
 
-class qtype_preg_charset_test extends UnitTestCase {
+class qtype_preg_charset_flag_test extends UnitTestCase {
 	function setUp() {
 	}
 	function teearDown() {
@@ -233,7 +233,23 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertFalse($flag->match("abc\26d", 3));
 		$this->assertTrue($flag->match("abc\26d", 4));
 	}
-	//TODO: test unicode property
+	function test_unicode_property_matching() {
+		$up = new preg_charset_flag;
+		$up->set_uprop('L');
+		$this->assertFalse($up->match('12qw21', 0));
+		$this->assertFalse($up->match('12qw21', 1));
+		$this->assertTrue($up->match('12qw21', 2));
+		$this->assertTrue($up->match('12qw21', 3));
+		$this->assertFalse($up->match('12qw21', 4));
+		$this->assertFalse($up->match('12qw21', 5));
+		$up->negative = true;
+		$this->assertTrue($up->match('12qw21', 0));
+		$this->assertTrue($up->match('12qw21', 1));
+		$this->assertFalse($up->match('12qw21', 2));
+		$this->assertFalse($up->match('12qw21', 3));
+		$this->assertTrue($up->match('12qw21', 4));
+		$this->assertTrue($up->match('12qw21', 5));
+	}
 	function test_flag_circumflex_match() {
 		$flag = new preg_charset_flag;
 		$flag->set_circumflex();
@@ -326,11 +342,35 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$npunct->negative = true;
 		//put them in two array for loop test
 		$flags1 = $flags2 = array($digit, $xdigit, $space, $wordchar, $alnum, $alpha, $ascii, $cntrl, $graph, $lower, $upper, $print, $punct, $ndigit, $nxdigit, $nspace, $nwordchar, $nalnum, $nalpha, $nascii, $ncntrl, $ngraph, $nlower, $nupper, $nprint, $npunct);
-		//form string for test match of getting flag and two src flag
-		$string = '';
-		for ($i=1; $i<256; $i++) {
-			$string .= chr($i);
-		}
+		//form array of correct result
+		$correct = array( //				digit,		xdigit,		space,		wordchar,	alnum,		alpha,		ascii,		cntrl,		graph,		lower,		upper,		print,		punct,		ndigit,		nxdigit,	nspace,		nwordchar,	nalnum,		nalpha,		nascii,		ncntrl,		ngraph,		nlower,		nupper,		nprint,		npunct
+							/*digit*/		$digit,		$digit,		null,		$digit,		$digit,		null,		'set',		null,		$digit,		null,		null,		$digit,		null,		null,		null,		$digit,		null,		null,		$digit,		false,		$digit,		null,		$digit,		$digit,		null,		$digit,		
+							/*xdigit*/		$digit,		$xdigit,	null,		$xdigit,	$xdigit,	'set',		'set',		null,		$xdigit,	'set',		'set',		$xdigit,	null,		'set',		null,		$xdigit,	null,		null,		$digit,		false,		$xdigit,	null,		false,		false,		null,		$xdigit,		
+							/*space*/		null,		null,		$space,		null,		null,		null,		'set',		null,		null,		null,		null,		$space,		null,		$space,		$space,		null,		$space,		$space,		$space,		false,		$space,		$space,		$space,		$space,		null,		$space,		
+							/*wordchar*/ 	$digit,		$xdigit,	null,		$wordchar,	$alnum,		$alpha,		'set',		null,		$wordchar,	$lower,		$upper,		$wordchar,	null,		$alnum,		false,		$wordchar,	null,		'set',		false,		false,		$wordchar,	null,		false,		false,		null,		$wordchar,		
+							/*alnum*/		$digit,		$xdigit,	null,		$alnum,		$alnum,		$alpha,		'set',		null,		$alnum,		$lower,		$upper,		$alnum,		null,		$alpha,		false,		$alnum,		null,		null,		$digit,		false,		$alnum,		null,		false,		false,		null,		$alnum,		
+							/*alpha*/		null,		false,		null,		$alpha,		$alpha,		$alpha,		'set',		null,		$alpha,		$lower,		$upper,		$alpha,		null,		$alpha,		false,		$alpha,		null,		null,		null,		false,		$alpha,		null,		$upper,		$lower,		null,		$alpha,		
+							/*ascii*/		'set',		'set',		'set',		'set',		'set',		'set',		 $ascii,	'set',		'set',		'set',		'set',		'set',		'set',		'set',		'set',		'set',		'set',		'set',		'set',		null,		'set',		'set',		'set',		'set',		'set',		'set',		
+							/*cntrl*/		null,		null,		null,		null,		null,		null,		'set',		$cntrl,		false,		null,		null,		false,		null,		$cntrl,		$cntrl,		$cntrl,		$cntrl,		$cntrl,		$cntrl,		false,		null,		false,		$cntrl,		$cntrl,		false,		false,		
+							/*graph*/		$digit,		$xdigit,	null,		$wordchar,	$alnum,		$alpha,		'set',		false,		$graph,		$lower,		$upper,		$print,		false,		false,		false,		false,		false,		false,		false,		false,		false,		null,		false,		false,		false,		false,		
+							/*lower*/		null,		null,		null,		$lower,		$lower,		$lower,		'set',		null,		$lower,		$lower,		null,		$lower,		null,		$lower,		false,		$lower,		null,		null,		null,		false,		$lower,		null,		null,		$lower,		null,		$lower,		
+							/*upper*/		null,		null,		null,		$upper,		$upper,		$upper,		'set',		null,		$upper,		null,		$upper,		$upper,		null,		$upper,		false,		$upper,		null,		null,		null,		false,		$upper,		null,		$upper,		null,		null,		$upper,		
+							/*print*/		$digit,		$xdigit,	$space,		$wordchar,	$alnum,		$alpha,		'set',		false,		$graph,		$lower,		$upper,		$print,		$punct,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		null,		false,		
+							/*punct*/		null,		null,		null,		null,		null,		null,		'set',		false,		null,		null,		null,		$punct,		$punct,		$punct,		$punct,		$punct,		$punct,		$punct,		$punct,		false,		false,		$punct,		$punct,		$punct,		null,		null,		
+							/*ndigit*/		null,		'set',		$space,		$alnum,		$alpha,		$alpha,		'set',		$cntrl,		false,		$lower,		$upper,		false,		$punct,		$ndigit,	$nxdigit,	false,		$nwordchar,	$nalnum,	$nalnum,	false,		false,		$ngraph,	false,		false,		$nprint,	false,		
+							/*nxdigit*/		null,		null,		$space,		false,		false,		false,		'set',		$cntrl,		false,		$lower,		false,		false,		$punct,		$nxdigit,	$nxdigit,	false,		$nwordchar,	$nalnum,	$nalnum,	false,		false,		$ngraph,	false,		false,		$nprint,	false,		
+							/*nspace*/		$digit,		$xdigit,	null,		$wordchar,	$alnum,		$alpha,		'set',		$cntrl,		false,		$lower,		$upper,		false,		$punct,		false,		false,		$nspace,	false,		false,		false,		false,		false,		false,		false,		false,		$nprint,	false,		
+							/*nwordchar*/	null,		null,		$space,		null,		null,		null,		'set',		$cntrl,		false,		null,		null,		false,		$punct,		$nwordchar,	$nwordchar,	false,		$nwordchar,	$nwordchar,	$nwordchar,	false,		false,		$ngraph,	$nwordchar,	$nwordchar,	$nprint,	false,		
+							/*nalnum*/		null,		null,		$space,		'set',		null,		null,		'set',		$cntrl,		false,		null,		null,		false,		$punct,		$nalnum,	$nalnum,	false,		$nwordchar,	$nalnum,	$nalnum,	false,		false,		$ngraph,	$nalnum,	$nalnum,	$nprint,	false,		
+							/*nalpha*/		$digit,		$digit,		$space,		false,		$digit,		null,		'set',		$cntrl,		false,		null,		null,		false,		$punct,		$nalnum,	$nalnum,	false,		$nwordchar,	$nalnum,	$nalpha,	false,		false,		$ngraph,	$nalpha,	$nalpha,	$nprint,	false,		
+							/*nascii*/		false,		false,		false,		false,		false,		false,		null,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		$nascii,	false,		false,		false,		false,		false,		false,		
+							/*ncntrl*/		$digit,		$xdigit,	$space,		$wordchar,	$alnum,		$alpha,		'set',		null,		false,		$lower,		$upper,		false,		false,		false,		false,		false,		false,		false,		false,		false,		$ncntrl,	false,		false,		false,		false,		false,		
+							/*ngraph*/		null,		null,		$space,		null,		null,		null,		'set',		false,		null,		null,		null,		false,		$punct,		$ngraph,	$ngraph,	false,		$ngraph,	$ngraph,	$ngraph,	false,		false,		$ngraph,	$ngraph,	$ngraph,	$nprint,	false,		
+							/*nlower*/		$digit,		false,		$space,		false,		false,		$upper,		'set',		$cntrl,		false,		null,		$upper,		false,		$punct,		false,		false,		false,		$nwordchar,	$nalnum,	$nalpha,	false,		false,		$ngraph,	$nlower,	$nalpha,	$nprint,	false,		
+							/*nupper*/		$digit,		false,		$space,		false,		false,		$lower,		'set',		$cntrl,		false,		$lower,		null,		false,		$punct,		false,		false,		false,		$nwordchar,	$nalnum,	$nalpha,	false,		false,		$ngraph,	$nalpha,	$nupper,	$nprint,	false,		
+							/*nprint*/		null,		null,		null,		null,		null,		null,		'set',		false,		false,		null,		null,		null,		null,		$nprint,	$nprint,	$nprint,	$nprint,	$nprint,	$nprint,	false,		false,		$nprint,	$nprint,	$nprint,	$nprint,	$nprint,		
+							/*npunct*/		$digit,		$xdigit,	$space,		$wordchar,	$alnum,		$alpha,		'set',		false,		false,		$lower,		$upper,		false,		null,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		false,		$nprint,	$npunct
+						);
 		//try intersect
 		$result = array();
 		foreach ($flags1 as $flag1) {
@@ -338,14 +378,15 @@ class qtype_preg_charset_test extends UnitTestCase {
 				$result[] = $flag1->intersect($flag2);
 			}
 		}
-		//TODO: form array of correct result
-		//$correct = array(676 values)
 		//compare result and correct values
 		for ($i=0; $i<676; $i++) {
 			if ($correct[$i]===false) {
-				$this->assertTrue($result[$i]===false, "failed: result [ $i ]===false");
-			} else (
-				if ($this->assertFalse($result[$i]===false, "result [ $i ] is false instead preg_charset_flag object")) {
+				$this->assertTrue($result[$i]===false, "failed: result[$i]===false");
+			} else if ($correct[$i]===null) {
+				$this->assertTrue($result[$i]===null, "failed: result[$i]===null");
+			} else {
+				if ($this->assertFalse($result[$i]===false, "result[$i] is false instead preg_charset_flag object") &&
+					$this->assertFalse($result[$i]===null, "result[$i] is null instead preg_charset_flag object" )) {
 					$this->compare_match_results($flags1[$i/26], $flags2[$i%26], $result[$i]);
 				}
 			}
@@ -356,11 +397,15 @@ class qtype_preg_charset_test extends UnitTestCase {
 		if (!$this->assertTrue($intersected===false, 'intersected is false instead preg_charset_flag object, look for error in test')) {
 			return;
 		}
+		if (!$this->assertTrue($intersected===null, 'intersected is null instead preg_charset_flag object, look for error in test')) {
+			return;
+		}
 		//form string for test match of getting flag and two src flag
 		$string = '';
 		for ($i=1; $i<256; $i++) {
 			$string .= chr($i);
 		}
+		//test
 		$pos=0;
 		while ($pos<strlen($string)) {
 			$name1 = $src1->tohr();
@@ -369,6 +414,37 @@ class qtype_preg_charset_test extends UnitTestCase {
 			$this->assertTrue($intersected->match($string, $pos) && (!$src1->match($string, $pos) || !$src2->match($string, $pos)), "False positive result on intersect of '$name1' and '$name2' for character '$character'");
 			$this->assertTrue(!$intersected->match($string, $pos) && $src1->match($string, $pos) || $src2->match($string, $pos), "False negative result on intersect of '$name1' and '$name2' for character '$character'");
 		}
+		//TODO: May be range comparing also? It require range testing.
+	}
+	//intersection character's set with any flag or unicode property has one algorithm and only one test need.
+	function test_set_flag_intersect() {//intersect set and set hase same algorithm and testing by this test also
+		$flag = new preg_charset_flag;
+		$flag->set_flag(preg_charset_flag::XDIGIT);
+		$set = new preg_charset_flag;
+		$set->set_set('0123456789abcdEFGHjklmno+-*/!%@#$z');
+		$res1 = $set->intersect($flag);
+		$res2 = $flag->intersect($set);
+		$this->assertTrue(is_object($res1), 'Not object got by intersect set and flag!');
+		$this->assertTrue(is_object($res2), 'Not object got by intersect flag and set!');
+		$this->assertTrue($res1->type===preg_charset_flag::SET, 'Not set got by intersect set and flag!');
+		$this->assertTrue($res2->type===preg_charset_flag::SET, 'Not set got by intersect flag and set!');
+		$this->assertTrue($res1->set==='0123456789abcdEF', 'Incorrerct set got by intersect set and flag!');
+		$this->assertTrue($res1->set==='0123456789abcdEF', 'Incorrerct set got by intersect flag and set!');
+		$this->assertFalse($res1->negative, 'Negative charset got by intersect set and flag!');
+		$this->assertFalse($res2->negative, 'Negative charset got by intersect flag and set!');
+		$set->negative = true;
+		$res1 = $set->intersect($flag);
+		$res2 = $flag->intersect($set);
+		$this->assertTrue($res1===false, 'Negative set was intersected with flag!');
+		$this->assertTrue($res2===false, 'Flag was intersected with negative set!');
+		$nset2 = new preg_charset_flag;
+		$nset2->set_set('qwerty');
+		$nset2->negative = true;
+		$res3 = $nset2->intersect($set);
+		$this->assertTrue(is_object($res3), 'Not object got by intersect two negative sets!');
+		$this->assertTrue($res3->type===preg_charset_flag::SET, 'Not set got by intersect two negative sets!');
+		$this->assertTrue($res3->set==='0123456789abcdEFGHjklmno+-*/!%@#$zqwerty' || $res3->set==='qwerty0123456789abcdEFGHjklmno+-*/!%@#$z', 'Incorrect set got by intersect two negative sets!');
+		$this->assertTrue($res3->negative, 'Positive charset got by intersect two negative charset!');
 	}
 }
 ?>
