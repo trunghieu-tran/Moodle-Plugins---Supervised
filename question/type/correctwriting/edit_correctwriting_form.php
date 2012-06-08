@@ -78,6 +78,20 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('movedmistakeweight', PARAM_FLOAT);
         $mform->setDefault('movedmistakeweight', 0.05);
         $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
+        // Add hint grade border
+        $mform->addElement('text', 'hintgradeborder', 
+                           get_string('hintgradeborder', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('hintgradeborder', PARAM_FLOAT);
+        $mform->setDefault('hintgradeborder', 0.9);
+        $mform->addRule('hintgradeborder', null, 'required', null, 'client');
+        //Add max mistake percentage
+        $mform->addElement('text', 'maxmistakepercentage', 
+                           get_string('maxmistakepercentage', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('maxmistakepercentage', PARAM_FLOAT);
+        $mform->setDefault('maxmistakepercentage', 0.7);
+        $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
         
         $languages = block_formal_langs::available_langs();
         
