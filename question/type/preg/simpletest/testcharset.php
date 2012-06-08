@@ -416,6 +416,33 @@ class qtype_preg_charset_flag_test extends UnitTestCase {
 		}
 		//TODO: May be range comparing also? It require range testing.
 	}
+	function test_set_set_intersection() {
+		$set1 = new preg_charset_flag;
+		$set1->set_set('asdfyz');
+		$set2 = new preg_charset_flag;
+		$set2->set_set('qwertyz');
+		$res1 = $set2->intersect($set1);
+		$set1->negative = true;
+		$res2 = $set2->intersect($set1);
+		$set2->negative = true;
+		$res3 = $set2->intersect($set1);
+		//++
+		$this->assertTrue(is_object($res1), 'Not object got by intersect two positive sets!');
+		$this->assertTrue($res1->type===preg_charset_flag::SET, 'Not set got by intersect two positive sets!');
+		$this->assertTrue($res1->set==='yz', 'Incorrect set got by intersect two positive sets!');
+		$this->assertFalse($res1->negative, 'Negative set got by intersect two positive set!');
+		//-+
+		$this->assertTrue(is_object($res2), 'Not object got by intersect positive and negative sets!');
+		$this->assertTrue($res2->type===preg_charset_flag::SET, 'Not set got by intersect positive and negative sets!');
+		$this->assertTrue($res2->set==='qwert', 'Incorrect set got by intersect positive and negative sets!');
+		$this->assertFalse($res2->negative, 'Negative charset got by intersect positive and negative charset!');
+		//--
+		$this->assertTrue(is_object($res3), 'Not object got by intersect two negative sets!');
+		$this->assertTrue($res3->type===preg_charset_flag::SET, 'Not set got by intersect two negative sets!');
+		$this->assertTrue($res3->set==='qwertyzasdf' || $res3->set==='asdfyzqwert', 'Incorrect set got by intersect two negative sets!');
+		$this->assertFalse($res3->set==='qwertyzasdfyz' || $res3->set==='asdfyzqwertyz', 'few chars exist two time in one set after intersection two negative sets!');
+		$this->assertTrue($res3->negative, 'Positive charset got by intersect two negative charset!');
+	}
 	//intersection character's set with any flag or unicode property has one algorithm and only one test need.
 	function test_set_flag_intersect() {//intersect set and set hase same algorithm and testing by this test also
 		$flag = new preg_charset_flag;
@@ -437,14 +464,6 @@ class qtype_preg_charset_flag_test extends UnitTestCase {
 		$res2 = $flag->intersect($set);
 		$this->assertTrue($res1===false, 'Negative set was intersected with flag!');
 		$this->assertTrue($res2===false, 'Flag was intersected with negative set!');
-		$nset2 = new preg_charset_flag;
-		$nset2->set_set('qwerty');
-		$nset2->negative = true;
-		$res3 = $nset2->intersect($set);
-		$this->assertTrue(is_object($res3), 'Not object got by intersect two negative sets!');
-		$this->assertTrue($res3->type===preg_charset_flag::SET, 'Not set got by intersect two negative sets!');
-		$this->assertTrue($res3->set==='0123456789abcdEFGHjklmno+-*/!%@#$zqwerty' || $res3->set==='qwerty0123456789abcdEFGHjklmno+-*/!%@#$z', 'Incorrect set got by intersect two negative sets!');
-		$this->assertTrue($res3->negative, 'Positive charset got by intersect two negative charset!');
 	}
 }
 ?>
