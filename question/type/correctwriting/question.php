@@ -98,6 +98,11 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
         }
         return get_string('pleaseenterananswer', 'qtype_correctwriting');
     }
-    
+    /** Returns a current used answer id
+        @return current used answer id  
+      */
+    public function get_current_answer_id() {
+        return 0;
+    }
 }
  ?>
