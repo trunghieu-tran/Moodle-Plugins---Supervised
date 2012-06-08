@@ -46,14 +46,10 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result = array('qtype_correctwriting', 'langid', 'absentmistakeweight', 'addedmistakeweight', 'movedmistakeweight');
         $result[] = 'lexicalerrorthreshold'; 
         $result[] = 'lexicalerrorweight';
-        $result[] = 'usecase';        
+        $result[] = 'usecase';
+        $result[] = 'hintgradeborder';
+        $result[] = 'maxmistakepercentage';
         return $result;
-    }
-    /** Returns extra tables, needed for question
-        @return array extra tables, needed for question
-     */
-    public function extra_question_tables() {
-        return array('qtype_correctwriting_symbols'); 
     }
     /** Returns a name of foreign key columns for question type
         @return string name of foreign key, that points to question table
@@ -99,17 +95,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         @param  object $questiondata The user question data 
       */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
-        echo "initialise_question_instance<br/>";
         parent::initialise_question_instance($question, $questiondata);
-        //Rearrange lexemes arrays, arrange it as number => symbol
-        foreach($question->answers as $id => $answer) {
-            $symbols = array();
-            foreach ($answer->symbols as $symid => $symbol) {
-                $symbols[$symbol->number] = $symbol;
-                $symbol->id = $symid;
-            }
-            $answer->symbols = $symbols;
-        }
     }
     
     /** Saves a question 
