@@ -64,20 +64,7 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
      // @var int weight of error, when one lexeme is added to response
     public $addedmistakeweight = 0.1;
     
-    /**  Returns expected data from forms for question
-         @return array expected
-     */
-    public function get_expected_data() {
-        return array('response' => PARAM_RAW);
-    }
-    /**  Checks, whether user response is complete
-         @param  array  user response
-         @return bool whether response is complete
-     */
-    public function is_complete_response(array $response) {
-        return array_key_exists('response', $response) &&
-                ($response['response'] || $response['response'] === '0');
-    }
+    
 
     /** Checks, whether two responses are the same
         @param array prevresponse previous response
@@ -86,23 +73,45 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
      */
     public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_same_at_key_missing_is_blank(
-                $prevresponse, $newresponse, 'response');
+                $prevresponse, $newresponse, 'answer');
     }
+    
     /** Returns a validation error for response
         @param array response user response
         @return string validation error
       */
-    public function get_validation_error(array $response) {
+    public function get_validation_error(array $response) {        
+        print_r($response);
+        
         if ($this->is_gradable_response($response)) {
             return '';
         }
         return get_string('pleaseenterananswer', 'qtype_correctwriting');
     }
-    /** Returns a current used answer id
-        @return current used answer id  
-      */
-    public function get_current_answer_id() {
-        return 0;
+    
+    /**  Performs grading response, using lexical analyzer.
+         @param array $response student response  as array ( 'answer' => string of student response )
+     */
+    public function grade_response(array $response) {
+        echo "grade_response";
+        
+        return array(1.0, question_state::graded_state_for_fraction(1.0));
+        
+        $answer = $this->get_best_fit_answer($response['answer']);
+        if ($answer) {
+            return array($answer->fraction,
+                    question_state::graded_state_for_fraction($answer->fraction));
+        } else {
+            return array(0, question_state::$gradedwrong);
+        }
+    }
+    
+    /**  Returns matching answer. Must return matching answer found when response was being graded.
+         @param array $response student response  as array ( 'answer' => string of student response )
+     */
+    public function get_matching_answer(array $response) {
+        $keys = array_keys($this->answers);
+        return $this->answers[$keys[0]];
     }
 }
  ?>
