@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 
 require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/lexical_analyzer.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 /**
  * Represents a correctwriting question.
@@ -33,10 +35,7 @@ require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_question extends qtype_shortanswer_question /*extends question_graded_automatically
-        implements question_automatically_gradable*/ {
-        //TODO - commented out temporarily to use class as passive container for unit-testing - uncomment when real question class would be implemented
-
+class qtype_correctwriting_question extends qtype_shortanswer_question  {
     //Fields defining a question
     /** @var array of question_answer objects. */
     public $answers = array();
@@ -70,6 +69,13 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
     // @var maximum mistake percent to length of answer in lexemes  for answer to be matched
     public $maxmistakepercentage = 0.7;
     
+    // Some cached grade results in order to not recompute everything, because sometimes grade_response 
+    // is being called two times
+    public $gradecachevalid = false;
+    public $matchedanswerid = null;
+    public $matchedanalyzer = null;
+    public $matchedgradestate = null;
+    
     /** Checks, whether two responses are the same
         @param array prevresponse previous response
         @param array newresponse  new response
@@ -97,24 +103,80 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function grade_response(array $response) {
-        
-        return array(1.0, question_state::graded_state_for_fraction(1.0));
-        
-        $answer = $this->get_best_fit_answer($response['answer']);
-        if ($answer) {
-            return array($answer->fraction,
-                    question_state::graded_state_for_fraction($answer->fraction));
-        } else {
-            return array(0, question_state::$gradedwrong);
+        if ($this->gradecachevalid == true) {
+            return $this->matchedgradestate;
         }
+        
+        // Make all symbols lowercase, when non case-sensitive settings
+        if (!$this->usecase) {
+            $response['answer'] = strtolower($response['answer']);
+            foreach($this->answers as $id => $answer) {
+                $answer->answer = strtolower($answer->answer);
+            }
+        }
+        
+        $this->gradecachevalid = true;
+        $this->matchedanswerid = null;
+        $maxfraction = 0.0;
+        $language = block_formal_langs::lang_object($this->langid)
+        // Scan every answer
+        foreach($this->answers as $id => $answer) {
+            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response['answer']);
+            $mistakes = $analyzer->mistakes();
+            // Check whether answer allows non exact match
+            $allowsnonexactmatch = $answer->fraction > $this->hintgradeborder;
+            // Check, whether response has mistakes
+            $hasmistakes = count($analyzer->mistakes()) != 0 ; 
+            // Check whether mistakes more than percentage of lexemes
+            $language = block_formal_langs::lang_object($question->langid);
+            $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+            $answertokencount = count($answerstring->stream->tokens);
+            $fullyincorrect = count($analyzer->mistakes())  > $this->maxmistakepercentage * $answertokencount;
+            // Check, whether we could use it
+            if (($allowsnonexactmatch || !$hasmistakes) && !fullyincorrect) {
+                //Compute fraction
+                $fraction = $this->compute_fraction($answer->fraction, $analyzer);
+                // 0.000001 stands for precision control
+                if ($fraction >= $maxfraction - 0.000001) {
+                    $maxfraction = $fraction;
+                    $this->matchedanswerid = $id;
+                    $this->matchedanalyzer = $analyzer;
+                }
+            }
+        }
+        
+        if ($this->matchedanswerid != null ) {
+            $state = question_state::graded_state_for_fraction($maxfraction);
+            $this->matchedgradestate = array($maxfraction, $state);
+        } else {
+            $this->matchedgradestate = array(0, question_state::$gradedwrong);
+        }
+        
+        return $this->matchedgradestate;
     }
-    
+    /** Computes a fraction of student response, based on alayzer
+        @param float  $fraction maximum fraction of student response
+        @param object $analyzer lexical analyzer
+     */
+    public function compute_fraction($fraction, $analyzer) {
+        $result = $fraction;
+        foreach($analyzer->mistakes() as $mistake) {
+            $result = $result - $mistake->weight;
+        }
+        return $result;
+    }
     /**  Returns matching answer. Must return matching answer found when response was being graded.
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function get_matching_answer(array $response) {
-        $keys = array_keys($this->answers);
-        return $this->answers[$keys[0]];
+        if ($this->gradecachevalid == false) {
+            $this->matchedgradestate = $this->grade_response($response);
+        }
+        // Handle obstacle when no answer matched
+        if ($this->matchedanswerid == null) {
+            return null;
+        }
+        return $this->answers[$this->matchedanswerid];
     }
 }
  ?>
