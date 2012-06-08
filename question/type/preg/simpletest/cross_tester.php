@@ -168,7 +168,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
      * @param $count - number of elements in the resulting array.
      * @return - array in the form of (0 => qtype_preg_matching_results::NO_MATCH_FOUND, ..., $count - 1 => qtype_preg_matching_results::NO_MATCH_FOUND).
      */
-    function generate_empty_match_indexes($count) {
+    function generate_no_match_indexes($count) {
         $result = array();
         for ($i = 0; $i < $count; $i++) {
             $result[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
@@ -228,7 +228,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
             $index_first_expected = $expected['index_first'];
             $length_expected = $expected['length'];
         } else {
-            $index_first_expected = $this->generate_empty_match_indexes(count($expected['index_first']));
+            $index_first_expected = $this->generate_no_match_indexes(count($expected['index_first']));
             $length_expected = $index_first_expected;
         }
 
