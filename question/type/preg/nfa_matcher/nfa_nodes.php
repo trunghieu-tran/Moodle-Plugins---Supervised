@@ -7,7 +7,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
@@ -25,8 +25,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
      */
     public $tags;
 
-    public function __construct(&$from, &$pregleaf, &$to) {
-        parent::__construct($from, $pregleaf, $to);
+    public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
+        parent::__construct($from, $pregleaf, $to, $consumechars);
         $this->tags = array();
     }
 }
