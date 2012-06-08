@@ -57,15 +57,19 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
     //Other necessary question data like penalty for each type of mistakes etc
 
     
-    // @var int weight of error, when one lexeme is moved from one place to another
+    // @var float weight of error, when one lexeme is moved from one place to another
     public $movedmistakeweight = 0.1;
-    // @var int weight of error, when one lexeme in response is absent
+    // @var float weight of error, when one lexeme in response is absent
     public $absentmistakeweight = 0.1;
-     // @var int weight of error, when one lexeme is added to response
+    // @var float weight of error, when one lexeme is added to response
     public $addedmistakeweight = 0.1;
     
     
-
+    // @var float minimum grade for non-exact match answer
+    public $hintgradeborder = 0.9;
+    // @var maximum mistake percent to length of answer in lexemes  for answer to be matched
+    public $maxmistakepercentage = 0.7;
+    
     /** Checks, whether two responses are the same
         @param array prevresponse previous response
         @param array newresponse  new response
@@ -93,7 +97,6 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function grade_response(array $response) {
-        echo "grade_response";
         
         return array(1.0, question_state::graded_state_for_fraction(1.0));
         
@@ -107,7 +110,7 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
     }
     
     /**  Returns matching answer. Must return matching answer found when response was being graded.
-         @param array $response student response  as array ( 'answer' => student response string )
+         @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function get_matching_answer(array $response) {
         $keys = array_keys($this->answers);
