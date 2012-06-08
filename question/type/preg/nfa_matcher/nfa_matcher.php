@@ -7,7 +7,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
@@ -437,23 +437,39 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return new qtype_preg_matching_results($result->full, $result->index_first, $result->length, $result->left, $result->extendedmatch);
     }
 
+    /**
+     * Constructs an NFA corresponding to the given node.
+     * @param $node - object of nfa_preg_node child class.
+     * @return - object of qtype_preg_nondeterministic_fa in case of success, an error object otherwise.
+     */
+    public function build_nfa($node) {
+        $result = new qtype_preg_nondeterministic_fa();
+
+        // Create_automaton can throw an exception in case of too large finite automaton (see qtype_preg_finite_automaton::set_limits()).
+        try {
+            $stack = array();
+            $node->create_automaton($this, $result, $stack);
+        }
+        catch (Exception $e) {
+            $result = false;    // This way for now.
+            // TODO
+            //$this->errors[] = new qtype_preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
+        }
+		return $result;
+    }
+
     public function __construct($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
         if (!isset($regex) || !empty($this->errors)) {
             return;
         }
-        $this->automaton = new qtype_preg_nondeterministic_fa();
-        try {
-            $stack = array();
-            $priority_counter = 0;
-            $this->dst_root->create_automaton($this, $this->automaton, $stack, $priority_counter);
-        }
-        catch (Exception $e) {
-            // TODO
-            //$this->errors[] = new qtype_preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
+
+        // TODO - exceptions
+        $nfa = self::build_nfa($this->dst_root);
+        if ($nfa !== false) {
+            $this->automaton = $nfa;
         }
     }
-
 }
 
 ?>
