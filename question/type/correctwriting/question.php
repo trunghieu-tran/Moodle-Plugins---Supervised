@@ -107,7 +107,7 @@ class qtype_correctwriting_question extends qtype_shortanswer_question /*extends
     }
     
     /**  Returns matching answer. Must return matching answer found when response was being graded.
-         @param array $response student response  as array ( 'answer' => string of student response )
+         @param array $response student response  as array ( 'answer' => student response string )
      */
     public function get_matching_answer(array $response) {
         $keys = array_keys($this->answers);
