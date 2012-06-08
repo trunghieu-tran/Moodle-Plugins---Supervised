@@ -33,7 +33,7 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumechars=true) {
+    public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
         $this->from =& $from;
         $this->pregleaf = clone $pregleaf;
         $this->to =& $to;
@@ -437,28 +437,33 @@ abstract class qtype_preg_finite_automaton {
     public function draw($dotfilename, $jpgfilename) {
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nfa');
-        $dotfn = $dir.$dotfilename;
+        $dotfn = $dir . $dotfilename;
         $dotfile = fopen($dotfn, 'w');
-        // numerate all states
+
+        // Numerate all states.
         $tmp = 0;
         foreach ($this->states as $curstate)
         {
             $curstate->id = $tmp;
             $tmp++;
         }
-        // generate dot code
+
+        // Generate dot code.
         fprintf($dotfile, "digraph {\n");
         fprintf($dotfile, "rankdir = LR;\n");
         foreach ($this->states as $curstate) {
             $index1 = $curstate->id;
-            // draw a single state
+
             if (count($curstate->outgoing_transitions()) == 0) {
+                // Draw a single state.
                 fprintf($dotfile, "%s\n", "$index1");
-            } else {    // draw a state with transitions
+            } else {
+                // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
                     $index2 = $curtransition->to->id;
-                    $lab = $curtransition->pregleaf->tohr().',';
-                    // information about subpatterns
+                    $lab = $curtransition->pregleaf->tohr() . ',';
+
+                    // Information about subpatterns.
                     $subpatt_start = array();
                     $subpatt_end = array();
                     foreach ($curtransition->tags as $value) {
@@ -469,18 +474,25 @@ abstract class qtype_preg_finite_automaton {
                         }
                     }
                     if (count($subpatt_start) > 0) {
-                        $lab = $lab."starts";
+                        $lab = $lab . 'starts';
                         foreach ($subpatt_start as $num) {
-                            $lab = $lab."$num,";
+                            $lab = $lab . "$num,";
                         }
                     }
                     if (count($subpatt_end) > 0) {
-                        $lab = $lab."ends";
+                        $lab = $lab . 'ends';
                         foreach ($subpatt_end as $num) {
-                            $lab = $lab."$num,";
+                            $lab = $lab . "$num,";
                         }
                     }
-                    fprintf($dotfile, "%s\n", "$index1->$index2"."[label=\"$lab\"];");
+
+                    // Dummy transitions are displayed dotted.
+                    if ($curtransition->consumechars) {
+                        $resultstr = "$index1->$index2" . "[label = \"$lab\"];";
+                    } else {
+                        $resultstr = "$index1->$index2" . "[label = \"$lab\", style = dotted];";
+                    }
+                    fprintf($dotfile, "%s\n", $resultstr);
                 }
             }
         }
@@ -489,6 +501,4 @@ abstract class qtype_preg_finite_automaton {
         $regexhandler->execute_dot($dotfn, $jpgfilename);
         unlink($dotfn);
     }
-
-
-};
+}
