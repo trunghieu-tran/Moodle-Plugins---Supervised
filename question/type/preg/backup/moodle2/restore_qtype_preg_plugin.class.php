@@ -2,29 +2,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/engine/bank.php');
+
 class restore_qtype_preg_plugin extends restore_qtype_plugin {
 
     /**
-     * Returns the paths to be handled by the plugin at question level
+     * Returns the paths to be handled by the plugin at question level.
      */
     protected function define_question_plugin_structure() {
-
+        $qtypeobj = question_bank::get_qtype($this->pluginname);
         $paths = array();
 
-        // This qtype uses question_answers, add them
+        // This qtype uses question_answers, add them.
         $this->add_question_question_answers($paths);
 
-        // Add own qtype stuff
-        $elename = 'preg';
-        // we used get_recommended_name() so this works
-        $elepath = $this->get_pathfor('/preg');
-        $paths[] = new restore_path_element($elename, $elepath);
+        // Add own qtype stuff.
+        $elepath = $this->get_pathfor('/' . $qtypeobj->name());
+        $paths[] = new restore_path_element($qtypeobj->name(), $elepath);
 
-        return $paths; // And we return the interesting paths
+        return $paths; // And we return the interesting paths.
     }
 
     /**
-     * Process the qtype/preg element
+     * Process the qtype/... element.
      */
     public function process_preg($data) {
         global $DB;
@@ -32,25 +32,32 @@ class restore_qtype_preg_plugin extends restore_qtype_plugin {
         $data = (object)$data;
         $oldid = $data->id;
 
-        // Detect if the question is created or mapped
+        // Detect if the question is created or mapped.
         $oldquestionid   = $this->get_old_parentid('question');
         $newquestionid   = $this->get_new_parentid('question');
         $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
 
-        // If the question has been created by restore, we need to create its qtype_preg too
+        // If the question has been created by restore, we need to create its qtype_... too.
         if ($questioncreated) {
-            // Adjust some columns
+            $qtypeobj = question_bank::get_qtype($this->pluginname);
+            $extraquestionfields = $qtypeobj->extra_question_fields();
+            $tablename = array_shift($extraquestionfields);
+
+            // Adjust some columns.
             $data->question = $newquestionid;
-            // Map sequence of question_answer ids
+
+            // Map sequence of question_answer ids.
             $answersarr = explode(',', $data->answers);
             foreach ($answersarr as $key => $answer) {
                 $answersarr[$key] = $this->get_mappingid('question_answer', $answer);
             }
             $data->answers = implode(',', $answersarr);
+
             // Insert record
-            $newitemid = $DB->insert_record('qtype_preg', $data);
+            $newitemid = $DB->insert_record($tablename, $data);
+
             // Create mapping
-            $this->set_mapping('qtype_preg', $oldid, $newitemid);
+            $this->set_mapping($tablename, $oldid, $newitemid);
         }
     }
 }
