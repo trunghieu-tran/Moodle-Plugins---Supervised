@@ -35,4 +35,22 @@ require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
  */
 class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
 
+      public function specific_feedback(question_attempt $qa) {
+        $question = $qa->get_question();
+        $shortanswerfeedback = parent::specific_feedback($qa);
+        $myfeedback = '';
+        $analyzer = $question->matchedanalyzer;
+        if ($analyzer!=null) {
+            //Output mistakes messages
+            if (count($analyzer->mistakes())!=0) {
+                $mistakemesgs = array();
+                $mistakemesgs[] = get_string('foundmistakes', 'qtype_correctwriting');
+                foreach($analyzer->mistakes() as $mistake) {
+                    $mistakemesgs[] = $mistake->mistakemsg;
+                }
+                $myfeedback  = implode('<BR>', $mistakemesgs) . "<BR>";
+            }
+        }
+        return $myfeedback . $shortanswerfeedback; 
+      }
 }

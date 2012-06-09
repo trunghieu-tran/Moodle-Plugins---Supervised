@@ -3,9 +3,9 @@
 //Lang string file for the correct writing question type
 
 $string['correctwriting'] = 'Correct writing';
-$string['movedmistakemessage'] = 'A lexeme "{$a->description}" is moved ';
-$string['addedmistakemessage'] = 'A lexeme "{$a->value}" is odd in response ';
-$string['absentmistakemessage'] = 'A lexeme "{$a->description}" is absent in response ';
+$string['movedmistakemessage'] = '{$a->description} is moved ';
+$string['addedmistakemessage'] = 'A lexeme "{$a->value}" at {$a->line}:{$a->position} is odd in response ';
+$string['absentmistakemessage'] = '{$a->description} is absent in response ';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['caseyes'] = 'Yes, case is important';
 $string['caseno'] = 'No, case is unimportant';
@@ -29,4 +29,4 @@ $string['enterlexemedescriptions']  = 'Please enter lexeme descriptions';
 $string['writemoredescriptions']  = 'Supplied amount of descriptions are less than amount of tokens';
 $string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
 $string['foundlexicalerrors']  = 'There are lexical errors in your answer. Please consider fixing following errors: ';
-
+$string['foundmistakes'] = 'There are mistakes in your response:';
