@@ -26,8 +26,8 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_res
         $this->position = $response[$responseindex]->position();
         $this->languagename = $language->name();
         
-        $this->answer = $answer;
-        $this->response = $response;
+        $this->answer = $answer->stream->tokens;
+        $this->response = $response->stream->tokens;
         //Fill answer data
         $this->answermistaken = array();
         $this->answermistaken[] = $answerindex;
@@ -36,12 +36,8 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_res
         $this->responsemistaken[] = $responseindex;
         
         //Create a mistake message
-        $a = new stdClass;
-        $a->type = $answer[$answerindex]->type();
-        $a->answerline = $answer[$answerindex]->position()->linestart();
-        $a->answerposition = $answer[$answerindex]->position()->colstart();
-        $a->responseline = $response[$responseindex]->position()->linestart();
-        $a->responseposition = $response[$responseindex]->position()->colstart();
+        $a = new stdClass();
+        $a->description = $answer->node_description($answerindex);
         $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
     }
 }
@@ -59,8 +55,8 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
         $this->position = $response[$responseindex]->position();
         $this->languagename = $language->name();
         
-        $this->answer = $answer;
-        $this->response = $response;
+        $this->answer = $answer->stream->tokens;
+        $this->response = $response->stream->tokens;
         //Fill answer data
         $this->answermistaken = array();
         //Fill response data
@@ -68,10 +64,8 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
         $this->responsemistaken[] = $responseindex;
         
         //Create a mistake message
-        $a = new stdClass;
-        $a->type = $response[$responseindex]->type();
-        $a->line = $response[$responseindex]->position()->linestart();
-        $a->position = $response[$responseindex]->position()->colstart();
+        $a = new stdClass();
+        $a->value = $this->response[$responseindex]->value();
         $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
     }
 }
@@ -89,8 +83,8 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_re
         $this->position = $answer[$answerindex]->position();
         $this->languagename = $language->name();
         
-        $this->answer = $answer;
-        $this->response = $response;
+        $this->answer = $answer->stream->tokens;
+        $this->response = $response->stream->tokens;
         //Fill answer data
         $this->answermistaken=array();
         $this->answermistaken[] = $answer_index;
@@ -98,7 +92,8 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_re
         $this->responsemistaken = array();
         
         //Create a mistake message
-        $a = $answer[$answerindex]->type();
+        $a = new stdClass();
+        $a->description = $answer->node_description($answerindex);
         $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
     }
 }

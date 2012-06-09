@@ -3,9 +3,9 @@
 //Lang string file for the correct writing question type
 
 $string['correctwriting'] = 'Correct writing';
-$string['movedmistakemessage'] = 'A lexeme "{$a->type}" is moved from {$a->answerline}:{$a->answerposition} to {$a->responseline}:{$a->responseposition}';
-$string['addedmistakemessage'] = 'A lexeme "{$a->type}" at {$a->line}:{$a->position} is odd in response';
-$string['absentmistakemessage'] = 'A lexeme "{$a}" is skipped';
+$string['movedmistakemessage'] = 'A lexeme "{$a->description}" is moved ';
+$string['addedmistakemessage'] = 'A lexeme "{$a->value}" is odd in response ';
+$string['absentmistakemessage'] = 'A lexeme "{$a->description}" is absent in response ';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['caseyes'] = 'Yes, case is important';
 $string['caseno'] = 'No, case is unimportant';
