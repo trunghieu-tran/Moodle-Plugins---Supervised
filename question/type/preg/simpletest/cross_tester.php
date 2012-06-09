@@ -163,20 +163,6 @@ class qtype_preg_cross_tester extends UnitTestCase {
     }
 
     /**
-     * Generates an array representing array of indexes with no match found.
-     * Can be considered as both index_first and length.
-     * @param $count - number of elements in the resulting array.
-     * @return - array in the form of (0 => qtype_preg_matching_results::NO_MATCH_FOUND, ..., $count - 1 => qtype_preg_matching_results::NO_MATCH_FOUND).
-     */
-    function generate_no_match_indexes($count) {
-        $result = array();
-        for ($i = 0; $i < $count; $i++) {
-            $result[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
-        }
-        return $result;
-    }
-
-    /**
      * Performs some extra checks on results which contain generated ending of a partial match.
      * @param $regex - regular expression.
      * @param $modifiers - modifiers.
@@ -228,7 +214,7 @@ class qtype_preg_cross_tester extends UnitTestCase {
             $index_first_expected = $expected['index_first'];
             $length_expected = $expected['length'];
         } else {
-            $index_first_expected = $this->generate_no_match_indexes(count($expected['index_first']));
+            $index_first_expected = array_fill(0, count($expected['index_first']), qtype_preg_matching_results::NO_MATCH_FOUND);
             $length_expected = $index_first_expected;
         }
 
