@@ -609,7 +609,7 @@ class block_formal_langs_processed_string {
      */
     public function __get($name) {
         $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
-        $gettertable['descriptions'] = 'get_descriptions';
+        $gettertable['descriptions'] = 'node_descriptions_list';
         if (array_key_exists($name, $gettertable)) {
             $method = $gettertable[$name];
             return $this->$method();
