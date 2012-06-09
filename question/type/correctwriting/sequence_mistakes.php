@@ -23,11 +23,13 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_res
      * @param int    $responseindex index of response token
      */
     public function __construct($language,$answer,$answerindex,$response,$responseindex) {
-        $this->position = $response[$responseindex]->position();
         $this->languagename = $language->name();
         
         $this->answer = $answer->stream->tokens;
         $this->response = $response->stream->tokens;
+        
+        $this->position = $this->response[$responseindex]->position();
+        
         //Fill answer data
         $this->answermistaken = array();
         $this->answermistaken[] = $answerindex;
@@ -51,12 +53,13 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
      * @param array  $response      array response tokens
      * @param int    $responseindex index of response token
      */
-    public function __construct($language,$answer,$response,$responseindex) {
-        $this->position = $response[$responseindex]->position();
+    public function __construct($language,$answer,$response,$responseindex) { 
         $this->languagename = $language->name();
         
         $this->answer = $answer->stream->tokens;
         $this->response = $response->stream->tokens;
+        
+        $this->position = $this->response[$responseindex]->position();
         //Fill answer data
         $this->answermistaken = array();
         //Fill response data
@@ -66,6 +69,8 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
         //Create a mistake message
         $a = new stdClass();
         $a->value = $this->response[$responseindex]->value();
+        $a->line = $this->position->linestart();
+        $a->position = $this->position->colstart();
         $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
     }
 }
@@ -80,11 +85,12 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_re
      * @param array  $response      array response tokens
      */
     public function __construct($language,$answer,$answerindex,$response) {
-        $this->position = $answer[$answerindex]->position();
         $this->languagename = $language->name();
         
         $this->answer = $answer->stream->tokens;
         $this->response = $response->stream->tokens;
+        
+        $this->position = $this->answer[$answerindex]->position();
         //Fill answer data
         $this->answermistaken=array();
         $this->answermistaken[] = $answer_index;
