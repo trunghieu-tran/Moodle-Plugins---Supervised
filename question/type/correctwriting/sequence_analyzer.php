@@ -216,9 +216,9 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_moved_mistake($answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer->stream->tokens, 
+        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer, 
                                                              $answerindex,
-                                                             $this->correctedresponse->stream->tokens, 
+                                                             $this->correctedresponse, 
                                                              $responseindex);
     }
     /**
@@ -228,8 +228,8 @@ class  qtype_correctwriting_sequence_analyzer {
      */
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language, 
-                                                             $this->answer->stream->tokens,
-                                                             $this->correctedresponse->stream->tokens, 
+                                                             $this->answer,
+                                                             $this->correctedresponse, 
                                                              $responseindex);
     }
     /**
@@ -239,9 +239,9 @@ class  qtype_correctwriting_sequence_analyzer {
      */
     private function create_absent_mistake($answerindex) {
         return new qtype_correctwriting_lexeme_absent_mistake($this->language, 
-                                                              $this->answer->stream->tokens, 
+                                                              $this->answer, 
                                                               $answerindex,
-                                                              $this->correctedresponse->stream->tokens);
+                                                              $this->correctedresponse);
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
