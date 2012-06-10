@@ -55,18 +55,19 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
       }
        //This wil be shown only if show right answer is setup 
        public function correct_response(question_attempt $qa) {
-            global $CFG;
-            $question = $qa->get_question();
-            $resulttext  = '<BR>';
-             // This data should contain base64_encoded data about user mistakes
-             $analyzer = $question->matchedanalyzer;
-             if ($analyzer!=null) {
-                
-                $mistakecodeddata = '';
-                $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
-                $imagesrc = '<image src="'.$url.'">';
-                $resulttext = $imagesrc . $resulttext; 
-            }
-            return $resulttext . parent::correct_response($qa);
+           global $CFG;
+           $question = $qa->get_question();
+           $resulttext  = '<BR>';
+           // This data should contain base64_encoded data about user mistakes
+           $analyzer = $question->matchedanalyzer;
+           if ($analyzer!=null) {
+               if (count($analyzer->mistakes()) != 0) {
+                   $mistakecodeddata = '';
+                   $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
+                   $imagesrc = '<image src="'.$url.'">';
+                   $resulttext = $imagesrc . $resulttext; 
+               }
+           }
+           return $resulttext . parent::correct_response($qa);
        }
 }
