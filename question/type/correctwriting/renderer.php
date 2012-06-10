@@ -73,7 +73,12 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
    //Creates all information about mistakes, passed into mistakes    
    protected function create_image_information($qa,$analyzer) {
        $question = $qa->get_question();
-       $answer  = $question->answers[$question->matchedanswerid]->answer;
+       $keys = array_keys($question->answers);
+       $answer  = $question->answers[$keys[0]]->answer;
+       if ($question->matchedanswerid!=null) {
+          $answer = $question->answers[$question->matchedanswerid]->answer;
+       }
+       
        $language = block_formal_langs::lang_object($qa->get_question()->langid);
        //Create sections, that will be passed into an URL
        $resultsections = array();
@@ -81,7 +86,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
        //Create answer section
        $answertokenvalues = array();
        $answertokens = $language->create_from_string($answer);
-       foreach($answertokens as $token) {
+       foreach($answertokens->stream->tokens as $token) {
            $answertokenvalues[] = base64_encode($token->value());
        }
        $resultsections[] = implode(',,,',$answertokenvalues);
