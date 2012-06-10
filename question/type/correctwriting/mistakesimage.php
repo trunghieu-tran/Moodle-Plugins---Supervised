@@ -23,10 +23,38 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// A vertical space between answer and response 
+define('ANSWER_RESPONSE_VERTICAL_SPACE', 50);
+// A horizontal space between two lexemes on image
+define('ROW_HORIZONTAL_SPACE', 7);
+// A tiny space between arrow connector and label
+define('TINY_SPACE', 2);
+// Used font size
+define('FONT_SIZE', 4);
+
 // Simple entry, which will be printed
 class qtype_correctwriting_abstract_label
 {
-
+  /**
+    @var array  array(width, height)
+    */
+  public $wh = array(0,0);
+  /**
+    @var array  array(width, height) - connection point for each arrow
+    */
+  public $connection = array(0,0);
+  
+  /** Paints at position
+   */
+  public function paint(&$im, $palette, $currentrect, $up ) {
+       $connection = array();
+       $connection[] = $currentrect->x + $currentrect->width/2;
+       if ($up == true) {
+           $connection[] = $currentrect->y+$currentrect->height+TINY_SPACE;
+       } else {
+           $connection[] = $currentrect->y - TINY_SPACE; 
+       }
+  }
 }
 // An empty label leaves noting in image and used in stub to skip some parts 
 class qtype_correctwriting_empty_label extends qtype_correctwriting_abstract_label
@@ -36,19 +64,32 @@ class qtype_correctwriting_empty_label extends qtype_correctwriting_abstract_lab
  // A label - simple text+color, which will be output into image
 class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_label
 {
-    /**
-     @var string string of text
-     */
-    public $text;
-    /**
-     @var bool  whether it should be painted red (red means, it was fixed)
-     */
-    public $red;
+   /**
+    @var string string of text
+    */
+   public $text;
+   /**
+    @var bool  whether it should be painted red (red means, it was fixed)
+    */
+   public $red;
     
-    public function __construct($text) {
-        $this->text = $text;
-        $red  = false;
-    }
+   public function __construct($text) {
+       $width = imagefontwidth(FONT_SIZE);
+       $height = imagefontheight(FONT_SIZE);
+       $this->wh = array($width*strlen($text), $height);
+       $this->text = $text;
+       $red  = false;
+   }
+    
+   public function paint(&$im, $palette, $currentrect, $up) {
+       parent::paint($im, $palette, $currentrect, $up);
+       $color = $palette['black'];
+       if ($this->red) {
+           $color = $palette['red'];
+       }
+       $x = $currentrect->x + $currentrect->width/2 - $this->wh[0]/2;
+       imagestring($im, FONT_SIZE, $x, $currentrect->y, $this->text, $color);
+   }
 } 
 
 class qtype_correctwriting_table_cell
@@ -65,6 +106,26 @@ class qtype_correctwriting_table_cell
    public function __construct($answer, $response) {
        $this->answer = $answer;
        $this->response = $response; 
+   }
+   protected function labelsize() {
+       return array(max($this->answer->wh[0],$this->response->wh[0]) ,
+                    max($this->answer->wh[1],$this->response->wh[1]));
+   }
+   public function size() {
+       $width = max($this->answer->wh[0],$this->response->wh[0]) + ROW_HORIZONTAL_SPACE;
+       $height =  max($this->answer->wh[1],$this->response->wh[1]) * 2 + ANSWER_RESPONSE_VERTICAL_SPACE;
+       return array($width, $height);
+   }
+   
+   public function paint(&$im, $palette, $currentpos) {
+       $labelsize = $this->labelsize();
+       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1], 
+                                   'width' => $labelsize[0] + ROW_HORIZONTAL_SPACE, 'height' => $labelsize[1]);
+       $responserect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + ANSWER_RESPONSE_VERTICAL_SPACE, 
+                                     'width' => $labelsize[0], 'height' => $labelsize[1]);
+       $this->answer->paint($im, $palette, $answerrect, true );
+       $this->response->paint($im, $palette, $responserect, false );
+       
    }
 }
  
@@ -140,8 +201,38 @@ class qtype_correctwriting_image_generator
    public function produce_image() {
        // Align labels in a rows, without a links between them
        $this->create_alignments();
+       
+       // Compute size of image
+       $height = 0;
+       $width  = 0;
+       foreach($this->table as $entry) {
+           $size = $entry->size();
+           $width  = $width + $size[0];
+           $height = $size[1];
+       }
+      
+       $im = imagecreatetruecolor($width, $height);
+       $white = imagecolorallocate($im, 255, 255, 255);
+       $black = imagecolorallocate($im, 0, 0, 0);
+       $red = imagecolorallocate($im, 255, 0, 0);
+       imagefill($im,0,0,$white);
+       // Generate image
+       $this->generate_image($im, array('black' => $black, 'red' => $red));
+       // Output image
+       header('Content-type: image/png');
+       imagepng($im);
+       imagedestroy($im);
    }
-   
+   public function generate_image(&$im , $palette) {
+       $currentpos = array(0, 0);
+       foreach($this->table as $tableentry)
+       {
+         $size = $tableentry->size();
+         $tableentry->paint($im, $palette, $currentpos);
+         $currentpos[0] = $currentpos[0] + $size[0];
+       }
+       
+   }
    protected function is_moved_or_absent_answer($index) {
        return $this->is_in_arrays('absentlexemes','answer',$index);
    }
@@ -247,7 +338,6 @@ if (strlen($_GET['data']) != 0) {
        // If everything is ok
        $generator = new qtype_correctwriting_image_generator($sections);
        $generator->produce_image();
-       print_r($generator);
    } else {
        echo 'Error generating image: malformed data';
    }       
