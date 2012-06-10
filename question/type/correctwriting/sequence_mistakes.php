@@ -12,8 +12,14 @@ defined('MOODLE_INTERNAL') || die();
  
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 
+// A marker class to indicate errors from sequence_analyzer
+class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
+
+}
+
+
 // A mistake, that consists from moving one lexeme to different position, than original
-class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_response_mistake {
+class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_sequence_mistake {
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
@@ -45,7 +51,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_res
 }
 
 // A mistake, that consists from adding a lexeme to response, that is not in answer
-class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_response_mistake {
+class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_sequence_mistake {
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
@@ -76,7 +82,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_res
 }
 
 // A mistake, that consists of  skipping a lexeme from answer
-class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_response_mistake {
+class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_sequence_mistake {
     /**
      * Constructs a new error, filling it with constant message
      * @param object $language      a language object
