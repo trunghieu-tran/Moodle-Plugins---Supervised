@@ -131,7 +131,7 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             $language = block_formal_langs::lang_object($this->langid);
             $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
             $answertokencount = count($answerstring->stream->tokens);
-            $fullyincorrect = count($analyzer->mistakes())  > $this->maxmistakepercentage * $answertokencount;
+            $fullyincorrect = (count($analyzer->mistakes())  > ($this->maxmistakepercentage * $answertokencount));
             // Check, whether we could use it
             if (($allowsnonexactmatch || !$hasmistakes) && !$fullyincorrect) {
                 //Compute fraction
@@ -174,7 +174,8 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         }
         // Handle obstacle when no answer matched
         if ($this->matchedanswerid == null) {
-            return null;
+            $keys = array_keys($this->answers);
+            return $this->answers[$keys[0]];
         }
         return $this->answers[$this->matchedanswerid];
     }
