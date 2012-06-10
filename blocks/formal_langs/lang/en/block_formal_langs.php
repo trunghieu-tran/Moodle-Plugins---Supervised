@@ -10,4 +10,4 @@
  $string['pluginname'] = 'Formal languages block';
  $string['lang_simple_english'] = 'Simple English';
  $string['lang_simple_english_help'] = 'Simple English Language (only scanner)';
- 
+ $string['lexical_error_message'] = 'Cannot match input {$a->symbol} near {$a->line}:{$a->position} ';
