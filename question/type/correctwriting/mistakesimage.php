@@ -50,6 +50,19 @@ class qtype_correctwriting_image_generator
      @var array  array of strings, representing an response
     */
    private $response;
+   /**
+     @var array array of indexes of absent lexemes
+    */
+   private $absentlexemes;
+   /**
+     @var array array of indexes of added lexemes
+    */
+   private $addedlexemes;
+   /**
+     @var array array of indexes of added lexemes as stdClass( 'answer' => answer index, 'response' => response index) 
+    */
+   private $movedlexemes;
+   
    /** Constructs a generator, scanning section
      @param array $sections used sections
     */
@@ -66,7 +79,22 @@ class qtype_correctwriting_image_generator
        foreach($base64responses as $response) {
            $this->response[] = new qtype_correctwriting_lexeme_label(base64_decode($response));
        }
+       // Make fixed lexemes red
+       $fixedlexemeindexes = array_diff(explode(',,,',$sections[2]), array(''));
+       foreach($fixedlexemeindexes as $index) {
+            $this->response[$index]->red = true;
+       }
        
+       $this->absentlexemes = array_diff(explode(',,,',$sections[3]), array(''));
+       $this->addedlexemes = array_diff(explode(',,,',$sections[4]), array(''));
+       $movedlexemes = array_diff(explode(',,,',$sections[5]), array(''));
+       foreach($movedlexemes as $entry) {
+           $tmp = explode('_',$entry);
+           $data = new stdClass();
+           $data->answer = $tmp[0];
+           $data->response = $tmp[1];
+           $this->movedlexemes[] = $data;
+       }
        
    }
    // Produces an image
