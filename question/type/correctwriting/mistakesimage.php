@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Correct writing question definition class.
+ * Mistake image generator
  *
  * @package    qtype
  * @subpackage correctwriting
- * @copyright  2011 Sychev Oleg
+ * @copyright  2011 Sychev Oleg, Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,6 +31,12 @@ define('ROW_HORIZONTAL_SPACE', 7);
 define('TINY_SPACE', 2);
 // Used font size
 define('FONT_SIZE', 4);
+// Defines a width for drawing lines of moving, removing or adding
+define('LINE_WIDTH', 2);
+// A length of arrow end part
+define('ARROW_LENGTH', 5);
+// An arrow angle in radians
+define('ARROW_ANGLE', 0.5);
 
 // Simple entry, which will be printed
 class qtype_correctwriting_abstract_label
@@ -47,12 +53,12 @@ class qtype_correctwriting_abstract_label
   /** Paints at position
    */
   public function paint(&$im, $palette, $currentrect, $up ) {
-       $connection = array();
-       $connection[] = $currentrect->x + $currentrect->width/2;
+       $this->connection = array();
+       $this->connection[] = $currentrect->x + $currentrect->width/2;
        if ($up == true) {
-           $connection[] = $currentrect->y+$currentrect->height+TINY_SPACE;
+           $this->connection[] = $currentrect->y+$currentrect->height+TINY_SPACE;
        } else {
-           $connection[] = $currentrect->y - TINY_SPACE; 
+           $this->connection[] = $currentrect->y - TINY_SPACE; 
        }
   }
 }
@@ -117,6 +123,14 @@ class qtype_correctwriting_table_cell
        return array($width, $height);
    }
    
+   public function get_answer_connection_point() {
+       return $this->answer->connection;
+   }
+   
+   public function get_response_connection_point() {
+       return $this->response->connection;
+   }
+   
    public function paint(&$im, $palette, $currentpos) {
        $labelsize = $this->labelsize();
        $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1], 
@@ -156,13 +170,17 @@ class qtype_correctwriting_image_generator
     */
    private $table;
    /**
-     @var indexes of cells for answer in $table field 
+     @var  array indexes of cells for answer in $table field 
      */
    private $answertable;
    /**
-     @var indexes of cells for response in $table field 
+     @var array indexes of cells for response in $table field 
      */
    private $responsetable;
+   /**
+     @var array indexes of answer lexemes, put on LCS
+     */
+   private $lcs;
    /** Constructs a generator, scanning section
      @param array $sections used sections
     */
@@ -232,6 +250,60 @@ class qtype_correctwriting_image_generator
          $currentpos[0] = $currentpos[0] + $size[0];
        }
        
+       imagesetthickness($im, LINE_WIDTH);
+       // Draw absent lexemes arrows
+       foreach($this->absentlexemes as $index) {
+           $p1 = $this->get_answer_connection_point($index);
+           $p2 = $this->get_answer_response_connection_point($index);
+           $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+       }
+       // Draw added lexemes arrows
+       foreach($this->addedlexemes as $index) {
+           $p1 = $this->get_response_answer_connection_point($index);
+           $p2 = $this->get_response_connection_point($index);
+           $this->draw_arrow($im, $palette['red'], $p1, $p2, true);
+       }
+       // Draw moved lexemes arrows
+       foreach($this->movedlexemes as $entry) {
+           $p1 = $this->get_answer_connection_point($entry->answer);
+           $p2 = $this->get_response_connection_point($entry->response);
+           $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+       }
+       // Draw LCS
+       foreach($this->lcs as $index) {
+           $p1 = $this->get_answer_connection_point($index);
+           $p2 = $this->get_answer_response_connection_point($index);
+           $this->draw_arrow($im, $palette['black'], $p1, $p2, false);
+       }
+   }
+   protected function draw_arrow(&$im, $color, $p1, $p2, $markbegin) {
+       // Draw arrow shaft
+       imageline($im, $p1[0], $p1[1], $p2[0], $p2[1], $color);
+       // Draw arrow parts
+       $angle = atan2($p1[1] - $p2[1],$p1[0] - $p2[0]);
+       $point = $p2;
+       if ($markbegin == true) {
+           //TODO: Uncomment it if we want upward arrows
+           //$point = $p1;
+           //$angle = atan2($p2[1]-$p1[1],$p2[0]-$p1[0]); 
+       }
+       
+       $pmin = array($point[0] + ARROW_LENGTH * cos($angle + ARROW_ANGLE),$point[1] + ARROW_LENGTH * sin($angle + ARROW_ANGLE));
+       $pmax = array($point[0] + ARROW_LENGTH * cos($angle - ARROW_ANGLE),$point[1] + ARROW_LENGTH * sin($angle - ARROW_ANGLE));
+       imageline($im, $point[0], $point[1], $pmin[0], $pmin[1], $color);
+       imageline($im, $point[0], $point[1], $pmax[0], $pmax[1], $color);
+   }
+   protected function get_answer_connection_point($answerindex) {
+       return $this->table[$this->answertable[$answerindex]]->get_answer_connection_point();
+   }
+   protected function get_answer_response_connection_point($answerindex) {
+       return $this->table[$this->answertable[$answerindex]]->get_response_connection_point();
+   }
+   protected function get_response_connection_point($responseindex) {
+       return $this->table[$this->responsetable[$responseindex]]->get_response_connection_point();
+   }
+   protected function get_response_answer_connection_point($responseindex) {
+       return $this->table[$this->responsetable[$responseindex]]->get_answer_connection_point();
    }
    protected function is_moved_or_absent_answer($index) {
        return $this->is_in_arrays('absentlexemes','answer',$index);
@@ -271,6 +343,7 @@ class qtype_correctwriting_image_generator
                $lcsresponses[] = $responseindex;
            }
        }
+       $this->lcs = $lcsanswers;
        $beginanswers = 0;
        $beginresponses = 0;
        for ($i = 0 ;$i<count($lcsanswers);$i++) {
