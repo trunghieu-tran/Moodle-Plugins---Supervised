@@ -284,15 +284,19 @@ class qtype_correctwriting_mistake_container
    protected function is_in_arrays($skippedarrayname, $movedfieldname, $index) {
        $result = false;
        // Check skipped array
-       foreach($this->$skippedarrayname as $testindex) {
-           if ($index == $testindex) {
-               $result = true;
+       if(count($this->$skippedarrayname) != 0 ) {
+           foreach($this->$skippedarrayname as $testindex) {
+               if ($index == $testindex) {
+                   $result = true;
+               }
            }
        }
        //Check moved array
-       foreach ($this->movedlexemes as $testindex)  {
-           if ($index == $testindex->$movedfieldname) {
-               $result = true;
+       if(count($this->movedlexemes) != 0 ) {
+           foreach ($this->movedlexemes as $testindex)  {
+               if ($index == $testindex->$movedfieldname) {
+                   $result = true;
+               }
            }
        }
        return $result;
@@ -398,7 +402,15 @@ class qtype_correctwriting_table
      */
    public function __construct($answer, $response, $lcs, $mistakes) {
        $this->lcs = $lcs;
+       
+       // Create a labels for table
        $this->mistakes = $mistakes;
+       $this->table = array();
+       $answerlabel = new qtype_correctwriting_lexeme_label('Answer: ');
+       $responselabel = new qtype_correctwriting_lexeme_label('Response: ');
+       $this->table[] = new qtype_correctwriting_table_cell($answerlabel, $responselabel);
+       
+       // Build table
        if (count($lcs->lcs()) != 0) {
            $this->build_table_using_lcs($answer, $response, $lcs->lcs(), $mistakes);
        } else {
@@ -528,10 +540,12 @@ class qtype_correctwriting_table
    public function get_size() {
        $height = 0;
        $width  = 0;
-       foreach($this->table as $entry) {
-           $size = $entry->size();
-           $width  = $width + $size[0];
-           $height = $size[1];
+       if (count($this->table) != 0) {
+           foreach($this->table as $entry) {
+               $size = $entry->size();
+               $width  = $width + $size[0];
+               $height = $size[1];
+           }
        }
        return array($width, $height);
    }
@@ -541,11 +555,12 @@ class qtype_correctwriting_table
      */
    public function paint(&$im , $palette) {
        $currentpos = array(0, 0);
-       foreach($this->table as $tableentry)
-       {
-         $size = $tableentry->size();
-         $tableentry->paint($im, $palette, $currentpos);
-         $currentpos[0] = $currentpos[0] + $size[0];
+       if (count($this->table) != 0) {
+           foreach($this->table as $tableentry) {
+               $size = $tableentry->size();
+               $tableentry->paint($im, $palette, $currentpos);
+               $currentpos[0] = $currentpos[0] + $size[0];
+           }
        }
    }
 }
@@ -571,28 +586,36 @@ class qtype_correctwriting_arrow_builder {
        // Set thickness
        imagesetthickness($im, LINE_WIDTH);
        // Draw absent lexemes arrows
-       foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
-           $p1 = $this->table->get_connections_by_answer_index($index)->answer;
-           $p2 = $this->table->get_connections_by_answer_index($index)->response;
-           $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+       if (count($this->table->mistakes()->get_absent_lexeme_indexes()) != 0) {
+           foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
+               $p1 = $this->table->get_connections_by_answer_index($index)->answer;
+               $p2 = $this->table->get_connections_by_answer_index($index)->response;
+               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+           }
        }
        // Draw added lexemes arrows
-       foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
-           $p1 = $this->table->get_connections_by_response_index($index)->answer;
-           $p2 = $this->table->get_connections_by_response_index($index)->response;
-           $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+       if (count($this->table->mistakes()->get_added_lexeme_indexes()) != 0 ) {
+           foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
+               $p1 = $this->table->get_connections_by_response_index($index)->answer;
+               $p2 = $this->table->get_connections_by_response_index($index)->response;
+               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+           }
        }
        // Draw moved lexemes arrows
-       foreach($this->table->mistakes()->get_moves() as $entry) {
-           $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
-           $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
-           $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+       if (count($this->table->mistakes()->get_moves()) != 0) {
+           foreach($this->table->mistakes()->get_moves() as $entry) {
+               $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
+               $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
+               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+           }
        }
        // Draw LCS
-       foreach($this->table->lcs_extractor()->lcs() as $entry) {
-           $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
-           $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
-           $this->draw_arrow($im, $palette['black'], $p1, $p2, false);
+       if (count($this->table->lcs_extractor()->lcs()) != 0) {
+           foreach($this->table->lcs_extractor()->lcs() as $entry) {
+               $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
+               $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
+               $this->draw_arrow($im, $palette['black'], $p1, $p2, false);
+           }
        }
    }
 
@@ -637,20 +660,25 @@ class qtype_correctwriting_image_generator
        // Preprocess answers
        $answer = array();
        $base64answers = explode(',,,',$sections[0]);
-       foreach($base64answers as $tmpanswer) {
-           $answer[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpanswer));
+       if (count($base64answers) != 0) {
+           foreach($base64answers as $tmpanswer) {
+               $answer[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpanswer));
+           }
        }
        // Preprocess responses
        $response = array();
        $base64responses = explode(',,,',$sections[1]);
-       
-       foreach($base64responses as $tmpresponse) {
-           $response[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpresponse));
+       if (count($base64responses) != 0) {
+           foreach($base64responses as $tmpresponse) {
+               $response[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpresponse));
+           }
        }
        // Mark fixed lexemes
        $fixedlexemeindexes = array_diff(explode(',,,',$sections[2]), array(''));
-       foreach($fixedlexemeindexes as $index) {
-            $response[$index]->make_fixed();
+       if (count($fixedlexemeindexes) != 0 ) {
+           foreach($fixedlexemeindexes as $index) {
+               $response[$index]->make_fixed();
+           }
        }
        // Create a table
        $mistakes = new qtype_correctwriting_mistake_container($sections[3], $sections[4], $sections[5]);
