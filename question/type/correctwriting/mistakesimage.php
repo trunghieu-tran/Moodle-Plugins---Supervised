@@ -37,7 +37,10 @@ define('LINE_WIDTH', 2);
 define('ARROW_LENGTH', 5);
 // An arrow angle in radians
 define('ARROW_ANGLE', 0.5);
-
+// Define a space for frame 
+define('FRAME_SPACE', 2);
+// A thickness of drawn frame
+define('FRAME_THICKNESS', 1);
 /* Defines a simple label, which can be printed on image.
    Must contain size and point for arrow connection, which will be used  to draw arrow to or from this point.
  */
@@ -218,9 +221,10 @@ class qtype_correctwriting_table_cell
        // Compute max label size part
        $labelsize = $this->get_max_label_size();
        // Compute rectangles for painting answer and response
-       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1], 
+       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE, 
                                    'width' => $labelsize[0] + ROW_HORIZONTAL_SPACE, 'height' => $labelsize[1]);
-       $responserect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + ANSWER_RESPONSE_VERTICAL_SPACE, 
+       $height = imagesy($im);                            
+       $responserect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE, 
                                      'width' => $labelsize[0], 'height' => $labelsize[1]);
        // Draw an answer and response                              
        $this->answer->paint($im, $palette, $answerrect, true );
@@ -554,7 +558,7 @@ class qtype_correctwriting_table
        @param array $palette associative array of colors
      */
    public function paint(&$im , $palette) {
-       $currentpos = array(0, 0);
+       $currentpos = array(FRAME_SPACE, 0);
        if (count($this->table) != 0) {
            foreach($this->table as $tableentry) {
                $size = $tableentry->size();
@@ -692,7 +696,9 @@ class qtype_correctwriting_image_generator
        $size = $this->table->get_size();
        
        // Create image
-       $im = imagecreatetruecolor($size[0], $size[1]);
+       $sizex = $size[0] + 2 * FRAME_SPACE;
+       $sizey = $size[1] + 2 * FRAME_SPACE;
+       $im = imagecreatetruecolor($sizex, $sizey);
       
        // Fill palette
        $palette = array();
@@ -702,6 +708,14 @@ class qtype_correctwriting_image_generator
        
        // Set image background to white
        imagefill($im,0,0,$palette['white']);
+       
+       // Draw a rectangle frame
+       imagesetthickness($im, FRAME_THICKNESS);
+       imageline($im, 0, 0, $sizex - 1, 0, $palette['black']);
+       imageline($im, $sizex - 1, 0, $sizex - 1, $sizey - 1, $palette['black']);
+       imageline($im, $sizex - 1, $sizey - 1, 0, $sizey - 1, $palette['black']);
+       imageline($im, 0, $sizey - 1, 0, 0, $palette['black']);
+       
        
        // Draw a table
        $this->table->paint($im, $palette);
