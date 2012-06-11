@@ -745,7 +745,7 @@ class block_formal_langs_processed_string {
                 $oldrecordids[] = $oldrecord->id;    
             }
             $oldrecordin = implode(',',$oldrecordids);
-            $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$processedstring->table}' ");
+            $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$this->tablename}' ");
         }
     }
     
