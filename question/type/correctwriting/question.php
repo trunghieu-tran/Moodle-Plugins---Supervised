@@ -116,42 +116,15 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         }
         
         $this->gradecachevalid = true;
-        $this->matchedanswerid = null;
-        $maxfraction = 0.0;
-        $language = block_formal_langs::lang_object($this->langid);
-        // Scan every answer
-        foreach($this->answers as $id => $answer) {
-            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response['answer']);
-            $mistakes = $analyzer->mistakes();
-            // Check whether answer allows non exact match
-            $allowsnonexactmatch = $answer->fraction > $this->hintgradeborder;
-            // Check, whether response has mistakes
-            $hasmistakes = count($analyzer->mistakes()) != 0 ; 
-            // Check whether mistakes more than percentage of lexemes
-            $language = block_formal_langs::lang_object($this->langid);
-            $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
-            $answertokencount = count($answerstring->stream->tokens);
-            $fullyincorrect = (count($analyzer->mistakes())  > ($this->maxmistakepercentage * $answertokencount));
-            // Check, whether we could use it
-            if (($allowsnonexactmatch || !$hasmistakes) && !$fullyincorrect) {
-                //Compute fraction
-                $fraction = $this->compute_fraction($answer->fraction, $analyzer);
-                // 0.000001 stands for precision control
-                if ($fraction >= $maxfraction - 0.000001) {
-                    $maxfraction = $fraction;
-                    $this->matchedanswerid = $id;
-                    $this->matchedanalyzer = $analyzer;
-                }
+        
+        $questionclasses = $this->split_exactmatch_and_nonexactmatch_answers();
+        $matched = $this->check_exact_match_answers($response['answer'], $questionclasses['exact']);
+        if ($matched == false) {
+            $matched = $this->check_nonexact_match_answers($response['answer'], $questionclasses['nonexact']);
+            if ($matched == false) {
+                $this->grade_as_wrong_response_to_max_fraction($response['answer']);
             }
         }
-        
-        if ($this->matchedanswerid != null ) {
-            $state = question_state::graded_state_for_fraction($maxfraction);
-            $this->matchedgradestate = array($maxfraction, $state);
-        } else {
-            $this->matchedgradestate = array(0, question_state::$gradedwrong);
-        }
-        
         return $this->matchedgradestate;
     }
     /** Computes a fraction of student response, based on alayzer
@@ -164,6 +137,123 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             $result = $result - $mistake->weight;
         }
         return $result;
+    }
+    /** Splits an answer to a exact match answers and non-exact answer
+        @return array('exact' => array ('id' => answer) of exact match answers , "nonexact" => array('id' => answer))
+      */
+    public function split_exactmatch_and_nonexactmatch_answers() {
+        $exact = array();
+        $nonexact = array();
+        foreach($this->answers as $id => $answer) {
+            if ($answer->fraction >= $this->hintgradeborder) {
+                $nonexact[$id] = $answer;
+            } else {
+                $exact[$id] = $answer;
+            }
+        }
+        return array('exact' => $exact, 'nonexact' => $nonexact);
+    }
+    /** Checks, whether student answer matches exact match answer and if matches, grades it
+      @param string $response student response
+      @param array  $answers  array of exact match answers
+      @return bool  whether it was matched
+      */
+    public function check_exact_match_answers($response, $answers) {
+        // Don't scan if no need for this
+        if (count($answers) == 0) {
+            return false;
+        }
+        // Scan answers
+        $matched = false;
+        $matchedid = null;
+        $matchedanalyzer = null;
+        $fraction = -1;
+        // Scan answers for match
+        foreach($answers as $id => $answer) {
+            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
+            $mistakes = $analyzer->mistakes();
+            if (count($mistakes) == 0) {
+                $matched = true;
+                if ($fraction <= $answer->fraction) {
+                    $fraction = $answer->fraction;
+                    $matchedanalyzer = $analyzer;
+                    $matchedid = $id;
+                }
+            }
+        }
+        
+        if ($matched) {
+            // Copy matched data
+            $this->matchedanswerid = $matchedid;
+            $this->matchedanalyzer = $matchedanalyzer;
+            $state = question_state::graded_state_for_fraction($fraction);
+            $this->matchedgradestate = array($fraction, $state);
+        }
+        
+        return $matched;
+    }
+    /** Checks, whether student answer matches non-exact match answer and if matches, grades it
+      @param string $response student response
+      @param array  $answers  array of exact match answers
+      @return bool  whether it was matched
+      */
+    public function check_nonexact_match_answers($response, $answers) {
+        // Don't scan if no need for this
+        if (count($answers) == 0) {
+            return false;
+        }
+        // Scan answers
+        $matched = false;
+        $matchedid = null;
+        $matchedanalyzer = null;
+        $fraction = -1;
+        // Get language
+        $language = block_formal_langs::lang_object($this->langid);
+        // Scan answers for match
+        foreach($answers as $id => $answer) {
+            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
+            //Get lexeme count from answer
+            $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+            $answertokencount = count($answerstring->stream->tokens);
+            // Check, whether answer is partially correct
+            $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
+            if ($partiallycorrect == true) {
+                $matched = true;
+                $answerfraction = $this->compute_fraction($answer->fraction, $analyzer);
+                if ($fraction <= $answerfraction) {
+                    $fraction = $answerfraction;
+                    $matchedanalyzer = $analyzer;
+                    $matchedid = $id;
+                }
+            }
+        }
+        
+        if ($matched) {
+            // Copy matched data
+            $this->matchedanswerid = $matchedid;
+            $this->matchedanalyzer = $matchedanalyzer;
+            $state = question_state::graded_state_for_fraction($fraction);
+            $this->matchedgradestate = array($fraction, $state);
+        }
+        
+        return $matched;
+    }
+    /** Grades  as wrong answer to an answer of max fraction
+        @param string $response student response    
+      */    
+    public function grade_as_wrong_response_to_max_fraction($response) {
+        $fraction = -1;
+        $maxid = null;
+         foreach($this->answers as $id => $answer) {
+            if ($answer->fraction >= $fraction) {
+                $maxid = $id;
+                $fraction = $answer->fraction;
+            } 
+        }
+        $this->matchedanswerid = $maxid;
+        $answer = $this->answers[$maxid];
+        $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
+        $this->matchedgradestate = array(0, question_state::$gradedwrong);
     }
     /**  Returns matching answer. Must return matching answer found when response was being graded.
          @param array $response student response  as array ( 'answer' => string of student response )
