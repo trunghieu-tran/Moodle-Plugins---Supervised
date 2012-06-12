@@ -441,7 +441,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Constructs an NFA corresponding to the given node.
      * @param $node - object of nfa_preg_node child class.
      * @param $isassertion - will the result be a lookaround-assertion automaton.
-     * @return - object of qtype_preg_nondeterministic_fa in case of success, an error object otherwise.
+     * @return - object of qtype_preg_nondeterministic_fa in case of success, false otherwise.
      */
     public function build_nfa($node, $isassertion = false) {
         $result = new qtype_preg_nondeterministic_fa();
@@ -474,9 +474,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
         }
         catch (Exception $e) {
-            $result = false;    // This way for now.
-            // TODO
-            //$this->errors[] = new qtype_preg_too_complex_error($regex, $this, array('start' => $errornode->pregnode->indfirst, 'end' => $errornode->pregnode->indlast));
+            $result = false;
         }
         return $result;
     }
@@ -487,12 +485,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        // TODO - exceptions
         $nfa = self::build_nfa($this->dst_root);
         if ($nfa !== false) {
             $this->automaton = $nfa;
+        } else {
+            $this->automaton = null;
+            $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
         }
     }
 }
-
-?>
