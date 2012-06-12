@@ -173,13 +173,20 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
             $mistakes = $analyzer->mistakes();
             if (count($mistakes) == 0) {
-                $matched = true;
-                if ($fraction <= $answer->fraction) {
+                if (($fraction <= $answer->fraction) || ($matched == false)) {
                     $fraction = $answer->fraction;
                     $matchedanalyzer = $analyzer;
                     $matchedid = $id;
                 }
+                $matched = true;
             }
+        }
+        // Normalize fraction
+        if (($fraction < 0) && ($matched == true)) {
+            $fraction = 0;
+        }
+        if (($fraction > 1) && ($matched == true)) {
+            $fraction = 1;
         }
         
         if ($matched) {
@@ -218,14 +225,22 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             // Check, whether answer is partially correct
             $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
             if ($partiallycorrect == true) {
-                $matched = true;
                 $answerfraction = $this->compute_fraction($answer->fraction, $analyzer);
-                if ($fraction <= $answerfraction) {
+                if (($fraction <= $answerfraction) || ($matched == false)) {
                     $fraction = $answerfraction;
                     $matchedanalyzer = $analyzer;
                     $matchedid = $id;
                 }
+                $matched = true;
             }
+        }
+        
+        // Normalize fraction
+        if (($fraction < 0) && ($matched == true)) {
+            $fraction = 0;
+        }
+        if (($fraction > 1) && ($matched == true)) {
+            $fraction = 1;
         }
         
         if ($matched) {
@@ -245,11 +260,12 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         $fraction = -1;
         $maxid = null;
          foreach($this->answers as $id => $answer) {
-            if ($answer->fraction >= $fraction) {
+            if (($answer->fraction >= $fraction) || ($maxid == null)) {
                 $maxid = $id;
                 $fraction = $answer->fraction;
             } 
         }
+        
         $this->matchedanswerid = $maxid;
         $answer = $this->answers[$maxid];
         $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
