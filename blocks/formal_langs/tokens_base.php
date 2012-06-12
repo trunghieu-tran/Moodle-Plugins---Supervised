@@ -794,7 +794,7 @@ class block_formal_langs_processed_string {
      * @return string - description of node
      */
     public function node_description($nodenumber) {
-       $this->node_descriptions_list();
+        $this->node_descriptions_list();
         return $this->descriptions[$nodenumber];
     }
 
@@ -815,7 +815,15 @@ class block_formal_langs_processed_string {
         }
         return $this->descriptions;
     }
-    
+    /** Test, whether we have a lexeme descriptions for token with specified index
+     *  @param int $index index of token
+     */
+    protected function has_description($index) {
+       $this->node_descriptions_list();
+       if (array_key_exists($index, $this->descriptions) == true)
+           return strlen(trim($this->descriptions[$index]))!=0;
+       return false;
+    }
     /**
      *  Returns a stream of tokens.
      *  @return stream of tokens
