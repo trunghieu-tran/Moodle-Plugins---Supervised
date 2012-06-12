@@ -267,7 +267,13 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
             $keys = array_keys($this->answers);
             return $this->answers[$keys[0]];
         }
-        return $this->answers[$this->matchedanswerid];
+        // Handle fully incorrect answer
+        $result = $this->answers[$this->matchedanswerid];
+        if ($this->matchedgradestate[1] == question_state::$gradedwrong) {
+            $result = clone $result;
+            $result->fraction = 0;
+        }
+        return $result;
     }
 }
  ?>
