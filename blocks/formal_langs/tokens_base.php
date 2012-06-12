@@ -818,7 +818,7 @@ class block_formal_langs_processed_string {
     /** Test, whether we have a lexeme descriptions for token with specified index
      *  @param int $index index of token
      */
-    protected function has_description($index) {
+    public function has_description($index) {
        $this->node_descriptions_list();
        if (array_key_exists($index, $this->descriptions) == true)
            return strlen(trim($this->descriptions[$index]))!=0;
