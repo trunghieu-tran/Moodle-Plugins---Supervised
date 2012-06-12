@@ -199,7 +199,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     foreach($stream->errors as $error) {
                          $errormessages[] = $error->errormessage;
                     }
-                    $errors["lexemedescriptions[$key]"] = implode("<BR>", $errormessages);
+                    $errors["answer[$key]"] = implode("<BR>", $errormessages);
                 }
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {

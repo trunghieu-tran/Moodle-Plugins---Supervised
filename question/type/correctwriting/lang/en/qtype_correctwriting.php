@@ -4,8 +4,10 @@
 
 $string['correctwriting'] = 'Correct writing';
 $string['movedmistakemessage'] = '{$a->description} is moved ';
+$string['movedmistakemessagenodescription'] = 'A lexeme {$a->value} at {$a->line}:{$a->position} is moved ';
 $string['addedmistakemessage'] = 'A lexeme "{$a->value}" at {$a->line}:{$a->position} is odd in response ';
 $string['absentmistakemessage'] = '{$a->description} is absent in response ';
+$string['absentmistakemessagenodescription'] = 'A lexeme "{$a->value}" is absent in response ';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['caseyes'] = 'Yes, case is important';
 $string['caseno'] = 'No, case is unimportant';
