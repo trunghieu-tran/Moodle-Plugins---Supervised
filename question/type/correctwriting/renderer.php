@@ -68,7 +68,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                $resulttext = $imagesrc . $resulttext; 
            }
        }
-       return $resulttext . parent::correct_response($qa);
+       // TODO: Uncomment if we need original shortanswer hint
+       return $resulttext /*. parent::correct_response($qa) */;
    }
    //Creates all information about mistakes, passed into mistakes    
    protected function create_image_information($qa,$analyzer) {
