@@ -269,10 +269,9 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         }
         // Handle fully incorrect answer
         $result = $this->answers[$this->matchedanswerid];
-        if ($this->matchedgradestate[1] == question_state::$gradedwrong) {
-            $result = clone $result;
-            $result->fraction = 0;
-        }
+        $result = clone $result;
+        $result->fraction =  $this->matchedgradestate[0];
+        
         return $result;
     }
 }
