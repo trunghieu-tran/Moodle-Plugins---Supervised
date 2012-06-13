@@ -51,7 +51,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
        } else {
            $a->value = $this->answer[$answerindex]->value();
            $a->line = $this->answer[$answerindex]->position()->linestart();
-           $a->position = $this->response[$answerindex]->position()->colstart();
+           $a->position = $this->answer[$answerindex]->position()->colstart();
            $this->mistakemsg = get_string('movedmistakemessagenodescription','qtype_correctwriting',$a);
        }
    }
