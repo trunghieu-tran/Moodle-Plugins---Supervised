@@ -169,7 +169,20 @@ class  qtype_correctwriting_sequence_analyzer {
     
         // Compute temporary lcs data
         for($currenttoken = $answercount - 1;$currenttoken > -1;$currenttoken--) {
-            $newtmplcs = $tmplcs;
+            // Copy only maximum length LCS from older CS array
+            $lcslen = 0;
+            for($i = 0;$i < count($tmplcs);$i++) {
+                if (count($tmplcs[$i]['lcs']) > $lcslen) {
+                    $lcslen = count($tmplcs[$i]['lcs']);
+                }
+            }
+            $newtmplcs = array();
+            for($i = 0;$i < count($tmplcs);$i++) {
+                if (count($tmplcs[$i]['lcs']) == $lcslen) {
+                    $newtmplcs[] = $tmplcs[$i];
+                }
+            }
+            
             for($currentmatch = 0;$currentmatch < count($matches[$currenttoken]);$currentmatch++) {
                 // Scan existing suffixes and push match to it if can, changing maxind to current match
                 for ($currentcs = 0;$currentcs < count($tmplcs);$currentcs++) {
