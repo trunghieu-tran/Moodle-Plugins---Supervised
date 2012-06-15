@@ -299,7 +299,7 @@ class preg_leaf_charset extends preg_leaf {
 		$this->ranges = array(array());
 		$this->israngecalculated = true;//empty ranges for empty leaf is correct!
     }
-	protected $flags;//simple flags in disjunctive normal form
+	public $flags;//simple flags in disjunctive normal form
 	/*
 	*simple ranges, range is pair of integer, ranges is 3d array of integer
 	*or 2d array of pair (DNF of pair)
@@ -348,6 +348,7 @@ class preg_leaf_charset extends preg_leaf {
 	protected function push_negative() {
 		echo 'implement push_negative before use!';
 	}
+	//return intersection
 	public function intersect(preg_lef_charset $other) {
 		echo 'implement intersect before use!';
 	}
