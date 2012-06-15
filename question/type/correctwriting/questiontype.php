@@ -84,8 +84,16 @@ class qtype_correctwriting extends qtype_shortanswer {
         // They also are loaded as stdClass
         foreach($question->options->answers as $id => $answer) {
             $string = $lang->create_from_db('question_answers',$id);
-            // Set field according to data
-            $question->options->answers[$id]->lexemedescriptions = implode(PHP_EOL, $descriptions[$id]);
+            
+            // Fixing bug, when no description for first lexeme caused row shift
+            $string = '';
+            if (count($descriptions[$id]) != 0) {
+                if (strlen(trim($descriptions[$id][0])) == 0) {
+                    $string = "\n";
+                }
+            }
+            $string = $string . implode("\n", $descriptions[$id]);
+            $question->options->answers[$id]->lexemedescriptions = $string;
         }
         return true;
     }
