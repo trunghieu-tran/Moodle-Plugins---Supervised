@@ -132,6 +132,7 @@ L?\"(\\\"|[^\"])+\"                                         { return $this->crea
 "..."                                                       { return $this->create_token("ellipsis",$this->yytext()); }
 ">>="                                                       { return $this->create_token("right_assign",$this->yytext()); }
 "<<="                                                       { return $this->create_token("left_assign",$this->yytext()); }
+"="                                                        { return $this->create_token("assign",$this->yytext()); }
 "+="                                                       { return $this->create_token("add_assign",$this->yytext()); }
 "-="                                                       { return $this->create_token("sub_assign",$this->yytext()); }
 "*="                                                       { return $this->create_token("mul_assign",$this->yytext()); }
