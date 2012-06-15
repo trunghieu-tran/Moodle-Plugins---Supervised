@@ -160,7 +160,7 @@ class preg_parser_yyParser
         if ($lastindxs !== null) {
             $newnode->lastindxs = $lastindxs;
         }
-        $newnodw->addinfo = $addinfo;
+        $newnode->addinfo = $addinfo;
         $this->errornodes[] = $newnode;
         $this->error = true;
         return $newnode;

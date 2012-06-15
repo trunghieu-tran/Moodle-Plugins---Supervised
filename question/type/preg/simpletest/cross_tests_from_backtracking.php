@@ -1,13 +1,10 @@
 <?php
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-if (!defined('NOMATCH')) {
-    define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-}
+defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
 class qtype_preg_cross_tests_from_backtracking {
 
@@ -21,13 +18,13 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array('str'=>'abacd',
-                       'results'=>array(array('is_match'=>true,    // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,    // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,    // results for fa engine
+                                        array('is_match'=>true,    // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>5),
@@ -70,13 +67,13 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array('str'=>'abcdaaaabcdZz',
-                       'results'=>array(array('is_match'=>true,        // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,        // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>6),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,        // results for fa engine
+                                        array('is_match'=>true,        // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>12),
                                               'length'=>array(0=>13,1=>1),
@@ -140,13 +137,13 @@ class qtype_preg_cross_tests_from_backtracking {
 
     function data_for_test_Q_INF_6() {
         $test0 = array('str'=>'aaaaaaaaaaa',
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(1),
                                               'next'=>'b'),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>11),
@@ -176,13 +173,13 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array('str'=>'abacd',
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>3),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>5),
@@ -225,13 +222,13 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test1 = array('str'=>'abcdAz',
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>11),
                                               'length'=>array(0=>5,1=>1),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>5),
                                               'length'=>array(0=>6,1=>1),
@@ -261,13 +258,13 @@ class qtype_preg_cross_tests_from_backtracking {
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         $test2 = array('str'=>'abcb',
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>4,1=>1),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0,1=>3),
                                               'length'=>array(0=>4,1=>1),
@@ -344,13 +341,13 @@ class qtype_preg_cross_tests_from_backtracking {
 
     function data_for_test_Q_FIN_7() {
         $test0 = array('str'=>'aaaaaaaaaaa',
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>5),
                                               'left'=>array(0),
                                               'next'=>'nextchar'),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>11),
@@ -676,14 +673,14 @@ class qtype_preg_cross_tests_from_backtracking {
                        'left'=>array(0),
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
-        $test1 = array('str'=>'ABDEDSGR',                                  // test fails at the moment
-                       'results'=>array(array('is_match'=>true,            // results for backtracking engine
+        $test1 = array('str'=>'ABDEDSGR',
+                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>2),
                                               'left'=>array(1),
                                               'next'=>' '),
-                                        array('is_match'=>true,            // results for fa engine
+                                        array('is_match'=>true,            // Results for FA engine.
                                               'full'=>false,
                                               'index_first'=>array(0=>0),
                                               'length'=>array(0=>8),

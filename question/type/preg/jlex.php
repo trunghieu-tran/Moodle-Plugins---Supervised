@@ -4,7 +4,7 @@
   Based on JLex which is:
 
        JLEX COPYRIGHT NOTICE, LICENSE, AND DISCLAIMER
-  Copyright 1996-2000 by Elliot Joel Berk and C. Scott Ananian 
+  Copyright 1996-2000 by Elliot Joel Berk and C. Scott Ananian
 
   Permission to use, copy, modify, and distribute this software and its
   documentation for any purpose and without fee is hereby granted,
@@ -82,30 +82,32 @@ class JLexBase {
 
   protected function yy_advance() {
     if ($this->yy_buffer_index < $this->yy_buffer_read) {
-      return ord($this->yy_buffer[$this->yy_buffer_index++]);
+      $char = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+      return qtype_preg_unicode::ord($char);
     }
     if ($this->yy_buffer_start != 0) {
       /* shunt */
       $j = $this->yy_buffer_read - $this->yy_buffer_start;
-      $this->yy_buffer = substr($this->yy_buffer, $this->yy_buffer_start, $j);
+      $this->yy_buffer = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_start, $j);
       $this->yy_buffer_end -= $this->yy_buffer_start;
       $this->yy_buffer_start = 0;
       $this->yy_buffer_read = $j;
       $this->yy_buffer_index = $j;
 
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !strlen($data)) return $this->YY_EOF;
+      if ($data === false || !qtype_preg_unicode::strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= strlen($data);
+      $this->yy_buffer_read .= qtype_preg_unicode::strlen($data);
     }
 
     while ($this->yy_buffer_index >= $this->yy_buffer_read) {
       $data = fread($this->yy_reader, 8192);
-      if ($data === false || !strlen($data)) return $this->YY_EOF;
+      if ($data === false || !qtype_preg_unicode::strlen($data)) return $this->YY_EOF;
       $this->yy_buffer .= $data;
-      $this->yy_buffer_read .= strlen($data);
+      $this->yy_buffer_read .= qtype_preg_unicode::strlen($data);
     }
-    return ord($this->yy_buffer[$this->yy_buffer_index++]);
+    $char = qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_index++, 1);
+    return qtype_preg_unicode::ord($char);
   }
 
   protected function yy_move_end() {
@@ -157,7 +159,7 @@ class JLexBase {
   }
 
   protected function yytext() {
-    return substr($this->yy_buffer, $this->yy_buffer_start, 
+    return qtype_preg_unicode::substr($this->yy_buffer, $this->yy_buffer_start,
           $this->yy_buffer_end - $this->yy_buffer_start);
   }
 
