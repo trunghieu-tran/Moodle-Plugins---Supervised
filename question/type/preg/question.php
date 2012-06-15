@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
@@ -214,7 +215,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $bestmatchresult = $matchresults;
-                $fitness = strlen($response['answer']);
+                $fitness = qtype_preg_unicode::strlen($response['answer']);
                 break;
             }
 
@@ -313,7 +314,18 @@ class qtype_preg_question extends question_graded_automatically
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
-            $matcher = new $engineclass($for_regexp, $modifiers);
+            //Create and fill options object
+            $matchingoptions = new qtype_preg_matching_options;
+            //We need extension to hint next character or to generate correct answer if none is supplied
+            $matchingoptions->extensionneeded = $this->usehint || trim($this->correctanswer) == '';
+            if($answerid !== null) {
+                $feedback = $this->answers[$answerid]->feedback;
+                if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
+                    $matchingoptions->capturesubpatterns = false;
+                }
+            }
+
+            $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
             if ($answerid !== null) {
                 $this->matchers_cache[$answerid] =& $matcher;
             }
@@ -396,17 +408,17 @@ class qtype_preg_question extends question_graded_automatically
 
             $wronghead = '';
             if ($firstindex > 0) {//if there is wrong heading
-                $wronghead = substr($currentanswer, 0, $firstindex);
+                $wronghead = qtype_preg_unicode::substr($currentanswer, 0, $firstindex);
             }
 
             $correctpart = '';
             if ($firstindex != qtype_preg_matching_results::NO_MATCH_FOUND) {//there were any matched characters
-                $correctpart = substr($currentanswer, $firstindex, $length);
+                $correctpart = qtype_preg_unicode::substr($currentanswer, $firstindex, $length);
             }
 
             $correctbeforehint = $correctpart;
-            if ($correctbeforehint !== '' && $matchresults->correctendingstart != strlen($wronghead) + strlen($correctpart)) {//hint starts before match fail position
-                $correctbeforehint = substr($correctpart, 0, $matchresults->correctendingstart - strlen($wronghead));
+            if ($correctbeforehint !== '' && $matchresults->correctendingstart != qtype_preg_unicode::strlen($wronghead) + qtype_preg_unicode::strlen($correctpart)) {//hint starts before match fail position
+                $correctbeforehint = qtype_preg_unicode::substr($correctpart, 0, $matchresults->correctendingstart - qtype_preg_unicode::strlen($wronghead));
             }
 
             $hintedpart = null;
@@ -422,8 +434,8 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             $wrongtail = '';
-            if ($firstindex + $length < strlen($currentanswer)) {//if there is wrong tail
-                $wrongtail =  substr($currentanswer, $firstindex + $length, strlen($currentanswer) - $firstindex - $length);
+            if ($firstindex + $length < qtype_preg_unicode::strlen($currentanswer)) {//if there is wrong tail
+                $wrongtail =  qtype_preg_unicode::substr($currentanswer, $firstindex + $length, qtype_preg_unicode::strlen($currentanswer) - $firstindex - $length);
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail,
                             'correctbeforehint' =>  $correctbeforehint, 'deltail' => $deltail);
@@ -478,7 +490,7 @@ class qtype_preg_question extends question_graded_automatically
     public function insert_subpatterns($subject, $response, $matchresults) {
 
         //Sanity check
-        if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
+        if (qtype_preg_unicode::strpos($subject, '{$') === false || qtype_preg_unicode::strpos($subject, '}') === false) {
             //There are no placeholders for sure
             return $subject;
         }
@@ -494,7 +506,7 @@ class qtype_preg_question extends question_graded_automatically
                 $startindex = $matchresults->index_first($i);
                 $length = $matchresults->length($i);
                 if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $replace = substr($answer, $startindex, $length);
+                    $replace = qtype_preg_unicode::substr($answer, $startindex, $length);
                 } else {
                     $replace = '';
                 }

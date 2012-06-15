@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Hint class for showing matching part of a response (along with unmatched head and tail)
@@ -46,7 +47,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         return true;//All matching hints are based on the response
     }
 
-    /** 
+    /**
      * Returns whether response allows for the hint to be done
      */
     public function hint_available($response = null) {
@@ -58,14 +59,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         return false;
     }
 
-    /** 
+    /**
      * Returns penalty for using specific hint of given hint type (possibly for given response)
      */
     public function penalty_for_specific_hint($response = null) {
             return $this->question->penalty;
     }
 
-    /** 
+    /**
      * Render colored string with specific hint value for given response using correct ending, returned by the matcher
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
@@ -83,7 +84,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
                     $hint .= $renderer->render_tobecontinued();
                 }
                 $wrongtail = '';
-                if (strlen($hint) == 0) {
+                if (qtype_preg_unicode::strlen($hint) == 0) {
                     $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
@@ -143,7 +144,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
     ////Abstract hint class functions implementation
 
-    /** 
+    /**
      * Returns whether response allows for the hint to be done
      */
     public function hint_available($response = null) {
@@ -152,7 +153,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
         return parent::hint_available($response) && $this->question->usehint && !$matchresults->full;
     }
 
-    /** 
+    /**
      * Returns penalty for using specific hint of given hint type (possibly for given response)
      */
     public function penalty_for_specific_hint($response = null) {
@@ -163,18 +164,19 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function render_hint($renderer, $response) {
         return $this->render_stringextension_hint($renderer, $response);
     }
+	
     public function hinted_string($matchresults) {
         //One-character hint
         $hintedstring = $matchresults->string_extension();
-        if (strlen($hintedstring) > 0) {
-            return $hintedstring[0];
+        if (qtype_preg_unicode::strlen($hintedstring) > 0) {
+            return qtype_preg_unicode::substr($hintedstring, 0, 1);
         }
         return '';
     }
 
     public function to_be_continued($matchresults) {
         $hintedstring = $matchresults->string_extension();
-        return strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
+        return qtype_preg_unicode::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
     }
 
 }

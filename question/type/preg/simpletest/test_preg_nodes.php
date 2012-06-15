@@ -61,13 +61,13 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $backref->matcher = $matcher;
 
         // Matching at the end of the string.
-        $res = $backref->match('abc', 3, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('abc', 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abc', 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEqual($length, 0);
         $this->assertEqual($ch, 'abc');
         // The string doesn't match with backref at all.
-        $res = $backref->match('abcdef', 3, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('abcdef', 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abcdef', 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEqual($length, 0);
@@ -84,13 +84,13 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $backref->matcher = $matcher;
 
         // Reaching the end of the string.
-        $res = $backref->match('abcab', 3, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('abcab', 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abc', 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEqual($length, 2);
         $this->assertEqual($ch, 'c');
         // The string matches backref partially.
-        $res = $backref->match('abcacd', 3, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('abcacd', 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abcdef', 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEqual($length, 1);
@@ -106,7 +106,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $backref->number = 1;
         $backref->matcher = $matcher;
 
-        $res = $backref->match('abcabc', 3, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('abcabc', 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abc', 3, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEqual($length, 3);
@@ -123,7 +123,7 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $backref->number = 1;
         $backref->matcher = $matcher;
 
-        $res = $backref->match('', 0, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('', 0, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('', -1, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEqual($length, 0);
@@ -140,14 +140,14 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $backref->matcher = $matcher;
 
         // 2 characters matched
-        $res = $backref->match('aba', 2, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('aba', 2, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character('abc', 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEqual($length, 1);
         $this->assertEqual($ch, 'b');
         // Emptiness matched.
         $matcher->match('xyz');
-        $res = $backref->match('xyz', 0, &$length, false, $matcher->get_match_results());
+        $res = $backref->match('xyz', 0, $length, false, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEqual($length, 0);
     }

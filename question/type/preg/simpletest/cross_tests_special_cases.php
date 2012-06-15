@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Unit tests for matchers
  *
@@ -8,15 +8,11 @@
  * @package questions
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-if (!defined('NOMATCH')) {
-    define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-}
+defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
 class qtype_preg_cross_tests_special_cases {
 
@@ -71,5 +67,17 @@ class qtype_preg_cross_tests_special_cases {
         return array('regex'=>'\378',
                      'tests'=>array($test1));
     }
+
+    function data_for_test_unicode() {
+        $test1 = array( 'str'=>'абв',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3),
+                        'left'=>array(1),
+                        'next'=>'é');
+
+        return array('regex'=>'абвé',
+                     'tests'=>array($test1));
+    }
 }
-?>

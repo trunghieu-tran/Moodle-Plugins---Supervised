@@ -15,6 +15,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
@@ -23,12 +24,12 @@ class qtype_preg_regex_handler {
     protected $regex;
     //Modifiers for regular expression
     protected $modifiers;
-    //Max number of a subpattern available in regular expression
-    protected $maxsubpatt;
-    //A map where keys are subpattern names and values are their numbers
-    protected $subpatternmap;
-    //Number of lexems (defined by user) in regular expression
-    protected $lexemcount;
+    //Regular expression handling options, may be different for different handlers
+    protected $options;
+
+    protected $lexer;
+
+    protected $parser;
 
     //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
     protected $ast_root;
@@ -45,14 +46,15 @@ class qtype_preg_regex_handler {
 
     /**
     * Parse regex and do all necessary preprocessing
-    @param regex - regular expression for which will be build finite automate
-    @param modifiers - modifiers of regular expression
+    * @param regex - regular expression to handle
+    * @param modifiers - modifiers of regular expression
+    * @param options - options to handle regex, i.e. any necessary additional parameters
     */
-    public function __construct($regex = null, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         $this->errors = array();
-        $this->maxsubpatt = 0;
-        $this->subpatternmap = array();
-		$this->lexemcount = 0;
+        $this->lexer = null;
+        $this->parser = null;
+
         if ($regex === null) {
             return;
         }
@@ -60,15 +62,17 @@ class qtype_preg_regex_handler {
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
             $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i=0; $i < strlen($modifiers); $i++) {
-                if (strpos($supportedmodifiers,$modifiers[$i]) === false) {
-                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $modifiers[$i]);
+            for ($i = 0; $i < qtype_preg_unicode::strlen($modifiers); $i++) {
+                $mod = qtype_preg_unicode::substr($modifiers, $i, 1);
+                if (qtype_preg_unicode::strpos($supportedmodifiers, $mod) === false) {
+                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod);
                 }
             }
         }
 
         $this->regex = $regex;
         $this->modifiers = $modifiers;
+        $this->options = $options;
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
@@ -85,17 +89,43 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * returns notation, actually used by matcher
-    */
+     * Returns notation, actually used by matcher.
+     */
     public function used_notation() {
         return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
     }
 
     /**
-    * returns subpatterns map
-    */
+     * Returns subpatterns map.
+     */
     public function get_subpattern_map() {
-        return $this->subpatternmap;
+        if ($this->lexer !== null) {
+            return $this->lexer->get_subpattern_map();
+        } else {
+            return array();
+        }
+    }
+
+    /**
+     * Returns max subpattern number.
+     */
+    public function get_max_subpattern() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_max_subpattern();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Returns number of lexems.
+     */
+    public function get_lexem_count() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_lexem_count();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -157,36 +187,28 @@ class qtype_preg_regex_handler {
     @param $regex - regular expression for building tree
     */
     protected function build_tree($regex) {
-
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
-        $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->matcher =& $this;//Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
-        /*old-style modifier support
-        $lexer->globalmodifiers = $this->modifiers;
-        $lexer->localmodifiers = $this->modifiers;*/
-        $lexer->mod_top_opt($this->modifiers, '');
-        $parser = new preg_parser_yyParser;
-        while ($token = $lexer->nextToken()) {
+        $this->lexer = new qtype_preg_lexer($pseudofile);
+        $this->lexer->matcher =& $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
+        $this->lexer->mod_top_opt($this->modifiers, '');
+        $this->parser = new preg_parser_yyParser;
+        while ($token = $this->lexer->nextToken()) {
             if (!is_array($token)) {
-                $parser->doParse($token->type, $token->value);
+                $this->parser->doParse($token->type, $token->value);
             } else {
                 foreach ($token as $curtoken) {
-                    $parser->doParse($curtoken->type, $curtoken->value);
+                    $this->parser->doParse($curtoken->type, $curtoken->value);
                 }
             }
         }
-
-        $this->maxsubpatt = $lexer->get_max_subpattern();
-        $this->subpatternmap = $lexer->get_subpattern_map();
-		$this->lexemcount = $lexer->get_lexem_count();
-        $lexerrors = $lexer->get_errors();
+        $lexerrors = $this->lexer->get_errors();
         foreach ($lexerrors as $lexerror) {
-            $parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
+            $this->parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
         }
-        $parser->doParse(0, 0);
-        if ($parser->get_error()) {
-            $errornodes = $parser->get_error_nodes();
+        $this->parser->doParse(0, 0);
+        if ($this->parser->get_error()) {
+            $errornodes = $this->parser->get_error_nodes();
             $parseerrors = array();
             //Generate parser error messages
             foreach($errornodes as $node) {
@@ -194,7 +216,7 @@ class qtype_preg_regex_handler {
             }
             $this->errors = array_merge($this->errors, $parseerrors);
         } else {
-            $this->ast_root = $parser->get_root();
+            $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
         }

@@ -34,7 +34,7 @@ class qtype_preg_matching_results {
     public $length;
     /** @var integer The number of characters left to complete matching. */
     public $left;
-    /** @var object of qtype_preg_matching_results, containing string extended to give more close match than this  ($this->extededmatch->left <= $this->left)
+    /** @var object of qtype_preg_matching_results, containing string extended to give more close match than this ($this->extededmatch->left <= $this->left)
      *
      * There are several ways this string could be generated:
      * add characters to the end of matching part (index_first[0]+length[0]);
@@ -269,8 +269,8 @@ class qtype_preg_matching_results {
             $str2 = $this->extendedmatch->str;
             for ($i = 0; $i <= $this->length[0]; $i++) {
                 //One of the string ended or characters are different
-                if ($this->extendedmatch->index_first[0] + $i >= strlen($str2) || $this->index_first[0] + $i >= strlen($str1)
-                    || $str1[$this->index_first[0] + $i] != $str2[$this->extendedmatch->index_first[0] + $i]) {
+                if ($this->extendedmatch->index_first[0] + $i >= qtype_preg_unicode::strlen($str2) || $this->index_first[0] + $i >= qtype_preg_unicode::strlen($str1)
+                    || qtype_preg_unicode::substr($str1, $this->index_first[0] + $i, 1) != qtype_preg_unicode::substr($str2, $this->extendedmatch->index_first[0] + $i, 1)) {
                     $this->extensionstart = $this->index_first[0] + $i;
                     $this->extendedmatch->extensionstart = $this->extendedmatch->index_first[0] + $i;
                     break;
@@ -293,7 +293,7 @@ class qtype_preg_matching_results {
         $wronghead = '';
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
-                $wronghead = substr($this->str, 0, $this->index_first[$subpattern]);
+                $wronghead = qtype_preg_unicode::substr($this->str, 0, $this->index_first[$subpattern]);
             }
         } else {//No match, assuming all string is wrong heading (to display hint after it)
             $wronghead = $this->str;
@@ -309,7 +309,7 @@ class qtype_preg_matching_results {
         $correctpart = '';
         if ($this->is_match()) {//There is match
             if ( isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $correctpart = substr($this->str, $this->index_first[$subpattern], $this->length[$subpattern]);
+                $correctpart = qtype_preg_unicode::substr($this->str, $this->index_first[$subpattern], $this->length[$subpattern]);
             }
         }
         return $correctpart;
@@ -322,8 +322,8 @@ class qtype_preg_matching_results {
         $subpattern = $this->subpattern_number($subpattern);
         $wrongtail = '';
         if ($this->is_match()) {//There is match
-            if ($this->index_first[$subpattern] + $this->length[$subpattern] < strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail =  substr($this->str, $this->index_first[$subpattern] + $this->length[$subpattern], strlen($this->str) - $this->index_first[$subpattern] - $this->length[$subpattern]);
+            if ($this->index_first[$subpattern] + $this->length[$subpattern] < qtype_preg_unicode::strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail =  qtype_preg_unicode::substr($this->str, $this->index_first[$subpattern] + $this->length[$subpattern], qtype_preg_unicode::strlen($this->str) - $this->index_first[$subpattern] - $this->length[$subpattern]);
             }
         }
         return $wrongtail;
@@ -335,7 +335,7 @@ class qtype_preg_matching_results {
     public function correct_before_hint() {
         $correctbeforehint = '';
         if ($this->is_match()) {//There is match
-            $correctbeforehint = substr($this->str, $this->index_first[0], $this->extensionstart -  $this->index_first[0]);
+            $correctbeforehint = qtype_preg_unicode::substr($this->str, $this->index_first[0], $this->extensionstart - $this->index_first[0]);
         }
         return $correctbeforehint;
     }
@@ -346,8 +346,8 @@ class qtype_preg_matching_results {
     public function tail_to_delete() {
         $wrongtail = '';
         if ($this->is_match()) {//There is match
-            if ($this->extensionstart < strlen($this->str) && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail =  substr($this->str, $this->extensionstart, strlen($this->str) - $this->extensionstart);
+            if ($this->extensionstart < qtype_preg_unicode::strlen($this->str) && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
+                $wrongtail = qtype_preg_unicode::substr($this->str, $this->extensionstart, qtype_preg_unicode::strlen($this->str) - $this->extensionstart);
             }
         }
         return $wrongtail;
@@ -360,8 +360,8 @@ class qtype_preg_matching_results {
         $extension = '';
         if ($this->extendedmatch !== null) {
             $extendedstr = $this->extendedmatch->str();
-            if ($this->extendedmatch->extensionstart < strlen($extendedstr)) {
-                $extension = substr($extendedstr, $this->extendedmatch->extensionstart, strlen($extendedstr) - $this->extendedmatch->extensionstart);
+            if ($this->extendedmatch->extensionstart < qtype_preg_unicode::strlen($extendedstr)) {
+                $extension = qtype_preg_unicode::substr($extendedstr, $this->extendedmatch->extensionstart, qtype_preg_unicode::strlen($extendedstr) - $this->extendedmatch->extensionstart);
             }
         }
         return $extension;
@@ -369,6 +369,26 @@ class qtype_preg_matching_results {
 
 }
 
+/**
+ * Options, used to specify matching process
+ */
+class qtype_preg_matching_options {
+
+    /** @var boolean Should matcher try to generate extension? */
+    public $extensionneeded = true;
+    /** @var string Unicode property name for preferred alphabet for \w when generating extension*/
+    public $preferredalphabet = null;
+    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension*/
+    public $preferfordot = null;
+
+    /** @var boolean Should matcher look for subpattern captures or the whole match only? */
+    //TODO - does we need to specify subpatterns we are looking for or there is no sense in it?
+    public $capturesubpatterns = true;
+}
+
+/**
+ * Abstract base class for regular expression matcher
+ */
 class qtype_preg_matcher extends qtype_preg_regex_handler {
 
     //Constants for the capabilities which could (or could not) be supported by matching engine
@@ -402,24 +422,33 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
     /**
-    * Parse regex and do all necessary preprocessing.
-    *
-    * @param regex - regular expression for which will be build finite automate
+    * Parse regex and do all necessary preprocessing
+    * @param regex - regular expression to handle
     * @param modifiers - modifiers of regular expression
+    * @param options - options to handle regex, object of qtype_preg_matching_options class
     */
-    public function __construct($regex = null, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         //Set matching data empty
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
+        // Options should exist at least as a default object.
+        if ($options === null) {
+            $options = new qtype_preg_matching_options();
+        }
+
         //Do parsing
-        parent::__construct($regex, $modifiers);
+        parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
         }
 
+        if ($this->lexer !== null) {
+            $this->options->capturesubpatterns = $this->lexer->backrefs_exist();
+        }
+
         //Invalidate match called later to allow parser to count subpatterns
-        $this->matchresults->set_source_info('', $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $this->matchresults->set_source_info('', $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
         $this->matchresults->invalidate_match();
     }
 
@@ -449,7 +478,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //Are results cached already?
-        if (array_key_exists($str,$this->resultcache)) {
+        if (array_key_exists($str, $this->resultcache)) {
             $this->matchresults = $this->resultcache[$str];
             return $this->matchresults;
         }
@@ -457,7 +486,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         //Reset match data and perform matching.
         $this->matchresults = $this->match_inner($str);
         //Save source data for the match
-        $this->matchresults->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $this->matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
 
         //Set all string as incorrect if there were no matching
         if (!$this->matchresults->is_match()) {
@@ -487,7 +516,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->maxsubpatt, $this->subpatternmap, $this->lexemcount);
+        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
         $result->invalidate_match();
 
         if ($this->anchor->start) {
@@ -495,9 +524,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Results for other offsets would be same.
             $rightborder = 1;
         } else {
-            //Use textlib to be sure under Unicode
-            $textlib = textlib_get_instance();
-            $len = $textlib->strlen($str);
+            $len = qtype_preg_unicode::strlen($str);
             // Match from all indexes
             $rightborder = $len;
             //Try matching an empty string at least once
@@ -513,7 +540,6 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
                 $result = $tmp;
             }
         }
-
         return $result;
     }
 
