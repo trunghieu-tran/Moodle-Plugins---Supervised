@@ -486,9 +486,54 @@ class preg_charset_flag {
 				return $res;
 			}
 		} else if ($this->type==preg_charset_flag::FLAG && $other->type==preg_charset_flag::SET) {
+			if ($other->negative) {
+				return false;
+			}
+			$res = new preg_charset_flag;
+			$str = '';
+			for ($i=0; $i<strlen($other->set); $i++) {
+				if ($this->match($other->set, $i)) {
+					$str .= $other->set[$i];
+				}
+			}
+			$res->set_set($str);
+			return $res;
 		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::FLAG) {
 			return $other->intersect($this);
 		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::SET) {
+			if ($this->negative && $other->negative) {
+				$res = new preg_charset_flag;
+				$str = $str = $this->set . $other->set;var_dump($str);
+				$resstr = '';
+				for ($i=0; $i<strlen($str); $i++) {
+					if (strpos($str, $str[$i])==$i) {
+						$resstr .= $str[$i];
+					}
+				}var_dump($resstr);
+				$res->negative = true;
+				$res->set_set($resstr);
+			} else if ($this->negative && !$other->negative) {
+				$res = new preg_charset_flag;
+				$str = '';
+				for ($i=0; $i<strlen($other->set); $i++) {
+					if ($this->match($other->set, $i)) {
+						$str .= $other->set[$i];
+					}
+				}
+				$res->set_set($str);
+				return $res;
+			} else {
+				$res = new preg_charset_flag;
+				$str = '';
+				for ($i=0; $i<strlen($this->set); $i++) {
+					if ($other->match($this->set, $i)) {
+						$str .= $this->set[$i];
+					}
+				}
+				$res->set_set($str);
+				return $res;
+			}
+			return $res;
 		} else {
 			return false;
 		}
