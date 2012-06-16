@@ -349,8 +349,60 @@ class preg_leaf_charset extends preg_leaf {
 		echo 'implement push_negative before use!';
 	}
 	//return intersection
-	public function intersect(preg_lef_charset $other) {
-		echo 'implement intersect before use!';
+	public function intersect(preg_leaf_charset $other) {
+		foreach ($this->flags as $disjunct1) {
+			foreach ($other->flags as $disjunct2) {
+				$resflags[] = array_merge($disjunct1, $disjunct2);
+			}
+		}
+		$result = new preg_leaf_charset;
+		$result->flags = $resflags;
+		$result->israngecalculated = false;
+		$result->reduce_dnf();
+		return $result;
+	}
+	public function reduce_dnf() {
+		foreach ($this->flags as $key=>$disjunct) {
+			foreach ($this->flags[$key] as $index=>$flag) {
+				if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$index])) {
+					if ($flag->type===preg_charset_flag::SET && !$flag->negative) {
+						foreach ($disjunct as $flag2) {
+							$this->flags[$key][$index] = $this->flags[$key][$index]->intersect($flag2);
+							if ($this->flags[$key][$index]===null) {
+								$this->flags[$key]=null;
+								break;
+							}
+						}
+						$this->flags[$key] = array($this->flags[$key][$index]);
+					} else if ($flag->type===preg_charset_flag::SET || $flag->type===preg_charset_flag::FLAG) {//negative set or flag
+						foreach ($disjunct as $flag2) {
+							$intersected = $this->flags[$key][$index]->intersect($flag2);
+							if ($intersected===null) {
+								$this->flags[$key]=null;
+								break;
+							} else if ($intersected!==false) {
+								$this->flags[$key][$index] = $intersected;
+							}
+						}
+					}
+				}
+			}
+		}
+		$dnf = null;
+		foreach ($this->flags as $disjunct) {
+			if ($disjunct!==null) {
+				$disj = null;
+				foreach ($disjunct as $flag) {
+					if ($flag!==null) {
+						$disj[] = $flag;
+					}
+				}
+				if ($disj!==null) {
+					$dnf[] = $disj;
+				}
+			}
+		}
+		$this->flags = $dnf;
 	}
 	public function substract(preg_lef_charset $other) {
 		echo 'implement substract before use!';
@@ -496,6 +548,9 @@ class preg_charset_flag {
 					$str .= $other->set[$i];
 				}
 			}
+			if ($str==='') {
+				return null;
+			}
 			$res->set_set($str);
 			return $res;
 		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::FLAG) {
@@ -511,6 +566,9 @@ class preg_charset_flag {
 					}
 				}
 				$res->negative = true;
+				if ($resstr==='') {
+					return null;
+				}
 				$res->set_set($resstr);
 			} else if ($this->negative && !$other->negative) {
 				$res = new preg_charset_flag;
@@ -519,6 +577,9 @@ class preg_charset_flag {
 					if ($this->match($other->set, $i)) {
 						$str .= $other->set[$i];
 					}
+				}
+				if ($str==='') {
+					return null;
 				}
 				$res->set_set($str);
 				return $res;
@@ -529,6 +590,9 @@ class preg_charset_flag {
 					if ($other->match($this->set, $i)) {
 						$str .= $this->set[$i];
 					}
+				}
+				if ($str==='') {
+					return null;
 				}
 				$res->set_set($str);
 				return $res;
