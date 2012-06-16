@@ -337,7 +337,18 @@ class preg_leaf_charset extends preg_leaf {
 		return $result;
 	}
 	public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
-		return 'implement next_character before use!';
+		for ($i=ord('a'); $i<256; $i++) {
+			$c=chr($i);
+			if ($this->match($c, 0, $l, true)) {
+				return $c;
+			}
+		}
+		for ($i=0; $i<ord('a'); $i++) {
+			$c=chr($i);
+			if ($this->match($c, 0, $l, true)) {
+				return $c;
+			}
+		}
 	}
 	public function tohr() {
 		return 'implement tohr before use!';
