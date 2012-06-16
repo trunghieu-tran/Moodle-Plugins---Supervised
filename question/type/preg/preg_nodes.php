@@ -318,6 +318,9 @@ class preg_leaf_charset extends preg_leaf {
 	}
 	protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
 		$result = false;
+		if ($this->flags===null) {
+			return false;
+		}
 		foreach ($this->flags as $variant) {
 			$varres = true;
 			foreach ($variant as $flag) {
@@ -346,10 +349,47 @@ class preg_leaf_charset extends preg_leaf {
 		echo 'implement add_flag before use!';
 	}
 	protected function push_negative() {
-		echo 'implement push_negative before use!';
+		if (!$this->negative) {
+			die('pushing negative on positive charclass!');
+		}
+		if ($this->flags===null) {
+			return;
+		}
+		$result = $this->flags[0];
+		foreach ($this->flags as $i=>$disjunct) {
+			if ($i!=0) {
+				$result2 = array();
+				foreach ($result as $resflag) {
+					foreach ($disjunct as $disflag) {
+						if (is_array($resflag)) {
+							$tmp = $resflag;
+						} else {
+							$tmp = array($resflag);
+						}
+						$tmp[] = $disflag;
+						$result2[] = $tmp;
+					}
+				}
+				$result = $result2;
+			}
+		}
+		$this->flags = $result;
+		foreach ($this->flags as $i=>$disjunct) {
+			foreach ($this->flags[$i] as $j=>$flag) {
+				$this->flags[$i][$j] = clone $this->flags[$i][$j];
+				$this->flags[$i][$j]->negative = !$this->flags[$i][$j]->negative;
+			}
+		}
+		$this->reduce_dnf();
 	}
 	//return intersection
 	public function intersect(preg_leaf_charset $other) {
+		if ($this->negative) {
+			$this->push_negative();
+		}
+		if ($other->negative) {
+			$other->push_negative();
+		}
 		foreach ($this->flags as $disjunct1) {
 			foreach ($other->flags as $disjunct2) {
 				$resflags[] = array_merge($disjunct1, $disjunct2);
@@ -362,6 +402,10 @@ class preg_leaf_charset extends preg_leaf {
 		return $result;
 	}
 	public function reduce_dnf() {
+		if ($this->flags===null) {
+			return;
+		}
+		$working = false;
 		foreach ($this->flags as $key=>$disjunct) {
 			foreach ($this->flags[$key] as $index=>$flag) {
 				if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$index])) {
@@ -375,13 +419,19 @@ class preg_leaf_charset extends preg_leaf {
 						}
 						$this->flags[$key] = array($this->flags[$key][$index]);
 					} else if ($flag->type===preg_charset_flag::SET || $flag->type===preg_charset_flag::FLAG) {//negative set or flag
-						foreach ($disjunct as $flag2) {
-							$intersected = $this->flags[$key][$index]->intersect($flag2);
-							if ($intersected===null) {
-								$this->flags[$key]=null;
-								break;
-							} else if ($intersected!==false) {
-								$this->flags[$key][$index] = $intersected;
+						foreach ($disjunct as $i=>$flag2) {
+							if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$i])) {
+								$intersected = $this->flags[$key][$index]->intersect($flag2);
+								if ($intersected===null) {
+									$this->flags[$key]=null;
+									break;
+								} else if ($intersected!==false) {
+									$this->flags[$key][$index] = $intersected;
+									if ($i!=$index) {
+										$working=true;
+										$this->flags[$key][$i] = null;
+									}
+								}
 							}
 						}
 					}
@@ -403,9 +453,13 @@ class preg_leaf_charset extends preg_leaf {
 			}
 		}
 		$this->flags = $dnf;
+		if ($working) {
+			$this->reduce_dnf();
+		}
 	}
-	public function substract(preg_lef_charset $other) {
-		echo 'implement substract before use!';
+	public function substract(preg_leaf_charset $other) {
+		$other->negative = !$other->negative;
+		return $this->intersect($other);
 	}
 	/**
      * Returns number of characters consumed by this leaf: 0 in case of an assertion or eps-leaf, 1 in case of a single character, n in case of a backreferense
@@ -529,7 +583,7 @@ class preg_charset_flag {
 				return false;
 			} else {
 				$res = new preg_charset_flag;
-				if ($result[1]=='-') {
+				if ($result[0]=='-') {
 					$res->set_flag(substr($result, 1));
 					$res->negative = true;
 				} else {

@@ -532,11 +532,11 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertTrue($result->flags[0][0]->set=='(' || $result->flags[1][0]->set=='(' || $result->flags[2][0]->set=='(', '\'(\' not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
 		$this->assertTrue($result->flags[0][0]->set=='b%' || $result->flags[1][0]->set=='b%' || $result->flags[2][0]->set=='b%%', '\'b%\' not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
 		$this->assertTrue($result->flags[0][0]->set=='b' || $result->flags[1][0]->set=='b' || $result->flags[2][0]->set=='b', '\'b\' not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-		$this->assertTrue($result->match('(b@%)', 0, $l, true));
-		$this->assertTrue($result->match('(b@%)', 1, $l, true));
-		$this->assertFalse($result->match('(b@%)', 2, $l, true));
-		$this->assertTrue($result->match('(b@%)', 3, $l, true));
-		$this->assertFalse($result->match('(b@%)', 4, $l, true));
+		$this->assertTrue($result->match('(b@%)', 0, $l, true), 'Incorrect matching');
+		$this->assertTrue($result->match('(b@%)', 1, $l, true), 'Incorrect matching');
+		$this->assertFalse($result->match('(b@%)', 2, $l, true), 'Incorrect matching');
+		$this->assertTrue($result->match('(b@%)', 3, $l, true), 'Incorrect matching');
+		$this->assertFalse($result->match('(b@%)', 4, $l, true), 'Incorrect matching');
 	}
 	function test_substract() {
 		//create elemenntary charclasses
@@ -551,6 +551,7 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$c->set_set('s@');
 		$c->negative = true;
 		$d->set_flag(preg_charset_flag::WORDCHAR);
+		$d->negative = true;
 		$e->set_set('a%');
 		$e->negative = true;
 		$f->set_set('b%)');
@@ -559,18 +560,25 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$charset1->flags[0][0] = $a;
 		$charset1->flags[1][0] = $b;
 		$charset1->flags[1][1] = $c;
+		$charset1->negative = true;
 		$charset2 = new preg_leaf_charset;
 		$charset2->flags[0][0] = $d;
 		$charset2->flags[0][1] = $e;
 		$charset2->flags[1][0] = $f;
+		$charset2->negative = false;
 		//intersect them
-		$result = $charset1->intersect($charset2);
+		$result = $charset1->substract($charset2);
 		//verify result
-		$this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
-		$this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
-		$this->assertTrue($result->flags[0][0]->type===preg_charset_flag::SET, 'Not set instead first set in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
-		$this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
-		$this->assertTrue($result->flags[0][0]->set=='s', '\'(\' not exist in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+		$this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+		$this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+		$this->assertTrue($result->flags[0][0]->type===preg_charset_flag::SET, 'Not set instead first set in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+		$this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in substraction of ^[b%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+		$this->assertTrue($result->flags[0][0]->set=='s', '\'s\' not exist in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+		$this->assertFalse($result->match('(bs%)', 0, $l, true), 'Incorrect matching');
+		$this->assertFalse($result->match('(bs%)', 1, $l, true), 'Incorrect matching');
+		$this->assertTrue($result->match('(bs%)', 2, $l, true), 'Incorrect matching');
+		$this->assertFalse($result->match('(bs%)', 3, $l, true), 'Incorrect matching');
+		$this->assertFalse($result->match('(bs%)', 4, $l, true), 'Incorrect matching');
 	}
 }
 ?>
