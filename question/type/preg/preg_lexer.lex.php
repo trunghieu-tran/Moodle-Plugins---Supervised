@@ -89,7 +89,6 @@ class qtype_preg_lexer extends JLexBase  {
 					break;
 				case self::DOT://TODO: think about metasymbol dot
 					$flag->set_flag(preg_charset_flag::PRIN);
-					$flag->negative = true;
 					break;
 				default:
 					$flag->set_set($data);
@@ -5116,6 +5115,8 @@ array(
 						case 11:
 							{
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', self::DOT));
+	$res->value->flags[0][0]->type = preg_charset_flag::FLAG;
+	$res->value->flags[0][0]->flag = preg_charset_flag::PRIN;
     return $res;
 }
 						case -12:
