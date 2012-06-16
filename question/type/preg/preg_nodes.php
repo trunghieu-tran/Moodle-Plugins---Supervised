@@ -380,6 +380,9 @@ class preg_charset_flag {
 	public $flag;//as name of character verify function, see constants bellow
 	public $uniprop;
 	
+	static protected $flagtypes;
+	static protected $intersection;
+	
 		
 	public function set_circumflex() {
 		$this->type = self::CIRCUMFLEX;
@@ -446,7 +449,49 @@ class preg_charset_flag {
 	*@return result of intersection as preg_charset flag, if intersection is possible, null if intersection is empty and false if intersection is impossible
 	*/
 	public function intersect(preg_charset_flag $other) {
-		return false;
+		if ($this->type==preg_charset_flag::FLAG && $other->type==preg_charset_flag::FLAG) {
+			foreach (self::$flagtypes as $index=>$flagtype) {
+				if ($flagtype===$this->flag) {
+					if ($this->negative) {
+						$selfindex = $index+13;
+					} else {
+						$selfindex = $index;
+					}
+					break;
+				}
+			}
+			foreach (self::$flagtypes as $index=>$flagtype) {
+				if ($flagtype===$other->flag) {
+					if ($other->negative) {
+						$otherindex = $index+13;
+					} else {
+						$otherindex = $index;
+					}
+					break;
+				}
+			}
+			$result = self::$intersection[26 * $selfindex + $otherindex];
+			if ($result===false || $result===null) {
+				return $result;
+			} else if ($result=='set') {
+				return false;
+			} else {
+				$res = new preg_charset_flag;
+				if ($result[1]=='-') {
+					$res->set_flag(substr($result, 1));
+					$res->negative = true;
+				} else {
+					$res->set_flag($result);
+				}
+				return $res;
+			}
+		} else if ($this->type==preg_charset_flag::FLAG && $other->type==preg_charset_flag::SET) {
+		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::FLAG) {
+			return $other->intersect($this);
+		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::SET) {
+		} else {
+			return false;
+		}
 	}
 	/**
 	*substract this flag with other, if possible
@@ -454,7 +499,8 @@ class preg_charset_flag {
 	*@return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
 	*/
 	public function substract(preg_charset_flag $other) {
-		return false;
+		$copy = clone $pther;
+		return $this->intersect($copy);
 	}
 	
 	/**
@@ -489,6 +535,40 @@ class preg_charset_flag {
 	const UPPER = 'ctype_upper';			//[:upper:]
 	const PRIN = 'ctype_print';			//[:print:] PRIN, because PRINT is php keyword
 	const PUNCT = 'ctype_punct';			//[:punct:]
+	
+	public function __construct() {
+		if (!is_array(self::$intersection)) {
+			self::$flagtypes = array(self::DIGIT, self::XDIGIT, self::SPACE, self::WORDCHAR, self::ALNUM, self::ALPHA, self::ASCII, self::CNTRL, self::GRAPH, self::LOWER, self::UPPER, self::PRIN, self::PUNCT);
+			self::$intersection = array( //		digit,			xdigit,			space,			wordchar,		alnum,			alpha,			ascii,			cntrl,			graph,			lower,			upper,			print,			punct,			ndigit,				nxdigit,				nspace,				nwordchar,			nalnum,				nalpha,				nascii,				ncntrl,				ngraph,				nlower,				nupper,				nprint,			npunct
+								/*digit*/		self::DIGIT,	self::DIGIT,	null,			self::DIGIT,	self::DIGIT,	null,			'set',			null,			self::DIGIT,	null,			null,			self::DIGIT,	null,			null,				null,					self::DIGIT,		null,				null,				self::DIGIT,		false,				self::DIGIT,		null,				self::DIGIT,		self::DIGIT,		null,			self::DIGIT,					
+								/*xdigit*/		self::DIGIT,	self::XDIGIT,	null,			self::XDIGIT,	self::XDIGIT,	'set',			'set',			null,			self::XDIGIT,	'set',			'set',			self::XDIGIT,	null,			'set',				null,					self::XDIGIT,		null,				null,				self::DIGIT,		false,				self::XDIGIT,		null,				false,				false,				null,			self::XDIGIT,					
+								/*space*/		null,			null,			self::SPACE,	null,			null,			null,			'set',			null,			null,			null,			null,			self::SPACE,	null,			self::SPACE,		self::SPACE,			null,				self::SPACE,		self::SPACE,		self::SPACE,		false,				self::SPACE,		self::SPACE,		self::SPACE,		self::SPACE,		null,			self::SPACE,					
+								/*wordchar*/ 	self::DIGIT,	self::XDIGIT,	null,			self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			null,			self::WORDCHAR,	self::LOWER,	self::UPPER,	self::WORDCHAR,	null,			self::ALNUM,		false,					self::WORDCHAR,		null,				'set',				false,				false,				self::WORDCHAR,		null,				false,				false,				null,			self::WORDCHAR,					
+								/*alnum*/		self::DIGIT,	self::XDIGIT,	null,			self::ALNUM,	self::ALNUM,	self::ALPHA,	'set',			null,			self::ALNUM,	self::LOWER,	self::UPPER,	self::ALNUM,	null,			self::ALPHA,		false,					self::ALNUM,		null,				null,				self::DIGIT,		false,				self::ALNUM,		null,				false,				false,				null,			self::ALNUM,					
+								/*alpha*/		null,			false,			null,			self::ALPHA,	self::ALPHA,	self::ALPHA,	'set',			null,			self::ALPHA,	self::LOWER,	self::UPPER,	self::ALPHA,	null,			self::ALPHA,		false,					self::ALPHA,		null,				null,				null,				false,				self::ALPHA,		null,				self::UPPER,		self::LOWER,		null,			self::ALPHA,					
+								/*ascii*/		'set',			'set',			'set',			'set',			'set',			'set',			self::ASCII,	'set',			'set',			'set',			'set',			'set',			'set',			'set',				'set',					'set',				'set',				'set',				'set',				null,				'set',				'set',				'set',				'set',				'set',			'set',					
+								/*cntrl*/		null,			null,			null,			null,			null,			null,			'set',			self::CNTRL,	false,			null,			null,			false,			null,			self::CNTRL,		self::CNTRL,			self::CNTRL,		self::CNTRL,		self::CNTRL,		self::CNTRL,		false,				null,				false,				self::CNTRL,		self::CNTRL,		false,			false,					
+								/*graph*/		self::DIGIT,	self::XDIGIT,	null,			self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			false,			self::GRAPH,	self::LOWER,	self::UPPER,	self::PRIN,		false,			false,				false,					false,				false,				false,				false,				false,				false,				null,				false,				false,				false,			false,					
+								/*lower*/		null,			null,			null,			self::LOWER,	self::LOWER,	self::LOWER,	'set',			null,			self::LOWER,	self::LOWER,	null,			self::LOWER,	null,			self::LOWER,		false,					self::LOWER,		null,				null,				null,				false,				self::LOWER,		null,				null,				self::LOWER,		null,			self::LOWER,					
+								/*upper*/		null,			null,			null,			self::UPPER,	self::UPPER,	self::UPPER,	'set',			null,			self::UPPER,	null,			self::UPPER,	self::UPPER,	null,			self::UPPER,		false,					self::UPPER,		null,				null,				null,				false,				self::UPPER,		null,				self::UPPER,		null,				null,			self::UPPER,					
+								/*print*/		self::DIGIT,	self::XDIGIT,	self::SPACE,	self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			false,			self::GRAPH,	self::LOWER,	self::UPPER,	self::PRIN,		self::PUNCT,	false,				false,					false,				false,				false,				false,				false,				false,				false,				false,				false,				null,			false,					
+								/*punct*/		null,			null,			null,			null,			null,			null,			'set',			false,			null,			null,			null,			self::PUNCT,	self::PUNCT,	self::PUNCT,		self::PUNCT,			self::PUNCT,		self::PUNCT,		self::PUNCT,		self::PUNCT,		false,				false,				self::PUNCT,		self::PUNCT,		self::PUNCT,		null,			null,					
+								/*ndigit*/		null,			'set',			self::SPACE,	self::ALNUM,	self::ALPHA,	self::ALPHA,	'set',			self::CNTRL,	false,			self::LOWER,	self::UPPER,	false,			self::PUNCT,	'-'.self::DIGIT,	'-'.self::XDIGIT,		false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALNUM,	false,				false,				'-'.self::GRAPH,	false,				false,				'-'.self::PRIN,	false,					
+								/*nxdigit*/		null,			null,			self::SPACE,	false,			false,			false,			'set',			self::CNTRL,	false,			self::LOWER,	false,			false,			self::PUNCT,	'-'.self::XDIGIT,	'-'.self::XDIGIT,		false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALNUM,	false,				false,				'-'.self::GRAPH,	false,				false,				'-'.self::PRIN,	false,					
+								/*nspace*/		self::DIGIT,	self::XDIGIT,	null,			self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			self::CNTRL,	false,			self::LOWER,	self::UPPER,	false,			self::PUNCT,	false,				false,					'-'.self::SPACE,	false,				false,				false,				false,				false,				false,				false,				false,				'-'.self::PRIN,	false,					
+								/*nwordchar*/	null,			null,			self::SPACE,	null,			null,			null,			'set',			self::CNTRL,	false,			null,			null,			false,			self::PUNCT,	'-'.self::WORDCHAR,	'-'.self::WORDCHAR,		false,				'-'.self::WORDCHAR,	'-'.self::WORDCHAR,	'-'.self::WORDCHAR,	false,				false,				'-'.self::GRAPH,	'-'.self::WORDCHAR,	'-'.self::WORDCHAR,	'-'.self::PRIN,	false,					
+								/*nalnum*/		null,			null,			self::SPACE,	'set',			null,			null,			'set',			self::CNTRL,	false,			null,			null,			false,			self::PUNCT,	'-'.self::ALNUM,	'-'.self::ALNUM,		false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALNUM,	false,				false,				'-'.self::GRAPH,	'-'.self::ALNUM,	'-'.self::ALNUM,	'-'.self::PRIN,	false,					
+								/*nalpha*/		self::DIGIT,	self::DIGIT,	self::SPACE,	false,			self::DIGIT,	null,			'set',			self::CNTRL,	false,			null,			null,			false,			self::PUNCT,	'-'.self::ALNUM,	'-'.self::ALNUM,		false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALPHA,	false,				false,				'-'.self::GRAPH,	'-'.self::ALPHA,	'-'.self::ALPHA,	'-'.self::PRIN,	false,					
+								/*nascii*/		false,			false,			false,			false,			false,			false,			null,			false,			false,			false,			false,			false,			false,			false,				false,					false,				false,				false,				false,				'-'.self::ASCII,	false,				false,				false,				false,				false,			false,					
+								/*ncntrl*/		self::DIGIT,	self::XDIGIT,	self::SPACE,	self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			null,			false,			self::LOWER,	self::UPPER,	false,			false,			false,				false,					false,				false,				false,				false,				false,				'-'.self::CNTRL,	false,				false,				false,				false,			false,					
+								/*ngraph*/		null,			null,			self::SPACE,	null,			null,			null,			'set',			false,			null,			null,			null,			false,			self::PUNCT,	'-'.self::GRAPH,	'-'.self::GRAPH,		false,				'-'.self::GRAPH,	'-'.self::GRAPH,	'-'.self::GRAPH,	false,				false,				'-'.self::GRAPH,	'-'.self::GRAPH,	'-'.self::GRAPH,	'-'.self::PRIN,	false,					
+								/*nlower*/		self::DIGIT,	false,			self::SPACE,	false,			false,			self::UPPER,	'set',			self::CNTRL,	false,			null,			self::UPPER,	false,			self::PUNCT,	false,				false,					false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALPHA,	false,				false,				'-'.self::GRAPH,	'-'.self::LOWER,	'-'.self::ALPHA,	'-'.self::PRIN,	false,					
+								/*nupper*/		self::DIGIT,	false,			self::SPACE,	false,			false,			self::LOWER,	'set',			self::CNTRL,	false,			self::LOWER,	null,			false,			self::PUNCT,	false,				false,					false,				'-'.self::WORDCHAR,	'-'.self::ALNUM,	'-'.self::ALPHA,	false,				false,				'-'.self::GRAPH,	'-'.self::ALPHA,	'-'.self::UPPER,	'-'.self::PRIN,	false,					
+								/*nprint*/		null,			null,			null,			null,			null,			null,			'set',			false,			false,			null,			null,			null,			null,			'-'.self::PRIN,		'-'.self::PRIN,	'-'.	self::PRIN,			'-'.self::PRIN,		'-'.self::PRIN,		'-'.self::PRIN,		false,				false,				'-'.self::PRIN,		'-'.self::PRIN,		'-'.self::PRIN,		'-'.self::PRIN,	'-'.self::PRIN,					
+								/*npunct*/		self::DIGIT,	self::XDIGIT,	self::SPACE,	self::WORDCHAR,	self::ALNUM,	self::ALPHA,	'set',			false,			false,			self::LOWER,	self::UPPER,	false,			null,			false,				false,					false,				false,				false,				false,				false,				false,				false,				false,				false,				'-'.self::PRIN,	'-'.self::PUNCT
+								);
+		}
+	}
 }
 
 /**
