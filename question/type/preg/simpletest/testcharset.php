@@ -383,6 +383,7 @@ class qtype_preg_charset_flag_test extends UnitTestCase {
 			if ($correct[$i]===false || $correct[$i]==='set') {//TODO correct work for set result of intersection
 				$this->assertTrue($result[$i]===false, "failed: result[$i]===false");
 			} else if ($correct[$i]===null) {
+				var_dump($result[$i]);
 				$this->assertTrue($result[$i]===null, "failed: result[$i]===null");
 			} else {
 				if ($this->assertFalse($result[$i]===false, "result[$i] is false instead preg_charset_flag object") &&
@@ -394,10 +395,10 @@ class qtype_preg_charset_flag_test extends UnitTestCase {
 	}
 	function compare_match_results($src1, $src2, $intersected) {
 		//verify input data
-		if (!$this->assertTrue($intersected===false, 'intersected is false instead preg_charset_flag object, look for error in test')) {
+		if ($this->assertFalse($intersected===false, 'intersected is false instead preg_charset_flag object, look for error in test')) {
 			return;
 		}
-		if (!$this->assertTrue($intersected===null, 'intersected is null instead preg_charset_flag object, look for error in test')) {
+		if ($this->assertFalse($intersected===null, 'intersected is null instead preg_charset_flag object, look for error in test')) {
 			return;
 		}
 		//form string for test match of getting flag and two src flag
