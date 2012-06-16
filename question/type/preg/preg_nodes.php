@@ -483,7 +483,7 @@ class preg_charset_flag {
 	const ALNUM = 'ctype_alnum';			//[:alnum:]
 	const ALPHA = 'ctype_alpha';			//[:alpha:]
 	const ASCII = 'self::is_ascii';			//[:ascii:]
-	const CNTRL = 'ctype_cntrl';			//[:cntrl:]
+	const CNTRL = 'ctype_cntrl';			//[:ctrl:]
 	const GRAPH = 'ctype_graph';			//[:graph:]
 	const LOWER = 'ctype_lower';			//[:lower:]
 	const UPPER = 'ctype_upper';			//[:upper:]
