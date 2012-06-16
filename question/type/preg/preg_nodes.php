@@ -331,6 +331,7 @@ class preg_leaf_charset extends preg_leaf {
 		if ($this->negative) {
 			$result = !$result;
 		}
+		return $result;
 	}
 	public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
 		return 'implement next_character before use!';
@@ -405,7 +406,6 @@ class preg_charset_flag {
 	public function is_null_length() {
 		return $this->type===self::CIRCUMFLEX || $this->type===self::DOLLAR;
 	}
-	//TODO implement following function of preg_charset_flag
 	public function match($str, $pos, $cs=true) {
 		if ($pos<0 || $pos>=strlen($str)) { 
 			return false;// string index out of border
@@ -503,13 +503,13 @@ class preg_charset_flag {
 		} else if ($this->type==preg_charset_flag::SET && $other->type==preg_charset_flag::SET) {
 			if ($this->negative && $other->negative) {
 				$res = new preg_charset_flag;
-				$str = $str = $this->set . $other->set;var_dump($str);
+				$str = $str = $this->set . $other->set;
 				$resstr = '';
 				for ($i=0; $i<strlen($str); $i++) {
 					if (strpos($str, $str[$i])==$i) {
 						$resstr .= $str[$i];
 					}
-				}var_dump($resstr);
+				}
 				$res->negative = true;
 				$res->set_set($resstr);
 			} else if ($this->negative && !$other->negative) {
