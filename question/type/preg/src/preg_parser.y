@@ -172,20 +172,7 @@ expr(A) ::= OPENLEXEM(B) expr(C) CLOSELEXEM. {
 
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
-    if (B->type != preg_node::TYPE_LEAF_CHARSET || !B->w && !B->W) {
-        A = B;
-    } else if (B->w) {
-        A = new preg_node_alt;
-        A->operands[0] = new preg_leaf_meta;
-        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[1] = B;
-    } else if (B->W) {
-        A = new preg_node_alt;
-        A->operands[0] = new preg_leaf_meta;
-        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[0]->negative = true;
-        A->operands[1] = B;
-    }
+    A = B;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
