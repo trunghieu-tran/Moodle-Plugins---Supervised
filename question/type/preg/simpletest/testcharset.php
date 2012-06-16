@@ -383,7 +383,6 @@ class qtype_preg_charset_flag_test extends UnitTestCase {
 			if ($correct[$i]===false || $correct[$i]==='set') {//TODO correct work for set result of intersection
 				$this->assertTrue($result[$i]===false, "failed: result[$i]===false");
 			} else if ($correct[$i]===null) {
-				var_dump($result[$i]);
 				$this->assertTrue($result[$i]===null, "failed: result[$i]===null");
 			} else {
 				if ($this->assertFalse($result[$i]===false, "result[$i] is false instead preg_charset_flag object") &&
