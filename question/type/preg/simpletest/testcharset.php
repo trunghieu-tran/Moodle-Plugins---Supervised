@@ -528,5 +528,39 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertTrue($result->flags[0][0]->set=='(' || $result->flags[1][0]->set=='(', '\'(\' not exist in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
 		$this->assertTrue($result->flags[0][0]->set=='b%' || $result->flags[1][0]->set=='b%', '\'b%\' not exist in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');		
 	}
+	function test_substract() {
+		//create elemenntary charclasses
+		$a = new preg_charset_flag;
+		$b = new preg_charset_flag;
+		$c = new preg_charset_flag;
+		$d = new preg_charset_flag;
+		$e = new preg_charset_flag;
+		$f = new preg_charset_flag;
+		$a->set_set('b%(');
+		$b->set_flag(preg_charset_flag::WORDCHAR);
+		$c->set_set('s@');
+		$c->negative = true;
+		$d->set_flag(preg_charset_flag::WORDCHAR);
+		$e->set_set('a%');
+		$e->negative = true;
+		$f->set_set('b%)');
+		//form charsets
+		$charset1 = new preg_leaf_charset;
+		$charset1->flags[0][0] = $a;
+		$charset1->flags[1][0] = $b;
+		$charset1->flags[1][1] = $c;
+		$charset2 = new preg_leaf_charset;
+		$charset2->flags[0][0] = $d;
+		$charset2->flags[0][1] = $e;
+		$charset2->flags[1][0] = $f;
+		//intersect them
+		$result = $charset1->intersect($charset2);
+		//verify result
+		$this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+		$this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+		$this->assertTrue($result->flags[0][0]->type===preg_charset_flag::SET, 'Not set instead first set in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+		$this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+		$this->assertTrue($result->flags[0][0]->set=='s', '\'(\' not exist in intersection of [b%(]U\w[^s@] and \W[^a%]U[b%)]!');
+	}
 }
 ?>
