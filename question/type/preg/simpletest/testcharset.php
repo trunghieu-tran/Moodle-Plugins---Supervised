@@ -490,6 +490,23 @@ class qtype_preg_charset_test extends UnitTestCase {
 		$this->assertFalse($charset->match('bs@', 1, $l, true));
 		$this->assertTrue($charset->match('bs@', 2, $l, true));
 	}
+	function test_next() {
+		//create elemenntary charclasses
+		$a = new preg_charset_flag;
+		$b = new preg_charset_flag;
+		$c = new preg_charset_flag;
+		$a->set_set('b@(');
+		$b->set_flag(preg_charset_flag::WORDCHAR);
+		$c->set_set('s@');
+		$c->negative = true;
+		//form charsets
+		$charset = new preg_leaf_charset;
+		$charset->flags[0][0] = $a;
+		$charset->flags[1][0] = $b;
+		$charset->flags[1][1] = $c;
+		$this->assertTrue(strlen($charset->next_character('', 0))==1, 'Not one character got by next_character()!');
+		$this->assertTrue($charset->match($charset->next_character('', 0), 0, $l, true), 'Next character is unmatched!');
+	}
 	function test_intersect() {
 		//create elemenntary charclasses
 		$a = new preg_charset_flag;
