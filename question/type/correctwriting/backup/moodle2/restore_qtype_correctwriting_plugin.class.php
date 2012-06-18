@@ -25,7 +25,12 @@
  require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');
  
  class restore_qtype_corrrectwriting_plugin extends restore_qtype_poasquestion_plugin {
- 
+    /**
+     * Process the qtype/... element.
+     */
+    public function process_correctwriting($data) {
+        $this->process_poasquestion($data);
+    }
  }
  
  
