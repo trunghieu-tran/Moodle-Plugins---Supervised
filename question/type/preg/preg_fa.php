@@ -52,7 +52,8 @@ class qtype_preg_fa_state {
      * automaton during its construction: becoming non-deterministic, having eps or pure-assert transitions etc.
      */
     protected $FA;
-
+    /** @var int number of the state. */
+    public $number;
     /** @var array of qtype_preg_fa_transition child objects, indexed. */
     protected $outtransitions;
     /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
@@ -60,6 +61,7 @@ class qtype_preg_fa_state {
 
     public function __construct(&$FA = null) {
         $this->FA =& $FA;
+        $this->number = -1;    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
         $this->outtransitions = array();
         $this->deterministic = true;
     }
@@ -346,7 +348,24 @@ abstract class qtype_preg_finite_automaton {
      * @return array where states are values and states number - keys.
      */
     public function numerate_states() {
-        //TODO
+        $result = array();
+        $idcounter = 0;
+        $curstates = array($this->startstate);
+        while (count($curstates) !== 0) {
+            $newstates = array();
+            while (count($curstates) !== 0) {
+                $curstate = array_pop($curstates);
+                if ($curstate->number === -1) {
+                    $curstate->number = $idcounter;
+                    foreach ($curstate->outgoing_transitions() as $transition) {
+                        $newstates[] = $transition->to;
+                        $result[$idcounter++] = $transition->to;
+                    }
+                }
+            }
+            $curstates = $newstates;
+        }
+        return $result;
     }
 
     /**
