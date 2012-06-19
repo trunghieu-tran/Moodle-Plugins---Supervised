@@ -175,7 +175,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
     public function zero_length_closure($startstate, $str, $startpos) {
-        $startstateclone = new qtype_preg_nfa_processing_state(false, $startstate->index_first, $startstate->length, $startstate->index_first_new, $startstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+        $startstateclone = new qtype_preg_nfa_processing_state(false, $startstate->index_first, $startstate->length, $startstate->index_first_new,
+                                                               $startstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                $startstate->state, $startstate->last_transitions, $startstate->last_match_len, $startstate);
         $result = array($startstateclone);
         $curstates = array($startstateclone);
@@ -189,22 +190,15 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $length = 0;
                     if (!$transition->pregleaf->consumes($curstate) && $transition->pregleaf->match($str, $startpos + $curstate->length[0], $length, !$transition->pregleaf->caseinsensitive, $curstate)) {
                         // Create a new state.
-                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new, $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
+                        $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new,
+                                                                        $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, $curstate->last_transitions, $length, $curstate);
                         $newstate->last_transitions[] = $transition;
                         $newstate->length[0] += $length;
                         $this->write_tag_values($newstate, $curstate, $transition, $startpos, $length);
-                        $skip = false;
-                        foreach ($result as $skipstate) {
-                            if ($skipstate->state === $newstate->state && $skipstate->index_first === $newstate->index_first && $skipstate->length === $newstate->length &&
-                                $skipstate->index_first_new === $newstate->index_first_new && $skipstate->length_new === $newstate->length_new) {
-                                $skip = true;
-                                break;
-                            }
-                        }
-                        if (!$skip) {
-                            array_push($newstates, $newstate);
-                            array_push($result, $newstate);
+                        if (!array_key_exists($newstate->state->id, $result)) {
+                            $newstates[] = $newstate;
+                            $result[$newstate->state->id] = $newstate;
                         }
                     }
                 }
