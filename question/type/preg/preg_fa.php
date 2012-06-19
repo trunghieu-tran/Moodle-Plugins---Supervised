@@ -52,12 +52,12 @@ class qtype_preg_fa_state {
      * automaton during its construction: becoming non-deterministic, having eps or pure-assert transitions etc.
      */
     protected $FA;
-    /** @var int number of the state. */
-    public $number;
     /** @var array of qtype_preg_fa_transition child objects, indexed. */
     protected $outtransitions;
     /** @var boolean whether state is deterministic, i.e. whether it has no characters with two or more possible outgoing transitions. */
     protected $deterministic;
+    /** @var int number of the state. */
+    public $number;
 
     public function __construct(&$FA = null) {
         $this->FA =& $FA;
@@ -357,9 +357,9 @@ abstract class qtype_preg_finite_automaton {
                 $curstate = array_pop($curstates);
                 if ($curstate->number === -1) {
                     $curstate->number = $idcounter;
+                    $result[$idcounter++] = $curstate;
                     foreach ($curstate->outgoing_transitions() as $transition) {
                         $newstates[] = $transition->to;
-                        $result[$idcounter++] = $transition->to;
                     }
                 }
             }
@@ -459,19 +459,11 @@ abstract class qtype_preg_finite_automaton {
         $dotfn = $dir . $dotfilename;
         $dotfile = fopen($dotfn, 'w');
 
-        // Numerate all states.
-        $tmp = 0;
-        foreach ($this->states as $curstate)
-        {
-            $curstate->id = $tmp;
-            $tmp++;
-        }
-
         // Generate dot code.
         fprintf($dotfile, "digraph {\n");
         fprintf($dotfile, "rankdir = LR;\n");
         foreach ($this->states as $curstate) {
-            $index1 = $curstate->id;
+            $index1 = $curstate->number;
 
             if (count($curstate->outgoing_transitions()) == 0) {
                 // Draw a single state.
@@ -479,7 +471,7 @@ abstract class qtype_preg_finite_automaton {
             } else {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
-                    $index2 = $curtransition->to->id;
+                    $index2 = $curtransition->to->number;
                     $lab = $curtransition->pregleaf->tohr() . ',';
 
                     // Information about subpatterns.
