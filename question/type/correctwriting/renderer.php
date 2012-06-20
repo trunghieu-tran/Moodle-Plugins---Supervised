@@ -46,7 +46,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                $mistakemesgs = array();
                $mistakemesgs[] = get_string('foundmistakes', 'qtype_correctwriting');
                foreach($analyzer->mistakes() as $mistake) {
-                   $mistakemesgs[] = $mistake->mistakemsg;
+                   $mistakemesgs[] = $mistake->get_mistake_message();
                }
                $myfeedback  = implode('<BR>', $mistakemesgs) . "<BR>";
            }

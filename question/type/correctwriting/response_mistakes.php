@@ -35,5 +35,12 @@ abstract class  qtype_correctwriting_response_mistake {
     public $responsemistaken;
     //Weight of mistake used in mark computation
     public $weight;
+    
+    /** Returns a message for mistakes. Used for lazy message initiallization.
+        @return string mistake message
+     */
+    public function get_mistake_message() {
+        return $this->mistakemsg;
+    }
 }
 ?>
