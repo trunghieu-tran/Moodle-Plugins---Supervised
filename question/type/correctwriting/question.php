@@ -35,8 +35,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_question extends qtype_shortanswer_question  {
+class qtype_correctwriting_question extends question_graded_automatically  {
     //Fields defining a question
+    /** @var boolean whether answers should be graded case-sensitively. */
+    public $usecase;
     /** @var array of question_answer objects. */
     public $answers = array();
     //Typical answer objects usually contains answer (string), fraction and feedback fields
@@ -76,6 +78,24 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
     public $matchedanalyzer = null;
     public $matchedgradestate = null;
     
+    // Returns expected data from form
+    public function get_expected_data() {
+        return array('answer' => PARAM_RAW_TRIMMED);
+    }
+
+    public function summarise_response(array $response) {
+        if (isset($response['answer'])) {
+            return $response['answer'];
+        } else {
+            return null;
+        }
+    }
+
+    public function is_complete_response(array $response) {
+        return array_key_exists('answer', $response) &&
+                ($response['answer'] || $response['answer'] === '0');
+    }
+    
     /** Checks, whether two responses are the same
         @param array prevresponse previous response
         @param array newresponse  new response
@@ -84,6 +104,11 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
     public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_same_at_key_missing_is_blank(
                 $prevresponse, $newresponse, 'answer');
+    }
+    
+
+    public function get_answers() {
+        return $this->answers;
     }
     
     /** Returns a validation error for response
@@ -289,6 +314,14 @@ class qtype_correctwriting_question extends qtype_shortanswer_question  {
         $result->fraction =  $this->matchedgradestate[0];
         
         return $result;
+    }
+    
+    public function get_correct_response() {
+        $keys = array_keys($this->answers);
+        if (count($keys)==0) {
+            return null;
+        }
+        return array($keys[0] => $this->answers[$keys[0]]);
     }
 }
  ?>
