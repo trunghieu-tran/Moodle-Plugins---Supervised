@@ -43,11 +43,26 @@ class qtype_correctwriting extends qtype_shortanswer {
         @return array extra fields
      */
     public function extra_question_fields() {
-        $result = array('qtype_correctwriting', 'langid', 'absentmistakeweight', 'addedmistakeweight', 'movedmistakeweight');
+        // Retrieve parent extra fields from shortanswer, like case sensivity and other fields from shrtanswer
+        // We unset answers fields, because we do not need them
+        $result = array_diff(parent::extra_question_fields(), array('answers'));
+        // Replace shortanswer table with our table
+        $result[0]= 'qtype_correctwriting';
+        // Language, which will be used for analysis
+        $result[] = 'langid';        
+        // Penalty for absent lexeme mistake
+        $result[] = 'absentmistakeweight';
+        // Penalty for odd lexeme mistake  
+        $result[] = 'addedmistakeweight';
+        // Penalty for moved lexeme mistake
+        $result[] = 'movedmistakeweight';
+        // A threshold for lexical error as fraction to it's length
         $result[] = 'lexicalerrorthreshold'; 
+        // A penalty for error in symbol
         $result[] = 'lexicalerrorweight';
-        $result[] = 'usecase';
+        // Minimal grade for  answer to be approximately matched with student response
         $result[] = 'hintgradeborder';
+        // Maximum fraction of mistakes to length of teacher answer in lexemes
         $result[] = 'maxmistakepercentage';
         return $result;
     }
@@ -98,13 +113,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         return true;
     }
     
-    /** Initializes instance of question
-        @param  object $question     The question object instance
-        @param  object $questiondata The user question data 
-      */
-    protected function initialise_question_instance(question_definition $question, $questiondata) {
-        parent::initialise_question_instance($question, $questiondata);
-    }
+    
     
     /** Saves a question 
         @param object $question question data
