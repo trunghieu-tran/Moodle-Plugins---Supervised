@@ -56,8 +56,8 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
             //Create a mistake message
             $a = new stdClass();
             $answerindex = $this->answermistaken[0];
-            if ($answerstring->has_description($answerindex)) {
-                $a->description = $answerstring->node_description($answerindex);
+            if ($this->answerstring->has_description($answerindex)) {
+                $a->description = $this->answerstring->node_description($answerindex);
                 $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
             } else {
                 $a->value = $this->answer[$answerindex]->value();
