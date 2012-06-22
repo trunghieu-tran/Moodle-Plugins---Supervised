@@ -516,22 +516,6 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return $notmarkedstate;
     }
     /**
-    *function check: string1 include string2, or not include, without stock of sequence character
-    *@param string1 - string which may contain string2
-    *@param string2 - string which may be included in string1
-    *@return true if string1 include string2
-    */
-    static function is_include_characters($string1, $string2) {
-        $result = true;
-        $size = strlen($string2);
-        for ($i = 0; $i < $size && $result; $i++) {
-            if (strpos($string1, $string2[$i]) === false) {
-                $result = false;
-            }
-        }
-        return $result;
-    }
-    /**
     *function concatenate list of follow character for this number of character and other number match with character which mean this number
     *@param number - for this number will concatenate list of follow chars
     *@param fpmap - map of following characters
@@ -547,25 +531,23 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         $equnum = array();
         if ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
-            $str1 = $this->connection[$index][$number]->pregnode->charset;//for this charclass will found equivalent numbers
-            foreach ($this->connection[$index] as $num => $cc) {//forming vector of equivalent numbers
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
-                    $str2 = $cc->pregnode->charset;
-                    $equdirection = $cc->pregnode->negative === $this->connection[$index][$number]->pregnode->negative;
-                    if (qtype_preg_dfa_matcher::is_include_characters($str1, $str2) && array_key_exists($num, $passages) && $equdirection) {//if charclass 1 and 2 equivalenta and number exist in passages
-                        array_push($equnum, $num);
-                    }
-                } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
-                    array_push($equnum, $num);
-                }
-            }
+			foreach ($this->connection[$index] as $num => $cc) {
+				if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+					$cc->pregnode->push_negative();
+					$this->connection[$index][$number]->pregnode->push_negative();
+					if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
+						array_push($equnum, $num);
+					}
+				}
+			}
         } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
-            foreach ($this->connection[$index] as $num => $cc) {
+            echo '<BR>'.'LEAF_META used:'.$this->connection[$index][$number]->pregnode->type.'<BR>';
+			foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
-                } else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
+                } /*else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
-                }
+                }*/
             }
         } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {//if this leaf is assert
             foreach ($this->connection[$index] as $num => $cc) {
@@ -574,6 +556,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 }
             }
         }
+		$equnum = array_unique($equnum, SORT_NUMERIC);
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
             qtype_preg_dfa_matcher::push_unique($followU, $fpmap[$num]);
@@ -618,6 +601,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     @param modifiers - modifiers of regular expression
     */
     function __construct($regex = null, $modifiers = null) {
+		set_time_limit(100);
         global $CFG;
         $this->picnum=0;
         if (isset($CFG->qtype_preg_dfastatecount)) {
@@ -647,6 +631,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $this->roots[0]->lastpos();
         $this->roots[0]->followpos($this->map[0]);
         //$this->split_leafs(0);
+		//$this->prepare_map(0);
         $this->roots[0]->find_asserts($this->roots);
         foreach ($this->roots as $key => $value) {
             if ($key!=0) {
@@ -666,6 +651,41 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $this->built = true;
         return;
     }
+	protected function prepare_map($index) {
+		foreach ($this->connection[$index] as $i=>$leaf1) {
+			foreach ($this->connection[$index] as $j=>$leaf2) {
+				if (is_a($leaf1, 'dfa_preg_leaf_charset') && is_a($leaf2, 'dfa_preg_leaf_charset') && $leaf1->pregnode->is_part_ident($leaf2->pregnode)) {
+					$leaf1and2 = $leaf1->pregnode->intersect($leaf2->pregnode);
+					$leaf1not2 = $leaf1->pregnode->substract($leaf2->pregnode);
+					$leaf2not1 = $leaf2->pregnode->substract($leaf1->pregnode);
+					$num1and2 = $this->save_new_leaf($index, $leaf1and2);
+					$num2and1 = $this->save_new_leaf($index, $leaf1and2);
+					$num1not2 = $this->save_new_leaf($index, $leaf1not2);
+					$num2not1 = $this->save_new_leaf($index, $leaf2not1);
+					$this->replace_num_in_map($index, $i, $num1and2, $num1not2);
+					$this->replace_num_in_map($index, $j, $num2and1, $num2not1);
+					unset($this->connection[$index][$i]);
+					unset($this->connection[$index][$j]);
+				}
+			}
+		}
+		foreach ($this->connection[$index] as $i=>$leaf) {
+			if ($leaf->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $leaf->pregnode->flags===null) {
+				unset($this->connection[$index][$i]);
+			}
+		}
+		foreach ($this->map[$index] as $ccn=>$follows) {
+			if ($this->connection[$index][$ccn]===null) {
+				unset($this->map[$index][$ccn]);
+			} else {
+				foreach ($follows as $j=>$leafnum) {
+					if ($this->connection[$index][$leafnum]===null) {
+						unset($this->map[$index][$j]);
+					}
+				}
+			}
+		}
+	}
     /**
     * Function merge simple assert in map of character following
     * @param $num number of map for merging simple asserts
@@ -934,6 +954,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
     protected function save_new_leaf($num, $leaf) {
         $index = 0;
+		$leaf = new dfa_preg_leaf_charset($leaf);
         foreach ($this->connection[$num] as $key => $val) {
             if ($key > $index && $val->pregnode->type != preg_node::TYPE_NODE_ASSERT && $key < 186759556) {
                 $index = $key;
@@ -954,6 +975,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 }
             }
         }
+		$this->map[$num][$new1] = $this->map[$num][$old];
+		$this->map[$num][$new2] = $this->map[$num][$old];
+		unset($this->map[$num][$old]);
         foreach ($this->roots[$num]->firstpos as $key => $val) {
             if ($val == $old) {
                 $this->roots[$num]->firstpos[$key] = $new1;
@@ -1329,7 +1353,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     */
     public function draw($number, $subject) {
         $dir = $this->get_temp_dir('dfa');
-        $dotcode = call_user_func(array('dfa_preg_matcher', 'generate_'.$subject.'_dot_code'), $number);
+        $dotcode = call_user_func(array('qtype_preg_dfa_matcher', 'generate_'.$subject.'_dot_code'), $number);
         $dotfn = $dir.'/dotcode.dot';
         $dotfile = fopen($dotfn, 'w');
         foreach ($dotcode as $dotstring) {
@@ -1355,7 +1379,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         foreach ($this->finiteautomates[$number] as $index=>$state) {
             foreach ($state->passages as  $leafcode=>$target) {
                 if (is_object($this->connection[$number][$leafcode]->pregnode)) {
-                    $symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+                    //$symbol = $this->connection[$number][$leafcode]->pregnode->tohr();
+					$symbol = $leafcode;
                 } else {
                     $symbol = 'ERROR: '.var_export($this->connection[$number][$leafcode]->pregnode, true);
                 }

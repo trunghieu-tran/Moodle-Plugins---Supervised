@@ -139,7 +139,7 @@ class qtype_preg_lexer extends JLexBase  {
         if(qtype_preg_unicode::ord($startchar) < qtype_preg_unicode::ord($endchar)) {
             $char = qtype_preg_unicode::ord($startchar);
             while($char <= qtype_preg_unicode::ord($endchar)) {
-                $cc->charset .= qtype_preg_unicode::code2utf8($char);
+                $cc .= qtype_preg_unicode::code2utf8($char);
                 $char++;
             }
         } else {
@@ -5069,8 +5069,7 @@ array(
     $this->cc->negative = false;
     $this->cccharnumber = 0;
     $this->cc->indfirst = $this->yychar;
-	$this->ccset = new stdClass;
-	$this->ccset->charset = '';
+	$this->ccset = '';
     $this->yybegin(self::CHARCLASS);
 }
 						case -7:
@@ -5674,7 +5673,7 @@ array(
 							break;
 						case 69:
 							{
-    $this->ccset->charset .= $this->yytext();
+    $this->ccset .= $this->yytext();
     $this->cccharnumber++;
 }
 						case -70:
@@ -5683,6 +5682,11 @@ array(
 							{
     $this->cc->indlast = $this->yychar;
 	$this->cc->israngecalculated = false;
+	if ($this->ccset != '') {
+		$flag = new preg_charset_flag;
+		$flag->set_set($this->ccset);
+		$this->cc->flags[] = array($flag);
+	}
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     $this->yybegin(self::YYINITIAL);
     $this->cc = null;
@@ -5693,7 +5697,7 @@ array(
 						case 71:
 							{
     if (!$this->cccharnumber) {
-        $this->ccset->charset .= '-';
+        $this->ccset .= '-';
     }
     $this->cccharnumber++;
 }
@@ -5702,7 +5706,7 @@ array(
 						case 72:
 							{
     if ($this->cccharnumber) {
-        $this->ccset->charset .= '^';
+        $this->ccset .= '^';
     } else {
         $this->cc->negative = true;
     }
@@ -5712,28 +5716,28 @@ array(
 							break;
 						case 73:
 							{
-    $this->ccset->charset .= '[';
+    $this->ccset .= '[';
     $this->cccharnumber++;
 }
 						case -74:
 							break;
 						case 74:
 							{
-    $this->ccset->charset .= '\\';
+    $this->ccset .= '\\';
     $this->cccharnumber++;
 }
 						case -75:
 							break;
 						case 75:
 							{
-    $this->ccset->charset .= ']';
+    $this->ccset .= ']';
     $this->cccharnumber++;
 }
 						case -76:
 							break;
 						case 76:
 							{
-    $this->ccset->charset .= '-';
+    $this->ccset .= '-';
     $this->cccharnumber++;
 }
 						case -77:
@@ -5744,6 +5748,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::DIGIT);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -78:
 							break;
@@ -5754,6 +5759,7 @@ array(
 	$flag->set_flag(preg_charset_flag::DIGIT);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -79:
 							break;
@@ -5763,6 +5769,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::WORDCHAR);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -80:
 							break;
@@ -5773,6 +5780,7 @@ array(
 	$flag->set_flag(preg_charset_flag::WORDCHAR);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -81:
 							break;
@@ -5782,6 +5790,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::SPACE);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -82:
 							break;
@@ -5792,20 +5801,21 @@ array(
 	$flag->set_flag(preg_charset_flag::SPACE);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -83:
 							break;
 						case 83:
 							{
     $this->cccharnumber++;
-    $this->ccset->charset .= qtype_preg_unicode::code2utf8(9);
+    $this->ccset .= qtype_preg_unicode::code2utf8(9);
 }
 						case -84:
 							break;
 						case 84:
 							{
     if (!$this->cccharnumber) {
-        $this->ccset->charset .= '-';
+        $this->ccset .= '-';
         $this->cc->negative = true;
         $this->cccharnumber++;
     }
@@ -5814,7 +5824,7 @@ array(
 							break;
 						case 85:
 							{
-    $this->ccset->charset .= qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)));
+    $this->ccset .= qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)));
     $this->cccharnumber++;
 }
 						case -86:
@@ -5839,6 +5849,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::CNTRL);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -89:
 							break;
@@ -5848,6 +5859,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::GRAPH);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -90:
 							break;
@@ -5857,6 +5869,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::PRIN);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -91:
 							break;
@@ -5866,6 +5879,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::PUNCT);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -92:
 							break;
@@ -5875,6 +5889,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::ASCII);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -93:
 							break;
@@ -5884,6 +5899,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::ALPHA);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -94:
 							break;
@@ -5893,6 +5909,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::ALNUM);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -95:
 							break;
@@ -5902,6 +5919,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::LOWER);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -96:
 							break;
@@ -5911,6 +5929,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::UPPER);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -97:
 							break;
@@ -5921,6 +5940,7 @@ array(
 	$flag->set_flag(preg_charset_flag::CNTRL);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -98:
 							break;
@@ -5930,6 +5950,7 @@ array(
 	$flag = new preg_charset_flag;
 	$flag->set_flag(preg_charset_flag::xdigit);
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -99:
 							break;
@@ -5940,6 +5961,7 @@ array(
 	$flag->set_flag(preg_charset_flag::GRAPH);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -100:
 							break;
@@ -5950,6 +5972,7 @@ array(
 	$flag->set_flag(preg_charset_flag::PRIN);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -101:
 							break;
@@ -5960,6 +5983,7 @@ array(
 	$flag->set_flag(preg_charset_flag::PUNCT);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -102:
 							break;
@@ -5970,6 +5994,7 @@ array(
 	$flag->set_flag(preg_charset_flag::ASCII);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -103:
 							break;
@@ -5980,6 +6005,7 @@ array(
 	$flag->set_flag(preg_charset_flag::ALPHA);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -104:
 							break;
@@ -5990,6 +6016,7 @@ array(
 	$flag->set_flag(preg_charset_flag::ALNUM);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -105:
 							break;
@@ -6000,6 +6027,7 @@ array(
 	$flag->set_flag(preg_charset_flag::LOWER);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -106:
 							break;
@@ -6010,6 +6038,7 @@ array(
 	$flag->set_flag(preg_charset_flag::UPPER);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -107:
 							break;
@@ -6020,6 +6049,7 @@ array(
 	$flag->set_flag(preg_charset_flag::xdigit);
 	$flag->negative = true;
     $this->cc->flags[] = array($flag);
+	$this->ccgotflag=true;
 }
 						case -108:
 							break;
@@ -6095,7 +6125,7 @@ array(
 							break;
 						case 113:
 							{
-    $this->ccset->charset .= $this->yytext();
+    $this->ccset .= $this->yytext();
     $this->cccharnumber++;
 }
 						case -113:
@@ -6114,7 +6144,7 @@ array(
 							break;
 						case 116:
 							{
-    $this->ccset->charset .= $this->yytext();
+    $this->ccset .= $this->yytext();
     $this->cccharnumber++;
 }
 						case -115:
@@ -6170,7 +6200,7 @@ array(
 							break;
 						case 247:
 							{
-    $this->ccset->charset .= $this->yytext();
+    $this->ccset .= $this->yytext();
     $this->cccharnumber++;
 }
 						case -118:
