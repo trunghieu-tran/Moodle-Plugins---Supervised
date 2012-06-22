@@ -246,13 +246,13 @@ class preg_leaf_charset extends preg_leaf {
             return false;
         }
         foreach ($this->flags as $variant) {
-            $varres = true;
-            $work = false;
-            foreach ($variant as $flag) {
-                $work = true;
-                $varres = $varres && $flag->match($str, $pos, $cs);
+            if (count($variant) > 0) {
+                $varres = true;
+                foreach ($variant as $flag) {
+                    $varres &= $flag->match($str, $pos, $cs);
+                }
             }
-            if ($varres && $work) {
+            if ($varres) {
                 $result = true;
                 break;
             }
@@ -484,16 +484,16 @@ class preg_charset_flag {
     public function is_null_length() {
         return $this->type===self::CIRCUMFLEX || $this->type===self::DOLLAR;
     }
-    public function match($str, $pos, $cs=true) {
+    public function match($str, $pos, $cs = true) {
         if ($pos < 0 || $pos >= qtype_preg_unicode::strlen($str)) {
             return false;// string index out of border
         }
         switch ($this->type) {
             case self::CIRCUMFLEX:
-                $result = $pos==0;
+                $result = $pos === 0;
                 break;
             case self::DOLLAR:
-                $result = $pos==qtype_preg_unicode::strlen($str)-1;
+                $result = $pos === qtype_preg_unicode::strlen($str) - 1;
                 break;
             case self::SET:
                 if ($pos >= qtype_preg_unicode::strlen($str)) {
@@ -505,13 +505,13 @@ class preg_charset_flag {
                     $charsetcopy = qtype_preg_unicode::strtolower($charsetcopy);
                     $strcopy = qtype_preg_unicode::strtolower($strcopy);
                 }
-                $result = (qtype_preg_unicode::strpos($charsetcopy, $strcopy[$pos]) !== false);
+                $result = (qtype_preg_unicode::strpos($charsetcopy, qtype_preg_unicode::substr($strcopy, $pos, 1)) !== false);
                 break;
             case self::FLAG:
-                $result = call_user_func_array($this->flag, array($str[$pos]));
+                $result = call_user_func_array($this->flag, array(qtype_preg_unicode::substr($str, $pos, 1)));
                 break;
             case self::UPROP:
-                $result = call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
+                $result = call_user_func_array('preg_match', array($this->uniprop, qtype_preg_unicode::substr($str, $pos, 1)));
                 $result = (bool)$result;
                 break;
         }
