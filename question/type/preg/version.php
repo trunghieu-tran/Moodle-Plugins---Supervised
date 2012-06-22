@@ -9,6 +9,7 @@ $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
     'qbehaviour_adaptivehints' => 2011111902,
-    'qbehaviour_adaptivehintsnopenalties' => 2011111902
+    'qbehaviour_adaptivehintsnopenalties' => 2011111902,
+    'qtype_poasquestion' => 2012060900
 );
 ?>
