@@ -294,8 +294,8 @@ class preg_leaf_charset_old extends preg_leaf {
 class preg_leaf_charset extends preg_leaf {
 	public function __construct() {
         $this->type = preg_node::TYPE_LEAF_CHARSET;
-		$this->flags = array(array());
-		$this->ranges = array(array());
+		$this->ranges = array();
+		//$this->flags = array(array());
 		$this->israngecalculated = true;//empty ranges for empty leaf is correct!
     }
 	public $flags;//simple flags in disjunctive normal form
@@ -323,10 +323,12 @@ class preg_leaf_charset extends preg_leaf {
 		}
 		foreach ($this->flags as $variant) {
 			$varres = true;
+			$work = false;
 			foreach ($variant as $flag) {
+				$work = true;
 				$varres = $varres && $flag->match($str, $pos, $cs);
 			}
-			if ($varres) {
+			if ($varres && $work) {
 				$result = true;
 				break;
 			}
@@ -334,6 +336,7 @@ class preg_leaf_charset extends preg_leaf {
 		if ($this->negative) {
 			$result = !$result;
 		}
+		$length = 1;
 		return $result;
 	}
 	public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
@@ -350,6 +353,36 @@ class preg_leaf_charset extends preg_leaf {
 			}
 		}
 	}
+	/**
+	*function check that other charset included in this
+	*it's meaning that any character matching with other match with this
+	*@param other charset for checking including
+	*@return true if included, false otherwise
+	*/
+	public function is_include(preg_leaf_charset $other) {
+		for ($i=32; $i<126; $i++) {
+			$c=chr($i);
+			if (!$this->match($c, 0, $l, true) && $other->match($c, 0, $l, true)) {//matching with other and not matching with this mean - not included!
+				return false;
+			}
+		}
+		return true;
+	}
+	public function is_part_ident(preg_leaf_charset $other) {
+		$flag1=false;
+		$flag2=false;
+		for ($i=32; $i<126; $i++) {
+			$c=chr($i);
+			if ($this->match($c, 0, $l, true) && $other->match($c, 0, $l, true)) {//matching with other and not matching with this mean - not included!
+				$flag1=true;
+			}
+			if (!$this->match($c, 0, $l, true) && $other->match($c, 0, $l, true) || $this->match($c, 0, $l, true) && !$other->match($c, 0, $l, true)) {//matching with other and not matching with this mean - not included!
+				$flag2=true;
+			}
+		}
+		return $flag1 && $flag2;
+	}
+	
 	public function tohr() {
 		return 'implement tohr before use!';
 	}
@@ -359,12 +392,17 @@ class preg_leaf_charset extends preg_leaf {
 	public function add_flag_con(preg_charset_flag $flag) {
 		echo 'implement add_flag before use!';
 	}
-	protected function push_negative() {
+	public function push_negative() {
 		if (!$this->negative) {
-			die('pushing negative on positive charclass!');
+			return;
 		}
 		if ($this->flags===null) {
 			return;
+		}
+		if (is_array($this->flags) && isset($this->flags[0]) && is_array($this->flags[0]) && isset($this->flags[0][0])) {
+			if (is_array($this->flags) && isset($this->flags[1]) && is_array($this->flags[1])) {
+				$this->flags[0] = $this->flags[1];
+			}
 		}
 		$result = $this->flags[0];
 		foreach ($this->flags as $i=>$disjunct) {
@@ -384,7 +422,6 @@ class preg_leaf_charset extends preg_leaf {
 				$result = $result2;
 			}
 		}
-		$this->flags = $result;
 		foreach ($this->flags as $i=>$disjunct) {
 			foreach ($this->flags[$i] as $j=>$flag) {
 				$this->flags[$i][$j] = clone $this->flags[$i][$j];
@@ -477,7 +514,7 @@ class preg_leaf_charset extends preg_leaf {
      * @param matcherstateobj an object which implements qtype_preg_matcher_state interface.
      */
     public function consumes($matcherstateobj = null) {
-        echo 'implement consumes before use!';
+        return 1;
     }
 }
 
@@ -707,7 +744,7 @@ class preg_charset_flag {
 	const GRAPH = 'ctype_graph';			//[:graph:]
 	const LOWER = 'ctype_lower';			//[:lower:]
 	const UPPER = 'ctype_upper';			//[:upper:]
-	const PRIN = 'ctype_print';			//[:print:] PRIN, because PRINT is php keyword
+	const PRIN = 'ctype_print';				//[:print:] PRIN, because PRINT is php keyword
 	const PUNCT = 'ctype_punct';			//[:punct:]
 	
 	public function __construct() {
