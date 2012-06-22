@@ -302,23 +302,19 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * Checks if dot.exe of graphviz exists
-    */
+     * Checks if dot of graphviz exists.
+     */
     public function is_dot_installed() {
         global $CFG;
         if (!isset($CFG->qtype_preg_graphvizpath)) {
             return false;
         }
-        $dotexefilename = $CFG->qtype_preg_graphvizpath.'/dot.exe';
-        if (!file_exists($dotexefilename)) {
-            return false;
-        }
-        return true;
+        return true; //file_exists($CFG->qtype_preg_graphvizpath . '/dot.exe');
     }
 
     /**
-    * Runs dot.exe of graphviz on the given .dot file
-    */
+     * Runs dot of graphviz on the given .dot file.
+     */
     public function execute_dot($dotfilename, $jpegfilename = null) {
         global $CFG;
         if (!$this->is_dot_installed()) {
@@ -331,9 +327,7 @@ class qtype_preg_regex_handler {
         } else {
             $jpgfn = $jpgpath.'/'.$jpegfilename;
         }
-        chdir($CFG->qtype_preg_graphvizpath);
-        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
+        exec('"' . $CFG->qtype_preg_graphvizpath . "/dot\" -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
     }
-
 }
 ?>
