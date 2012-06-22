@@ -710,20 +710,11 @@ class preg_charset_flag {
 */
 class preg_leaf_meta extends preg_leaf {
 
-    //. - any character except \n
-    const SUBTYPE_DOT = 'dot_leaf_meta';
-    //\p{L} or \pL
-    const SUBTYPE_UNICODE_PROP = 'unicode_prop_leaf_meta';
-    // \w
-    //Should be locale-aware, but not Unicode for PCRE-compatibility
-    const SUBTYPE_WORD_CHAR = 'word_char_leaf_meta';
     //Leaf with empty in alternative (something|)
     const SUBTYPE_EMPTY = 'empty_leaf_meta';
     //Service subtype - end of regex, but not end of string
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
-    //Unicode property name, used in case of SUBTYPE_UNICODE_PROP
-    public $propname = '';
-    //true if charset is DNF range matrix, false if charset is DNF of flags
+    //True if charset is DNF range matrix, false if charset is DNF of flags
     public $israngecalculated;
 
     public function __construct() {
@@ -736,94 +727,27 @@ class preg_leaf_meta extends preg_leaf {
     //TODO - ui_nodename()
 
     public function consumes($matcherstateobj = null) {
-        if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
-            return 0;
-        }
-        return 1;
+        return 0;
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        switch ($this->subtype) {
-            case preg_leaf_meta::SUBTYPE_DOT:
-                $result = 'D';
-                break;
-            //TODO: unicode property
-            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
-                if ($this->negative) {
-                    $result = '#';
-                } else {
-                    $result = 'W';
-                }
-                break;
-        }
-        return $result;
+        return '';
     }
 
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        if ($this->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
-            $length = 0;
-            return true;
-        }
-        if ($pos >= qtype_preg_unicode::strlen($str)) {
-            $length = 0;
-            return false;
-        }
-        switch ($this->subtype) {
-            case preg_leaf_meta::SUBTYPE_DOT:
-                if ($pos < qtype_preg_unicode::strlen($str) && qtype_preg_unicode::substr($str, $pos, 1) != "\n") {
-                    $length = 1;
-                    return true;
-                } else {
-                    $length = 0;
-                    return false;
-                }
-                break;
-            //TODO: unicode property
-            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
-                if (ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)) || qtype_preg_unicode::substr($str, $pos, 1) === '_') {
-                    $result =  true;
-                } else {
-                    $result =  false;
-                }
-                break;
-            case preg_leaf_meta::SUBTYPE_EMPTY:
-                $length = 0;
-                return true;
-                break;
-        }
-        if ($this->negative) {
-            $result = !$result;
-        }
-        if ($result) {
-            $length = 1;
-        } else {
-            $length = 0;
-        }
-        return $result;
+        $length = 0;
+        return true;
     }
 
     public function tohr() {
-        if ($this->negative) {
-            $direction = '!';
-        } else {
-            $direction = '';
-        }
         switch ($this->subtype) {
-            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
-                $type = '\\w';
-                break;
-            case preg_leaf_meta::SUBTYPE_DOT:
-                $type = 'dot';
-                break;
             case preg_leaf_meta::SUBTYPE_ENDREG:
-                $type = 'ENDREG';
-                break;
+                return 'metaENDREG';
             case preg_leaf_meta::SUBTYPE_EMPTY:
-                $type = 'eps';
-                break;
-        };
-        $result = "$direction"."meta$type";
-        return $result;
+                return 'metaEPS';
+            default:
+                return '';
+        }
     }
 }
 
