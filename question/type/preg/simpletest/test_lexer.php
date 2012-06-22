@@ -424,8 +424,8 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $lexer = $this->create_lexer('.');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_META);
-        $this->assertTrue($token->value->subtype === preg_leaf_meta::SUBTYPE_DOT);
+        $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->flag === preg_charset_flag::PRIN);
     }
     function test_lexer_subpatterns() {
         $lexer = $this->create_lexer('((?:(?>(?(?=(?(?!(?(?<=(?(?<!');
