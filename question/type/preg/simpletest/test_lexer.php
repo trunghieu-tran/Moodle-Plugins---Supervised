@@ -239,7 +239,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->set === '3');
+        $this->assertTrue($token->value->flags[0][0]->set == '3');
         $token = $lexer->nextToken();// \81 - binary zero followed by '8' and '1'
         if ($this->assertTrue(is_array($token))) {
             $this->assertTrue($token[0]->type === preg_parser_yyParser::PARSLEAF);
@@ -355,7 +355,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->flag === preg_charset_flag::DIGIT);
-        $this->assertTrue($token->value->flags[1][0]->set === 'ab');
+        $this->assertTrue($token->value->flags[1][0]->set == 'ab');
         $token = $lexer->nextToken();// [a-d]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
@@ -705,7 +705,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
     }
     function test_lexer_global_options() {
         $lexer = $this->create_lexer('ab(?-i:cd)e');
-        $lexer->mod_top_opt('i', '');
+        $lexer->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
         $token = $lexer->nextToken();// a
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
