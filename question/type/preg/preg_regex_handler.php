@@ -15,29 +15,30 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
     //////Initial data
-    //Regular expression as string
+    // Regular expression as an object of qtype_preg_string.
     protected $regex;
-    //Modifiers for regular expression
+    // Modifiers for regular expression as an object of qtype_preg_string.
     protected $modifiers;
-    //Regular expression handling options, may be different for different handlers
+    // Regular expression handling options, may be different for different handlers.
     protected $options;
 
     protected $lexer;
 
     protected $parser;
 
-    //The root of abstract syntax tree of the regular expression - tree consists of preg_node childs
+    // The root of abstract syntax tree of the regular expression - tree consists of preg_node childs.
     protected $ast_root;
-    //The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name
+    // The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name.
     protected $dst_root;
-    //The error objects array
+    // The error objects array.
     protected $errors;
-    //Anchoring - object,  with 'start' and 'end' logical fields, which are true if all regex is anchored
+    // Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored.
     protected $anchor;
 
     public function name() {
@@ -45,11 +46,11 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * Parse regex and do all necessary preprocessing
-    * @param regex - regular expression to handle
-    * @param modifiers - modifiers of regular expression
-    * @param options - options to handle regex, i.e. any necessary additional parameters
-    */
+     * Parses the regex and does all necessary preprocessing.
+     * @param string regex - regular expression to handle.
+     * @param string modifiers - modifiers of the regular expression.
+     * @param object options - options to handle regex, i.e. any necessary additional parameters.
+     */
     public function __construct($regex = null, $modifiers = null, $options = null) {
         $this->errors = array();
         $this->lexer = null;
@@ -61,16 +62,19 @@ class qtype_preg_regex_handler {
 
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
+            $modifiers = new qtype_preg_string($modifiers);
             $supportedmodifiers = $this->get_supported_modifiers();
-            for ($i = 0; $i < qtype_preg_unicode::strlen($modifiers); $i++) {
-                $mod = qtype_preg_unicode::substr($modifiers, $i, 1);
-                if (qtype_preg_unicode::strpos($supportedmodifiers, $mod) === false) {
-                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod);
+            for ($i = 0; $i < $modifiers->length(); $i++) {
+                $mod = $modifiers[$i];
+                if ($supportedmodifiers->contains($mod) === false) {
+                    $this->errors[] = new qtype_preg_error_unsupported_modifier($this->name(), $mod->string());
                 }
             }
+        } else {
+            $modifiers = new qtype_preg_string('');
         }
 
-        $this->regex = $regex;
+        $this->regex = new qtype_preg_string($regex);
         $this->modifiers = $modifiers;
         $this->options = $options;
         //do parsing
@@ -132,7 +136,7 @@ class qtype_preg_regex_handler {
     * returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return 'i';//any qtype_preg_matcher who intends to work with this question should support case insensitivity
+        return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
@@ -183,15 +187,15 @@ class qtype_preg_regex_handler {
 
 
     /**
-    * Function does lexical and syntaxical analysis of regex and builds abstract syntax tree, saving root node in $this->ast_root
-    @param $regex - regular expression for building tree
-    */
+     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
+     * @param string regex - regular expression for building tree.
+     */
     protected function build_tree($regex) {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher =& $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
-        $this->lexer->mod_top_opt($this->modifiers, '');
+        $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
         $this->parser = new preg_parser_yyParser;
         while ($token = $this->lexer->nextToken()) {
             if (!is_array($token)) {
