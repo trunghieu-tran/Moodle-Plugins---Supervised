@@ -63,6 +63,16 @@ class qtype_preg_string implements ArrayAccess {
     }
 
     /**
+     * Returns a substring of this string.
+     * @param start starting index of the substring.
+     * @param length length of the substring.
+     * @return an object of qtype_preg_string.
+     */
+    public function substr($start, $length = null) {
+        return new qtype_preg_string(qtype_preg_unicode::substr($this->fstring, $start, $length));
+    }
+
+    /**
      * Concatenates a string to this string.
      * @param mixed a string to concatenate (can be either an object of qtype_preg_string or a simple string).
      */
