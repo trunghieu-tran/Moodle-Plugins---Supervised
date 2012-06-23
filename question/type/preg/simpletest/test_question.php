@@ -9,10 +9,8 @@
  * @package question
  */
 
+defined('MOODLE_INTERNAL') || die();
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 class qtype_preg_question_test extends UnitTestCase {
