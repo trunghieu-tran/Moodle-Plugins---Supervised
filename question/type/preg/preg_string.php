@@ -39,7 +39,31 @@ class qtype_preg_string implements ArrayAccess {
     }
 
     /**
-     * Concatenates a string.
+     * Converts this string to lowercase.
+     */
+    public function tolower() {
+        $this->fstring = qtype_preg_unicode::strtolower($this->fstring);
+    }
+
+    /**
+     * Converts this string to uppercase.
+     */
+    public function toupper() {
+        $this->fstring = qtype_preg_unicode::strtoupper($this->fstring);
+    }
+
+    /**
+     * Checks if this string contains another string.
+     * @param str substring.
+     * @return true if this string contais str, false otherwise.
+     */
+    public function contains($str) {
+        $str = (string)$str;
+        return qtype_preg_unicode::strpos($this->fstring, $str);
+    }
+
+    /**
+     * Concatenates a string to this string.
      * @param mixed a string to concatenate (can be either an object of qtype_preg_string or a simple string).
      */
     public function concatenate($str) {
