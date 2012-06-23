@@ -263,25 +263,38 @@ class preg_leaf_charset extends preg_leaf {
         ($result === true) ? $length = 1 : $length = 0;
         return $result;
     }
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {//may be rename to character?
-        /*$ranges = qtype_preg_unicode::get_ranges($this->flags[0][0]->set->string());
-        foreach ($ranges as $range) {
-            for ($i = $range[0]; $i < $range[1]; $i++)
-                if ($this->match(new qtype_preg_string(chr($i)), 0, $l, true)) {
-                    return new qtype_preg_string(chr($i));
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { //may be rename to character?
+        if ($this->flags[0][0]->type === preg_charset_flag::SET) {
+            if ($this->negative) {
+                $ranges = qtype_preg_unicode::get_ranges($this->flags[0][0]->set->string());
+                foreach ($ranges as $range) {
+                    $leftborder = $range[0];
+                    if ($leftborder < qtype_preg_unicode::ord(' ')) {
+                        $leftborder = qtype_preg_unicode::ord(' ');
+                    }
+                    for ($i = $leftborder; $i < $range[1]; $i++) {
+                        $char = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
+                        if ($this->match($char, 0, $l, true)) {
+                            return $char;
+                        }
+                    }
                 }
-        }*/
 
-        for ($i = ord('a'); $i < 256; $i++) {
-            $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
-            if ($this->match($c, 0, $l, true)) {
-                return $c;
+            } else {
+                return new qtype_preg_string($this->flags[0][0]->set[0]);
             }
-        }
-        for ($i = ord(' '); $i < ord('a'); $i++) {
-            $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
-            if ($this->match($c, 0, $l, true)) {
-                return $c;
+        } else {
+            for ($i = ord('a'); $i < 256; $i++) {
+                $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
+                if ($this->match($c, 0, $l, true)) {
+                    return $c;
+                }
+            }
+            for ($i = ord(' '); $i < ord('a'); $i++) {
+                $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
+                if ($this->match($c, 0, $l, true)) {
+                    return $c;
+                }
             }
         }
     }
@@ -462,6 +475,19 @@ class preg_leaf_charset extends preg_leaf {
     public function consumes($matcherstateobj = null) {
         return 1;
     }
+
+    public function __clone() {
+        parent::__clone();
+        if ($this->flags !== null) {
+            foreach ($this->flags as $ind1 => $extflag) {
+                $cur = array();
+                foreach ($extflag as $ind2 => $inflag) {
+                    $cur[$ind2] = clone $inflag;
+                }
+                $this->flags[$ind1] = $cur;
+            }
+        }
+    }
 }
 
 /**
@@ -499,6 +525,19 @@ class preg_charset_flag {
 
     static protected $flagtypes;
     static protected $intersection;
+
+    public function __clone() {
+        $this->negative = $this->negative;
+        $this->type = $this->type;
+
+        if ($this->set !== null) {
+            $this->set = clone $this->set;
+        } else {
+            $this->set = $this->set;
+        }
+        $this->flag = $this->flag;
+        $this->uniprop = $this->uniprop;
+    }
 
     public function set_circumflex() {
         $this->type = self::CIRCUMFLEX;
@@ -738,7 +777,7 @@ class preg_charset_flag {
             $result = $this->set;
             break;
         case self::FLAG:
-            $result = $this->set;
+            $result = $this->flag;
             break;
         case self::UPROP:
             $result = 'todo';
