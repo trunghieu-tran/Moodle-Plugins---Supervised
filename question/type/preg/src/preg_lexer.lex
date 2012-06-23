@@ -2,6 +2,7 @@
 require_once($CFG->dirroot . '/question/type/preg/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 %%
@@ -26,15 +27,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $this->optcount = 1;
 %init}
 %{
-    protected $errors;
-    protected $lastsubpatt;
-    protected $maxsubpatt;
-    protected $subpatternmap;
-    protected $lexemcount;
-    protected $backrefsexist;
-    protected $optstack;
-    protected $optcount;
-
     const CHARSET_DUMMY = 100;
     const CHARSET_d = 101;
     const CHARSET_w = 102;
@@ -46,11 +38,15 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
     // A reference to the matcher object to be passed to some nodes.
     public $matcher = null;
-    // Global modifiers as a string - defined for entire expression.
-    public $globalmodifiers = '';
-    // Local modifiers - turned on (or off) using options in the expression.
-    // It's contains copy of a global modifiers at start, but could be changed later.
-    public $localmodifiers ='';
+
+    protected $errors;
+    protected $lastsubpatt;
+    protected $maxsubpatt;
+    protected $subpatternmap;
+    protected $lexemcount;
+    protected $backrefsexist;
+    protected $optstack;
+    protected $optcount;
 
     public function get_errors() {
         return $this->errors;
@@ -85,7 +81,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         case 'preg_leaf_charset':
             $flag = new preg_charset_flag;
             if ($subtype === self::CHARSET_DUMMY) {
-                $flag->set_set($data);
+                $flag->set_set(new qtype_preg_string($data));
             } else {
                 switch ($subtype) {
                 case self::CHARSET_d:
@@ -134,12 +130,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
             if ($index === false) {
                 $result->posopt = $text;
             } else {
-                $result->posopt = qtype_preg_unicode::substr($text, 0, $index);
-                $result->negopt = qtype_preg_unicode::substr($text, $index + 1);
+                $result->posopt = new qtype_preg_string(qtype_preg_unicode::substr($text, 0, $index));
+                $result->negopt = new qtype_preg_string(qtype_preg_unicode::substr($text, $index + 1));
             }
             break;
         case 'preg_leaf_recursion':
-            if ($data[2] == 'R') {
+            if ($data[2] === 'R') {
                 $result->number = 0;
             } else {
                 $result->number = qtype_preg_unicode::substr($data, 2, qtype_preg_unicode::strlen($data) - 3);
@@ -147,7 +143,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
             break;
         }
         $result->indfirst = $this->yychar;
-        $text = $this->yytext();
         $result->indlast = $this->yychar + $this->yylength() - 1;
         return $result;
     }
@@ -160,7 +155,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     }
 
     protected function form_num_interval(&$cc, $startchar, $endchar) {
-        if(qtype_preg_unicode::ord($startchar) < qtype_preg_unicode::ord($endchar)) {
+        if (qtype_preg_unicode::ord($startchar) < qtype_preg_unicode::ord($endchar)) {
             $char = qtype_preg_unicode::ord($startchar);
             while($char <= qtype_preg_unicode::ord($endchar)) {
                 $cc .= qtype_preg_unicode::code2utf8($char);
@@ -174,7 +169,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         if ($this->optcount > 0) {
             $this->optstack[$this->optcount] = clone $this->optstack[$this->optcount - 1];
 
-            if ($subpattnum != -1) {
+            if ($subpattnum !== -1) {
                 $this->optstack[$this->optcount]->subpattnum = $subpattnum;
                 $this->optstack[$this->optcount]->parennum = $this->optcount;
             }
@@ -187,9 +182,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
             $item = $this->optstack[$this->optcount - 1];
             $this->optcount--;
             // Is it a pair for (?|
-            if ($item->parennum == $this->optcount) {
+            if ($item->parennum === $this->optcount) {
                 // Are we out of a (?|...) block?
-                if ($this->optstack[$this->optcount - 1]->subpattnum != -1) {
+                if ($this->optstack[$this->optcount - 1]->subpattnum !== -1) {
                     $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    // Reset subpattern numeration.
                 } else {
                     $this->lastsubpatt = $this->maxsubpatt;
@@ -198,20 +193,20 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         }
     }
     public function mod_top_opt($set, $unset) {
-        for ($i = 0; $i < qtype_preg_unicode::strlen($set); $i++) {
-            if (qtype_preg_unicode::strpos($unset, qtype_preg_unicode::substr($set, $i, 1))) {// Setting and unsetting modifier at the same time is error.
+        for ($i = 0; $i < $set->length(); $i++) {
+            if (qtype_preg_unicode::strpos($unset, $set[$i])) {// Setting and unsetting modifier at the same time is error.
                 $text = $this->yytext;
                 $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - qtype_preg_unicode::strlen($text), $this->yychar - 1);
                 return;
             }
         }
         // If error does not exist, set and unset local modifiers.
-        for ($i = 0; $i < qtype_preg_unicode::strlen($set); $i++) {
-            $tmp = qtype_preg_unicode::substr($set, $i, 1);
+        for ($i = 0; $i < $set->length(); $i++) {
+            $tmp = $set[$i];
             $this->optstack[$this->optcount - 1]->$tmp = true;
         }
-        for ($i = 0; $i < qtype_preg_unicode::strlen($unset); $i++) {
-            $tmp = qtype_preg_unicode::substr($unset, $i, 1);
+        for ($i = 0; $i < $unset->length(); $i++) {
+            $tmp = $unset[$i];
             $this->optstack[$this->optcount - 1]->$tmp = false;
         }
     }
@@ -627,23 +622,23 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 }
 <YYINITIAL> \(\?i\) {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
-    $this->mod_top_opt('i', '');
+    $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
 }
 <YYINITIAL> \(\?-i\) {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
-    $this->mod_top_opt('', 'i');
+    $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('i'));
 }
 <YYINITIAL> \(\?i: {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
     $this->push_opt_lvl();
-    $this->mod_top_opt('i', '');
+    $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
 <YYINITIAL> \(\?-i: {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
     $this->push_opt_lvl();
-    $this->mod_top_opt('', '-i');
+    $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('-i'));
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
     return $res;
 }
@@ -899,7 +894,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     }
     $this->cccharnumber++;
 }
-<CHARCLASS> [0-9]-[0-9]|[a-z]-[a-z]|[A-Z]-[A-Z] {
+<CHARCLASS> [^\[\]\\*+?{}()|.^$]-[^\[\]\\*+?{}()|.^$] {
     $text = $this->yytext();
     $this->form_num_interval($this->ccset, qtype_preg_unicode::substr($text, 0, 1), qtype_preg_unicode::substr($text, 2, 1));
 }
@@ -914,9 +909,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 <CHARCLASS> \] {
     $this->cc->indlast = $this->yychar;
     $this->cc->israngecalculated = false;
-    if ($this->ccset != '') {
+    if ($this->ccset !== '') {
         $flag = new preg_charset_flag;
-        $flag->set_set($this->ccset);
+        $flag->set_set(new qtype_preg_string($this->ccset));
         $this->cc->flags[] = array($flag);
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
