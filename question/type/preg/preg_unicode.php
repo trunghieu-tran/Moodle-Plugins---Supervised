@@ -165,7 +165,7 @@ class qtype_preg_unicode extends textlib {
             $code = self::ord(self::substr($utf8str, $i, 1));
             foreach (self::$ranges as $name => $range) {
                 if ($code >= $range[0] && $code < $range[1]) {
-                    if (!array_key_exists($result, $name)) {
+                    if (!array_key_exists($name, $result)) {
                         $result[$name] = $range;
                     }
                     break;
@@ -306,7 +306,7 @@ class qtype_preg_unicode extends textlib {
      * @param utf8chr the character to be checked.
      * @return true if the character is alphabetic, false otherwise.
      */
-    public static function is_alpha() {
+    public static function is_alpha($utf8chr) {
         return ctype_alpha($utf8chr);
     }
 
@@ -315,7 +315,7 @@ class qtype_preg_unicode extends textlib {
      * @param utf8chr the character to be checked.
      * @return true if the character is alphanumeric, false otherwise.
      */
-    public static function is_alnum() {
+    public static function is_alnum($utf8chr) {
         return ctype_alnum($utf8chr);
     }
 
@@ -325,6 +325,6 @@ class qtype_preg_unicode extends textlib {
      * @return true if the character is alphabetic or '_', false otherwise.
      */
     public static function is_wordchar($utf8chr) {
-        return $char === '_' || self::is_alnum($char);
+        return $utf8chr === '_' || self::is_alnum($utf8chr);
     }
 }
