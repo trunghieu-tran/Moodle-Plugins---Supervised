@@ -954,7 +954,7 @@ class preg_leaf_backref extends preg_leaf {
 
         $strcopy = clone $str;
         if (!$cs) {
-            $strcopy = $strcopy->tolower();
+            $strcopy->tolower();
         }
         $matchlen = 0;
         $result = true;
