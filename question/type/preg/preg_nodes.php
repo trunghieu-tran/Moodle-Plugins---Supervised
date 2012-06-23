@@ -468,59 +468,77 @@ class preg_leaf_charset extends preg_leaf {
 *one requirement to character
 */
 class preg_charset_flag {
-    //types
-    const SET = 'enumerable_characters';
-    const FLAG = 'functionally_calculated_characters';
-    const UPROP = 'unicode_property';
+
+    // Charset types.
+    const SET        = 'enumerable_characters';
+    const FLAG       = 'functionally_calculated_characters';
+    const UPROP      = 'unicode_property';
     const CIRCUMFLEX = 'circumflex';
-    const DOLLAR = 'dollar';
+    const DOLLAR     = 'dollar';
+
+    // Flag types.
+    const DIGIT      = 'qtype_preg_unicode::is_digit';      // \d AND [:digit:]
+    const XDIGIT     = 'qtype_preg_unicode::is_xdigit';     // [:xdigit:]
+    const SPACE      = 'qtype_preg_unicode::is_space';      // \s AND [:space:]
+    const WORDCHAR   = 'qtype_preg_unicode::is_wordchar';   // \w AND [:word:]
+    const ALNUM      = 'qtype_preg_unicode::is_alnum';      // [:alnum:]
+    const ALPHA      = 'qtype_preg_unicode::is_alpha';      // [:alpha:]
+    const ASCII      = 'qtype_preg_unicode::is_ascii';      // [:ascii:]
+    const CNTRL      = 'qtype_preg_unicode::is_cntrl';      // [:ctrl:]
+    const GRAPH      = 'qtype_preg_unicode::is_graph';      // [:graph:]
+    const LOWER      = 'qtype_preg_unicode::is_lower';      // [:lower:]
+    const UPPER      = 'qtype_preg_unicode::is_upper';      // [:upper:]
+    const PRIN       = 'qtype_preg_unicode::is_print';      // [:print:] PRIN, because PRINT is php keyword
+    const PUNCT      = 'qtype_preg_unicode::is_punct';      // [:punct:]
 
     public $negative;
     public $type;
     public $set;
-    public $flag;//as name of character verify function, see constants bellow
+    public $flag;    //as name of character verify function, see constants bellow
     public $uniprop;
 
     static protected $flagtypes;
     static protected $intersection;
 
-
     public function set_circumflex() {
         $this->type = self::CIRCUMFLEX;
     }
+
     public function set_dollar() {
         $this->type = self::DOLLAR;
     }
+
     public function set_set($set) {
         $this->type = self::SET;
         $this->set = $set;
     }
+
     public function set_flag($flag) {
         $this->type = self::FLAG;
         $this->flag = $flag;
     }
+
     public function set_uprop($prop) {
         $this->type = self::UPROP;
         $this->uniprop = '/\\p{'.$prop.'}/';
     }
+
     public function is_null_length() {
         return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
     }
+
     public function match($str, $pos, $cs = true) {
         if ($pos < 0 || $pos >= $str->length()) {
-            return false; // String index out of borders.
+            return false;    // String index out of borders.
         }
         switch ($this->type) {
             case self::CIRCUMFLEX:
-                $result = $pos === 0;
+                $result = ($pos === 0);
                 break;
             case self::DOLLAR:
-                $result = $pos === $str->length() - 1;
+                $result = ($pos === $str->length() - 1);
                 break;
             case self::SET:
-                if ($pos >= $str->length()) {
-                    return false;
-                }
                 $charsetcopy = clone $this->set;
                 $strcopy = clone $str;
                 if (!$cs) {
@@ -530,11 +548,10 @@ class preg_charset_flag {
                 $result = ($charsetcopy->contains($strcopy[$pos]) !== false);
                 break;
             case self::FLAG:
-                $result = call_user_func_array($this->flag, array($str[$pos]));
+                $result = (bool)call_user_func_array($this->flag, array($str[$pos]));
                 break;
             case self::UPROP:
-                $result = call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
-                $result = (bool)$result;
+                $result = (bool)call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
                 break;
         }
         if ($this->negative) {
@@ -543,28 +560,26 @@ class preg_charset_flag {
         return $result;
     }
     /**
-    *intersect this flag with other, if possible
-    *@param other other flag to intersection
-    *@return result of intersection as preg_charset flag, if intersection is possible, null if intersection is empty and false if intersection is impossible
+     * Intersect this flag with other, if possible.
+     * @param other other flag to intersect with.
+     * @return result of the intersection as preg_charset flag, if intersection is possible, null if intersection is empty and false if intersection is impossible.
     */
     public function intersect(preg_charset_flag $other) {
         if ($this->type === preg_charset_flag::FLAG && $other->type === preg_charset_flag::FLAG) {
             foreach (self::$flagtypes as $index => $flagtype) {
                 if ($flagtype === $this->flag) {
+                    $selfindex = $index;
                     if ($this->negative) {
-                        $selfindex = $index + 13;
-                    } else {
-                        $selfindex = $index;
+                        $selfindex += 13;
                     }
                     break;
                 }
             }
             foreach (self::$flagtypes as $index => $flagtype) {
                 if ($flagtype === $other->flag) {
+                    $otherindex = $index;
                     if ($other->negative) {
-                        $otherindex = $index + 13;
-                    } else {
-                        $otherindex = $index;
+                        $otherindex += 13;
                     }
                     break;
                 }
@@ -572,11 +587,11 @@ class preg_charset_flag {
             $result = self::$intersection[26 * $selfindex + $otherindex];
             if ($result === false || $result === null) {
                 return $result;
-            } else if ($result == 'set') {
+            } else if ($result === 'set') {
                 return false;
             } else {
                 $res = new preg_charset_flag;
-                if ($result[0] == '-') {
+                if ($result[0] === '-') {
                     $res->set_flag(qtype_preg_unicode::substr($result, 1));
                     $res->negative = true;
                 } else {
@@ -589,13 +604,13 @@ class preg_charset_flag {
                 return false;
             }
             $res = new preg_charset_flag;
-            $str = '';
-            for ($i = 0; $i < qtype_preg_unicode::strlen($other->set); $i++) {
+            $str = new qtype_preg_string('');
+            for ($i = 0; $i < $other->set->length(); $i++) {
                 if ($this->match($other->set, $i)) {
-                    $str .= $other->set[$i];
+                    $str->concatenate($other->set[$i]);
                 }
             }
-            if ($str === '') {
+            if ($str->length() === 0) {
                 return null;
             }
             $res->set_set($str);
@@ -605,40 +620,41 @@ class preg_charset_flag {
         } else if ($this->type === preg_charset_flag::SET && $other->type === preg_charset_flag::SET) {
             if ($this->negative && $other->negative) {
                 $res = new preg_charset_flag;
-                $str = $str = $this->set . $other->set;
-                $resstr = '';
-                for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
+                $str = clone $this->set;
+                $str->concatenate($other->set);
+                $resstr = new qtype_preg_string('');
+                for ($i = 0; $i < $str->length(); $i++) {
                     if (qtype_preg_unicode::strpos($str, $str[$i]) == $i) {
-                        $resstr .= $str[$i];
+                        $resstr->concatenate($str[$i]);
                     }
                 }
                 $res->negative = true;
-                if ($resstr === '') {
+                if ($resstr->length() === 0) {
                     return null;
                 }
                 $res->set_set($resstr);
             } else if ($this->negative && !$other->negative) {
                 $res = new preg_charset_flag;
-                $str = '';
-                for ($i = 0; $i < qtype_preg_unicode::strlen($other->set); $i++) {
+                $str = new qtype_preg_string('');
+                for ($i = 0; $i < $other->set->length(); $i++) {
                     if ($this->match($other->set, $i)) {
-                        $str .= $other->set[$i];
+                        $str->concatenate($other->set[$i]);
                     }
                 }
-                if ($str === '') {
+                if ($str->length() === 0) {
                     return null;
                 }
                 $res->set_set($str);
                 return $res;
             } else {
                 $res = new preg_charset_flag;
-                $str = '';
-                for ($i = 0; $i < qtype_preg_unicode::strlen($this->set); $i++) {
+                $str = new qtype_preg_string('');
+                for ($i = 0; $i < $this->set->length(); $i++) {
                     if ($other->match($this->set, $i)) {
-                        $str .= $this->set[$i];
+                        $str->concatenate($this->set[$i]);
                     }
                 }
-                if ($str === '') {
+                if ($str->length() === 0) {
                     return null;
                 }
                 $res->set_set($str);
@@ -650,36 +666,24 @@ class preg_charset_flag {
         }
     }
     /**
-    *substract this flag with other, if possible
-    *@param other other flag to substraction
-    *@return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
-    */
+     * Substract this flag with other, if possible.
+     * @param other other flag for substraction.
+     * @return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
+     */
     public function substract(preg_charset_flag $other) {
         $copy = clone $other;
         return $this->intersect($copy);
     }
 
     /**
-    *function get and return char code range for this flag
-    *@return range as array[2] of integer or array of ranges (for set) as array[size][2] of integer
-    */
+     * Returns char code range for this flag.
+     * @return range as array[2] of integer or array of ranges (for set) as array[size][2] of integer
+     */
     public function get_range() {
         die('implement get_range before use i1!');
     }
 
-    const DIGIT    = 'qtype_preg_unicode::is_digit';      // \d AND [:digit:]
-    const XDIGIT   = 'qtype_preg_unicode::is_xdigit';     // [:xdigit:]
-    const SPACE    = 'qtype_preg_unicode::is_space';      // \s AND [:space:]
-    const WORDCHAR = 'qtype_preg_unicode::is_wordchar';   // \w AND [:word:]
-    const ALNUM    = 'qtype_preg_unicode::is_alnum';      // [:alnum:]
-    const ALPHA    = 'qtype_preg_unicode::is_alpha';      // [:alpha:]
-    const ASCII    = 'qtype_preg_unicode::is_ascii';      // [:ascii:]
-    const CNTRL    = 'qtype_preg_unicode::is_cntrl';      // [:ctrl:]
-    const GRAPH    = 'qtype_preg_unicode::is_graph';      // [:graph:]
-    const LOWER    = 'qtype_preg_unicode::is_lower';      // [:lower:]
-    const UPPER    = 'qtype_preg_unicode::is_upper';      // [:upper:]
-    const PRIN     = 'qtype_preg_unicode::is_print';      // [:print:] PRIN, because PRINT is php keyword
-    const PUNCT    = 'qtype_preg_unicode::is_punct';      // [:punct:]
+
 
     public function __construct() {
         if (is_array(self::$flagtypes)) {
@@ -831,38 +835,27 @@ class preg_leaf_assert extends preg_leaf {
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         $length = 0;
         switch ($this->subtype) {
-            case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
-            case preg_leaf_assert::SUBTYPE_ESC_G://there are no repetitive matching for now, so \G is equvivalent to \A
+            case preg_leaf_assert::SUBTYPE_ESC_A:    // Because may be one line only is response.
+            case preg_leaf_assert::SUBTYPE_ESC_G:    // There are no repetitive matching for now, so \G is equvivalent to \A.
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                if($pos === 0) {
-                    $result = true;
-                } else {
-                    $result = false;
-                }
+                $result = ($pos === 0);
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z://because may be one line only is response
+            case preg_leaf_assert::SUBTYPE_ESC_Z:    // Because may be one line only is response
             case preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($pos === $str->length()) {
-                    $result = true;
-                } else {
-                    $result = false;
-                }
+                $result = ($pos === $str->length());
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
-                $start = $pos == 0 && (qtype_preg_unicode::substr($str, 0, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, 0, 1)));
-                $end = $pos == qtype_preg_unicode::strlen($str) && (qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1)));
-                if ($pos > 0 && $pos < qtype_preg_unicode::strlen($str)) {
-                    $wW = (qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1))) && !(qtype_preg_unicode::substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)));
-                    $Ww = !(qtype_preg_unicode::substr($str, $pos - 1, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos - 1, 1))) && (qtype_preg_unicode::substr($str, $pos, 1) == '_' || ctype_alnum(qtype_preg_unicode::substr($str, $pos, 1)));
-                } else {
-                    $wW = $Ww = false;
+                $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_alnum($str[0]));
+                $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1]));
+                $wW = $Ww = false;
+                if ($pos > 0 && $pos < $str->length()) {
+                    $wW = ($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1])) && !($str[$pos] === '_' || qtype_preg_unicode::is_alnum($str[$pos]));
+                    $Ww = !($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1])) && ($str[$pos] === '_' || qtype_preg_unicode::is_alnum($str[$pos]));
                 }
-                if ($start || $end || $wW || $Ww) {
-                    $result = true;
-                } else {
-                    $result = false;
-                }
+                $result = ($start || $end || $wW || $Ww);
                 break;
+            default:
+                $result = false;
         }
         if ($this->negative) {
             $result = !$result;
@@ -897,11 +890,6 @@ class preg_leaf_assert extends preg_leaf {
         }
     }
     public function tohr() {
-        if ($this->negative) {
-            $direction = '!';
-        } else {
-            $direction = '';
-        }
         switch ($this->subtype) {
             case preg_leaf_assert::SUBTYPE_ESC_A://because may be one line only is response
             case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
@@ -914,9 +902,12 @@ class preg_leaf_assert extends preg_leaf {
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $type = '\\b';
                 break;
-        };
-        $result = "$direction"."assert$type";
-        return $result;
+        }
+        if ($this->negative) {
+            return '!assert' . $type;
+        } else {
+            return 'assert' . $type;
+        }
     }
 }
 
@@ -937,18 +928,14 @@ class preg_leaf_backref extends preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
-            $length = 0;
-            return false;
-        }
+        $length = 0;
         $subpattlen = $matcherstateobj->length($this->number);
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $subpattlen - 1;
-        if ($subpattlen > 0 && $pos >= $str->length()) {
-            $length = 0;
+
+        if (!$matcherstateobj->is_subpattern_captured($this->number) || ($subpattlen > 0 && $pos >= $str->length())) {
             return false;
-        } else if ($subpattlen == 0) {
-            $length = 0;
+        } else if ($subpattlen === 0) {
             return true;
         }
 
@@ -984,14 +971,14 @@ class preg_leaf_backref extends preg_leaf {
         }
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $matcherstateobj->length($this->number);
-        if ($end > qtype_preg_unicode::strlen($str)) {
+        if ($end > $str->length()) {
             return new qtype_preg_string('');
         }
         return $str->substr($start + $length, $end - $start - $length);
     }
 
     public function tohr() {
-        return 'backref #'.$this->number;
+        return 'backref #' . $this->number;
     }
 }
 
@@ -1055,7 +1042,6 @@ abstract class preg_operator extends preg_node {
             $this->operands[$i] = clone $operand;
         }
     }
-
 }
 
 
