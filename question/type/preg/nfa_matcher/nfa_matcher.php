@@ -31,10 +31,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->length_new = $length_new;
         $this->last_transitions = $last_transitions;
         $this->last_match_len = $last_match_len;
-        $this->str = $sourceobj->str;
-        $this->maxsubpatt = $sourceobj->maxsubpatt;
-        $this->subpatternmap = $sourceobj->subpatternmap;
-        $this->lexemcount = $sourceobj->lexemcount;
+        $this->set_source_info($sourceobj->str, $sourceobj->maxsubpatt, $sourceobj->subpatternmap, $sourceobj->lexemcount);
     }
 
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
@@ -62,7 +59,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
     }
 
     public function concatenate_char_to_str($char) {
-        $this->str .= $char;
+        $this->str->concatenate($char);
     }
 
 }
@@ -169,9 +166,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns an array of states which can be reached without consuming characters.
-     * @param startstate state to go from.
-     * @param $str string being matched.
-     * @param $startpos start position of matching.
+     * @param qtype_preg_nfa_processing_state startstate state to go from.
+     * @param qtype_preg_string str string being matched.
+     * @param int startpos start position of matching.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
     public function zero_length_closure($startstate, $str, $startpos) {
@@ -211,10 +208,10 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
-     * @param $str string being matched.
-     * @param startpos - start position of matching.
-     * @param laststate - the last state of the automaton, an object of qtype_preg_nfa_processing_state.
-     * @param fulllastmatch - was the last transition captured fully, not partially?
+     * @param qtype_preg_string str string being matched.
+     * @param int startpos - start position of matching.
+     * @param qtype_preg_nfa_processing_state laststate - the last state of the automaton, an object of qtype_preg_nfa_processing_state.
+     * @param bool fulllastmatch - was the last transition captured fully, not partially?
      * @return - an object of qtype_preg_nfa_processing_state.
      */
     public function determine_characters_left($str, $startpos, $laststate, $fulllastmatch) {
@@ -329,8 +326,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the longest match using a string as input. Matching is proceeded from a given start position.
-     * @param str - the original input string.
-     * @param startpos - index of the start position to match.
+     * @param qtype_preg_string str - the original input string.
+     * @param int startpos - index of the start position to match.
      * @return - the longest character sequence matched.
      */
     public function match_from_pos($str, $startpos) {
@@ -397,8 +394,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info(qtype_preg_unicode::substr($newresult->str(), 0, $startpos + $newresult->length[0]),
-                                                    $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+                        $newresult->set_source_info($newresult->str()->substr(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
 
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
