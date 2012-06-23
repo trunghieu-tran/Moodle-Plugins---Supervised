@@ -8,9 +8,7 @@
  * @package question
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
 //see carefully commented example of test on lines 617-644
