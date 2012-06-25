@@ -516,6 +516,8 @@ class preg_charset_flag {
     const UPPER      = 'qtype_preg_unicode::is_upper';      // [:upper:]
     const PRIN       = 'qtype_preg_unicode::is_print';      // [:print:] PRIN, because PRINT is php keyword
     const PUNCT      = 'qtype_preg_unicode::is_punct';      // [:punct:]
+    const HSPACE     = 'qtype_preg_unicode::is_hspace';     // \h
+    const VSPACE     = 'qtype_preg_unicode::is_vspace';     // \v
 
     public $negative;
     public $type;
