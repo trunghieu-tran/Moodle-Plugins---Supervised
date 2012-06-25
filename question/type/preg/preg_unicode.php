@@ -327,4 +327,48 @@ class qtype_preg_unicode extends textlib {
     public static function is_wordchar($utf8chr) {
         return $utf8chr === '_' || self::is_alnum($utf8chr);
     }
+
+    /**
+     * Checks if a character is a horizontal space.
+     * @param utf8chr the character to be checked.
+     * @return true if the character is a horizontal space, false otherwise.
+     */
+    public static function is_hspace($utf8chr) {
+        $ord = self::ord($utf8chr);
+        return $ord === 0x0009 ||    // Horizontal tab.
+               $ord === 0x0020 ||    // Space.
+               $ord === 0x00A0 ||    // Non-break space.
+               $ord === 0x1680 ||    // Ogham space mark.
+               $ord === 0x180E ||    // Mongolian vowel separator.
+               $ord === 0x2000 ||    // En quad.
+               $ord === 0x2001 ||    // Em quad.
+               $ord === 0x2002 ||    // En space.
+               $ord === 0x2003 ||    // Em space.
+               $ord === 0x2004 ||    // Three-per-em space.
+               $ord === 0x2005 ||    // Four-per-em space.
+               $ord === 0x2006 ||    // Six-per-em space.
+               $ord === 0x2007 ||    // Figure space.
+               $ord === 0x2008 ||    // Punctuation space.
+               $ord === 0x2009 ||    // Thin space.
+               $ord === 0x200A ||    // Hair space.
+               $ord === 0x202F ||    // Narrow no-break space.
+               $ord === 0x205F ||    // Medium mathematical space.
+               $ord === 0x3000;      // Ideographic space.
+    }
+
+    /**
+     * Checks if a character is a vertical space.
+     * @param utf8chr the character to be checked.
+     * @return true if the character is a vertical space, false otherwise.
+     */
+    public static function is_vspace($utf8chr) {
+        $ord = self::ord($utf8chr);
+        return $ord === 0x000A ||    // Linefeed.
+               $ord === 0x000B ||    // Vertical tab.
+               $ord === 0x000C ||    // Formfeed.
+               $ord === 0x000D ||    // Carriage return.
+               $ord === 0x0085 ||    // Next line.
+               $ord === 0x2028 ||    // Line separator.
+               $ord === 0x2029;      // Paragraph separator.
+    }
 }
