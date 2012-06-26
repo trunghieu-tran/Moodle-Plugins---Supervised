@@ -1,1 +1,1 @@
-java JLexPHP.Main ..\preg_lexer.lex
+java JLexPHP.Main ../preg_lexer.lex
