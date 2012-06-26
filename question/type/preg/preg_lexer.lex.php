@@ -5719,8 +5719,14 @@ array(
                             break;
                         case 45:
                             {
-    // TODO control-x
-    throw new Exception('\cx is not implemented yet');
+    $char = qtype_preg_unicode::substr($this->yytext(), 2);
+    $code = qtype_preg_unicode::ord($char);
+    if ($code > 127) {
+        throw new Exception('The code of \'' . $char . '\' is ' . $code . ', but should be <= 127.');
+    }
+    $code ^= 0x40;
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8($code)));
+    return $res;
 }
                         case -46:
                             break;
