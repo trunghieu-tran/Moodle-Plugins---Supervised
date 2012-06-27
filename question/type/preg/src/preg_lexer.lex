@@ -669,6 +669,24 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_recursion', null, $this->yytext()));
     return $res;
 }
+<YYINITIAL> \\Q.*(\\E)? {
+    $text = $this->yytext();
+    $str = '';
+    $epos = qtype_preg_unicode::strpos($text, '\\E');
+    if ($epos === false) {
+        $str = qtype_preg_unicode::substr($text, 2);
+    } else {
+        $str = qtype_preg_unicode::substr($text, 2, $epos - 2);
+        // Here's a trick. Quantifiers are greed, so a part after '\Q...\E' can be matched by this rule. Reset $this->yy_buffer_index manually.
+        $tail = qtype_preg_unicode::substr($text, $epos + 2);
+        $this->yy_buffer_index -= qtype_preg_unicode::strlen($tail);
+    }
+    $res = array();
+    for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
+        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($str, $i, 1)));
+    }
+    return $res;
+}
 <YYINITIAL> \\. {
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;

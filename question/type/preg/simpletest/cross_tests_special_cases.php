@@ -94,4 +94,43 @@ class qtype_preg_cross_tests_special_cases {
         return array('regex'=>'\d\D\h\H\s\S\v\V\w\W',
                      'tests'=>array($test1));
     }
+
+    function data_for_test_q() {
+        $test1 = array( 'str'=>'x?+x{3,10}',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>10),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'x\Q?+x{3,10}',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_qe_empty() {
+        $test1 = array( 'str'=>'xxxxxxxxxxx',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>11),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'x\Q\Ex{3,10}',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_qe() {
+        $test1 = array( 'str'=>'a + b = c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>9),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'a\Q + b\E = c',
+                     'tests'=>array($test1));
+    }
 }

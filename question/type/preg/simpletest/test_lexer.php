@@ -871,5 +871,57 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($token->value->subtype === preg_leaf_assert::SUBTYPE_DOLLAR);
     }
+    function test_lexer_qe() {
+        $lexer = $this->create_lexer('\\Q');
+        $token = $lexer->nextToken();// \Q
+        if ($this->assertTrue(is_array($token))) {
+            $this->assertTrue(count($token) === 0);
+        }
+        $lexer = $this->create_lexer('\\Q\\Ex{3,10}');
+        $token = $lexer->nextToken();// \Q\E
+        if ($this->assertTrue(is_array($token))) {
+            $this->assertTrue(count($token) === 0);
+        }
+        $token = $lexer->nextToken();// x
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == 'x');
+        $token = $lexer->nextToken();// {3,10}
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
+        $this->assertTrue($token->value->leftborder === 3);
+        $this->assertTrue($token->value->rightborder === 10);
+        $this->assertTrue(!$token->value->lazy);
+        $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
+        $lexer = $this->create_lexer('\\Qt@$t\\Es+');
+        $token = $lexer->nextToken();// \Qt@$t\E
+        if ($this->assertTrue(is_array($token))) {
+            $this->assertTrue(count($token) === 4);
+            $this->assertTrue($token[0]->type === preg_parser_yyParser::PARSLEAF);
+            $this->assertTrue($token[0]->value->type == preg_node::TYPE_LEAF_CHARSET);
+            $this->assertTrue($token[0]->value->flags[0][0]->set == 't');
+            $this->assertTrue($token[1]->type === preg_parser_yyParser::PARSLEAF);
+            $this->assertTrue($token[1]->value->type == preg_node::TYPE_LEAF_CHARSET);
+            $this->assertTrue($token[1]->value->flags[0][0]->set == '@');
+            $this->assertTrue($token[2]->type === preg_parser_yyParser::PARSLEAF);
+            $this->assertTrue($token[2]->value->type == preg_node::TYPE_LEAF_CHARSET);
+            $this->assertTrue($token[2]->value->flags[0][0]->set == '$');
+            $this->assertTrue($token[3]->type === preg_parser_yyParser::PARSLEAF);
+            $this->assertTrue($token[3]->value->type == preg_node::TYPE_LEAF_CHARSET);
+            $this->assertTrue($token[3]->value->flags[0][0]->set == 't');
+        }
+        $token = $lexer->nextToken();// s
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == 's');
+        $token = $lexer->nextToken();// +
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
+        $this->assertTrue($token->value->leftborder === 1);
+        $this->assertTrue(!$token->value->lazy);
+        $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
+    }
 }
 ?>
