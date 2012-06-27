@@ -1093,10 +1093,12 @@ abstract class preg_operator extends preg_node {
 */
 class preg_node_finite_quant extends preg_operator {
 
+    //Is quantifier lazy?
+    public $lazy;
     //Is quantifier greed?
     public $greed;
-    //Is quantifier posessive?
-    public $posessive;
+    //Is quantifier possessive?
+    public $possessive;
     //Smallest possible repetition number
     public $leftborder;
     //Biggest possible repetition number
@@ -1119,10 +1121,12 @@ class preg_node_finite_quant extends preg_operator {
 */
 class preg_node_infinite_quant extends preg_operator {
 
+    //Is quantifier lazy?
+    public $lazy;
     //Is quantifier greed?
     public $greed;
-    //Is quantifier posessive?
-    public $posessive;
+    //Is quantifier possessive?
+    public $possessive;
     //Smallest possible repetition number
     public $leftborder;
 
