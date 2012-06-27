@@ -57,7 +57,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         return $this->backrefsexist;
     }
 
-    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $greed = true) {
+    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false) {
         $result = new $name;
         if ($subtype !== null) {
             $result->subtype = $subtype;
@@ -89,8 +89,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         case 'preg_node_finite_quant':
             $result->rightborder = $rightborder;
         case 'preg_node_infinite_quant':
-            $result->greed = $greed;
             $result->leftborder = $leftborder;
+            $result->lazy = $lazy;
+            $result->greed = $greed;
+            $result->possessive = $possessive;
             break;
         case 'preg_leaf_option':
             $text = qtype_preg_unicode::substr($data, 2, qtype_preg_unicode::strlen($data) - 3);
@@ -225,68 +227,84 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 %eof}
 %%
 
-<YYINITIAL> \? {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1));
+<YYINITIAL> \?(\?|\+)? {
+    $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
+    $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
+    $possessive = !$greed && !$lazy;
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \* {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0));
+<YYINITIAL> \*(\?|\+)? {
+    $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
+    $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
+    $possessive = !$greed && !$lazy;
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \+ {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1));
+<YYINITIAL> \+(\?|\+)? {
+    $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
+    $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
+    $possessive = !$greed && !$lazy;
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \?\? {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, false));
-    return $res;
-}
-<YYINITIAL> \*\? {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, false));
-    return $res;
-}
-<YYINITIAL> \+\? {
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, false));
-    return $res;
-}
-<YYINITIAL> \{[0-9]+,[0-9]+\} {
+<YYINITIAL> \{[0-9]+,[0-9]+\}(\?|\+)? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), qtype_preg_unicode::substr($text, qtype_preg_unicode::strpos($text, ',') + 1, qtype_preg_unicode::strlen($text) - 2 - qtype_preg_unicode::strpos($text, ','))));
+    $textlen = qtype_preg_unicode::strlen($text);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $greed = ($lastchar === '}');
+    $lazy = !$greed && $lastchar === '?';
+    $possessive = !$greed && !$lazy;
+    if (!$greed) {
+        $textlen--;
+    }
+    $delimpos = qtype_preg_unicode::strpos($text, ',');
+    $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
+    $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \{[0-9]+,\} {
+
+<YYINITIAL> \{[0-9]+,\}(\?|\+)? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1)));
+    $textlen = qtype_preg_unicode::strlen($text);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $greed = ($lastchar === '}');
+    $lazy = !$greed && $lastchar === '?';
+    $possessive = !$greed && !$lazy;
+    if (!$greed) {
+        $textlen--;
+    }
+    $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \{,[0-9]+\} {
+<YYINITIAL> \{,[0-9]+\}(\?|\+)? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, qtype_preg_unicode::substr($text, 2, qtype_preg_unicode::strlen($text) - 3)));
+    $textlen = qtype_preg_unicode::strlen($text);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $greed = ($lastchar === '}');
+    $lazy = !$greed && $lastchar === '?';
+    $possessive = !$greed && !$lazy;
+    if (!$greed) {
+        $textlen--;
+    }
+    $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> \{[0-9]+\} {
+<YYINITIAL> \{[0-9]+\}(\?|\+)? {
     $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1)));
-    return $res;
-}
-<YYINITIAL> \{[0-9]+,[0-9]+\}\? {
-    $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), qtype_preg_unicode::substr($text, qtype_preg_unicode::strpos($text, ',') + 1, qtype_preg_unicode::strlen($text) - 2 - qtype_preg_unicode::strpos($text, ',')), false));
-    return $res;
-}
-<YYINITIAL> \{[0-9]+,\}\? {
-    $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), null, false));
-    return $res;
-}
-<YYINITIAL> \{,[0-9]+\}\? {
-    $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, qtype_preg_unicode::substr($text, 2, qtype_preg_unicode::strlen($text) - 3), false));
-    return $res;
-}
-<YYINITIAL> \{[0-9]+\}\? {
-    $text = $this->yytext();
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), qtype_preg_unicode::substr($text, 1, qtype_preg_unicode::strpos($text, ',') - 1), false));
+    $textlen = qtype_preg_unicode::strlen($text);
+    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
+    $greed = ($lastchar === '}');
+    $lazy = !$greed && $lastchar === '?';
+    $possessive = !$greed && !$lazy;
+    if (!$greed) {
+        $textlen--;
+    }
+    $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 2);
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \[ {
