@@ -22,57 +22,73 @@ class qtype_preg_lexer_test extends UnitTestCase {
     }
 
     function test_lexer_quantificators() {
-        $lexer = $this->create_lexer('?*+{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}?');
+        $lexer = $this->create_lexer('?*++{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}+');
         $token = $lexer->nextToken();// ?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
         $this->assertTrue($token->value->rightborder == 1);
         $this->assertTrue($token->value->greed);
-        $token = $lexer->nextToken();// *
+        $token = $lexer->nextToken();// *+
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
-        $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->lazy);
+        $this->assertTrue(!$token->value->greed);
+        $this->assertTrue($token->value->possessive);
         $token = $lexer->nextToken();// +
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 1);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {1,5}
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 1);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {,5}
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {1,}
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 1);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {5}
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 5);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue($token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// *?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
+        $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// ??
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
         $this->assertTrue($token->value->rightborder == 1);
+        $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// +?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
@@ -83,24 +99,32 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 1);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {,5}?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 0);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {1,}?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 1);
+        $this->assertTrue($token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue(!$token->value->possessive);
         $token = $lexer->nextToken();// {5}?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
         $this->assertTrue($token->value->type == preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($token->value->leftborder == 5);
         $this->assertTrue($token->value->rightborder == 5);
+        $this->assertTrue(!$token->value->lazy);
         $this->assertTrue(!$token->value->greed);
+        $this->assertTrue($token->value->possessive);
     }
     function test_lexer_backslash() {
         $lexer = $this->create_lexer('\\\\\\*\\[\\23\\9\\023\\x\\x23\\x{7ff}\\d\\s\\t\\b\\B\\>\\<\\%((((((((((((\\g15\\12\\g{15}\\g{-2}\\a\\e\\f\\n\\r\\cz\\c{\\c;\\j');
