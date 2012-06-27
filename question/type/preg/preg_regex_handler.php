@@ -197,7 +197,7 @@ class qtype_preg_regex_handler {
         $this->lexer->matcher =& $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
         $this->parser = new preg_parser_yyParser;
-        while ($token = $this->lexer->nextToken()) {
+        while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
                 $this->parser->doParse($token->type, $token->value);
             } else {
