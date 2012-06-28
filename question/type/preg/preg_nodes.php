@@ -496,28 +496,157 @@ class preg_leaf_charset extends preg_leaf {
 class preg_charset_flag {
 
     // Charset types.
-    const SET        = 'enumerable_characters';
-    const FLAG       = 'functionally_calculated_characters';
-    const UPROP      = 'unicode_property';
-    const CIRCUMFLEX = 'circumflex';
-    const DOLLAR     = 'dollar';
+    const SET                    = 'enumerable_characters';
+    const FLAG                   = 'functionally_calculated_characters';
+    const UPROP                  = 'unicode_property';
+    const CIRCUMFLEX             = 'circumflex';
+    const DOLLAR                 = 'dollar';
 
     // Flag types.
-    const DIGIT      = 'qtype_preg_unicode::is_digit';      // \d AND [:digit:]
-    const XDIGIT     = 'qtype_preg_unicode::is_xdigit';     // [:xdigit:]
-    const SPACE      = 'qtype_preg_unicode::is_space';      // \s AND [:space:]
-    const WORDCHAR   = 'qtype_preg_unicode::is_wordchar';   // \w AND [:word:]
-    const ALNUM      = 'qtype_preg_unicode::is_alnum';      // [:alnum:]
-    const ALPHA      = 'qtype_preg_unicode::is_alpha';      // [:alpha:]
-    const ASCII      = 'qtype_preg_unicode::is_ascii';      // [:ascii:]
-    const CNTRL      = 'qtype_preg_unicode::is_cntrl';      // [:ctrl:]
-    const GRAPH      = 'qtype_preg_unicode::is_graph';      // [:graph:]
-    const LOWER      = 'qtype_preg_unicode::is_lower';      // [:lower:]
-    const UPPER      = 'qtype_preg_unicode::is_upper';      // [:upper:]
-    const PRIN       = 'qtype_preg_unicode::is_print';      // [:print:] PRIN, because PRINT is php keyword
-    const PUNCT      = 'qtype_preg_unicode::is_punct';      // [:punct:]
-    const HSPACE     = 'qtype_preg_unicode::is_hspace';     // \h
-    const VSPACE     = 'qtype_preg_unicode::is_vspace';     // \v
+    const DIGIT                  = 'digit';      // \d AND [:digit:]
+    const XDIGIT                 = 'xdigit';     // [:xdigit:]
+    const SPACE                  = 'space';      // \s AND [:space:]
+    const WORDCHAR               = 'wordchar';   // \w AND [:word:]
+    const ALNUM                  = 'alnum';      // [:alnum:]
+    const ALPHA                  = 'alpha';      // [:alpha:]
+    const ASCII                  = 'ascii';      // [:ascii:]
+    const CNTRL                  = 'cntrl';      // [:ctrl:]
+    const GRAPH                  = 'graph';      // [:graph:]
+    const LOWER                  = 'lower';      // [:lower:]
+    const UPPER                  = 'upper';      // [:upper:]
+    const PRIN                   = 'print';      // [:print:] PRIN, because PRINT is php keyword
+    const PUNCT                  = 'punct';      // [:punct:]
+    const HSPACE                 = 'hspace';     // \h
+    const VSPACE                 = 'vspace';     // \v
+    const UPROPCC                = 'Cc';         // Control
+    const UPROPCF                = 'Cf';         // Format
+    const UPROPCN                = 'Cn';         // Unassigned
+    const UPROPCO                = 'Co';         // Private use
+    const UPROPCS                = 'Cs';         // Surrogate
+    const UPROPLL                = 'Ll';         // Lower case letter
+    const UPROPLM                = 'Lm';         // Modifier letter
+    const UPROPLO                = 'Lo';         // Other letter
+    const UPROPLT                = 'Lt';         // Title case letter
+    const UPROPLU                = 'Lu';         // Upper case letter
+    const UPROPL                 = 'L';          // Letter
+    const UPROPMC                = 'Mc';         // Spacing mark
+    const UPROPME                = 'Me';         // Enclosing mark
+    const UPROPMN                = 'Mn';         // Non-spacing mark
+    const UPROPM                 = 'M';          // Mark
+    const UPROPND                = 'Nd';         // Decimal number
+    const UPROPNL                = 'Nl';         // Letter number
+    const UPROPNO                = 'No';         // Other number
+    const UPROPN                 = 'N';          // Number
+    const UPROPPC                = 'Pc';         // Connector punctuation
+    const UPROPPD                = 'Pd';         // Dash punctuation
+    const UPROPPE                = 'Pe';         // Close punctuation
+    const UPROPPF                = 'Pf';         // Final punctuation
+    const UPROPPI                = 'Pi';         // Initial punctuation
+    const UPROPPO                = 'Po';         // Other punctuation
+    const UPROPPS                = 'Ps';         // Open punctuation
+    const UPROPP                 = 'P';          // Punctuation
+    const UPROPSC                = 'Sc';         // Currency symbol
+    const UPROPSK                = 'Sk';         // Modifier symbol
+    const UPROPSM                = 'Sm';         // Mathematical symbol
+    const UPROPSO                = 'So';         // Other symbol
+    const UPROPS                 = 'S';          // Symbol
+    const UPROPZL                = 'Zl';         // Line separator
+    const UPROPZP                = 'Zp';         // Paragraph separator
+    const UPROPZS                = 'Zs';         // Space separator
+    const UPROPZ                 = 'Z';          // Separator
+    const UPROPC                 = 'C';          // Other
+    const ARABIC                 = 'Arabic';
+    const ARMENIAN               = 'Armenian';
+    const AVESTAN                = 'Avestan';
+    const BALINESE               = 'Balinese';
+    const BAMUM                  = 'Bamum';
+    const BENGALI                = 'Bengali';
+    const BOPOMOFO               = 'Bopomofo';
+    const BRAILLE                = 'Braille';
+    const BUGINESE               = 'Buginese';
+    const BUHID                  = 'Buhid';
+    const CANADIAN_ABORIGINAL    = 'Canadian_Aboriginal';
+    const CARIAN                 = 'Carian';
+    const CHAM                   = 'Cham';
+    const CHEROKEE               = 'Cherokee';
+    const COMMON                 = 'Common';
+    const COPTIC                 = 'Coptic';
+    const CUNEIFORM              = 'Cuneiform';
+    const CYPRIOT                = 'Cypriot';
+    const CYRILLIC               = 'Cyrillic';
+    const DESERET                = 'Deseret';
+    const DEVANAGARI             = 'Devanagari';
+    const EGYPTIAN_HIEROGLYPHS   = 'Egyptian_Hieroglyphs';
+    const ETHIOPIC               = 'Ethiopic';
+    const GEORGIAN               = 'Georgian';
+    const GLAGOLITIC             = 'Glagolitic';
+    const GOTHIC                 = 'Gothic';
+    const GREEK                  = 'Greek';
+    const GUJARATI               = 'Gujarati';
+    const GURMUKHI               = 'Gurmukhi';
+    const HAN                    = 'Han';
+    const HANGUL                 = 'Hangul';
+    const HANUNOO                = 'Hanunoo';
+    const HEBREW                 = 'Hebrew';
+    const HIRAGANA               = 'Hiragana';
+    const IMPERIAL_ARAMAIC       = 'Imperial_Aramaic';
+    const INHERITED              = 'Inherited';
+    const INSCRIPTIONAL_PAHLAVI  = 'Inscriptional_Pahlavi';
+    const INSCRIPTIONAL_PARTHIAN = 'Inscriptional_Parthian';
+    const JAVANESE               = 'Javanese';
+    const KAITHI                 = 'Kaithi';
+    const KANNADA                = 'Kannada';
+    const KATAKANA               = 'Katakana';
+    const KAYAH_LI               = 'Kayah_Li';
+    const KHAROSHTHI             = 'Kharoshthi';
+    const KHMER                  = 'Khmer';
+    const LAO                    = 'Lao';
+    const LATIN                  = 'Latin';
+    const LEPCHA                 = 'Lepcha';
+    const LIMBU                  = 'Limbu';
+    const LINEAR_B               = 'Linear_B';
+    const LISU                   = 'Lisu';
+    const LYCIAN                 = 'Lycian';
+    const LYDIAN                 = 'Lydian';
+    const MALAYALAM              = 'Malayalam';
+    const MEETEI_MAYEK           = 'Meetei_Mayek';
+    const MONGOLIAN              = 'Mongolian';
+    const MYANMAR                = 'Myanmar';
+    const NEW_TAI_LUE            = 'New_Tai_Lue';
+    const NKO                    = 'Nko';
+    const OGHAM                  = 'Ogham';
+    const OLD_ITALIC             = 'Old_Italic';
+    const OLD_PERSIAN            = 'Old_Persian';
+    const OLD_SOUTH_ARABIAN      = 'Old_South_Arabian';
+    const OLD_TURKIC             = 'Old_Turkic';
+    const OL_CHIKI               = 'Ol_Chiki';
+    const ORIYA                  = 'Oriya';
+    const OSMANYA                = 'Osmanya';
+    const PHAGS_PA               = 'Phags_Pa';
+    const PHOENICIAN             = 'Phoenician';
+    const REJANG                 = 'Rejang';
+    const RUNIC                  = 'Runic';
+    const SAMARITAN              = 'Samaritan';
+    const SAURASHTRA             = 'Saurashtra';
+    const SHAVIAN                = 'Shavian';
+    const SINHALA                = 'Sinhala';
+    const SUNDANESE              = 'Sundanese';
+    const SYLOTI_NAGRI           = 'Syloti_Nagri';
+    const SYRIAC                 = 'Syriac';
+    const TAGALOG                = 'Tagalog';
+    const TAGBANWA               = 'Tagbanwa';
+    const TAI_LE                 = 'Tai_Le';
+    const TAI_THAM               = 'Tai_Tham';
+    const TAI_VIET               = 'Tai_Viet';
+    const TAMIL                  = 'Tamil';
+    const TELUGU                 = 'Telugu';
+    const THAANA                 = 'Thaana';
+    const THAI                   = 'Thai';
+    const TIBETAN                = 'Tibetan';
+    const TIFINAGH               = 'Tifinagh';
+    const UGARITIC               = 'Ugaritic';
+    const VAI                    = 'Vai';
+    const YI                     = 'Yi';
 
     public $negative;
     public $type;
@@ -561,7 +690,7 @@ class preg_charset_flag {
 
     public function set_uprop($prop) {
         $this->type = self::UPROP;
-        $this->uniprop = '/\\p{'.$prop.'}/';
+        $this->uniprop = $prop;        //'/\\p{'.$prop.'}/';
     }
 
     public function is_null_length() {
@@ -589,7 +718,7 @@ class preg_charset_flag {
                 $result = ($charsetcopy->contains($strcopy[$pos]) !== false);
                 break;
             case self::FLAG:
-                $result = (bool)call_user_func_array($this->flag, array($str[$pos]));
+                $result = (bool)call_user_func_array('qtype_preg_unicode::is_' . $this->flag, array($str[$pos]));
                 break;
             case self::UPROP:
                 $result = (bool)call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
