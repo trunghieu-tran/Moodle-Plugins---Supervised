@@ -57,7 +57,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         return $this->backrefsexist;
     }
 
-    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false) {
+    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
         $result = new $name;
         if ($subtype !== null) {
             $result->subtype = $subtype;
@@ -70,15 +70,15 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         case 'preg_leaf_charset':
             $flag = new preg_charset_flag;
             $flag->negative = false;
-            if ($subtype === null) {
+            if ($subtype === preg_charset_flag::SET) {
                 $flag->set_set(new qtype_preg_string($data));
-            } else {
-                // Set flag type in any way.
-                $flag->set_flag($subtype);
-                // Every flag but PRIN can be negative.
-                if ($flag !== preg_charset_flag::PRIN) {
-                    $flag->negative = $data;
-                }
+            } else if ($subtype === preg_charset_flag::FLAG) {
+                $flag->set_flag($data);
+                $flag->negative = $negative;
+
+            } else if ($subtype === preg_charset_flag::UPROP) {
+                $flag->set_uprop($data);
+                $flag->negative = $negative;
             }
             $result->flags = array(array($flag));
             $result->israngecalculated = false;
@@ -231,6 +231,270 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $this->ccset .= $char;
         $this->cccharnumber++;
         $this->form_num_interval($this->ccset, $this->cccharnumber);
+    }
+
+    public function get_uprop_flag_type($str) {
+        if ($str === 'C') {
+            return preg_charset_flag::UPROPC;
+        } else if ($str === 'Cc') {
+            return preg_charset_flag::UPROPCC;
+        } else if ($str === 'Cf') {
+            return preg_charset_flag::UPROPCF;
+        } else if ($str === 'Cn') {
+            return preg_charset_flag::UPROPCN;
+        } else if ($str === 'Co') {
+            return preg_charset_flag::UPROPCO;
+        } else if ($str === 'Cs') {
+            return preg_charset_flag::UPROPCS;
+        } else if ($str === 'L') {
+            return preg_charset_flag::UPROPL;
+        } else if ($str === 'Ll') {
+            return preg_charset_flag::UPROPLL;
+        } else if ($str === 'Lm') {
+            return preg_charset_flag::UPROPLM;
+        } else if ($str === 'Lo') {
+            return preg_charset_flag::UPROPLO;
+        } else if ($str === 'Lt') {
+            return preg_charset_flag::UPROPLT;
+        } else if ($str === 'Lu') {
+            return preg_charset_flag::UPROPLU;
+        } else if ($str === 'M') {
+            return preg_charset_flag::UPROPM;
+        } else if ($str === 'Mc') {
+            return preg_charset_flag::UPROPMC;
+        } else if ($str === 'Me') {
+            return preg_charset_flag::UPROPME;
+        } else if ($str === 'Mn') {
+            return preg_charset_flag::UPROPMN;
+        } else if ($str === 'N') {
+            return preg_charset_flag::UPROPN;
+        } else if ($str === 'Nd') {
+            return preg_charset_flag::UPROPND;
+        } else if ($str === 'Nl') {
+            return preg_charset_flag::UPROPNL;
+        } else if ($str === 'No') {
+            return preg_charset_flag::UPROPNO;
+        } else if ($str === 'P') {
+            return preg_charset_flag::UPROPP;
+        } else if ($str === 'Pc') {
+            return preg_charset_flag::UPROPPC;
+        } else if ($str === 'Pd') {
+            return preg_charset_flag::UPROPPD;
+        } else if ($str === 'Pe') {
+            return preg_charset_flag::UPROPPE;
+        } else if ($str === 'Pf') {
+            return preg_charset_flag::UPROPPF;
+        } else if ($str === 'Pi') {
+            return preg_charset_flag::UPROPPI;
+        } else if ($str === 'Po') {
+            return preg_charset_flag::UPROPPO;
+        } else if ($str === 'Ps') {
+            return preg_charset_flag::UPROPPS;
+        } else if ($str === 'S') {
+            return preg_charset_flag::UPROPS;
+        } else if ($str === 'Sc') {
+            return preg_charset_flag::UPROPSC;
+        } else if ($str === 'Sk') {
+            return preg_charset_flag::UPROPSK;
+        } else if ($str === 'Sm') {
+            return preg_charset_flag::UPROPSM;
+        } else if ($str === 'So') {
+            return preg_charset_flag::UPROPSO;
+        } else if ($str === 'Z') {
+            return preg_charset_flag::UPROPZ;
+        } else if ($str === 'Zl') {
+            return preg_charset_flag::UPROPZL;
+        } else if ($str === 'Zp') {
+            return preg_charset_flag::UPROPZP;
+        } else if ($str === 'Zs') {
+            return preg_charset_flag::UPROPZS;
+        } else if ($str === 'Arabic') {
+            return preg_charset_flag::ARABIC;
+        } else if ($str === 'Armenian') {
+            return preg_charset_flag::ARMENIAN;
+        } else if ($str === 'Avestan') {
+            return preg_charset_flag::AVESTAN;
+        } else if ($str === 'Balinese') {
+            return preg_charset_flag::BALINESE;
+        } else if ($str === 'Bamum') {
+            return preg_charset_flag::BAMUM;
+        } else if ($str === 'Bengali') {
+            return preg_charset_flag::BENGALI;
+        } else if ($str === 'Bopomofo') {
+            return preg_charset_flag::BOPOMOFO;
+        } else if ($str === 'Braille') {
+            return preg_charset_flag::BRAILLE;
+        } else if ($str === 'Buginese') {
+            return preg_charset_flag::BUGINESE;
+        } else if ($str === 'Buhid') {
+            return preg_charset_flag::BUHID;
+        } else if ($str === 'Canadian_Aboriginal') {
+            return preg_charset_flag::CANADIAN_ABORIGINAL;
+        } else if ($str === 'Carian') {
+            return preg_charset_flag::CARIAN;
+        } else if ($str === 'Cham') {
+            return preg_charset_flag::CHAM;
+        } else if ($str === 'Cherokee') {
+            return preg_charset_flag::CHEROKEE;
+        } else if ($str === 'Common') {
+            return preg_charset_flag::COMMON;
+        } else if ($str === 'Coptic') {
+            return preg_charset_flag::COPTIC;
+        } else if ($str === 'Cuneiform') {
+            return preg_charset_flag::CUNEIFORM;
+        } else if ($str === 'Cypriot') {
+            return preg_charset_flag::CYPRIOT;
+        } else if ($str === 'Cyrillic') {
+            return preg_charset_flag::CYRILLIC;
+        } else if ($str === 'Deseret') {
+            return preg_charset_flag::DESERET;
+        } else if ($str === 'Devanagari') {
+            return preg_charset_flag::DEVANAGARI;
+        } else if ($str === 'Egyptian_Hieroglyphs') {
+            return preg_charset_flag::EGYPTIAN_HIEROGLYPHS;
+        } else if ($str === 'Ethiopic') {
+            return preg_charset_flag::ETHIOPIC;
+        } else if ($str === 'Georgian') {
+            return preg_charset_flag::GEORGIAN;
+        } else if ($str === 'Glagolitic') {
+            return preg_charset_flag::GLAGOLITIC;
+        } else if ($str === 'Gothic') {
+            return preg_charset_flag::GOTHIC;
+        } else if ($str === 'Greek') {
+            return preg_charset_flag::GREEK;
+        } else if ($str === 'Gujarati') {
+            return preg_charset_flag::GUJARATI;
+        } else if ($str === 'Gurmukhi') {
+            return preg_charset_flag::GURMUKHI;
+        } else if ($str === 'Han') {
+            return preg_charset_flag::HAN;
+        } else if ($str === 'Hangul') {
+            return preg_charset_flag::HANGUL;
+        } else if ($str === 'Hanunoo') {
+            return preg_charset_flag::HANUNOO;
+        } else if ($str === 'Hebrew') {
+            return preg_charset_flag::HEBREW;
+        } else if ($str === 'Hiragana') {
+            return preg_charset_flag::HIRAGANA;
+        } else if ($str === 'Imperial_Aramaic') {
+            return preg_charset_flag::IMPERIAL_ARAMAIC;
+        } else if ($str === 'Inherited') {
+            return preg_charset_flag::INHERITED;
+        } else if ($str === 'Inscriptional_Pahlavi') {
+            return preg_charset_flag::INSCRIPTIONAL_PAHLAVI;
+        } else if ($str === 'Inscriptional_Parthian') {
+            return preg_charset_flag::INSCRIPTIONAL_PARTHIAN;
+        } else if ($str === 'Javanese') {
+            return preg_charset_flag::JAVANESE;
+        } else if ($str === 'Kaithi') {
+            return preg_charset_flag::KAITHI;
+        } else if ($str === 'Kannada') {
+            return preg_charset_flag::KANNADA;
+        } else if ($str === 'Katakana') {
+            return preg_charset_flag::KATAKANA;
+        } else if ($str === 'Kayah_Li') {
+            return preg_charset_flag::KAYAH_LI;
+        } else if ($str === 'Kharoshthi') {
+            return preg_charset_flag::KHAROSHTHI;
+        } else if ($str === 'Khmer') {
+            return preg_charset_flag::KHMER;
+        } else if ($str === 'Lao') {
+            return preg_charset_flag::LAO;
+        } else if ($str === 'Latin') {
+            return preg_charset_flag::LATIN;
+        } else if ($str === 'Lepcha') {
+            return preg_charset_flag::LEPCHA;
+        } else if ($str === 'Limbu') {
+            return preg_charset_flag::LIMBU;
+        } else if ($str === 'Linear_B') {
+            return preg_charset_flag::LINEAR_B;
+        } else if ($str === 'Lisu') {
+            return preg_charset_flag::LISU;
+        } else if ($str === 'Lycian') {
+            return preg_charset_flag::LYCIAN;
+        } else if ($str === 'Lydian') {
+            return preg_charset_flag::LYDIAN;
+        } else if ($str === 'Malayalam') {
+            return preg_charset_flag::MALAYALAM;
+        } else if ($str === 'Meetei_Mayek') {
+            return preg_charset_flag::MEETEI_MAYEK;
+        } else if ($str === 'Mongolian') {
+            return preg_charset_flag::MONGOLIAN;
+        } else if ($str === 'Myanmar') {
+            return preg_charset_flag::MYANMAR;
+        } else if ($str === 'New_Tai_Lue') {
+            return preg_charset_flag::NEW_TAI_LUE;
+        } else if ($str === 'Nko') {
+            return preg_charset_flag::NKO;
+        } else if ($str === 'Ogham') {
+            return preg_charset_flag::OGHAM;
+        } else if ($str === 'Old_Italic') {
+            return preg_charset_flag::OLD_ITALIC;
+        } else if ($str === 'Old_Persian') {
+            return preg_charset_flag::OLD_PERSIAN;
+        } else if ($str === 'Old_South_Arabian') {
+            return preg_charset_flag::OLD_SOUTH_ARABIAN;
+        } else if ($str === 'Old_Turkic') {
+            return preg_charset_flag::OLD_TURKIC;
+        } else if ($str === 'Ol_Chiki') {
+            return preg_charset_flag::OL_CHIKI;
+        } else if ($str === 'Oriya') {
+            return preg_charset_flag::ORIYA;
+        } else if ($str === 'Osmanya') {
+            return preg_charset_flag::OSMANYA;
+        } else if ($str === 'Phags_Pa') {
+            return preg_charset_flag::PHAGS_PA;
+        } else if ($str === 'Phoenician') {
+            return preg_charset_flag::PHOENICIAN;
+        } else if ($str === 'Rejang') {
+            return preg_charset_flag::REJANG;
+        } else if ($str === 'Runic') {
+            return preg_charset_flag::RUNIC;
+        } else if ($str === 'Samaritan') {
+            return preg_charset_flag::SAMARITAN;
+        } else if ($str === 'Saurashtra') {
+            return preg_charset_flag::SAURASHTRA;
+        } else if ($str === 'Shavian') {
+            return preg_charset_flag::SHAVIAN;
+        } else if ($str === 'Sinhala') {
+            return preg_charset_flag::SINHALA;
+        } else if ($str === 'Sundanese') {
+            return preg_charset_flag::SUNDANESE;
+        } else if ($str === 'Syloti_Nagri') {
+            return preg_charset_flag::SYLOTI_NAGRI;
+        } else if ($str === 'Syriac') {
+            return preg_charset_flag::SYRIAC;
+        } else if ($str === 'Tagalog') {
+            return preg_charset_flag::TAGALOG;
+        } else if ($str === 'Tagbanwa') {
+            return preg_charset_flag::TAGBANWA;
+        } else if ($str === 'Tai_Le') {
+            return preg_charset_flag::TAI_LE;
+        } else if ($str === 'Tai_Tham') {
+            return preg_charset_flag::TAI_THAM;
+        } else if ($str === 'Tai_Viet') {
+            return preg_charset_flag::TAI_VIET;
+        } else if ($str === 'Tamil') {
+            return preg_charset_flag::TAMIL;
+        } else if ($str === 'Telugu') {
+            return preg_charset_flag::TELUGU;
+        } else if ($str === 'Thaana') {
+            return preg_charset_flag::THAANA;
+        } else if ($str === 'Thai') {
+            return preg_charset_flag::THAI;
+        } else if ($str === 'Tibetan') {
+            return preg_charset_flag::TIBETAN;
+        } else if ($str === 'Tifinagh') {
+            return preg_charset_flag::TIFINAGH;
+        } else if ($str === 'Ugaritic') {
+            return preg_charset_flag::UGARITIC;
+        } else if ($str === 'Vai') {
+            return preg_charset_flag::VAI;
+        } else if ($str === 'Yi') {
+            return preg_charset_flag::YI;
+        } else {
+            throw new Exception('Unknown unicode property: ' . $str);
+        }
     }
 
 %}
@@ -438,11 +702,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     return $res;
 }
 <YYINITIAL> \. {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> [^\[\]\\*+?{}()|.^$] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \| {
@@ -454,7 +718,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     return $res;
 }
 <YYINITIAL> \\[\[\]?*+{}|().] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
@@ -484,12 +748,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_preg_unicode::strlen($tail) === 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
             for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($tail, $i, 1)));
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
             }
         }
     }
@@ -548,47 +812,44 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     return $res;
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
     return $res;
 }
 <YYINITIAL> \\\\ {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, '\\'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, '\\'));
     return $res;
 }
 <YYINITIAL> \\a {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x07)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07)));
     return $res;
 }
 <YYINITIAL> \\c. {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
     return $res;
 }
 <YYINITIAL> \\e {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x1B)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B)));
     return $res;
 }
 <YYINITIAL> \\f {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x0C)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C)));
     return $res;
 }
 <YYINITIAL> \\n {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x0A)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
     return $res;
 }
-<YYINITIAL> (\\p|\\P)[CLMNPSZ][cdefiklmnopstu]? {
-    // TODO: Unicode properties.
-    throw new Exception('\p and \P are not implemented yet');
-}
-<YYINITIAL> (\\p|\\P)\{.+\} {
-    // TODO: Unicode properties.
-    throw new Exception('\p and \P are not implemented yet');
+<YYINITIAL> (\\p|\\P)\{[a-z_A-Z]+\} {
+    $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P')));
+    return $res;
 }
 <YYINITIAL> \\r {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x0D)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D)));
     return $res;
 }
 <YYINITIAL> \\t {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(0x09)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09)));
     return $res;
 }
 <YYINITIAL> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
@@ -597,37 +858,37 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
 <YYINITIAL> \\x\{[0-9a-fA-F]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::code2utf8(hexdec($str))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str))));
     return $res;
 }
 <YYINITIAL> \\d|\\D {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::DIGIT, ($this->yytext() === '\D')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
     return $res;
 }
 <YYINITIAL> \\h|\\H {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::HSPACE, ($this->yytext() === '\H')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
     return $res;
 }
 <YYINITIAL> \\s|\\S {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SPACE, ($this->yytext() === '\S')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
     return $res;
 }
 <YYINITIAL> \\v|\\V {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::VSPACE, ($this->yytext() === '\V')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
     return $res;
 }
 <YYINITIAL> \\w|\\W {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::WORDCHAR, ($this->yytext() === '\W')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
     return $res;
 }
 <YYINITIAL> \\C {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> \\u([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])? {
@@ -636,12 +897,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
 <YYINITIAL> \\N {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> \\K {
@@ -678,7 +939,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
-
 <YYINITIAL> "^" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
@@ -727,12 +987,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     }
     $res = array();
     for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($str, $i, 1)));
+        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
     }
     return $res;
 }
 <YYINITIAL> \\. {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
 <CHARCLASS> \[:alnum:\] {
@@ -819,6 +1079,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 <CHARCLASS> \["^":xdigit:\] {
     $this->add_flag_to_charset(preg_charset_flag::XDIGIT, true);
 }
+<CHARCLASS> (\\p|\\P)\{a-z_A-Z+\} {
+    $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
+    $this->add_flag_to_charset($this->get_uprop_flag_type($str), (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P'));
+}
 <CHARCLASS> \\\\ {
     $this->add_character_to_charset('\\');
 }
@@ -857,14 +1121,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 }
 <CHARCLASS> \\n {
     $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0A));
-}
-<CHARCLASS> (\\p|\\P)[CLMNPSZ][cdefiklmnopstu]? {
-    // TODO: Unicode properties.
-    throw new Exception('\p and \P are not implemented yet');
-}
-<CHARCLASS> (\\p|\\P)\{.+\} {
-    // TODO: Unicode properties.
-    throw new Exception('\p and \P are not implemented yet');
 }
 <CHARCLASS> \\r {
     $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0D));
