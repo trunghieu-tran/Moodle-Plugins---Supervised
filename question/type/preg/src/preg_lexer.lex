@@ -610,6 +610,39 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::WORDCHAR, ($this->yytext() === '\W')));
     return $res;
 }
+<YYINITIAL> \\C {
+    // TODO: matches any one data unit. For now implemented the same way as dot.
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
+    return $res;
+}
+<YYINITIAL> \\u([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])? {
+    if (qtype_preg_unicode::strlen($this->yytext()) === 2) {
+        $str = qtype_preg_unicode::substr($this->yytext(), 1);
+    } else {
+        $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
+    }
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', null, $str));
+    return $res;
+}
+<YYINITIAL> \\N {
+    // TODO: matches any character except new line characters. For now, the same as dot.
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
+    return $res;
+}
+<YYINITIAL> \\K {
+    // TODO: reset start of match.
+    throw new Exception('\K is not implemented yet');
+}
+<YYINITIAL> \\R {
+    // TODO: matches new line unicode sequences.
+    // \B, \R, and \X are not special inside a character class.
+    throw new Exception('\R is not implemented yet');
+}
+<YYINITIAL> \\X {
+    // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
+    // \B, \R, and \X are not special inside a character class.
+    throw new Exception('\R is not implemented yet');
+}
 <YYINITIAL> \\b|\\B {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     $res->value->negative = ($this->yytext() === '\B');
@@ -630,11 +663,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
-<YYINITIAL> \\C {
-    // TODO: matches any one data unit. For now implemented the same way as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::PRIN));
-    return $res;
-}
+
 <YYINITIAL> "^" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
