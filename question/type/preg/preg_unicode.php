@@ -2,8 +2,7 @@
 
 class qtype_preg_unicode extends textlib {
 
-    public static $ranges = array(
-                                  'Basic Latin'                               => array(0x0000, 0x007F),
+    public static $ranges = array('Basic Latin'                               => array(0x0000, 0x007F),
                                   'C1 Controls and Latin-1 Supplement'        => array(0x0080, 0x00FF),
                                   'Latin Extended-A'                          => array(0x0100, 0x017F),
                                   'Latin Extended-B'                          => array(0x0180, 0x024F),
@@ -152,7 +151,37 @@ class qtype_preg_unicode extends textlib {
                                   'Supplementary Private Use Area-A'          => array(0xF0000, 0xFFFFD),
                                   //'Unused'                                  => array(0xFFFFE, 0xFFFFF),
                                   'Supplementary Private Use Area-B'          => array(0x100000, 0x10FFFD)
-    );
+                                  );
+
+    public static $hspaces = array(0x0009,    // Horizontal tab.
+                                   0x0020,    // Space.
+                                   0x00A0,    // Non-break space.
+                                   0x1680,    // Ogham space mark.
+                                   0x180E,    // Mongolian vowel separator.
+                                   0x2000,    // En quad.
+                                   0x2001,    // Em quad.
+                                   0x2002,    // En space.
+                                   0x2003,    // Em space.
+                                   0x2004,    // Three-per-em space.
+                                   0x2005,    // Four-per-em space.
+                                   0x2006,    // Six-per-em space.
+                                   0x2007,    // Figure space.
+                                   0x2008,    // Punctuation space.
+                                   0x2009,    // Thin space.
+                                   0x200A,    // Hair space.
+                                   0x202F,    // Narrow no-break space.
+                                   0x205F,    // Medium mathematical space.
+                                   0x3000     // Ideographic space.
+                                   );
+
+    public static $vspaces = array(0x000A,    // Linefeed.
+                                   0x000B,    // Vertical tab.
+                                   0x000C,    // Formfeed.
+                                   0x000D,    // Carriage return.
+                                   0x0085,    // Next line.
+                                   0x2028,    // Line separator.
+                                   0x2029     // Paragraph separator.
+                                   );
 
     /**
      * Returns unicode ranges which $utf8str characters belongs to.
@@ -210,8 +239,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is an ascii character.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is ascii, false otherwise.
      */
     public static function is_ascii($utf8chr) {
         $ord = self::ord($utf8chr);
@@ -222,8 +249,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is a digit.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a digit, false otherwise.
      */
     public static function is_digit($utf8chr) {
         return ctype_digit($utf8chr);
@@ -231,8 +256,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is an xdigit.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is an xdigit, false otherwise.
      */
     public static function is_xdigit($utf8chr) {
         return ctype_xdigit($utf8chr);
@@ -240,8 +263,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is a space.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a whitespace, false otherwise.
      */
     public static function is_space($utf8chr) {
         return ctype_space($utf8chr);
@@ -249,8 +270,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is a cntrl.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a cntrl, false otherwise.
      */
     public static function is_cntrl($utf8chr) {
         return ctype_cntrl($utf8chr);
@@ -258,8 +277,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is a graph.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a graph, false otherwise.
      */
     public static function is_graph($utf8chr) {
         return ctype_graph($utf8chr);
@@ -267,8 +284,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is lowercase.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is lowercase, false otherwise.
      */
     public static function is_lower($utf8chr) {
         return ctype_lower($utf8chr);
@@ -276,8 +291,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is uppercase.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is uppercase, false otherwise.
      */
     public static function is_upper($utf8chr) {
         return ctype_upper($utf8chr);
@@ -285,8 +298,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is printable.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is printable, false otherwise.
      */
     public static function is_print($utf8chr) {
         return ctype_print($utf8chr);
@@ -294,8 +305,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is non-space or alnum.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is non-space or alnum, false otherwise.
      */
     public static function is_punct($utf8chr) {
         return ctype_punct($utf8chr);
@@ -303,8 +312,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is alphabetic.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is alphabetic, false otherwise.
      */
     public static function is_alpha($utf8chr) {
         return ctype_alpha($utf8chr);
@@ -312,8 +319,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is alphanumeric.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is alphanumeric, false otherwise.
      */
     public static function is_alnum($utf8chr) {
         return ctype_alnum($utf8chr);
@@ -321,8 +326,6 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is alphabetic or '_'.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is alphabetic or '_', false otherwise.
      */
     public static function is_wordchar($utf8chr) {
         return $utf8chr === '_' || self::is_alnum($utf8chr);
@@ -330,45 +333,557 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * Checks if a character is a horizontal space.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a horizontal space, false otherwise.
      */
     public static function is_hspace($utf8chr) {
-        $ord = self::ord($utf8chr);
-        return $ord === 0x0009 ||    // Horizontal tab.
-               $ord === 0x0020 ||    // Space.
-               $ord === 0x00A0 ||    // Non-break space.
-               $ord === 0x1680 ||    // Ogham space mark.
-               $ord === 0x180E ||    // Mongolian vowel separator.
-               $ord === 0x2000 ||    // En quad.
-               $ord === 0x2001 ||    // Em quad.
-               $ord === 0x2002 ||    // En space.
-               $ord === 0x2003 ||    // Em space.
-               $ord === 0x2004 ||    // Three-per-em space.
-               $ord === 0x2005 ||    // Four-per-em space.
-               $ord === 0x2006 ||    // Six-per-em space.
-               $ord === 0x2007 ||    // Figure space.
-               $ord === 0x2008 ||    // Punctuation space.
-               $ord === 0x2009 ||    // Thin space.
-               $ord === 0x200A ||    // Hair space.
-               $ord === 0x202F ||    // Narrow no-break space.
-               $ord === 0x205F ||    // Medium mathematical space.
-               $ord === 0x3000;      // Ideographic space.
+        return in_array(self::ord($utf8chr), self::$hspaces);
     }
 
     /**
      * Checks if a character is a vertical space.
-     * @param utf8chr the character to be checked.
-     * @return true if the character is a vertical space, false otherwise.
      */
     public static function is_vspace($utf8chr) {
-        $ord = self::ord($utf8chr);
-        return $ord === 0x000A ||    // Linefeed.
-               $ord === 0x000B ||    // Vertical tab.
-               $ord === 0x000C ||    // Formfeed.
-               $ord === 0x000D ||    // Carriage return.
-               $ord === 0x0085 ||    // Next line.
-               $ord === 0x2028 ||    // Line separator.
-               $ord === 0x2029;      // Paragraph separator.
+        return in_array(self::ord($utf8chr), self::$vspaces);
     }
+
+    /******************************************************************/
+
+    public static function is_Cc($utf8chr) {    // Control
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cf($utf8chr) {    // Format
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cn($utf8chr) {    // Unassigned
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Co($utf8chr) {    // Private use
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cs($utf8chr) {    // Surrogate
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    /******************************************************************/
+
+    public static function is_Ll($utf8chr) {    // Lower case letter
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lm($utf8chr) {    // Modifier letter
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lo($utf8chr) {    // Other letter
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lt($utf8chr) {    // Title case letter
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lu($utf8chr) {    // Upper case letter
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_L($utf8chr) {     // Letter
+        return self::is_Ll($utf8chr) || self::is_Lm($utf8chr) || self::is_Lo($utf8chr) ||
+               self::is_Lt($utf8chr) || self::is_Lu($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_Mc($utf8chr) {    // Spacing mark
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Me($utf8chr) {    // Enclosing mark
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Mn($utf8chr) {    // Non-spacing mark
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_M($utf8chr) {     // Mark
+        return self::is_Mc($utf8chr) || self::is_Me($utf8chr) || self::is_Mn($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_Nd($utf8chr) {    // Decimal number
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Nl($utf8chr) {    // Letter number
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_No($utf8chr) {    // Other number
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_N($utf8chr) {     // Number
+        return self::is_Nd($utf8chr) || self::is_Nl($utf8chr) || self::is_No($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_Pc($utf8chr) {    // Connector punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Pd($utf8chr) {    // Dash punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Pe($utf8chr) {    // Close punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Pf($utf8chr) {    // Final punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Pi($utf8chr) {    // Initial punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Po($utf8chr) {    // Other punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Ps($utf8chr) {    // Open punctuation
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_P($utf8chr) {     // Punctuation
+        return self::is_Pc($utf8chr) || self::is_Pd($utf8chr) || self::is_Pe($utf8chr) ||
+               self::is_Pf($utf8chr) || self::is_Pi($utf8chr) || self::is_Po($utf8chr) ||
+               self::is_Ps($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_Sc($utf8chr) {    // Currency symbol
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Sk($utf8chr) {    // Modifier symbol
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Sm($utf8chr) {    // Mathematical symbol
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_So($utf8chr) {    // Other symbol
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_S($utf8chr) {     // Symbol
+        return self::is_Sc($utf8chr) || self::is_Sk($utf8chr) ||
+               self::is_Sm($utf8chr) || self::is_So($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_Zl($utf8chr) {    // Line separator
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Zp($utf8chr) {    // Paragraph separator
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Zs($utf8chr) {    // Space separator
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Z($utf8chr) {     // Separator
+        return self::is_Zl($utf8chr) || self::is_Zp($utf8chr) || self::is_Zs($utf8chr);
+    }
+
+    /******************************************************************/
+
+    public static function is_C($utf8chr) {     // Other
+        return !self::is_cC($utf8chr) && !self::is_Cf($utf8chr) && !self::is_Cn($utf8chr) &&
+               !self::is_Co($utf8chr) && !self::is_Cs($utf8chr) && !self::is_L($utf8chr) &&
+               !self::is_M($utf8chr) && !self::is_N($utf8chr) && !self::is_P($utf8chr) &&
+               !self::is_S($utf8chr) && !self::is_Z($utf8chr);
+    }
+    
+    /******************************************************************/
+    
+    public static function is_Arabic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Armenian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Avestan($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Balinese($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Bamum($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Bengali($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Bopomofo($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Braille($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Buginese($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Buhid($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Canadian_Aboriginal($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Carian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cham($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cherokee($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Common($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Coptic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cuneiform($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cypriot($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Cyrillic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Deseret($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Devanagari($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Egyptian_Hieroglyphs($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Ethiopic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Georgian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Glagolitic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Gothic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Greek($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Gujarati($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Gurmukhi($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Han($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Hangul($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Hanunoo($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Hebrew($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Hiragana($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Imperial_Aramaic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Inherited($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Inscriptional_Pahlavi($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Inscriptional_Parthian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Javanese($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Kaithi($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Kannada($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Katakana($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Kayah_Li($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Kharoshthi($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Khmer($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lao($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Latin($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lepcha($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Limbu($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Linear_B($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lisu($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lycian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Lydian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Malayalam($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Meetei_Mayek($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Mongolian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Myanmar($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_New_Tai_Lue($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Nko($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Ogham($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Old_Italic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Old_Persian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Old_South_Arabian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Old_Turkic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Ol_Chiki($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Oriya($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Osmanya($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Phags_Pa($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Phoenician($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Rejang($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Runic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Samaritan($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Saurashtra($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Shavian($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Sinhala($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Sundanese($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Syloti_Nagri($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Syriac($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tagalog($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tagbanwa($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tai_Le($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tai_Tham($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tai_Viet($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tamil($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Telugu($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Thaana($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Thai($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tibetan($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Tifinagh($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Ugaritic($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Vai($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
+    public static function is_Yi($utf8chr) {
+        throw new Exception('Unicode properties support is not implemented yet');
+    }
+
 }
