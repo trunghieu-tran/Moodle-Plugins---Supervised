@@ -127,7 +127,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->possessive);
     }
     function test_lexer_backslash() {
-        $lexer = $this->create_lexer('\\\\\\*\\[\\23\\9\\023\\x\\x23\\x{7ff}\\d\\s\\t\\b\\B\\>\\<\\%((((((((((((\\g15\\12\\g{15}\\g{-2}\\a\\e\\f\\n\\r\\cz\\c{\\c;\\j');
+        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\\>\\<\\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff');
         $token = $lexer->nextToken();// \\
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
@@ -252,10 +252,30 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->set == chr(0x7B));
-        $token = $lexer->nextToken();// \j
+        $token = $lexer->nextToken();// \u
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->set == 'j');
+        $this->assertTrue($token->value->flags[0][0]->set == 'u');
+        $token = $lexer->nextToken();// 3
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == '3');
+        $token = $lexer->nextToken();// f
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == 'f');
+        $token = $lexer->nextToken();// 1
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == '1');
+        $token = $lexer->nextToken();// \U
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == 'U');
+        $token = $lexer->nextToken();// \uffff
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->set == qtype_preg_unicode::code2utf8(0xffff));
     }
     function test_lexer_named_backref() {
         $lexer = $this->create_lexer('\\k<name_1>\\k\'name_2\'\\k{name_3}\\g{name_4}(?P=name_5)');
@@ -871,7 +891,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($token->value->subtype === preg_leaf_assert::SUBTYPE_DOLLAR);
     }
-    function test_lexer_qe() {
+    function test_lexer_qw() {
         $lexer = $this->create_lexer('\\Q');
         $token = $lexer->nextToken();// \Q
         if ($this->assertTrue(is_array($token))) {
