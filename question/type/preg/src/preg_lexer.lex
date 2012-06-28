@@ -218,6 +218,21 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         return qtype_preg_unicode::code2utf8($code);
     }
 
+    public function add_flag_to_charset($type, $negative = false) {
+        $this->cccharnumber++;
+        $flag = new preg_charset_flag;
+        $flag->set_flag($type);
+        $flag->negative = $negative;
+        $this->cc->flags[] = array($flag);
+        $this->ccgotflag = true;
+    }
+
+    public function add_character_to_charset($char) {
+        $this->ccset .= $char;
+        $this->cccharnumber++;
+        $this->form_num_interval($this->ccset, $this->cccharnumber);
+    }
+
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) { // End of the expression inside a character class.
@@ -720,25 +735,101 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', null, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
+<CHARCLASS> \[:alnum:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ALNUM);
+}
+<CHARCLASS> \[:alpha:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ALPHA);
+}
+<CHARCLASS> \[:ascii:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ASCII);
+}
+<CHARCLASS> \\h|\[:blank:\] {
+    $this->add_flag_to_charset(preg_charset_flag::HSPACE);
+}
+<CHARCLASS> \[:ctrl:\] {
+    $this->add_flag_to_charset(preg_charset_flag::CNTRL);
+}
+<CHARCLASS> \\d|\[:digit:\] {
+    $this->add_flag_to_charset(preg_charset_flag::DIGIT);
+}
+<CHARCLASS> \[:graph:\] {
+    $this->add_flag_to_charset(preg_charset_flag::GRAPH);
+}
+<CHARCLASS> \[:lower:\] {
+    $this->add_flag_to_charset(preg_charset_flag::LOWER);
+}
+<CHARCLASS> \[:print:\] {
+    $this->add_flag_to_charset(preg_charset_flag::PRIN);
+}
+<CHARCLASS> \[:punct:\] {
+    $this->add_flag_to_charset(preg_charset_flag::PUNCT);
+}
+<CHARCLASS> \\s|\[:space:\]  {
+    $this->add_flag_to_charset(preg_charset_flag::SPACE);
+}
+<CHARCLASS> \[:upper:\] {
+    $this->add_flag_to_charset(preg_charset_flag::UPPER);
+}
+<CHARCLASS> \\w|\[:word:\] {
+    $this->add_flag_to_charset(preg_charset_flag::WORDCHAR);
+}
+<CHARCLASS> \[:xdigit:\] {
+    $this->add_flag_to_charset(preg_charset_flag::XDIGIT);
+}
+<CHARCLASS> \["^":alnum:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ALNUM, true);
+}
+<CHARCLASS> \["^":alpha:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ALNUM, true);
+}
+<CHARCLASS> \["^":ascii:\] {
+    $this->add_flag_to_charset(preg_charset_flag::ASCII, true);
+}
+<CHARCLASS> \\H|\["^":blank:\] {
+    $this->add_flag_to_charset(preg_charset_flag::HSPACE, true);
+}
+<CHARCLASS> \["^":ctrl:\] {
+    $this->add_flag_to_charset(preg_charset_flag::CNTRL, true);
+}
+<CHARCLASS> \\D|\["^":digit:\] {
+    $this->add_flag_to_charset(preg_charset_flag::DIGIT, true);
+}
+<CHARCLASS> \["^":graph:\] {
+    $this->add_flag_to_charset(preg_charset_flag::GRAPH, true);
+}
+<CHARCLASS> \["^":lower:\] {
+    $this->add_flag_to_charset(preg_charset_flag::LOWER, true);
+}
+<CHARCLASS> \["^":print:\] {
+    $this->add_flag_to_charset(preg_charset_flag::PRIN, true);
+}
+<CHARCLASS> \["^":punct:\] {
+    $this->add_flag_to_charset(preg_charset_flag::PUNCT, true);
+}
+<CHARCLASS> \\S|\["^":space:\]  {
+    $this->add_flag_to_charset(preg_charset_flag::SPACE, true);
+}
+<CHARCLASS> \["^":upper:\] {
+    $this->add_flag_to_charset(preg_charset_flag::UPPER, true);
+}
+<CHARCLASS> \\W|\["^":word:\] {
+    $this->add_flag_to_charset(preg_charset_flag::WORDCHAR, true);
+}
+<CHARCLASS> \["^":xdigit:\] {
+    $this->add_flag_to_charset(preg_charset_flag::XDIGIT, true);
+}
 <CHARCLASS> \\\\ {
-    $this->ccset .= '\\';
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset('\\');
 }
 <CHARCLASS> \\\[ {
-    $this->ccset .= '[';
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset('[');
 }
 <CHARCLASS> \\\] {
-    $this->ccset .= ']';
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(']');
 }
 <CHARCLASS> \\0[0-7][0-7]|[0-7][0-7][0-7] {
-    $this->ccset .= qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)));
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
 }
 <CHARCLASS> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
     if (qtype_preg_unicode::strlen($this->yytext()) < 3) {
@@ -746,342 +837,56 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->ccset .= $str;
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset($str);
 }
 <CHARCLASS> \\x\{[0-9a-fA-F]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->ccset .= qtype_preg_unicode::code2utf8(hexdec($str));
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
-}
-<CHARCLASS> \[:alnum:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ALNUM);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:alpha:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ALPHA);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:ascii:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ASCII);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\h|\[:blank:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::HSPACE);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:ctrl:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::CNTRL);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\d|\[:digit:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::DIGIT);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:graph:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::GRAPH);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:lower:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::LOWER);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:print:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::PRIN);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:punct:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::PUNCT);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\s|\[:space:\]  {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::SPACE);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:upper:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::UPPER);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\w|\[:word:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::WORDCHAR);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \[:xdigit:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::xdigit);
-    $flag->negative = false;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":alnum:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ALNUM);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":alpha:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ALPHA);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":ascii:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::ASCII);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\H|\["^":blank:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::HSPACE);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":ctrl:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::CNTRL);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\D|\["^":digit:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::DIGIT);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":graph:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::GRAPH);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":lower:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::LOWER);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":print:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::PRIN);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":punct:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::PUNCT);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\S|\["^":space:\]  {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::SPACE);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":upper:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::UPPER);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\W|\["^":word:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::WORDCHAR);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \["^":xdigit:\] {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::xdigit);
-    $flag->negative = true;
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(hexdec($str)));
 }
 <CHARCLASS> \\a {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x07);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x07));
 }
 <CHARCLASS> \\c. {
-    $this->ccset .= $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2));
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset($this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
 }
 <CHARCLASS> \\e {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x1B);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x1B));
 }
 <CHARCLASS> \\f {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x0C);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0C));
 }
 <CHARCLASS> \\n {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x0A);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0A));
 }
 <CHARCLASS> (\\p|\\P)[CLMNPSZ][cdefiklmnopstu]? {
     // TODO: Unicode properties.
     throw new Exception('\p and \P are not implemented yet');
-    /*$this->ccset .= qtype_preg_unicode::code2utf8(0x09);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);*/
 }
 <CHARCLASS> (\\p|\\P)\{.+\} {
     // TODO: Unicode properties.
     throw new Exception('\p and \P are not implemented yet');
-    /*$this->ccset .= qtype_preg_unicode::code2utf8(0x09);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);*/
 }
 <CHARCLASS> \\r {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x0D);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0D));
 }
 <CHARCLASS> \\t {
-    $this->ccset .= qtype_preg_unicode::code2utf8(0x09);
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
-}
-<CHARCLASS> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
-    if (qtype_preg_unicode::strlen($this->yytext()) < 3) {
-        $str = qtype_preg_unicode::substr($this->yytext(), 1);
-    } else {
-        $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
-    }
-    $this->ccset .= $str;
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
-}
-<CHARCLASS> \\x\{[0-9a-fA-F]*\} {
-    $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->ccset .= qtype_preg_unicode::code2utf8(hexdec($str));
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
-}
-<CHARCLASS> \\h|\\H {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::HSPACE);
-    $flag->negative = ($this->yytext() === '\H');
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
-}
-<CHARCLASS> \\v|\\V {
-    $this->cccharnumber++;
-    $flag = new preg_charset_flag;
-    $flag->set_flag(preg_charset_flag::VSPACE);
-    $flag->negative = ($this->yytext() === '\V');
-    $this->cc->flags[] = array($flag);
-    $this->ccgotflag = true;
+    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x09));
 }
 <CHARCLASS> "^" {
     if ($this->cccharnumber) {
-        $this->cccharnumber++;
-        $this->ccset .= '^';
-        $this->form_num_interval($this->ccset, $this->cccharnumber);
+        $this->add_character_to_charset('^');
     } else {
         $this->cc->negative = true;
     }
 }
 <CHARCLASS> - {
-    $this->ccset .= '-';
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset('-');
 }
 <CHARCLASS> \\ {
     // Do nothing.
 }
 <CHARCLASS> [^-\[\]\\^] {
-    $this->ccset .= $this->yytext();
-    $this->cccharnumber++;
-    $this->form_num_interval($this->ccset, $this->cccharnumber);
+    $this->add_character_to_charset($this->yytext());
 }
 <CHARCLASS> \] {
     $this->cc->indlast = $this->yychar;
@@ -1092,7 +897,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $this->cc->flags[] = array($flag);
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
-    $this->yybegin(self::YYINITIAL);
     $this->cc = null;
+    $this->yybegin(self::YYINITIAL);
     return $res;
 }
