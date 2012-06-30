@@ -186,7 +186,7 @@ class qtype_preg_unicode extends textlib {
     /**
      * Returns unicode ranges which $utf8str characters belongs to.
      * @param utf8str UTF-8 string.
-     * @return array of arrays[2] containing ranges.
+     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
      */
     public static function get_ranges($utf8str) {
         $result = array();
@@ -195,9 +195,64 @@ class qtype_preg_unicode extends textlib {
             foreach (self::$ranges as $name => $range) {
                 if ($code >= $range[0] && $code < $range[1]) {
                     if (!array_key_exists($name, $result)) {
-                        $result[$name] = $range;
+                        $result[$name] = array('left' => $range[0], 'right' => $range[1]);
                     }
                     break;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Intersects ranges to get a one whole range.
+     * @param ranges an array of ranges by "OR". Every range is represented as array('negative'=>bool, 'left'=>int, 'right'=>int).
+     * @return an array of ranges where ranges represented as array ('left'=>int, 'right'=>int).
+     */
+    public static function intersect_ranges($ranges) {
+        $result = array();
+        foreach ($ranges as $tointersect) {
+            $curresult = array(array('left' => 0, 'right' => 0x10FFFD));
+            for ($i = 0; count($curresult) > 0 && $i < count($tointersect); $i++) {
+                // $curresult is updated every iteration of this loop.
+                $tmp = $tointersect[$i];
+                // A negative range turns into two positive ranges.
+                if (!$tmp['negative']) {
+                    $currange = array(array('left' => $tmp['left'], 'right' => $tmp['right']));
+                } else {
+                    $currange = array();
+                    if ($tmp['left'] > 0) {
+                        $currange[] = array('left' => 0, 'right' => $tmp['left']);
+                    }
+                    if ($tmp['right'] < 0x10FFFD) {
+                        $currange[] = array('left' => $tmp['right'], 'right' => 0x10FFFD);
+                    }
+                }
+
+                // Process two current ranges.
+                $tmp = array();
+                //echo 'intersecting '; print_r($curresult); echo ' with '; print_r($currange); echo '<br/>';
+                foreach ($curresult as $curresultpart) {
+                    foreach ($currange as $currangepart) {
+                        if ($curresultpart['left'] < $currangepart['left']) {
+                            $left = $curresultpart;
+                            $right = $currangepart;
+                        } else {
+                            $left = $currangepart;
+                            $right = $curresultpart;
+                        }
+                        //echo $left['right'].'<br/>';
+                        if ($right['left'] <= $left['right'] && $left['right'] >= $right['left']) {
+                            $tmp[] = array('left' => $right['left'], 'right' => min($left['right'], $right['right']));
+                        }
+                    }
+                }
+                //echo 'result: '; print_r($tmp); echo '<br/><br/>';
+                $curresult = $tmp;
+            }
+            if (count($curresult) > 0) {
+                foreach ($curresult as $tmp) {
+                    $result[] = $tmp;
                 }
             }
         }
@@ -515,9 +570,9 @@ class qtype_preg_unicode extends textlib {
                !self::is_M($utf8chr) && !self::is_N($utf8chr) && !self::is_P($utf8chr) &&
                !self::is_S($utf8chr) && !self::is_Z($utf8chr);
     }
-    
+
     /******************************************************************/
-    
+
     public static function is_Arabic($utf8chr) {
         throw new Exception('Unicode properties support is not implemented yet');
     }
