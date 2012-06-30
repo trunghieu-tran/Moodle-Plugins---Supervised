@@ -69,16 +69,14 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         switch($name) {
         case 'preg_leaf_charset':
             $flag = new preg_charset_flag;
-            $flag->negative = false;
+            $flag->negative = $negative;
             if ($subtype === preg_charset_flag::SET) {
                 $flag->set_set(new qtype_preg_string($data));
             } else if ($subtype === preg_charset_flag::FLAG) {
                 $flag->set_flag($data);
-                $flag->negative = $negative;
 
             } else if ($subtype === preg_charset_flag::UPROP) {
                 $flag->set_uprop($data);
-                $flag->negative = $negative;
             }
             $result->flags = array(array($flag));
             $result->israngecalculated = false;
@@ -846,12 +844,24 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
     return $res;
 }
-<YYINITIAL> (\\p|\\P)\{[a-z_A-Z]+\} {
+<YYINITIAL> (\\p|\\P)[CLMNPSZ] {
+    $str = qtype_preg_unicode::substr($this->yytext(), 2);
+    $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
+    return $res;
+}
+<YYINITIAL> (\\p|\\P)\{"^"?[a-z_A-Z]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
+    $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
+    $circumflex = (qtype_preg_unicode::substr($str, 0, 1) === '^');
+    $negative = ($negative xor $circumflex);
+    if ($circumflex) {
+        $str = qtype_preg_unicode::substr($str, 1);
+    }
     if ($str !== 'Any') {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P')));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
     } else {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN, null, null, false, false, false, $negative));
     }
     return $res;
 }
@@ -1090,12 +1100,23 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 <CHARCLASS> \["^":xdigit:\] {
     $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
 }
-<CHARCLASS> (\\p|\\P)\{a-z_A-Z+\} {
+<CHARCLASS> (\\p|\\P)[CLMNPSZ] {
+    $str = qtype_preg_unicode::substr($this->yytext(), 2);
+    $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
+    $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
+}
+<CHARCLASS> (\\p|\\P)\{"^"?[a-z_A-Z]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
+    $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
+    $circumflex = (qtype_preg_unicode::substr($str, 0, 1) === '^');
+    $negative = ($negative xor $circumflex);
+    if ($circumflex) {
+        $str = qtype_preg_unicode::substr($str, 1);
+    }
     if ($str !== 'Any') {
-        $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P'));
+        $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
     } else {
-        $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN);
+        $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
     }
 }
 <CHARCLASS> \\\\ {
