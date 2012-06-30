@@ -127,7 +127,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->possessive);
     }
     function test_lexer_backslash() {
-        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\\>\\<\\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff\p{Greek}\\p{Lt}');
+        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\\>\\<\\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff\p{Greek}\P{Lt}\P{^M}\PL');
         $token = $lexer->nextToken();// \\
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
@@ -280,10 +280,22 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->uniprop === preg_charset_flag::GREEK);
-        $token = $lexer->nextToken();// \p{Lt}
+        $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();// \P{Lt}
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->uniprop === preg_charset_flag::UPROPLT);
+        $this->assertTrue($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();// \P{^M}
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->uniprop === preg_charset_flag::UPROPM);
+        $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();// \PL
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->uniprop === preg_charset_flag::UPROPL);
+        $this->assertTrue($token->value->flags[0][0]->negative);
     }
     function test_lexer_named_backref() {
         $lexer = $this->create_lexer('\\k<name_1>\\k\'name_2\'\\k{name_3}\\g{name_4}(?P=name_5)');
