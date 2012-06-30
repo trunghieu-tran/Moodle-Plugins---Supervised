@@ -175,7 +175,7 @@ class qtype_preg_lexer extends JLexBase  {
         }
     }
     public function map_subpattern($name) {
-        if (!array_key_exists($name, $this->subpatternmap)) {    // This subpattern does not exists.
+        if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
             $this->subpatternmap[$name] = $num;
         } else {                                                // Subpatterns with same names should have same numbers.
@@ -192,18 +192,26 @@ class qtype_preg_lexer extends JLexBase  {
         $code ^= 0x40;
         return qtype_preg_unicode::code2utf8($code);
     }
-    public function add_flag_to_charset($type, $negative = false) {
+    public function add_flag_to_charset($type, $data, $negative = false) {
         $this->cccharnumber++;
-        $flag = new preg_charset_flag;
-        $flag->set_flag($type);
-        $flag->negative = $negative;
-        $this->cc->flags[] = array($flag);
-        $this->ccgotflag = true;
-    }
-    public function add_character_to_charset($char) {
-        $this->ccset .= $char;
-        $this->cccharnumber++;
-        $this->form_num_interval($this->ccset, $this->cccharnumber);
+        switch ($type) {
+        case preg_charset_flag::SET:
+            $this->ccset .= $data;
+            $this->form_num_interval($this->ccset, $this->cccharnumber);
+            break;
+        case preg_charset_flag::FLAG:
+        case preg_charset_flag::UPROP:
+            $flag = new preg_charset_flag;
+            if ($type === preg_charset_flag::FLAG) {
+                $flag->set_flag($data);
+            } else if ($type === preg_charset_flag::UPROP) {
+                $flag->set_uprop($data);
+            }
+            $flag->negative = $negative;
+            $this->cc->flags[] = array($flag);
+            $this->ccgotflag = true;
+            break;
+        }
     }
     public function get_uprop_flag_type($str) {
         if ($str === 'C') {
@@ -6331,7 +6339,11 @@ array(
                         case 64:
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P')));
+    if ($str !== 'Any') {
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P')));
+    } else {
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    }
     return $res;
 }
                         case -65:
@@ -6455,7 +6467,7 @@ array(
                             break;
                         case 77:
                             {
-    $this->add_character_to_charset($this->yytext());
+    $this->add_flag_to_charset(preg_charset_flag::SET, $this->yytext());
 }
                         case -78:
                             break;
@@ -6483,14 +6495,14 @@ array(
                             break;
                         case 80:
                             {
-    $this->add_character_to_charset('-');
+    $this->add_flag_to_charset(preg_charset_flag::SET, '-');
 }
                         case -81:
                             break;
                         case 81:
                             {
     if ($this->cccharnumber) {
-        $this->add_character_to_charset('^');
+        $this->add_flag_to_charset(preg_charset_flag::SET, '^');
     } else {
         $this->cc->negative = true;
     }
@@ -6499,55 +6511,55 @@ array(
                             break;
                         case 82:
                             {
-    $this->add_character_to_charset('[');
+    $this->add_flag_to_charset(preg_charset_flag::SET, '[');
 }
                         case -83:
                             break;
                         case 83:
                             {
-    $this->add_character_to_charset('\\');
+    $this->add_flag_to_charset(preg_charset_flag::SET, '\\');
 }
                         case -84:
                             break;
                         case 84:
                             {
-    $this->add_character_to_charset(']');
+    $this->add_flag_to_charset(preg_charset_flag::SET, ']');
 }
                         case -85:
                             break;
                         case 85:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x07));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
                         case -86:
                             break;
                         case 86:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x1B));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
                         case -87:
                             break;
                         case 87:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0C));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
                         case -88:
                             break;
                         case 88:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0A));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
                         case -89:
                             break;
                         case 89:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x0D));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
                         case -90:
                             break;
                         case 90:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(0x09));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
 }
                         case -91:
                             break;
@@ -6558,201 +6570,205 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_character_to_charset($str);
+    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
 }
                         case -92:
                             break;
                         case 92:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::DIGIT);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
 }
                         case -93:
                             break;
                         case 93:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::DIGIT, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
 }
                         case -94:
                             break;
                         case 94:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::HSPACE);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
 }
                         case -95:
                             break;
                         case 95:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::HSPACE, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
 }
                         case -96:
                             break;
                         case 96:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SPACE);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE);
 }
                         case -97:
                             break;
                         case 97:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SPACE, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
 }
                         case -98:
                             break;
                         case 98:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::WORDCHAR);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
 }
                         case -99:
                             break;
                         case 99:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::WORDCHAR, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
 }
                         case -100:
                             break;
                         case 100:
                             {
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
 }
                         case -101:
                             break;
                         case 101:
                             {
-    $this->add_character_to_charset($this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
+    $this->add_flag_to_charset(preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
 }
                         case -102:
                             break;
                         case 102:
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->add_character_to_charset(qtype_preg_unicode::code2utf8(hexdec($str)));
+    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str)));
 }
                         case -103:
                             break;
                         case 103:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::CNTRL);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
 }
                         case -104:
                             break;
                         case 104:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::GRAPH);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
 }
                         case -105:
                             break;
                         case 105:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ASCII);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII);
 }
                         case -106:
                             break;
                         case 106:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ALNUM);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
 }
                         case -107:
                             break;
                         case 107:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ALPHA);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
 }
                         case -108:
                             break;
                         case 108:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::PRIN);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN);
 }
                         case -109:
                             break;
                         case 109:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::PUNCT);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
 }
                         case -110:
                             break;
                         case 110:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::UPPER);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER);
 }
                         case -111:
                             break;
                         case 111:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::LOWER);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER);
 }
                         case -112:
                             break;
                         case 112:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::CNTRL, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
 }
                         case -113:
                             break;
                         case 113:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::XDIGIT);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
 }
                         case -114:
                             break;
                         case 114:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::GRAPH, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
 }
                         case -115:
                             break;
                         case 115:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ASCII, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
 }
                         case -116:
                             break;
                         case 116:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
                         case -117:
                             break;
                         case 117:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
                         case -118:
                             break;
                         case 118:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::PRIN, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
 }
                         case -119:
                             break;
                         case 119:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::PUNCT, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
 }
                         case -120:
                             break;
                         case 120:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::UPPER, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
 }
                         case -121:
                             break;
                         case 121:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::LOWER, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
 }
                         case -122:
                             break;
                         case 122:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::XDIGIT, true);
+    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
 }
                         case -123:
                             break;
                         case 123:
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->add_flag_to_charset($this->get_uprop_flag_type($str), (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P'));
+    if ($str !== 'Any') {
+        $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), (qtype_preg_unicode::substr($this->yytext(), 1, 1) === '\P'));
+    } else {
+        $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN);
+    }
 }
                         case -124:
                             break;
@@ -6946,7 +6962,7 @@ array(
                             break;
                         case 138:
                             {
-    $this->add_character_to_charset($this->yytext());
+    $this->add_flag_to_charset(preg_charset_flag::SET, $this->yytext());
 }
                         case -138:
                             break;
@@ -6957,7 +6973,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_character_to_charset($str);
+    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
 }
                         case -139:
                             break;
@@ -6987,7 +7003,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_character_to_charset($str);
+    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
 }
                         case -142:
                             break;
