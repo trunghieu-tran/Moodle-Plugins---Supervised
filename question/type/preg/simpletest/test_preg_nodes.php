@@ -40,7 +40,6 @@ class qtype_preg_regex_handler_test extends UnitTestCase {
         $this->assertTrue($copyroot->operands[1]->operands[0] == $altnode->operands[1]->operands[0], 'B character node contents copied wrong');
         $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copyied');
     }
-
 }
 
 /**
