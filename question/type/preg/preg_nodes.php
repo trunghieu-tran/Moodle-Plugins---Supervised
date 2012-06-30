@@ -264,15 +264,16 @@ class preg_leaf_charset extends preg_leaf {
         return $result;
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { //may be rename to character?
+        // TODO: use qtype_preg_unicode::get_ranges() and qtype_preg_unicode::intersect_ranges().
         if ($this->flags[0][0]->type === preg_charset_flag::SET) {
             if ($this->negative) {
                 $ranges = qtype_preg_unicode::get_ranges($this->flags[0][0]->set->string());
                 foreach ($ranges as $range) {
-                    $leftborder = $range[0];
+                    $leftborder = $range['left'];
                     if ($leftborder < qtype_preg_unicode::ord(' ')) {
                         $leftborder = qtype_preg_unicode::ord(' ');
                     }
-                    for ($i = $leftborder; $i < $range[1]; $i++) {
+                    for ($i = $leftborder; $i < $range['right']; $i++) {
                         $char = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
                         if ($this->match($char, 0, $l, true)) {
                             return $char;
