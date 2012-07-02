@@ -269,11 +269,11 @@ class preg_leaf_charset extends preg_leaf {
             if ($this->negative) {
                 $ranges = qtype_preg_unicode::get_ranges($this->flags[0][0]->set->string());
                 foreach ($ranges as $range) {
-                    $leftborder = $range['left'];
+                    $leftborder = $range[0];
                     if ($leftborder < qtype_preg_unicode::ord(' ')) {
                         $leftborder = qtype_preg_unicode::ord(' ');
                     }
-                    for ($i = $leftborder; $i < $range['right']; $i++) {
+                    for ($i = $leftborder; $i < $range[1]; $i++) {
                         $char = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
                         if ($this->match($char, 0, $l, true)) {
                             return $char;

@@ -70,7 +70,7 @@ class qtype_preg_unicode_properties_test extends UnitTestCase {
             $ranges = call_user_func($funcname);
             $counter = 0;
             foreach ($ranges as $range) {
-                for ($i = $range['left']; $i <= $range['right']; $i++) {
+                for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $counter++;
                     $matched = preg_match('/(*UTF8)\p{' . $prop . '}/', qtype_preg_unicode::code2utf8($i));
                     if (!$matched) {
@@ -103,81 +103,81 @@ class qtype_preg_unicode_properties_test extends UnitTestCase {
 class qtype_preg_unicode_ranges_intersection_test extends UnitTestCase {
 
     function test_intersect_positive_ranges() {
-        $range11 = array('negative' => false, 'left' => 0, 'right' => 10);
-        $range12 = array('negative' => false, 'left' => 3, 'right' => 13);
-        $range13 = array('negative' => false, 'left' => 2, 'right' => 7);
+        $range11 = array('negative' => false, 0 => 0, 1 => 10);
+        $range12 = array('negative' => false, 0 => 3, 1 => 13);
+        $range13 = array('negative' => false, 0 => 2, 1 => 7);
         $ranges1 = array($range11, $range12, $range13);
 
-        $range21 = array('negative' => false, 'left' => 20, 'right' => 30);
-        $range22 = array('negative' => false, 'left' => 22, 'right' => 28);
-        $range23 = array('negative' => false, 'left' => 21, 'right' => 32);
+        $range21 = array('negative' => false, 0 => 20, 1 => 30);
+        $range22 = array('negative' => false, 0 => 22, 1 => 28);
+        $range23 = array('negative' => false, 0 => 21, 1 => 32);
         $ranges2 = array($range21, $range22, $range23);
 
         $result = qtype_preg_unicode::intersect_ranges(array($ranges1, $ranges2));
 
         $this->assertTrue(count($result) === 2);
-        $this->assertTrue($result[0]['left'] === 3);
-        $this->assertTrue($result[0]['right'] === 7);
-        $this->assertTrue($result[1]['left'] === 22);
-        $this->assertTrue($result[1]['right'] === 28);
+        $this->assertTrue($result[0][0] === 3);
+        $this->assertTrue($result[0][1] === 7);
+        $this->assertTrue($result[1][0] === 22);
+        $this->assertTrue($result[1][1] === 28);
     }
 
     function test_intersect_negative_ranges() {
-        $range11 = array('negative' => true, 'left' => 0, 'right' => 100);
-        $range12 = array('negative' => true, 'left' => 300, 'right' => 0x10FFFD);
-        $range13 = array('negative' => true, 'left' => 150, 'right' => 250);
+        $range11 = array('negative' => true, 0 => 0, 1 => 100);
+        $range12 = array('negative' => true, 0 => 300, 1 => 0x10FFFD);
+        $range13 = array('negative' => true, 0 => 150, 1 => 250);
         $ranges1 = array($range11, $range12, $range13);
 
-        $range21 = array('negative' => true, 'left' => 100, 'right' => 400);
-        $range22 = array('negative' => true, 'left' => 200, 'right' => 300);
-        $range23 = array('negative' => true, 'left' => 200, 'right' => 300);
+        $range21 = array('negative' => true, 0 => 100, 1 => 400);
+        $range22 = array('negative' => true, 0 => 200, 1 => 300);
+        $range23 = array('negative' => true, 0 => 200, 1 => 300);
         $ranges2 = array($range21, $range22, $range23);
 
         $result = qtype_preg_unicode::intersect_ranges(array($ranges1, $ranges2));
 
         $this->assertTrue(count($result) === 4);
-        $this->assertTrue($result[0]['left'] === 100);
-        $this->assertTrue($result[0]['right'] === 150);
-        $this->assertTrue($result[1]['left'] === 250);
-        $this->assertTrue($result[1]['right'] === 300);
-        $this->assertTrue($result[2]['left'] === 0);
-        $this->assertTrue($result[2]['right'] === 100);
-        $this->assertTrue($result[3]['left'] === 400);
-        $this->assertTrue($result[3]['right'] === 0x10FFFD);
+        $this->assertTrue($result[0][0] === 100);
+        $this->assertTrue($result[0][1] === 150);
+        $this->assertTrue($result[1][0] === 250);
+        $this->assertTrue($result[1][1] === 300);
+        $this->assertTrue($result[2][0] === 0);
+        $this->assertTrue($result[2][1] === 100);
+        $this->assertTrue($result[3][0] === 400);
+        $this->assertTrue($result[3][1] === 0x10FFFD);
     }
 
     function test_intersect_mixed_ranges() {
-        $range11 = array('negative' => true, 'left' => 200, 'right' => 300);
-        $range12 = array('negative' => false, 'left' => 100, 'right' => 400);
+        $range11 = array('negative' => true, 0 => 200, 1 => 300);
+        $range12 = array('negative' => false, 0 => 100, 1 => 400);
         $ranges1 = array($range11, $range12);
 
-        $range21 = array('negative' => true, 'left' => 200, 'right' => 300);
-        $range22 = array('negative' => false, 'left' => 100, 'right' => 230);
-        $range23 = array('negative' => false, 'left' => 240, 'right' => 400);
+        $range21 = array('negative' => true, 0 => 200, 1 => 300);
+        $range22 = array('negative' => false, 0 => 100, 1 => 230);
+        $range23 = array('negative' => false, 0 => 240, 1 => 400);
         $ranges2 = array($range21, $range22, $range23);
 
-        $range31 = array('negative' => false, 'left' => 100, 'right' => 500);
-        $range32 = array('negative' => false, 'left' => 200, 'right' => 300);
-        $range33 = array('negative' => false, 'left' => 300, 'right' => 400);
+        $range31 = array('negative' => false, 0 => 100, 1 => 500);
+        $range32 = array('negative' => false, 0 => 200, 1 => 300);
+        $range33 = array('negative' => false, 0 => 300, 1 => 400);
         $ranges3 = array($range31, $range32, $range33);
 
-        $range41 = array('negative' => true, 'left' => 200, 'right' => 400);
-        $range42 = array('negative' => false, 'left' => 100, 'right' => 500);
-        $range43 = array('negative' => false, 'left' => 200, 'right' => 450);
+        $range41 = array('negative' => true, 0 => 200, 1 => 400);
+        $range42 = array('negative' => false, 0 => 100, 1 => 500);
+        $range43 = array('negative' => false, 0 => 200, 1 => 450);
         $ranges4 = array($range41, $range42, $range43);
 
         $result = qtype_preg_unicode::intersect_ranges(array($ranges1, $ranges2, $ranges3, $ranges4));
 
         $this->assertTrue(count($result) === 5);
-        $this->assertTrue($result[0]['left'] === 100);
-        $this->assertTrue($result[0]['right'] === 200);
-        $this->assertTrue($result[1]['left'] === 300);
-        $this->assertTrue($result[1]['right'] === 400);
-        $this->assertTrue($result[2]['left'] === 300);
-        $this->assertTrue($result[2]['right'] === 300);
-        $this->assertTrue($result[3]['left'] === 200);
-        $this->assertTrue($result[3]['right'] === 200);
-        $this->assertTrue($result[4]['left'] === 400);
-        $this->assertTrue($result[4]['right'] === 450);
+        $this->assertTrue($result[0][0] === 100);
+        $this->assertTrue($result[0][1] === 200);
+        $this->assertTrue($result[1][0] === 300);
+        $this->assertTrue($result[1][1] === 400);
+        $this->assertTrue($result[2][0] === 300);
+        $this->assertTrue($result[2][1] === 300);
+        $this->assertTrue($result[3][0] === 200);
+        $this->assertTrue($result[3][1] === 200);
+        $this->assertTrue($result[4][0] === 400);
+        $this->assertTrue($result[4][1] === 450);
     }
 }

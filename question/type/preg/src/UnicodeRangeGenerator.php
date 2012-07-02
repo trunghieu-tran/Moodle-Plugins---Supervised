@@ -41,17 +41,17 @@
         $str = substr($str, 0, strlen($str) - 1);
         $newnum = hexdec($str);
         if ($previous === -1) {
-            fwrite($out, "array('left'=>" . $str . ', ');
+            fwrite($out, "array(0=>" . $str . ', ');
         } else {
             if ($newnum !== $previous + 1) {
-                fwrite($out, "'right'=>" . $prevhex . '),' . chr(0x000A));
-                fwrite($out, $tab."array('left'=>" . $str . ', ');
+                fwrite($out, "1=>" . $prevhex . '),' . chr(0x000A));
+                fwrite($out, $tab."array(0=>" . $str . ', ');
             }
         }
         $previous = $newnum;
         $prevhex = $str;
     }
-    fwrite($out, "'right'=>" . $prevhex . '));');
+    fwrite($out, "1=>" . $prevhex . '));');
     echo "DONE";
     fclose($in);
     fclose($out);
