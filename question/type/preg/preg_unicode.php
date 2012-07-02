@@ -153,36 +153,6 @@ class qtype_preg_unicode extends textlib {
                                   'Supplementary Private Use Area-B'          => array(0x100000, 0x10FFFD)
                                   );
 
-    public static $hspaces = array(0x0009,    // Horizontal tab.
-                                   0x0020,    // Space.
-                                   0x00A0,    // Non-break space.
-                                   0x1680,    // Ogham space mark.
-                                   0x180E,    // Mongolian vowel separator.
-                                   0x2000,    // En quad.
-                                   0x2001,    // Em quad.
-                                   0x2002,    // En space.
-                                   0x2003,    // Em space.
-                                   0x2004,    // Three-per-em space.
-                                   0x2005,    // Four-per-em space.
-                                   0x2006,    // Six-per-em space.
-                                   0x2007,    // Figure space.
-                                   0x2008,    // Punctuation space.
-                                   0x2009,    // Thin space.
-                                   0x200A,    // Hair space.
-                                   0x202F,    // Narrow no-break space.
-                                   0x205F,    // Medium mathematical space.
-                                   0x3000     // Ideographic space.
-                                   );
-
-    public static $vspaces = array(0x000A,    // Linefeed.
-                                   0x000B,    // Vertical tab.
-                                   0x000C,    // Formfeed.
-                                   0x000D,    // Carriage return.
-                                   0x0085,    // Next line.
-                                   0x2028,    // Line separator.
-                                   0x2029     // Paragraph separator.
-                                   );
-
     /**
      * Returns the code of a UTF-8 character.
      * @param utf8chr - a UTF-8 character.
@@ -6214,6 +6184,75 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0xA490, 1=>0xA4C6));
     }
     /******************************************************************/
+    public static function ascii_ranges() {
+        return array(array(0=>0x0000, 1=>0x007F));
+    }
+    public static function digit_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039));
+    }
+    public static function xdigit_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x0046),
+                     array(0=>0x0061, 1=>0x0066));
+    }
+    public static function space_ranges() {
+        return array(array(0=>0x0009, 1=>0x000D),
+                     array(0=>0x0020, 1=>0x0020));
+    }
+    public static function cntrl_ranges() {
+        return array(array(0=>0x0000, 1=>0x001F),
+                     array(0=>0x007F, 1=>0x007F));
+    }
+    public static function graph_ranges() {
+        return array(array(0=>0x0021, 1=>0x007E));
+    }
+    public static function lower_ranges() {
+        return array(array(0=>0x0061, 1=>0x007A));
+    }
+    public static function upper_ranges() {
+        return array(array(0=>0x0041, 1=>0x005A));
+    }
+    public static function print_ranges() {
+        return array(array(0=>0x0020, 1=>0x007E));
+    }
+    public static function punct_ranges() {
+        return array(array(0=>0x0021, 1=>0x002F),
+                     array(0=>0x003A, 1=>0x0040),
+                     array(0=>0x005B, 1=>0x0060),
+                     array(0=>0x007B, 1=>0x007E));
+    }
+    public static function alpha_ranges() {
+        return array(array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+    public static function alnum_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+    public static function wordchar_ranges() {
+        return array(array(0=>0x0030, 1=>0x0039),
+                     array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x005F, 1=>0x005F),
+                     array(0=>0x0061, 1=>0x007A));
+    }
+    public static function hspace_ranges() {
+        return array(array(0=>0x0009, 1=>0x0009),
+                     array(0=>0x0020, 1=>0x0020),
+                     array(0=>0x00A0, 1=>0x00A0),
+                     array(0=>0x1680, 1=>0x1680),
+                     array(0=>0x180E, 1=>0x180E),
+                     array(0=>0x2000, 1=>0x200A),
+                     array(0=>0x202F, 1=>0x202F),
+                     array(0=>0x205F, 1=>0x205F),
+                     array(0=>0x3000, 1=>0x3000));
+    }
+    public static function vspace_ranges() {
+        return array(array(0=>0x000A, 1=>0x000D),
+                     array(0=>0x0085, 1=>0x0085),
+                     array(0=>0x2028, 1=>0x2028),
+                     array(0=>0x2029, 1=>0x2029));
+    }
     /******************************************************************/
     private static function is_in_range($utf8chr, $ranges) {
         $ord = self::ord($utf8chr);
@@ -6612,112 +6651,49 @@ class qtype_preg_unicode extends textlib {
         return self::is_in_range($utf8chr, self::Yi_ranges());
     }
     /******************************************************************/
-
-    /**
-     * Checks if a character is an ascii character.
-     */
     public static function is_ascii($utf8chr) {
-        $ord = self::ord($utf8chr);
-        return $ord >= 0 && $ord <= 127;
+        return self::is_in_range($utf8chr, self::ascii_ranges());
     }
-
-    // TODO: unicode support for the functions below!
-
-    /**
-     * Checks if a character is a digit.
-     */
     public static function is_digit($utf8chr) {
-        return ctype_digit($utf8chr);
+        return self::is_in_range($utf8chr, self::digit_ranges());
     }
-
-    /**
-     * Checks if a character is an xdigit.
-     */
     public static function is_xdigit($utf8chr) {
-        return ctype_xdigit($utf8chr);
+        return self::is_in_range($utf8chr, self::xdigit_ranges());
     }
-
-    /**
-     * Checks if a character is a space.
-     */
     public static function is_space($utf8chr) {
-        return ctype_space($utf8chr);
+        return self::is_in_range($utf8chr, self::space_ranges());
     }
-
-    /**
-     * Checks if a character is a cntrl.
-     */
     public static function is_cntrl($utf8chr) {
-        return ctype_cntrl($utf8chr);
+        return self::is_in_range($utf8chr, self::cntrl_ranges());
     }
-
-    /**
-     * Checks if a character is a graph.
-     */
     public static function is_graph($utf8chr) {
-        return ctype_graph($utf8chr);
+        return self::is_in_range($utf8chr, self::graph_ranges());
     }
-
-    /**
-     * Checks if a character is lowercase.
-     */
     public static function is_lower($utf8chr) {
-        return ctype_lower($utf8chr);
+        return self::is_in_range($utf8chr, self::lower_ranges());
     }
-
-    /**
-     * Checks if a character is uppercase.
-     */
     public static function is_upper($utf8chr) {
-        return ctype_upper($utf8chr);
+        return self::is_in_range($utf8chr, self::upper_ranges());
     }
-
-    /**
-     * Checks if a character is printable.
-     */
     public static function is_print($utf8chr) {
-        return ctype_print($utf8chr);
+        return self::is_in_range($utf8chr, self::print_ranges());
     }
-
-    /**
-     * Checks if a character is non-space or alnum.
-     */
     public static function is_punct($utf8chr) {
-        return ctype_punct($utf8chr);
+        return self::is_in_range($utf8chr, self::punct_ranges());
     }
-
-    /**
-     * Checks if a character is alphabetic.
-     */
     public static function is_alpha($utf8chr) {
-        return ctype_alpha($utf8chr);
+        return self::is_in_range($utf8chr, self::alpha_ranges());
     }
-
-    /**
-     * Checks if a character is alphanumeric.
-     */
     public static function is_alnum($utf8chr) {
-        return ctype_alnum($utf8chr);
+        return self::is_in_range($utf8chr, self::alnum_ranges());
     }
-
-    /**
-     * Checks if a character is alphabetic or '_'.
-     */
     public static function is_wordchar($utf8chr) {
-        return $utf8chr === '_' || self::is_alnum($utf8chr);
+        return self::is_in_range($utf8chr, self::wordchar_ranges());
     }
-
-    /**
-     * Checks if a character is a horizontal space.
-     */
     public static function is_hspace($utf8chr) {
-        return in_array(self::ord($utf8chr), self::$hspaces);
+        return self::is_in_range($utf8chr, self::hspace_ranges());
     }
-
-    /**
-     * Checks if a character is a vertical space.
-     */
     public static function is_vspace($utf8chr) {
-        return in_array(self::ord($utf8chr), self::$vspaces);
+        return self::is_in_range($utf8chr, self::vspace_ranges());
     }
 }
