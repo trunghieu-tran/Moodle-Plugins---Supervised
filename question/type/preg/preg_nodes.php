@@ -524,6 +524,7 @@ class preg_charset_flag {
     const UPROPCN                = 'Cn';         // Unassigned
     const UPROPCO                = 'Co';         // Private use
     const UPROPCS                = 'Cs';         // Surrogate
+    const UPROPC                 = 'C';          // Other
     const UPROPLL                = 'Ll';         // Lower case letter
     const UPROPLM                = 'Lm';         // Modifier letter
     const UPROPLO                = 'Lo';         // Other letter
@@ -555,7 +556,6 @@ class preg_charset_flag {
     const UPROPZP                = 'Zp';         // Paragraph separator
     const UPROPZS                = 'Zs';         // Space separator
     const UPROPZ                 = 'Z';          // Separator
-    const UPROPC                 = 'C';          // Other
     const ARABIC                 = 'Arabic';
     const ARMENIAN               = 'Armenian';
     const AVESTAN                = 'Avestan';
@@ -649,10 +649,15 @@ class preg_charset_flag {
     const VAI                    = 'Vai';
     const YI                     = 'Yi';
 
+    /** Is this flag negative. */
     public $negative;
+    /** Type of this flag, can be either SET or FLAG or UPROP or CIRCUMFLEX or DOLLAR. */
     public $type;
+    /** Characters which match this flag if this is SET, see the constants above. */
     public $set;
-    public $flag;    //as name of character verify function, see constants bellow
+    /* Name of the qtype_preg_unicode function which verifies this flag, see the constants above. */
+    public $flag;
+    /* Name of the qtype_preg_unicode function which verifies this flag, see the constants above. */
     public $uniprop;
 
     static protected $flagtypes;
