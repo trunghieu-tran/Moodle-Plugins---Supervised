@@ -5061,6 +5061,1158 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x3000, 1=>0x3000));
     }
     /******************************************************************/
+    public static function Arabic_ranges() {
+        return array(array(0=>0x0600, 1=>0x0603),
+                     array(0=>0x0606, 1=>0x060B),
+                     array(0=>0x060D, 1=>0x061A),
+                     array(0=>0x061E, 1=>0x061E),
+                     array(0=>0x0620, 1=>0x063F),
+                     array(0=>0x0641, 1=>0x064A),
+                     array(0=>0x0656, 1=>0x065E),
+                     array(0=>0x066A, 1=>0x066F),
+                     array(0=>0x0671, 1=>0x06DC),
+                     array(0=>0x06DE, 1=>0x06FF),
+                     array(0=>0x0750, 1=>0x077F),
+                     array(0=>0xFB50, 1=>0xFBC1),
+                     array(0=>0xFBD3, 1=>0xFD3D),
+                     array(0=>0xFD50, 1=>0xFD8F),
+                     array(0=>0xFD92, 1=>0xFDC7),
+                     array(0=>0xFDF0, 1=>0xFDFC),
+                     array(0=>0xFE70, 1=>0xFE74),
+                     array(0=>0xFE76, 1=>0xFEFC),
+                     array(0=>0x10E60, 1=>0x10E7E));
+    }
+    public static function Armenian_ranges() {
+        return array(array(0=>0x0531, 1=>0x0556),
+                     array(0=>0x0559, 1=>0x055F),
+                     array(0=>0x0561, 1=>0x0587),
+                     array(0=>0x058A, 1=>0x058A),
+                     array(0=>0xFB13, 1=>0xFB17));
+    }
+    public static function Avestan_ranges() {
+        return array(array(0=>0x10B00, 1=>0x10B35),
+                     array(0=>0x10B39, 1=>0x10B3F));
+    }
+    public static function Balinese_ranges() {
+        return array(array(0=>0x1B00, 1=>0x1B4B),
+                     array(0=>0x1B50, 1=>0x1B7C));
+    }
+    public static function Bamum_ranges() {
+        return array(array(0=>0xA6A0, 1=>0xA6F7),
+                     array(0=>0x16800, 1=>0x16A38));
+    }
+    public static function Bengali_ranges() {
+        return array(array(0=>0x0981, 1=>0x0983),
+                     array(0=>0x0985, 1=>0x098C),
+                     array(0=>0x098F, 1=>0x0990),
+                     array(0=>0x0993, 1=>0x09A8),
+                     array(0=>0x09AA, 1=>0x09B0),
+                     array(0=>0x09B2, 1=>0x09B2),
+                     array(0=>0x09B6, 1=>0x09B9),
+                     array(0=>0x09BC, 1=>0x09C4),
+                     array(0=>0x09C7, 1=>0x09C8),
+                     array(0=>0x09CB, 1=>0x09CE),
+                     array(0=>0x09D7, 1=>0x09D7),
+                     array(0=>0x09DC, 1=>0x09DD),
+                     array(0=>0x09DF, 1=>0x09E3),
+                     array(0=>0x09E6, 1=>0x09FB));
+    }
+    public static function Bopomofo_ranges() {
+        return array(array(0=>0x02EA, 1=>0x02EB),
+                     array(0=>0x3105, 1=>0x312D),
+                     array(0=>0x31A0, 1=>0x31BA));
+    }
+    public static function Braille_ranges() {
+        return array(array(0=>0x2800, 1=>0x28FF));
+    }
+    public static function Buginese_ranges() {
+        return array(array(0=>0x1A00, 1=>0x1A1B),
+                     array(0=>0x1A1E, 1=>0x1A1F));
+    }
+    public static function Buhid_ranges() {
+        return array(array(0=>0x1740, 1=>0x1753));
+    }
+    public static function Canadian_Aboriginal_ranges() {
+        return array(array(0=>0x1400, 1=>0x167F),
+                     array(0=>0x18B0, 1=>0x18F5));
+    }
+    public static function Carian_ranges() {
+        return array(array(0=>0x102A0, 1=>0x102D0));
+    }
+    public static function Cham_ranges() {
+        return array(array(0=>0xAA00, 1=>0xAA36),
+                     array(0=>0xAA40, 1=>0xAA4D),
+                     array(0=>0xAA50, 1=>0xAA59),
+                     array(0=>0xAA5C, 1=>0xAA5F));
+    }
+    public static function Cherokee_ranges() {
+        return array(array(0=>0x13A0, 1=>0x13F4));
+    }
+    public static function Common_ranges() {
+        return array(array(0=>0x0000, 1=>0x0040),
+                     array(0=>0x005B, 1=>0x0060),
+                     array(0=>0x007B, 1=>0x00A9),
+                     array(0=>0x00AB, 1=>0x00B9),
+                     array(0=>0x00BB, 1=>0x00BF),
+                     array(0=>0x00D7, 1=>0x00D7),
+                     array(0=>0x00F7, 1=>0x00F7),
+                     array(0=>0x02B9, 1=>0x02DF),
+                     array(0=>0x02E5, 1=>0x02E9),
+                     array(0=>0x02EC, 1=>0x02FF),
+                     array(0=>0x0374, 1=>0x0374),
+                     array(0=>0x0378, 1=>0x0379),
+                     array(0=>0x037E, 1=>0x0383),
+                     array(0=>0x0385, 1=>0x0385),
+                     array(0=>0x0387, 1=>0x0387),
+                     array(0=>0x038B, 1=>0x038B),
+                     array(0=>0x038D, 1=>0x038D),
+                     array(0=>0x03A2, 1=>0x03A2),
+                     array(0=>0x0528, 1=>0x0530),
+                     array(0=>0x0557, 1=>0x0558),
+                     array(0=>0x0560, 1=>0x0560),
+                     array(0=>0x0588, 1=>0x0589),
+                     array(0=>0x058B, 1=>0x0590),
+                     array(0=>0x05C8, 1=>0x05CF),
+                     array(0=>0x05EB, 1=>0x05EF),
+                     array(0=>0x05F5, 1=>0x05FF),
+                     array(0=>0x0604, 1=>0x0605),
+                     array(0=>0x060C, 1=>0x060C),
+                     array(0=>0x061B, 1=>0x061D),
+                     array(0=>0x061F, 1=>0x061F),
+                     array(0=>0x0640, 1=>0x0640),
+                     array(0=>0x0660, 1=>0x0669),
+                     array(0=>0x06DD, 1=>0x06DD),
+                     array(0=>0x070E, 1=>0x070E),
+                     array(0=>0x074B, 1=>0x074C),
+                     array(0=>0x07B2, 1=>0x07BF),
+                     array(0=>0x07FB, 1=>0x07FF),
+                     array(0=>0x082E, 1=>0x082F),
+                     array(0=>0x083F, 1=>0x083F),
+                     array(0=>0x085C, 1=>0x085D),
+                     array(0=>0x085F, 1=>0x08FF),
+                     array(0=>0x0964, 1=>0x0965),
+                     array(0=>0x0970, 1=>0x0970),
+                     array(0=>0x0978, 1=>0x0978),
+                     array(0=>0x0980, 1=>0x0980),
+                     array(0=>0x0984, 1=>0x0984),
+                     array(0=>0x098D, 1=>0x098E),
+                     array(0=>0x0991, 1=>0x0992),
+                     array(0=>0x09A9, 1=>0x09A9),
+                     array(0=>0x09B1, 1=>0x09B1),
+                     array(0=>0x09B3, 1=>0x09B5),
+                     array(0=>0x09BA, 1=>0x09BB),
+                     array(0=>0x09C5, 1=>0x09C6),
+                     array(0=>0x09C9, 1=>0x09CA),
+                     array(0=>0x09CF, 1=>0x09D6),
+                     array(0=>0x09D8, 1=>0x09DB),
+                     array(0=>0x09DE, 1=>0x09DE),
+                     array(0=>0x09E4, 1=>0x09E5),
+                     array(0=>0x09FC, 1=>0x0A00),
+                     array(0=>0x0A04, 1=>0x0A04),
+                     array(0=>0x0A0B, 1=>0x0A0E),
+                     array(0=>0x0A11, 1=>0x0A12),
+                     array(0=>0x0A29, 1=>0x0A29),
+                     array(0=>0x0A31, 1=>0x0A31),
+                     array(0=>0x0A34, 1=>0x0A34),
+                     array(0=>0x0A37, 1=>0x0A37),
+                     array(0=>0x0A3A, 1=>0x0A3B),
+                     array(0=>0x0A3D, 1=>0x0A3D),
+                     array(0=>0x0A43, 1=>0x0A46),
+                     array(0=>0x0A49, 1=>0x0A4A),
+                     array(0=>0x0A4E, 1=>0x0A50),
+                     array(0=>0x0A52, 1=>0x0A58),
+                     array(0=>0x0A5D, 1=>0x0A5D),
+                     array(0=>0x0A5F, 1=>0x0A65),
+                     array(0=>0x0A76, 1=>0x0A80),
+                     array(0=>0x0A84, 1=>0x0A84),
+                     array(0=>0x0A8E, 1=>0x0A8E),
+                     array(0=>0x0A92, 1=>0x0A92),
+                     array(0=>0x0AA9, 1=>0x0AA9),
+                     array(0=>0x0AB1, 1=>0x0AB1),
+                     array(0=>0x0AB4, 1=>0x0AB4),
+                     array(0=>0x0ABA, 1=>0x0ABB),
+                     array(0=>0x0AC6, 1=>0x0AC6),
+                     array(0=>0x0ACA, 1=>0x0ACA),
+                     array(0=>0x0ACE, 1=>0x0ACF),
+                     array(0=>0x0AD1, 1=>0x0ADF),
+                     array(0=>0x0AE4, 1=>0x0AE5),
+                     array(0=>0x0AF0, 1=>0x0AF0),
+                     array(0=>0x0AF2, 1=>0x0B00),
+                     array(0=>0x0B04, 1=>0x0B04),
+                     array(0=>0x0B0D, 1=>0x0B0E),
+                     array(0=>0x0B11, 1=>0x0B12),
+                     array(0=>0x0B29, 1=>0x0B29),
+                     array(0=>0x0B31, 1=>0x0B31),
+                     array(0=>0x0B34, 1=>0x0B34),
+                     array(0=>0x0B3A, 1=>0x0B3B),
+                     array(0=>0x0B45, 1=>0x0B46),
+                     array(0=>0x0B49, 1=>0x0B4A),
+                     array(0=>0x0B4E, 1=>0x0B55),
+                     array(0=>0x0B58, 1=>0x0B5B),
+                     array(0=>0x0B5E, 1=>0x0B5E),
+                     array(0=>0x0B64, 1=>0x0B65),
+                     array(0=>0x0B78, 1=>0x0B81),
+                     array(0=>0x0B84, 1=>0x0B84),
+                     array(0=>0x0B8B, 1=>0x0B8D),
+                     array(0=>0x0B91, 1=>0x0B91),
+                     array(0=>0x0B96, 1=>0x0B98),
+                     array(0=>0x0B9B, 1=>0x0B9B),
+                     array(0=>0x0B9D, 1=>0x0B9D),
+                     array(0=>0x0BA0, 1=>0x0BA2),
+                     array(0=>0x0BA5, 1=>0x0BA7),
+                     array(0=>0x0BAB, 1=>0x0BAD),
+                     array(0=>0x0BBA, 1=>0x0BBD),
+                     array(0=>0x0BC3, 1=>0x0BC5),
+                     array(0=>0x0BC9, 1=>0x0BC9),
+                     array(0=>0x0BCE, 1=>0x0BCF),
+                     array(0=>0x0BD1, 1=>0x0BD6),
+                     array(0=>0x0BD8, 1=>0x0BE5),
+                     array(0=>0x0BFB, 1=>0x0C00),
+                     array(0=>0x0C04, 1=>0x0C04),
+                     array(0=>0x0C0D, 1=>0x0C0D),
+                     array(0=>0x0C11, 1=>0x0C11),
+                     array(0=>0x0C29, 1=>0x0C29),
+                     array(0=>0x0C34, 1=>0x0C34),
+                     array(0=>0x0C3A, 1=>0x0C3C),
+                     array(0=>0x0C45, 1=>0x0C45),
+                     array(0=>0x0C49, 1=>0x0C49),
+                     array(0=>0x0C4E, 1=>0x0C54),
+                     array(0=>0x0C57, 1=>0x0C57),
+                     array(0=>0x0C5A, 1=>0x0C5F),
+                     array(0=>0x0C64, 1=>0x0C65),
+                     array(0=>0x0C70, 1=>0x0C77),
+                     array(0=>0x0C80, 1=>0x0C81),
+                     array(0=>0x0C84, 1=>0x0C84),
+                     array(0=>0x0C8D, 1=>0x0C8D),
+                     array(0=>0x0C91, 1=>0x0C91),
+                     array(0=>0x0CA9, 1=>0x0CA9),
+                     array(0=>0x0CB4, 1=>0x0CB4),
+                     array(0=>0x0CBA, 1=>0x0CBB),
+                     array(0=>0x0CC5, 1=>0x0CC5),
+                     array(0=>0x0CC9, 1=>0x0CC9),
+                     array(0=>0x0CCE, 1=>0x0CD4),
+                     array(0=>0x0CD7, 1=>0x0CDD),
+                     array(0=>0x0CDF, 1=>0x0CDF),
+                     array(0=>0x0CE4, 1=>0x0CE5),
+                     array(0=>0x0CF0, 1=>0x0CF0),
+                     array(0=>0x0CF3, 1=>0x0D01),
+                     array(0=>0x0D04, 1=>0x0D04),
+                     array(0=>0x0D0D, 1=>0x0D0D),
+                     array(0=>0x0D11, 1=>0x0D11),
+                     array(0=>0x0D3B, 1=>0x0D3C),
+                     array(0=>0x0D45, 1=>0x0D45),
+                     array(0=>0x0D49, 1=>0x0D49),
+                     array(0=>0x0D4F, 1=>0x0D56),
+                     array(0=>0x0D58, 1=>0x0D5F),
+                     array(0=>0x0D64, 1=>0x0D65),
+                     array(0=>0x0D76, 1=>0x0D78),
+                     array(0=>0x0D80, 1=>0x0D81),
+                     array(0=>0x0D84, 1=>0x0D84),
+                     array(0=>0x0D97, 1=>0x0D99),
+                     array(0=>0x0DB2, 1=>0x0DB2),
+                     array(0=>0x0DBC, 1=>0x0DBC),
+                     array(0=>0x0DBE, 1=>0x0DBF),
+                     array(0=>0x0DC7, 1=>0x0DC9),
+                     array(0=>0x0DCB, 1=>0x0DCE),
+                     array(0=>0x0DD5, 1=>0x0DD5),
+                     array(0=>0x0DD7, 1=>0x0DD7),
+                     array(0=>0x0DE0, 1=>0x0DF1),
+                     array(0=>0x0DF5, 1=>0x0E00),
+                     array(0=>0x0E3B, 1=>0x0E3F),
+                     array(0=>0x0E5C, 1=>0x0E80),
+                     array(0=>0x0E83, 1=>0x0E83),
+                     array(0=>0x0E85, 1=>0x0E86),
+                     array(0=>0x0E89, 1=>0x0E89),
+                     array(0=>0x0E8B, 1=>0x0E8C),
+                     array(0=>0x0E8E, 1=>0x0E93),
+                     array(0=>0x0E98, 1=>0x0E98),
+                     array(0=>0x0EA0, 1=>0x0EA0),
+                     array(0=>0x0EA4, 1=>0x0EA4),
+                     array(0=>0x0EA6, 1=>0x0EA6),
+                     array(0=>0x0EA8, 1=>0x0EA9),
+                     array(0=>0x0EAC, 1=>0x0EAC),
+                     array(0=>0x0EBA, 1=>0x0EBA),
+                     array(0=>0x0EBE, 1=>0x0EBF),
+                     array(0=>0x0EC5, 1=>0x0EC5),
+                     array(0=>0x0EC7, 1=>0x0EC7),
+                     array(0=>0x0ECE, 1=>0x0ECF),
+                     array(0=>0x0EDA, 1=>0x0EDB),
+                     array(0=>0x0EDE, 1=>0x0EFF),
+                     array(0=>0x0F48, 1=>0x0F48),
+                     array(0=>0x0F6D, 1=>0x0F70),
+                     array(0=>0x0F98, 1=>0x0F98),
+                     array(0=>0x0FBD, 1=>0x0FBD),
+                     array(0=>0x0FCD, 1=>0x0FCD),
+                     array(0=>0x0FD5, 1=>0x0FD8),
+                     array(0=>0x0FDB, 1=>0x0FFF),
+                     array(0=>0x10C6, 1=>0x10CF),
+                     array(0=>0x10FB, 1=>0x10FB),
+                     array(0=>0x10FD, 1=>0x10FF),
+                     array(0=>0x1249, 1=>0x1249),
+                     array(0=>0x124E, 1=>0x124F),
+                     array(0=>0x1257, 1=>0x1257),
+                     array(0=>0x1259, 1=>0x1259),
+                     array(0=>0x125E, 1=>0x125F),
+                     array(0=>0x1289, 1=>0x1289),
+                     array(0=>0x128E, 1=>0x128F),
+                     array(0=>0x12B1, 1=>0x12B1),
+                     array(0=>0x12B6, 1=>0x12B7),
+                     array(0=>0x12BF, 1=>0x12BF),
+                     array(0=>0x12C1, 1=>0x12C1),
+                     array(0=>0x12C6, 1=>0x12C7),
+                     array(0=>0x12D7, 1=>0x12D7),
+                     array(0=>0x1311, 1=>0x1311),
+                     array(0=>0x1316, 1=>0x1317),
+                     array(0=>0x135B, 1=>0x135C),
+                     array(0=>0x137D, 1=>0x137F),
+                     array(0=>0x139A, 1=>0x139F),
+                     array(0=>0x13F5, 1=>0x13FF),
+                     array(0=>0x169D, 1=>0x169F),
+                     array(0=>0x16EB, 1=>0x16ED),
+                     array(0=>0x16F1, 1=>0x16FF),
+                     array(0=>0x170D, 1=>0x170D),
+                     array(0=>0x1715, 1=>0x171F),
+                     array(0=>0x1735, 1=>0x173F),
+                     array(0=>0x1754, 1=>0x175F),
+                     array(0=>0x176D, 1=>0x176D),
+                     array(0=>0x1771, 1=>0x1771),
+                     array(0=>0x1774, 1=>0x177F),
+                     array(0=>0x17DE, 1=>0x17DF),
+                     array(0=>0x17EA, 1=>0x17EF),
+                     array(0=>0x17FA, 1=>0x17FF),
+                     array(0=>0x1802, 1=>0x1803),
+                     array(0=>0x1805, 1=>0x1805),
+                     array(0=>0x180F, 1=>0x180F),
+                     array(0=>0x181A, 1=>0x181F),
+                     array(0=>0x1878, 1=>0x187F),
+                     array(0=>0x18AB, 1=>0x18AF),
+                     array(0=>0x18F6, 1=>0x18FF),
+                     array(0=>0x191D, 1=>0x191F),
+                     array(0=>0x192C, 1=>0x192F),
+                     array(0=>0x193C, 1=>0x193F),
+                     array(0=>0x1941, 1=>0x1943),
+                     array(0=>0x196E, 1=>0x196F),
+                     array(0=>0x1975, 1=>0x197F),
+                     array(0=>0x19AC, 1=>0x19AF),
+                     array(0=>0x19CA, 1=>0x19CF),
+                     array(0=>0x19DB, 1=>0x19DD),
+                     array(0=>0x1A1C, 1=>0x1A1D),
+                     array(0=>0x1A5F, 1=>0x1A5F),
+                     array(0=>0x1A7D, 1=>0x1A7E),
+                     array(0=>0x1A8A, 1=>0x1A8F),
+                     array(0=>0x1A9A, 1=>0x1A9F),
+                     array(0=>0x1AAE, 1=>0x1AFF),
+                     array(0=>0x1B4C, 1=>0x1B4F),
+                     array(0=>0x1B7D, 1=>0x1B7F),
+                     array(0=>0x1BAB, 1=>0x1BAD),
+                     array(0=>0x1BBA, 1=>0x1BBF),
+                     array(0=>0x1BF4, 1=>0x1BFB),
+                     array(0=>0x1C38, 1=>0x1C3A),
+                     array(0=>0x1C4A, 1=>0x1C4C),
+                     array(0=>0x1C80, 1=>0x1CCF),
+                     array(0=>0x1CD3, 1=>0x1CD3),
+                     array(0=>0x1CE1, 1=>0x1CE1),
+                     array(0=>0x1CE9, 1=>0x1CEC),
+                     array(0=>0x1CEE, 1=>0x1CFF),
+                     array(0=>0x1DE7, 1=>0x1DFB),
+                     array(0=>0x1F16, 1=>0x1F17),
+                     array(0=>0x1F1E, 1=>0x1F1F),
+                     array(0=>0x1F46, 1=>0x1F47),
+                     array(0=>0x1F4E, 1=>0x1F4F),
+                     array(0=>0x1F58, 1=>0x1F58),
+                     array(0=>0x1F5A, 1=>0x1F5A),
+                     array(0=>0x1F5C, 1=>0x1F5C),
+                     array(0=>0x1F5E, 1=>0x1F5E),
+                     array(0=>0x1F7E, 1=>0x1F7F),
+                     array(0=>0x1FB5, 1=>0x1FB5),
+                     array(0=>0x1FC5, 1=>0x1FC5),
+                     array(0=>0x1FD4, 1=>0x1FD5),
+                     array(0=>0x1FDC, 1=>0x1FDC),
+                     array(0=>0x1FF0, 1=>0x1FF1),
+                     array(0=>0x1FF5, 1=>0x1FF5),
+                     array(0=>0x1FFF, 1=>0x200B),
+                     array(0=>0x200E, 1=>0x2070),
+                     array(0=>0x2072, 1=>0x207E),
+                     array(0=>0x2080, 1=>0x208F),
+                     array(0=>0x209D, 1=>0x20CF),
+                     array(0=>0x20F1, 1=>0x2125),
+                     array(0=>0x2127, 1=>0x2129),
+                     array(0=>0x212C, 1=>0x2131),
+                     array(0=>0x2133, 1=>0x214D),
+                     array(0=>0x214F, 1=>0x215F),
+                     array(0=>0x2189, 1=>0x27FF),
+                     array(0=>0x2900, 1=>0x2BFF),
+                     array(0=>0x2C2F, 1=>0x2C2F),
+                     array(0=>0x2C5F, 1=>0x2C5F),
+                     array(0=>0x2CF2, 1=>0x2CF8),
+                     array(0=>0x2D26, 1=>0x2D2F),
+                     array(0=>0x2D66, 1=>0x2D6E),
+                     array(0=>0x2D71, 1=>0x2D7E),
+                     array(0=>0x2D97, 1=>0x2D9F),
+                     array(0=>0x2DA7, 1=>0x2DA7),
+                     array(0=>0x2DAF, 1=>0x2DAF),
+                     array(0=>0x2DB7, 1=>0x2DB7),
+                     array(0=>0x2DBF, 1=>0x2DBF),
+                     array(0=>0x2DC7, 1=>0x2DC7),
+                     array(0=>0x2DCF, 1=>0x2DCF),
+                     array(0=>0x2DD7, 1=>0x2DD7),
+                     array(0=>0x2DDF, 1=>0x2DDF),
+                     array(0=>0x2E00, 1=>0x2E7F),
+                     array(0=>0x2E9A, 1=>0x2E9A),
+                     array(0=>0x2EF4, 1=>0x2EFF),
+                     array(0=>0x2FD6, 1=>0x3004),
+                     array(0=>0x3006, 1=>0x3006),
+                     array(0=>0x3008, 1=>0x3020),
+                     array(0=>0x3030, 1=>0x3037),
+                     array(0=>0x303C, 1=>0x3040),
+                     array(0=>0x3097, 1=>0x3098),
+                     array(0=>0x309B, 1=>0x309C),
+                     array(0=>0x30A0, 1=>0x30A0),
+                     array(0=>0x30FB, 1=>0x30FC),
+                     array(0=>0x3100, 1=>0x3104),
+                     array(0=>0x312E, 1=>0x3130),
+                     array(0=>0x318F, 1=>0x319F),
+                     array(0=>0x31BB, 1=>0x31EF),
+                     array(0=>0x321F, 1=>0x325F),
+                     array(0=>0x327F, 1=>0x32CF),
+                     array(0=>0x32FF, 1=>0x32FF),
+                     array(0=>0x3358, 1=>0x33FF),
+                     array(0=>0x4DB6, 1=>0x4DFF),
+                     array(0=>0x9FCC, 1=>0x9FFF),
+                     array(0=>0xA48D, 1=>0xA48F),
+                     array(0=>0xA4C7, 1=>0xA4CF),
+                     array(0=>0xA62C, 1=>0xA63F),
+                     array(0=>0xA674, 1=>0xA67B),
+                     array(0=>0xA698, 1=>0xA69F),
+                     array(0=>0xA6F8, 1=>0xA721),
+                     array(0=>0xA788, 1=>0xA78A),
+                     array(0=>0xA78F, 1=>0xA78F),
+                     array(0=>0xA792, 1=>0xA79F),
+                     array(0=>0xA7AA, 1=>0xA7F9),
+                     array(0=>0xA82C, 1=>0xA83F),
+                     array(0=>0xA878, 1=>0xA87F),
+                     array(0=>0xA8C5, 1=>0xA8CD),
+                     array(0=>0xA8DA, 1=>0xA8DF),
+                     array(0=>0xA8FC, 1=>0xA8FF),
+                     array(0=>0xA954, 1=>0xA95E),
+                     array(0=>0xA97D, 1=>0xA97F),
+                     array(0=>0xA9CE, 1=>0xA9CE),
+                     array(0=>0xA9DA, 1=>0xA9DD),
+                     array(0=>0xA9E0, 1=>0xA9FF),
+                     array(0=>0xAA37, 1=>0xAA3F),
+                     array(0=>0xAA4E, 1=>0xAA4F),
+                     array(0=>0xAA5A, 1=>0xAA5B),
+                     array(0=>0xAA7C, 1=>0xAA7F),
+                     array(0=>0xAAC3, 1=>0xAADA),
+                     array(0=>0xAAE0, 1=>0xAB00),
+                     array(0=>0xAB07, 1=>0xAB08),
+                     array(0=>0xAB0F, 1=>0xAB10),
+                     array(0=>0xAB17, 1=>0xAB1F),
+                     array(0=>0xAB27, 1=>0xAB27),
+                     array(0=>0xAB2F, 1=>0xABBF),
+                     array(0=>0xABEE, 1=>0xABEF),
+                     array(0=>0xABFA, 1=>0xABFF),
+                     array(0=>0xD7A4, 1=>0xD7AF),
+                     array(0=>0xD7C7, 1=>0xD7CA),
+                     array(0=>0xD7FC, 1=>0xD7FF),
+                     array(0=>0xE000, 1=>0xF8FF),
+                     array(0=>0xFA2E, 1=>0xFA2F),
+                     array(0=>0xFA6E, 1=>0xFA6F),
+                     array(0=>0xFADA, 1=>0xFAFF),
+                     array(0=>0xFB07, 1=>0xFB12),
+                     array(0=>0xFB18, 1=>0xFB1C),
+                     array(0=>0xFB37, 1=>0xFB37),
+                     array(0=>0xFB3D, 1=>0xFB3D),
+                     array(0=>0xFB3F, 1=>0xFB3F),
+                     array(0=>0xFB42, 1=>0xFB42),
+                     array(0=>0xFB45, 1=>0xFB45),
+                     array(0=>0xFBC2, 1=>0xFBD2),
+                     array(0=>0xFD3E, 1=>0xFD4F),
+                     array(0=>0xFD90, 1=>0xFD91),
+                     array(0=>0xFDC8, 1=>0xFDEF),
+                     array(0=>0xFDFD, 1=>0xFDFF),
+                     array(0=>0xFE10, 1=>0xFE1F),
+                     array(0=>0xFE27, 1=>0xFE6F),
+                     array(0=>0xFE75, 1=>0xFE75),
+                     array(0=>0xFEFD, 1=>0xFF20),
+                     array(0=>0xFF3B, 1=>0xFF40),
+                     array(0=>0xFF5B, 1=>0xFF65),
+                     array(0=>0xFF70, 1=>0xFF70),
+                     array(0=>0xFF9E, 1=>0xFF9F),
+                     array(0=>0xFFBF, 1=>0xFFC1),
+                     array(0=>0xFFC8, 1=>0xFFC9),
+                     array(0=>0xFFD0, 1=>0xFFD1),
+                     array(0=>0xFFD8, 1=>0xFFD9),
+                     array(0=>0xFFDD, 1=>0xFFFF),
+                     array(0=>0x1000C, 1=>0x1000C),
+                     array(0=>0x10027, 1=>0x10027),
+                     array(0=>0x1003B, 1=>0x1003B),
+                     array(0=>0x1003E, 1=>0x1003E),
+                     array(0=>0x1004E, 1=>0x1004F),
+                     array(0=>0x1005E, 1=>0x1007F),
+                     array(0=>0x100FB, 1=>0x1013F),
+                     array(0=>0x1018B, 1=>0x101FC),
+                     array(0=>0x101FE, 1=>0x1027F),
+                     array(0=>0x1029D, 1=>0x1029F),
+                     array(0=>0x102D1, 1=>0x102FF),
+                     array(0=>0x1031F, 1=>0x1031F),
+                     array(0=>0x10324, 1=>0x1032F),
+                     array(0=>0x1034B, 1=>0x1037F),
+                     array(0=>0x1039E, 1=>0x1039E),
+                     array(0=>0x103C4, 1=>0x103C7),
+                     array(0=>0x103D6, 1=>0x103FF),
+                     array(0=>0x1049E, 1=>0x1049F),
+                     array(0=>0x104AA, 1=>0x107FF),
+                     array(0=>0x10806, 1=>0x10807),
+                     array(0=>0x10809, 1=>0x10809),
+                     array(0=>0x10836, 1=>0x10836),
+                     array(0=>0x10839, 1=>0x1083B),
+                     array(0=>0x1083D, 1=>0x1083E),
+                     array(0=>0x10856, 1=>0x10856),
+                     array(0=>0x10860, 1=>0x108FF),
+                     array(0=>0x1091C, 1=>0x1091E),
+                     array(0=>0x1093A, 1=>0x1093E),
+                     array(0=>0x10940, 1=>0x109FF),
+                     array(0=>0x10A04, 1=>0x10A04),
+                     array(0=>0x10A07, 1=>0x10A0B),
+                     array(0=>0x10A14, 1=>0x10A14),
+                     array(0=>0x10A18, 1=>0x10A18),
+                     array(0=>0x10A34, 1=>0x10A37),
+                     array(0=>0x10A3B, 1=>0x10A3E),
+                     array(0=>0x10A48, 1=>0x10A4F),
+                     array(0=>0x10A59, 1=>0x10A5F),
+                     array(0=>0x10A80, 1=>0x10AFF),
+                     array(0=>0x10B36, 1=>0x10B38),
+                     array(0=>0x10B56, 1=>0x10B57),
+                     array(0=>0x10B73, 1=>0x10B77),
+                     array(0=>0x10B80, 1=>0x10BFF),
+                     array(0=>0x10C49, 1=>0x10E5F),
+                     array(0=>0x10E7F, 1=>0x10FFF),
+                     array(0=>0x1104E, 1=>0x11051),
+                     array(0=>0x11070, 1=>0x1107F),
+                     array(0=>0x110C2, 1=>0x11FFF),
+                     array(0=>0x1236F, 1=>0x123FF),
+                     array(0=>0x12463, 1=>0x1246F),
+                     array(0=>0x12474, 1=>0x12FFF),
+                     array(0=>0x1342F, 1=>0x167FF),
+                     array(0=>0x16A39, 1=>0x1AFFF),
+                     array(0=>0x1B002, 1=>0x1D166),
+                     array(0=>0x1D16A, 1=>0x1D17A),
+                     array(0=>0x1D183, 1=>0x1D184),
+                     array(0=>0x1D18C, 1=>0x1D1A9),
+                     array(0=>0x1D1AE, 1=>0x1D1FF),
+                     array(0=>0x1D246, 1=>0x1F1FF),
+                     array(0=>0x1F201, 1=>0x1FFFF),
+                     array(0=>0x2A6D7, 1=>0x2A6FF),
+                     array(0=>0x2B735, 1=>0x2B73F),
+                     array(0=>0x2B81E, 1=>0x2F7FF),
+                     array(0=>0x2FA1E, 1=>0xE00FF),
+                     array(0=>0xE01F0, 1=>0x10FFFD));
+    }
+    public static function Coptic_ranges() {
+        return array(array(0=>0x03E2, 1=>0x03EF),
+                     array(0=>0x2C80, 1=>0x2CF1),
+                     array(0=>0x2CF9, 1=>0x2CFF));
+    }
+    public static function Cuneiform_ranges() {
+        return array(array(0=>0x12000, 1=>0x1236E),
+                     array(0=>0x12400, 1=>0x12462),
+                     array(0=>0x12470, 1=>0x12473));
+    }
+    public static function Cypriot_ranges() {
+        return array(array(0=>0x10800, 1=>0x10805),
+                     array(0=>0x10808, 1=>0x10808),
+                     array(0=>0x1080A, 1=>0x10835),
+                     array(0=>0x10837, 1=>0x10838),
+                     array(0=>0x1083C, 1=>0x1083C),
+                     array(0=>0x1083F, 1=>0x1083F));
+    }
+    public static function Cyrillic_ranges() {
+        return array(array(0=>0x0400, 1=>0x0484),
+                     array(0=>0x0487, 1=>0x0527),
+                     array(0=>0x1D2B, 1=>0x1D2B),
+                     array(0=>0x1D78, 1=>0x1D78),
+                     array(0=>0x2DE0, 1=>0x2DFF),
+                     array(0=>0xA640, 1=>0xA673),
+                     array(0=>0xA67C, 1=>0xA697));
+    }
+    public static function Deseret_ranges() {
+        return array(array(0=>0x10400, 1=>0x1044F));
+    }
+    public static function Devanagari_ranges() {
+        return array(array(0=>0x0900, 1=>0x0950),
+                     array(0=>0x0953, 1=>0x0963),
+                     array(0=>0x0966, 1=>0x096F),
+                     array(0=>0x0971, 1=>0x0977),
+                     array(0=>0x0979, 1=>0x097F),
+                     array(0=>0xA8E0, 1=>0xA8FB));
+    }
+    public static function Egyptian_Hieroglyphs_ranges() {
+        return array(array(0=>0x13000, 1=>0x1342E));
+    }
+    public static function Ethiopic_ranges() {
+        return array(array(0=>0x1200, 1=>0x1248),
+                     array(0=>0x124A, 1=>0x124D),
+                     array(0=>0x1250, 1=>0x1256),
+                     array(0=>0x1258, 1=>0x1258),
+                     array(0=>0x125A, 1=>0x125D),
+                     array(0=>0x1260, 1=>0x1288),
+                     array(0=>0x128A, 1=>0x128D),
+                     array(0=>0x1290, 1=>0x12B0),
+                     array(0=>0x12B2, 1=>0x12B5),
+                     array(0=>0x12B8, 1=>0x12BE),
+                     array(0=>0x12C0, 1=>0x12C0),
+                     array(0=>0x12C2, 1=>0x12C5),
+                     array(0=>0x12C8, 1=>0x12D6),
+                     array(0=>0x12D8, 1=>0x1310),
+                     array(0=>0x1312, 1=>0x1315),
+                     array(0=>0x1318, 1=>0x135A),
+                     array(0=>0x135D, 1=>0x137C),
+                     array(0=>0x1380, 1=>0x1399),
+                     array(0=>0x2D80, 1=>0x2D96),
+                     array(0=>0x2DA0, 1=>0x2DA6),
+                     array(0=>0x2DA8, 1=>0x2DAE),
+                     array(0=>0x2DB0, 1=>0x2DB6),
+                     array(0=>0x2DB8, 1=>0x2DBE),
+                     array(0=>0x2DC0, 1=>0x2DC6),
+                     array(0=>0x2DC8, 1=>0x2DCE),
+                     array(0=>0x2DD0, 1=>0x2DD6),
+                     array(0=>0x2DD8, 1=>0x2DDE),
+                     array(0=>0xAB01, 1=>0xAB06),
+                     array(0=>0xAB09, 1=>0xAB0E),
+                     array(0=>0xAB11, 1=>0xAB16),
+                     array(0=>0xAB20, 1=>0xAB26),
+                     array(0=>0xAB28, 1=>0xAB2E));
+    }
+    public static function Georgian_ranges() {
+        return array(array(0=>0x10A0, 1=>0x10C5),
+                     array(0=>0x10D0, 1=>0x10FA),
+                     array(0=>0x10FC, 1=>0x10FC),
+                     array(0=>0x2D00, 1=>0x2D25));
+    }
+    public static function Glagolitic_ranges() {
+        return array(array(0=>0x2C00, 1=>0x2C2E),
+                     array(0=>0x2C30, 1=>0x2C5E));
+    }
+    public static function Gothic_ranges() {
+        return array(array(0=>0x10330, 1=>0x1034A));
+    }
+    public static function Greek_ranges() {
+        return array(array(0=>0x0370, 1=>0x0373),
+                     array(0=>0x0375, 1=>0x0377),
+                     array(0=>0x037A, 1=>0x037D),
+                     array(0=>0x0384, 1=>0x0384),
+                     array(0=>0x0386, 1=>0x0386),
+                     array(0=>0x0388, 1=>0x038A),
+                     array(0=>0x038C, 1=>0x038C),
+                     array(0=>0x038E, 1=>0x03A1),
+                     array(0=>0x03A3, 1=>0x03E1),
+                     array(0=>0x03F0, 1=>0x03FF),
+                     array(0=>0x1D26, 1=>0x1D2A),
+                     array(0=>0x1D5D, 1=>0x1D61),
+                     array(0=>0x1D66, 1=>0x1D6A),
+                     array(0=>0x1DBF, 1=>0x1DBF),
+                     array(0=>0x1F00, 1=>0x1F15),
+                     array(0=>0x1F18, 1=>0x1F1D),
+                     array(0=>0x1F20, 1=>0x1F45),
+                     array(0=>0x1F48, 1=>0x1F4D),
+                     array(0=>0x1F50, 1=>0x1F57),
+                     array(0=>0x1F59, 1=>0x1F59),
+                     array(0=>0x1F5B, 1=>0x1F5B),
+                     array(0=>0x1F5D, 1=>0x1F5D),
+                     array(0=>0x1F5F, 1=>0x1F7D),
+                     array(0=>0x1F80, 1=>0x1FB4),
+                     array(0=>0x1FB6, 1=>0x1FC4),
+                     array(0=>0x1FC6, 1=>0x1FD3),
+                     array(0=>0x1FD6, 1=>0x1FDB),
+                     array(0=>0x1FDD, 1=>0x1FEF),
+                     array(0=>0x1FF2, 1=>0x1FF4),
+                     array(0=>0x1FF6, 1=>0x1FFE),
+                     array(0=>0x2126, 1=>0x2126),
+                     array(0=>0x10140, 1=>0x1018A),
+                     array(0=>0x1D200, 1=>0x1D245));
+    }
+    public static function Gujarati_ranges() {
+        return array(array(0=>0x0A81, 1=>0x0A83),
+                     array(0=>0x0A85, 1=>0x0A8D),
+                     array(0=>0x0A8F, 1=>0x0A91),
+                     array(0=>0x0A93, 1=>0x0AA8),
+                     array(0=>0x0AAA, 1=>0x0AB0),
+                     array(0=>0x0AB2, 1=>0x0AB3),
+                     array(0=>0x0AB5, 1=>0x0AB9),
+                     array(0=>0x0ABC, 1=>0x0AC5),
+                     array(0=>0x0AC7, 1=>0x0AC9),
+                     array(0=>0x0ACB, 1=>0x0ACD),
+                     array(0=>0x0AD0, 1=>0x0AD0),
+                     array(0=>0x0AE0, 1=>0x0AE3),
+                     array(0=>0x0AE6, 1=>0x0AEF),
+                     array(0=>0x0AF1, 1=>0x0AF1));
+    }
+    public static function Gurmukhi_ranges() {
+        return array(array(0=>0x0A01, 1=>0x0A03),
+                     array(0=>0x0A05, 1=>0x0A0A),
+                     array(0=>0x0A0F, 1=>0x0A10),
+                     array(0=>0x0A13, 1=>0x0A28),
+                     array(0=>0x0A2A, 1=>0x0A30),
+                     array(0=>0x0A32, 1=>0x0A33),
+                     array(0=>0x0A35, 1=>0x0A36),
+                     array(0=>0x0A38, 1=>0x0A39),
+                     array(0=>0x0A3C, 1=>0x0A3C),
+                     array(0=>0x0A3E, 1=>0x0A42),
+                     array(0=>0x0A47, 1=>0x0A48),
+                     array(0=>0x0A4B, 1=>0x0A4D),
+                     array(0=>0x0A51, 1=>0x0A51),
+                     array(0=>0x0A59, 1=>0x0A5C),
+                     array(0=>0x0A5E, 1=>0x0A5E),
+                     array(0=>0x0A66, 1=>0x0A75));
+    }
+    public static function Han_ranges() {
+        return array(array(0=>0x2E80, 1=>0x2E99),
+                     array(0=>0x2E9B, 1=>0x2EF3),
+                     array(0=>0x2F00, 1=>0x2FD5),
+                     array(0=>0x3005, 1=>0x3005),
+                     array(0=>0x3007, 1=>0x3007),
+                     array(0=>0x3021, 1=>0x3029),
+                     array(0=>0x3038, 1=>0x303B),
+                     array(0=>0x3400, 1=>0x4DB5),
+                     array(0=>0x4E00, 1=>0x9FCB),
+                     array(0=>0xF900, 1=>0xFA2D),
+                     array(0=>0xFA30, 1=>0xFA6D),
+                     array(0=>0xFA70, 1=>0xFAD9),
+                     array(0=>0x20000, 1=>0x2A6D6),
+                     array(0=>0x2A700, 1=>0x2B734),
+                     array(0=>0x2B740, 1=>0x2B81D),
+                     array(0=>0x2F800, 1=>0x2FA1D));
+    }
+    public static function Hangul_ranges() {
+        return array(array(0=>0x1100, 1=>0x11FF),
+                     array(0=>0x302E, 1=>0x302F),
+                     array(0=>0x3131, 1=>0x318E),
+                     array(0=>0x3200, 1=>0x321E),
+                     array(0=>0x3260, 1=>0x327E),
+                     array(0=>0xA960, 1=>0xA97C),
+                     array(0=>0xAC00, 1=>0xD7A3),
+                     array(0=>0xD7B0, 1=>0xD7C6),
+                     array(0=>0xD7CB, 1=>0xD7FB),
+                     array(0=>0xFFA0, 1=>0xFFBE),
+                     array(0=>0xFFC2, 1=>0xFFC7),
+                     array(0=>0xFFCA, 1=>0xFFCF),
+                     array(0=>0xFFD2, 1=>0xFFD7),
+                     array(0=>0xFFDA, 1=>0xFFDC));
+    }
+    public static function Hanunoo_ranges() {
+        return array(array(0=>0x1720, 1=>0x1734));
+    }
+    public static function Hebrew_ranges() {
+        return array(array(0=>0x0591, 1=>0x05C7),
+                     array(0=>0x05D0, 1=>0x05EA),
+                     array(0=>0x05F0, 1=>0x05F4),
+                     array(0=>0xFB1D, 1=>0xFB36),
+                     array(0=>0xFB38, 1=>0xFB3C),
+                     array(0=>0xFB3E, 1=>0xFB3E),
+                     array(0=>0xFB40, 1=>0xFB41),
+                     array(0=>0xFB43, 1=>0xFB44),
+                     array(0=>0xFB46, 1=>0xFB4F));
+    }
+    public static function Hiragana_ranges() {
+        return array(array(0=>0x3041, 1=>0x3096),
+                     array(0=>0x309D, 1=>0x309F),
+                     array(0=>0x1B001, 1=>0x1B001),
+                     array(0=>0x1F200, 1=>0x1F200));
+    }
+    public static function Imperial_Aramaic_ranges() {
+        return array(array(0=>0x10840, 1=>0x10855),
+                     array(0=>0x10857, 1=>0x1085F));
+    }
+    public static function Inherited_ranges() {
+        return array(array(0=>0x0300, 1=>0x036F),
+                     array(0=>0x0485, 1=>0x0486),
+                     array(0=>0x064B, 1=>0x0655),
+                     array(0=>0x065F, 1=>0x065F),
+                     array(0=>0x0670, 1=>0x0670),
+                     array(0=>0x0951, 1=>0x0952),
+                     array(0=>0x1CD0, 1=>0x1CD2),
+                     array(0=>0x1CD4, 1=>0x1CE0),
+                     array(0=>0x1CE2, 1=>0x1CE8),
+                     array(0=>0x1CED, 1=>0x1CED),
+                     array(0=>0x1DC0, 1=>0x1DE6),
+                     array(0=>0x1DFC, 1=>0x1DFF),
+                     array(0=>0x200C, 1=>0x200D),
+                     array(0=>0x20D0, 1=>0x20F0),
+                     array(0=>0x302A, 1=>0x302D),
+                     array(0=>0x3099, 1=>0x309A),
+                     array(0=>0xFE00, 1=>0xFE0F),
+                     array(0=>0xFE20, 1=>0xFE26),
+                     array(0=>0x101FD, 1=>0x101FD),
+                     array(0=>0x1D167, 1=>0x1D169),
+                     array(0=>0x1D17B, 1=>0x1D182),
+                     array(0=>0x1D185, 1=>0x1D18B),
+                     array(0=>0x1D1AA, 1=>0x1D1AD),
+                     array(0=>0xE0100, 1=>0xE01EF));
+    }
+    public static function Inscriptional_Pahlavi_ranges() {
+        return array(array(0=>0x10B60, 1=>0x10B72),
+                     array(0=>0x10B78, 1=>0x10B7F));
+    }
+    public static function Inscriptional_Parthian_ranges() {
+        return array(array(0=>0x10B40, 1=>0x10B55),
+                     array(0=>0x10B58, 1=>0x10B5F));
+    }
+    public static function Javanese_ranges() {
+        return array(array(0=>0xA980, 1=>0xA9CD),
+                     array(0=>0xA9CF, 1=>0xA9D9),
+                     array(0=>0xA9DE, 1=>0xA9DF));
+    }
+    public static function Kaithi_ranges() {
+        return array(array(0=>0x11080, 1=>0x110C1));
+    }
+    public static function Kannada_ranges() {
+        return array(array(0=>0x0C82, 1=>0x0C83),
+                     array(0=>0x0C85, 1=>0x0C8C),
+                     array(0=>0x0C8E, 1=>0x0C90),
+                     array(0=>0x0C92, 1=>0x0CA8),
+                     array(0=>0x0CAA, 1=>0x0CB3),
+                     array(0=>0x0CB5, 1=>0x0CB9),
+                     array(0=>0x0CBC, 1=>0x0CC4),
+                     array(0=>0x0CC6, 1=>0x0CC8),
+                     array(0=>0x0CCA, 1=>0x0CCD),
+                     array(0=>0x0CD5, 1=>0x0CD6),
+                     array(0=>0x0CDE, 1=>0x0CDE),
+                     array(0=>0x0CE0, 1=>0x0CE3),
+                     array(0=>0x0CE6, 1=>0x0CEF),
+                     array(0=>0x0CF1, 1=>0x0CF2));
+    }
+    public static function Katakana_ranges() {
+        return array(array(0=>0x30A1, 1=>0x30FA),
+                     array(0=>0x30FD, 1=>0x30FF),
+                     array(0=>0x31F0, 1=>0x31FF),
+                     array(0=>0x32D0, 1=>0x32FE),
+                     array(0=>0x3300, 1=>0x3357),
+                     array(0=>0xFF66, 1=>0xFF6F),
+                     array(0=>0xFF71, 1=>0xFF9D),
+                     array(0=>0x1B000, 1=>0x1B000));
+    }
+    public static function Kayah_Li_ranges() {
+        return array(array(0=>0xA900, 1=>0xA92F));
+    }
+    public static function Kharoshthi_ranges() {
+        return array(array(0=>0x10A00, 1=>0x10A03),
+                     array(0=>0x10A05, 1=>0x10A06),
+                     array(0=>0x10A0C, 1=>0x10A13),
+                     array(0=>0x10A15, 1=>0x10A17),
+                     array(0=>0x10A19, 1=>0x10A33),
+                     array(0=>0x10A38, 1=>0x10A3A),
+                     array(0=>0x10A3F, 1=>0x10A47),
+                     array(0=>0x10A50, 1=>0x10A58));
+    }
+    public static function Khmer_ranges() {
+        return array(array(0=>0x1780, 1=>0x17DD),
+                     array(0=>0x17E0, 1=>0x17E9),
+                     array(0=>0x17F0, 1=>0x17F9),
+                     array(0=>0x19E0, 1=>0x19FF));
+    }
+    public static function Lao_ranges() {
+        return array(array(0=>0x0E81, 1=>0x0E82),
+                     array(0=>0x0E84, 1=>0x0E84),
+                     array(0=>0x0E87, 1=>0x0E88),
+                     array(0=>0x0E8A, 1=>0x0E8A),
+                     array(0=>0x0E8D, 1=>0x0E8D),
+                     array(0=>0x0E94, 1=>0x0E97),
+                     array(0=>0x0E99, 1=>0x0E9F),
+                     array(0=>0x0EA1, 1=>0x0EA3),
+                     array(0=>0x0EA5, 1=>0x0EA5),
+                     array(0=>0x0EA7, 1=>0x0EA7),
+                     array(0=>0x0EAA, 1=>0x0EAB),
+                     array(0=>0x0EAD, 1=>0x0EB9),
+                     array(0=>0x0EBB, 1=>0x0EBD),
+                     array(0=>0x0EC0, 1=>0x0EC4),
+                     array(0=>0x0EC6, 1=>0x0EC6),
+                     array(0=>0x0EC8, 1=>0x0ECD),
+                     array(0=>0x0ED0, 1=>0x0ED9),
+                     array(0=>0x0EDC, 1=>0x0EDD));
+    }
+    public static function Latin_ranges() {
+        return array(array(0=>0x0041, 1=>0x005A),
+                     array(0=>0x0061, 1=>0x007A),
+                     array(0=>0x00AA, 1=>0x00AA),
+                     array(0=>0x00BA, 1=>0x00BA),
+                     array(0=>0x00C0, 1=>0x00D6),
+                     array(0=>0x00D8, 1=>0x00F6),
+                     array(0=>0x00F8, 1=>0x02B8),
+                     array(0=>0x02E0, 1=>0x02E4),
+                     array(0=>0x1D00, 1=>0x1D25),
+                     array(0=>0x1D2C, 1=>0x1D5C),
+                     array(0=>0x1D62, 1=>0x1D65),
+                     array(0=>0x1D6B, 1=>0x1D77),
+                     array(0=>0x1D79, 1=>0x1DBE),
+                     array(0=>0x1E00, 1=>0x1EFF),
+                     array(0=>0x2071, 1=>0x2071),
+                     array(0=>0x207F, 1=>0x207F),
+                     array(0=>0x2090, 1=>0x209C),
+                     array(0=>0x212A, 1=>0x212B),
+                     array(0=>0x2132, 1=>0x2132),
+                     array(0=>0x214E, 1=>0x214E),
+                     array(0=>0x2160, 1=>0x2188),
+                     array(0=>0x2C60, 1=>0x2C7F),
+                     array(0=>0xA722, 1=>0xA787),
+                     array(0=>0xA78B, 1=>0xA78E),
+                     array(0=>0xA790, 1=>0xA791),
+                     array(0=>0xA7A0, 1=>0xA7A9),
+                     array(0=>0xA7FA, 1=>0xA7FF),
+                     array(0=>0xFB00, 1=>0xFB06),
+                     array(0=>0xFF21, 1=>0xFF3A),
+                     array(0=>0xFF41, 1=>0xFF5A));
+    }
+    public static function Lepcha_ranges() {
+        return array(array(0=>0x1C00, 1=>0x1C37),
+                     array(0=>0x1C3B, 1=>0x1C49),
+                     array(0=>0x1C4D, 1=>0x1C4F));
+    }
+    public static function Limbu_ranges() {
+        return array(array(0=>0x1900, 1=>0x191C),
+                     array(0=>0x1920, 1=>0x192B),
+                     array(0=>0x1930, 1=>0x193B),
+                     array(0=>0x1940, 1=>0x1940),
+                     array(0=>0x1944, 1=>0x194F));
+    }
+    public static function Linear_B_ranges() {
+        return array(array(0=>0x10000, 1=>0x1000B),
+                     array(0=>0x1000D, 1=>0x10026),
+                     array(0=>0x10028, 1=>0x1003A),
+                     array(0=>0x1003C, 1=>0x1003D),
+                     array(0=>0x1003F, 1=>0x1004D),
+                     array(0=>0x10050, 1=>0x1005D),
+                     array(0=>0x10080, 1=>0x100FA));
+    }
+    public static function Lisu_ranges() {
+        return array(array(0=>0xA4D0, 1=>0xA4FF));
+    }
+    public static function Lycian_ranges() {
+        return array(array(0=>0x10280, 1=>0x1029C));
+    }
+    public static function Lydian_ranges() {
+        return array(array(0=>0x10920, 1=>0x10939),
+                     array(0=>0x1093F, 1=>0x1093F));
+    }
+    public static function Malayalam_ranges() {
+        return array(array(0=>0x0D02, 1=>0x0D03),
+                     array(0=>0x0D05, 1=>0x0D0C),
+                     array(0=>0x0D0E, 1=>0x0D10),
+                     array(0=>0x0D12, 1=>0x0D3A),
+                     array(0=>0x0D3D, 1=>0x0D44),
+                     array(0=>0x0D46, 1=>0x0D48),
+                     array(0=>0x0D4A, 1=>0x0D4E),
+                     array(0=>0x0D57, 1=>0x0D57),
+                     array(0=>0x0D60, 1=>0x0D63),
+                     array(0=>0x0D66, 1=>0x0D75),
+                     array(0=>0x0D79, 1=>0x0D7F));
+    }
+    public static function Meetei_Mayek_ranges() {
+        return array(array(0=>0xABC0, 1=>0xABED),
+                     array(0=>0xABF0, 1=>0xABF9));
+    }
+    public static function Mongolian_ranges() {
+        return array(array(0=>0x1800, 1=>0x1801),
+                     array(0=>0x1804, 1=>0x1804),
+                     array(0=>0x1806, 1=>0x180E),
+                     array(0=>0x1810, 1=>0x1819),
+                     array(0=>0x1820, 1=>0x1877),
+                     array(0=>0x1880, 1=>0x18AA));
+    }
+    public static function Myanmar_ranges() {
+        return array(array(0=>0x1000, 1=>0x109F),
+                     array(0=>0xAA60, 1=>0xAA7B));
+    }
+    public static function New_Tai_Lue_ranges() {
+        return array(array(0=>0x1980, 1=>0x19AB),
+                     array(0=>0x19B0, 1=>0x19C9),
+                     array(0=>0x19D0, 1=>0x19DA),
+                     array(0=>0x19DE, 1=>0x19DF));
+    }
+    public static function Nko_ranges() {
+        return array(array(0=>0x07C0, 1=>0x07FA));
+    }
+    public static function Ogham_ranges() {
+        return array(array(0=>0x1680, 1=>0x169C));
+    }
+    public static function Old_Italic_ranges() {
+        return array(array(0=>0x10300, 1=>0x1031E),
+                     array(0=>0x10320, 1=>0x10323));
+    }
+    public static function Old_Persian_ranges() {
+        return array(array(0=>0x103A0, 1=>0x103C3),
+                     array(0=>0x103C8, 1=>0x103D5));
+    }
+    public static function Old_South_Arabian_ranges() {
+        return array(array(0=>0x10A60, 1=>0x10A7F));
+    }
+    public static function Old_Turkic_ranges() {
+        return array(array(0=>0x10C00, 1=>0x10C48));
+    }
+    public static function Ol_Chiki_ranges() {
+        return array(array(0=>0x1C50, 1=>0x1C7F));
+    }
+    public static function Oriya_ranges() {
+        return array(array(0=>0x0B01, 1=>0x0B03),
+                     array(0=>0x0B05, 1=>0x0B0C),
+                     array(0=>0x0B0F, 1=>0x0B10),
+                     array(0=>0x0B13, 1=>0x0B28),
+                     array(0=>0x0B2A, 1=>0x0B30),
+                     array(0=>0x0B32, 1=>0x0B33),
+                     array(0=>0x0B35, 1=>0x0B39),
+                     array(0=>0x0B3C, 1=>0x0B44),
+                     array(0=>0x0B47, 1=>0x0B48),
+                     array(0=>0x0B4B, 1=>0x0B4D),
+                     array(0=>0x0B56, 1=>0x0B57),
+                     array(0=>0x0B5C, 1=>0x0B5D),
+                     array(0=>0x0B5F, 1=>0x0B63),
+                     array(0=>0x0B66, 1=>0x0B77));
+    }
+    public static function Osmanya_ranges() {
+        return array(array(0=>0x10480, 1=>0x1049D),
+                     array(0=>0x104A0, 1=>0x104A9));
+    }
+    public static function Phags_Pa_ranges() {
+        return array(array(0=>0xA840, 1=>0xA877));
+    }
+    public static function Phoenician_ranges() {
+        return array(array(0=>0x10900, 1=>0x1091B),
+                     array(0=>0x1091F, 1=>0x1091F));
+    }
+    public static function Rejang_ranges() {
+        return array(array(0=>0xA930, 1=>0xA953),
+                     array(0=>0xA95F, 1=>0xA95F));
+    }
+    public static function Runic_ranges() {
+        return array(array(0=>0x16A0, 1=>0x16EA),
+                     array(0=>0x16EE, 1=>0x16F0));
+    }
+    public static function Samaritan_ranges() {
+        return array(array(0=>0x0800, 1=>0x082D),
+                     array(0=>0x0830, 1=>0x083E));
+    }
+    public static function Saurashtra_ranges() {
+        return array(array(0=>0xA880, 1=>0xA8C4),
+                     array(0=>0xA8CE, 1=>0xA8D9));
+    }
+    public static function Shavian_ranges() {
+        return array(array(0=>0x10450, 1=>0x1047F));
+    }
+    public static function Sinhala_ranges() {
+        return array(array(0=>0x0D82, 1=>0x0D83),
+                     array(0=>0x0D85, 1=>0x0D96),
+                     array(0=>0x0D9A, 1=>0x0DB1),
+                     array(0=>0x0DB3, 1=>0x0DBB),
+                     array(0=>0x0DBD, 1=>0x0DBD),
+                     array(0=>0x0DC0, 1=>0x0DC6),
+                     array(0=>0x0DCA, 1=>0x0DCA),
+                     array(0=>0x0DCF, 1=>0x0DD4),
+                     array(0=>0x0DD6, 1=>0x0DD6),
+                     array(0=>0x0DD8, 1=>0x0DDF),
+                     array(0=>0x0DF2, 1=>0x0DF4));
+    }
+    public static function Sundanese_ranges() {
+        return array(array(0=>0x1B80, 1=>0x1BAA),
+                     array(0=>0x1BAE, 1=>0x1BB9));
+    }
+    public static function Syloti_Nagri_ranges() {
+        return array(array(0=>0xA800, 1=>0xA82B));
+    }
+    public static function Syriac_ranges() {
+        return array(array(0=>0x0700, 1=>0x070D),
+                     array(0=>0x070F, 1=>0x074A),
+                     array(0=>0x074D, 1=>0x074F));
+    }
+    public static function Tagalog_ranges() {
+        return array(array(0=>0x1700, 1=>0x170C),
+                     array(0=>0x170E, 1=>0x1714));
+    }
+    public static function Tagbanwa_ranges() {
+        return array(array(0=>0x1760, 1=>0x176C),
+                     array(0=>0x176E, 1=>0x1770),
+                     array(0=>0x1772, 1=>0x1773));
+    }
+    public static function Tai_Le_ranges() {
+        return array(array(0=>0x1950, 1=>0x196D),
+                     array(0=>0x1970, 1=>0x1974));
+    }
+    public static function Tai_Tham_ranges() {
+        return array(array(0=>0x1A20, 1=>0x1A5E),
+                     array(0=>0x1A60, 1=>0x1A7C),
+                     array(0=>0x1A7F, 1=>0x1A89),
+                     array(0=>0x1A90, 1=>0x1A99),
+                     array(0=>0x1AA0, 1=>0x1AAD));
+    }
+    public static function Tai_Viet_ranges() {
+        return array(array(0=>0xAA80, 1=>0xAAC2),
+                     array(0=>0xAADB, 1=>0xAADF));
+    }
+    public static function Tamil_ranges() {
+        return array(array(0=>0x0B82, 1=>0x0B83),
+                     array(0=>0x0B85, 1=>0x0B8A),
+                     array(0=>0x0B8E, 1=>0x0B90),
+                     array(0=>0x0B92, 1=>0x0B95),
+                     array(0=>0x0B99, 1=>0x0B9A),
+                     array(0=>0x0B9C, 1=>0x0B9C),
+                     array(0=>0x0B9E, 1=>0x0B9F),
+                     array(0=>0x0BA3, 1=>0x0BA4),
+                     array(0=>0x0BA8, 1=>0x0BAA),
+                     array(0=>0x0BAE, 1=>0x0BB9),
+                     array(0=>0x0BBE, 1=>0x0BC2),
+                     array(0=>0x0BC6, 1=>0x0BC8),
+                     array(0=>0x0BCA, 1=>0x0BCD),
+                     array(0=>0x0BD0, 1=>0x0BD0),
+                     array(0=>0x0BD7, 1=>0x0BD7),
+                     array(0=>0x0BE6, 1=>0x0BFA));
+    }
+    public static function Telugu_ranges() {
+        return array(array(0=>0x0C01, 1=>0x0C03),
+                     array(0=>0x0C05, 1=>0x0C0C),
+                     array(0=>0x0C0E, 1=>0x0C10),
+                     array(0=>0x0C12, 1=>0x0C28),
+                     array(0=>0x0C2A, 1=>0x0C33),
+                     array(0=>0x0C35, 1=>0x0C39),
+                     array(0=>0x0C3D, 1=>0x0C44),
+                     array(0=>0x0C46, 1=>0x0C48),
+                     array(0=>0x0C4A, 1=>0x0C4D),
+                     array(0=>0x0C55, 1=>0x0C56),
+                     array(0=>0x0C58, 1=>0x0C59),
+                     array(0=>0x0C60, 1=>0x0C63),
+                     array(0=>0x0C66, 1=>0x0C6F),
+                     array(0=>0x0C78, 1=>0x0C7F));
+    }
+    public static function Thaana_ranges() {
+        return array(array(0=>0x0780, 1=>0x07B1));
+    }
+    public static function Thai_ranges() {
+        return array(array(0=>0x0E01, 1=>0x0E3A),
+                     array(0=>0x0E40, 1=>0x0E5B));
+    }
+    public static function Tibetan_ranges() {
+        return array(array(0=>0x0F00, 1=>0x0F47),
+                     array(0=>0x0F49, 1=>0x0F6C),
+                     array(0=>0x0F71, 1=>0x0F97),
+                     array(0=>0x0F99, 1=>0x0FBC),
+                     array(0=>0x0FBE, 1=>0x0FCC),
+                     array(0=>0x0FCE, 1=>0x0FD4),
+                     array(0=>0x0FD9, 1=>0x0FDA));
+    }
+    public static function Tifinagh_ranges() {
+        return array(array(0=>0x2D30, 1=>0x2D65),
+                     array(0=>0x2D6F, 1=>0x2D70),
+                     array(0=>0x2D7F, 1=>0x2D7F));
+    }
+    public static function Ugaritic_ranges() {
+        return array(array(0=>0x10380, 1=>0x1039D),
+                     array(0=>0x1039F, 1=>0x1039F));
+    }
+    public static function Vai_ranges() {
+        return array(array(0=>0xA500, 1=>0xA62B));
+    }
+    public static function Yi_ranges() {
+        return array(array(0=>0xA000, 1=>0xA48C),
+                     array(0=>0xA490, 1=>0xA4C6));
+    }
     /******************************************************************/
     /******************************************************************/
     private static function is_in_range($utf8chr, $ranges) {
@@ -5072,122 +6224,392 @@ class qtype_preg_unicode extends textlib {
         }
         return false;
     }
-    public static function is_Cc($utf8chr) {    // Control
-        return self::is_in_range($utf8chr, self::Cc_ranges());
-    }
-    public static function is_Cf($utf8chr) {    // Format
-        return self::is_in_range($utf8chr, self::Cf_ranges());
-    }
-    public static function is_Cn($utf8chr) {    // Unassigned
-        return self::is_in_range($utf8chr, self::Cn_ranges());
-    }
-    public static function is_Co($utf8chr) {    // Private use
-        return self::is_in_range($utf8chr, self::Co_ranges());
-    }
-    public static function is_Cs($utf8chr) {    // Surrogate
-        return self::is_in_range($utf8chr, self::Cs_ranges());
-    }
-    public static function is_C($utf8chr) {     // Other
+    public static function is_C($utf8chr) {
         return self::is_in_range($utf8chr, self::C_ranges());
     }
-    /******************************************************************/
-    public static function is_Ll($utf8chr) {    // Lower case letter
-        return self::is_in_range($utf8chr, self::Ll_ranges());
+    public static function is_Cc($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cc_ranges());
     }
-    public static function is_Lm($utf8chr) {    // Modifier letter
-        return self::is_in_range($utf8chr, self::Lm_ranges());
+    public static function is_Cf($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cf_ranges());
     }
-    public static function is_Lo($utf8chr) {    // Other letter
-        return self::is_in_range($utf8chr, self::Lo_ranges());
+    public static function is_Cn($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cn_ranges());
     }
-    public static function is_Lt($utf8chr) {    // Title case letter
-        return self::is_in_range($utf8chr, self::Lt_ranges());
+    public static function is_Co($utf8chr) {
+        return self::is_in_range($utf8chr, self::Co_ranges());
     }
-    public static function is_Lu($utf8chr) {    // Upper case letter
-        return self::is_in_range($utf8chr, self::Lu_ranges());
+    public static function is_Cs($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cs_ranges());
     }
-    public static function is_L($utf8chr) {     // Letter
+    public static function is_L($utf8chr) {
         return self::is_in_range($utf8chr, self::L_ranges());
     }
-    /******************************************************************/
-    public static function is_Mc($utf8chr) {    // Spacing mark
-        return self::is_in_range($utf8chr, self::Mc_ranges());
+    public static function is_Ll($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ll_ranges());
     }
-    public static function is_Me($utf8chr) {    // Enclosing mark
-        return self::is_in_range($utf8chr, self::Me_ranges());
+    public static function is_Lm($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lm_ranges());
     }
-    public static function is_Mn($utf8chr) {    // Non-spacing mark
-        return self::is_in_range($utf8chr, self::Mn_ranges());
+    public static function is_Lo($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lo_ranges());
     }
-    public static function is_M($utf8chr) {     // Mark
+    public static function is_Lt($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lt_ranges());
+    }
+    public static function is_Lu($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lu_ranges());
+    }
+    public static function is_M($utf8chr) {
         return self::is_in_range($utf8chr, self::M_ranges());
     }
-    /******************************************************************/
-    public static function is_Nd($utf8chr) {    // Decimal number
-        return self::is_in_range($utf8chr, self::Nd_ranges());
+    public static function is_Mc($utf8chr) {
+        return self::is_in_range($utf8chr, self::Mc_ranges());
     }
-    public static function is_Nl($utf8chr) {    // Letter number
-        return self::is_in_range($utf8chr, self::Nl_ranges());
+    public static function is_Me($utf8chr) {
+        return self::is_in_range($utf8chr, self::Me_ranges());
     }
-    public static function is_No($utf8chr) {    // Other number
-        return self::is_in_range($utf8chr, self::No_ranges());
+    public static function is_Mn($utf8chr) {
+        return self::is_in_range($utf8chr, self::Mn_ranges());
     }
-    public static function is_N($utf8chr) {     // Number
+    public static function is_N($utf8chr) {
         return self::is_in_range($utf8chr, self::N_ranges());
     }
-    /******************************************************************/
-    public static function is_Pc($utf8chr) {    // Connector punctuation
-        return self::is_in_range($utf8chr, self::Pc_ranges());
+    public static function is_Nd($utf8chr) {
+        return self::is_in_range($utf8chr, self::Nd_ranges());
     }
-    public static function is_Pd($utf8chr) {    // Dash punctuation
-        return self::is_in_range($utf8chr, self::Pd_ranges());
+    public static function is_Nl($utf8chr) {
+        return self::is_in_range($utf8chr, self::Nl_ranges());
     }
-    public static function is_Pe($utf8chr) {    // Close punctuation
-        return self::is_in_range($utf8chr, self::Pe_ranges());
+    public static function is_No($utf8chr) {
+        return self::is_in_range($utf8chr, self::No_ranges());
     }
-    public static function is_Pf($utf8chr) {    // Final punctuation
-        return self::is_in_range($utf8chr, self::Pf_ranges());
-    }
-    public static function is_Pi($utf8chr) {    // Initial punctuation
-        return self::is_in_range($utf8chr, self::Pi_ranges());
-    }
-    public static function is_Po($utf8chr) {    // Other punctuation
-        return self::is_in_range($utf8chr, self::Po_ranges());
-    }
-    public static function is_Ps($utf8chr) {    // Open punctuation
-        return self::is_in_range($utf8chr, self::Ps_ranges());
-    }
-    public static function is_P($utf8chr) {     // Punctuation
+    public static function is_P($utf8chr) {
         return self::is_in_range($utf8chr, self::P_ranges());
     }
-    /******************************************************************/
-    public static function is_Sc($utf8chr) {    // Currency symbol
-        return self::is_in_range($utf8chr, self::Sc_ranges());
+    public static function is_Pc($utf8chr) {
+        return self::is_in_range($utf8chr, self::Pc_ranges());
     }
-    public static function is_Sk($utf8chr) {    // Modifier symbol
-        return self::is_in_range($utf8chr, self::Sk_ranges());
+    public static function is_Pd($utf8chr) {
+        return self::is_in_range($utf8chr, self::Pd_ranges());
     }
-    public static function is_Sm($utf8chr) {    // Mathematical symbol
-        return self::is_in_range($utf8chr, self::Sm_ranges());
+    public static function is_Pe($utf8chr) {
+        return self::is_in_range($utf8chr, self::Pe_ranges());
     }
-    public static function is_So($utf8chr) {    // Other symbol
-        return self::is_in_range($utf8chr, self::So_ranges());
+    public static function is_Pf($utf8chr) {
+        return self::is_in_range($utf8chr, self::Pf_ranges());
     }
-    public static function is_S($utf8chr) {     // Symbol
+    public static function is_Pi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Pi_ranges());
+    }
+    public static function is_Po($utf8chr) {
+        return self::is_in_range($utf8chr, self::Po_ranges());
+    }
+    public static function is_Ps($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ps_ranges());
+    }
+    public static function is_S($utf8chr) {
         return self::is_in_range($utf8chr, self::S_ranges());
     }
-    /******************************************************************/
-    public static function is_Zl($utf8chr) {    // Line separator
+    public static function is_Sc($utf8chr) {
+        return self::is_in_range($utf8chr, self::Sc_ranges());
+    }
+    public static function is_Sk($utf8chr) {
+        return self::is_in_range($utf8chr, self::Sk_ranges());
+    }
+    public static function is_Sm($utf8chr) {
+        return self::is_in_range($utf8chr, self::Sm_ranges());
+    }
+    public static function is_So($utf8chr) {
+        return self::is_in_range($utf8chr, self::So_ranges());
+    }
+    public static function is_Z($utf8chr) {
+        return self::is_in_range($utf8chr, self::Z_ranges());
+    }
+    public static function is_Zl($utf8chr) {
         return self::is_in_range($utf8chr, self::Zl_ranges());
     }
-    public static function is_Zp($utf8chr) {    // Paragraph separator
+    public static function is_Zp($utf8chr) {
         return self::is_in_range($utf8chr, self::Zp_ranges());
     }
-    public static function is_Zs($utf8chr) {    // Space separator
+    public static function is_Zs($utf8chr) {
         return self::is_in_range($utf8chr, self::Zs_ranges());
     }
-    public static function is_Z($utf8chr) {     // Separator
-        return self::is_in_range($utf8chr, self::Z_ranges());
+    public static function is_Arabic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Arabic_ranges());
+    }
+    public static function is_Armenian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Armenian_ranges());
+    }
+    public static function is_Avestan($utf8chr) {
+        return self::is_in_range($utf8chr, self::Avestan_ranges());
+    }
+    public static function is_Balinese($utf8chr) {
+        return self::is_in_range($utf8chr, self::Balinese_ranges());
+    }
+    public static function is_Bamum($utf8chr) {
+        return self::is_in_range($utf8chr, self::Bamum_ranges());
+    }
+    public static function is_Bengali($utf8chr) {
+        return self::is_in_range($utf8chr, self::Bengali_ranges());
+    }
+    public static function is_Bopomofo($utf8chr) {
+        return self::is_in_range($utf8chr, self::Bopomofo_ranges());
+    }
+    public static function is_Braille($utf8chr) {
+        return self::is_in_range($utf8chr, self::Braille_ranges());
+    }
+    public static function is_Buginese($utf8chr) {
+        return self::is_in_range($utf8chr, self::Buginese_ranges());
+    }
+    public static function is_Buhid($utf8chr) {
+        return self::is_in_range($utf8chr, self::Buhid_ranges());
+    }
+    public static function is_Canadian_Aboriginal($utf8chr) {
+        return self::is_in_range($utf8chr, self::Canadian_Aboriginal_ranges());
+    }
+    public static function is_Carian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Carian_ranges());
+    }
+    public static function is_Cham($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cham_ranges());
+    }
+    public static function is_Cherokee($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cherokee_ranges());
+    }
+    public static function is_Common($utf8chr) {
+        return self::is_in_range($utf8chr, self::Common_ranges());
+    }
+    public static function is_Coptic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Coptic_ranges());
+    }
+    public static function is_Cuneiform($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cuneiform_ranges());
+    }
+    public static function is_Cypriot($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cypriot_ranges());
+    }
+    public static function is_Cyrillic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Cyrillic_ranges());
+    }
+    public static function is_Deseret($utf8chr) {
+        return self::is_in_range($utf8chr, self::Deseret_ranges());
+    }
+    public static function is_Devanagari($utf8chr) {
+        return self::is_in_range($utf8chr, self::Devanagari_ranges());
+    }
+    public static function is_Egyptian_Hieroglyphs($utf8chr) {
+        return self::is_in_range($utf8chr, self::Egyptian_Hieroglyphs_ranges());
+    }
+    public static function is_Ethiopic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ethiopic_ranges());
+    }
+    public static function is_Georgian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Georgian_ranges());
+    }
+    public static function is_Glagolitic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Glagolitic_ranges());
+    }
+    public static function is_Gothic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Gothic_ranges());
+    }
+    public static function is_Greek($utf8chr) {
+        return self::is_in_range($utf8chr, self::Greek_ranges());
+    }
+    public static function is_Gujarati($utf8chr) {
+        return self::is_in_range($utf8chr, self::Gujarati_ranges());
+    }
+    public static function is_Gurmukhi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Gurmukhi_ranges());
+    }
+    public static function is_Han($utf8chr) {
+        return self::is_in_range($utf8chr, self::Han_ranges());
+    }
+    public static function is_Hangul($utf8chr) {
+        return self::is_in_range($utf8chr, self::Hangul_ranges());
+    }
+    public static function is_Hanunoo($utf8chr) {
+        return self::is_in_range($utf8chr, self::Hanunoo_ranges());
+    }
+    public static function is_Hebrew($utf8chr) {
+        return self::is_in_range($utf8chr, self::Hebrew_ranges());
+    }
+    public static function is_Hiragana($utf8chr) {
+        return self::is_in_range($utf8chr, self::Hiragana_ranges());
+    }
+    public static function is_Imperial_Aramaic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Imperial_Aramaic_ranges());
+    }
+    public static function is_Inherited($utf8chr) {
+        return self::is_in_range($utf8chr, self::Inherited_ranges());
+    }
+    public static function is_Inscriptional_Pahlavi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Inscriptional_Pahlavi_ranges());
+    }
+    public static function is_Inscriptional_Parthian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Inscriptional_Parthian_ranges());
+    }
+    public static function is_Javanese($utf8chr) {
+        return self::is_in_range($utf8chr, self::Javanese_ranges());
+    }
+    public static function is_Kaithi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Kaithi_ranges());
+    }
+    public static function is_Kannada($utf8chr) {
+        return self::is_in_range($utf8chr, self::Kannada_ranges());
+    }
+    public static function is_Katakana($utf8chr) {
+        return self::is_in_range($utf8chr, self::Katakana_ranges());
+    }
+    public static function is_Kayah_Li($utf8chr) {
+        return self::is_in_range($utf8chr, self::Kayah_Li_ranges());
+    }
+    public static function is_Kharoshthi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Kharoshthi_ranges());
+    }
+    public static function is_Khmer($utf8chr) {
+        return self::is_in_range($utf8chr, self::Khmer_ranges());
+    }
+    public static function is_Lao($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lao_ranges());
+    }
+    public static function is_Latin($utf8chr) {
+        return self::is_in_range($utf8chr, self::Latin_ranges());
+    }
+    public static function is_Lepcha($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lepcha_ranges());
+    }
+    public static function is_Limbu($utf8chr) {
+        return self::is_in_range($utf8chr, self::Limbu_ranges());
+    }
+    public static function is_Linear_B($utf8chr) {
+        return self::is_in_range($utf8chr, self::Linear_B_ranges());
+    }
+    public static function is_Lisu($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lisu_ranges());
+    }
+    public static function is_Lycian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lycian_ranges());
+    }
+    public static function is_Lydian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Lydian_ranges());
+    }
+    public static function is_Malayalam($utf8chr) {
+        return self::is_in_range($utf8chr, self::Malayalam_ranges());
+    }
+    public static function is_Meetei_Mayek($utf8chr) {
+        return self::is_in_range($utf8chr, self::Meetei_Mayek_ranges());
+    }
+    public static function is_Mongolian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Mongolian_ranges());
+    }
+    public static function is_Myanmar($utf8chr) {
+        return self::is_in_range($utf8chr, self::Myanmar_ranges());
+    }
+    public static function is_New_Tai_Lue($utf8chr) {
+        return self::is_in_range($utf8chr, self::New_Tai_Lue_ranges());
+    }
+    public static function is_Nko($utf8chr) {
+        return self::is_in_range($utf8chr, self::Nko_ranges());
+    }
+    public static function is_Ogham($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ogham_ranges());
+    }
+    public static function is_Old_Italic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Old_Italic_ranges());
+    }
+    public static function is_Old_Persian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Old_Persian_ranges());
+    }
+    public static function is_Old_South_Arabian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Old_South_Arabian_ranges());
+    }
+    public static function is_Old_Turkic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Old_Turkic_ranges());
+    }
+    public static function is_Ol_Chiki($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ol_Chiki_ranges());
+    }
+    public static function is_Oriya($utf8chr) {
+        return self::is_in_range($utf8chr, self::Oriya_ranges());
+    }
+    public static function is_Osmanya($utf8chr) {
+        return self::is_in_range($utf8chr, self::Osmanya_ranges());
+    }
+    public static function is_Phags_Pa($utf8chr) {
+        return self::is_in_range($utf8chr, self::Phags_Pa_ranges());
+    }
+    public static function is_Phoenician($utf8chr) {
+        return self::is_in_range($utf8chr, self::Phoenician_ranges());
+    }
+    public static function is_Rejang($utf8chr) {
+        return self::is_in_range($utf8chr, self::Rejang_ranges());
+    }
+    public static function is_Runic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Runic_ranges());
+    }
+    public static function is_Samaritan($utf8chr) {
+        return self::is_in_range($utf8chr, self::Samaritan_ranges());
+    }
+    public static function is_Saurashtra($utf8chr) {
+        return self::is_in_range($utf8chr, self::Saurashtra_ranges());
+    }
+    public static function is_Shavian($utf8chr) {
+        return self::is_in_range($utf8chr, self::Shavian_ranges());
+    }
+    public static function is_Sinhala($utf8chr) {
+        return self::is_in_range($utf8chr, self::Sinhala_ranges());
+    }
+    public static function is_Sundanese($utf8chr) {
+        return self::is_in_range($utf8chr, self::Sundanese_ranges());
+    }
+    public static function is_Syloti_Nagri($utf8chr) {
+        return self::is_in_range($utf8chr, self::Syloti_Nagri_ranges());
+    }
+    public static function is_Syriac($utf8chr) {
+        return self::is_in_range($utf8chr, self::Syriac_ranges());
+    }
+    public static function is_Tagalog($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tagalog_ranges());
+    }
+    public static function is_Tagbanwa($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tagbanwa_ranges());
+    }
+    public static function is_Tai_Le($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tai_Le_ranges());
+    }
+    public static function is_Tai_Tham($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tai_Tham_ranges());
+    }
+    public static function is_Tai_Viet($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tai_Viet_ranges());
+    }
+    public static function is_Tamil($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tamil_ranges());
+    }
+    public static function is_Telugu($utf8chr) {
+        return self::is_in_range($utf8chr, self::Telugu_ranges());
+    }
+    public static function is_Thaana($utf8chr) {
+        return self::is_in_range($utf8chr, self::Thaana_ranges());
+    }
+    public static function is_Thai($utf8chr) {
+        return self::is_in_range($utf8chr, self::Thai_ranges());
+    }
+    public static function is_Tibetan($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tibetan_ranges());
+    }
+    public static function is_Tifinagh($utf8chr) {
+        return self::is_in_range($utf8chr, self::Tifinagh_ranges());
+    }
+    public static function is_Ugaritic($utf8chr) {
+        return self::is_in_range($utf8chr, self::Ugaritic_ranges());
+    }
+    public static function is_Vai($utf8chr) {
+        return self::is_in_range($utf8chr, self::Vai_ranges());
+    }
+    public static function is_Yi($utf8chr) {
+        return self::is_in_range($utf8chr, self::Yi_ranges());
     }
     /******************************************************************/
 
@@ -5298,375 +6720,4 @@ class qtype_preg_unicode extends textlib {
     public static function is_vspace($utf8chr) {
         return in_array(self::ord($utf8chr), self::$vspaces);
     }
-
-    /****************/
-
-    public static function is_Arabic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Armenian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Avestan($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Balinese($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Bamum($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Bengali($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Bopomofo($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Braille($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Buginese($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Buhid($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Canadian_Aboriginal($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Carian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Cham($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Cherokee($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Common($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Coptic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Cuneiform($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Cypriot($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Cyrillic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Deseret($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Devanagari($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Egyptian_Hieroglyphs($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Ethiopic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Georgian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Glagolitic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Gothic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Greek($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Gujarati($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Gurmukhi($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Han($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Hangul($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Hanunoo($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Hebrew($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Hiragana($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Imperial_Aramaic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Inherited($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Inscriptional_Pahlavi($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Inscriptional_Parthian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Javanese($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Kaithi($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Kannada($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Katakana($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Kayah_Li($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Kharoshthi($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Khmer($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Lao($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Latin($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Lepcha($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Limbu($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Linear_B($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Lisu($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Lycian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Lydian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Malayalam($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Meetei_Mayek($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Mongolian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Myanmar($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_New_Tai_Lue($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Nko($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Ogham($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Old_Italic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Old_Persian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Old_South_Arabian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Old_Turkic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Ol_Chiki($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Oriya($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Osmanya($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Phags_Pa($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Phoenician($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Rejang($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Runic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Samaritan($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Saurashtra($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Shavian($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Sinhala($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Sundanese($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Syloti_Nagri($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Syriac($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tagalog($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tagbanwa($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tai_Le($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tai_Tham($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tai_Viet($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tamil($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Telugu($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Thaana($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Thai($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tibetan($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Tifinagh($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Ugaritic($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Vai($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
-    public static function is_Yi($utf8chr) {
-        throw new Exception('Unicode properties support is not implemented yet');
-    }
-
 }
