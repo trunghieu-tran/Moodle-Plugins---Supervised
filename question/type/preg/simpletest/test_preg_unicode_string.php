@@ -54,6 +54,66 @@ class qtype_preg_string_test extends UnitTestCase {
     }
 }
 
+class qtype_preg_unicode_properties_test extends UnitTestCase {
+    function test_ranges() {
+        $props = array(/*array('name'=>'C', 'count'=>0),
+                       array('name'=>'Cc', 'count'=>65),
+                       array('name'=>'Cf', 'count'=>139),
+                       array('name'=>'Cn', 'count'=>0),
+                       array('name'=>'Co', 'count'=>6),
+                       array('name'=>'Cs', 'count'=>6),
+                       array('name'=>'L', 'count'=>0),
+                       array('name'=>'Ll', 'count'=>1751),
+                       array('name'=>'Lm', 'count'=>237),
+                       array('name'=>'Lo', 'count'=>11788),
+                       array('name'=>'Lt', 'count'=>31),
+                       array('name'=>'Lu', 'count'=>1441),
+                       array('name'=>'M', 'count'=>0),
+                       array('name'=>'Mc', 'count'=>353),
+                       array('name'=>'Me', 'count'=>12),
+                       array('name'=>'Mn', 'count'=>1280),
+                       array('name'=>'N', 'count'=>0),
+                       array('name'=>'Nd', 'count'=>460),
+                       array('name'=>'Nl', 'count'=>224),
+                       array('name'=>'No', 'count'=>464),
+                       array('name'=>'P', 'count'=>0),
+                       array('name'=>'Pc', 'count'=>10),
+                       array('name'=>'Pd', 'count'=>23),
+                       array('name'=>'Pe', 'count'=>71),
+                       array('name'=>'Pf', 'count'=>10),
+                       array('name'=>'Pi', 'count'=>12),
+                       array('name'=>'Po', 'count'=>434),
+                       array('name'=>'Ps', 'count'=>72),
+                       array('name'=>'S', 'count'=>0),
+                       array('name'=>'Sc', 'count'=>48),
+                       array('name'=>'Sk', 'count'=>115),
+                       array('name'=>'Sm', 'count'=>952),
+                       array('name'=>'So', 'count'=>4404),*/
+                       array('name'=>'Z', 'count'=>20),
+                       array('name'=>'Zl', 'count'=>1),
+                       array('name'=>'Zp', 'count'=>1),
+                       array('name'=>'Zs', 'count'=>18)
+                   );
+        foreach ($props as $prop) {
+            $funcname = 'qtype_preg_unicode::' . $prop['name'] . '_ranges';
+            $ranges = call_user_func($funcname);
+            $counter = 0;
+            foreach ($ranges as $range) {
+                for ($i = $range['left']; $i <= $range['right']; $i++) {
+                    $counter++;
+                    $matched = preg_match("/(*UTF8)\p{".$prop['name']."}/", qtype_preg_unicode::code2utf8($i));
+                    if (!$matched) {
+                        echo qtype_preg_unicode::code2utf8($i).'<br/>';
+                        $this->assertTrue(false, 'U+' . dechex($i) . ' should have not been matched by ' . $prop['name']);
+                    }
+                }
+
+            }
+            $this->assertTrue($counter === $prop['count'], 'Wrong number of characters for property ' . $prop['name'] . ': expected ' . $prop['count'] . ', obtained ' . $counter);
+        }
+    }
+}
+
 /**
  * Unit tests for unicode ranges intersection.
  *
