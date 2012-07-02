@@ -55,62 +55,43 @@ class qtype_preg_string_test extends UnitTestCase {
 }
 
 class qtype_preg_unicode_properties_test extends UnitTestCase {
+
     function test_ranges() {
-        $props = array(/*array('name'=>'C', 'count'=>0),
-                       array('name'=>'Cc', 'count'=>65),
-                       array('name'=>'Cf', 'count'=>139),
-                       array('name'=>'Cn', 'count'=>0),
-                       array('name'=>'Co', 'count'=>6),
-                       array('name'=>'Cs', 'count'=>6),
-                       array('name'=>'L', 'count'=>0),
-                       array('name'=>'Ll', 'count'=>1751),
-                       array('name'=>'Lm', 'count'=>237),
-                       array('name'=>'Lo', 'count'=>11788),
-                       array('name'=>'Lt', 'count'=>31),
-                       array('name'=>'Lu', 'count'=>1441),
-                       array('name'=>'M', 'count'=>0),
-                       array('name'=>'Mc', 'count'=>353),
-                       array('name'=>'Me', 'count'=>12),
-                       array('name'=>'Mn', 'count'=>1280),
-                       array('name'=>'N', 'count'=>0),
-                       array('name'=>'Nd', 'count'=>460),
-                       array('name'=>'Nl', 'count'=>224),
-                       array('name'=>'No', 'count'=>464),
-                       array('name'=>'P', 'count'=>0),
-                       array('name'=>'Pc', 'count'=>10),
-                       array('name'=>'Pd', 'count'=>23),
-                       array('name'=>'Pe', 'count'=>71),
-                       array('name'=>'Pf', 'count'=>10),
-                       array('name'=>'Pi', 'count'=>12),
-                       array('name'=>'Po', 'count'=>434),
-                       array('name'=>'Ps', 'count'=>72),
-                       array('name'=>'S', 'count'=>0),
-                       array('name'=>'Sc', 'count'=>48),
-                       array('name'=>'Sk', 'count'=>115),
-                       array('name'=>'Sm', 'count'=>952),
-                       array('name'=>'So', 'count'=>4404),*/
-                       array('name'=>'Z', 'count'=>20),
-                       array('name'=>'Zl', 'count'=>1),
-                       array('name'=>'Zp', 'count'=>1),
-                       array('name'=>'Zs', 'count'=>18)
-                   );
+        $props = array('C', //'Cc', 'Cf', 'Cn', 'Co', 'Cs',
+                       'L', //'Ll', 'Lm', 'Lo', 'Lt', 'Lu',
+                       'M', //'Mc', 'Me', 'Mn',
+                       'N', //'Nd', 'Nl', 'No',
+                       'P', //'Pc', 'Pd', 'Pe', 'Pf', 'Pi', 'Po', 'Ps',
+                       'S',// 'Sc', 'Sk', 'Sm', 'So',
+                       'Z'//, 'Zl', 'Zp', 'Zs'
+                       );
         foreach ($props as $prop) {
-            $funcname = 'qtype_preg_unicode::' . $prop['name'] . '_ranges';
+            $funcname = 'qtype_preg_unicode::' . $prop . '_ranges';
             $ranges = call_user_func($funcname);
             $counter = 0;
             foreach ($ranges as $range) {
                 for ($i = $range['left']; $i <= $range['right']; $i++) {
                     $counter++;
-                    $matched = preg_match("/(*UTF8)\p{".$prop['name']."}/", qtype_preg_unicode::code2utf8($i));
+                    $matched = preg_match('/(*UTF8)\p{' . $prop . '}/', qtype_preg_unicode::code2utf8($i));
                     if (!$matched) {
-                        echo qtype_preg_unicode::code2utf8($i).'<br/>';
-                        $this->assertTrue(false, 'U+' . dechex($i) . ' should have not been matched by ' . $prop['name']);
+                        $this->assertTrue(false, 'U+' . dechex($i) . ' should not have been matched by ' . $prop);
                     }
                 }
 
             }
-            $this->assertTrue($counter === $prop['count'], 'Wrong number of characters for property ' . $prop['name'] . ': expected ' . $prop['count'] . ', obtained ' . $counter);
         }
+
+        /*for ($i = 0; $i <= 0x10FF; $i++) {
+            foreach ($props as $prop) {
+                $funcname = 'qtype_preg_unicode::is_' . $prop;
+                $char = qtype_preg_unicode::code2utf8($i);
+                $thisres = call_user_func($funcname, $char);
+                $pcreres = (bool)preg_match('/(*UTF8)\p{' . $prop . '}/', $char);
+                $boolstr = array(true => 'TRUE', false => 'FALSE');
+                $fail = ((bool)$pcreres !== (bool)$thisres);
+                $this->assertFalse(($pcreres xor $thisres), 'Fail on unicode property ' . $prop . ' check: character ' . $char . ', code 0x' . strtoupper(dechex($i)) . ', expected '.$boolstr[$pcreres] . ', obtained '.$boolstr[$thisres]);
+            }
+        }*/
     }
 }
 
