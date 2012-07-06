@@ -963,5 +963,20 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->greed);
         $this->assertTrue(!$token->value->possessive);
     }
+    function test_lexer_pcre_compatibility() {
+        global $CFG;
+        $file = fopen($CFG->dirroot . '/question/type/preg/simpletest/pcre_lexer_testinput1.txt', 'r');
+        $counter = 0;
+        while (!feof($file)) {
+            $str = fgets($file);
+            //echo $counter++.'<br/>';
+            if ($str !== '') {
+                $lexer = $this->create_lexer('\\Q');
+                while ($token = $lexer->nextToken())
+                    ;
+            }
+        }
+        fclose($file);
+    }
 }
 ?>

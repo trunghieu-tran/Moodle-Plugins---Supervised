@@ -625,6 +625,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 <YYINITIAL> \(\?\#[^)]*\) {       // Comment.
     return $this->nextToken();
 }
+<YYINITIAL> \(\*[^\[\]\\*+?{}()|.^$]*\) {
+    return $this->nextToken();
+}
 <YYINITIAL> \(\?> {
     $this->push_opt_lvl();
     $this->lastsubpatt++;

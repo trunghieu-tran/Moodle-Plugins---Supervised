@@ -289,7 +289,7 @@ class qtype_preg_parser_test extends UnitTestCase {
         $parser =& $this->run_parser('?a({2,3})c(*)e(+)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 4);
+        $this->assertTrue(count($errornodes) == 3);
         $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
@@ -300,12 +300,8 @@ class qtype_preg_parser_test extends UnitTestCase {
         $this->assertTrue($errornodes[1]->lastindxs[0] == 7);
         $this->assertTrue($errornodes[2]->type == preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
-        $this->assertTrue($errornodes[2]->firstindxs[0] == 11);
-        $this->assertTrue($errornodes[2]->lastindxs[0] == 11);
-        $this->assertTrue($errornodes[3]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[3]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
-        $this->assertTrue($errornodes[3]->firstindxs[0] == 15);
-        $this->assertTrue($errornodes[3]->lastindxs[0] == 15);
+        $this->assertTrue($errornodes[2]->firstindxs[0] == 15);
+        $this->assertTrue($errornodes[2]->lastindxs[0] == 15);
     }
     function test_lexem_syntax_errors() {
         //Unopened lexem
