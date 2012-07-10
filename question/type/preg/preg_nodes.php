@@ -19,11 +19,14 @@ class preg_lexem {
     /** Indexes of first and last characters for the lexem, they are equal if it's one-character lexem. */
     public $indfirst = -1;
     public $indlast = -1;
+    /** What the user actually typed, the original representation of this node in the regex. Can be a qtype_preg_string object, or an array of them. */
+    public $userinscription = '';
 
-    public function __construct($subtype, $indfirst, $indlast) {
+    public function __construct($subtype, $indfirst, $indlast, $userinscription) {
         $this->subtype = $subtype;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
+        $this->$userinscription = $userinscription;
     }
 }
 
@@ -34,8 +37,8 @@ class preg_lexem_subpatt extends preg_lexem {
     /** Number of subpattern. */
     public $number;
 
-    public function __construct($subtype, $indfirst, $indlast, $number) {
-        parent::__construct($subtype, $indfirst, $indlast);
+    public function __construct($subtype, $indfirst, $indlast, $userinscription, $number) {
+        parent::__construct($subtype, $indfirst, $indlast, $userinscription);
         $this->number = $number;
     }
 }
@@ -62,7 +65,7 @@ interface qtype_preg_matcher_state {
 }
 
 /**
- * Generic node class
+ * Generic node class.
  */
 abstract class preg_node {
 
@@ -111,6 +114,8 @@ abstract class preg_node {
     //Indexes of first and last characters for the node, they are equal if it's one-character node
     public $indfirst = -1;
     public $indlast = -1;
+    /** What the user actually typed, the original representation of this node in the regex. Can be a string or an array of strings. */
+    public $userinscription = '';
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;

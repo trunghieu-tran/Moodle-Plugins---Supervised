@@ -83,6 +83,7 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A = new preg_node_concat;
     A->operands[0] = B;
     A->operands[1] = C;
+    A->userinscription = '';
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
@@ -93,6 +94,7 @@ expr(A) ::= expr(B) ALT expr(C). {
     A = new preg_node_alt;
     A->operands[0] = B;
     A->operands[1] = C;
+    A->userinscription = '|';
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
@@ -103,6 +105,7 @@ expr(A) ::= expr(B) ALT. {
     A->operands[0] = B;
     A->operands[1] = new preg_leaf_meta;
     A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+    A->userinscription = '|';
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast + 1;
@@ -130,6 +133,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
         A->subtype = B->subtype;
         A->operands[0] = C;
     }
+    A->userinscription = B->userinscription . ' ... )';
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast + 1;
@@ -154,6 +158,7 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A->operands[2] = new preg_node_assert;
     A->operands[2]->subtype = D->subtype;
     A->operands[2]->operands[0] = B;
+    A->userinscription = D->userinscription . ' ... ) .... )';
     $this->reducecount++;
     A->indfirst = D->indfirst;
     A->indlast = C->indlast + 1;
@@ -165,6 +170,7 @@ expr(A) ::= OPENLEXEM(B) expr(C) CLOSELEXEM. {
     A->number = B->number;
     A->subtype = B->subtype;
     A->operands[0] = C;
+    A->userinscription = B->userinscription . ' ... (?#}})';
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast + 1;
@@ -173,6 +179,7 @@ expr(A) ::= OPENLEXEM(B) expr(C) CLOSELEXEM. {
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
     A = B;
+    A->userinscription = B->userinscription;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
@@ -180,6 +187,7 @@ expr(A) ::= PARSLEAF(B). {
 
 lastexpr(A) ::= expr(B). {
     A = B;
+    A->userinscription = B->userinscription;
     $this->reducecount++;
 }
 

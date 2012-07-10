@@ -23,27 +23,35 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser =& $this->run_parser('a|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->userinscription === '|');
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->set == 'a');
+        $this->assertTrue($root->operands[0]->userinscription === array('a'));
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->flags[0][0]->set == 'b');
+        $this->assertTrue($root->operands[1]->userinscription === array('b'));
     }
     function test_parser_quantification() {//ab+
         $parser =& $this->run_parser('ab+');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->userinscription === '');
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->set == 'a');
+        $this->assertTrue($root->operands[0]->userinscription === array('a'));
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->operands[1]->leftborder == 1);
+        $this->assertTrue($root->operands[1]->userinscription === '+');
         $this->assertTrue($root->operands[1]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->operands[0]->flags[0][0]->set == 'b');
+        $this->assertTrue($root->operands[1]->operands[0]->userinscription === array('b'));
     }
     function test_parser_alt_and_quantif() {//a*|b
         $parser =& $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_INFINITE_QUANT);
+        $this->assertTrue($root->operands[0]->userinscription === '*');
         $this->assertTrue($root->operands[0]->leftborder == 0);
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->set == 'a');
@@ -103,6 +111,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->type == preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription === '^');
         $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->set == 'a');
         $this->assertTrue($root->operands[1]->type == preg_node::TYPE_LEAF_ASSERT);
@@ -149,12 +158,16 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $ff = $root->operands[1]->operands[1]->operands[1];
         $this->assertTrue($tf->type == preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($tf->subtype == preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($tf->userinscription === '(?= ... )');
         $this->assertTrue($ff->type == preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($ff->subtype == preg_node_assert::SUBTYPE_NLA);
+        $this->assertTrue($ff->userinscription === '(?! ... )');
         $this->assertTrue($fb->type == preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($fb->subtype == preg_node_assert::SUBTYPE_NLB);
+        $this->assertTrue($fb->userinscription === '(?<! ... )');
         $this->assertTrue($tb->type == preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($tb->subtype == preg_node_assert::SUBTYPE_PLB);
+        $this->assertTrue($tb->userinscription === '(?<= ... )');
     }
     function test_parser_metasymbol_dot() {
         $parser =& $this->run_parser('.');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines NFA matcher class
  *
