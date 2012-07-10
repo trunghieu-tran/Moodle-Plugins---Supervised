@@ -724,7 +724,7 @@ class preg_charset_flag {
                 $result = (bool)call_user_func_array('qtype_preg_unicode::is_' . $this->flag, array($str[$pos]));
                 break;
             case self::UPROP:
-                $result = (bool)call_user_func_array('preg_match', array($this->uniprop, $str[$pos]));
+                $result = (bool)call_user_func_array('qtype_preg_unicode::is_' . $this->uniprop, array($str[$pos]));
                 break;
         }
         if ($this->negative) {

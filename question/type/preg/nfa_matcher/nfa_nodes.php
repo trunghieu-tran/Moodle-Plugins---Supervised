@@ -110,8 +110,8 @@ class nfa_preg_leaf extends nfa_preg_node {
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
-        $start =& new qtype_preg_fa_state($automaton);
-        $end =& new qtype_preg_fa_state($automaton);
+        $start = new qtype_preg_fa_state($automaton);
+        $end = new qtype_preg_fa_state($automaton);
         // Add a corresponding transition between them.
         $start->add_transition(new qtype_preg_nfa_transition($start, $this->pregnode, $end));
         $automaton->add_state($start);
@@ -178,20 +178,20 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 
         // It is necessary to add eps-transitions to the end of each automaton if they represent quantifiers.
         if (count($first['end']->outgoing_transitions()) > 0) {
-            $end =& new qtype_preg_fa_state;
+            $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf =& new preg_leaf_meta;
+            $epsleaf = new preg_leaf_meta;
             $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
             $first['end']->add_transition(new qtype_preg_nfa_transition($first['end'], $epsleaf, $end));
-            $first['end'] =& $end;
+            $first['end'] = $end;
         }
         if (count($second['end']->outgoing_transitions()) > 0) {
-            $end =& new qtype_preg_fa_state;
+            $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf =& new preg_leaf_meta;
+            $epsleaf = new preg_leaf_meta;
             $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
             $second['end']->add_transition(new qtype_preg_nfa_transition($second['end'], $epsleaf, $end));
-            $second['end'] =& $end;
+            $second['end'] = $end;
         }
 
         // Now, merge start and end states.
@@ -233,7 +233,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         }
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf =& new preg_leaf_meta;
+        $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
@@ -268,7 +268,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
                 $automaton->update_state_references($res['end'], $cur['start']);
                 $cur['start']->merge_transition_set($res['end']);
                 $automaton->remove_state($res['end']);
-                $res['end'] =& $cur['end'];
+                $res['end'] = $cur['end'];
             }
         }
         $automaton->set_start_state($res['start']);
@@ -299,7 +299,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         $body = array_pop($stack);
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf =& new preg_leaf_meta;
+        $epsleaf = new preg_leaf_meta;
         $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
@@ -325,7 +325,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
-                $borderstates[] =& $cur['start'];
+                $borderstates[] = $cur['start'];
             }
             if ($res === null) {
                 // On the first iteration we just remember current automaton as the result.
@@ -335,7 +335,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
                 $automaton->update_state_references($res['end'], $cur['start']);
                 $cur['start']->merge_transition_set($res['end']);
                 $automaton->remove_state($res['end']);
-                $res['end'] =& $cur['end'];
+                $res['end'] = $cur['end'];
             }
         }
 

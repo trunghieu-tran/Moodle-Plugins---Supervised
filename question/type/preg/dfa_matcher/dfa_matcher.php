@@ -96,12 +96,12 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     function append_end($index) {
         /*
         if ($index==0) {
-            $root =& $this->roots[0];
+            $root = $this->roots[0];
         } else {
-            $root =& $this->roots[$index]->pregnode->operands[0];
+            $root = $this->roots[$index]->pregnode->operands[0];
         }
         */
-        $root =& $this->roots[$index];
+        $root = $this->roots[$index];
         $oldroot = $root;
         $root = new preg_node_concat;
         $root->operands[1] = new preg_leaf_meta;
@@ -1160,29 +1160,29 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $name = $pregnode->name();
         switch ($name) {
             case 'node_finite_quant':
-                $pregnode =& $this->convert_finite_quant($pregnode);
+                $pregnode = $this->convert_finite_quant($pregnode);
                 break;
             case 'node_infinite_quant':
-                $pregnode =& $this->convert_infinite_quant($pregnode);
+                $pregnode = $this->convert_infinite_quant($pregnode);
                 break;
             //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
             case 'node_subpatt':
-                $pregnode =& $pregnode->operands[0];
+                $pregnode = $pregnode->operands[0];
                 return $this->from_preg_node($pregnode);
                 break;
             case 'node_alt':
                 if ($pregnode->operands[1]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[1]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
-                    $tmp =& $pregnode->operands[0];
+                    $tmp = $pregnode->operands[0];
                     $pregnode = new preg_node_finite_quant;
                     $pregnode->leftborder = 0;
                     $pregnode->rightborder = 1;
-                    $pregnode->operands[0] =& $tmp;
+                    $pregnode->operands[0] = $tmp;
                 } else if ($pregnode->operands[0]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[0]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
-                    $tmp =& $pregnode->operands[1];
+                    $tmp = $pregnode->operands[1];
                     $pregnode = new preg_node_finite_quant;
                     $pregnode->leftborder = 0;
                     $pregnode->rightborder = 1;
-                    $pregnode->operands[0] =& $tmp;
+                    $pregnode->operands[0] = $tmp;
                 }
         }
         return parent::from_preg_node($pregnode);

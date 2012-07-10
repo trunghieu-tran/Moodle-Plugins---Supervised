@@ -11,7 +11,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
  * @copyright  2012 Valeriy Streltsov
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_preg_string_test extends UnitTestCase {
+class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
 
     function test_string() {
         $str1 = new qtype_preg_string('аzб');
@@ -53,55 +53,6 @@ class qtype_preg_string_test extends UnitTestCase {
         $this->assertTrue($str3[10] === 'я');
         $this->assertTrue($str3[11] === null);
     }
-}
-
-class qtype_preg_unicode_properties_test extends UnitTestCase {
-
-    function test_ranges() {
-        $props = array('C', //'Cc', 'Cf', 'Cn', 'Co', 'Cs',
-                       'L', //'Ll', 'Lm', 'Lo', 'Lt', 'Lu',
-                       'M', //'Mc', 'Me', 'Mn',
-                       'N', //'Nd', 'Nl', 'No',
-                       'P', //'Pc', 'Pd', 'Pe', 'Pf', 'Pi', 'Po', 'Ps',
-                       'S',// 'Sc', 'Sk', 'Sm', 'So',
-                       'Z'//, 'Zl', 'Zp', 'Zs'
-                       );
-        foreach ($props as $prop) {
-            $funcname = 'qtype_preg_unicode::' . $prop . '_ranges';
-            $ranges = call_user_func($funcname);
-            $counter = 0;
-            foreach ($ranges as $range) {
-                for ($i = $range[0]; $i <= $range[1]; $i++) {
-                    $counter++;
-                    $matched = preg_match('/(*UTF8)\p{' . $prop . '}/', qtype_preg_unicode::code2utf8($i));
-                    if (!$matched) {
-                        $this->assertTrue(false, 'U+' . dechex($i) . ' should not have been matched by ' . $prop);
-                    }
-                }
-
-            }
-        }
-
-        /*for ($i = 0; $i <= 0x10FF; $i++) {
-            foreach ($props as $prop) {
-                $funcname = 'qtype_preg_unicode::is_' . $prop;
-                $char = qtype_preg_unicode::code2utf8($i);
-                $thisres = call_user_func($funcname, $char);
-                $pcreres = (bool)preg_match('/(*UTF8)\p{' . $prop . '}/', $char);
-                $boolstr = array(true => 'TRUE', false => 'FALSE');
-                $fail = ((bool)$pcreres !== (bool)$thisres);
-                $this->assertFalse(($pcreres xor $thisres), 'Fail on unicode property ' . $prop . ' check: character ' . $char . ', code 0x' . strtoupper(dechex($i)) . ', expected '.$boolstr[$pcreres] . ', obtained '.$boolstr[$thisres]);
-            }
-        }*/
-    }
-}
-
-/**
- * Unit tests for unicode ranges intersection.
- *
- * @author Valeriy Streltsov
- */
-class qtype_preg_unicode_ranges_intersection_test extends UnitTestCase {
 
     function test_intersect_positive_ranges() {
         $range11 = array('negative' => false, 0 => 0, 1 => 10);

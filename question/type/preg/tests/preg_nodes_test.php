@@ -1,4 +1,4 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+<?php
 
 /**
  * Unit tests for (some of) question/type/preg/preg_nodes.php.
@@ -9,12 +9,13 @@
  * @package question
  */
 
- defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 
-class qtype_preg_regex_handler_test extends UnitTestCase {
+class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
@@ -40,15 +41,8 @@ class qtype_preg_regex_handler_test extends UnitTestCase {
         $this->assertTrue($copyroot->operands[1]->operands[0] == $altnode->operands[1]->operands[0], 'B character node contents copied wrong');
         $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copyied');
     }
-}
 
-/**
- * Unit tests for preg_leaf_backref.
- *
- * @author Valeriy Streltsov
- */
-class qtype_preg_backreferences_test extends UnitTestCase {
-    function test_no_match() {
+    function test_backref_no_match() {
         $regex = '(abc)';
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
@@ -61,17 +55,17 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $res = $backref->match(new qtype_preg_string('abc'), 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
-        $this->assertEqual($length, 0);
-        $this->assertEqual($ch, 'abc');
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, 'abc');
         // The string doesn't match with backref at all.
         $res = $backref->match(new qtype_preg_string('abcdef'), 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abcdef'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
-        $this->assertEqual($length, 0);
-        $this->assertEqual($ch, 'abc');
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, 'abc');
     }
 
-    function test_partial_match() {
+    function test_backref_partial_match() {
         $regex = '(abc)';
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
@@ -84,17 +78,17 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $res = $backref->match(new qtype_preg_string('abcab'), 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
-        $this->assertEqual($length, 2);
-        $this->assertEqual($ch, 'c');
+        $this->assertEquals($length, 2);
+        $this->assertEquals($ch, 'c');
         // The string matches backref partially.
         $res = $backref->match(new qtype_preg_string('abcacd'), 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abcdef'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
-        $this->assertEqual($length, 1);
-        $this->assertEqual($ch, 'bc');
+        $this->assertEquals($length, 1);
+        $this->assertEquals($ch, 'bc');
     }
 
-    function test_full_match() {
+    function test_backref_full_match() {
         $regex = '(abc)';
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
@@ -106,11 +100,11 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $res = $backref->match(new qtype_preg_string('abcabc'), 3, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abc'), 3, $length, $matcher->get_match_results());
         $this->assertTrue($res);
-        $this->assertEqual($length, 3);
-        $this->assertEqual($ch, '');
+        $this->assertEquals($length, 3);
+        $this->assertEquals($ch, '');
     }
 
-    function test_empty_match() {
+    function test_backref_empty_match() {
         $regex = '(^$)';
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
@@ -123,11 +117,11 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $res = $backref->match(new qtype_preg_string(''), 0, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string(''), -1, $length, $matcher->get_match_results());
         $this->assertTrue($res);
-        $this->assertEqual($length, 0);
-        $this->assertEqual($ch, '');
+        $this->assertEquals($length, 0);
+        $this->assertEquals($ch, '');
     }
 
-    function test_alt_match() {
+    function test_backref_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
@@ -140,13 +134,12 @@ class qtype_preg_backreferences_test extends UnitTestCase {
         $res = $backref->match(new qtype_preg_string('aba'), 2, $length, false, $matcher->get_match_results());
         $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
-        $this->assertEqual($length, 1);
-        $this->assertEqual($ch, 'b');
+        $this->assertEquals($length, 1);
+        $this->assertEquals($ch, 'b');
         // Emptiness matched.
         $matcher->match('xyz');
         $res = $backref->match(new qtype_preg_string('xyz'), 0, $length, false, $matcher->get_match_results());
         $this->assertTrue($res);
-        $this->assertEqual($length, 0);
+        $this->assertEquals($length, 0);
     }
 }
-?>

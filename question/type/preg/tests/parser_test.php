@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 
-class qtype_preg_parser_test extends advanced_testcase {
+class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
 
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b

@@ -82,6 +82,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
@@ -99,7 +100,7 @@ abstract class qtype_preg_cross_tests_extra_checker {
 
 }
 
-class qtype_preg_cross_tester extends UnitTestCase {
+class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     var $testdataobjects;    // Objects with test data.
     var $extracheckobjects;  // Objects for extra checks.
@@ -122,10 +123,10 @@ class qtype_preg_cross_tester extends UnitTestCase {
         // Include file with matcher to test.
         require_once($CFG->dirroot . '/question/type/preg/' . $enginename . '/' . $enginename . '.php');
         // Find all available test files.
-        if ($dh = opendir($CFG->dirroot . '/question/type/preg/simpletest')) {
+        if ($dh = opendir($CFG->dirroot . '/question/type/preg/tests')) {
             while (($file = readdir($dh)) !== false) {
                 if (strpos($file, 'cross_tests_') === 0 && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                    require_once($CFG->dirroot . '/question/type/preg/simpletest/' . $file);
+                    require_once($CFG->dirroot . '/question/type/preg/tests/' . $file);
                     $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
                     if (strpos($file, 'cross_tests_extra_checker') === 0) {
                         // Extra checker found.

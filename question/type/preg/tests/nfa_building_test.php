@@ -2,27 +2,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 
-class qtype_preg_nfa_building_test extends UnitTestCase {
-
-    function setUp() {
-    }
-
-    function tearDown() {
-    }
-
-    /*function test_transition_cloning() {
-        $leaf = new preg_leaf_charset();
-        $state = new qtype_preg_fa_state();
-        $tr = new qtype_preg_nfa_transition($leaf, $state, false);
-        $clone = clone $tr;
-        $this->assertFalse($tr === $clone);
-        $this->assertFalse($tr->pregleaf === $clone->pregleaf);
-        $this->assertTrue($tr->state === $clone->state);
-        $tr->subpatt_start[] = 4;
-        $this->assertFalse($tr->subpatt_start == $clone->subpatt_start);
-    }*/
+class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
 
     function test_build_concat() {
         $matcher = new qtype_preg_nfa_matcher('^abc$');
@@ -194,9 +177,4 @@ class qtype_preg_nfa_building_test extends UnitTestCase {
             $this->assertTrue(false, "nfa building failed <br/>");
         }
     }
-
 }
-
-
-
-?>
