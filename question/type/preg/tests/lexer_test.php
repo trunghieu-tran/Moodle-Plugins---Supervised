@@ -1,9 +1,9 @@
-﻿<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+﻿<?php
 
 /**
  * Unit tests for (some of) question/type/preg/preg_parser.php.
  *
- * @copyright &copy; 2010 Dmitriy Kolesov
+ * @copyright 2010 Dmitriy Kolesov
  * @author Dmitriy Kolesov
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package question
@@ -11,9 +11,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 
-class qtype_preg_lexer_test extends UnitTestCase {
+class qtype_preg_lexer_test extends advanced_testcase {
 
     function create_lexer($regex) {
         StringStreamController::createRef('regex', $regex);
@@ -21,7 +23,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         return new qtype_preg_lexer($pseudofile);
     }
 
-    function test_lexer_quantificators() {
+    function test_lexer_quantifiers() {
         $lexer = $this->create_lexer('?*++{1,5}{,5}{1,}{5}*???+?{1,5}?{,5}?{1,}?{5}+');
         $token = $lexer->nextToken();// ?
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
@@ -127,7 +129,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
         $this->assertTrue($token->value->possessive);
     }
     function test_lexer_backslash() {
-        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\\>\\<\\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff\p{Greek}\P{Lt}\P{^M}\PL');
+        $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\>\<\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff\p{Greek}\P{Lt}\P{^M}\PL');
         $token = $lexer->nextToken();// \\
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
@@ -965,7 +967,7 @@ class qtype_preg_lexer_test extends UnitTestCase {
     }
     function test_lexer_pcre_compatibility() {
         global $CFG;
-        $file = fopen($CFG->dirroot . '/question/type/preg/simpletest/pcre_lexer_testinput1.txt', 'r');
+        $file = fopen($CFG->dirroot . '/question/type/preg/tests/pcre_lexer_testinput1.txt', 'r');
         $counter = 0;
         while (!feof($file)) {
             $str = fgets($file);
