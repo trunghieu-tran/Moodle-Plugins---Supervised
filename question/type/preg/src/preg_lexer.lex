@@ -57,8 +57,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         return $this->backrefsexist;
     }
 
-    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
+    protected function form_node($userinscription = '', $name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
         $result = new $name;
+        $result->userinscription = $userinscription;
         if ($subtype !== null) {
             $result->subtype = $subtype;
         }
@@ -181,7 +182,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         for ($i = 0; $i < $set->length(); $i++) {
             if (qtype_preg_unicode::strpos($unset, $set[$i])) {// Setting and unsetting modifier at the same time is error.
                 $text = $this->yytext;
-                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - qtype_preg_unicode::strlen($text), $this->yychar - 1);
+                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - qtype_preg_unicode::strlen($text), $this->yychar - 1, '');
                 return;
             }
         }
@@ -216,8 +217,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         return qtype_preg_unicode::code2utf8($code);
     }
 
-    public function add_flag_to_charset($type, $data, $negative = false) {
+    public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
         $this->cccharnumber++;
+        $this->cc->userinscription[] = $userinscription;
         switch ($type) {
         case preg_charset_flag::SET:
             $this->ccset .= $data;
@@ -505,7 +507,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 %}
 %eof{
         if (isset($this->cc) && is_object($this->cc)) { // End of the expression inside a character class.
-            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1);
+            $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1, '');
             $this->cc = null;
         }
 %eof}
@@ -515,21 +517,21 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \*(\?|\+)? {
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \+(\?|\+)? {
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \{[0-9]+,[0-9]+\}(\?|\+)? {
@@ -545,7 +547,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
 
@@ -560,7 +562,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $textlen--;
     }
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \{,[0-9]+\}(\?|\+)? {
@@ -574,7 +576,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $textlen--;
     }
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \{[0-9]+\}(\?|\+)? {
@@ -588,14 +590,14 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $textlen--;
     }
     $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 2);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
     return $res;
 }
 <YYINITIAL> \[ {
     $this->cc = new preg_leaf_charset;
-    $this->cc->negative = false;
-    $this->cccharnumber = 0;
     $this->cc->indfirst = $this->yychar;
+    $this->cc->userinscription = array();
+    $this->cccharnumber = 0;
     $this->ccset = '';
     $this->yybegin(self::CHARCLASS);
 }
@@ -603,23 +605,23 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?\#\{\{\) {        // Beginning of a lexem.
     $this->push_opt_lvl();
     $this->lexemcount++;
-    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, -$this->lexemcount));
+    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), -$this->lexemcount));
     return $res;
 }
 <YYINITIAL> \) {
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
+    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\#\}\}\) {        // Ending of a lexem.
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\#[^)]*\) {       // Comment.
@@ -632,89 +634,89 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> \(\?\<[^\[\]\\*+?{}()|.^$]+\> {    // Named subpattern (?<name>...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
 <YYINITIAL> \(\?\'[^\[\]\\*+?{}()|.^$]+\' {    // Named subpattern (?'name'...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
 <YYINITIAL> \(\?P\<[^\[\]\\*+?{}()|.^$]+\> {   // Named subpattern (?P<name>...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
 <YYINITIAL> \(\?: {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\| {
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\(\?= {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\(\?! {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<= {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\(\?<! {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?= {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?! {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?<= {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?<! {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \. {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> [^\[\]\\*+?{}()|.^$] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \| {
@@ -722,18 +724,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
-    $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \\[\[\]?*+{}|().] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $str = qtype_preg_unicode::substr($this->yytext(), 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
         $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
@@ -756,19 +758,19 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_preg_unicode::strlen($tail) === 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
             for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
             }
         }
     }
     return $res;
 }
 <YYINITIAL> \\g[0-9][0-9]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -779,78 +781,78 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     if ($num < 0) {
         $num = $this->lastsubpatt + $num + 1;
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $num));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $num));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\g\{[^\[\]\\*+?{}()|.^$]+\} {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\{[^\[\]\\*+?{}()|.^$]+\} {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\'[^\[\]\\*+?{}()|.^$]+\' {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\<[^\[\]\\*+?{}()|.^$]+\> {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \(\?P=[^\[\]\\*+?{}()|.^$]+\) {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
     return $res;
 }
 <YYINITIAL> \\\\ {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, '\\'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, '\\'));
     return $res;
 }
 <YYINITIAL> \\a {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07)));
     return $res;
 }
 <YYINITIAL> \\c. {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
     return $res;
 }
 <YYINITIAL> \\e {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B)));
     return $res;
 }
 <YYINITIAL> \\f {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C)));
     return $res;
 }
 <YYINITIAL> \\n {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
     return $res;
 }
 <YYINITIAL> (\\p|\\P)[CLMNPSZ] {
     $str = qtype_preg_unicode::substr($this->yytext(), 2);
     $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
     return $res;
 }
 <YYINITIAL> (\\p|\\P)\{"^"?[a-z_A-Z]+\} {
@@ -862,18 +864,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str !== 'Any') {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
     } else {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN, null, null, false, false, false, $negative));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN, null, null, false, false, false, $negative));
     }
     return $res;
 }
 <YYINITIAL> \\r {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D)));
     return $res;
 }
 <YYINITIAL> \\t {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09)));
     return $res;
 }
 <YYINITIAL> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
@@ -882,37 +884,37 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
 <YYINITIAL> \\x\{[0-9a-fA-F]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str))));
     return $res;
 }
 <YYINITIAL> \\d|\\D {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
     return $res;
 }
 <YYINITIAL> \\h|\\H {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
     return $res;
 }
 <YYINITIAL> \\s|\\S {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
     return $res;
 }
 <YYINITIAL> \\v|\\V {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
     return $res;
 }
 <YYINITIAL> \\w|\\W {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
     return $res;
 }
 <YYINITIAL> \\C {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> \\u([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])? {
@@ -921,12 +923,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
 <YYINITIAL> \\N {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
 <YYINITIAL> \\K {
@@ -944,31 +946,31 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     throw new Exception('\R is not implemented yet');
 }
 <YYINITIAL> \\b|\\B {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     $res->value->negative = ($this->yytext() === '\B');
     return $res;
 }
 <YYINITIAL> \\A {
     // TODO: matches at the start of the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
 <YYINITIAL> \\z|\\Z {
     // TODO: matches only at the end of the subject | matches at the end of the subject also matches before a newline at the end of the subject. For now the same as $.
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
     return $res;
 }
 <YYINITIAL> \\G {
     // TODO: matches at the first matching position in the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
 <YYINITIAL> "^" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
 <YYINITIAL> "$" {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
     return $res;
 }
 <YYINITIAL> \(\?i\) {/*TODO: refactor this rule at adding support other modifier*/
@@ -983,18 +985,18 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $text = $this->yytext();
     $this->push_opt_lvl();
     $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?-i: {/*TODO: refactor this rule at adding support other modifier*/
     $text = $this->yytext();
     $this->push_opt_lvl();
     $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('-i'));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?(R|[0-9]+)\) {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_recursion', null, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_recursion', null, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \\Q.*(\\E)? {
@@ -1011,102 +1013,102 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     }
     $res = array();
     for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
+        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
     }
     return $res;
 }
 <YYINITIAL> \\. {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
 <CHARCLASS> \[:alnum:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
 }
 <CHARCLASS> \[:alpha:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
 }
 <CHARCLASS> \[:ascii:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII);
 }
 <CHARCLASS> \\h|\[:blank:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
 }
 <CHARCLASS> \[:ctrl:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
 }
 <CHARCLASS> \\d|\[:digit:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
 }
 <CHARCLASS> \[:graph:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
 }
 <CHARCLASS> \[:lower:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER);
 }
 <CHARCLASS> \[:print:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN);
 }
 <CHARCLASS> \[:punct:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
 }
 <CHARCLASS> \\s|\[:space:\]  {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE);
 }
 <CHARCLASS> \[:upper:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER);
 }
 <CHARCLASS> \\w|\[:word:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
 }
 <CHARCLASS> \[:xdigit:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
 }
 <CHARCLASS> \["^":alnum:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
 <CHARCLASS> \["^":alpha:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
 <CHARCLASS> \["^":ascii:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
 }
 <CHARCLASS> \\H|\["^":blank:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
 }
 <CHARCLASS> \["^":ctrl:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
 }
 <CHARCLASS> \\D|\["^":digit:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
 }
 <CHARCLASS> \["^":graph:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
 }
 <CHARCLASS> \["^":lower:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
 }
 <CHARCLASS> \["^":print:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
 }
 <CHARCLASS> \["^":punct:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
 }
 <CHARCLASS> \\S|\["^":space:\]  {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
 }
 <CHARCLASS> \["^":upper:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
 }
 <CHARCLASS> \\W|\["^":word:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
 }
 <CHARCLASS> \["^":xdigit:\] {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
 }
 <CHARCLASS> (\\p|\\P)[CLMNPSZ] {
     $str = qtype_preg_unicode::substr($this->yytext(), 2);
     $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
-    $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
 }
 <CHARCLASS> (\\p|\\P)\{"^"?[a-z_A-Z]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
@@ -1117,22 +1119,22 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str !== 'Any') {
-        $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
     } else {
-        $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
     }
 }
 <CHARCLASS> \\\\ {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '\\');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '\\');
 }
 <CHARCLASS> \\\[ {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '[');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '[');
 }
 <CHARCLASS> \\\] {
-    $this->add_flag_to_charset(preg_charset_flag::SET, ']');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, ']');
 }
 <CHARCLASS> \\0[0-7][0-7]|[0-7][0-7][0-7] {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
 }
 <CHARCLASS> \\x[0-9a-fA-F]?[0-9a-fA-F]? {
     if (qtype_preg_unicode::strlen($this->yytext()) < 3) {
@@ -1140,48 +1142,48 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $str);
 }
 <CHARCLASS> \\x\{[0-9a-fA-F]+\} {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str)));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str)));
 }
 <CHARCLASS> \\a {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
 <CHARCLASS> \\c. {
-    $this->add_flag_to_charset(preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
 }
 <CHARCLASS> \\e {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
 <CHARCLASS> \\f {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
 <CHARCLASS> \\n {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
 <CHARCLASS> \\r {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
 <CHARCLASS> \\t {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
 }
 <CHARCLASS> "^" {
     if ($this->cccharnumber) {
-        $this->add_flag_to_charset(preg_charset_flag::SET, '^');
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '^');
     } else {
         $this->cc->negative = true;
     }
 }
 <CHARCLASS> - {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '-');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '-');
 }
 <CHARCLASS> \\ {
     // Do nothing.
 }
 <CHARCLASS> [^-\[\]\\^] {
-    $this->add_flag_to_charset(preg_charset_flag::SET, $this->yytext());
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $this->yytext());
 }
 <CHARCLASS> \] {
     $this->cc->indlast = $this->yychar;

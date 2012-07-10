@@ -41,8 +41,9 @@ class qtype_preg_lexer extends JLexBase  {
     public function backrefs_exist() {
         return $this->backrefsexist;
     }
-    protected function form_node($name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
+    protected function form_node($userinscription = '', $name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
         $result = new $name;
+        $result->userinscription = $userinscription;
         if ($subtype !== null) {
             $result->subtype = $subtype;
         }
@@ -158,7 +159,7 @@ class qtype_preg_lexer extends JLexBase  {
         for ($i = 0; $i < $set->length(); $i++) {
             if (qtype_preg_unicode::strpos($unset, $set[$i])) {// Setting and unsetting modifier at the same time is error.
                 $text = $this->yytext;
-                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - qtype_preg_unicode::strlen($text), $this->yychar - 1);
+                $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar - qtype_preg_unicode::strlen($text), $this->yychar - 1, '');
                 return;
             }
         }
@@ -190,8 +191,9 @@ class qtype_preg_lexer extends JLexBase  {
         $code ^= 0x40;
         return qtype_preg_unicode::code2utf8($code);
     }
-    public function add_flag_to_charset($type, $data, $negative = false) {
+    public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
         $this->cccharnumber++;
+        $this->cc->userinscription[] = $userinscription;
         switch ($type) {
         case preg_charset_flag::SET:
             $this->ccset .= $data;
@@ -499,7 +501,7 @@ class qtype_preg_lexer extends JLexBase  {
         if (false === $this->yy_eof_done) {
 
         if (isset($this->cc) && is_object($this->cc)) { // End of the expression inside a character class.
-            $this->errors[] = new preg_lexem (preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1);
+            $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1, '');
             $this->cc = null;
         }
         }
@@ -5733,7 +5735,7 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
     return $res;
 }
                         case -3:
@@ -5743,7 +5745,7 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -4:
@@ -5753,14 +5755,14 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -5:
                             break;
                         case 5:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $this->yytext()));
     return $res;
 }
                         case -6:
@@ -5768,9 +5770,9 @@ array(
                         case 6:
                             {
     $this->cc = new preg_leaf_charset;
-    $this->cc->negative = false;
-    $this->cccharnumber = 0;
     $this->cc->indfirst = $this->yychar;
+    $this->cc->userinscription = array();
+    $this->cccharnumber = 0;
     $this->ccset = '';
     $this->yybegin(self::CHARCLASS);
 }
@@ -5781,7 +5783,7 @@ array(
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
     return $res;
 }
                         case -8:
@@ -5789,14 +5791,14 @@ array(
                         case 8:
                             {
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar));
+    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
     return $res;
 }
                         case -9:
                             break;
                         case 9:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
     return $res;
 }
                         case -10:
@@ -5807,49 +5809,49 @@ array(
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
-    $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::ALT, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -11:
                             break;
                         case 11:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
                         case -12:
                             break;
                         case 12:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
                         case -13:
                             break;
                         case 13:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -14:
                             break;
                         case 14:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
     return $res;
 }
                         case -15:
                             break;
                         case 15:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -16:
                             break;
                         case 16:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, '\\'));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, '\\'));
     return $res;
 }
                         case -17:
@@ -5859,7 +5861,7 @@ array(
     $str = qtype_preg_unicode::substr($this->yytext(), 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
         $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
@@ -5882,12 +5884,12 @@ array(
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_preg_unicode::strlen($tail) === 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
             for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
             }
         }
     }
@@ -5897,42 +5899,42 @@ array(
                             break;
                         case 18:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07)));
     return $res;
 }
                         case -19:
                             break;
                         case 19:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B)));
     return $res;
 }
                         case -20:
                             break;
                         case 20:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C)));
     return $res;
 }
                         case -21:
                             break;
                         case 21:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A)));
     return $res;
 }
                         case -22:
                             break;
                         case 22:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D)));
     return $res;
 }
                         case -23:
                             break;
                         case 23:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09)));
     return $res;
 }
                         case -24:
@@ -5944,7 +5946,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
                         case -25:
@@ -5952,42 +5954,42 @@ array(
                         case 25:
                             {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
                         case -26:
                             break;
                         case 26:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
     return $res;
 }
                         case -27:
                             break;
                         case 27:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
     return $res;
 }
                         case -28:
                             break;
                         case 28:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
     return $res;
 }
                         case -29:
                             break;
                         case 29:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
     return $res;
 }
                         case -30:
                             break;
                         case 30:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
     return $res;
 }
                         case -31:
@@ -5999,7 +6001,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
                         case -32:
@@ -6007,7 +6009,7 @@ array(
                         case 32:
                             {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN));
     return $res;
 }
                         case -33:
@@ -6037,7 +6039,7 @@ array(
                             break;
                         case 36:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_WORDBREAK));
     $res->value->negative = ($this->yytext() === '\B');
     return $res;
 }
@@ -6046,7 +6048,7 @@ array(
                         case 37:
                             {
     // TODO: matches at the start of the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
                         case -38:
@@ -6054,7 +6056,7 @@ array(
                         case 38:
                             {
     // TODO: matches only at the end of the subject | matches at the end of the subject also matches before a newline at the end of the subject. For now the same as $.
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_DOLLAR));
     return $res;
 }
                         case -39:
@@ -6062,7 +6064,7 @@ array(
                         case 39:
                             {
     // TODO: matches at the first matching position in the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_assert', preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
     return $res;
 }
                         case -40:
@@ -6082,7 +6084,7 @@ array(
     }
     $res = array();
     for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
+        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
     }
     return $res;
 }
@@ -6100,7 +6102,7 @@ array(
         $textlen--;
     }
     $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 2);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
     return $res;
 }
                         case -42:
@@ -6110,7 +6112,7 @@ array(
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $this->lastsubpatt));
     return $res;
 }
                         case -43:
@@ -6118,7 +6120,7 @@ array(
                         case 43:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -44:
@@ -6126,7 +6128,7 @@ array(
                         case 44:
                             {
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -45:
@@ -6134,7 +6136,7 @@ array(
                         case 45:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -46:
@@ -6142,7 +6144,7 @@ array(
                         case 46:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -47:
@@ -6157,14 +6159,14 @@ array(
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 2);
     $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
     return $res;
 }
                         case -49:
                             break;
                         case 49:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6173,7 +6175,7 @@ array(
                             break;
                         case 50:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2))));
     return $res;
 }
                         case -51:
@@ -6190,7 +6192,7 @@ array(
         $textlen--;
     }
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -52:
@@ -6207,14 +6209,14 @@ array(
         $textlen--;
     }
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
                         case -53:
                             break;
                         case 53:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_recursion', null, $this->yytext()));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_recursion', null, $this->yytext()));
     return $res;
 }
                         case -54:
@@ -6228,7 +6230,7 @@ array(
                         case 55:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -56:
@@ -6236,7 +6238,7 @@ array(
                         case 56:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem(preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -57:
@@ -6253,7 +6255,7 @@ array(
     $text = $this->yytext();
     $this->push_opt_lvl();
     $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -59:
@@ -6272,7 +6274,7 @@ array(
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
                         case -60:
@@ -6280,7 +6282,7 @@ array(
                         case 60:
                             {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -61:
@@ -6289,7 +6291,7 @@ array(
                             {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -62:
@@ -6299,7 +6301,7 @@ array(
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
                         case -63:
@@ -6309,7 +6311,7 @@ array(
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
                         case -64:
@@ -6326,7 +6328,7 @@ array(
     $text = $this->yytext();
     $this->push_opt_lvl();
     $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('-i'));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -66:
@@ -6341,9 +6343,9 @@ array(
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str !== 'Any') {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), null, null, false, false, false, $negative));
     } else {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN, null, null, false, false, false, $negative));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::FLAG, preg_charset_flag::PRIN, null, null, false, false, false, $negative));
     }
     return $res;
 }
@@ -6356,7 +6358,7 @@ array(
     if ($num < 0) {
         $num = $this->lastsubpatt + $num + 1;
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $num));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $num));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6366,7 +6368,7 @@ array(
                         case 68:
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6376,7 +6378,7 @@ array(
                         case 69:
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6386,7 +6388,7 @@ array(
                         case 70:
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6396,7 +6398,7 @@ array(
                         case 71:
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6406,7 +6408,7 @@ array(
                         case 72:
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str))));
     return $res;
 }
                         case -73:
@@ -6415,7 +6417,7 @@ array(
                             {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -74:
@@ -6424,7 +6426,7 @@ array(
                             {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new preg_lexem(preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -75:
@@ -6433,7 +6435,7 @@ array(
                             {        // Beginning of a lexem.
     $this->push_opt_lvl();
     $this->lexemcount++;
-    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, -$this->lexemcount));
+    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), -$this->lexemcount));
     return $res;
 }
                         case -76:
@@ -6441,7 +6443,7 @@ array(
                         case 76:
                             {        // Ending of a lexem.
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1));
+    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
                         case -77:
@@ -6451,7 +6453,7 @@ array(
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
     return $res;
 }
                         case -78:
@@ -6459,7 +6461,7 @@ array(
                         case 78:
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6468,7 +6470,7 @@ array(
                             break;
                         case 79:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, $this->yytext());
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $this->yytext());
 }
                         case -80:
                             break;
@@ -6496,14 +6498,14 @@ array(
                             break;
                         case 82:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '-');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '-');
 }
                         case -83:
                             break;
                         case 83:
                             {
     if ($this->cccharnumber) {
-        $this->add_flag_to_charset(preg_charset_flag::SET, '^');
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '^');
     } else {
         $this->cc->negative = true;
     }
@@ -6512,55 +6514,55 @@ array(
                             break;
                         case 84:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '[');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '[');
 }
                         case -85:
                             break;
                         case 85:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, '\\');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, '\\');
 }
                         case -86:
                             break;
                         case 86:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, ']');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, ']');
 }
                         case -87:
                             break;
                         case 87:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x07));
 }
                         case -88:
                             break;
                         case 88:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x1B));
 }
                         case -89:
                             break;
                         case 89:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0C));
 }
                         case -90:
                             break;
                         case 90:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0A));
 }
                         case -91:
                             break;
                         case 91:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x0D));
 }
                         case -92:
                             break;
                         case 92:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(0x09));
 }
                         case -93:
                             break;
@@ -6571,61 +6573,61 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $str);
 }
                         case -94:
                             break;
                         case 94:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
 }
                         case -95:
                             break;
                         case 95:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
 }
                         case -96:
                             break;
                         case 96:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
 }
                         case -97:
                             break;
                         case 97:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
 }
                         case -98:
                             break;
                         case 98:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE);
 }
                         case -99:
                             break;
                         case 99:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
 }
                         case -100:
                             break;
                         case 100:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
 }
                         case -101:
                             break;
                         case 101:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
 }
                         case -102:
                             break;
                         case 102:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1))));
 }
                         case -103:
                             break;
@@ -6633,13 +6635,13 @@ array(
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 2);
     $negative = (qtype_preg_unicode::substr($this->yytext(), 1, 1) === 'P');
-    $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
 }
                         case -104:
                             break;
                         case 104:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $this->calculate_cx(qtype_preg_unicode::substr($this->yytext(), 2)));
 }
                         case -105:
                             break;
@@ -6653,9 +6655,9 @@ array(
         $str = qtype_preg_unicode::substr($str, 1);
     }
     if ($str !== 'Any') {
-        $this->add_flag_to_charset(preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::UPROP, $this->get_uprop_flag_type($str), $negative);
     } else {
-        $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
+        $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
     }
 }
                         case -106:
@@ -6663,127 +6665,127 @@ array(
                         case 106:
                             {
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
-    $this->add_flag_to_charset(preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str)));
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, qtype_preg_unicode::code2utf8(hexdec($str)));
 }
                         case -107:
                             break;
                         case 107:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
 }
                         case -108:
                             break;
                         case 108:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
 }
                         case -109:
                             break;
                         case 109:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII);
 }
                         case -110:
                             break;
                         case 110:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
 }
                         case -111:
                             break;
                         case 111:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
 }
                         case -112:
                             break;
                         case 112:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN);
 }
                         case -113:
                             break;
                         case 113:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
 }
                         case -114:
                             break;
                         case 114:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER);
 }
                         case -115:
                             break;
                         case 115:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER);
 }
                         case -116:
                             break;
                         case 116:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
 }
                         case -117:
                             break;
                         case 117:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
 }
                         case -118:
                             break;
                         case 118:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
 }
                         case -119:
                             break;
                         case 119:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
 }
                         case -120:
                             break;
                         case 120:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
                         case -121:
                             break;
                         case 121:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
 }
                         case -122:
                             break;
                         case 122:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
 }
                         case -123:
                             break;
                         case 123:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
 }
                         case -124:
                             break;
                         case 124:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
 }
                         case -125:
                             break;
                         case 125:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
 }
                         case -126:
                             break;
                         case 126:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
 }
                         case -127:
                             break;
@@ -6792,7 +6794,7 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
     return $res;
 }
                         case -128:
@@ -6802,7 +6804,7 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -129:
@@ -6812,21 +6814,21 @@ array(
     $greed = qtype_preg_unicode::strlen($this->yytext()) === 1;
     $lazy = !$greed && qtype_preg_unicode::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -130:
                             break;
                         case 131:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
     return $res;
 }
                         case -131:
                             break;
                         case 132:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -132:
@@ -6836,7 +6838,7 @@ array(
     $str = qtype_preg_unicode::substr($this->yytext(), 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
         $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
@@ -6859,12 +6861,12 @@ array(
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_preg_unicode::strlen($tail) === 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
             for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
             }
         }
     }
@@ -6879,7 +6881,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
                         case -134:
@@ -6891,7 +6893,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
                         case -135:
@@ -6908,14 +6910,14 @@ array(
         $textlen--;
     }
     $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 2);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
     return $res;
 }
                         case -136:
                             break;
                         case 137:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
     $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
@@ -6934,7 +6936,7 @@ array(
         $textlen--;
     }
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $textlen - 1);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
     return $res;
 }
                         case -138:
@@ -6951,7 +6953,7 @@ array(
         $textlen--;
     }
     $rightborder = (int)qtype_preg_unicode::substr($text, 2, $textlen - 3);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
                         case -139:
@@ -6970,14 +6972,14 @@ array(
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node('preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
                         case -140:
                             break;
                         case 141:
                             {
-    $this->add_flag_to_charset(preg_charset_flag::SET, $this->yytext());
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $this->yytext());
 }
                         case -141:
                             break;
@@ -6988,13 +6990,13 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $str);
 }
                         case -142:
                             break;
                         case 144:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -143:
@@ -7006,7 +7008,7 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, $str));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, $str));
     return $res;
 }
                         case -144:
@@ -7018,27 +7020,27 @@ array(
     } else {
         $str = qtype_preg_unicode::code2utf8(hexdec(qtype_preg_unicode::substr($this->yytext(), 2)));
     }
-    $this->add_flag_to_charset(preg_charset_flag::SET, $str);
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::SET, $str);
 }
                         case -145:
                             break;
                         case 148:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -146:
                             break;
                         case 150:
                             {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
                         case -147:
                             break;
                         case 288:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec(qtype_preg_unicode::substr($this->yytext(), 1)))));
     return $res;
 }
                         case -148:
@@ -7048,7 +7050,7 @@ array(
     $str = qtype_preg_unicode::substr($this->yytext(), 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'preg_leaf_backref', null, $str));
         $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
@@ -7071,12 +7073,12 @@ array(
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_preg_unicode::strlen($tail) === 0) {
-            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
         } else {
             $res = array();
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
+            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::code2utf8(octdec($octal))));
             for ($i = 0; $i < qtype_preg_unicode::strlen($tail); $i++) {
-                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
+                $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($tail, $i, 1)));
             }
         }
     }
