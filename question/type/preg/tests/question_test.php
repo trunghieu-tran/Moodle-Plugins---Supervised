@@ -1,4 +1,4 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+<?php
 
 /**
  * Unit tests for (some of) question/type/preg/question.php.
@@ -11,9 +11,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+echo __FILE__.chr(0x000A);
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
-class qtype_preg_question_test extends UnitTestCase {
+class qtype_preg_question_test extends advanced_testcase {
 
     protected $testquestion;
     protected $subpattquestion;
@@ -219,7 +222,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
         $hintstr = $matchresults->string_extension();
-        $this->assertTrue(strstr('crb', $hintstr[0]));
+        $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'hats?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //Matching breaks inside the word
@@ -228,7 +231,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat b');
         $hintstr = $matchresults->string_extension();
-        $this->assertTrue(strstr('a', $hintstr[0]));
+        $this->assertTrue(strstr('a', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'ets?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong head
@@ -237,7 +240,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($matchresults->match_heading() == '');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
         $hintstr = $matchresults->string_extension();
-        $this->assertTrue(strstr('crb', $hintstr[0]));
+        $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == 'hats?');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong tail
@@ -246,7 +249,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($matchresults->match_heading() == 'Oh! ');
         $this->assertTrue($matchresults->matched_part() == 'Do cats eat ');
         $hintstr = $matchresults->string_extension();
-        $this->assertTrue(strstr('crb', $hintstr[0]));
+        $this->assertTrue(strstr('crb', $hintstr[0]) !== false);
         $this->assertTrue($matchresults->match_tail() == '');
         $this->assertTrue($hintobj->could_show_hint($matchresults));
         //No wrong tail and hinted character
@@ -264,7 +267,7 @@ class qtype_preg_question_test extends UnitTestCase {
         $this->assertTrue($matchresults->match_heading().$matchresults->match_tail() == '!@#$^%&');
         $this->assertTrue($matchresults->matched_part() == '');
         $hintstr = $matchresults->string_extension();
-        $this->assertTrue(strstr('D', $hintstr[0]));
+        $this->assertTrue(strstr('D', $hintstr[0]) !== false);
         $this->assertTrue($hintobj->could_show_hint($matchresults));
 
         ////Engine without partial matching support should show colored parts only when there is a match

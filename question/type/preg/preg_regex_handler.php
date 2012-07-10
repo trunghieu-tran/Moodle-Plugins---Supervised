@@ -194,7 +194,7 @@ class qtype_preg_regex_handler {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher =& $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
+        $this->lexer->matcher = $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
         $this->parser = new preg_parser_yyParser;
         while (($token = $this->lexer->nextToken()) !== null) {

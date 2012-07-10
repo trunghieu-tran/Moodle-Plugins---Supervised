@@ -34,9 +34,9 @@ class qtype_preg_fa_transition {
     }
 
     public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
-        $this->from =& $from;
+        $this->from = $from;
         $this->pregleaf = clone $pregleaf;
-        $this->to =& $to;
+        $this->to = $to;
         $this->consumechars = $consumechars;
     }
 }
@@ -60,14 +60,14 @@ class qtype_preg_fa_state {
     public $number;
 
     public function __construct(&$FA = null) {
-        $this->FA =& $FA;
+        $this->FA = $FA;
         $this->number = -1;    // States should be numerated from 0 by calling qtype_preg_finite_automaton::numerate_states().
         $this->outtransitions = array();
         $this->deterministic = true;
     }
 
     public function set_FA(&$FA) {
-        $this->FA =& $FA;
+        $this->FA = $FA;
     }
 
     /**
@@ -76,7 +76,7 @@ class qtype_preg_fa_state {
      * @param transtion a reference to an object of child class of qtype_preg_fa_transition.
      */
     public function add_transition(&$transition) {
-        $transition->from =& $this;
+        $transition->from = $this;
         $this->outtransitions[] = $transition;
         //TODO - check whether it makes a node non-deterministic
         //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
@@ -110,7 +110,7 @@ class qtype_preg_fa_state {
     public function update_state_references(&$oldref, &$newref) {
         foreach($this->outtransitions as $transition) {
             if ($transition->to === $oldref) {
-                $transition->to =& $newref;
+                $transition->to = $newref;
             }
         }
     }
@@ -241,7 +241,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function set_start_state(&$state) {
         if ($this->state_exists($state)) {
-            $this->startstate =& $state;
+            $this->startstate = $state;
         } else {
             throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
         }
@@ -252,7 +252,7 @@ abstract class qtype_preg_finite_automaton {
      */
     public function set_end_state(&$state) {
         if ($this->state_exists($state)) {
-            $this->endstate =& $state;
+            $this->endstate = $state;
         } else {
             throw new qtype_preg_exception('set_end_state error: No state '.$stateindex.' in automaton');
         }
@@ -310,7 +310,7 @@ abstract class qtype_preg_finite_automaton {
      * @param state a reference to an object of qtype_preg_fa_state class.
      */
     public function add_state(&$state) {
-        $this->states[] =& $state;
+        $this->states[] = $state;
         $state->set_FA($this);
         $this->statecount++;
         if ($this->statecount > $this->statelimit) {
@@ -570,7 +570,7 @@ abstract class qtype_preg_finite_automaton {
                 throw new qtype_preg_toolargefa_exception('');
             }
         }
-        $transition->to =& $this->states[$lst];
+        $transition->to = $this->states[$lst];
         $end++;
         $this->states[$fir]->add_transition($transition);
         $this->read_code_member($facode, $end);

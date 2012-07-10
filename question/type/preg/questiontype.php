@@ -91,7 +91,7 @@ class qtype_preg extends qtype_shortanswer {
     function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
-        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $matcher = $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
         return $matcher->match($state->responses['']);
     }
 

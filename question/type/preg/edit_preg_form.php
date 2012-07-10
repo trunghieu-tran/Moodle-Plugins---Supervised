@@ -69,7 +69,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         parent::definition_inner($mform);
 
-        $answersinstruct =& $mform->getElement('answersinstruct');
+        $answersinstruct = $mform->getElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_preg'));
 
     }
@@ -99,7 +99,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 //Not using exactmatch option to not confuse user by things it adds to regex
-                $matcher =& $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
+                $matcher = $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';

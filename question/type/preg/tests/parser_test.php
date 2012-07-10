@@ -1,9 +1,9 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/08 21:01:01 dvkolesov Exp $
+<?php
 
 /**
  * Unit tests for (some of) question/type/preg/preg_parser.php.
  *
- * @copyright &copy; 2010 Dmitriy Kolesov
+ * @copyright 2010 Dmitriy Kolesov
  * @author Dmitriy Kolesov
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package question
@@ -11,11 +11,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 
-class qtype_preg_parser_test extends UnitTestCase {
+class qtype_preg_parser_test extends advanced_testcase {
 
     //Unit tests for parser
     function test_parser_easy_regex() {//a|b
