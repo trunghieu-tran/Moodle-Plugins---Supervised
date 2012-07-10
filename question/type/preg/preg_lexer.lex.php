@@ -5860,7 +5860,7 @@ array(
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-        $res->value->matcher =& $this->matcher;
+        $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
         // Return a character.
@@ -6165,7 +6165,7 @@ array(
                         case 49:
                             {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6357,7 +6357,7 @@ array(
         $num = $this->lastsubpatt + $num + 1;
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $num));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6367,7 +6367,7 @@ array(
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6377,7 +6377,7 @@ array(
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6387,7 +6387,7 @@ array(
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6397,7 +6397,7 @@ array(
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6460,7 +6460,7 @@ array(
                             {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -6837,7 +6837,7 @@ array(
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-        $res->value->matcher =& $this->matcher;
+        $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
         // Return a character.
@@ -6916,7 +6916,7 @@ array(
                         case 137:
                             {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -7049,7 +7049,7 @@ array(
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-        $res->value->matcher =& $this->matcher;
+        $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
         // Return a character.

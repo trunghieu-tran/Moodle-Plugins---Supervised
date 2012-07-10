@@ -25,6 +25,8 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
@@ -193,7 +195,7 @@ class qtype_preg_question extends question_graded_automatically
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $hintgradeborder) {
                     $bestfitanswer = $answer;
-                    $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
+                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
                     $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
                         $maxfitness = (-1)*$bestmatchresult->left;
@@ -208,7 +210,7 @@ class qtype_preg_question extends question_graded_automatically
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
         $full = false;
         foreach ($this->answers as $answer) {
-            $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
+            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
             $matchresults = $matcher->match($response['answer']);
 
             //Check full match.
@@ -287,7 +289,7 @@ class qtype_preg_question extends question_graded_automatically
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
-            $matcher =& $this->matchers_cache[$answerid];
+            $matcher = $this->matchers_cache[$answerid];
         } else {//create and store matcher object
 
             $modifiers = null;
@@ -327,7 +329,7 @@ class qtype_preg_question extends question_graded_automatically
 
             $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
             if ($answerid !== null) {
-                $this->matchers_cache[$answerid] =& $matcher;
+                $this->matchers_cache[$answerid] = $matcher;
             }
         }
         return $matcher;

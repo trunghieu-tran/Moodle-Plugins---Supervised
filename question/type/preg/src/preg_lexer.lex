@@ -734,7 +734,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-        $res->value->matcher =& $this->matcher;
+        $res->value->matcher = $this->matcher;
         $this->backrefsexist = true;
     } else {
         // Return a character.
@@ -769,7 +769,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 }
 <YYINITIAL> \\g[0-9][0-9]? {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, qtype_preg_unicode::substr($this->yytext(), 2)));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
@@ -780,42 +780,42 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $num = $this->lastsubpatt + $num + 1;
     }
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $num));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\g\{[^\[\]\\*+?{}()|.^$]+\} {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\{[^\[\]\\*+?{}()|.^$]+\} {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\'[^\[\]\\*+?{}()|.^$]+\' {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\k\<[^\[\]\\*+?{}()|.^$]+\> {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 3, qtype_preg_unicode::strlen($this->yytext()) - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \(\?P=[^\[\]\\*+?{}()|.^$]+\) {    // Named backreference.
     $str = qtype_preg_unicode::substr($this->yytext(), 4, qtype_preg_unicode::strlen($this->yytext()) - 5);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node('preg_leaf_backref', null, $str));
-    $res->value->matcher =& $this->matcher;
+    $res->value->matcher = $this->matcher;
     $this->backrefsexist = true;
     return $res;
 }

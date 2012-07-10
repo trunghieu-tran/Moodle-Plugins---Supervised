@@ -98,7 +98,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Implement in child classes to show hint
      */
-    public function hinted_string($response, $matchresults) {
+    public function hinted_string($matchresults) {
         return '';
     }
 
