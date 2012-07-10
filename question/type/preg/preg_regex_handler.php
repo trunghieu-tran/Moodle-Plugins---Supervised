@@ -133,33 +133,33 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * returns string of regular expression modifiers supported by this engine
-    */
+     * returns string of regular expression modifiers supported by this engine
+     */
     public function get_supported_modifiers() {
         return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
-    * is this engine need a parsing of regular expression?
-    @return bool if parsing needed
-    */
+     * is this engine need a parsing of regular expression?
+     * @return bool if parsing needed
+     */
     protected function is_parsing_needed() {
         //most engines will need parsing
         return true;
     }
 
     /**
-    * Was there an errors in regex?
-    @return bool  errors exists
-    */
+     * Was there an errors in regex?
+     * @return bool  errors exists
+     */
     public function is_error_exists() {
         return (!empty($this->errors));
     }
 
     /**
-    * Returns error messages for regex
-    @return array of error messages
-    */
+     * Returns error messages for regex
+     * @return array of error messages
+     */
     public function get_errors() {
         $res = array();
         foreach($this->errors as $error) {
@@ -177,14 +177,26 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * Is a preg_node_... or a preg_leaf_... supported by the engine?
-    * Returns true if node is supported or user interface string describing
-    *   what properties of node isn't supported.
-    */
+     * Is a preg_node_... or a preg_leaf_... supported by the engine?
+     * Returns true if node is supported or user interface string describing
+     *   what properties of node isn't supported.
+     */
     protected function is_preg_node_acceptable($pregnode) {
         return false;    // Should be overloaded by child classes
     }
 
+    /**
+     * Fill anchor field to show if regex is anchored using ast_root
+     *
+     * If all top-level alternatives starts from ^ or .* then expression is anchored from start (i.e. if matching from start failed, no other matches possible)
+     * If all top-level alternatives ends on $ or .* then expression is anchored from end (i.e. if matching from start failed, no other matches possible)
+     */
+    public function look_for_anchors() {
+        //TODO(performance) - write real code, for now think no anchoring is in expressions
+        $this->anchor = new stdClass;
+        $this->anchor->start = false;
+        $this->anchor->end = false;
+    }
 
     /**
      * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->ast_root.
