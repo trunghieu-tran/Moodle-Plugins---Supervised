@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Defines the class for unicode support.
+ *
+ * @copyright &copy; 2012  Valeriy Streltsov
+ * @author Valeriy Streltsov, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
 class qtype_preg_unicode extends textlib {
 
     public static $ranges = array('Basic Latin'                               => array(0x0000, 0x007F),
