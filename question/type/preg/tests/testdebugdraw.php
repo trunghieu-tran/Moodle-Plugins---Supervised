@@ -2,11 +2,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
-
 require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
-//see carefully commented example of test on lines 617-644
-class qtype_preg_fa_draw_test extends UnitTestCase {
+
+class qtype_preg_fa_draw_test extends PHPUnit_Framework_TestCase {
 	protected $matcher;
 	function setUp() {
 		$this->matcher  = new qtype_preg_nondeterministic_fa;
@@ -25,5 +25,3 @@ class qtype_preg_fa_draw_test extends UnitTestCase {
 		$this->matcher->draw('subpattern.dot', 'subpattern.jpg');
 	}
 }
-
-?>

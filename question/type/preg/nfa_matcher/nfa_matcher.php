@@ -447,16 +447,16 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             if (!$isassertion) {
                 /*
                 // Add a dummy transitions to the beginning of the NFA.
-                $start =& new qtype_preg_fa_state($result);
-                $epsleaf =& new preg_leaf_meta;
+                $start = new qtype_preg_fa_state($result);
+                $epsleaf = new preg_leaf_meta;
                 $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
                 $start->add_transition(new qtype_preg_nfa_transition($start, $epsleaf, $result->start_state(), false));
                 $result->add_state($start);
                 $result->set_start_state($start);
 
                 // Add a dummy transitions to the end of the NFA.
-                $end =& new qtype_preg_fa_state($result);
-                $epsleaf =& new preg_leaf_meta;
+                $end = new qtype_preg_fa_state($result);
+                $epsleaf = new preg_leaf_meta;
                 $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
                 $result->end_state()->add_transition(new qtype_preg_nfa_transition($result->end_state(), $epsleaf, $end, false));
                 $result->add_state($end);

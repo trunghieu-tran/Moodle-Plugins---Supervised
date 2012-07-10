@@ -1,4 +1,5 @@
-<?php  // $Id: testquestiontype.php,v 0.1 beta 2010/08/10 21:40:20 dvkolesov Exp $
+<?php
+
 /**
  * Unit tests for (some of) question/type/preg/dfa_preg_matcher.php.
  *
@@ -10,9 +11,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/dfa_preg_matcher/dfa_preg_matcher.php');
-//see carefully commented example of test on lines 617-644
-class qtype_preg_dfa_future_test extends UnitTestCase {
+
+class qtype_preg_dfa_future_test extends PHPUnit_Framework_TestCase {
     var $qtype;
 
     function setUp() {
@@ -44,4 +46,4 @@ class qtype_preg_dfa_future_test extends UnitTestCase {
         $this->assertTrue(substr($matcher->get_match_results()->string_extension(), 0, 1)=='%');
     }
 }
-?>
+

@@ -15,7 +15,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 
-class qtype_preg_lexer_test extends advanced_testcase {
+class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
 
     function create_lexer($regex) {
         StringStreamController::createRef('regex', $regex);

@@ -33,7 +33,7 @@ abstract class dfa_preg_node {
         if (is_a($node, 'preg_operator')) {
             foreach ($node->operands as $key=>$operand) {
                 if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
-                    $node->operands[$key] =& $matcher->from_preg_node($operand);
+                    $node->operands[$key] = $matcher->from_preg_node($operand);
                 }
             }
         }

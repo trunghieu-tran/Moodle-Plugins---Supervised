@@ -11,12 +11,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-echo __FILE__.chr(0x000A);
-
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
-class qtype_preg_question_test extends advanced_testcase {
+class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
 
     protected $testquestion;
     protected $subpattquestion;
@@ -381,7 +379,4 @@ class qtype_preg_question_test extends advanced_testcase {
         //'(12)|34(56)gh'
         //'(z|y(x))(w)'
     }
-
 }
-
-?>
