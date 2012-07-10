@@ -14,9 +14,9 @@
  * Class for plain lexems (that are not complete nodes), so they could contain position information too.
  */
 class preg_lexem {
-    //Subtype of lexem
+    /** Subtype of the lexem. */
     public $subtype;
-    //Indexes of first and last characters for the lexem, they are equal if it's one-character lexem
+    /** Indexes of first and last characters for the lexem, they are equal if it's one-character lexem. */
     public $indfirst = -1;
     public $indlast = -1;
 
@@ -31,7 +31,7 @@ class preg_lexem {
  * Class for plain subpattern lexems.
  */
 class preg_lexem_subpatt extends preg_lexem {
-    //Number of subpattern
+    /** Number of subpattern. */
     public $number;
 
     public function __construct($subtype, $indfirst, $indlast, $number) {
@@ -117,10 +117,10 @@ abstract class preg_node {
     }
 
     /**
-    * Return class name without 'preg_' prefix
-    * Interface string for the node name should be exactly same (and start from upper-case character)
-    * if class not overloading ui_nodename function
-    */
+     * Return class name without 'preg_' prefix
+     * Interface string for the node name should be exactly same (and start from upper-case character)
+     * if class not overloading ui_nodename function
+     */
     abstract public function name();
 
 
@@ -132,9 +132,9 @@ abstract class preg_node {
 }
 
 /**
-* Generic leaf node class
-*
-*/
+ * Generic leaf node class
+ *
+ */
 abstract class preg_leaf extends preg_node {
 
     //Is matching case insensitive?
@@ -213,25 +213,22 @@ abstract class preg_leaf extends preg_node {
 }
 
 /**
-*Character or charcter class
-*/
+ * Character or charcter class.
+ */
 class preg_leaf_charset extends preg_leaf {
+
+    /** Simple flags in disjunctive normal form. */
+    public $flags = null;   // array(array());
+    /** A range is a pair of integers, ranges are 3-dimensional array of integers or 2-dimensional array of pairs. */
+    protected $ranges = array();
+    /** Array of assert flag (assert impossible to calculate as range), each asserts[i] is array of 0/1/2 asserts as flag; for ranges[i]. */
+    protected $asserts = array();
+    /** true if charset is DNF range matrix, false if charset is DNF of flags. */
+    public $israngecalculated = true;
+
     public function __construct() {
         $this->type = preg_node::TYPE_LEAF_CHARSET;
-        $this->ranges = array();
-        //$this->flags = array(array());
-        $this->israngecalculated = true;//empty ranges for empty leaf is correct!
     }
-    public $flags;//simple flags in disjunctive normal form
-    /*
-    *simple ranges, range is pair of integer, ranges is 3d array of integer
-    *or 2d array of pair (DNF of pair)
-    */
-    protected $ranges;
-    protected $asserts;//array of assert flag (assert impossible to calculate as range), each asserts[i] is array of 0/1/2 asserts as flag; for ranges[i]
-    public $negative;
-    //true if charset is DNF range matrix, false if charset is DNF of flags
-    public $israngecalculated;
 
     public function name() {
         return 'leaf_charset';
@@ -650,7 +647,7 @@ class preg_charset_flag {
     const YI                     = 'Yi';
 
     /** Is this flag negative. */
-    public $negative;
+    public $negative = false;
     /** Type of this flag, can be either SET or FLAG or UPROP or CIRCUMFLEX or DOLLAR. */
     public $type;
     /** Characters which match this flag if this is SET, see the constants above. */
