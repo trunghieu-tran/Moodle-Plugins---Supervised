@@ -2,7 +2,7 @@
 
 class qtype_preg_error {
 
-    //Human-understandable error message
+    // Human-understandable error message.
     public $errormsg;
     //
     public $index_first;
@@ -24,7 +24,7 @@ class qtype_preg_error {
      }
 }
 
-// A syntax error occured while parsing a regex
+// A syntax error occured while parsing a regex.
 class qtype_preg_parsing_error extends qtype_preg_error {
 
     public function __construct($regex, $parsernode) {
@@ -32,10 +32,9 @@ class qtype_preg_parsing_error extends qtype_preg_error {
         $this->index_last = $parsernode->lastindxs[0];
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
     }
-
 }
 
-// There's an unacceptable node in a regex
+// There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
     /*
@@ -60,7 +59,7 @@ class qtype_preg_accepting_error extends qtype_preg_error {
 
 }
 
-// There's an unsupported modifier in a regex
+// There's an unsupported modifier in a regex.
 class qtype_preg_modifier_error extends qtype_preg_error {
 
     public function __construct($matchername, $modifier) {
@@ -69,10 +68,29 @@ class qtype_preg_modifier_error extends qtype_preg_error {
         $a->classname = $matchername;
         $this->errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
     }
-
 }
 
-// FA is too large
+// Unknown unicode property.
+class qtype_preg_unknown_unicode_property_error extends qtype_preg_error {
+
+    public function __construct($uprop) {
+        $a = new stdClass;
+        $a->uprop = $uprop;
+        $this->errormsg = get_string('unknownunicodeproperty', 'qtype_preg', $a);
+    }
+}
+
+// Unknown posix class.
+class qtype_preg_unknown_posix_class_error extends qtype_preg_error {
+
+    public function __construct($posixclass) {
+        $a = new stdClass;
+        $a->posixclass = $posixclass;
+        $this->errormsg = get_string('unknownposixclass', 'qtype_preg', $a);
+    }
+}
+
+// FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
@@ -89,5 +107,4 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $this->index_last = $a->indlast;
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('toolargefa', 'qtype_preg', $a);
     }
-
 }
