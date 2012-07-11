@@ -913,7 +913,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($token->value->subtype === preg_leaf_assert::SUBTYPE_DOLLAR);
     }
-    function test_lexer_qw() {
+    function test_lexer_qe() {
         $lexer = $this->create_lexer('\\Q');
         $token = $lexer->nextToken();// \Q
         if ($this->assertTrue(is_array($token))) {
@@ -979,6 +979,32 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
             }
         }
         fclose($file);
+    }
+    function test_lexer_errors() {
+        $lexer = $this->create_lexer('\p{C}\p{Squirrel}');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->uniprop === preg_charset_flag::UPROPC);
+        $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token === null);
+        $errors = $lexer->get_errors();
+        $this->assertTrue($errors[0]->subtype === preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY);
+        $this->assertTrue($errors[0]->indfirst === 5);
+        $this->assertTrue($errors[0]->indlast === 16);
+        $lexer = $this->create_lexer('[[:alpha:]][[:nut:]]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->flag === preg_charset_flag::ALPHA);
+        $this->assertFalse($token->value->flags[0][0]->negative);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token === null);
+        $errors = $lexer->get_errors();
+        $this->assertTrue($errors[0]->subtype === preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS);
+        $this->assertTrue($errors[0]->indfirst === 12);
+        $this->assertTrue($errors[0]->indlast === 18);
     }
 }
 ?>
