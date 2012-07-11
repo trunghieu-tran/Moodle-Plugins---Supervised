@@ -26,7 +26,7 @@ class preg_lexem {
         $this->subtype = $subtype;
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
-        $this->$userinscription = $userinscription;
+        $this->userinscription = $userinscription;
     }
 }
 
@@ -1407,37 +1407,49 @@ class preg_node_cond_subpatt extends preg_operator {
 }
 class preg_node_error extends preg_node {
 
-    //Subtypes define a type of error
-    //Unknown parse error
+    // Subtypes define a type of error
+    // Unknown parse error
     const SUBTYPE_UNKNOWN_ERROR = 'unknown_error_node_error';
-    //Too much top-level alternatives in conditional subpattern
+    // Too much top-level alternatives in conditional subpattern
     const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 'consubpatt_too_much_alter_node_error';
-    //Close paren without opening  xxx)
+    // Close paren without opening  xxx)
     const SUBTYPE_WRONG_CLOSE_PAREN = 'wrong_close_paren_node_error';
-    //Ending of a lexem without beginning  xxx(?#}})
+    // Ending of a lexem without beginning  xxx(?#}})
     const SUBTYPE_WRONG_CLOSE_LEXEM = 'wrong_close_lexem_node_error';
-    //Open paren without closing  (xxx
+    // Open paren without closing  (xxx
     const SUBTYPE_WRONG_OPEN_PAREN = 'wrong_open_paren_node_error';
-    //Beginning of a lexem without ending  (?#{{)xxx
+    // Beginning of a lexem without ending  (?#{{)xxx
     const SUBTYPE_WRONG_OPEN_LEXEM = 'wrong_open_lexem_node_error';
-    //Empty parens
+    // Empty parens
     const SUBTYPE_EMPTY_PARENS = 'empty_parens_node_error';
-    //Empty lexem
+    // Empty lexem
     const SUBTYPE_EMPTY_LEXEM = 'empty_lexem_node_error';
-    //Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
+    // Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
-    //Unclosed square brackets in character class
+    // Unclosed square brackets in character class
     const SUBTYPE_UNCLOSED_CHARCLASS = 'unclosed_charclass_node_error';
-    //Set and unset same modifier at ther same time
+    // Set and unset same modifier at ther same time
     const SUBTYPE_SET_UNSET_MODIFIER = 'set_and_unset_same_modifier_at_the_same_time_node_error';
+    // Unknown unicode property
+    const SUBTYPE_UNKNOWN_UNICODE_PROPERTY = 'unknown_unicode_property_node_error';
+    // Unknown posix class
+    const SUBTYPE_UNKNOWN_POSIX_CLASS = 'unknown_posix_class_node_error';
 
-    //Error strings name in qtype_preg.php lang file
-    public static $errstrs = array( preg_node_error::SUBTYPE_UNKNOWN_ERROR => 'incorrectregex', preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER => 'threealtincondsubpatt',
-                                    preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN => 'unopenedparen', preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM => 'unopenedlexem',
-                                    preg_node_error::SUBTYPE_WRONG_OPEN_PAREN => 'unclosedparen', preg_node_error::SUBTYPE_WRONG_OPEN_LEXEM => 'unclosedlexem',
-                                    preg_node_error::SUBTYPE_EMPTY_PARENS => 'emptyparens', preg_node_error::SUBTYPE_EMPTY_LEXEM => 'emptylexem',
-                                    preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart', preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS => 'unclosedsqbrackets',
-                                    preg_node_error::SUBTYPE_SET_UNSET_MODIFIER =>'setunsetmod');
+    // Error strings name in qtype_preg.php lang file
+    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'incorrectregex',
+                                   self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'threealtincondsubpatt',
+                                   self::SUBTYPE_WRONG_CLOSE_PAREN            => 'unopenedparen',
+                                   self::SUBTYPE_WRONG_CLOSE_LEXEM            => 'unopenedlexem',
+                                   self::SUBTYPE_WRONG_OPEN_PAREN             => 'unclosedparen',
+                                   self::SUBTYPE_WRONG_OPEN_LEXEM             => 'unclosedlexem',
+                                   self::SUBTYPE_EMPTY_PARENS                 => 'emptyparens',
+                                   self::SUBTYPE_EMPTY_LEXEM                  => 'emptylexem',
+                                   self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart',
+                                   self::SUBTYPE_UNCLOSED_CHARCLASS           => 'unclosedsqbrackets',
+                                   self::SUBTYPE_SET_UNSET_MODIFIER           => 'setunsetmod',
+                                   self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'unknownunicodeproperty',
+                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'unknownposixclass'
+                                   );
 
     //Arrays of indexes in regex string describing error to highlight to the user (and include in message) - first and last
     public $firstindxs;
@@ -1467,6 +1479,3 @@ class preg_node_error extends preg_node {
         return get_string(preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
     }
 }
-
-
-?>
