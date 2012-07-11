@@ -1117,7 +1117,7 @@ static public $yy_action = array(
 #line 1122 "../preg_parser.php"
 #line 331 "../preg_parser.y"
     function yy_r22(){
-    $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor->subtype, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + 0]->minor->indlast));
+    $this->_retvalue = $this->create_error_node($this->yystack[$this->yyidx + 0]->minor->subtype, array($this->yystack[$this->yyidx + 0]->minor->indfirst), array($this->yystack[$this->yyidx + 0]->minor->indlast), $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + 0]->minor->indfirst;//NOTE - indexes may depends on $this->yystack[$this->yyidx + 0]->minor->subtype, take into account if another lexer error would be found
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + 0]->minor->indlast;

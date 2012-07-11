@@ -70,26 +70,6 @@ class qtype_preg_modifier_error extends qtype_preg_error {
     }
 }
 
-// Unknown unicode property.
-class qtype_preg_unknown_unicode_property_error extends qtype_preg_error {
-
-    public function __construct($uprop) {
-        $a = new stdClass;
-        $a->uprop = $uprop;
-        $this->errormsg = get_string('unknownunicodeproperty', 'qtype_preg', $a);
-    }
-}
-
-// Unknown posix class.
-class qtype_preg_unknown_posix_class_error extends qtype_preg_error {
-
-    public function __construct($posixclass) {
-        $a = new stdClass;
-        $a->posixclass = $posixclass;
-        $this->errormsg = get_string('unknownposixclass', 'qtype_preg', $a);
-    }
-}
-
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
