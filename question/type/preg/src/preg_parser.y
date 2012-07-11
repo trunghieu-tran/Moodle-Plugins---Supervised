@@ -330,7 +330,7 @@ expr(A) ::= QUANT(B). [ERROR_PREC] {
 }
 
 lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
-    A = $this->create_error_node(C->subtype, array(C->indfirst), array(C->indlast));
+    A = $this->create_error_node(C->subtype, array(C->indfirst), array(C->indlast), C->userinscription);
     $this->reducecount++;
     A->indfirst = C->indfirst;//NOTE - indexes may depends on C->subtype, take into account if another lexer error would be found
     A->indlast = C->indlast;
