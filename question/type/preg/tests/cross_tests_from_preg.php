@@ -2959,18 +2959,18 @@ class qtype_preg_cross_tests_from_preg {
         return array('regex'=>'a\Q + b\E = c',
                      'tests'=>array($test1));
     }
-    
+
     function data_for_test_uprops_and_posix_classes() {
-		$uch    = qtype_preg_unicode::code2utf8(0xE01F0);
-		$pch    = qtype_preg_unicode::code2utf8(0x007A);
-		$hspace = qtype_preg_unicode::code2utf8(0x3000);
-		
-		$str = '';
-		$length = 80;
-		for ($i = 0; $i < $length; $i++) {
-			$str .= $uch . $pch . $hspace;
-		}
-		
+        $uch    = qtype_preg_unicode::code2utf8(0xE01F0);
+        $pch    = qtype_preg_unicode::code2utf8(0x007A);
+        $hspace = qtype_preg_unicode::code2utf8(0x3000);
+
+        $str = '';
+        $length = 80;
+        for ($i = 0; $i < $length; $i++) {
+            $str .= $uch . $pch . $hspace;
+        }
+
         $test1 = array( 'str'=>$str,
                         'is_match'=>true,
                         'full'=>true,
@@ -2978,7 +2978,7 @@ class qtype_preg_cross_tests_from_preg {
                         'length'=>array(0=>3 * $length),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
-                        
+
         $test2 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
