@@ -16,7 +16,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $this->lastsubpatt = 0;
     $this->maxsubpatt = 0;
     $this->subpatternmap = array();
-    $this->lexemcount = 0;
     $this->backrefsexist = false;
     $this->optstack = array();
     $this->optstack[0] = new stdClass;
@@ -32,7 +31,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     protected $lastsubpatt;
     protected $maxsubpatt;
     protected $subpatternmap;
-    protected $lexemcount;
     protected $backrefsexist;
     protected $optstack;
     protected $optcount;
@@ -178,10 +176,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
     public function get_subpattern_map() {
         return $this->subpatternmap;
-    }
-
-    public function get_lexem_count() {
-        return $this->lexemcount;
     }
 
     public function backrefs_exist() {
@@ -530,20 +524,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
     return $res;
 }
-<YYINITIAL> \(\?\#\{\{\) {        // Beginning of a lexem.
-    $this->push_opt_lvl();
-    $this->lexemcount++;
-    $res = $this->form_res(preg_parser_yyParser::OPENLEXEM, new preg_lexem_subpatt(preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), -$this->lexemcount));
-    return $res;
-}
 <YYINITIAL> \) {
     $this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
-    return $res;
-}
-<YYINITIAL> \(\?\#\}\}\) {        // Ending of a lexem.
-    $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSELEXEM, new preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
 <YYINITIAL> \(\?\#[^)]*\) {       // Comment.

@@ -197,19 +197,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[0]->operands[0]->subtype == preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
-    function test_parser_lexems() {
-        $parser =& $this->run_parser('(?#{{)(?#{{)a(?#}})b(?#}})');
-        $root = $parser->get_root();
-        $this->assertTrue($root->type == preg_node::TYPE_NODE_SUBPATT);
-        $this->assertTrue($root->number == -1);
-        $this->assertTrue($root->operands[0]->type == preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->operands[0]->type == preg_node::TYPE_NODE_SUBPATT);
-        $this->assertTrue($root->operands[0]->operands[0]->number == -2);
-        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type == preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->flags[0][0]->set == 'a');
-        $this->assertTrue($root->operands[0]->operands[1]->type == preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->set == 'b');
-    }
     function test_parser_duplicate_subpattern_numbers() {
         $parser =& $this->run_parser('(?|a|b|c)');
         $root = $parser->get_root();
@@ -316,26 +303,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
         $this->assertTrue($errornodes[2]->firstindxs[0] == 15);
         $this->assertTrue($errornodes[2]->lastindxs[0] == 15);
-    }
-    function test_lexem_syntax_errors() {
-        //Unopened lexem
-        $parser =& $this->run_parser('(?#}})(qwe)(?#}})');
-        $this->assertTrue($parser->get_error());
-        $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 2);
-        $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM);
-        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_LEXEM);
-        //Unclosed lexem
-        $parser =& $this->run_parser('(?#{{)(?#}})(?#{{)(qwe)');
-        $this->assertTrue($parser->get_error());
-        $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 2);
-        $this->assertTrue($errornodes[1]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[1]->subtype == preg_node_error::SUBTYPE_WRONG_OPEN_LEXEM);
-        $this->assertTrue($errornodes[2]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[2]->subtype == preg_node_error::SUBTYPE_EMPTY_LEXEM);
     }
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
