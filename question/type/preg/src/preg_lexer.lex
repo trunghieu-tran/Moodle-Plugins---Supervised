@@ -936,94 +936,63 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'preg_leaf_charset', preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1)));
     return $res;
 }
-<CHARCLASS> \[:alnum:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM);
+<CHARCLASS> "[:alnum:]"|"[^:alnum:]" {
+    $negative = ($this->yytext() === '[^:alnum:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, $negative);
 }
-<CHARCLASS> \[:alpha:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALPHA);
+<CHARCLASS> "[:alpha:]"|"[^:alpha:]" {
+    $negative = ($this->yytext() === '[^:alpha:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALPHA, $negative);
 }
-<CHARCLASS> \[:ascii:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII);
+<CHARCLASS> "[:ascii:]"|"[^:ascii:]" {
+    $negative = ($this->yytext() === '[^:ascii:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII, $negative);
 }
-<CHARCLASS> \\h|\[:blank:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE);
+<CHARCLASS> "\h"|"\H"|"[:blank:]"|"[^:blank:]" {
+    $negative = ($this->yytext() === '\H' || $this->yytext() === '[^:blank:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE, $negative);
 }
-<CHARCLASS> \[:ctrl:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL);
+<CHARCLASS> "[:cntrl:]"|"[^:cntrl:]" {
+    $negative = ($this->yytext() === '[^:cntrl:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL, $negative);
 }
-<CHARCLASS> \\d|\[:digit:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT);
+<CHARCLASS> "\d"|"\D"|"[:digit:]"|"[^:digit:]" {
+    $negative = ($this->yytext() === '\D' || $this->yytext() === '[^:digit:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT, $negative);
 }
-<CHARCLASS> \[:graph:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH);
+<CHARCLASS> "[:graph:]"|"[^:graph:]" {
+    $negative = ($this->yytext() === '[^:graph:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH, $negative);
 }
-<CHARCLASS> \[:lower:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER);
+<CHARCLASS> "[:lower:]"|"[^:lower:]" {
+    $negative = ($this->yytext() === '[^:lower:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER, $negative);
 }
-<CHARCLASS> \[:print:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN);
+<CHARCLASS> "[:print:]"|"[^:print:]" {
+    $negative = ($this->yytext() === '[^:print:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, $negative);
 }
-<CHARCLASS> \[:punct:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT);
+<CHARCLASS> "[:punct:]"|"[^:punct:]" {
+    $negative = ($this->yytext() === '[^:punct:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT, $negative);
 }
-<CHARCLASS> \\s|\[:space:\]  {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE);
+<CHARCLASS> "\s"|"\S"|"[:space:]"|"[^:space:]"  {
+    $negative = ($this->yytext() === '\S' || $this->yytext() === '[^:space:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE, $negative);
 }
-<CHARCLASS> \[:upper:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER);
+<CHARCLASS> "[:upper:]"|"[^:upper:]" {
+    $negative = ($this->yytext() === '[^:upper:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER, $negative);
 }
-<CHARCLASS> \\w|\[:word:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR);
+<CHARCLASS> "\w"|"\W"|"[:word:]"|"[^:word:]" {
+    $negative = ($this->yytext() === '\W' || $this->yytext() === '[^:word:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, $negative);
 }
-<CHARCLASS> \[:xdigit:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT);
+<CHARCLASS> "[:xdigit:]"|"[^:xdigit:]" {
+    $negative = ($this->yytext() === '[^:xdigit:]');
+    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, $negative);
 }
-<CHARCLASS> \["^":alnum:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
-}
-<CHARCLASS> \["^":alpha:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ALNUM, true);
-}
-<CHARCLASS> \["^":ascii:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::ASCII, true);
-}
-<CHARCLASS> \\H|\["^":blank:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::HSPACE, true);
-}
-<CHARCLASS> \["^":ctrl:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::CNTRL, true);
-}
-<CHARCLASS> \\D|\["^":digit:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::DIGIT, true);
-}
-<CHARCLASS> \["^":graph:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::GRAPH, true);
-}
-<CHARCLASS> \["^":lower:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::LOWER, true);
-}
-<CHARCLASS> \["^":print:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PRIN, true);
-}
-<CHARCLASS> \["^":punct:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::PUNCT, true);
-}
-<CHARCLASS> \\S|\["^":space:\]  {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::SPACE, true);
-}
-<CHARCLASS> \["^":upper:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::UPPER, true);
-}
-<CHARCLASS> \\W|\["^":word:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::WORDCHAR, true);
-}
-<CHARCLASS> \["^":xdigit:\] {
-    $this->add_flag_to_charset($this->yytext(), preg_charset_flag::FLAG, preg_charset_flag::XDIGIT, true);
-}
-<CHARCLASS> \[:[^\]]*:\] {
-    $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
-}
-<CHARCLASS> \["^":[^\]]*:\] {
+<CHARCLASS> "[:"[^\]]*":]"|"[^:"[^\]]*":]" {
     $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
 }
 <CHARCLASS> (\\p|\\P). {
