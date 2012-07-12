@@ -2991,6 +2991,20 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_uprops_and_posix_negative() {
+
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
+                        'left'=>array(80),
+                        'next'=>'[^[:alpha:]]');
+
+        return array('regex'=>'^[^[:alpha:]]{80,}',
+                     'tests'=>array($test1));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
