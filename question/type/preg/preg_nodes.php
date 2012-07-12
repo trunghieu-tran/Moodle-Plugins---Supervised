@@ -243,19 +243,22 @@ class preg_leaf_charset extends preg_leaf {
         die('implement range calulate before use it!');
     }
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
+        if ($pos < 0 || $pos >= $str->length()) {
+            return false;
+        }
         $result = false;
         if ($this->flags === null) {
             return false;
         }
-        foreach ($this->flags as $variant) {
-            if (count($variant) > 0) {
-                $varres = true;
-                foreach ($variant as $flag) {
-                    $varres &= $flag->match($str, $pos, $cs);
+        foreach ($this->flags as $flags) {
+            $result = count($flags) > 0;
+            foreach ($flags as $flag) {
+                $result = $result && $flag->match($str, $pos, $cs);
+                if (!$result) {
+                    break;
                 }
             }
-            if ($varres) {
-                $result = true;
+            if ($result) {
                 break;
             }
         }
@@ -721,13 +724,16 @@ class preg_charset_flag {
                     $charsetcopy->tolower();
                     $strcopy->tolower();
                 }
-                $result = ($charsetcopy->contains($strcopy[$pos]) !== false);
+                $currange = qtype_preg_unicode::get_ranges_from_charset($charsetcopy);
+                $result = qtype_preg_unicode::is_in_range($strcopy[$pos], $currange);
                 break;
             case self::FLAG:
-                $result = (bool)call_user_func_array('qtype_preg_unicode::is_' . $this->flag, array($str[$pos]));
+                $currange = call_user_func('qtype_preg_unicode::' . $this->flag . '_ranges');
+                $result = qtype_preg_unicode::is_in_range($str[$pos], $currange);
                 break;
             case self::UPROP:
-                $result = (bool)call_user_func_array('qtype_preg_unicode::is_' . $this->uniprop, array($str[$pos]));
+                $currange = call_user_func('qtype_preg_unicode::' . $this->uniprop . '_ranges');
+                $result = qtype_preg_unicode::is_in_range($str[$pos], $currange);
                 break;
         }
         if ($this->negative) {
