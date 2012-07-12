@@ -239,9 +239,10 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             if ($obtained->extendedmatch !== null) {
                 $str = $obtained->string_extension();
             }
-            $nextpassed = (($expected['next'] === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $str !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER &&
-                            qtype_preg_unicode::strpos($expected['next'], qtype_preg_unicode::substr($str, 0, 1)) !== false));    // Expected 'next' contains obtained 'next'.
+            $regex = $pattern = '/(*UTF8)' . $expected['next'] . '/';
+            $char = qtype_preg_unicode::substr($str, 0, 1);
+            $nextpassed = (($expected['next'] === $str && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && preg_match($pattern, $char)));
         }
 
         // Checking number of characters left.
