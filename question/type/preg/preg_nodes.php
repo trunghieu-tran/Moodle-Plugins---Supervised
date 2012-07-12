@@ -276,7 +276,7 @@ class preg_leaf_charset extends preg_leaf {
                 } else if ($flag->type === preg_charset_flag::FLAG) {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->flag . '_ranges');
                 } else if ($flag->type === preg_charset_flag::UPROP) {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->uprop . '_ranges');
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->uniprop . '_ranges');
                 }
                 foreach ($currange as &$tmp)
                     $tmp['negative'] = $flag->negative;
