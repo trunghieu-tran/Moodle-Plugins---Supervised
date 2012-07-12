@@ -265,42 +265,40 @@ class preg_leaf_charset extends preg_leaf {
         ($result === true) ? $length = 1 : $length = 0;
         return $result;
     }
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { //may be rename to character?
-        // TODO: use qtype_preg_unicode::get_ranges() and qtype_preg_unicode::intersect_ranges().
-        if ($this->flags[0][0]->type === preg_charset_flag::SET) {
-            if ($this->negative) {
-                $ranges = qtype_preg_unicode::get_ranges($this->flags[0][0]->set->string());
-                foreach ($ranges as $range) {
-                    $leftborder = $range[0];
-                    if ($leftborder < qtype_preg_unicode::ord(' ')) {
-                        $leftborder = qtype_preg_unicode::ord(' ');
-                    }
-                    for ($i = $leftborder; $i < $range[1]; $i++) {
-                        $char = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
-                        if ($this->match($char, 0, $l, true)) {
-                            return $char;
-                        }
-                    }
-                }
 
-            } else {
-                return new qtype_preg_string($this->flags[0][0]->set[0]);
-            }
-        } else {
-            for ($i = ord('a'); $i < 256; $i++) {
-                $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
-                if ($this->match($c, 0, $l, true)) {
-                    return $c;
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { //may be rename to character?
+        foreach ($this->flags as $flags) {
+            foreach ($flags as $flag) {
+                // Get intersection of all current flags.
+                $range = array(array('negative' => false, 0 => 0, 1 => 0x10FFFD));
+                if ($flag->type === preg_charset_flag::SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->set);
+                } else if ($flag->type === preg_charset_flag::FLAG) {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->flag . '_ranges');
+                } else if ($flag->type === preg_charset_flag::UPROP) {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->uprop . '_ranges');
                 }
-            }
-            for ($i = ord(' '); $i < ord('a'); $i++) {
-                $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
-                if ($this->match($c, 0, $l, true)) {
-                    return $c;
+                foreach ($currange as &$tmp)
+                    $tmp['negative'] = $flag->negative;
+                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                if ($this->negative) {
+                    foreach ($ranges as &$tmp)
+                        $tmp['negative'] = true;
+                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => 0x10FFFD)));
+                }
+                // Check all the returned ranges.
+                foreach ($ranges as $range) {
+                    for ($i = $range[0]; $i <= $range[1]; $i++) {
+                        $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
+                        //if ($this->match($c, 0, $l, true)) {
+                            return $c;
+                        //}
+                    }
                 }
             }
         }
     }
+
     /**
     *function check that other charset included in this
     *it's meaning that any character matching with other match with this
