@@ -116,6 +116,8 @@ abstract class preg_node {
     public $indlast = -1;
     /** What the user actually typed, the original representation of this node in the regex. Can be a string or an array of strings. */
     public $userinscription = '';
+    /** Identifier of this node. */
+    public $id = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
