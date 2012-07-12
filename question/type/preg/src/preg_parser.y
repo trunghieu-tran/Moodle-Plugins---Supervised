@@ -1,28 +1,40 @@
 %name preg_parser_
 %include{
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 }
 %include_class {
-    //Root of the Abstract Syntax Tree (AST)
+    // Root of the Abstract Syntax Tree (AST).
     private $root;
-    //Are there any errors during the parsing
+    // Are there any errors during the parsing.
     private $error;
-    //Copies of preg_node_error for errors during the parsing
+    // Copies of preg_node_error for errors during the parsing.
     private $errornodes;
-    //Count of reduces made
+    // Count of reduces made.
     private $reducecount;
-    //Open-parenthesis strings
+    // Open-parenthesis strings.
     private $parens;
-    //Quantifier strings
+    // Quantifier strings.
     private $quants;
+    // Node id counter.
+    private $idcounter;
 
     function __construct() {
         $this->error = false;
         $this->errornodes = array();
         $this->reducecount = 0;
-        $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>',
-                              preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
-                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
+        $this->parens = array('grouping' => '(?:',
+                              preg_node_subpatt::SUBTYPE_SUBPATT => '(',
+                              preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>',
+                              preg_node_assert::SUBTYPE_PLA => '(?=',
+                              preg_node_assert::SUBTYPE_PLB => '(?<=',
+                              preg_node_assert::SUBTYPE_NLA => '(?!',
+                              preg_node_assert::SUBTYPE_NLB => '(?<!',
+                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=',
+                              preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',
+                              preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!',
+                              preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
+        $this->idcounter = 0;
     }
 
     function get_root() {
@@ -38,13 +50,13 @@
     }
 
     /**
-    * Create and return an error node, also add it to the array of parser errors
-    @param subtype type of error
-    @param firstindxs array of starting indexes of highlited areas
-    @param lastindxs array of ending indexes of highlited areas
-    @param addinfo additional info, supplied for this error
-    @return preg_node_error object
-    */
+     * Creates and returns an error node, also adds it to the array of parser errors
+     * @param subtype type of error
+     * @param firstindxs array of starting indexes of highlited areas
+     * @param lastindxs array of ending indexes of highlited areas
+     * @param addinfo additional info, supplied for this error
+     * @return preg_node_error object
+     */
     protected function create_error_node($subtype, $firstindxs = null, $lastindxs = null, $addinfo = null) {
         $newnode = new preg_node_error;
         $newnode->subtype = $subtype;
@@ -84,6 +96,7 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->operands[0] = B;
     A->operands[1] = C;
     A->userinscription = '';
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
@@ -95,6 +108,7 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->operands[0] = B;
     A->operands[1] = C;
     A->userinscription = '|';
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
@@ -106,6 +120,7 @@ expr(A) ::= expr(B) ALT. {
     A->operands[1] = new preg_leaf_meta;
     A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
     A->userinscription = '|';
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast + 1;
@@ -114,6 +129,7 @@ expr(A) ::= expr(B) ALT. {
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->operands[0] = B;
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
@@ -132,6 +148,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
         }
         A->subtype = B->subtype;
         A->operands[0] = C;
+        A->id = $this->idcounter++;
     }
     A->userinscription = B->userinscription . ' ... )';
     $this->reducecount++;
@@ -140,7 +157,6 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
 }
 
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    //ECHO  'CONDSUB TF <br/>';
     A = new preg_node_cond_subpatt;
     if (C->type != preg_node::TYPE_NODE_ALT) {
         A->operands[0] = C;
@@ -158,7 +174,11 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A->operands[2] = new preg_node_assert;
     A->operands[2]->subtype = D->subtype;
     A->operands[2]->operands[0] = B;
-    A->userinscription = D->userinscription . ' ... ) .... )';
+    A->operands[2]->userinscription = qtype_preg_unicode::substr(D->userinscription, 2) . ' ... )';
+    A->operands[2]->id = $this->idcounter++;
+
+    A->userinscription = D->userinscription . ' ... ) ... | .... )';
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = D->indfirst;
     A->indlast = C->indlast + 1;
@@ -168,6 +188,7 @@ expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
     A = B;
     A->userinscription = B->userinscription;
+    A->id = $this->idcounter++;
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast;
