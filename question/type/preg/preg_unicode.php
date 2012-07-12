@@ -216,18 +216,44 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
-     * Intersects ranges to get a one whole range.
-     * @param ranges an array of ranges by "OR". Every range is represented as array('negative'=>bool, 0=>int, 1=>int).
+     * @param $charset object of qtype_preg_string.
+     */
+    public static function get_ranges_from_charset($charset) {
+        $result = array();
+        $previous = -1;
+        for ($i = 0; $i < $charset->length(); $i++) {
+            $str = $charset[$i];
+            $newnum = self::ord($str);
+            if ($previous === -1) {
+                $toadd = array(0 => $newnum);
+            } else {
+                if ($newnum !== $previous + 1) {
+                    $toadd[1] = $previous;
+                    $result[] = $toadd;
+                    $toadd = array(0 => $newnum);
+                }
+            }
+            $previous = $newnum;
+        }
+        $toadd[1] = $previous;
+        $result[] = $toadd;
+        return $result;
+    }
+
+    /**
+     * A trivial range is an array('negative'=>bool, 0=>int, 1=>int).
+     * A range is an array of trivial ranges - they united by OR.
+     * This function intersects a set of ranges united by AND, thus $tointersect is a 3-dimensional array.
+     * @param tointersect an array of ranges united by "AND".
      * @return an array of ranges where ranges represented as array (0=>int, 1=>int).
      */
-    public static function intersect_ranges($ranges) {
-        $result = array();
-        foreach ($ranges as $tointersect) {
-            $curresult = array(array(0 => 0, 1 => 0x10FFFD));
-            for ($i = 0; count($curresult) > 0 && $i < count($tointersect); $i++) {
-                // $curresult is updated every iteration of this loop.
-                $tmp = $tointersect[$i];
-                // A negative range turns into two positive ranges.
+    public static function intersect_ranges($tointersect) {
+        $result = array(array(0 => 0, 1 => 0x10FFFD));
+        for ($i = 0; count($result) > 0 && $i < count($tointersect); $i++) {
+            $toresult = array();    // This will replace $result by the end of this loop.
+            foreach ($tointersect[$i] as $tmp) {
+                // $tmp is something like array('negative' => false, 0 => 0, 1 => 0x10FFFD) - a trivial range.
+                // We convert it to a range: a negative trivial range turns into two positive trivial ranges.
                 if (!$tmp['negative']) {
                     $currange = array(array(0 => $tmp[0], 1 => $tmp[1]));
                 } else {
@@ -239,33 +265,27 @@ class qtype_preg_unicode extends textlib {
                         $currange[] = array(0 => $tmp[1], 1 => 0x10FFFD);
                     }
                 }
+                // Now we've got somethign like array($trivialrange1[, $trivialrange2])
+                // Each trivial range of $currange is going to be intersected with each trivial range of $result.
+                $tmp1 = array();    // This will store that trivial intersections.
 
-                // Process two current ranges.
-                $tmp = array();
-                //echo 'intersecting '; print_r($curresult); echo ' with '; print_r($currange); echo '<br/>';
-                foreach ($curresult as $curresultpart) {
+                foreach ($result as $resultpart) {
                     foreach ($currange as $currangepart) {
-                        if ($curresultpart[0] < $currangepart[0]) {
-                            $left = $curresultpart;
+                        if ($resultpart[0] < $currangepart[0]) {
+                            $left = $resultpart;
                             $right = $currangepart;
                         } else {
                             $left = $currangepart;
-                            $right = $curresultpart;
+                            $right = $resultpart;
                         }
-                        //echo $left[1].'<br/>';
                         if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
-                            $tmp[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
+                            $tmp1[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
                         }
                     }
                 }
-                //echo 'result: '; print_r($tmp); echo '<br/><br/>';
-                $curresult = $tmp;
+                $toresult = array_merge($toresult, $tmp1);
             }
-            if (count($curresult) > 0) {
-                foreach ($curresult as $tmp) {
-                    $result[] = $tmp;
-                }
-            }
+            $result = $toresult;
         }
         return $result;
     }
