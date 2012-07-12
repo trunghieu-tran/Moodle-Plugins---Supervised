@@ -1412,16 +1412,10 @@ class preg_node_error extends preg_node {
     const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER = 'consubpatt_too_much_alter_node_error';
     // Close paren without opening  xxx)
     const SUBTYPE_WRONG_CLOSE_PAREN = 'wrong_close_paren_node_error';
-    // Ending of a lexem without beginning  xxx(?#}})
-    const SUBTYPE_WRONG_CLOSE_LEXEM = 'wrong_close_lexem_node_error';
     // Open paren without closing  (xxx
     const SUBTYPE_WRONG_OPEN_PAREN = 'wrong_open_paren_node_error';
-    // Beginning of a lexem without ending  (?#{{)xxx
-    const SUBTYPE_WRONG_OPEN_LEXEM = 'wrong_open_lexem_node_error';
     // Empty parens
     const SUBTYPE_EMPTY_PARENS = 'empty_parens_node_error';
-    // Empty lexem
-    const SUBTYPE_EMPTY_LEXEM = 'empty_lexem_node_error';
     // Quantifier at start of expression  - NOTE - currently incompatible with PCRE which treat it as character
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';
     // Unclosed square brackets in character class
@@ -1437,11 +1431,8 @@ class preg_node_error extends preg_node {
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'incorrectregex',
                                    self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'threealtincondsubpatt',
                                    self::SUBTYPE_WRONG_CLOSE_PAREN            => 'unopenedparen',
-                                   self::SUBTYPE_WRONG_CLOSE_LEXEM            => 'unopenedlexem',
                                    self::SUBTYPE_WRONG_OPEN_PAREN             => 'unclosedparen',
-                                   self::SUBTYPE_WRONG_OPEN_LEXEM             => 'unclosedlexem',
                                    self::SUBTYPE_EMPTY_PARENS                 => 'emptyparens',
-                                   self::SUBTYPE_EMPTY_LEXEM                  => 'emptylexem',
                                    self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart',
                                    self::SUBTYPE_UNCLOSED_CHARCLASS           => 'unclosedsqbrackets',
                                    self::SUBTYPE_SET_UNSET_MODIFIER           => 'setunsetmod',

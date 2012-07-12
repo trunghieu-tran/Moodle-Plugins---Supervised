@@ -32,7 +32,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->length_new = $length_new;
         $this->last_transitions = $last_transitions;
         $this->last_match_len = $last_match_len;
-        $this->set_source_info($sourceobj->str, $sourceobj->maxsubpatt, $sourceobj->subpatternmap, $sourceobj->lexemcount);
+        $this->set_source_info($sourceobj->str, $sourceobj->maxsubpatt, $sourceobj->subpatternmap);
     }
 
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
@@ -338,7 +338,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $fullmatchfound = false;
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
         $result->invalidate_match();
 
         // Creating identifiers for states
@@ -395,13 +395,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info($newresult->str()->substr(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+                        $newresult->set_source_info($newresult->str()->substr(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
 
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
                             $newresult->left = $path->length[0] - $newresult->length[0];
                             $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
-                            $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+                            $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
                         }
                         // Finally, save the possible partial match.
                         $partialmatches[] = $newresult;

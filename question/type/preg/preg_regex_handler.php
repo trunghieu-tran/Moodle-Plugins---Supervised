@@ -122,17 +122,6 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns number of lexems.
-     */
-    public function get_lexem_count() {
-        if ($this->lexer !== null) {
-            return $this->lexer->get_lexem_count();
-        } else {
-            return 0;
-        }
-    }
-
-    /**
      * returns string of regular expression modifiers supported by this engine
      */
     public function get_supported_modifiers() {

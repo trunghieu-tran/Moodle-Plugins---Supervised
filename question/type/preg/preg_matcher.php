@@ -58,8 +58,6 @@ class qtype_preg_matching_results {
     protected $maxsubpatt;
     /** @var array A map where keys are subpattern names and values are their numbers */
     protected $subpatternmap;
-    /** @var integer Number of lexems (defined by user) in regular expression */
-    protected $lexemcount;
 
     public function __construct($full = false, $index_first = array(), $length = array(), $left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT,
                                 $extendedmatch = null) {
@@ -74,11 +72,10 @@ class qtype_preg_matching_results {
     /**
      * Sets info about string and regular expression, that is needed for some functions to work
      */
-    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array(), $lexemcount = 0) {
+    public function set_source_info($str = null, $maxsubpatt = 0, $subpatternmap = array()) {
         $this->str = clone $str;
         $this->maxsubpatt = $maxsubpatt;
         $this->subpatternmap = $subpatternmap;
-        $this->lexemcount = $lexemcount;
     }
 
     public function str() {
@@ -91,7 +88,7 @@ class qtype_preg_matching_results {
      * Use to enumerate subpatterns
      */
     public function all_subpatterns() {
-        //Merge all numeric subpattern keys (numbered subpatterns and lexems) with named subpatterns from $subpatternman
+        //Merge all numeric subpattern keys with named subpatterns from $subpatternman
         return array_merge(array_keys($this->index_first), array_keys($this->subpatternmap));
     }
 
@@ -99,7 +96,7 @@ class qtype_preg_matching_results {
      * Return subpattern index in the index_first and length arrays
      *
      * If it is subpattern name, use $subpatternmap to find appropriate index,
-     * otherwise (numbered subpattern or lexeme) just return $subpattern.
+     * otherwise (numbered subpattern) just return $subpattern.
      */
     public function subpattern_number($subpattern) {
         if (array_key_exists($subpattern, $this->subpatternmap)) {//named subpattern
@@ -225,7 +222,7 @@ class qtype_preg_matching_results {
         //$this->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $this->index_first = array();
         $this->length = array();
-        for ($i = -$this->lexemcount; $i <= $this->maxsubpatt; $i++) {
+        for ($i = 0; $i <= $this->maxsubpatt; $i++) {
             $this->index_first[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
             $this->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
@@ -446,7 +443,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //Invalidate match called later to allow parser to count subpatterns
-        $this->matchresults->set_source_info(new qtype_preg_string(''), $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+        $this->matchresults->set_source_info(new qtype_preg_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
         $this->matchresults->invalidate_match();
     }
 
@@ -470,7 +467,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Reset match data and perform matching.
             $this->matchresults = $this->match_inner($str);
             //Save source data for the match
-            $this->matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+            $this->matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
 
             //Set all string as incorrect if there were no matching
             if (!$this->matchresults->is_match()) {
@@ -502,7 +499,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map(), $this->get_lexem_count());
+        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
         $result->invalidate_match();
 
         if ($this->anchor->start) {

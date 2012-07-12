@@ -418,19 +418,9 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);
     }
     function test_lexer_lexems() {
-        $lexer = $this->create_lexer('(?#this should be skipped)(?#{{)(?#{{)(?#}})(?#}})');
+        $lexer = $this->create_lexer('(?#this should be skipped)');
         $token = $lexer->nextToken();    // (?#{{)
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENLEXEM);
-        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token->value->number === -1);
-        $token = $lexer->nextToken();    // (?#{{)
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENLEXEM);
-        $this->assertTrue($token->value->subtype === preg_node_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token->value->number === -2);
-        $token = $lexer->nextToken();    // (?#}})
-        $this->assertTrue($token->type == preg_parser_yyParser::CLOSELEXEM);
-        $token = $lexer->nextToken();    // (?#}})
-        $this->assertTrue($token->type == preg_parser_yyParser::CLOSELEXEM);
+        $this->assertTrue($token === null);
     }
     function test_lexer_charclass() {
         $lexer = $this->create_lexer('[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d0-9][3-6][^\x61-\x{63}][^-\w\D]');
