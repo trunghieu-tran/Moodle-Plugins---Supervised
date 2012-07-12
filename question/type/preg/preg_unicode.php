@@ -6282,7 +6282,10 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2029, 1=>0x2029));
     }
     /******************************************************************/
-    private static function is_in_range($utf8chr, $ranges) {
+    public static function is_in_range($utf8chr, $ranges) {
+        if ($utf8chr === null || $utf8chr === '') {
+            return false;
+        }
         $ord = self::ord($utf8chr);
         foreach ($ranges as $range) {
             if ($range[0] <= $ord && $ord <= $range[1]) {
