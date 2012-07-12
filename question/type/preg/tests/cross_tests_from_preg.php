@@ -1745,23 +1745,15 @@ class qtype_preg_cross_tests_from_preg {
                        'left'=>array(0),
                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
-/*************************!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
         $test3 = array('str'=>'abcb',
-                       'results'=>array(array('is_match'=>true,            // Result for backtracking engine.
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0,1=>3),
-                                              'length'=>array(0=>4,1=>1),
-                                              'left'=>array(1),
-                                              'next'=>'b',
-                                              'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING)),
-                                        array('is_match'=>true,            // Results for FA engine.
-                                              'full'=>false,
-                                              'index_first'=>array(0=>0,1=>3),
-                                              'length'=>array(0=>4,1=>1),
-                                              'left'=>array(1),
-                                              'next'=>'b',
-                                              'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING))
-                                        ));
+                       'is_match'=>true,
+                       'full'=>false,
+                       'index_first'=>array(0=>0,1=>3),
+                       'length'=>array(0=>4,1=>1),
+                       'left'=>array(1),
+                       'next'=>'b',
+                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
 
         return array('regex'=>'a(b|c){3,20}b',
                      'tests'=>array($test1, $test2, $test3));
