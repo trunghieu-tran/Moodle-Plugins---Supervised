@@ -277,14 +277,13 @@ class preg_leaf_charset extends preg_leaf {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => 0x10FFFD));
                 if ($flag->type === preg_charset_flag::SET) {
-                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->set);
-                } else if ($flag->type === preg_charset_flag::FLAG) {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->flag . '_ranges');
-                } else if ($flag->type === preg_charset_flag::UPROP) {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->uniprop . '_ranges');
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
                 }
-                foreach ($currange as &$tmp)
+                foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
+                }
                 $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
@@ -296,7 +295,7 @@ class preg_leaf_charset extends preg_leaf {
                     for ($i = $range[0]; $i <= $range[1]; $i++) {
                         $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
                         //if ($this->match($c, 0, $l, true)) {
-                            return $c;
+                        return $c;
                         //}
                     }
                 }
@@ -656,52 +655,23 @@ class preg_charset_flag {
 
     /** Is this flag negative. */
     public $negative = false;
-    /** Type of this flag, can be either SET or FLAG or UPROP or CIRCUMFLEX or DOLLAR. */
+    /** Type of this flag, can be either TYPE_SET or TYPE_FLAG or TYPE_UPROP or TYPE_CIRCUMFLEX or TYPE_DOLLAR. */
     public $type;
-    /** Characters which match this flag if this is SET, see the constants above. */
-    public $set;
-    /* Name of the qtype_preg_unicode function which verifies this flag, see the constants above. */
-    public $flag;
-    /* Name of the qtype_preg_unicode function which verifies this flag, see the constants above. */
-    public $uniprop;
+    /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG or TYPE_UPROP correspondingly. */
+    public $data;
 
     static protected $flagtypes;
     static protected $intersection;
 
     public function __clone() {
-        $this->negative = $this->negative;
-        $this->type = $this->type;
-
-        if ($this->set !== null) {
-            $this->set = clone $this->set;
-        } else {
-            $this->set = $this->set;
+        if (is_object($this->data)) {
+            $this->data = clone $this->data;
         }
-        $this->flag = $this->flag;
-        $this->uniprop = $this->uniprop;
     }
 
-    public function set_circumflex() {
-        $this->type = self::CIRCUMFLEX;
-    }
-
-    public function set_dollar() {
-        $this->type = self::DOLLAR;
-    }
-
-    public function set_set($set) {
-        $this->type = self::SET;
-        $this->set = $set;
-    }
-
-    public function set_flag($flag) {
-        $this->type = self::FLAG;
-        $this->flag = $flag;
-    }
-
-    public function set_uprop($prop) {
-        $this->type = self::UPROP;
-        $this->uniprop = $prop;        //'/\\p{'.$prop.'}/';
+    public function set_data($type, $data) {
+        $this->type = $type;
+        $this->data = $data;
     }
 
     public function is_null_length() {
@@ -720,7 +690,7 @@ class preg_charset_flag {
                 $result = ($pos === $str->length() - 1);
                 break;
             case self::SET:
-                $charsetcopy = clone $this->set;
+                $charsetcopy = clone $this->data;
                 $strcopy = clone $str;
                 if (!$cs) {
                     $charsetcopy->tolower();
@@ -730,11 +700,8 @@ class preg_charset_flag {
                 $result = qtype_preg_unicode::is_in_range($strcopy[$pos], $currange);
                 break;
             case self::FLAG:
-                $currange = call_user_func('qtype_preg_unicode::' . $this->flag . '_ranges');
-                $result = qtype_preg_unicode::is_in_range($str[$pos], $currange);
-                break;
             case self::UPROP:
-                $currange = call_user_func('qtype_preg_unicode::' . $this->uniprop . '_ranges');
+                $currange = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
                 $result = qtype_preg_unicode::is_in_range($str[$pos], $currange);
                 break;
         }
@@ -751,7 +718,7 @@ class preg_charset_flag {
     public function intersect(preg_charset_flag $other) {
         if ($this->type === preg_charset_flag::FLAG && $other->type === preg_charset_flag::FLAG) {
             foreach (self::$flagtypes as $index => $flagtype) {
-                if ($flagtype === $this->flag) {
+                if ($flagtype === $this->data) {
                     $selfindex = $index;
                     if ($this->negative) {
                         $selfindex += 13;
@@ -760,7 +727,7 @@ class preg_charset_flag {
                 }
             }
             foreach (self::$flagtypes as $index => $flagtype) {
-                if ($flagtype === $other->flag) {
+                if ($flagtype === $other->data) {
                     $otherindex = $index;
                     if ($other->negative) {
                         $otherindex += 13;
@@ -776,10 +743,10 @@ class preg_charset_flag {
             } else {
                 $res = new preg_charset_flag;
                 if ($result[0] === '-') {
-                    $res->set_flag(qtype_preg_unicode::substr($result, 1));
+                    $res->set_data(preg_charset_flag::FLAG, qtype_preg_unicode::substr($result, 1));
                     $res->negative = true;
                 } else {
-                    $res->set_flag($result);
+                    $res->set_data(preg_charset_flag::FLAG, $result);
                 }
                 return $res;
             }
@@ -789,23 +756,23 @@ class preg_charset_flag {
             }
             $res = new preg_charset_flag;
             $str = new qtype_preg_string('');
-            for ($i = 0; $i < $other->set->length(); $i++) {
-                if ($this->match($other->set, $i)) {
-                    $str->concatenate($other->set[$i]);
+            for ($i = 0; $i < $other->data->length(); $i++) {
+                if ($this->match($other->data, $i)) {
+                    $str->concatenate($other->data[$i]);
                 }
             }
             if ($str->length() === 0) {
                 return null;
             }
-            $res->set_set($str);
+            $res->set_data(preg_charset_flag::SET, $str);
             return $res;
         } else if ($this->type === preg_charset_flag::SET && $other->type === preg_charset_flag::FLAG) {
             return $other->intersect($this);
         } else if ($this->type === preg_charset_flag::SET && $other->type === preg_charset_flag::SET) {
             if ($this->negative && $other->negative) {
                 $res = new preg_charset_flag;
-                $str = clone $this->set;
-                $str->concatenate($other->set);
+                $str = clone $this->data;
+                $str->concatenate($other->data);
                 $resstr = new qtype_preg_string('');
                 for ($i = 0; $i < $str->length(); $i++) {
                     if (qtype_preg_unicode::strpos($str, $str[$i]) == $i) {
@@ -816,32 +783,32 @@ class preg_charset_flag {
                 if ($resstr->length() === 0) {
                     return null;
                 }
-                $res->set_set($resstr);
+                $res->set_data(preg_charset_flag::SET, $resstr);
             } else if ($this->negative && !$other->negative) {
                 $res = new preg_charset_flag;
                 $str = new qtype_preg_string('');
-                for ($i = 0; $i < $other->set->length(); $i++) {
-                    if ($this->match($other->set, $i)) {
-                        $str->concatenate($other->set[$i]);
+                for ($i = 0; $i < $other->data->length(); $i++) {
+                    if ($this->match($other->data, $i)) {
+                        $str->concatenate($other->data[$i]);
                     }
                 }
                 if ($str->length() === 0) {
                     return null;
                 }
-                $res->set_set($str);
+                $res->set_data(preg_charset_flag::SET, $str);
                 return $res;
             } else {
                 $res = new preg_charset_flag;
                 $str = new qtype_preg_string('');
-                for ($i = 0; $i < $this->set->length(); $i++) {
-                    if ($other->match($this->set, $i)) {
-                        $str->concatenate($this->set[$i]);
+                for ($i = 0; $i < $this->data->length(); $i++) {
+                    if ($other->match($this->data, $i)) {
+                        $str->concatenate($this->data[$i]);
                     }
                 }
                 if ($str->length() === 0) {
                     return null;
                 }
-                $res->set_set($str);
+                $res->set_data(preg_charset_flag::SET, $str);
                 return $res;
             }
             return $res;
@@ -919,10 +886,10 @@ class preg_charset_flag {
             $result = '$';
             break;
         case self::SET:
-            $result = $this->set;
+            $result = $this->data;
             break;
         case self::FLAG:
-            $result = $this->flag;
+            $result = $this->data;
             break;
         case self::UPROP:
             $result = 'todo';
