@@ -105,6 +105,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_FROM_NFA          = 0;
     const TAG_FROM_DFA          = 1;
     const TAG_FROM_BACKTRACKING = 2;
+    const TAG_FROM_PCRE         = 3;
+    const TAG_FROM_AT_AND_T     = 4;
 
     var $testdataobjects;    // Objects with test data.
     var $extracheckobjects;  // Objects for extra checks.
