@@ -10,287 +10,6 @@
  */
 class qtype_preg_unicode extends textlib {
 
-    public static $ranges = array('Basic Latin'                               => array(0x0000, 0x007F),
-                                  'C1 Controls and Latin-1 Supplement'        => array(0x0080, 0x00FF),
-                                  'Latin Extended-A'                          => array(0x0100, 0x017F),
-                                  'Latin Extended-B'                          => array(0x0180, 0x024F),
-                                  'IPA Extensions'                            => array(0x0250, 0x02AF),
-                                  'Spacing Modifier Letters'                  => array(0x02B0, 0x02FF),
-                                  'Combining Diacritical Marks'               => array(0x0300, 0x036F),
-                                  'Greek/Coptic'                              => array(0x0370, 0x03FF),
-                                  'Cyrillic'                                  => array(0x0400, 0x04FF),
-                                  'Cyrillic Supplement'                       => array(0x0500, 0x052F),
-                                  'Armenian'                                  => array(0x0530, 0x058F),
-                                  'Hebrew'                                    => array(0x0590, 0x05FF),
-                                  'Arabic'                                    => array(0x0600, 0x06FF),
-                                  'Syriac'                                    => array(0x0700, 0x074F),
-                                  //'Undefined'                               => array(0x0750, 0x077F),
-                                  'Thaana'                                    => array(0x0780, 0x07BF),
-                                  //'Undefined'                               => array(0x07C0, 0x08FF),
-                                  'Devanagari'                                => array(0x0900, 0x097F),
-                                  'Bengali/Assamese'                          => array(0x0980, 0x09FF),
-                                  'Gurmukhi'                                  => array(0x0A00, 0x0A7F),
-                                  'Gujarati'                                  => array(0x0A80, 0x0AFF),
-                                  'Oriya'                                     => array(0x0B00, 0x0B7F),
-                                  'Tamil'                                     => array(0x0B80, 0x0BFF),
-                                  'Telugu'                                    => array(0x0C00, 0x0C7F),
-                                  'Kannada'                                   => array(0x0C80, 0x0CFF),
-                                  'Malayalam'                                 => array(0x0D00, 0x0DFF),
-                                  'Sinhala'                                   => array(0x0D80, 0x0DFF),
-                                  'Thai'                                      => array(0x0E00, 0x0E7F),
-                                  'Lao'                                       => array(0x0E80, 0x0EFF),
-                                  'Tibetan'                                   => array(0x0F00, 0x0FFF),
-                                  'Myanmar'                                   => array(0x1000, 0x109F),
-                                  'Georgian'                                  => array(0x10A0, 0x10FF),
-                                  'Hangul Jamo'                               => array(0x1100, 0x11FF),
-                                  'Ethiopic'                                  => array(0x1200, 0x137F),
-                                  //'Undefined'                               => array(0x1380, 0x139F),
-                                  'Cherokee'                                  => array(0x13A0, 0x13FF),
-                                  'Unified Canadian Aboriginal Syllabics'     => array(0x1400, 0x167F),
-                                  'Ogham'                                     => array(0x1680, 0x169F),
-                                  'Runic'                                     => array(0x16A0, 0x16FF),
-                                  'Tagalog'                                   => array(0x1700, 0x171F),
-                                  'Hanunoo'                                   => array(0x1720, 0x173F),
-                                  'Buhid'                                     => array(0x1740, 0x175F),
-                                  'Tagbanwa'                                  => array(0x1760, 0x177F),
-                                  'Khmer'                                     => array(0x1780, 0x17FF),
-                                  'Mongolian'                                 => array(0x1800, 0x18AF),
-                                  //'Undefined'                               => array(0x18B0, 0x18FF),
-                                  'Limbu'                                     => array(0x1900, 0x194F),
-                                  'Tai Le'                                    => array(0x1950, 0x197F),
-                                  //'Undefined'                               => array(0x1980, 0x19DF),
-                                  'Khmer Symbols'                             => array(0x19E0, 0x19FF),
-                                  //'Undefined'                               => array(0x1A00, 0x1CFF),
-                                  'Phonetic Extensions'                       => array(0x1D00, 0x1D7F),
-                                  //'Undefined'                               => array(0x1D80, 0x1DFF),
-                                  'Latin Extended Additional'                 => array(0x1E00, 0x1EFF),
-                                  'Greek Extended'                            => array(0x1F00, 0x1FFF),
-                                  'General Punctuation'                       => array(0x2000, 0x206F),
-                                  'Superscripts and Subscripts'               => array(0x2070, 0x209F),
-                                  'Currency Symbols'                          => array(0x20A0, 0x20CF),
-                                  'Combining Diacritical Marks for Symbols'   => array(0x20D0, 0x20FF),
-                                  'Letterlike Symbols'                        => array(0x2100, 0x214F),
-                                  'Number Forms'                              => array(0x2150, 0x218F),
-                                  'Arrows'                                    => array(0x2190, 0x21FF),
-                                  'Mathematical Operators'                    => array(0x2200, 0x22FF),
-                                  'Miscellaneous Technical'                   => array(0x2300, 0x23FF),
-                                  'Control Pictures'                          => array(0x2400, 0x243F),
-                                  'Optical Character Recognition'             => array(0x2440, 0x245F),
-                                  'Enclosed Alphanumerics'                    => array(0x2460, 0x24FF),
-                                  'Box Drawing'                               => array(0x2500, 0x257F),
-                                  'Block Elements'                            => array(0x2580, 0x259F),
-                                  'Geometric Shapes'                          => array(0x25A0, 0x25FF),
-                                  'Miscellaneous Symbols'                     => array(0x2600, 0x26FF),
-                                  'Dingbats'                                  => array(0x2700, 0x27BF),
-                                  'Miscellaneous Mathematical Symbols-A'      => array(0x27C0, 0x27EF),
-                                  'Supplemental Arrows-A'                     => array(0x27F0, 0x27FF),
-                                  'Braille Patterns'                          => array(0x2800, 0x28FF),
-                                  'Supplemental Arrows-B'                     => array(0x2900, 0x297F),
-                                  'Miscellaneous Mathematical Symbols-B'      => array(0x2980, 0x29FF),
-                                  'Supplemental Mathematical Operators'       => array(0x2A00, 0x2AFF),
-                                  'Miscellaneous Symbols and Arrows'          => array(0x2B00, 0x2BFF),
-                                  //'Undefined'                               => array(0x2C00, 0x2E7F),
-                                  'CJK Radicals Supplement'                   => array(0x2E80, 0x2EFF),
-                                  'Kangxi Radicals'                           => array(0x2F00, 0x2FDF),
-                                  //'Undefined'                               => array(0x2FE0, 0x2FEF),
-                                  'Ideographic Description Characters'        => array(0x2FF0, 0x2FFF),
-                                  'CJK Symbols and Punctuation'               => array(0x3000, 0x303F),
-                                  'Hiragana'                                  => array(0x3040, 0x309F),
-                                  'Katakana'                                  => array(0x30A0, 0x30FF),
-                                  'Bopomofo'                                  => array(0x3100, 0x312F),
-                                  'Hangul Compatibility Jamo'                 => array(0x3130, 0x318F),
-                                  'Kanbun (0xKunten),'                        => array(0x3190, 0x319F),
-                                  'Bopomofo Extended'                         => array(0x31A0, 0x31BF),
-                                  //'Undefined'                               => array(0x31C0, 0x31EF),
-                                  'Katakana Phonetic Extensions'              => array(0x31F0, 0x31FF),
-                                  'Enclosed CJK Letters and Months'           => array(0x3200, 0x32FF),
-                                  'CJK Compatibility'                         => array(0x3300, 0x33FF),
-                                  'CJK Unified Ideographs Extension A'        => array(0x3400, 0x4DBF),
-                                  'Yijing Hexagram Symbols'                   => array(0x4DC0, 0x4DFF),
-                                  'CJK Unified Ideographs'                    => array(0x4E00, 0x9FAF),
-                                  //'Undefined'                               => array(0x9FB0, 0x9FFF),
-                                  'Yi Syllables'                              => array(0xA000, 0xA48F),
-                                  'Yi Radicals'                               => array(0xA490, 0xA4CF),
-                                  //'Undefined'                               => array(0xA4D0, 0xABFF),
-                                  'Hangul Syllables'                          => array(0xAC00, 0xD7AF),
-                                  //'Undefined'                               => array(0xD7B0, 0xD7FF),
-                                  'High Surrogate Area'                       => array(0xD800, 0xDBFF),
-                                  'Low Surrogate Area'                        => array(0xDC00, 0xDFFF),
-                                  'Private Use Area'                          => array(0xE000, 0xF8FF),
-                                  'CJK Compatibility Ideographs'              => array(0xF900, 0xFAFF),
-                                  'Alphabetic Presentation Forms'             => array(0xFB00, 0xFB4F),
-                                  'Arabic Presentation Forms-A'               => array(0xFB50, 0xFDFF),
-                                  'Variation Selectors'                       => array(0xFE00, 0xFE0F),
-                                  //'Undefined'                               => array(0xFE10, 0xFE1F),
-                                  'Combining Half Marks'                      => array(0xFE20, 0xFE2F),
-                                  'CJK Compatibility Forms'                   => array(0xFE30, 0xFE4F),
-                                  'Small Form Variants'                       => array(0xFE50, 0xFE6F),
-                                  'Arabic Presentation Forms-B'               => array(0xFE70, 0xFEFF),
-                                  'Halfwidth and Fullwidth Forms'             => array(0xFF00, 0xFFEF),
-                                  'Specials'                                  => array(0xFFF0, 0xFFFF),
-                                  'Linear B Syllabary'                        => array(0x10000, 0x1007F),
-                                  'Linear B Ideograms'                        => array(0x10080, 0x100FF),
-                                  'Aegean Numbers'                            => array(0x10100, 0x1013F),
-                                  //'Undefined'                               => array(0x10140, 0x102FF),
-                                  'Old Italic'                                => array(0x10300, 0x1032F),
-                                  'Gothic'                                    => array(0x10330, 0x1034F),
-                                  'Ugaritic'                                  => array(0x10380, 0x1039F),
-                                  'Deseret'                                   => array(0x10400, 0x1044F),
-                                  'Shavian'                                   => array(0x10450, 0x1047F),
-                                  'Osmanya'                                   => array(0x10480, 0x104AF),
-                                  //'Undefined'                               => array(0x104B0, 0x107FF),
-                                  'Cypriot Syllabary'                         => array(0x10800, 0x1083F),
-                                  //'Undefined'                               => array(0x10840, 0x1CFFF),
-                                  'Byzantine Musical Symbols'                 => array(0x1D000, 0x1D0FF),
-                                  'Musical Symbols'                           => array(0x1D100, 0x1D1FF),
-                                  //'Undefined'                               => array(0x1D200, 0x1D2FF),
-                                  'Tai Xuan Jing Symbols'                     => array(0x1D300, 0x1D35F),
-                                  //'Undefined'                               => array(0x1D360, 0x1D3FF),
-                                  'Mathematical Alphanumeric Symbols'         => array(0x1D400, 0x1D7FF),
-                                  //'Undefined'                               => array(0x1D800, 0x1FFFF),
-                                  'CJK Unified Ideographs Extension B'        => array(0x20000, 0x2A6DF),
-                                  //'Undefined'                               => array(0x2A6E0, 0x2F7FF),
-                                  'CJK Compatibility Ideographs Supplement'   => array(0x2F800, 0x2FA1F),
-                                  //'Unused'                                  => array(0x2FAB0, 0xDFFFF),
-                                  'Tags'                                      => array(0xE0000, 0xE007F),
-                                  //'Unused'                                  => array(0xE0080, 0xE00FF),
-                                  'Variation Selectors Supplement'            => array(0xE0100, 0xE01EF),
-                                  //'Unused'                                  => array(0xE01F0, 0xEFFFF),
-                                  'Supplementary Private Use Area-A'          => array(0xF0000, 0xFFFFD),
-                                  //'Unused'                                  => array(0xFFFFE, 0xFFFFF),
-                                  'Supplementary Private Use Area-B'          => array(0x100000, 0x10FFFD)
-                                  );
-
-    /**
-     * Returns the code of a UTF-8 character.
-     * @param utf8chr - a UTF-8 character.
-     * @return its code.
-     */
-    public static function ord($utf8chr) {
-        if ($utf8chr === '') {
-            return 0;
-        }
-
-        $ord0 = ord($utf8chr{0});
-        if ($ord0 >= 0 && $ord0 <= 127) {
-            return $ord0;
-        }
-
-        $ord1 = ord($utf8chr{1});
-        if ($ord0 >= 192 && $ord0 <= 223) {
-            return ($ord0 - 192) * 64 + ($ord1 - 128);
-        }
-
-        $ord2 = ord($utf8chr{2});
-        if ($ord0 >= 224 && $ord0 <= 239) {
-            return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-        }
-
-        $ord3 = ord($utf8chr{3});
-        if ($ord0 >= 240 && $ord0 <= 247) {
-            return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns unicode ranges which $utf8str characters belongs to.
-     * @param utf8str UTF-8 string.
-     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
-     */
-    public static function get_ranges($utf8str) {
-        $result = array();
-        for ($i = 0; $i < self::strlen($utf8str); $i++) {
-            $code = self::ord(self::substr($utf8str, $i, 1));
-            foreach (self::$ranges as $name => $range) {
-                if ($code >= $range[0] && $code < $range[1]) {
-                    if (!array_key_exists($name, $result)) {
-                        $result[$name] = $range;
-                    }
-                    break;
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * @param $charset object of qtype_preg_string.
-     */
-    public static function get_ranges_from_charset($charset) {
-        $result = array();
-        $previous = -1;
-        for ($i = 0; $i < $charset->length(); $i++) {
-            $str = $charset[$i];
-            $newnum = self::ord($str);
-            if ($previous === -1) {
-                $toadd = array(0 => $newnum);
-            } else {
-                if ($newnum !== $previous + 1) {
-                    $toadd[1] = $previous;
-                    $result[] = $toadd;
-                    $toadd = array(0 => $newnum);
-                }
-            }
-            $previous = $newnum;
-        }
-        $toadd[1] = $previous;
-        $result[] = $toadd;
-        return $result;
-    }
-
-    /**
-     * A trivial range is an array('negative'=>bool, 0=>int, 1=>int).
-     * A range is an array of trivial ranges - they united by OR.
-     * This function intersects a set of ranges united by AND, thus $tointersect is a 3-dimensional array.
-     * @param tointersect an array of ranges united by "AND".
-     * @return an array of ranges where ranges represented as array (0=>int, 1=>int).
-     */
-    public static function intersect_ranges($tointersect) {
-        $result = array(array(0 => 0, 1 => 0x10FFFD));
-        for ($i = 0; count($result) > 0 && $i < count($tointersect); $i++) {
-            $toresult = array();    // This will replace $result by the end of this loop.
-            foreach ($tointersect[$i] as $tmp) {
-                // $tmp is something like array('negative' => false, 0 => 0, 1 => 0x10FFFD) - a trivial range.
-                // We convert it to a range: a negative trivial range turns into two positive trivial ranges.
-                if (!$tmp['negative']) {
-                    $currange = array(array(0 => $tmp[0], 1 => $tmp[1]));
-                } else {
-                    $currange = array();
-                    if ($tmp[0] > 0) {
-                        $currange[] = array(0 => 0, 1 => $tmp[0]);
-                    }
-                    if ($tmp[1] < 0x10FFFD) {
-                        $currange[] = array(0 => $tmp[1], 1 => 0x10FFFD);
-                    }
-                }
-                // Now we've got somethign like array($trivialrange1[, $trivialrange2])
-                // Each trivial range of $currange is going to be intersected with each trivial range of $result.
-                $tmp1 = array();    // This will store that trivial intersections.
-
-                foreach ($result as $resultpart) {
-                    foreach ($currange as $currangepart) {
-                        if ($resultpart[0] < $currangepart[0]) {
-                            $left = $resultpart;
-                            $right = $currangepart;
-                        } else {
-                            $left = $currangepart;
-                            $right = $resultpart;
-                        }
-                        if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
-                            $tmp1[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
-                        }
-                    }
-                }
-                $toresult = array_merge($toresult, $tmp1);
-            }
-            $result = $toresult;
-        }
-        return $result;
-    }
-
-    /******************************************************************/
     public static function Cc_ranges() {
         return array(array(0=>0x0000, 1=>0x001F),
                      array(0=>0x007F, 1=>0x009F));
@@ -6282,6 +6001,136 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2029, 1=>0x2029));
     }
     /******************************************************************/
+    
+    /**
+     * Returns the code of a UTF-8 character.
+     * @param utf8chr - a UTF-8 character.
+     * @return its code.
+     */
+    public static function ord($utf8chr) {
+        if ($utf8chr === '') {
+            return 0;
+        }
+
+        $ord0 = ord($utf8chr{0});
+        if ($ord0 >= 0 && $ord0 <= 127) {
+            return $ord0;
+        }
+
+        $ord1 = ord($utf8chr{1});
+        if ($ord0 >= 192 && $ord0 <= 223) {
+            return ($ord0 - 192) * 64 + ($ord1 - 128);
+        }
+
+        $ord2 = ord($utf8chr{2});
+        if ($ord0 >= 224 && $ord0 <= 239) {
+            return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
+        }
+
+        $ord3 = ord($utf8chr{3});
+        if ($ord0 >= 240 && $ord0 <= 247) {
+            return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns unicode ranges which $utf8str characters belongs to.
+     * @param utf8str UTF-8 string.
+     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
+     */
+    public static function get_ranges($utf8str) {
+        $result = array();
+        for ($i = 0; $i < self::strlen($utf8str); $i++) {
+            $code = self::ord(self::substr($utf8str, $i, 1));
+            foreach (self::$ranges as $name => $range) {
+                if ($code >= $range[0] && $code < $range[1]) {
+                    if (!array_key_exists($name, $result)) {
+                        $result[$name] = $range;
+                    }
+                    break;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $charset object of qtype_preg_string.
+     */
+    public static function get_ranges_from_charset($charset) {
+        $result = array();
+        $previous = -1;
+        for ($i = 0; $i < $charset->length(); $i++) {
+            $str = $charset[$i];
+            $newnum = self::ord($str);
+            if ($previous === -1) {
+                $toadd = array(0 => $newnum);
+            } else {
+                if ($newnum !== $previous + 1) {
+                    $toadd[1] = $previous;
+                    $result[] = $toadd;
+                    $toadd = array(0 => $newnum);
+                }
+            }
+            $previous = $newnum;
+        }
+        $toadd[1] = $previous;
+        $result[] = $toadd;
+        return $result;
+    }
+
+    /**
+     * A trivial range is an array('negative'=>bool, 0=>int, 1=>int).
+     * A range is an array of trivial ranges - they united by OR.
+     * This function intersects a set of ranges united by AND, thus $tointersect is a 3-dimensional array.
+     * @param tointersect an array of ranges united by "AND".
+     * @return an array of ranges where ranges represented as array (0=>int, 1=>int).
+     */
+    public static function intersect_ranges($tointersect) {
+        $result = array(array(0 => 0, 1 => 0x10FFFD));
+        for ($i = 0; count($result) > 0 && $i < count($tointersect); $i++) {
+            $toresult = array();    // This will replace $result by the end of this loop.
+            foreach ($tointersect[$i] as $tmp) {
+                // $tmp is something like array('negative' => false, 0 => 0, 1 => 0x10FFFD) - a trivial range.
+                // We convert it to a range: a negative trivial range turns into two positive trivial ranges.
+                if (!$tmp['negative']) {
+                    $currange = array(array(0 => $tmp[0], 1 => $tmp[1]));
+                } else {
+                    $currange = array();
+                    if ($tmp[0] > 0) {
+                        $currange[] = array(0 => 0, 1 => $tmp[0]);
+                    }
+                    if ($tmp[1] < 0x10FFFD) {
+                        $currange[] = array(0 => $tmp[1], 1 => 0x10FFFD);
+                    }
+                }
+                // Now we've got somethign like array($trivialrange1[, $trivialrange2])
+                // Each trivial range of $currange is going to be intersected with each trivial range of $result.
+                $tmp1 = array();    // This will store that trivial intersections.
+
+                foreach ($result as $resultpart) {
+                    foreach ($currange as $currangepart) {
+                        if ($resultpart[0] < $currangepart[0]) {
+                            $left = $resultpart;
+                            $right = $currangepart;
+                        } else {
+                            $left = $currangepart;
+                            $right = $resultpart;
+                        }
+                        if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
+                            $tmp1[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
+                        }
+                    }
+                }
+                $toresult = array_merge($toresult, $tmp1);
+            }
+            $result = $toresult;
+        }
+        return $result;
+    }
+    
     public static function is_in_range($utf8chr, $ranges) {
         if ($utf8chr === null || $utf8chr === '') {
             return false;
@@ -6293,438 +6142,5 @@ class qtype_preg_unicode extends textlib {
             }
         }
         return false;
-    }
-    public static function is_C($utf8chr) {
-        return self::is_in_range($utf8chr, self::C_ranges());
-    }
-    public static function is_Cc($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cc_ranges());
-    }
-    public static function is_Cf($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cf_ranges());
-    }
-    public static function is_Cn($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cn_ranges());
-    }
-    public static function is_Co($utf8chr) {
-        return self::is_in_range($utf8chr, self::Co_ranges());
-    }
-    public static function is_Cs($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cs_ranges());
-    }
-    public static function is_L($utf8chr) {
-        return self::is_in_range($utf8chr, self::L_ranges());
-    }
-    public static function is_Ll($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ll_ranges());
-    }
-    public static function is_Lm($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lm_ranges());
-    }
-    public static function is_Lo($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lo_ranges());
-    }
-    public static function is_Lt($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lt_ranges());
-    }
-    public static function is_Lu($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lu_ranges());
-    }
-    public static function is_M($utf8chr) {
-        return self::is_in_range($utf8chr, self::M_ranges());
-    }
-    public static function is_Mc($utf8chr) {
-        return self::is_in_range($utf8chr, self::Mc_ranges());
-    }
-    public static function is_Me($utf8chr) {
-        return self::is_in_range($utf8chr, self::Me_ranges());
-    }
-    public static function is_Mn($utf8chr) {
-        return self::is_in_range($utf8chr, self::Mn_ranges());
-    }
-    public static function is_N($utf8chr) {
-        return self::is_in_range($utf8chr, self::N_ranges());
-    }
-    public static function is_Nd($utf8chr) {
-        return self::is_in_range($utf8chr, self::Nd_ranges());
-    }
-    public static function is_Nl($utf8chr) {
-        return self::is_in_range($utf8chr, self::Nl_ranges());
-    }
-    public static function is_No($utf8chr) {
-        return self::is_in_range($utf8chr, self::No_ranges());
-    }
-    public static function is_P($utf8chr) {
-        return self::is_in_range($utf8chr, self::P_ranges());
-    }
-    public static function is_Pc($utf8chr) {
-        return self::is_in_range($utf8chr, self::Pc_ranges());
-    }
-    public static function is_Pd($utf8chr) {
-        return self::is_in_range($utf8chr, self::Pd_ranges());
-    }
-    public static function is_Pe($utf8chr) {
-        return self::is_in_range($utf8chr, self::Pe_ranges());
-    }
-    public static function is_Pf($utf8chr) {
-        return self::is_in_range($utf8chr, self::Pf_ranges());
-    }
-    public static function is_Pi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Pi_ranges());
-    }
-    public static function is_Po($utf8chr) {
-        return self::is_in_range($utf8chr, self::Po_ranges());
-    }
-    public static function is_Ps($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ps_ranges());
-    }
-    public static function is_S($utf8chr) {
-        return self::is_in_range($utf8chr, self::S_ranges());
-    }
-    public static function is_Sc($utf8chr) {
-        return self::is_in_range($utf8chr, self::Sc_ranges());
-    }
-    public static function is_Sk($utf8chr) {
-        return self::is_in_range($utf8chr, self::Sk_ranges());
-    }
-    public static function is_Sm($utf8chr) {
-        return self::is_in_range($utf8chr, self::Sm_ranges());
-    }
-    public static function is_So($utf8chr) {
-        return self::is_in_range($utf8chr, self::So_ranges());
-    }
-    public static function is_Z($utf8chr) {
-        return self::is_in_range($utf8chr, self::Z_ranges());
-    }
-    public static function is_Zl($utf8chr) {
-        return self::is_in_range($utf8chr, self::Zl_ranges());
-    }
-    public static function is_Zp($utf8chr) {
-        return self::is_in_range($utf8chr, self::Zp_ranges());
-    }
-    public static function is_Zs($utf8chr) {
-        return self::is_in_range($utf8chr, self::Zs_ranges());
-    }
-    public static function is_Arabic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Arabic_ranges());
-    }
-    public static function is_Armenian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Armenian_ranges());
-    }
-    public static function is_Avestan($utf8chr) {
-        return self::is_in_range($utf8chr, self::Avestan_ranges());
-    }
-    public static function is_Balinese($utf8chr) {
-        return self::is_in_range($utf8chr, self::Balinese_ranges());
-    }
-    public static function is_Bamum($utf8chr) {
-        return self::is_in_range($utf8chr, self::Bamum_ranges());
-    }
-    public static function is_Bengali($utf8chr) {
-        return self::is_in_range($utf8chr, self::Bengali_ranges());
-    }
-    public static function is_Bopomofo($utf8chr) {
-        return self::is_in_range($utf8chr, self::Bopomofo_ranges());
-    }
-    public static function is_Braille($utf8chr) {
-        return self::is_in_range($utf8chr, self::Braille_ranges());
-    }
-    public static function is_Buginese($utf8chr) {
-        return self::is_in_range($utf8chr, self::Buginese_ranges());
-    }
-    public static function is_Buhid($utf8chr) {
-        return self::is_in_range($utf8chr, self::Buhid_ranges());
-    }
-    public static function is_Canadian_Aboriginal($utf8chr) {
-        return self::is_in_range($utf8chr, self::Canadian_Aboriginal_ranges());
-    }
-    public static function is_Carian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Carian_ranges());
-    }
-    public static function is_Cham($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cham_ranges());
-    }
-    public static function is_Cherokee($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cherokee_ranges());
-    }
-    public static function is_Common($utf8chr) {
-        return self::is_in_range($utf8chr, self::Common_ranges());
-    }
-    public static function is_Coptic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Coptic_ranges());
-    }
-    public static function is_Cuneiform($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cuneiform_ranges());
-    }
-    public static function is_Cypriot($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cypriot_ranges());
-    }
-    public static function is_Cyrillic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Cyrillic_ranges());
-    }
-    public static function is_Deseret($utf8chr) {
-        return self::is_in_range($utf8chr, self::Deseret_ranges());
-    }
-    public static function is_Devanagari($utf8chr) {
-        return self::is_in_range($utf8chr, self::Devanagari_ranges());
-    }
-    public static function is_Egyptian_Hieroglyphs($utf8chr) {
-        return self::is_in_range($utf8chr, self::Egyptian_Hieroglyphs_ranges());
-    }
-    public static function is_Ethiopic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ethiopic_ranges());
-    }
-    public static function is_Georgian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Georgian_ranges());
-    }
-    public static function is_Glagolitic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Glagolitic_ranges());
-    }
-    public static function is_Gothic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Gothic_ranges());
-    }
-    public static function is_Greek($utf8chr) {
-        return self::is_in_range($utf8chr, self::Greek_ranges());
-    }
-    public static function is_Gujarati($utf8chr) {
-        return self::is_in_range($utf8chr, self::Gujarati_ranges());
-    }
-    public static function is_Gurmukhi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Gurmukhi_ranges());
-    }
-    public static function is_Han($utf8chr) {
-        return self::is_in_range($utf8chr, self::Han_ranges());
-    }
-    public static function is_Hangul($utf8chr) {
-        return self::is_in_range($utf8chr, self::Hangul_ranges());
-    }
-    public static function is_Hanunoo($utf8chr) {
-        return self::is_in_range($utf8chr, self::Hanunoo_ranges());
-    }
-    public static function is_Hebrew($utf8chr) {
-        return self::is_in_range($utf8chr, self::Hebrew_ranges());
-    }
-    public static function is_Hiragana($utf8chr) {
-        return self::is_in_range($utf8chr, self::Hiragana_ranges());
-    }
-    public static function is_Imperial_Aramaic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Imperial_Aramaic_ranges());
-    }
-    public static function is_Inherited($utf8chr) {
-        return self::is_in_range($utf8chr, self::Inherited_ranges());
-    }
-    public static function is_Inscriptional_Pahlavi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Inscriptional_Pahlavi_ranges());
-    }
-    public static function is_Inscriptional_Parthian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Inscriptional_Parthian_ranges());
-    }
-    public static function is_Javanese($utf8chr) {
-        return self::is_in_range($utf8chr, self::Javanese_ranges());
-    }
-    public static function is_Kaithi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Kaithi_ranges());
-    }
-    public static function is_Kannada($utf8chr) {
-        return self::is_in_range($utf8chr, self::Kannada_ranges());
-    }
-    public static function is_Katakana($utf8chr) {
-        return self::is_in_range($utf8chr, self::Katakana_ranges());
-    }
-    public static function is_Kayah_Li($utf8chr) {
-        return self::is_in_range($utf8chr, self::Kayah_Li_ranges());
-    }
-    public static function is_Kharoshthi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Kharoshthi_ranges());
-    }
-    public static function is_Khmer($utf8chr) {
-        return self::is_in_range($utf8chr, self::Khmer_ranges());
-    }
-    public static function is_Lao($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lao_ranges());
-    }
-    public static function is_Latin($utf8chr) {
-        return self::is_in_range($utf8chr, self::Latin_ranges());
-    }
-    public static function is_Lepcha($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lepcha_ranges());
-    }
-    public static function is_Limbu($utf8chr) {
-        return self::is_in_range($utf8chr, self::Limbu_ranges());
-    }
-    public static function is_Linear_B($utf8chr) {
-        return self::is_in_range($utf8chr, self::Linear_B_ranges());
-    }
-    public static function is_Lisu($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lisu_ranges());
-    }
-    public static function is_Lycian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lycian_ranges());
-    }
-    public static function is_Lydian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Lydian_ranges());
-    }
-    public static function is_Malayalam($utf8chr) {
-        return self::is_in_range($utf8chr, self::Malayalam_ranges());
-    }
-    public static function is_Meetei_Mayek($utf8chr) {
-        return self::is_in_range($utf8chr, self::Meetei_Mayek_ranges());
-    }
-    public static function is_Mongolian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Mongolian_ranges());
-    }
-    public static function is_Myanmar($utf8chr) {
-        return self::is_in_range($utf8chr, self::Myanmar_ranges());
-    }
-    public static function is_New_Tai_Lue($utf8chr) {
-        return self::is_in_range($utf8chr, self::New_Tai_Lue_ranges());
-    }
-    public static function is_Nko($utf8chr) {
-        return self::is_in_range($utf8chr, self::Nko_ranges());
-    }
-    public static function is_Ogham($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ogham_ranges());
-    }
-    public static function is_Old_Italic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Old_Italic_ranges());
-    }
-    public static function is_Old_Persian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Old_Persian_ranges());
-    }
-    public static function is_Old_South_Arabian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Old_South_Arabian_ranges());
-    }
-    public static function is_Old_Turkic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Old_Turkic_ranges());
-    }
-    public static function is_Ol_Chiki($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ol_Chiki_ranges());
-    }
-    public static function is_Oriya($utf8chr) {
-        return self::is_in_range($utf8chr, self::Oriya_ranges());
-    }
-    public static function is_Osmanya($utf8chr) {
-        return self::is_in_range($utf8chr, self::Osmanya_ranges());
-    }
-    public static function is_Phags_Pa($utf8chr) {
-        return self::is_in_range($utf8chr, self::Phags_Pa_ranges());
-    }
-    public static function is_Phoenician($utf8chr) {
-        return self::is_in_range($utf8chr, self::Phoenician_ranges());
-    }
-    public static function is_Rejang($utf8chr) {
-        return self::is_in_range($utf8chr, self::Rejang_ranges());
-    }
-    public static function is_Runic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Runic_ranges());
-    }
-    public static function is_Samaritan($utf8chr) {
-        return self::is_in_range($utf8chr, self::Samaritan_ranges());
-    }
-    public static function is_Saurashtra($utf8chr) {
-        return self::is_in_range($utf8chr, self::Saurashtra_ranges());
-    }
-    public static function is_Shavian($utf8chr) {
-        return self::is_in_range($utf8chr, self::Shavian_ranges());
-    }
-    public static function is_Sinhala($utf8chr) {
-        return self::is_in_range($utf8chr, self::Sinhala_ranges());
-    }
-    public static function is_Sundanese($utf8chr) {
-        return self::is_in_range($utf8chr, self::Sundanese_ranges());
-    }
-    public static function is_Syloti_Nagri($utf8chr) {
-        return self::is_in_range($utf8chr, self::Syloti_Nagri_ranges());
-    }
-    public static function is_Syriac($utf8chr) {
-        return self::is_in_range($utf8chr, self::Syriac_ranges());
-    }
-    public static function is_Tagalog($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tagalog_ranges());
-    }
-    public static function is_Tagbanwa($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tagbanwa_ranges());
-    }
-    public static function is_Tai_Le($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tai_Le_ranges());
-    }
-    public static function is_Tai_Tham($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tai_Tham_ranges());
-    }
-    public static function is_Tai_Viet($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tai_Viet_ranges());
-    }
-    public static function is_Tamil($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tamil_ranges());
-    }
-    public static function is_Telugu($utf8chr) {
-        return self::is_in_range($utf8chr, self::Telugu_ranges());
-    }
-    public static function is_Thaana($utf8chr) {
-        return self::is_in_range($utf8chr, self::Thaana_ranges());
-    }
-    public static function is_Thai($utf8chr) {
-        return self::is_in_range($utf8chr, self::Thai_ranges());
-    }
-    public static function is_Tibetan($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tibetan_ranges());
-    }
-    public static function is_Tifinagh($utf8chr) {
-        return self::is_in_range($utf8chr, self::Tifinagh_ranges());
-    }
-    public static function is_Ugaritic($utf8chr) {
-        return self::is_in_range($utf8chr, self::Ugaritic_ranges());
-    }
-    public static function is_Vai($utf8chr) {
-        return self::is_in_range($utf8chr, self::Vai_ranges());
-    }
-    public static function is_Yi($utf8chr) {
-        return self::is_in_range($utf8chr, self::Yi_ranges());
-    }
-    /******************************************************************/
-    public static function is_ascii($utf8chr) {
-        return self::is_in_range($utf8chr, self::ascii_ranges());
-    }
-    public static function is_digit($utf8chr) {
-        return self::is_in_range($utf8chr, self::digit_ranges());
-    }
-    public static function is_xdigit($utf8chr) {
-        return self::is_in_range($utf8chr, self::xdigit_ranges());
-    }
-    public static function is_space($utf8chr) {
-        return self::is_in_range($utf8chr, self::space_ranges());
-    }
-    public static function is_cntrl($utf8chr) {
-        return self::is_in_range($utf8chr, self::cntrl_ranges());
-    }
-    public static function is_graph($utf8chr) {
-        return self::is_in_range($utf8chr, self::graph_ranges());
-    }
-    public static function is_lower($utf8chr) {
-        return self::is_in_range($utf8chr, self::lower_ranges());
-    }
-    public static function is_upper($utf8chr) {
-        return self::is_in_range($utf8chr, self::upper_ranges());
-    }
-    public static function is_print($utf8chr) {
-        return self::is_in_range($utf8chr, self::print_ranges());
-    }
-    public static function is_punct($utf8chr) {
-        return self::is_in_range($utf8chr, self::punct_ranges());
-    }
-    public static function is_alpha($utf8chr) {
-        return self::is_in_range($utf8chr, self::alpha_ranges());
-    }
-    public static function is_alnum($utf8chr) {
-        return self::is_in_range($utf8chr, self::alnum_ranges());
-    }
-    public static function is_wordchar($utf8chr) {
-        return self::is_in_range($utf8chr, self::wordchar_ranges());
-    }
-    public static function is_hspace($utf8chr) {
-        return self::is_in_range($utf8chr, self::hspace_ranges());
-    }
-    public static function is_vspace($utf8chr) {
-        return self::is_in_range($utf8chr, self::vspace_ranges());
     }
 }
