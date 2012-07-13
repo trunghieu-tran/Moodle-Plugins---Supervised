@@ -211,12 +211,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
             $flag = new preg_charset_flag;
             $flag->negative = $negative;
             if ($subtype === preg_charset_flag::SET) {
-                $flag->set_set(new qtype_preg_string($data));
-            } else if ($subtype === preg_charset_flag::FLAG) {
-                $flag->set_flag($data);
-            } else if ($subtype === preg_charset_flag::UPROP) {
-                $flag->set_uprop($data);
+                $data = new qtype_preg_string($data));
             }
+            $flag->set_data($subtype, $data);
             $result->flags = array(array($flag));
             $result->israngecalculated = false;
             break;
@@ -394,11 +391,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         case preg_charset_flag::FLAG:
         case preg_charset_flag::UPROP:
             $flag = new preg_charset_flag;
-            if ($type === preg_charset_flag::FLAG) {
-                $flag->set_flag($data);
-            } else if ($type === preg_charset_flag::UPROP) {
-                $flag->set_uprop($data);
-            }
+            $flag->set_data($type, $data);
             $flag->negative = $negative;
             $this->cc->flags[] = array($flag);
             $this->ccgotflag = true;
@@ -1087,7 +1080,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
         $this->cc->israngecalculated = false;
         if ($this->ccset !== '') {
             $flag = new preg_charset_flag;
-            $flag->set_set(new qtype_preg_string($this->ccset));
+            $flag->set_data(preg_charset_flag::SET, new qtype_preg_string($this->ccset));
             $this->cc->flags[] = array($flag);
         }
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
