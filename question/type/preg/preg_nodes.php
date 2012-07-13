@@ -1029,12 +1029,13 @@ class preg_leaf_assert extends preg_leaf {
                 $result = ($pos === $str->length());
                 break;
             case preg_leaf_assert::SUBTYPE_WORDBREAK:
-                $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_alnum($str[0]));
-                $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1]));
+                $alnumrange = qtype_preg_unicode::alnum_ranges();
+                $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_in_range($str[0], $alnumrange));
+                $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange));
                 $wW = $Ww = false;
                 if ($pos > 0 && $pos < $str->length()) {
-                    $wW = ($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1])) && !($str[$pos] === '_' || qtype_preg_unicode::is_alnum($str[$pos]));
-                    $Ww = !($str[$pos - 1] === '_' || qtype_preg_unicode::is_alnum($str[$pos - 1])) && ($str[$pos] === '_' || qtype_preg_unicode::is_alnum($str[$pos]));
+                    $wW = ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange)) && !($str[$pos] === '_' || qtype_preg_unicode::is_in_range($str[$pos], $alnumrange));
+                    $Ww = !($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange)) && ($str[$pos] === '_' || qtype_preg_unicode::is_in_range($str[$pos], $alnumrange));
                 }
                 $result = ($start || $end || $wW || $Ww);
                 break;
