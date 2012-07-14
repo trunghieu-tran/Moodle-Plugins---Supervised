@@ -19,21 +19,21 @@ require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
 
     function test_parser_id_dummy_1() {
-        $parser =& $this->run_parser('a');
+        $parser = $this->run_parser('a');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->id === 0);
     }
 
     function test_parser_id_dummy_2() {
-        $parser =& $this->run_parser('$');
+        $parser = $this->run_parser('$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($root->id === 0);
     }
 
     function test_parser_id_alt() {
-        $parser =& $this->run_parser('a|');
+        $parser = $this->run_parser('a|');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->id === 1);
@@ -43,7 +43,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_grouping() {
-        $parser =& $this->run_parser('(?:ab)');
+        $parser = $this->run_parser('(?:ab)');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->userinscription === '(?: ... )');
@@ -57,7 +57,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_subpatt() {
-        $parser =& $this->run_parser('(ab)');
+        $parser = $this->run_parser('(ab)');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->userinscription === '( ... )');
@@ -74,7 +74,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_qu() {
-        $parser =& $this->run_parser('(?:ab)??');
+        $parser = $this->run_parser('(?:ab)??');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($root->userinscription === '??');
@@ -92,7 +92,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_aster() {
-        $parser =& $this->run_parser('(?:ab)*');
+        $parser = $this->run_parser('(?:ab)*');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription === '*');
@@ -110,7 +110,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_plus() {
-        $parser =& $this->run_parser('(?:ab)++');
+        $parser = $this->run_parser('(?:ab)++');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription === '++');
@@ -128,7 +128,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_brace() {
-        $parser =& $this->run_parser('[^\p{Egyptian_Hieroglyphs}]{8,}');
+        $parser = $this->run_parser('[^\p{Egyptian_Hieroglyphs}]{8,}');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription === '{8,}');
@@ -140,7 +140,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_cond_subpatt() {
-        $parser =& $this->run_parser('(?(?=a)b|cd)');
+        $parser = $this->run_parser('(?(?=a)b|cd)');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBPATT);
         $this->assertTrue($root->userinscription === '(?(?= ... ) ... | .... )');
@@ -167,7 +167,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_easy_regex() {//a|b
-        $parser =& $this->run_parser('a|b');
+        $parser = $this->run_parser('a|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->userinscription === '|');
@@ -182,7 +182,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->id === 1);
     }
     function test_parser_quantifier() {//ab+
-        $parser =& $this->run_parser('ab+');
+        $parser = $this->run_parser('ab+');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->userinscription === '');
@@ -200,7 +200,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->operands[0]->id === 1);
     }
     function test_parser_alt_and_quantifier() {//a*|b
-        $parser =& $this->run_parser('a*|b');
+        $parser = $this->run_parser('a*|b');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->id === 3);
@@ -216,7 +216,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->id === 2);
     }
     function test_parser_concatenation() {//ab
-        $parser =& $this->run_parser('ab');
+        $parser = $this->run_parser('ab');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->id == 2);
@@ -228,7 +228,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->id == 1);
     }
     function test_parser_alt_and_concatenation() {//ab|cd
-        $parser =& $this->run_parser('ab|cd');
+        $parser = $this->run_parser('ab|cd');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->id == 6);
@@ -250,7 +250,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->operands[1]->id == 4);
     }
     function _test_parser_long_regex() {//(?:a|b)*abb
-        $parser =& $this->run_parser('(?:a|b)*abb');
+        $parser = $this->run_parser('(?:a|b)*abb');
         $matcher = new qtype_preg_dfa_preg_matcher;
         $matcher->roots[0] = $parser->get_root();
         $matcher->append_end(0);
@@ -273,7 +273,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->next == 0);
     }
     function test_parser_two_anchors() {
-        $parser =& $this->run_parser('^a$');
+        $parser = $this->run_parser('^a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
@@ -285,7 +285,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_start_anchor() {
-        $parser =& $this->run_parser('^a');
+        $parser = $this->run_parser('^a');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
@@ -294,7 +294,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->flags[0][0]->data == 'a');
     }
     function test_parser_end_anchor() {
-        $parser =& $this->run_parser('a$');
+        $parser = $this->run_parser('a$');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -303,15 +303,15 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
     }
     function test_parser_error() {
-        $parser =& $this->run_parser('^((ab|cd)ef$');
+        $parser = $this->run_parser('^((ab|cd)ef$');
         $this->assertTrue($parser->get_error());
     }
     function test_parser_no_error() {
-        $parser =& $this->run_parser('((ab|cd)ef)');
+        $parser = $this->run_parser('((ab|cd)ef)');
         $this->assertFalse($parser->get_error());
     }
     function test_parser_asserts() {
-        $parser =& $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)');
+        $parser = $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)');
         $root = $parser->get_root();
         $tb = $root->operands[0]->operands[0];
         $fb = $root->operands[0]->operands[1];
@@ -331,27 +331,27 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tb->userinscription === '(?<= ... )');
     }
     function test_parser_metasymbol_dot() {
-        $parser =& $this->run_parser('.');
+        $parser = $this->run_parser('.');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->flags[0][0]->data == qtype_preg_charset_flag::PRIN);
     }
     function test_parser_word_break() {
-        $parser =& $this->run_parser('a\b');
+        $parser = $this->run_parser('a\b');
         $root = $parser->get_root();
         $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
         $this->assertTrue(!$root->operands[1]->negative);
     }
     function test_parser_word_not_break() {
-        $parser =& $this->run_parser('a\B');
+        $parser = $this->run_parser('a\B');
         $root = $parser->get_root();
         $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
         $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
         $this->assertTrue($root->operands[1]->negative);
     }
     function test_parser_subpatterns() {
-        $parser =& $this->run_parser('((?:(?(?=a)(?>b)|a)))');
+        $parser = $this->run_parser('((?:(?(?=a)(?>b)|a)))');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_COND_SUBPATT);
@@ -359,7 +359,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[0]->subtype == qtype_preg_node_subpatt::SUBTYPE_ONCEONLY);
     }
     function test_parser_duplicate_subpattern_numbers() {
-        $parser =& $this->run_parser('(?|a|b|c)');
+        $parser = $this->run_parser('(?|a|b|c)');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT);
@@ -371,7 +371,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->flags[0][0]->data == 'c');
     }
     function test_parser_index() {
-        $parser =& $this->run_parser('abcdefgh|(abcd)*');
+        $parser = $this->run_parser('abcdefgh|(abcd)*');
         $root = $parser->get_root();
         $this->assertTrue($root->indfirst == 0);
         $this->assertTrue($root->indlast == 15);
@@ -381,7 +381,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->indlast == 15);
     }
     function test_parser_array_of_tokens() {//\88
-        $parser =& $this->run_parser('\89');
+        $parser = $this->run_parser('\89');
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT);
@@ -392,19 +392,19 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
     function test_syntax_errors() {//Test error reporting
         //Unclosed square brackets
-        $parser =& $this->run_parser('ab(c|d)[fg\\]');
+        $parser = $this->run_parser('ab(c|d)[fg\\]');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 7);
         //Unclosed parenthesis
-        $parser =& $this->run_parser('a(b(?:c(?=d(?!e(?<=f(?<!g(?>h');
+        $parser = $this->run_parser('a(b(?:c(?=d(?!e(?<=f(?<!g(?>h');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 7);
         //Unopened parenthesis
-        $parser =& $this->run_parser(')ab(c|d)eg)');
+        $parser = $this->run_parser(')ab(c|d)eg)');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 2);
@@ -415,12 +415,12 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[1]->firstindxs[0] == 10);
         //Several unopened and unclosed parenthesis
-        $parser =& $this->run_parser(')a)b)e(((g(');
+        $parser = $this->run_parser(')a)b)e(((g(');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 7);
         //Empty parenthesis
-        $parser =& $this->run_parser(')abeg(?!)f');
+        $parser = $this->run_parser(')abeg(?!)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 2);
@@ -432,7 +432,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[2]->firstindxs[0] == 5);
         $this->assertTrue($errornodes[2]->lastindxs[0] == 8);
         //Several empty parenthesis
-        $parser =& $this->run_parser(')ab()eg(?!)f');
+        $parser = $this->run_parser(')ab()eg(?!)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 3);
@@ -448,7 +448,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[4]->firstindxs[0] == 3);
         $this->assertTrue($errornodes[4]->lastindxs[0] == 4);
         //Quantifiers without argument inside parenthesis
-        $parser =& $this->run_parser('?a({2,3})c(*)e(+)f');
+        $parser = $this->run_parser('?a({2,3})c(*)e(+)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 3);
@@ -467,7 +467,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern
-        $parser =& $this->run_parser('(?(?=bc)dd|e*f|hhh)');
+        $parser = $this->run_parser('(?(?=bc)dd|e*f|hhh)');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -476,10 +476,10 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
         $this->assertTrue($errornodes[0]->lastindxs[0] == 18);
         //Correct situation: alternatives are nested within two alternatives for conditional subpattern
-        $parser =& $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))');
+        $parser = $this->run_parser('(?(?=bc)(dd|e*f)|(hhh|ff))');
         $this->assertFalse($parser->get_error());
         //Unclosed second parenthesis
-        $parser =& $this->run_parser('a(?(?=bc)dd|e*f|hhh');
+        $parser = $this->run_parser('a(?(?=bc)dd|e*f|hhh');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -488,7 +488,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[0]->firstindxs[0] == 1);
         $this->assertTrue($errornodes[0]->lastindxs[0] == 5);
         //Two parethesis unclosed
-        $parser =& $this->run_parser('(?(?=bce*f|hhh');
+        $parser = $this->run_parser('(?(?=bce*f|hhh');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -497,7 +497,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
         $this->assertTrue($errornodes[0]->lastindxs[0] == 4);
         //Empty assert in conditional subpattern
-        $parser =& $this->run_parser('a(?(?=)');
+        $parser = $this->run_parser('a(?(?=)');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -506,7 +506,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->firstindxs[0] == 1);
         $this->assertTrue($errornodes[1]->lastindxs[0] == 6);
         //Empty yes-expr in conditional subpattern
-        $parser =& $this->run_parser('(?(?=ab))');
+        $parser = $this->run_parser('(?(?=ab))');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -515,7 +515,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->firstindxs[0] == 0);
         $this->assertTrue($errornodes[1]->lastindxs[0] == 8);
         //Conditional subpattern starts at the end of expression
-        $parser =& $this->run_parser('ab(?(?=');
+        $parser = $this->run_parser('ab(?(?=');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) == 1);
@@ -529,7 +529,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
      * @param regex Regular expression to parse.
      * @return parser object.
      */
-    protected function &run_parser($regex) {
+    protected function run_parser($regex) {
         $parser = new preg_parser_yyParser;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
@@ -548,6 +548,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
             $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
         }
         $parser->doParse(0, 0);
+        fclose($pseudofile);
         return $parser;
     }
 }
