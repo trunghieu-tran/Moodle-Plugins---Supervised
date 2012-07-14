@@ -13,7 +13,7 @@
 /**
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
-class preg_lexem {
+class qtype_preg_lexem {
     /** Subtype of the lexem. */
     public $subtype;
     /** Indexes of first and last characters of the lexem. */
@@ -33,7 +33,7 @@ class preg_lexem {
 /**
  * Class for plain subpattern lexems.
  */
-class preg_lexem_subpatt extends preg_lexem {
+class qtype_preg_lexem_subpatt extends qtype_preg_lexem {
     /** Number of the subpattern. */
     public $number;
 
@@ -44,7 +44,7 @@ class preg_lexem_subpatt extends preg_lexem {
 }
 
 /**
- * The interface for objects that are passed to preg_leaf::match(), preg_leaf::consumes(), preg_leaf::next_character() as $matcherstateobj.
+ * The interface for objects that are passed to qtype_preg_leaf::match(), qtype_preg_leaf::consumes(), qtype_preg_leaf::next_character() as $matcherstateobj.
  */
 interface qtype_preg_matcher_state {
 
@@ -67,7 +67,7 @@ interface qtype_preg_matcher_state {
 /**
  * Generic node class.
  */
-abstract class preg_node {
+abstract class qtype_preg_node {
 
     /** Abstract node class, not representing real things. */
     const TYPE_ABSTRACT = 'abstract';
@@ -138,13 +138,13 @@ abstract class preg_node {
 /**
  * Generic leaf class.
  */
-abstract class preg_leaf extends preg_node {
+abstract class qtype_preg_leaf extends qtype_preg_node {
 
     /** Is matching case insensitive? */
     public $caseinsensitive = false;
     /** Is this leaf negative? */
     public $negative = false;
-    /** Assertions merged into this node (preg_leaf_assert objects). */
+    /** Assertions merged into this node (qtype_preg_leaf_assert objects). */
     public $mergedassertions = array();
 
     public function __clone() {
@@ -214,7 +214,7 @@ abstract class preg_leaf extends preg_node {
 /**
  * Represents a character or a charcter set.
  */
-class preg_leaf_charset extends preg_leaf {
+class qtype_preg_leaf_charset extends qtype_preg_leaf {
 
     /** Simple flags in the disjunctive normal form. */
     public $flags = null;   // array(array());
@@ -226,7 +226,7 @@ class preg_leaf_charset extends preg_leaf {
     public $israngecalculated = true;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_CHARSET;
+        $this->type = qtype_preg_node::TYPE_LEAF_CHARSET;
     }
 
     public function __clone() {
@@ -283,7 +283,7 @@ class preg_leaf_charset extends preg_leaf {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
                 $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
-                if ($flag->type === preg_charset_flag::SET) {
+                if ($flag->type === qtype_preg_charset_flag::SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
                     $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
@@ -315,7 +315,7 @@ class preg_leaf_charset extends preg_leaf {
      * @param other charset to check.
      * @return true if included, false otherwise
      */
-    public function is_include(preg_leaf_charset $other) {
+    public function is_include(qtype_preg_leaf_charset $other) {
         $result = true;
         for ($i = 32; $result && $i < 126; $i++) {
             $c = chr($i);
@@ -323,7 +323,7 @@ class preg_leaf_charset extends preg_leaf {
         }
         return $result;
     }
-    public function is_part_ident(preg_leaf_charset $other) {
+    public function is_part_ident(qtype_preg_leaf_charset $other) {
         $flag1 = false;
         $flag2 = false;
         for ($i = 32; !($flag1 && $flag2) && $i < 126; $i++) {
@@ -352,11 +352,11 @@ class preg_leaf_charset extends preg_leaf {
         return $result;
     }
 
-    public function add_flag_dis(preg_charset_flag $flag) {
+    public function add_flag_dis(qtype_preg_charset_flag $flag) {
         echo 'implement add_flag before use!';
     }
 
-    public function add_flag_con(preg_charset_flag $flag) {
+    public function add_flag_con(qtype_preg_charset_flag $flag) {
         echo 'implement add_flag before use!';
     }
 
@@ -397,9 +397,9 @@ class preg_leaf_charset extends preg_leaf {
     /**
      * Intersects this charset with other one.
      * @param other charset to intersect with.
-     * @return an object of preg_leaf_charset which is the intersection of this and other.
+     * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
      */
-    public function intersect(preg_leaf_charset $other) {
+    public function intersect(qtype_preg_leaf_charset $other) {
         if ($this->negative) {
             $this->push_negative();
         }
@@ -411,7 +411,7 @@ class preg_leaf_charset extends preg_leaf {
                 $resflags[] = array_merge($disjunct1, $disjunct2);
             }
         }
-        $result = new preg_leaf_charset;
+        $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
         $result->israngecalculated = false;
         $result->reduce_dnf();
@@ -426,7 +426,7 @@ class preg_leaf_charset extends preg_leaf {
         foreach ($this->flags as $key => $disjunct) {
             foreach ($this->flags[$key] as $index => $flag) {
                 if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$index])) {
-                    if ($flag->type === preg_charset_flag::SET && !$flag->negative) {
+                    if ($flag->type === qtype_preg_charset_flag::SET && !$flag->negative) {
                         foreach ($disjunct as $flag2) {
                             $this->flags[$key][$index] = $this->flags[$key][$index]->intersect($flag2);
                             if ($this->flags[$key][$index] === null) {
@@ -435,7 +435,7 @@ class preg_leaf_charset extends preg_leaf {
                             }
                         }
                         $this->flags[$key] = array($this->flags[$key][$index]);
-                    } else if ($flag->type === preg_charset_flag::SET || $flag->type === preg_charset_flag::FLAG) { // A negative set or a flag.
+                    } else if ($flag->type === qtype_preg_charset_flag::SET || $flag->type === qtype_preg_charset_flag::FLAG) { // A negative set or a flag.
                         foreach ($disjunct as $i => $flag2) {
                             if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$i])) {
                                 $intersected = $this->flags[$key][$index]->intersect($flag2);
@@ -478,9 +478,9 @@ class preg_leaf_charset extends preg_leaf {
     /**
      * Substracts other charset from this.
      * @param other charset to substract.
-     * @return an object of preg_leaf_charset which is the substraction of this and other.
+     * @return an object of qtype_preg_leaf_charset which is the substraction of this and other.
      */
-    public function substract(preg_leaf_charset $other) {
+    public function substract(qtype_preg_leaf_charset $other) {
         $other->negative = !$other->negative;
         $result = $this->intersect($other);
         $other->negative = !$other->negative;
@@ -491,7 +491,7 @@ class preg_leaf_charset extends preg_leaf {
 /**
  * Represents a part of a charset - can be a numerable characters, flag like \w, \d or a unicode property.
  */
-class preg_charset_flag {
+class qtype_preg_charset_flag {
 
     // Charset types.
     const SET                    = 'enumerable_characters';
@@ -712,10 +712,10 @@ class preg_charset_flag {
     /**
      * Intersect this flag with other if possible.
      * @param other other flag to intersect with.
-     * @return the intersection as a preg_charset_flag object if the intersection is possible, null if the intersection is empty and false if the intersection is impossible.
+     * @return the intersection as a qtype_preg_charset_flag object if the intersection is possible, null if the intersection is empty and false if the intersection is impossible.
      */
-    public function intersect(preg_charset_flag $other) {
-        if ($this->type === preg_charset_flag::FLAG && $other->type === preg_charset_flag::FLAG) {
+    public function intersect(qtype_preg_charset_flag $other) {
+        if ($this->type === qtype_preg_charset_flag::FLAG && $other->type === qtype_preg_charset_flag::FLAG) {
             foreach (self::$flagtypes as $index => $flagtype) {
                 if ($flagtype === $this->data) {
                     $selfindex = $index;
@@ -741,20 +741,20 @@ class preg_charset_flag {
             if ($result === false || $result === null) {
                 return $result;
             } else {
-                $res = new preg_charset_flag;
+                $res = new qtype_preg_charset_flag;
                 if ($result[0] === '-') {
-                    $res->set_data(preg_charset_flag::FLAG, qtype_preg_unicode::substr($result, 1));
+                    $res->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_unicode::substr($result, 1));
                     $res->negative = true;
                 } else {
-                    $res->set_data(preg_charset_flag::FLAG, $result);
+                    $res->set_data(qtype_preg_charset_flag::FLAG, $result);
                 }
                 return $res;
             }
-        } else if ($this->type === preg_charset_flag::FLAG && $other->type === preg_charset_flag::SET) {
+        } else if ($this->type === qtype_preg_charset_flag::FLAG && $other->type === qtype_preg_charset_flag::SET) {
             if ($other->negative) {
                 return false;
             }
-            $res = new preg_charset_flag;
+            $res = new qtype_preg_charset_flag;
             $str = new qtype_preg_string('');
             for ($i = 0; $i < $other->data->length(); $i++) {
                 if ($this->match($other->data, $i)) {
@@ -764,13 +764,13 @@ class preg_charset_flag {
             if ($str->length() === 0) {
                 return null;
             }
-            $res->set_data(preg_charset_flag::SET, $str);
+            $res->set_data(qtype_preg_charset_flag::SET, $str);
             return $res;
-        } else if ($this->type === preg_charset_flag::SET && $other->type === preg_charset_flag::FLAG) {
+        } else if ($this->type === qtype_preg_charset_flag::SET && $other->type === qtype_preg_charset_flag::FLAG) {
             return $other->intersect($this);
-        } else if ($this->type === preg_charset_flag::SET && $other->type === preg_charset_flag::SET) {
+        } else if ($this->type === qtype_preg_charset_flag::SET && $other->type === qtype_preg_charset_flag::SET) {
             if ($this->negative && $other->negative) {
-                $res = new preg_charset_flag;
+                $res = new qtype_preg_charset_flag;
                 $str = clone $this->data;
                 $str->concatenate($other->data);
                 $resstr = new qtype_preg_string('');
@@ -783,9 +783,9 @@ class preg_charset_flag {
                 if ($resstr->length() === 0) {
                     return null;
                 }
-                $res->set_data(preg_charset_flag::SET, $resstr);
+                $res->set_data(qtype_preg_charset_flag::SET, $resstr);
             } else if ($this->negative && !$other->negative) {
-                $res = new preg_charset_flag;
+                $res = new qtype_preg_charset_flag;
                 $str = new qtype_preg_string('');
                 for ($i = 0; $i < $other->data->length(); $i++) {
                     if ($this->match($other->data, $i)) {
@@ -795,10 +795,10 @@ class preg_charset_flag {
                 if ($str->length() === 0) {
                     return null;
                 }
-                $res->set_data(preg_charset_flag::SET, $str);
+                $res->set_data(qtype_preg_charset_flag::SET, $str);
                 return $res;
             } else {
-                $res = new preg_charset_flag;
+                $res = new qtype_preg_charset_flag;
                 $str = new qtype_preg_string('');
                 for ($i = 0; $i < $this->data->length(); $i++) {
                     if ($other->match($this->data, $i)) {
@@ -808,7 +808,7 @@ class preg_charset_flag {
                 if ($str->length() === 0) {
                     return null;
                 }
-                $res->set_data(preg_charset_flag::SET, $str);
+                $res->set_data(qtype_preg_charset_flag::SET, $str);
                 return $res;
             }
             return $res;
@@ -822,7 +822,7 @@ class preg_charset_flag {
      * @param other other flag for substraction.
      * @return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
      */
-    public function substract(preg_charset_flag $other) {
+    public function substract(qtype_preg_charset_flag $other) {
         $copy = clone $other;
         return $this->intersect($copy);
     }
@@ -898,7 +898,7 @@ class preg_charset_flag {
 /**
  * Defines meta-characters that can't be enumerated.
  */
-class preg_leaf_meta extends preg_leaf {
+class qtype_preg_leaf_meta extends qtype_preg_leaf {
 
     //Leaf with empty in alternative (something|)
     const SUBTYPE_EMPTY = 'empty_leaf_meta';
@@ -906,7 +906,7 @@ class preg_leaf_meta extends preg_leaf {
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_META;
+        $this->type = qtype_preg_node::TYPE_LEAF_META;
     }
     public function name() {
         return 'leaf_meta';
@@ -929,9 +929,9 @@ class preg_leaf_meta extends preg_leaf {
 
     public function tohr() {
         switch ($this->subtype) {
-            case preg_leaf_meta::SUBTYPE_ENDREG:
+            case qtype_preg_leaf_meta::SUBTYPE_ENDREG:
                 return 'metaENDREG';
-            case preg_leaf_meta::SUBTYPE_EMPTY:
+            case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
                 return 'metaEPS';
             default:
                 return '';
@@ -942,7 +942,7 @@ class preg_leaf_meta extends preg_leaf {
 /**
  * Defines simple assertions.
  */
-class preg_leaf_assert extends preg_leaf {
+class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     /** ^ */
     const SUBTYPE_CIRCUMFLEX = 'circumflex_leaf_assert';
@@ -958,7 +958,7 @@ class preg_leaf_assert extends preg_leaf {
     const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_ASSERT;
+        $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -973,16 +973,16 @@ class preg_leaf_assert extends preg_leaf {
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         $length = 0;
         switch ($this->subtype) {
-            case preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_ESC_G:    // There are no repetitive matching for now, so \G is equvivalent to \A.
-            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:    // There are no repetitive matching for now, so \G is equvivalent to \A.
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $result = ($pos === 0);
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_DOLLAR:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $result = ($pos === $str->length());
                 break;
-            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $alnumrange = qtype_preg_unicode::alnum_ranges();
                 $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_in_range($str[0], $alnumrange));
                 $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange));
@@ -1003,23 +1003,23 @@ class preg_leaf_assert extends preg_leaf {
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
-            case preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if ($this->negative) {
                     return 'notstringstart';
                 } else {
                     return 'stringstart';
                 }
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_DOLLAR:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 if ($this->negative) {
                     return ' notstringend';
                 } else {
                     return '';
                 }
                 break;
-            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
                 if ($this->negative) {
                     return 'notwordchar';
                 } else {
@@ -1030,15 +1030,15 @@ class preg_leaf_assert extends preg_leaf {
     }
     public function tohr() {
         switch ($this->subtype) {
-            case preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $type = '^';
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
-            case preg_leaf_assert::SUBTYPE_DOLLAR:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $type = '$';
                 break;
-            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $type = '\\b';
                 break;
         }
@@ -1053,12 +1053,12 @@ class preg_leaf_assert extends preg_leaf {
 /**
  * Defines backreferences.
  */
-class preg_leaf_backref extends preg_leaf {
+class qtype_preg_leaf_backref extends qtype_preg_leaf {
     /** The number of a subpattern to refer to. */
     public $number;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_BACKREF;
+        $this->type = qtype_preg_node::TYPE_LEAF_BACKREF;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -1123,42 +1123,42 @@ class preg_leaf_backref extends preg_leaf {
     }
 }
 
-class preg_leaf_option extends preg_leaf {
+class qtype_preg_leaf_option extends qtype_preg_leaf {
     public $posopt;
     public $negopt;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_OPTIONS;
+        $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
     }
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');
     }
     public function name() {
         return 'leaf_option';
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        die ('TODO: implements abstract function character for preg_leaf_option class before use it!');
+        die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
     }
     public function tohr() {
         return '(?'.$this->posopt.'-'.$this->negopt;
     }
 }
 
-class preg_leaf_recursion extends preg_leaf {
+class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     public $number;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_LEAF_RECURSION;
+        $this->type = qtype_preg_node::TYPE_LEAF_RECURSION;
     }
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
-        die ('TODO: implements abstract function match for preg_leaf_recursion class before use it!');
+        die ('TODO: implements abstract function match for qtype_preg_leaf_recursion class before use it!');
     }
     public function name() {
         return 'leaf_recursion';
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null){
-        die ('TODO: implements abstract function character for preg_leaf_recursion class before use it!');
+        die ('TODO: implements abstract function character for qtype_preg_leaf_recursion class before use it!');
     }
     public function tohr() {
         return 'recursion';
@@ -1169,7 +1169,7 @@ class preg_leaf_recursion extends preg_leaf {
 /**
  * Defines operator nodes.
  */
-abstract class preg_operator extends preg_node {
+abstract class qtype_preg_operator extends qtype_preg_node {
 
     /** An array of operands. */
     public $operands = array();
@@ -1187,7 +1187,7 @@ abstract class preg_operator extends preg_node {
  * Defines finite quantifiers with left and right borders, unary operator.
  * Possible errors: left border is greater than right one.
  */
-class preg_node_finite_quant extends preg_operator {
+class qtype_preg_node_finite_quant extends qtype_preg_operator {
 
     /** Is quantifier lazy? */
     public $lazy;
@@ -1201,7 +1201,7 @@ class preg_node_finite_quant extends preg_operator {
     public $rightborder;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_FINITE_QUANT;
+        $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
     }
 
     public function name() {
@@ -1214,7 +1214,7 @@ class preg_node_finite_quant extends preg_operator {
 /**
  * Defines infinite quantifiers node with the left border only, unary operator.
  */
-class preg_node_infinite_quant extends preg_operator {
+class qtype_preg_node_infinite_quant extends qtype_preg_operator {
 
     /** Is quantifier lazy? */
     public $lazy;
@@ -1226,7 +1226,7 @@ class preg_node_infinite_quant extends preg_operator {
     public $leftborder;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_INFINITE_QUANT;
+        $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
     }
 
     public function name() {
@@ -1239,9 +1239,9 @@ class preg_node_infinite_quant extends preg_operator {
 /**
  * Defines concatenation, binary operator.
  */
-class preg_node_concat extends preg_operator {
+class qtype_preg_node_concat extends qtype_preg_operator {
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_CONCAT;
+        $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
     }
 
     public function name() {
@@ -1252,10 +1252,10 @@ class preg_node_concat extends preg_operator {
 /**
  * Defines alternative, binary operator.
  */
-class preg_node_alt extends preg_operator {
+class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_ALT;
+        $this->type = qtype_preg_node::TYPE_NODE_ALT;
     }
 
     public function name() {
@@ -1266,7 +1266,7 @@ class preg_node_alt extends preg_operator {
 /**
  * Defines lookaround assertions, unary operator.
  */
-class preg_node_assert extends preg_operator {
+class qtype_preg_node_assert extends qtype_preg_operator {
 
     /** Positive lookahead assert. */
     const SUBTYPE_PLA = 'pla_node_assert';
@@ -1278,7 +1278,7 @@ class preg_node_assert extends preg_operator {
     const SUBTYPE_NLB = 'nlb_node_assert';
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_ASSERT;
+        $this->type = qtype_preg_node::TYPE_NODE_ASSERT;
     }
 
     public function name() {
@@ -1294,7 +1294,7 @@ class preg_node_assert extends preg_operator {
 /**
  * Defines subpatterns, unary operator.
  */
-class preg_node_subpatt extends preg_operator {
+class qtype_preg_node_subpatt extends qtype_preg_operator {
 
     /** Subpattern. */
     const SUBTYPE_SUBPATT = 'subpatt_node_subpatt';
@@ -1307,7 +1307,7 @@ class preg_node_subpatt extends preg_operator {
     public $match = null;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_SUBPATT;
+        $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
     }
 
     public function name() {
@@ -1322,7 +1322,7 @@ class preg_node_subpatt extends preg_operator {
  * The first operand yes-pattern, second - no-pattern, third - the lookaround assertion (if any).
  * Possible errors: there is no backreference with such number in expression
  */
-class preg_node_cond_subpatt extends preg_operator {
+class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
 
     /** Positive lookahead assert. */
     const SUBTYPE_PLA = 'pla_node_cond_subpatt';
@@ -1347,7 +1347,7 @@ class preg_node_cond_subpatt extends preg_operator {
     public $backrefnumber = -1;
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_COND_SUBPATT;
+        $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
     }
 
     public function name() {
@@ -1359,7 +1359,7 @@ class preg_node_cond_subpatt extends preg_operator {
 /**
  * Defines error nodes, used when syntax errors in the regular expression occur.
  */
-class preg_node_error extends preg_node {
+class qtype_preg_node_error extends qtype_preg_node {
 
     /** Unknown parse error. */
     const SUBTYPE_UNKNOWN_ERROR = 'unknown_error_node_error';
@@ -1406,7 +1406,7 @@ class preg_node_error extends preg_node {
     }
 
     public function __construct() {
-        $this->type = preg_node::TYPE_NODE_ERROR;
+        $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->firstindxs = array();
         $this->lastindxs = array();
         $this->addinfo = null;
@@ -1420,6 +1420,6 @@ class preg_node_error extends preg_node {
         $a->indfirst = $this->firstindxs[0];
         $a->indlast = $this->lastindxs[0];
         $a->addinfo = $this->addinfo;
-        return get_string(preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
+        return get_string(qtype_preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
     }
 }

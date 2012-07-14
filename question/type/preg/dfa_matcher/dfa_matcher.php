@@ -103,9 +103,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         */
         $root = $this->roots[$index];
         $oldroot = $root;
-        $root = new preg_node_concat;
-        $root->operands[1] = new preg_leaf_meta;
-        $root->operands[1]->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
+        $root = new qtype_preg_node_concat;
+        $root->operands[1] = new qtype_preg_leaf_meta;
+        $root->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
         $root = $this->from_preg_node($root);
         $root->pregnode->operands[0] = $oldroot;
     }
@@ -146,8 +146,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                         $passcount++;
                     }
                 }
-                if ($this->connection[$index][$num]->pregnode->type === preg_node::TYPE_LEAF_META &&
-                    $this->connection[$index][$num]->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
+                if ($this->connection[$index][$num]->pregnode->type === qtype_preg_node::TYPE_LEAF_META &&
+                    $this->connection[$index][$num]->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_ENDREG) {
                     //if this passage point to end state
                     //end state is imagined and not match with real object, index -1 in array, which have zero and positive index only
                     $this->finiteautomates[$index][$currentstateindex]->passages[$num] = -1;
@@ -256,12 +256,12 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
                     $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, $length, $casesens);
                 }
-                if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_META) {
+                if ($found && $this->connection[$assertnumber][$key]->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
                     $mfound = true;
                     $mkey = $key;
                     $found  = false;
                 }
-                if ($found && $this->connection[$assertnumber][$key]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+                if ($found && $this->connection[$assertnumber][$key]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                     $afound = true;
                     $akey = $key;
                     $found  = false;
@@ -373,7 +373,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $left = 1;
         foreach ($this->finiteautomates[$assertnum][$current]->passages as $key => $passage) {
             $endafterassert = false;
-            if ($this->connection[$assertnum][$key]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+            if ($this->connection[$assertnum][$key]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                 foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
                     if ($secondpass == -1) {
                         $endafterassert = true;
@@ -410,7 +410,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                     foreach ($this->finiteautomates[$assertnum][$step]->passages as $passkey => $passage) {//for all passage in this state
                         if ($passage != $step) {//if passage not to self
                             $endafterassert = false;
-                            if ($this->connection[$assertnum][$passkey]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+                            if ($this->connection[$assertnum][$passkey]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                                 foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
                                     if ($secondpass == -1) {
                                         $endafterassert = true;
@@ -423,7 +423,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                                 $result->left = $left - $front[$i]->assertinpath;
                                 $result->nextkey = $front[$i]->charnum;
                                 return $result;
-                            } else if ($this->connection[$assertnum][$passkey]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {
+                            } else if ($this->connection[$assertnum][$passkey]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
                                 foreach ($this->finiteautomates[$assertnum][$passage]->passages as $secondpass) {
                                     $front[$i]->nextstep[] = $secondpass;
                                 }
@@ -469,7 +469,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $typeequ = $this->connection[$index][$member]->pregnode->type==$this->connection[$index][$leaf]->pregnode->type;
                 $subtypeequ = $this->connection[$index][$member]->pregnode->subtype==$this->connection[$index][$leaf]->pregnode->subtype;
                 $directionequ = $this->connection[$index][$member]->pregnode->negative==$this->connection[$index][$leaf]->pregnode->negative;
-                if ($this->connection[$index][$member]->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $this->connection[$index][$leaf]->pregnode->type==preg_node::TYPE_LEAF_CHARSET) {
+                if ($this->connection[$index][$member]->pregnode->type==qtype_preg_node::TYPE_LEAF_CHARSET && $this->connection[$index][$leaf]->pregnode->type==qtype_preg_node::TYPE_LEAF_CHARSET) {
                     $charsetequ = $this->connection[$index][$member]->pregnode->charset==$this->connection[$index][$leaf]->pregnode->charset;
                 } else {
                     $charsetequ = true;
@@ -524,15 +524,15 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     *@return concatenated list of follow chars
     */
     function followposU($number, $fpmap, $passages, $index) {
-        if ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META &&
-            $this->connection[$index][$number]->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
+        if ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_META &&
+            $this->connection[$index][$number]->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_ENDREG) {
             $res = array();
             return $res;
         }
         $equnum = array();
-        if ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
+        if ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
 			foreach ($this->connection[$index] as $num => $cc) {
-				if ($cc->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+				if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
 					$cc->pregnode->push_negative();
 					$this->connection[$index][$number]->pregnode->push_negative();
 					if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
@@ -540,18 +540,18 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 					}
 				}
 			}
-        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
+        } elseif ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {//if this leaf is metacharacter
             echo '<BR>'.'LEAF_META used:'.$this->connection[$index][$number]->pregnode->type.'<BR>';
 			foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
+                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
-                } /*else if ($cc->pregnode->type == preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
+                } /*else if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $cc->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_DOT && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
                 }*/
             }
-        } elseif ($this->connection[$index][$number]->pregnode->type == preg_node::TYPE_LEAF_ASSERT) {//if this leaf is assert
+        } elseif ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {//if this leaf is assert
             foreach ($this->connection[$index] as $num => $cc) {
-                if ($cc->pregnode->type == preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
+                if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT && $cc->pregnode->subtype == $this->connection[$index][$number]->pregnode->subtype && array_key_exists($num, $passages)) {
                     array_push($equnum, $num);
                 }
             }
@@ -670,7 +670,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 			}
 		}
 		foreach ($this->connection[$index] as $i=>$leaf) {
-			if ($leaf->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $leaf->pregnode->flags===null) {
+			if ($leaf->pregnode->type==qtype_preg_node::TYPE_LEAF_CHARSET && $leaf->pregnode->flags===null) {
 				unset($this->connection[$index][$i]);
 			}
 		}
@@ -726,12 +726,12 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return is partial match
     */
     static protected function is_leafs_part_match($first, $second) {
-        if ($first->pregnode->type == preg_node::TYPE_LEAF_ASSERT || $second->pregnode->type == preg_node::TYPE_LEAF_ASSERT ||
-            $first->pregnode->type == preg_node::TYPE_NODE_ASSERT || $second->pregnode->type == preg_node::TYPE_NODE_ASSERT) {
+        if ($first->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT || $second->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT ||
+            $first->pregnode->type == qtype_preg_node::TYPE_NODE_ASSERT || $second->pregnode->type == qtype_preg_node::TYPE_NODE_ASSERT) {
             return false;
-        } elseif ($first->pregnode->type == preg_node::TYPE_LEAF_META && $second->pregnode->type == preg_node::TYPE_LEAF_META) {
+        } elseif ($first->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $second->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
             return $first->pregnode->subtype != $second->pregnode->subtype;
-        } elseif ($first->pregnode->type == preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+        } elseif ($first->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($first->pregnode->negative && $second->pregnode->negative) {
                 return $first->pregnode->charset != $second->pregnode->charset;
             } elseif (!$first->pregnode->negative && !$second->pregnode->negative) {
@@ -748,13 +748,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 return false;
             }
         } else {//meta and charset
-            if ($second->pregnode->type == preg_node::TYPE_LEAF_META) {
+            if ($second->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
                 $tmp = $first;
                 $first = $second;
                 $second = $tmp;
             }
             //first is meta, second is charset
-            if ($first->pregnode->subtype == preg_leaf_meta::SUBTYPE_ENDREG) {
+            if ($first->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_ENDREG) {
                 return false;//ENDREG not partial match with any other operand
             }
             for ($j=0; $j<strlen($second->pregnode->charset); $j++) {
@@ -772,13 +772,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return unique and equivalent leafs array
     */
     protected function get_unequ_leafs($first, $second) {
-        if ($first->pregnode->type == preg_node::TYPE_LEAF_META && $second->pregnode->type == preg_node::TYPE_LEAF_META) {
+        if ($first->pregnode->type == qtype_preg_node::TYPE_LEAF_META && $second->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
         //two meta leafs
             $result[0] = $this->cross_meta_leafs(clone $first, clone $second, false, true);
             $result[1] = $this->cross_meta_leafs(clone $first, clone $second, false, false);
             $result[2] = $this->cross_meta_leafs(clone $first, clone $second, false, false);
             $result[3] = $this->cross_meta_leafs(clone $first, clone $second, true, false);
-        } elseif ($first->pregnode->type == preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+        } elseif ($first->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET && $second->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
         //two charset leafs
             $result[0] = $this->cross_charsets(clone $first, clone $second, false, true);
             $result[1] = $this->cross_charsets(clone $first, clone $second, false, false);
@@ -788,7 +788,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         //meta and charset
             $fixindex1 = 0;
             $fixindex2 = 2;
-            if ($second->pregnode->type == preg_node::TYPE_LEAF_META) {
+            if ($second->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
                 $tmp = $first;
                 $first = $second;
                 $second = $tmp;
@@ -816,7 +816,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return $result;
     }
     protected function cross_charsets($leaf1, $leaf2, $invert1, $invert2) {
-        $result = new preg_leaf_charset;
+        $result = new qtype_preg_leaf_charset;
         if ($invert1) {
             $leaf1->pregnode->negative = !$leaf1->pregnode->negative;
         }
@@ -868,7 +868,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         //one of leaf is \w, other is metadot
         $flag = false;
-        if ($leaf1->pregnode->subtype == preg_leaf_meta::SUBTYPE_WORD_CHAR) {
+        if ($leaf1->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR) {
             $tmp = $leaf1;
             $leaf1 = $leaf2;
             $second = $tmp;
@@ -878,9 +878,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if ($leaf1->pregnode->negative) {
             $result =  false;//impossible to match
         } else {
-            $result = new preg_leaf_meta;
+            $result = new qtype_preg_leaf_meta;
             $result->negative = $leaf2->pregnode->negative;
-            $result->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
+            $result->subtype = qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR;
             $result = $this->from_preg_node($result);
         }
         if ($flag) {
@@ -904,18 +904,18 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             $leaf2->pregnode->negative = !$leaf2->pregnode->negative;
         }
         $flag = false;
-        if ($leaf1->pregnode->type == preg_node::TYPE_LEAF_CHARSET) {
+        if ($leaf1->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             $tmp = $leaf1;
             $leaf1 = $leaf2;
             $second = $tmp;
             $flag = true;
         }
         //now leaf1 is meta and leaf2 is charset
-        if ($leaf1->pregnode->subtype == preg_leaf_meta::SUBTYPE_DOT) {
+        if ($leaf1->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_DOT) {
             if ($leaf1->pregnode->negative) {
                 $result =  false;//impossible to match
             } else {
-                $result = new preg_leaf_charset;
+                $result = new qtype_preg_leaf_charset;
                 $result->negative = $leaf2->pregnode->negative;
                 $result->charset = $leaf2->pregnode->charset;
                 $result = $this->from_preg_node($result);
@@ -925,7 +925,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $result = preg_leaf_combo::get_cross($leaf1->pregnode, $leaf2->pregnode);
                 $result = $this->from_preg_node($result);
             } else {
-                $result = new preg_leaf_charset;
+                $result = new qtype_preg_leaf_charset;
                 $result->negative = $leaf2->pregnode->negative;
                 $result->charset = '';
                 for ($i=0; $i < strlen($leaf2->pregnode->charset); $i++) {
@@ -956,7 +956,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $index = 0;
 		$leaf = new dfa_preg_leaf_charset($leaf);
         foreach ($this->connection[$num] as $key => $val) {
-            if ($key > $index && $val->pregnode->type != preg_node::TYPE_NODE_ASSERT && $key < 186759556) {
+            if ($key > $index && $val->pregnode->type != qtype_preg_node::TYPE_NODE_ASSERT && $key < 186759556) {
                 $index = $key;
             }
         }
@@ -1011,8 +1011,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $table[dfa_preg_leaf_meta::ENDREG][$mkey]->leaf = $this->connection[0][$mkey];
             }
         }
-        $newleaf = new preg_leaf_meta;
-        $newleaf->subtype = preg_leaf_meta::SUBTYPE_ENDREG;
+        $newleaf = new qtype_preg_leaf_meta;
+        $newleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
         $newleaf = $this->from_preg_node($newleaf);
         $table[dfa_preg_leaf_meta::ENDREG][dfa_preg_leaf_meta::ENDREG] = new fptab;
         $table[dfa_preg_leaf_meta::ENDREG][dfa_preg_leaf_meta::ENDREG]->leaf = $newleaf;
@@ -1117,7 +1117,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                         $this->connection[0][$maxnum] = $table[$akey][$mkey]->leaf;
                     }
                     //forming firstpos
-                    if (in_array($akey, $firsta) && in_array($mkey, $firstm) && !($table[$akey][$mkey]->leaf->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $table[$akey][$mkey]->leaf->pregnode->charset == '')) {
+                    if (in_array($akey, $firsta) && in_array($mkey, $firstm) && !($table[$akey][$mkey]->leaf->pregnode->type==qtype_preg_node::TYPE_LEAF_CHARSET && $table[$akey][$mkey]->leaf->pregnode->charset == '')) {
                         $newfirstposfortree[] = $table[$akey][$mkey]->number;
                     }
                 }
@@ -1137,7 +1137,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
         //delete empty symbols
         foreach ($this->map[0] as $key=>$val) {
-            if ($this->connection[0][$key]->pregnode->type==preg_node::TYPE_LEAF_CHARSET && $this->connection[0][$key]->pregnode->charset == '') {
+            if ($this->connection[0][$key]->pregnode->type==qtype_preg_node::TYPE_LEAF_CHARSET && $this->connection[0][$key]->pregnode->charset == '') {
                 unset($this->map[0][$key]);
                 unset($this->connection[0][$key]);
             }
@@ -1153,7 +1153,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
     /**
     * DFA node factory
-    * @param pregnode preg_node child class instance
+    * @param pregnode qtype_preg_node child class instance
     * @return corresponding dfa_preg_node child class instance
     */
     public function &from_preg_node($pregnode) {
@@ -1171,15 +1171,15 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 return $this->from_preg_node($pregnode);
                 break;
             case 'node_alt':
-                if ($pregnode->operands[1]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[1]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+                if ($pregnode->operands[1]->type == qtype_preg_node::TYPE_LEAF_META && $pregnode->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                     $tmp = $pregnode->operands[0];
-                    $pregnode = new preg_node_finite_quant;
+                    $pregnode = new qtype_preg_node_finite_quant;
                     $pregnode->leftborder = 0;
                     $pregnode->rightborder = 1;
                     $pregnode->operands[0] = $tmp;
-                } else if ($pregnode->operands[0]->type == preg_node::TYPE_LEAF_META && $pregnode->operands[0]->subtype == preg_leaf_meta::SUBTYPE_EMPTY) {
+                } else if ($pregnode->operands[0]->type == qtype_preg_node::TYPE_LEAF_META && $pregnode->operands[0]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                     $tmp = $pregnode->operands[1];
-                    $pregnode = new preg_node_finite_quant;
+                    $pregnode = new qtype_preg_node_finite_quant;
                     $pregnode->leftborder = 0;
                     $pregnode->rightborder = 1;
                     $pregnode->operands[0] = $tmp;
@@ -1203,17 +1203,17 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     protected function &convert_finite_quant($node) {
         if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
             $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
+            $subroot = new qtype_preg_node_concat;
             $subroot->operands[0] = clone $tmp;
             $subroot->operands[1] = clone $tmp;
             $count = $node->leftborder;
             for ($i=2; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
+                $newsubroot = new qtype_preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
                 $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
             }
-            $tmp = new preg_node_finite_quant;
+            $tmp = new qtype_preg_node_finite_quant;
             $tmp->leftborder = 0;
             $tmp->rightborder = 1;
             $tmp->greed = $node->greed;
@@ -1229,7 +1229,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $count = $node->rightborder - $node->leftborder;
             }
             for ($i=0; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
+                $newsubroot = new qtype_preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
                 $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
@@ -1249,23 +1249,23 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             return $node;
         } else if ($node->leftborder == 1) {
             $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
+            $subroot = new qtype_preg_node_concat;
             $subroot->operands[0] = clone $tmp;
             $subroot->operands[1] = clone $node;
             $subroot->operands[1]->leftborder = 0;
         } else {
             $tmp = $node->operands[0];
-            $subroot = new preg_node_concat;
+            $subroot = new qtype_preg_node_concat;
             $subroot->operands[0] = clone $tmp;;
             $subroot->operands[1] = clone $tmp;
             $count = $node->leftborder;
             for ($i=2; $i<$count; $i++) {
-                $newsubroot = new preg_node_concat;
+                $newsubroot = new qtype_preg_node_concat;
                 $newsubroot->operands[0] = $subroot;
                 $newsubroot->operands[1] = clone $tmp;
                 $subroot = $newsubroot;
             }
-            $newsubroot = new preg_node_concat;
+            $newsubroot = new qtype_preg_node_concat;
             $newsubroot->operands[0] = clone $subroot;
             $newsubroot->operands[1] = clone $node;
             $newsubroot->operands[1]->leftborder = 0;

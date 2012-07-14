@@ -18,7 +18,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
 class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
 
     function test_set_match() {
-        $flag = new preg_charset_flag;
+        $flag = new qtype_preg_charset_flag;
         $flag->set_set(new qtype_preg_string('asdf0123'));
         $this->assertTrue($flag->match(new qtype_preg_string('abc015'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('abc015'), 1));
@@ -35,8 +35,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('abc015'), 5));
     }
     function test_flag_d_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::DIGIT);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::DIGIT);
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('12Afg'), 2));
@@ -50,8 +50,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 4));
     }
     function test_flag_xdigit_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::XDIGIT);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::XDIGIT);
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 1));
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 2));
@@ -65,8 +65,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('12Afg'), 4));
     }
     function test_flag_s_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::SPACE);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::SPACE);
         $this->assertFalse($flag->match(new qtype_preg_string('a bc '), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('a bc  '), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('a bc '), 2));
@@ -80,8 +80,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($flag->match(new qtype_preg_string('a bc '), 4));
     }
     function test_flag_w_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::WORDCHAR);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 1));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 2));
@@ -95,8 +95,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($flag->match(new qtype_preg_string('1a_@5'), 4));
     }
     function test_flag_alnum_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::ALNUM);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::ALNUM);
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('1a_@5'), 2));
@@ -110,8 +110,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($flag->match(new qtype_preg_string('1a_@5'), 4));
     }
     function test_flag_alpha_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::ALPHA);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::ALPHA);
         $this->assertFalse($flag->match(new qtype_preg_string('1a_@5'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('1a_@5'), 2));
@@ -125,8 +125,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 4));
     }
     function test_flag_ascii_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::ASCII);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::ASCII);
         $str = new qtype_preg_string(qtype_preg_unicode::code2utf8(17).qtype_preg_unicode::code2utf8(78).qtype_preg_unicode::code2utf8(130).qtype_preg_unicode::code2utf8(131).qtype_preg_unicode::code2utf8(200));
         $this->assertTrue($flag->match($str, 0));
         $this->assertTrue($flag->match($str, 1));
@@ -141,8 +141,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match($str, 4));
     }
     function test_flag_graph_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::GRAPH);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::GRAPH);
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('ab 5\0'), 2));
@@ -156,8 +156,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 4));
     }
     function test_flag_lower_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::LOWER);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::LOWER);
         $this->assertTrue($flag->match(new qtype_preg_string('aB!De'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('aB!De'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('aB!De'), 2));
@@ -171,8 +171,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($flag->match(new qtype_preg_string('aB!De'), 4));
     }
     function test_flag_upper_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::UPPER);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::UPPER);
         $this->assertFalse($flag->match(new qtype_preg_string('aB!De'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('aB!De'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('aB!De'), 2));
@@ -186,8 +186,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('aB!De'), 4));
     }
     function test_flag_print_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::PRIN);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::PRIN);
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 1));
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 2));
@@ -201,8 +201,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('ab 5\0'), 4));
     }
     function test_flag_punct_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::PUNCT);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::PUNCT);
         $this->assertFalse($flag->match(new qtype_preg_string('ab, c'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('ab, c'), 1));
         $this->assertTrue($flag->match(new qtype_preg_string('ab, c'), 2));
@@ -216,8 +216,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('ab, c'), 4));
     }
     function test_flag_cntrl_match() {
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::CNTRL);
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::CNTRL);
         $this->assertFalse($flag->match(new qtype_preg_string('abc\26d'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('abc\26d'), 1));
         $this->assertFalse($flag->match(new qtype_preg_string('abc\26d'), 2));
@@ -231,7 +231,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('abc\26d'), 4));
     }
     function test_unicode_property_matching() {
-        $up = new preg_charset_flag;
+        $up = new qtype_preg_charset_flag;
         $up->set_uprop('L');
         $this->assertFalse($up->match(new qtype_preg_string('12qw21'), 0));
         $this->assertFalse($up->match(new qtype_preg_string('12qw21'), 1));
@@ -248,7 +248,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($up->match(new qtype_preg_string('12qw21'), 5));
     }
     function test_flag_circumflex_match() {
-        $flag = new preg_charset_flag;
+        $flag = new qtype_preg_charset_flag;
         $flag->set_circumflex();
         $this->assertTrue($flag->match(new qtype_preg_string('abc'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('abc'), 1));
@@ -259,7 +259,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($flag->match(new qtype_preg_string('abc'), 2));
     }
     function test_flag_dollar_match() {
-        $flag = new preg_charset_flag;
+        $flag = new qtype_preg_charset_flag;
         $flag->set_dollar();
         $this->assertFalse($flag->match(new qtype_preg_string('abc'), 0));
         $this->assertFalse($flag->match(new qtype_preg_string('abc'), 1));
@@ -272,58 +272,58 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
 
     function test_flag_intersect() {//substract is intersect with negation second operand
         //form all types of flag with negative and positive variant
-        $digit = new preg_charset_flag;
-        $xdigit = new preg_charset_flag;
-        $space = new preg_charset_flag;
-        $wordchar = new preg_charset_flag;
-        $alnum = new preg_charset_flag;
-        $alpha = new preg_charset_flag;
-        $ascii = new preg_charset_flag;
-        $cntrl = new preg_charset_flag;
-        $graph = new preg_charset_flag;
-        $lower = new preg_charset_flag;
-        $upper = new preg_charset_flag;
-        $print = new preg_charset_flag;
-        $punct = new preg_charset_flag;
-        $ndigit = new preg_charset_flag;
-        $nxdigit = new preg_charset_flag;
-        $nspace = new preg_charset_flag;
-        $nwordchar = new preg_charset_flag;
-        $nalnum = new preg_charset_flag;
-        $nalpha = new preg_charset_flag;
-        $nascii = new preg_charset_flag;
-        $ncntrl = new preg_charset_flag;
-        $ngraph = new preg_charset_flag;
-        $nlower = new preg_charset_flag;
-        $nupper = new preg_charset_flag;
-        $nprint = new preg_charset_flag;
-        $npunct = new preg_charset_flag;
-        $digit->set_flag(preg_charset_flag::DIGIT);
-        $xdigit->set_flag(preg_charset_flag::XDIGIT);
-        $space->set_flag(preg_charset_flag::SPACE);
-        $wordchar->set_flag(preg_charset_flag::WORDCHAR);
-        $alnum->set_flag(preg_charset_flag::ALNUM);
-        $alpha->set_flag(preg_charset_flag::ALPHA);
-        $ascii->set_flag(preg_charset_flag::ASCII);
-        $cntrl->set_flag(preg_charset_flag::CNTRL);
-        $graph->set_flag(preg_charset_flag::GRAPH);
-        $lower->set_flag(preg_charset_flag::LOWER);
-        $upper->set_flag(preg_charset_flag::UPPER);
-        $print->set_flag(preg_charset_flag::PRIN);
-        $punct->set_flag(preg_charset_flag::PUNCT);
-        $ndigit->set_flag(preg_charset_flag::DIGIT);
-        $nxdigit->set_flag(preg_charset_flag::XDIGIT);
-        $nspace->set_flag(preg_charset_flag::SPACE);
-        $nwordchar->set_flag(preg_charset_flag::WORDCHAR);
-        $nalnum->set_flag(preg_charset_flag::ALNUM);
-        $nalpha->set_flag(preg_charset_flag::ALPHA);
-        $nascii->set_flag(preg_charset_flag::ASCII);
-        $ncntrl->set_flag(preg_charset_flag::CNTRL);
-        $ngraph->set_flag(preg_charset_flag::GRAPH);
-        $nlower->set_flag(preg_charset_flag::LOWER);
-        $nupper->set_flag(preg_charset_flag::UPPER);
-        $nprint->set_flag(preg_charset_flag::PRIN);
-        $npunct->set_flag(preg_charset_flag::PUNCT);
+        $digit = new qtype_preg_charset_flag;
+        $xdigit = new qtype_preg_charset_flag;
+        $space = new qtype_preg_charset_flag;
+        $wordchar = new qtype_preg_charset_flag;
+        $alnum = new qtype_preg_charset_flag;
+        $alpha = new qtype_preg_charset_flag;
+        $ascii = new qtype_preg_charset_flag;
+        $cntrl = new qtype_preg_charset_flag;
+        $graph = new qtype_preg_charset_flag;
+        $lower = new qtype_preg_charset_flag;
+        $upper = new qtype_preg_charset_flag;
+        $print = new qtype_preg_charset_flag;
+        $punct = new qtype_preg_charset_flag;
+        $ndigit = new qtype_preg_charset_flag;
+        $nxdigit = new qtype_preg_charset_flag;
+        $nspace = new qtype_preg_charset_flag;
+        $nwordchar = new qtype_preg_charset_flag;
+        $nalnum = new qtype_preg_charset_flag;
+        $nalpha = new qtype_preg_charset_flag;
+        $nascii = new qtype_preg_charset_flag;
+        $ncntrl = new qtype_preg_charset_flag;
+        $ngraph = new qtype_preg_charset_flag;
+        $nlower = new qtype_preg_charset_flag;
+        $nupper = new qtype_preg_charset_flag;
+        $nprint = new qtype_preg_charset_flag;
+        $npunct = new qtype_preg_charset_flag;
+        $digit->set_flag(qtype_preg_charset_flag::DIGIT);
+        $xdigit->set_flag(qtype_preg_charset_flag::XDIGIT);
+        $space->set_flag(qtype_preg_charset_flag::SPACE);
+        $wordchar->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $alnum->set_flag(qtype_preg_charset_flag::ALNUM);
+        $alpha->set_flag(qtype_preg_charset_flag::ALPHA);
+        $ascii->set_flag(qtype_preg_charset_flag::ASCII);
+        $cntrl->set_flag(qtype_preg_charset_flag::CNTRL);
+        $graph->set_flag(qtype_preg_charset_flag::GRAPH);
+        $lower->set_flag(qtype_preg_charset_flag::LOWER);
+        $upper->set_flag(qtype_preg_charset_flag::UPPER);
+        $print->set_flag(qtype_preg_charset_flag::PRIN);
+        $punct->set_flag(qtype_preg_charset_flag::PUNCT);
+        $ndigit->set_flag(qtype_preg_charset_flag::DIGIT);
+        $nxdigit->set_flag(qtype_preg_charset_flag::XDIGIT);
+        $nspace->set_flag(qtype_preg_charset_flag::SPACE);
+        $nwordchar->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $nalnum->set_flag(qtype_preg_charset_flag::ALNUM);
+        $nalpha->set_flag(qtype_preg_charset_flag::ALPHA);
+        $nascii->set_flag(qtype_preg_charset_flag::ASCII);
+        $ncntrl->set_flag(qtype_preg_charset_flag::CNTRL);
+        $ngraph->set_flag(qtype_preg_charset_flag::GRAPH);
+        $nlower->set_flag(qtype_preg_charset_flag::LOWER);
+        $nupper->set_flag(qtype_preg_charset_flag::UPPER);
+        $nprint->set_flag(qtype_preg_charset_flag::PRIN);
+        $npunct->set_flag(qtype_preg_charset_flag::PUNCT);
         $ndigit->negative = true;
         $nxdigit->negative = true;
         $nspace->negative = true;
@@ -382,8 +382,8 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
             } else if ($correct[$i]===null) {
                 $this->assertTrue($result[$i]===null, 'failed: result[$i]===null');
             } else {
-                if ($this->assertFalse($result[$i]===false, 'result[$i] is false instead preg_charset_flag object') &&
-                    $this->assertFalse($result[$i]===null, 'result[$i] is null instead preg_charset_flag object' )) {
+                if ($this->assertFalse($result[$i]===false, 'result[$i] is false instead qtype_preg_charset_flag object') &&
+                    $this->assertFalse($result[$i]===null, 'result[$i] is null instead qtype_preg_charset_flag object' )) {
                     $this->compare_match_results($flags1[$i/26], $flags2[$i%26], $result[$i]);
                 }
             }
@@ -391,10 +391,10 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
     }
     function compare_match_results($src1, $src2, $intersected) {
         //verify input data
-        if ($this->assertFalse($intersected===false, 'intersected is false instead preg_charset_flag object, look for error in test')) {
+        if ($this->assertFalse($intersected===false, 'intersected is false instead qtype_preg_charset_flag object, look for error in test')) {
             return;
         }
-        if ($this->assertFalse($intersected===null, 'intersected is null instead preg_charset_flag object, look for error in test')) {
+        if ($this->assertFalse($intersected===null, 'intersected is null instead qtype_preg_charset_flag object, look for error in test')) {
             return;
         }
         //form string for test match of getting flag and two src flag
@@ -414,9 +414,9 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         //TODO: May be range comparing also? It require range testing.
     }
     function test_set_set_intersection() {
-        $set1 = new preg_charset_flag;
+        $set1 = new qtype_preg_charset_flag;
         $set1->set_set(new qtype_preg_string('asdfyz'));
-        $set2 = new preg_charset_flag;
+        $set2 = new qtype_preg_charset_flag;
         $set2->set_set(new qtype_preg_string('qwertyz'));
         $res1 = $set2->intersect($set1);
         $set1->negative = true;
@@ -425,33 +425,33 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $res3 = $set2->intersect($set1);
         //++
         $this->assertTrue(is_object($res1), 'Not object got by intersect two positive sets!');
-        $this->assertTrue($res1->type===preg_charset_flag::SET, 'Not set got by intersect two positive sets!');
+        $this->assertTrue($res1->type===qtype_preg_charset_flag::SET, 'Not set got by intersect two positive sets!');
         $this->assertTrue($res1->set==='yz', 'Incorrect set got by intersect two positive sets!');
         $this->assertFalse($res1->negative, 'Negative set got by intersect two positive set!');
         //-+
         $this->assertTrue(is_object($res2), 'Not object got by intersect positive and negative sets!');
-        $this->assertTrue($res2->type===preg_charset_flag::SET, 'Not set got by intersect positive and negative sets!');
+        $this->assertTrue($res2->type===qtype_preg_charset_flag::SET, 'Not set got by intersect positive and negative sets!');
         $this->assertTrue($res2->set==='qwert', 'Incorrect set got by intersect positive and negative sets!');
         $this->assertFalse($res2->negative, 'Negative charset got by intersect positive and negative charset!');
         //--
         $this->assertTrue(is_object($res3), 'Not object got by intersect two negative sets!');
-        $this->assertTrue($res3->type===preg_charset_flag::SET, 'Not set got by intersect two negative sets!');
+        $this->assertTrue($res3->type===qtype_preg_charset_flag::SET, 'Not set got by intersect two negative sets!');
         $this->assertTrue($res3->set==='qwertyzasdf' || $res3->set==='asdfyzqwert', 'Incorrect set got by intersect two negative sets!');
         $this->assertFalse($res3->set==='qwertyzasdfyz' || $res3->set==='asdfyzqwertyz', 'few chars exist two time in one set after intersection two negative sets!');
         $this->assertTrue($res3->negative, 'Positive charset got by intersect two negative charset!');
     }
     //intersection character's set with any flag or unicode property has one algorithm and only one test need.
     function test_set_flag_intersect() {//intersect set and set hase same algorithm and testing by this test also
-        $flag = new preg_charset_flag;
-        $flag->set_flag(preg_charset_flag::XDIGIT);
-        $set = new preg_charset_flag;
+        $flag = new qtype_preg_charset_flag;
+        $flag->set_flag(qtype_preg_charset_flag::XDIGIT);
+        $set = new qtype_preg_charset_flag;
         $set->set_set(new qtype_preg_string('0123456789abcdEFGHjklmno+-*/!%@#$z'));
         $res1 = $set->intersect($flag);
         $res2 = $flag->intersect($set);
         $this->assertTrue(is_object($res1), 'Not object got by intersect set and flag!');
         $this->assertTrue(is_object($res2), 'Not object got by intersect flag and set!');
-        $this->assertTrue($res1->type===preg_charset_flag::SET, 'Not set got by intersect set and flag!');
-        $this->assertTrue($res2->type===preg_charset_flag::SET, 'Not set got by intersect flag and set!');
+        $this->assertTrue($res1->type===qtype_preg_charset_flag::SET, 'Not set got by intersect set and flag!');
+        $this->assertTrue($res2->type===qtype_preg_charset_flag::SET, 'Not set got by intersect flag and set!');
         $this->assertTrue($res1->set==='0123456789abcdEF', 'Incorrerct set got by intersect set and flag!');
         $this->assertTrue($res1->set==='0123456789abcdEF', 'Incorrerct set got by intersect flag and set!');
         $this->assertFalse($res1->negative, 'Negative charset got by intersect set and flag!');
@@ -471,15 +471,15 @@ class qtype_preg_charset_test extends UnitTestCase {
     }
     function test_match() {
         //create elemenntary charclasses
-        $a = new preg_charset_flag;
-        $b = new preg_charset_flag;
-        $c = new preg_charset_flag;
+        $a = new qtype_preg_charset_flag;
+        $b = new qtype_preg_charset_flag;
+        $c = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b@('));
-        $b->set_flag(preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
         //form charsets
-        $charset = new preg_leaf_charset;
+        $charset = new qtype_preg_leaf_charset;
         $charset->flags[0][0] = $a;
         $charset->flags[1][0] = $b;
         $charset->flags[1][1] = $c;
@@ -489,15 +489,15 @@ class qtype_preg_charset_test extends UnitTestCase {
     }
     function test_next() {
         //create elemenntary charclasses
-        $a = new preg_charset_flag;
-        $b = new preg_charset_flag;
-        $c = new preg_charset_flag;
+        $a = new qtype_preg_charset_flag;
+        $b = new qtype_preg_charset_flag;
+        $c = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b@('));
-        $b->set_flag(preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
         //form charsets
-        $charset = new preg_leaf_charset;
+        $charset = new qtype_preg_leaf_charset;
         $charset->flags[0][0] = $a;
         $charset->flags[1][0] = $b;
         $charset->flags[1][1] = $c;
@@ -506,27 +506,27 @@ class qtype_preg_charset_test extends UnitTestCase {
     }
     function test_intersect() {
         //create elemenntary charclasses
-        $a = new preg_charset_flag;
-        $b = new preg_charset_flag;
-        $c = new preg_charset_flag;
-        $d = new preg_charset_flag;
-        $e = new preg_charset_flag;
-        $f = new preg_charset_flag;
+        $a = new qtype_preg_charset_flag;
+        $b = new qtype_preg_charset_flag;
+        $c = new qtype_preg_charset_flag;
+        $d = new qtype_preg_charset_flag;
+        $e = new qtype_preg_charset_flag;
+        $f = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b%('));
-        $b->set_flag(preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
-        $d->set_flag(preg_charset_flag::WORDCHAR);
+        $d->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $d->negative = true;
         $e->set_set(new qtype_preg_string('a%'));
         $e->negative = true;
         $f->set_set(new qtype_preg_string('b%)'));
         //form charsets
-        $charset1 = new preg_leaf_charset;
+        $charset1 = new qtype_preg_leaf_charset;
         $charset1->flags[0][0] = $a;
         $charset1->flags[1][0] = $b;
         $charset1->flags[1][1] = $c;
-        $charset2 = new preg_leaf_charset;
+        $charset2 = new qtype_preg_leaf_charset;
         $charset2->flags[0][0] = $d;
         $charset2->flags[0][1] = $e;
         $charset2->flags[1][0] = $f;
@@ -537,9 +537,9 @@ class qtype_preg_charset_test extends UnitTestCase {
         $this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue(count($result->flags[1])==1, 'Incorrect count of flags in second disjunct of  intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue(count($result->flags[2])==1, 'Incorrect count of flags in third disjunct of  intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->type===preg_charset_flag::SET, 'Not set instead first set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[1][0]->type===preg_charset_flag::SET, 'Not set instead second set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[2][0]->type===preg_charset_flag::SET, 'Not set instead second set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+        $this->assertTrue($result->flags[0][0]->type===qtype_preg_charset_flag::SET, 'Not set instead first set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+        $this->assertTrue($result->flags[1][0]->type===qtype_preg_charset_flag::SET, 'Not set instead second set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+        $this->assertTrue($result->flags[2][0]->type===qtype_preg_charset_flag::SET, 'Not set instead second set in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertFalse($result->flags[1][0]->negative, 'Second set is negative  in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertFalse($result->flags[2][0]->negative, 'Second set is negative  in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
@@ -554,28 +554,28 @@ class qtype_preg_charset_test extends UnitTestCase {
     }
     function test_substract() {
         //create elemenntary charclasses
-        $a = new preg_charset_flag;
-        $b = new preg_charset_flag;
-        $c = new preg_charset_flag;
-        $d = new preg_charset_flag;
-        $e = new preg_charset_flag;
-        $f = new preg_charset_flag;
+        $a = new qtype_preg_charset_flag;
+        $b = new qtype_preg_charset_flag;
+        $c = new qtype_preg_charset_flag;
+        $d = new qtype_preg_charset_flag;
+        $e = new qtype_preg_charset_flag;
+        $f = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b%('));
-        $b->set_flag(preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
-        $d->set_flag(preg_charset_flag::WORDCHAR);
+        $d->set_flag(qtype_preg_charset_flag::WORDCHAR);
         $d->negative = true;
         $e->set_set(new qtype_preg_string('a%'));
         $e->negative = true;
         $f->set_set(new qtype_preg_string('b%)'));
         //form charsets
-        $charset1 = new preg_leaf_charset;
+        $charset1 = new qtype_preg_leaf_charset;
         $charset1->flags[0][0] = $a;
         $charset1->flags[1][0] = $b;
         $charset1->flags[1][1] = $c;
         $charset1->negative = true;
-        $charset2 = new preg_leaf_charset;
+        $charset2 = new qtype_preg_leaf_charset;
         $charset2->flags[0][0] = $d;
         $charset2->flags[0][1] = $e;
         $charset2->flags[1][0] = $f;
@@ -585,7 +585,7 @@ class qtype_preg_charset_test extends UnitTestCase {
         //verify result
         $this->assertTrue(count($result->flags)==1, 'Incorrect count of disjunct in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue(count($result->flags[0])==1, 'Incorrect count of flags in first disjunct of  substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->flags[0][0]->type===preg_charset_flag::SET, 'Not set instead first set in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
+        $this->assertTrue($result->flags[0][0]->type===qtype_preg_charset_flag::SET, 'Not set instead first set in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertFalse($result->flags[0][0]->negative, 'First set is negative  in substraction of ^[b%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue($result->flags[0][0]->set=='s', '\'s\' not exist in substraction of ^[b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertFalse($result->match(new qtype_preg_string('(bs%)'), 0, $l, true), 'Incorrect matching');

@@ -22,7 +22,7 @@ class qtype_preg_fa_transition {
 
     /** @var object of qtype_preg_fa_state class - a state which transition starts from. */
     public $from;
-    /** @var object of preg_leaf class - condition for this transition. */
+    /** @var object of qtype_preg_leaf class - condition for this transition. */
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
@@ -81,11 +81,11 @@ class qtype_preg_fa_state {
         //TODO - check whether it makes a node non-deterministic
         //TODO - signal automaton if a node become non-deterministic, see make_nondeterministic function in automaton class
 
-        if ($transition->pregleaf->subtype === preg_leaf_meta::SUBTYPE_EMPTY) {
+        if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
             $this->FA->epsilon_transtion_added();
         }
 
-        if ($transition->pregleaf->type === preg_node::TYPE_LEAF_ASSERT) {
+        if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_ASSERT) {
             $this->FA->assertion_transition_added();
         }
 
@@ -621,7 +621,7 @@ abstract class qtype_preg_finite_automaton {
                 $i++;
             }
         }
-        $leaf = new preg_leaf_charset();
+        $leaf = new qtype_preg_leaf_charset();
         $leaf->charset = $charset;
         // TODO: input for dfa.
         $trash =  new qtype_preg_fa_state();
