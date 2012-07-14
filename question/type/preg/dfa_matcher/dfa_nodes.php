@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 */
 abstract class dfa_preg_node {
 
-    //Instance of preg_node child class
+    //Instance of qtype_preg_node child class
     public $pregnode;
     //Cashes for important data
     public $nullable;
@@ -30,9 +30,9 @@ abstract class dfa_preg_node {
     public function __construct($node, &$matcher) {
         $this->pregnode = $node;
         //Convert operands to dfa nodes
-        if (is_a($node, 'preg_operator')) {
+        if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $key=>$operand) {
-                if (is_a($node->operands[$key], 'preg_node')) {//Just to be sure this is not plain-data operand
+                if (is_a($node->operands[$key], 'qtype_preg_node')) {//Just to be sure this is not plain-data operand
                     $node->operands[$key] = $matcher->from_preg_node($operand);
                 }
             }
@@ -256,7 +256,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
 
     const ENDREG = 186759556;
     public function number(&$connection, &$maxnum) {
-        if ($this->pregnode->subtype === preg_leaf_meta::SUBTYPE_ENDREG) {
+        if ($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_ENDREG) {
             $this->number = dfa_preg_leaf_meta::ENDREG;
             $connection[dfa_preg_leaf_meta::ENDREG] = $this;
         } else {
@@ -274,19 +274,19 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
         }
         echo '<br/>';
         switch ($this->pregnode->subtype) {
-            case preg_leaf_meta::SUBTYPE_DOT:
+            case qtype_preg_leaf_meta::SUBTYPE_DOT:
                 $subtype = 'dot';
                 break;
-            case preg_leaf_meta::SUBTYPE_UNICODE_PROP:
+            case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
                 $subtype = 'unicode property';
                 break;
-            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+            case qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR:
                 $subtype = 'word char';
                 break;
-            case preg_leaf_meta::SUBTYPE_EMPTY:
+            case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
                 $subtype = 'empty';
                 break;
-            case preg_leaf_meta::SUBTYPE_ENDREG:
+            case qtype_preg_leaf_meta::SUBTYPE_ENDREG:
                 $subtype = 'endreg';
                 break;
         }
@@ -302,19 +302,19 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
             $direction = 'positive';
         }
         switch ($this->pregnode->subtype) {
-            case preg_leaf_meta::SUBTYPE_DOT:
+            case qtype_preg_leaf_meta::SUBTYPE_DOT:
                 $subtype = 'dot';
                 break;
-            case preg_leaf_meta::SUBTYPE_UNICODE_PROP:
+            case qtype_preg_leaf_meta::SUBTYPE_UNICODE_PROP:
                 $subtype = 'unicode property';
                 break;
-            case preg_leaf_meta::SUBTYPE_WORD_CHAR:
+            case qtype_preg_leaf_meta::SUBTYPE_WORD_CHAR:
                 $subtype = 'word char';
                 break;
-            case preg_leaf_meta::SUBTYPE_EMPTY:
+            case qtype_preg_leaf_meta::SUBTYPE_EMPTY:
                 $subtype = 'empty';
                 break;
-            case preg_leaf_meta::SUBTYPE_ENDREG:
+            case qtype_preg_leaf_meta::SUBTYPE_ENDREG:
                 $subtype = 'endreg';
                 break;
         }
@@ -324,7 +324,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
 }
 class dfa_preg_leaf_assert extends dfa_preg_leaf {
     public function accept() {
-        if ($this->pregnode->subtype == preg_leaf_assert::SUBTYPE_ESC_G) {
+        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
             $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
             return $leafdesc . ' \G';
         }
@@ -341,19 +341,19 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         }
         echo '<br/>';
         switch ($this->pregnode->subtype) {
-            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $subtype = 'circumflex';
                 break;
-            case preg_leaf_assert::SUBTYPE_DOLLAR:
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $subtype = 'dollar';
                 break;
-            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $subtype = 'word break';
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_A:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
                 $subtype = '\\A';
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:
                 $subtype = '\\Z';
                 break;
         }
@@ -369,19 +369,19 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
             $direction = 'positive';
         }
         switch ($this->pregnode->subtype) {
-            case preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $subtype = 'circumflex';
                 break;
-            case preg_leaf_assert::SUBTYPE_DOLLAR:
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $subtype = 'dollar';
                 break;
-            case preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
                 $subtype = 'word break';
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_A:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
                 $subtype = '\\A';
                 break;
-            case preg_leaf_assert::SUBTYPE_ESC_Z:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z:
                 $subtype = '\\Z';
                 break;
         }
@@ -534,15 +534,15 @@ class dfa_preg_node_assert extends dfa_preg_operator {
 
     public function accept() {
 		return 'Asserts temporary unsupported!';
-		if ($this->pregnode->subtype!=preg_node_assert::SUBTYPE_PLA) {
+		if ($this->pregnode->subtype!=qtype_preg_node_assert::SUBTYPE_PLA) {
             switch ($this->pregnode->subtype) {
-                case preg_node_assert::SUBTYPE_NLA:
+                case qtype_preg_node_assert::SUBTYPE_NLA:
                     $res = 'assertff';
                     break;
-                case preg_node_assert::SUBTYPE_PLB:
+                case qtype_preg_node_assert::SUBTYPE_PLB:
                     $res = 'asserttb';
                     break;
-                case preg_node_assert::SUBTYPE_NLB:
+                case qtype_preg_node_assert::SUBTYPE_NLB:
 					$res = 'assertfb';
 					break;
             }
@@ -576,16 +576,16 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         $this->print_indent($indent);
         echo 'type: node assert<br/>';
         switch ($this->pregnode->subtype) {
-            case preg_node_assert::SUBTYPE_PLA:
+            case qtype_preg_node_assert::SUBTYPE_PLA:
                 $subtype = 'PLA';
                 break;
-            case preg_node_assert::SUBTYPE_PLB:
+            case qtype_preg_node_assert::SUBTYPE_PLB:
                 $subtype = 'PLB';
                 break;
-            case preg_node_assert::SUBTYPE_NLA:
+            case qtype_preg_node_assert::SUBTYPE_NLA:
                 $subtype = 'NLA';
                 break;
-            case preg_node_assert::SUBTYPE_NLB:
+            case qtype_preg_node_assert::SUBTYPE_NLB:
                 $subtype = 'NLB';
                 break;
         }
@@ -598,16 +598,16 @@ class dfa_preg_node_assert extends dfa_preg_operator {
     public function write_self_to_dotcode() {
         $str = dfa_preg_node::write_self_to_dotcode();
         switch ($this->pregnode->subtype) {
-            case preg_node_assert::SUBTYPE_PLA:
+            case qtype_preg_node_assert::SUBTYPE_PLA:
                 $subtype = 'PLA';
                 break;
-            case preg_node_assert::SUBTYPE_PLB:
+            case qtype_preg_node_assert::SUBTYPE_PLB:
                 $subtype = 'PLB';
                 break;
-            case preg_node_assert::SUBTYPE_NLA:
+            case qtype_preg_node_assert::SUBTYPE_NLA:
                 $subtype = 'NLA';
                 break;
-            case preg_node_assert::SUBTYPE_NLB:
+            case qtype_preg_node_assert::SUBTYPE_NLB:
                 $subtype = 'NLB';
                 break;
         }

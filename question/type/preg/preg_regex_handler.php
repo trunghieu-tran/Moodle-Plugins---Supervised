@@ -32,7 +32,7 @@ class qtype_preg_regex_handler {
 
     protected $parser;
 
-    // The root of abstract syntax tree of the regular expression - tree consists of preg_node childs.
+    // The root of abstract syntax tree of the regular expression - tree consists of qtype_preg_node childs.
     protected $ast_root;
     // The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name.
     protected $dst_root;
@@ -195,7 +195,7 @@ class qtype_preg_regex_handler {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->matcher = $this;        // Set matcher field, to allow creating preg_leaf nodes that require interaction with matcher
+        $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
         $this->parser = new preg_parser_yyParser;
         while (($token = $this->lexer->nextToken()) !== null) {
@@ -254,11 +254,11 @@ class qtype_preg_regex_handler {
 
     /**
     * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree
-    * @param pregnode preg_node child class instance
+    * @param pregnode qtype_preg_node child class instance
     * @return corresponding xxx_preg_node child class instance
     */
     public function &from_preg_node($pregnode) {
-        if (is_a($pregnode,'preg_node')) {//checking that the node isn't already converted
+        if (is_a($pregnode,'qtype_preg_node')) {//checking that the node isn't already converted
             $enginenodename = $this->get_engine_node_name($pregnode->name());
             if (class_exists($enginenodename)) {
                 $enginenode = new $enginenodename($pregnode, $this);

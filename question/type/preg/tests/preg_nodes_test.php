@@ -19,14 +19,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
-        $anode = new preg_leaf_charset;
+        $anode = new qtype_preg_leaf_charset;
         $anode->charset = 'a';
-        $bnode = new preg_leaf_charset;
+        $bnode = new qtype_preg_leaf_charset;
         $bnode->charset = 'b';
-        $astnode = new preg_node_infinite_quant;
+        $astnode = new qtype_preg_node_infinite_quant;
         $astnode->leftborder = 0;
         $astnode->operands[] = $bnode;
-        $altnode = new preg_node_alt;
+        $altnode = new qtype_preg_node_alt;
         $altnode->operands[] = $anode;
         $altnode->operands[] = $astnode;
 
@@ -47,7 +47,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
-        $backref = new preg_leaf_backref();
+        $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;
 
@@ -70,7 +70,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
-        $backref = new preg_leaf_backref();
+        $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;
 
@@ -93,7 +93,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('abc');
-        $backref = new preg_leaf_backref();
+        $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;
 
@@ -110,7 +110,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('');
         $this->assertTrue($matcher->get_match_results()->full);
-        $backref = new preg_leaf_backref();
+        $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;
 
@@ -126,7 +126,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $matcher = new qtype_preg_nfa_matcher($regex);
         $matcher->match('ab');
-        $backref = new preg_leaf_backref();
+        $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
         $backref->matcher = $matcher;
 

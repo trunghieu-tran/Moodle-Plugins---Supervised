@@ -228,7 +228,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         if ($lasttransition === null || $fulllastmatch) {    // The last transition was fully-matched.
             // Check if an asserion $ failed the match and it's possible to remove a few characters.
             foreach ($laststate->state->outgoing_transitions() as $transition) {
-                if ($transition->pregleaf->subtype === preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to === $this->automaton->end_state()) {
+                if ($transition->pregleaf->subtype === qtype_preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to === $this->automaton->end_state()) {
                     $states[$endstateid] = clone $laststate;
                     $states[$endstateid]->state = $this->automaton->end_state();
                     $states[$endstateid]->full = true;
@@ -264,12 +264,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstate = array_pop($curstates);
                 foreach ($states[$curstate]->state->outgoing_transitions() as $transition) {
                     // Check for anchors.
-                    $skip = (($transition->pregleaf->subtype === preg_leaf_assert::SUBTYPE_CIRCUMFLEX && $states[$curstate]->length[0] > 0) ||               // ^ in the middle.
-                             ($transition->pregleaf->subtype === preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to !== $this->automaton->end_state()));    // $ in the middle.
+                    $skip = (($transition->pregleaf->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX && $states[$curstate]->length[0] > 0) ||               // ^ in the middle.
+                             ($transition->pregleaf->subtype === qtype_preg_leaf_assert::SUBTYPE_DOLLAR && $transition->to !== $this->automaton->end_state()));    // $ in the middle.
 
 
                     if (!$skip) {
-                        if (is_a($transition->pregleaf, 'preg_leaf_backref')) {        // Only generated subpatterns can be passed.
+                        if (is_a($transition->pregleaf, 'qtype_preg_leaf_backref')) {        // Only generated subpatterns can be passed.
                             if (array_key_exists($transition->pregleaf->number, $states[$curstate]->length) && $states[$curstate]->length[$transition->pregleaf->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
                                 $length = $states[$curstate]->length[$transition->pregleaf->number];
                             } else {
@@ -463,16 +463,16 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 /*
                 // Add a dummy transitions to the beginning of the NFA.
                 $start = new qtype_preg_fa_state($result);
-                $epsleaf = new preg_leaf_meta;
-                $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+                $epsleaf = new qtype_preg_leaf_meta;
+                $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
                 $start->add_transition(new qtype_preg_nfa_transition($start, $epsleaf, $result->start_state(), false));
                 $result->add_state($start);
                 $result->set_start_state($start);
 
                 // Add a dummy transitions to the end of the NFA.
                 $end = new qtype_preg_fa_state($result);
-                $epsleaf = new preg_leaf_meta;
-                $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+                $epsleaf = new qtype_preg_leaf_meta;
+                $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
                 $result->end_state()->add_transition(new qtype_preg_nfa_transition($result->end_state(), $epsleaf, $end, false));
                 $result->add_state($end);
                 $result->set_end_state($end);

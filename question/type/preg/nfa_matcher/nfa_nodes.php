@@ -74,7 +74,7 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
  */
 abstract class nfa_preg_node {
 
-    public $pregnode;    // Reference to the corresponding preg_node.
+    public $pregnode;    // Reference to the corresponding qtype_preg_node.
 
     /**
      * Returns true if this node is supported by the engine, rejection string otherwise.
@@ -102,7 +102,7 @@ abstract class nfa_preg_node {
 class nfa_preg_leaf extends nfa_preg_node {
 
     public function accept() {
-        if ($this->pregnode->type === preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype === preg_leaf_assert::SUBTYPE_ESC_G) {
+        if ($this->pregnode->type === qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
             $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
             return $leafdesc . ' \G';
         }
@@ -181,16 +181,16 @@ class nfa_preg_node_alt extends nfa_preg_operator {
         if (count($first['end']->outgoing_transitions()) > 0) {
             $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new preg_leaf_meta;
-            $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+            $epsleaf = new qtype_preg_leaf_meta;
+            $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
             $first['end']->add_transition(new qtype_preg_nfa_transition($first['end'], $epsleaf, $end));
             $first['end'] = $end;
         }
         if (count($second['end']->outgoing_transitions()) > 0) {
             $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new preg_leaf_meta;
-            $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+            $epsleaf = new qtype_preg_leaf_meta;
+            $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
             $second['end']->add_transition(new qtype_preg_nfa_transition($second['end'], $epsleaf, $end));
             $second['end'] = $end;
         }
@@ -234,8 +234,8 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
         }
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf = new preg_leaf_meta;
-        $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta;
+        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
     }
@@ -300,8 +300,8 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         $body = array_pop($stack);
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf = new preg_leaf_meta;
-        $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta;
+        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
     }
@@ -321,8 +321,8 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
-        $epsleaf = new preg_leaf_meta;
-        $epsleaf->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta;
+        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
