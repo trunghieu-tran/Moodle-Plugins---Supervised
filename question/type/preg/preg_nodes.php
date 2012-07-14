@@ -282,7 +282,7 @@ class preg_leaf_charset extends preg_leaf {
         foreach ($this->flags as $flags) {
             foreach ($flags as $flag) {
                 // Get intersection of all current flags.
-                $range = array(array('negative' => false, 0 => 0, 1 => 0x10FFFD));
+                $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 if ($flag->type === preg_charset_flag::SET) {
                     $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
                 } else {
@@ -295,7 +295,7 @@ class preg_leaf_charset extends preg_leaf {
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
                         $tmp['negative'] = true;
-                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => 0x10FFFD)));
+                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
                 }
                 // Check all the returned ranges.
                 foreach ($ranges as $range) {
