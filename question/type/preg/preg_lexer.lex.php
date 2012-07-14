@@ -350,7 +350,7 @@ class qtype_preg_lexer extends JLexBase  {
         return qtype_preg_unicode::code2utf8($code);
     }
     /**
-     * Adds a flag to the lexer's charset when lexer is in the CHARCLASS state.
+     * Adds a flag to the lexer's charset when lexer is in the CHARSET state.
      * @param userinscription a string typed by user and consumed by lexer.
      * @param type type of the flag, should be a constant of preg_leaf_charset.
      * @param data can contain either subtype of a flag or characters for a charset.
@@ -411,14 +411,14 @@ class qtype_preg_lexer extends JLexBase  {
         if (false === $this->yy_eof_done) {
 
         if (isset($this->cc) && is_object($this->cc)) { // End of the expression inside a character class.
-            $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS, $this->cc->indfirst, $this->yychar - 1, '');
+            $this->errors[] = new preg_lexem(preg_node_error::SUBTYPE_UNCLOSED_CHARSET, $this->cc->indfirst, $this->yychar - 1, '');
             $this->cc = null;
         }
         }
         $this->yy_eof_done = true;
     }
     const YYINITIAL = 0;
-    const CHARCLASS = 1;
+    const CHARSET = 1;
     static $yy_state_dtrans = array(
         0,
         177
@@ -5663,7 +5663,7 @@ array(
     $this->cc->negative = $this->yylength() === 2;
     $this->cccharnumber = 0;
     $this->ccset = '';
-    $this->yybegin(self::CHARCLASS);
+    $this->yybegin(self::CHARSET);
 }
                         case -7:
                             break;
@@ -6645,7 +6645,7 @@ array(
     $this->cc->negative = $this->yylength() === 2;
     $this->cccharnumber = 0;
     $this->ccset = '';
-    $this->yybegin(self::CHARCLASS);
+    $this->yybegin(self::CHARSET);
 }
                         case -115:
                             break;
