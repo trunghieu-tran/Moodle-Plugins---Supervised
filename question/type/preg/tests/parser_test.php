@@ -396,7 +396,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue($errornodes[0]->type == preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_UNCLOSED_CHARCLASS);
+        $this->assertTrue($errornodes[0]->subtype == preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 7);
         //Unclosed parenthesis
         $parser =& $this->run_parser('a(b(?:c(?=d(?!e(?<=f(?<!g(?>h');
