@@ -126,6 +126,13 @@ abstract class qtype_preg_node {
      */
     abstract public function name();
 
+    /**
+     * Writes this node to a .dot file - used for debugging.
+     * @param file the opened output file.
+     * @return name of the node in the .dot file.
+     */
+    abstract public function write_to_dot_file($file);
+
 
     /**
      * May be overloaded by childs to change name using data from $this->pregnode.
@@ -152,6 +159,21 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         foreach ($this->mergedassertions as $i => $mergedassertion) {
             $this->mergedassertions[$i] = clone $mergedassertion;
         }
+    }
+
+    public function write_to_dot_file($file) {
+        if (is_array($this->userinscription)) {
+            $userinscription = '[';
+            foreach ($this->userinscription as $tmp) {
+                $userinscription .= $tmp;
+            }
+            $userinscription .= ']';
+        } else {
+            $userinscription = $this->userinscription;
+        }
+        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
+        fwrite($file, $str . ";\n");
+        return $str;
     }
 
     /**
@@ -1180,6 +1202,17 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $this->operands[$i] = clone $operand;
         }
     }
+
+    public function write_to_dot_file($file) {
+        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
+        foreach ($this->operands as $operand) {
+            $operandstr = $operand->write_to_dot_file($file);
+            fwrite($file, $str . '->' . $operandstr . ";\n");
+        }
+
+        fwrite($file, $str . ";\n");
+        return $str;
+    }
 }
 
 
@@ -1410,6 +1443,8 @@ class qtype_preg_node_error extends qtype_preg_node {
         $this->firstindxs = array();
         $this->lastindxs = array();
         $this->addinfo = null;
+    }
+    public function write_to_dot_file($file) {
     }
 
     /**
