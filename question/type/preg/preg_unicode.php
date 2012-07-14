@@ -10,6 +10,14 @@
  */
 class qtype_preg_unicode extends textlib {
 
+    public static function min_possible_code() {
+        return 0;
+    }
+
+    public static function max_possible_code() {
+        return 0x10FFFD;
+    }
+
     public static function Cc_ranges() {
         return array(array(0=>0x0000, 1=>0x001F),
                      array(0=>0x007F, 1=>0x009F));
@@ -5960,7 +5968,7 @@ class qtype_preg_unicode extends textlib {
         return array(array(0=>0x0041, 1=>0x005A));
     }
     public static function print_ranges() {
-        return array(array(0=>0x0020, 1=>0x007E));
+        return array(array(0=>0x0020, 1=>self::max_possible_code()));
     }
     public static function punct_ranges() {
         return array(array(0=>0x0021, 1=>0x002F),
@@ -6001,7 +6009,7 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2029, 1=>0x2029));
     }
     /******************************************************************/
-    
+
     /**
      * Returns the code of a UTF-8 character.
      * @param utf8chr - a UTF-8 character.
@@ -6130,7 +6138,7 @@ class qtype_preg_unicode extends textlib {
         }
         return $result;
     }
-    
+
     public static function is_in_range($utf8chr, $ranges) {
         if ($utf8chr === null || $utf8chr === '') {
             return false;
