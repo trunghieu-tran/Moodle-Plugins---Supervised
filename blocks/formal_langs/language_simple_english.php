@@ -1,4 +1,4 @@
-<? 
+<?php 
 /**
  * Defines a simple  english language lexer for correctwriting question type.
  *
@@ -11,6 +11,7 @@
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/jlex.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/simple_english_tokens.php');
 class block_formal_langs_language_simple_english extends block_formal_langs_predefined_language
 {
     public function __construct() {
@@ -50,9 +51,11 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
 
   // @var int number of  current parsed lexeme.
   private  $counter = 0;
-  private function create_token($type, $value) {
+  private function create_token($name, $value) {
+        // get name of object
+        $objectname = 'block_formal_langs_language_simple_english_' . $name;
         // create token object
-        $res = new block_formal_langs_token_base(null, $type, $value, $this->return_pos(), $this->counter);
+        $res = new $objectname(null, strtoupper($name), $value, $this->return_pos(), $this->counter);
         // increase token count
         $this->counter++;
         return $res;
@@ -92,38 +95,68 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
 		/* 4 */ self::YY_NO_ANCHOR,
 		/* 5 */ self::YY_NO_ANCHOR,
 		/* 6 */ self::YY_NO_ANCHOR,
-		/* 7 */ self::YY_NO_ANCHOR
+		/* 7 */ self::YY_NO_ANCHOR,
+		/* 8 */ self::YY_NOT_ACCEPT,
+		/* 9 */ self::YY_NO_ANCHOR,
+		/* 10 */ self::YY_NO_ANCHOR,
+		/* 11 */ self::YY_NOT_ACCEPT,
+		/* 12 */ self::YY_NO_ANCHOR,
+		/* 13 */ self::YY_NO_ANCHOR,
+		/* 14 */ self::YY_NOT_ACCEPT,
+		/* 15 */ self::YY_NO_ANCHOR,
+		/* 16 */ self::YY_NO_ANCHOR
 	);
 		static $yy_cmap = array(
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 5, 4, 6, 4, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4,
- 6, 6, 6, 4, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 6, 6, 6, 6, 6, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
- 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0,);
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 8, 0, 14, 14, 0, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 8, 11, 10, 13, 14, 13, 13, 2,
+ 10, 10, 13, 13, 10, 13, 9, 14, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 10, 10,
+ 13, 13, 13, 12, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 14, 14, 14, 13, 14, 14, 1, 1, 1,
+ 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 3, 6, 1, 1, 1,
+ 1, 1, 1, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+ 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15,);
 
 		static $yy_rmap = array(
- 0, 1, 2, 3, 1, 1, 1, 1,);
+ 0, 1, 2, 3, 2, 2, 2, 2, 4, 5, 6, 7, 2, 8, 9, 4, 10,);
 
 		static $yy_nxt = array(
 array(
- 1, 2, 3, 4, 5, 6, 7,
+ -1, 1, 2, 1, 1, 1, 1, 3, 4, 10, 2, 13, 16, 5, 6, 7,
 ),
 array(
- -1, -1, -1, -1, -1, -1, -1,
+ -1, 1, 8, 9, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, 2, -1, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ),
 array(
- -1, -1, 3, -1, -1, -1, -1,
+ -1, -1, -1, -1, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, 12, 14, -1, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, 1, 15, 9, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 11, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 16, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+),
+array(
+ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, -1, -1, -1,
 ),
 );
 
@@ -169,15 +202,15 @@ array(
 					$this->yy_to_mark();
 					switch ($yy_last_accept_state) {
 						case 1:
-							
+							{ return $this->create_token("word",$this->yytext()); }
 						case -2:
 							break;
 						case 2:
-							{ return $this->create_token("word",$this->yytext()); }
+							{ return $this->create_token("punctuation",$this->yytext()); }
 						case -3:
 							break;
 						case 3:
-							{ return $this->create_token("number",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -4:
 							break;
 						case 4:
@@ -185,16 +218,40 @@ array(
 						case -5:
 							break;
 						case 5:
-							{ return $this->create_token("sign",$this->yytext()); }
+							{ return $this->create_token("typographic_mark",$this->yytext()); }
 						case -6:
 							break;
 						case 6:
-							{ return $this->create_token("mathsigns",$this->yytext()); }
+							{ return $this->create_token("other",$this->yytext());}
 						case -7:
 							break;
 						case 7:
-							{ return $this->create_token("other",$this->yytext());}
+							
 						case -8:
+							break;
+						case 9:
+							{ return $this->create_token("word",$this->yytext()); }
+						case -9:
+							break;
+						case 10:
+							{ return $this->create_token("punctuation",$this->yytext()); }
+						case -10:
+							break;
+						case 12:
+							{ return $this->create_token("word",$this->yytext()); }
+						case -11:
+							break;
+						case 13:
+							{ return $this->create_token("punctuation",$this->yytext()); }
+						case -12:
+							break;
+						case 15:
+							{ return $this->create_token("word",$this->yytext()); }
+						case -13:
+							break;
+						case 16:
+							{ return $this->create_token("punctuation",$this->yytext()); }
+						case -14:
 							break;
 						default:
 						$this->yy_error('INTERNAL',false);
