@@ -29,6 +29,7 @@ $string['hintgradeborder_help'] = 'Answers with the grade less then the hint gra
 $string['hintnextchar'] = 'next correct character';
 $string['hintpenalty'] = 'Penalty for the next character hint';
 $string['hintpenalty_help'] = 'Penalty for getting the one-character hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints). These penalties are mutually exclusive.';
+$string['incorrectrange'] = 'Incorrect range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater then the right border';
 $string['PCREincorrectregex'] = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['largefa'] = 'Too large finite automaton';
 $string['leaf_assert'] = 'simple assertion';

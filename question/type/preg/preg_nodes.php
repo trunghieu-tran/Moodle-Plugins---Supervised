@@ -1414,6 +1414,8 @@ class qtype_preg_node_error extends qtype_preg_node {
     const SUBTYPE_UNKNOWN_UNICODE_PROPERTY = 'unknown_unicode_property_node_error';
     /** Unknown posix class. */
     const SUBTYPE_UNKNOWN_POSIX_CLASS = 'unknown_posix_class_node_error';
+    /** Incorrect ranges in a quantifier or a character set: {5,3} or [z-a]. **/
+    const SUBTYPE_INCORRECT_RANGE = 'incorrect_range_node_error';
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'incorrectregex',
@@ -1425,7 +1427,8 @@ class qtype_preg_node_error extends qtype_preg_node {
                                    self::SUBTYPE_UNCLOSED_CHARSET             => 'unclosedsqbrackets',
                                    self::SUBTYPE_SET_UNSET_MODIFIER           => 'setunsetmod',
                                    self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'unknownunicodeproperty',
-                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'unknownposixclass'
+                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'unknownposixclass',
+                                   self::SUBTYPE_INCORRECT_RANGE              => 'incorrectrange'
                                    );
 
     /** Arrays of indexes in regex string describing error to highlight to the user (and include in message) - first and last. */

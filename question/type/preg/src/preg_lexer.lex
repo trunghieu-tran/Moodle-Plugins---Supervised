@@ -283,10 +283,10 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
         }
         $startchar = qtype_preg_unicode::substr($cc, $cclength - 3, 1);
         $endchar = qtype_preg_unicode::substr($cc, $cclength - 1, 1);
-        $cc = qtype_preg_unicode::substr($cc, 0, $cclength - 3);
-        $cclength -= 3;
-        // Replace last 3 characters by all the characters between them.
-        if (qtype_preg_unicode::ord($startchar) < qtype_preg_unicode::ord($endchar)) {
+        if (qtype_preg_unicode::ord($startchar) <= qtype_preg_unicode::ord($endchar)) {
+            // Replace last 3 characters by all the characters between them.
+            $cc = qtype_preg_unicode::substr($cc, 0, $cclength - 3);
+            $cclength -= 3;
             $curord = qtype_preg_unicode::ord($startchar);
             $endord = qtype_preg_unicode::ord($endchar);
             while ($curord <= $endord) {
@@ -294,7 +294,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
                 $cclength++;
             }
         } else {
-            $cc->error = 1;
+            $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar - 2, $this->yychar + $this->yylength() - 1, '');
         }
     }
 
@@ -307,8 +307,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
                 $this->optstack[$this->optcount]->parennum = $this->optcount;
             }
             $this->optcount++;
-        } /*else
-            error will be found in parser, lexer does nothing for this error (close unopened bracket)*/
+        } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
     }
 
     protected function pop_opt_lvl() {
@@ -329,7 +328,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
 
     public function mod_top_opt($set, $unset) {
         for ($i = 0; $i < $set->length(); $i++) {
-            if (qtype_preg_unicode::strpos($unset, $set[$i])) {// Setting and unsetting modifier at the same time is error.
+            if (qtype_preg_unicode::strpos($unset, $set[$i])) { // Setting and unsetting modifier at the same time is error.
                 $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, '');
                 return;
             }
@@ -458,8 +457,13 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
     $delimpos = qtype_preg_unicode::strpos($text, ',');
     $leftborder = (int)qtype_preg_unicode::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_preg_unicode::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
-    return $res;
+    if ($leftborder <= $rightborder) {
+        $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
+        return $res;
+    } else {
+        $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar + 1, $this->yychar + $this->yylength() - 2, '');
+        return null;
+    }
 }
 
 <YYINITIAL> "{"[0-9]+",}"("?"|"+")? {

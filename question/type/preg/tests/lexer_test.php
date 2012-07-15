@@ -995,5 +995,30 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS);
         $this->assertTrue($errors[0]->indfirst === 12);
         $this->assertTrue($errors[0]->indlast === 18);
+        $lexer = $this->create_lexer('[0-z]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $lexer = $this->create_lexer('[z-z]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $lexer = $this->create_lexer('[a-0]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token === null);
+        $errors = $lexer->get_errors();
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($errors[0]->indfirst === 1);
+        $this->assertTrue($errors[0]->indlast === 3);
+        $lexer = $this->create_lexer('{2,2}');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $lexer = $this->create_lexer('{127,11}');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token === null);
+        $errors = $lexer->get_errors();
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($errors[0]->indfirst === 1);
+        $this->assertTrue($errors[0]->indlast === 6);
     }
 }
