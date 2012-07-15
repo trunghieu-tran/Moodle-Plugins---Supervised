@@ -39,8 +39,9 @@ class block_formal_langs_predefined_simple_english_lexer {
         while ($token = $lexer->next_token()) {
             $tokens[] = $token;
         }
-        $stream = $processedstring->stream;
-        $stream->tokens = $tokens;
+        // Due to some bugs in PHP, we will use this
+        // to avoid errors
+        $processedstring->get_stream()->tokens = $tokens;
   }
 
 }

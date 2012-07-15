@@ -24,7 +24,7 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 // This wrapper is created because there is no way, we can create other lexer without stream
 // And current architecture won't allow to do so, because mostly we need string.
 class block_formal_langs_predefined_simple_english_lexer {
-  public function tokenize($processedstring) {
+  public function tokenize(&$processedstring) {
         $string = $processedstring->string;
         $file = fopen('data://text/plain;base64,' . base64_encode($string), 'r');
         $lexer = new block_formal_langs_predefined_simple_english_lexer_raw($file);
@@ -33,8 +33,9 @@ class block_formal_langs_predefined_simple_english_lexer {
         while ($token = $lexer->next_token()) {
             $tokens[] = $token;
         }
-        $stream = $processedstring->stream;
-        $stream->tokens = $tokens;
+        // Due to some bugs in PHP, we will use this
+        // to avoid errors
+        $processedstring->get_stream()->tokens = $tokens;
   }
 }
 
