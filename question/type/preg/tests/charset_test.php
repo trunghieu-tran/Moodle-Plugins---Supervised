@@ -81,7 +81,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
     }
     function test_flag_w_match() {
         $flag = new qtype_preg_charset_flag;
-        $flag->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $flag->set_flag(qtype_preg_charset_flag::WORD);
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 0));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 1));
         $this->assertTrue($flag->match(new qtype_preg_string('1a_@5'), 2));
@@ -301,7 +301,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $digit->set_flag(qtype_preg_charset_flag::DIGIT);
         $xdigit->set_flag(qtype_preg_charset_flag::XDIGIT);
         $space->set_flag(qtype_preg_charset_flag::SPACE);
-        $wordchar->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $wordchar->set_flag(qtype_preg_charset_flag::WORD);
         $alnum->set_flag(qtype_preg_charset_flag::ALNUM);
         $alpha->set_flag(qtype_preg_charset_flag::ALPHA);
         $ascii->set_flag(qtype_preg_charset_flag::ASCII);
@@ -314,7 +314,7 @@ class qtype_preg_charset_flag_test extends PHPUnit_Framework_TestCase {
         $ndigit->set_flag(qtype_preg_charset_flag::DIGIT);
         $nxdigit->set_flag(qtype_preg_charset_flag::XDIGIT);
         $nspace->set_flag(qtype_preg_charset_flag::SPACE);
-        $nwordchar->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $nwordchar->set_flag(qtype_preg_charset_flag::WORD);
         $nalnum->set_flag(qtype_preg_charset_flag::ALNUM);
         $nalpha->set_flag(qtype_preg_charset_flag::ALPHA);
         $nascii->set_flag(qtype_preg_charset_flag::ASCII);
@@ -475,7 +475,7 @@ class qtype_preg_charset_test extends UnitTestCase {
         $b = new qtype_preg_charset_flag;
         $c = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b@('));
-        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORD);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
         //form charsets
@@ -493,7 +493,7 @@ class qtype_preg_charset_test extends UnitTestCase {
         $b = new qtype_preg_charset_flag;
         $c = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b@('));
-        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORD);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
         //form charsets
@@ -513,10 +513,10 @@ class qtype_preg_charset_test extends UnitTestCase {
         $e = new qtype_preg_charset_flag;
         $f = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b%('));
-        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORD);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
-        $d->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $d->set_flag(qtype_preg_charset_flag::WORD);
         $d->negative = true;
         $e->set_set(new qtype_preg_string('a%'));
         $e->negative = true;
@@ -561,10 +561,10 @@ class qtype_preg_charset_test extends UnitTestCase {
         $e = new qtype_preg_charset_flag;
         $f = new qtype_preg_charset_flag;
         $a->set_set(new qtype_preg_string('b%('));
-        $b->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $b->set_flag(qtype_preg_charset_flag::WORD);
         $c->set_set(new qtype_preg_string('s@'));
         $c->negative = true;
-        $d->set_flag(qtype_preg_charset_flag::WORDCHAR);
+        $d->set_flag(qtype_preg_charset_flag::WORD);
         $d->negative = true;
         $e->set_set(new qtype_preg_string('a%'));
         $e->negative = true;

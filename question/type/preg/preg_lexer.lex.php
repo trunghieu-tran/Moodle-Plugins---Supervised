@@ -62,6 +62,10 @@ class qtype_preg_lexer extends JLexBase  {
                                          'Zl'                     => qtype_preg_charset_flag::UPROPZL,
                                          'Zp'                     => qtype_preg_charset_flag::UPROPZP,
                                          'Zs'                     => qtype_preg_charset_flag::UPROPZS,
+                                         'Xan'                    => qtype_preg_charset_flag::UPROPXAN,
+                                         'Xps'                    => qtype_preg_charset_flag::UPROPXPS,
+                                         'Xsp'                    => qtype_preg_charset_flag::UPROPXSP,
+                                         'Xwd'                    => qtype_preg_charset_flag::UPROPXWD,
                                          'Arabic'                 => qtype_preg_charset_flag::ARABIC,
                                          'Armenian'               => qtype_preg_charset_flag::ARMENIAN,
                                          'Avestan'                => qtype_preg_charset_flag::AVESTAN,
@@ -406,26 +410,6 @@ class qtype_preg_lexer extends JLexBase  {
             $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $this->yychar, $this->yychar + $this->yylength() - 1, $str);
             return null;
         }
-    }
-    /**
-     * Returns a string of characters suitable for the special unicode properties.
-     * @param uprop name of the property.
-     * @return string of characters suitable for it.
-     */
-    public function get_special_uprop_characters($uprop) {
-        if ($uprop === 'Xps') {
-            // POSIX space: property Z or tab, NL, VT, FF, CR.
-            return qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0B).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D);
-        }
-        if ($uprop === 'Xsp') {
-            // Perl space: property Z or tab, NL, FF, CR.
-            return qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D);
-        }
-        if ($uprop === 'Xwd') {
-            // Perl word: property Xan or underscore.
-            return '_';
-        }
-        return '';
     }
     protected $yy_count_chars = true;
 
@@ -6954,7 +6938,7 @@ array(
                             break;
                         case 34:
                             {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORDCHAR, null, null, false, false, false, ($this->yytext() === '\W')));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, null, null, false, false, false, ($this->yytext() === '\W')));
     return $res;
 }
                         case -35:
@@ -7206,33 +7190,6 @@ array(
     }
     if ($str === 'Any') {
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, null, null, false, false, false, $negative));
-    } else if ($str === 'Xan' || $str === 'Xps' || $str === 'Xsp' || $str === 'Xwd') {
-        $charset = new qtype_preg_leaf_charset;
-        $charset->indfirst = $this->yychar;
-        $charset->indlast = $this->yychar + $this->yylength() - 1;
-        $charset->negative = $negative;
-        if ($str === 'Xan' || $str === 'Xwd') {
-            // Alphanumeric: union of properties L and N.
-            $flag = new qtype_preg_charset_flag;
-            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPL);
-            $charset->flags[] = array($flag);
-            $flag = new qtype_preg_charset_flag;
-            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN);
-            $charset->flags[] = array($flag);
-        }
-        if ($str === 'Xps' || $str === 'Xsp') {
-            $flag = new qtype_preg_charset_flag;
-            $flag = new qtype_preg_charset_flag;
-            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ);
-            $charset->flags[] = array($flag);
-        }
-        if ($str === 'Xwd' || $str === 'Xps' || $str === 'Xsp') {
-            $flag = new qtype_preg_charset_flag;
-            $flag->set_data(qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str));
-            $charset->flags[] = array($flag);
-        }
-        $charset->userinscription = array($this->yytext());
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $charset);
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype !== null) {
@@ -7691,7 +7648,7 @@ array(
                         case 113:
                             {
     $negative = ($this->yytext() === '\W' || $this->yytext() === '[^:word:]');
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORDCHAR, $negative);
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $negative);
 }
                         case -114:
                             break;
@@ -7735,19 +7692,6 @@ array(
     }
     if ($str === 'Any') {
         $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
-    } else if ($str === 'Xan' || $str === 'Xps' || $str === 'Xsp' || $str === 'Xwd') {
-        if ($str === 'Xan' || $str === 'Xwd') {
-            // Alphanumeric: union of properties L and N.
-            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPL, false);
-            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN, false);
-        }
-        if ($str === 'Xps' || $str === 'Xsp') {
-            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ, false);
-        }
-        if ($str === 'Xwd' || $str === 'Xps' || $str === 'Xsp') {
-            $this->add_flag_to_charset('', qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str), false);
-        }
-        $this->cc->userinscription[] = $this->yytext();
     } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype !== null) {
