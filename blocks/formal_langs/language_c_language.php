@@ -20,20 +20,6 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         return 'c_language';
     }
 }
-// This wrapper is created because there is no way, we can create other lexer without stream
-// And current architecture won't allow to do so, because mostly we need string.
-class block_formal_langs_predefined_c_language_lexer {
-  public function tokenize($processedstring) {
-        $lexer = new block_formal_langs_predefined_c_language_lexer_raw(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
-        //Now, we are splitting text into lexemes
-        $tokens = array();
-        while ($token = $lexer->next_token()) {
-            $tokens[] = $token;
-        }
-        $processedstring->stream->tokens = $tokens;
-        $processedstring->stream->errors = $lexer->get_errors();
-  }
-}
 
 
 class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {

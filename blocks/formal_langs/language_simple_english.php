@@ -21,23 +21,6 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
         return 'simple_english';
     }
 }
-// This wrapper is created because there is no way, we can create other lexer without stream
-// And current architecture won't allow to do so, because mostly we need string.
-class block_formal_langs_predefined_simple_english_lexer {
-  public function tokenize(&$processedstring) {
-        $string = $processedstring->string;
-        $file = fopen('data://text/plain;base64,' . base64_encode($string), 'r');
-        $lexer = new block_formal_langs_predefined_simple_english_lexer_raw($file);
-        //Now, we are splitting text into lexemes
-        $tokens = array();
-        while ($token = $lexer->next_token()) {
-            $tokens[] = $token;
-        }
-        // Due to some bugs in PHP, we will use this
-        // to avoid errors
-        $processedstring->get_stream()->tokens = $tokens;
-  }
-}
 
 
 class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
@@ -53,6 +36,9 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
 
   // @var int number of  current parsed lexeme.
   private  $counter = 0;
+  public function get_errors() {
+      return array();
+  }
   private function create_token($name, $value) {
         // get name of object
         $objectname = 'block_formal_langs_language_simple_english_' . $name;

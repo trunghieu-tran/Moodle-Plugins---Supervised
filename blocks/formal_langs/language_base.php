@@ -78,9 +78,7 @@ abstract class block_formal_langs_abstract_language {
      * @param object block_formal_langs_processed_string object with string filled
      *
      */
-    public function scan(&$processedstring) {
-        $stream = new block_formal_langs_token_stream();
-        $processedstring->stream = $stream;        
+    public function scan(&$processedstring) {       
         $this->scaner->tokenize($processedstring);
     }
 
@@ -132,6 +130,7 @@ abstract class block_formal_langs_abstract_language {
  */
 abstract class block_formal_langs_predefined_language extends block_formal_langs_abstract_language {
 
+    
     public function __construct($id, $langdbrecord = NULL) {
         $this->id = $id;
 
@@ -139,16 +138,35 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             // get all info from it
         } else {
             // TODO: via DB get $name, $techname, $isparserenabled, $version
-        }
-
-        $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer';
-        $this->scaner = new $scanerclass();
+        } 
         if ($this->could_parse()) {
             $parserclass = 'block_formal_langs_predefined_' . $this->name() . '_parser';
             $this->parser = new $parserclass();
         }
     }
-
+    
+    /**
+     * Fills token stream field of the processed string objects
+     *
+     * Add lexical errors if any exists.
+     * @param object block_formal_langs_processed_string object with string filled
+     *
+     */
+    public function scan(&$processedstring) {
+         // Lexer must be a valid JLexPHP class, or implement next_token() and get_errors()
+        $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
+        $this->scaner = new $scanerclass(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
+        //Now, we are splitting text into lexemes
+        $tokens = array();
+        while ($token = $this->scaner->next_token()) {
+            $tokens[] = $token;
+        }
+        $stream = new block_formal_langs_token_stream();
+        $stream->tokens = $tokens;
+        $stream->errors = $this->scaner->get_errors();
+        $processedstring->stream = $stream;
+    }
+    
     /**
      * Returns true if this language has predefined (hardcoded) lexer and parser.
      *
