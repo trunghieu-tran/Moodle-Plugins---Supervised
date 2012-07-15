@@ -407,6 +407,11 @@ class qtype_preg_lexer extends JLexBase  {
             return null;
         }
     }
+    /**
+     * Returns a string of characters suitable for the special unicode properties.
+     * @param uprop name of the property.
+     * @return string of characters suitable for it.
+     */
     public function get_special_uprop_characters($uprop) {
         if ($uprop === 'Xps') {
             // POSIX space: property Z or tab, NL, VT, FF, CR.
@@ -415,6 +420,10 @@ class qtype_preg_lexer extends JLexBase  {
         if ($uprop === 'Xsp') {
             // Perl space: property Z or tab, NL, FF, CR.
             return qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D);
+        }
+        if ($uprop === 'Xwd') {
+            // Perl word: property Xan or underscore.
+            return '_';
         }
         return '';
     }
@@ -7211,16 +7220,13 @@ array(
             $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN);
             $charset->flags[] = array($flag);
         }
-        if ($str === 'Xwd') {
-            // Perl word: property Xan or underscore.
-            $flag = new qtype_preg_charset_flag;
-            $flag->set_data(qtype_preg_charset_flag::SET, '_');
-            $charset->flags[] = array($flag);
-        }
         if ($str === 'Xps' || $str === 'Xsp') {
+            $flag = new qtype_preg_charset_flag;
             $flag = new qtype_preg_charset_flag;
             $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ);
             $charset->flags[] = array($flag);
+        }
+        if ($str === 'Xwd' || $str === 'Xps' || $str === 'Xsp') {
             $flag = new qtype_preg_charset_flag;
             $flag->set_data(qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str));
             $charset->flags[] = array($flag);
@@ -7735,12 +7741,10 @@ array(
             $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPL, false);
             $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN, false);
         }
-        if ($str === 'Xwd') {
-            // Perl word: property Xan or underscore.
-            $this->add_flag_to_charset('', qtype_preg_charset_flag::SET, '_', false);
-        }
         if ($str === 'Xps' || $str === 'Xsp') {
             $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ, false);
+        }
+        if ($str === 'Xwd' || $str === 'Xps' || $str === 'Xsp') {
             $this->add_flag_to_charset('', qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str), false);
         }
         $this->cc->userinscription[] = $this->yytext();
