@@ -28,7 +28,4 @@ $settings->add(new admin_setting_configtext('qtype_preg_nfatransitionlimit', get
                                                 get_string('nfalimitsdescription', 'qtype_preg'), 250, PARAM_INT));
 
 $settings->add(new admin_setting_heading('debugheading', get_string('debugheading', 'qtype_preg'), ''));
-$settings->add(new admin_setting_configtext('qtype_preg_graphvizpath', get_string('gvpath', 'qtype_preg'),
-                                                get_string('gvdescription', 'qtype_preg'), 'C:\\Program Files\\GraphViz\\bin\\', PARAM_RAW_TRIMMED));
 }
-?>

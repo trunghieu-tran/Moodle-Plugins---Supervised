@@ -18,16 +18,6 @@ require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
-    private $graphvizpath = '';    // path to dot.exe of graphviz
-
-    public function __construct() {
-        global $CFG;
-        if (isset($CFG->qtype_preg_graphvizpath)) {
-            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;
-        } else {
-            $this->graphvizpath = '';
-        }
-    }
 
     /*public function questionid_column_name() {
         return 'questionid';

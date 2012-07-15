@@ -449,25 +449,16 @@ abstract class qtype_preg_finite_automaton {
 
     /**
      * Generates dot code for drawing FA.
-     *
-     * @param dotfilename - name of the dot file.
-     * @param jpgfilename - name of the resulting jpg file.
+     * @param filename - name of the resulting image file.
      */
-    public function draw($dotfilename, $jpgfilename) {
-        $regexhandler = new qtype_preg_regex_handler();
-        $dir = $regexhandler->get_temp_dir('nfa');
-        $dotfn = $dir . $dotfilename;
-        $dotfile = fopen($dotfn, 'w');
-
-        // Generate dot code.
-        fprintf($dotfile, "digraph {\n");
-        fprintf($dotfile, "rankdir = LR;\n");
+    public function draw($filename) {
+        $result = "digraph {\nrankdir = LR;\n";
         foreach ($this->states as $curstate) {
             $index1 = $curstate->number;
 
             if (count($curstate->outgoing_transitions()) == 0) {
                 // Draw a single state.
-                fprintf($dotfile, "%s\n", "$index1");
+                $result .= "$index1\n";
             } else {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
@@ -499,18 +490,15 @@ abstract class qtype_preg_finite_automaton {
 
                     // Dummy transitions are displayed dotted.
                     if ($curtransition->consumechars) {
-                        $resultstr = "$index1->$index2" . "[label = \"$lab\"];";
+                        $result .= "$index1->$index2" . "[label = \"$lab\"];\n";
                     } else {
-                        $resultstr = "$index1->$index2" . "[label = \"$lab\", style = dotted];";
+                        $result .= "$index1->$index2" . "[label = \"$lab\", style = dotted];\n";
                     }
-                    fprintf($dotfile, "%s\n", $resultstr);
                 }
             }
         }
-        fprintf($dotfile, "};");
-        fclose($dotfile);
-        $regexhandler->execute_dot($dotfn, $jpgfilename);
-        //unlink($dotfn);
+        $result .= "};";
+        qtype_preg_regex_handler::execute_dot($result, $filename);
     }
 
 

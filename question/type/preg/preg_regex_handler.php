@@ -158,9 +158,9 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * Returns errors as objects
-    @return array of errors
-    */
+     * Returns errors as objects
+     * @return array of errors
+     */
     public function get_error_objects() {
         return $this->errors;
     }
@@ -244,19 +244,19 @@ class qtype_preg_regex_handler {
         }
     }
 
-    /*
-    * Access function to AST root.
-    * Used mainly for unit-testing and avoiding re-parsing
-    */
+    /**
+     * Access function to AST root.
+     * Used mainly for unit-testing and avoiding re-parsing
+     */
     public function get_ast_root() {
         return $this->ast_root;
     }
 
     /**
-    * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree
-    * @param pregnode qtype_preg_node child class instance
-    * @return corresponding xxx_preg_node child class instance
-    */
+     * Definite syntax tree (DST) node factory creates node objects for given engine from abstract syntax tree
+     * @param pregnode qtype_preg_node child class instance
+     * @return corresponding xxx_preg_node child class instance
+     */
     public function &from_preg_node($pregnode) {
         if (is_a($pregnode,'qtype_preg_node')) {//checking that the node isn't already converted
             $enginenodename = $this->get_engine_node_name($pregnode->name());
@@ -280,26 +280,28 @@ class qtype_preg_regex_handler {
     }
 
     /**
-    * Returns engine node name having preg node name
-    * Overload in case of sophisticated node name schemes
-    */
+     * Returns engine node name having preg node name
+     * Overload in case of sophisticated node name schemes
+     */
     protected function get_engine_node_name($pregname) {
         return $this->node_prefix().'_preg_'.$pregname;
     }
 
     /**
-    * Returns prefix for engine specific node classes
-    */
+     * Returns prefix for engine specific node classes
+     */
     protected function node_prefix() {
         return null;
     }
 
     /**
-    * Returns path to the temporary directory for given component
-    */
-    public function get_temp_dir($componentname) {
+     * Returns path to the temporary directory for the given component.
+     * @param componentname name of the component calling this function.
+     * @return absolute path to the temporary directory for the given component.
+     */
+    public static function get_temp_dir($componentname) {
         global $CFG;
-        $dir = $CFG->dataroot.'/temp/preg/'.$componentname.'/';
+        $dir = $CFG->dataroot . '/temp/preg/' . $componentname . '/';
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -307,32 +309,31 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Checks if dot of graphviz exists.
-     */
-    public function is_dot_installed() {
-        global $CFG;
-        if (!isset($CFG->qtype_preg_graphvizpath)) {
-            return false;
-        }
-        return true; //file_exists($CFG->qtype_preg_graphvizpath . '/dot.exe');
-    }
-
-    /**
      * Runs dot of graphviz on the given .dot file.
+     * @param dotscript a string containing the dot script.
+     * @param filename the absolute path to the resulting image file.
      */
-    public function execute_dot($dotfilename, $jpegfilename = null) {
+    public static function execute_dot($dotscript, $filename) {
         global $CFG;
-        if (!$this->is_dot_installed()) {
-            return;
-        }
-        $jpgpath = pathinfo($dotfilename, PATHINFO_DIRNAME);
-        if ($jpegfilename === null) {
-            $filename = pathinfo($dotfilename, PATHINFO_FILENAME);
-            $jpgfn = $jpgpath.'/'.$filename.'.jpg';
+        $descriptorspec = array(0 => array('pipe', 'r'), // stdin is a pipe that the child will read from
+                                1 => array('pipe', 'w'), // stdout is a pipe that the child will write to
+                                2 => array('pipe', 'w')  // stderr is a pipe that the child will write to
+                                );
+        $type = pathinfo($filename, PATHINFO_EXTENSION);
+        $cmd = (!empty($CFG->pathtodot) ? $CFG->pathtodot : 'dot') . " -T$type -o\"$filename\"";
+        $process = proc_open($cmd, $descriptorspec, $pipes, "/tmp", array());
+        if (is_resource($process)) {
+            fwrite($pipes[0], $dotscript);
+            fclose($pipes[0]);
+            $err = stream_get_contents($pipes[2]);
+            if (!empty($err)) {
+                echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
+            }
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
         } else {
-            $jpgfn = $jpgpath.'/'.$jpegfilename;
+            echo "failed to execute cmd \"$cmd\"";
         }
-        exec('"' . $CFG->qtype_preg_graphvizpath . "/dot\" -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
     }
 }
-?>
