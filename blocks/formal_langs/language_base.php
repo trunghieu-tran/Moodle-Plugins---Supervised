@@ -79,6 +79,8 @@ abstract class block_formal_langs_abstract_language {
      *
      */
     public function scan($processedstring) {
+        $stream = new block_formal_langs_token_stream();
+        $processedstring->stream = $stream;        
         $this->scaner->tokenize($processedstring);
     }
 
@@ -156,6 +158,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         return true;
     }
 
+    
     /**
      * User-visible name of the language
      */

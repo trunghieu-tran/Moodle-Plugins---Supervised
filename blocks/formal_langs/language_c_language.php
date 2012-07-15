@@ -30,10 +30,8 @@ class block_formal_langs_predefined_c_language_lexer {
         while ($token = $lexer->next_token()) {
             $tokens[] = $token;
         }
-        $stream = new block_formal_langs_token_stream();
-        $stream->tokens = $tokens;
-        $stream->errors = $lexer->get_errors();
-        $processedstring->stream = $stream;
+        $processedstring->stream->tokens = $tokens;
+        $processedstring->stream->errors = $lexer->get_errors();
   }
 }
 
