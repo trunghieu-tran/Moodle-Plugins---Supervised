@@ -308,19 +308,15 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// [ab\p{Xps}]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::UPROPZ);
+        $this->assertTrue($token->value->flags[0][0]->data == qtype_preg_charset_flag::UPROPXPS);
         $this->assertFalse($token->value->flags[0][0]->negative);
-        $this->assertTrue($token->value->flags[1][0]->data == 'ab'.qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0B).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D));
+        $this->assertTrue($token->value->flags[1][0]->data == 'ab');
         $this->assertFalse($token->value->flags[1][0]->negative);
         $token = $lexer->nextToken();// \p{Xwd}
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::UPROPL);
+        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::UPROPXWD);
         $this->assertFalse($token->value->flags[0][0]->negative);
-        $this->assertTrue($token->value->flags[1][0]->data === qtype_preg_charset_flag::UPROPN);
-        $this->assertFalse($token->value->flags[1][0]->negative);
-        $this->assertTrue($token->value->flags[2][0]->data == '_');
-        $this->assertFalse($token->value->flags[2][0]->negative);
     }
     function test_lexer_named_backref() {
         $lexer = $this->create_lexer('\\k<name_1>\\k\'name_2\'\\k{name_3}\\g{name_4}(?P=name_5)');
@@ -490,7 +486,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->negative);
-        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::WORDCHAR);
+        $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::WORD);
         $this->assertFalse($token->value->flags[0][0]->negative);
         $this->assertTrue($token->value->flags[1][0]->data === qtype_preg_charset_flag::DIGIT);
         $this->assertTrue($token->value->flags[1][0]->negative);
