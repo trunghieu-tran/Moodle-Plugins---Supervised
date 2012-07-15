@@ -13,6 +13,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 %state CHARSET
 SPECIAL = [\\^$.\[\]|()?*+{}]
 NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
+MODIFIER = [iJmsUx]
 %init{
     $this->errors = array();
     $this->lastsubpatt = 0;
@@ -327,20 +328,21 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
     }
 
     public function mod_top_opt($set, $unset) {
+        // Some sanity checks.
         for ($i = 0; $i < $set->length(); $i++) {
-            if (qtype_preg_unicode::strpos($unset, $set[$i])) { // Setting and unsetting modifier at the same time is error.
-                $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, '');
+            if ($unset->contains($set[$i])) { // Setting and unsetting modifier at the same time is error.
+                $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, $set[$i]);
                 return;
             }
         }
-        // If error does not exist, set and unset local modifiers.
+        // If errors don't exist, set and unset local modifiers.
         for ($i = 0; $i < $set->length(); $i++) {
-            $tmp = $set[$i];
-            $this->optstack[$this->optcount - 1]->$tmp = true;
+            $modname = $set[$i];
+            $this->optstack[$this->optcount - 1]->$modname = true;
         }
         for ($i = 0; $i < $unset->length(); $i++) {
-            $tmp = $unset[$i];
-            $this->optstack[$this->optcount - 1]->$tmp = false;
+            $modname = $unset[$i];
+            $this->optstack[$this->optcount - 1]->$modname = false;
         }
     }
 
@@ -996,25 +998,29 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_DOLLAR));
     return $res;
 }
-<YYINITIAL> "(?i)" {/*TODO: refactor this rule at adding support other modifier*/
-    $text = $this->yytext();
-    $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), '-');
+    if ($delimpos !== false) {
+        $set = qtype_preg_unicode::substr($this->yytext(), 2, $delimpos - 2);
+        $unset = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    } else {
+        $set = qtype_preg_unicode::substr($this->yytext(), 2, $this->yylength() - 3);
+        $unset = '';
+    }
+    $this->mod_top_opt(new qtype_preg_string($set), new qtype_preg_string($unset));
+    return $this->nextToken();
 }
-<YYINITIAL> "(?-i)" {/*TODO: refactor this rule at adding support other modifier*/
-    $text = $this->yytext();
-    $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('i'));
-}
-<YYINITIAL> "(?i:" {/*TODO: refactor this rule at adding support other modifier*/
-    $text = $this->yytext();
+<YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), '-');
+    if ($delimpos !== false) {
+        $set = qtype_preg_unicode::substr($this->yytext(), 2, $delimpos - 2);
+        $unset = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    } else {
+        $set = qtype_preg_unicode::substr($this->yytext(), 2, $this->yylength() - 3);
+        $unset = '';
+    }
     $this->push_opt_lvl();
-    $this->mod_top_opt(new qtype_preg_string('i'), new qtype_preg_string(''));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
-}
-<YYINITIAL> "(?-i:" {/*TODO: refactor this rule at adding support other modifier*/
-    $text = $this->yytext();
-    $this->push_opt_lvl();
-    $this->mod_top_opt(new qtype_preg_string(''), new qtype_preg_string('-i'));
+    $this->mod_top_opt(new qtype_preg_string($set), new qtype_preg_string($unset));
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
