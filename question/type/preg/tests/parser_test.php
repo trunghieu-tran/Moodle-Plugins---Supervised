@@ -407,7 +407,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser(')ab(c|d)eg)');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue(count($errornodes) === 2);
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
@@ -418,12 +418,12 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser(')a)b)e(((g(');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 7);
+        $this->assertTrue(count($errornodes) === 7);
         //Empty parenthesis
         $parser = $this->run_parser(')abeg(?!)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 2);
+        $this->assertTrue(count($errornodes) === 2);
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
@@ -435,7 +435,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser(')ab()eg(?!)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 3);
+        $this->assertTrue(count($errornodes) === 3);
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
@@ -448,10 +448,10 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[4]->firstindxs[0] == 3);
         $this->assertTrue($errornodes[4]->lastindxs[0] == 4);
         //Quantifiers without argument inside parenthesis
-        $parser = $this->run_parser('?a({2,3})c(*)e(+)f');
+        $parser = $this->run_parser('?a({2,3})c(*)e(+)(*s)f');
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 3);
+        $this->assertTrue(count($errornodes) === 5);
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
         $this->assertTrue($errornodes[0]->firstindxs[0] == 0);
@@ -462,8 +462,16 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->lastindxs[0] == 7);
         $this->assertTrue($errornodes[2]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[2]->subtype == qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
-        $this->assertTrue($errornodes[2]->firstindxs[0] == 15);
-        $this->assertTrue($errornodes[2]->lastindxs[0] == 15);
+        $this->assertTrue($errornodes[2]->firstindxs[0] == 11);
+        $this->assertTrue($errornodes[2]->lastindxs[0] == 11);
+        $this->assertTrue($errornodes[3]->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[3]->subtype == qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER);
+        $this->assertTrue($errornodes[3]->firstindxs[0] == 15);
+        $this->assertTrue($errornodes[3]->lastindxs[0] == 15);
+        $this->assertTrue($errornodes[4]->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[4]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE);
+        $this->assertTrue($errornodes[4]->firstindxs[0] == 17);
+        $this->assertTrue($errornodes[4]->lastindxs[0] == 20);
     }
     function test_condsubpattern_syntax_errors() {//Test error reporting for conditional subpatterns, which are particulary tricky
         //Three or more alternatives in conditional subpattern

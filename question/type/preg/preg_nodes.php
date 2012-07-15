@@ -81,6 +81,8 @@ abstract class qtype_preg_node {
     const TYPE_LEAF_BACKREF = 'leaf_backref';
     /** Recursive match. */
     const TYPE_LEAF_RECURSION = 'leaf_recursion';
+    /** Backtracking control, newline conventions etc sequences. */
+    const TYPE_LEAF_CONTROL = 'leaf_control';
     /** Option set. */
     const TYPE_LEAF_OPTIONS = 'leaf_options';
     /** Combination of few leaf. */
@@ -1179,11 +1181,78 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     public function name() {
         return 'leaf_recursion';
     }
-    public function next_character($str, $pos, $length = 0, $matcherstateobj = null){
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implements abstract function character for qtype_preg_leaf_recursion class before use it!');
     }
     public function tohr() {
         return 'recursion';
+    }
+}
+
+/**
+ * Reperesents backtracking control, newline convention etc sequences like (*...).
+ */
+class qtype_preg_leaf_control extends qtype_preg_leaf {
+
+    /** (*ACCEPT) */
+    const SUBTYPE_ACCEPT = 'accept_leaf_control';
+    /** (*FAIL) */
+    const SUBTYPE_FAIL = 'fail_leaf_control';
+    /** (*MARK:NAME) */
+    const SUBTYPE_MARK_NAME = 'mark_name_leaf_control';
+
+    /** (*COMMIT) */
+    const SUBTYPE_COMMIT = 'commit_leaf_control';
+    /** (*PRUNE) */
+    const SUBTYPE_PRUNE = 'prune_leaf_control';
+    /** (*SKIP) */
+    const SUBTYPE_SKIP = 'skip_leaf_control';
+    /** (*SKIP:NAME) */
+    const SUBTYPE_SKIP_NAME = 'skip_name_leaf_control';
+    /** (*THEN) */
+    const SUBTYPE_THEN = 'then_leaf_control';
+
+    /** (*CR) */
+    const SUBTYPE_CR = 'cr_leaf_control';
+    /** (*LF) */
+    const SUBTYPE_LF = 'lf_leaf_control';
+    /** (*CRLF) */
+    const SUBTYPE_CRLF = 'crlf_leaf_control';
+    /** (*ANYCRLF) */
+    const SUBTYPE_ANYCRLF = 'anycrlf_leaf_control';
+    /** (*ANY) */
+    const SUBTYPE_ANY = 'any_leaf_control';
+
+    /** (*BSR_ANYCRLF) */
+    const SUBTYPE_BSR_ANYCRLF = 'bsr_anycrlf_leaf_control';
+    /** (*BSR_UNICODE) */
+    const SUBTYPE_BSR_UNICODE = 'bsr_unicode_leaf_control';
+
+    /** (*NO_START_OPT) */
+    const SUBTYPE_NO_START_OPT = 'no_start_opt_leaf_control';
+    /** (*UTF8) */
+    const SUBTYPE_UTF8 = 'utf8_leaf_control';
+    /** (*UTF16) */
+    const SUBTYPE_UTF16 = 'utf16_leaf_control';
+    /** (*UCP) */
+    const SUBTYPE_UCP = 'ucp_leaf_control';
+
+    public $name;
+
+    public function __construct() {
+        $this->type = qtype_preg_node::TYPE_LEAF_CONTROL;
+    }
+    protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
+        // Do nothing, the matching should be controlled by the matching engine.
+    }
+    public function name() {
+        return 'leaf_control';
+    }
+    public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
+        // Do nothing, the matching should be controlled by the matching engine.
+    }
+    public function tohr() {
+        return 'control';
     }
 }
 
@@ -1414,6 +1483,8 @@ class qtype_preg_node_error extends qtype_preg_node {
     const SUBTYPE_UNKNOWN_UNICODE_PROPERTY = 'unknown_unicode_property_node_error';
     /** Unknown posix class. */
     const SUBTYPE_UNKNOWN_POSIX_CLASS = 'unknown_posix_class_node_error';
+    /** Unknown control sequence (*...). */
+    const SUBTYPE_UNKNOWN_CONTROL_SEQUENCE = 'unknown_control_sequence_node_error';
     /** Incorrect ranges in a quantifier or a character set: {5,3} or [z-a]. **/
     const SUBTYPE_INCORRECT_RANGE = 'incorrect_range_node_error';
 
@@ -1428,6 +1499,7 @@ class qtype_preg_node_error extends qtype_preg_node {
                                    self::SUBTYPE_SET_UNSET_MODIFIER           => 'setunsetmod',
                                    self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'unknownunicodeproperty',
                                    self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'unknownposixclass',
+                                   self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'unknowncontrolsequence',
                                    self::SUBTYPE_INCORRECT_RANGE              => 'incorrectrange'
                                    );
 

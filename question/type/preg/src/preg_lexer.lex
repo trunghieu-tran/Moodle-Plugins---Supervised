@@ -294,7 +294,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
                 $cclength++;
             }
         } else {
-            $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar - 2, $this->yychar + $this->yylength() - 1, '');
+            $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar - 2, $this->yychar + $this->yylength() - 1, $startchar . '-' . $endchar);
         }
     }
 
@@ -481,7 +481,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
         $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive));
         return $res;
     } else {
-        $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar + 1, $this->yychar + $this->yylength() - 2, '');
+        $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE, $this->yychar + 1, $this->yychar + $this->yylength() - 2, $text);
         return null;
     }
 }
@@ -514,18 +514,9 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
     $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
     return $res;
 }
-<YYINITIAL> "{"[0-9]+"}"("?"|"+")? {
-    $text = $this->yytext();
-    $textlen = $this->yylength();
-    $lastchar = qtype_preg_unicode::substr($text, $textlen - 1, 1);
-    $greed = ($lastchar === '}');
-    $lazy = !$greed && $lastchar === '?';
-    $possessive = !$greed && !$lazy;
-    if (!$greed) {
-        $textlen--;
-    }
-    $count = (int)qtype_preg_unicode::substr($text, 1, $textlen - 2);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, $lazy, $greed, $possessive));
+<YYINITIAL> "{"[0-9]+"}" {
+    $count = (int)qtype_preg_unicode::substr($this->yytext(), 1, $this->yylength() - 2);
+    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, false, true, false));
     return $res;
 }
 <YYINITIAL> "[^"|"[" {
@@ -552,9 +543,105 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
 <YYINITIAL> "(?#"[^)]*")" {       // Comment.
     return $this->nextToken();
 }
-<YYINITIAL> "(*"{NOTSPECIAL}*")" {
-    // TODO
-    return $this->nextToken();
+<YYINITIAL> "(*ACCEPT)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ACCEPT));
+    return $res;
+}
+<YYINITIAL> "(*FAIL)"|"(*F)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_FAIL));
+    return $res;
+}
+<YYINITIAL> ("(*MARK:"|"(*:"){NOTSPECIAL}+")" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), ':');
+    $name = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
+    return $res;
+}
+<YYINITIAL> "(*COMMIT)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_COMMIT));
+    return $res;
+}
+<YYINITIAL> "(*PRUNE)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
+    return $res;
+}
+<YYINITIAL> "(*PRUNE:"{NOTSPECIAL}+")" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), ':');
+    $name = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    $res = array();
+    $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
+    $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
+    return $res;
+}
+<YYINITIAL> "(*SKIP)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP));
+    return $res;
+}
+<YYINITIAL> "(*SKIP:"{NOTSPECIAL}+")" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), ':');
+    $name = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name));
+    return $res;
+}
+<YYINITIAL> "(*THEN)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
+    return $res;
+}
+<YYINITIAL> "(*THEN:"{NOTSPECIAL}+")" {
+    $delimpos = qtype_preg_unicode::strpos($this->yytext(), ':');
+    $name = qtype_preg_unicode::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
+    $res = array();
+    $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
+    $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
+    return $res;
+}
+<YYINITIAL> "(*CR)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CR));
+    return $res;
+}
+<YYINITIAL> "(*LF)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_LF));
+    return $res;
+}
+<YYINITIAL> "(*CRLF)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CRLF));
+    return $res;
+}
+<YYINITIAL> "(*ANYCRLF)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANYCRLF));
+    return $res;
+}
+<YYINITIAL> "(*ANY)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANY));
+    return $res;
+}
+<YYINITIAL> "(*BSR_ANYCRLF)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF));
+    return $res;
+}
+<YYINITIAL> "(*BSR_UNICODE)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE));
+    return $res;
+}
+<YYINITIAL> "(*NO_START_OPT)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_NO_START_OPT));
+    return $res;
+}
+<YYINITIAL> "(*UTF8)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF8));
+    return $res;
+}
+<YYINITIAL> "(*UTF16)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF16));
+    return $res;
+}
+<YYINITIAL> "(*UCP)" {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UCP));
+    return $res;
+}
+<YYINITIAL> "(*"{NOTSPECIAL}+")" {
+    $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE,  $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
+    return null;
 }
 <YYINITIAL> "(?>" {
     $this->push_opt_lvl();
