@@ -78,7 +78,7 @@ abstract class block_formal_langs_abstract_language {
      * @param object block_formal_langs_processed_string object with string filled
      *
      */
-    public function scan($processedstring) {
+    public function scan(&$processedstring) {
         $stream = new block_formal_langs_token_stream();
         $processedstring->stream = $stream;        
         $this->scaner->tokenize($processedstring);
