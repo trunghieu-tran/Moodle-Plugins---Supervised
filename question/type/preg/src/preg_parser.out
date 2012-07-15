@@ -17,12 +17,14 @@ State 0:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
           lastexpr ::= * lastexpr LEXERROR
+          lastexpr ::= * LEXERROR
 
-                    CLOSEBRACK shift  12
-                      PARSLEAF shift  15
-                         QUANT shift  14
+                    CLOSEBRACK shift  15
+                      PARSLEAF shift  20
+                         QUANT shift  12
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
+                      LEXERROR shift  13
                          start accept
                       lastexpr shift  11
                           expr shift  3
@@ -54,7 +56,7 @@ State 1:
 
                     CLOSEBRACK shift  6
                            ALT shift  8
-                      PARSLEAF shift  15
+                      PARSLEAF shift  20
                          QUANT shift  18
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
@@ -87,7 +89,7 @@ State 2:
 
                     CLOSEBRACK shift  16
                            ALT shift  8
-                      PARSLEAF shift  15
+                      PARSLEAF shift  20
                          QUANT shift  18
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
@@ -117,9 +119,9 @@ State 3:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  13
+                    CLOSEBRACK shift  14
                            ALT shift  8
-                      PARSLEAF shift  15
+                      PARSLEAF shift  20
                          QUANT shift  18
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
@@ -152,7 +154,7 @@ State 4:
 
                     CLOSEBRACK shift  19
                            ALT shift  8
-                      PARSLEAF shift  15
+                      PARSLEAF shift  20
                          QUANT shift  18
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
@@ -180,9 +182,9 @@ State 5:
      (15) expr ::= CONDSUBPATT *
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  12
-                      PARSLEAF shift  15
-                         QUANT shift  14
+                    CLOSEBRACK shift  15
+                      PARSLEAF shift  20
+                         QUANT shift  12
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
                           expr shift  1
@@ -209,9 +211,9 @@ State 6:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  12
-                      PARSLEAF shift  15
-                         QUANT shift  14
+                    CLOSEBRACK shift  15
+                      PARSLEAF shift  20
+                         QUANT shift  12
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
                           expr shift  4
@@ -237,9 +239,9 @@ State 7:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  12
-                      PARSLEAF shift  15
-                         QUANT shift  14
+                    CLOSEBRACK shift  15
+                      PARSLEAF shift  20
+                         QUANT shift  12
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
                           expr shift  2
@@ -264,8 +266,8 @@ State 8:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
 
-                      PARSLEAF shift  15
-                         QUANT shift  14
+                      PARSLEAF shift  20
+                         QUANT shift  12
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
                           expr shift  9
@@ -294,7 +296,7 @@ State 9:
           expr ::= * CONDSUBPATT
           expr ::= * QUANT
 
-                      PARSLEAF shift  15
+                      PARSLEAF shift  20
                          QUANT shift  18
                      OPENBRACK shift  7
                    CONDSUBPATT shift  5
@@ -338,25 +340,25 @@ State 11:
                      {default} reduce 0
 
 State 12:
-     (10) expr ::= CLOSEBRACK *
+     (16) expr ::= QUANT *
 
-                     {default} reduce 10
+                     {default} reduce 16
 
 State 13:
+     (18) lastexpr ::= LEXERROR *
+
+                     {default} reduce 18
+
+State 14:
       (9) expr ::= expr CLOSEBRACK *
      (10) expr ::= CLOSEBRACK *
 
                      {default} reduce 9
 
-State 14:
-     (16) expr ::= QUANT *
-
-                     {default} reduce 16
-
 State 15:
-      (7) expr ::= PARSLEAF *
+     (10) expr ::= CLOSEBRACK *
 
-                     {default} reduce 7
+                     {default} reduce 10
 
 State 16:
       (5) expr ::= OPENBRACK expr CLOSEBRACK *
@@ -382,4 +384,9 @@ State 19:
      (10) expr ::= CLOSEBRACK *
 
                      {default} reduce 6
+
+State 20:
+      (7) expr ::= PARSLEAF *
+
+                     {default} reduce 7
 

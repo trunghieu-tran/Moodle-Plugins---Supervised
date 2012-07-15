@@ -302,3 +302,10 @@ lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
     A->indfirst = C->indfirst;//NOTE - indexes may depends on C->subtype, take into account if another lexer error would be found
     A->indlast = C->indlast;
 }
+
+lastexpr(A) ::= LEXERROR(C). {
+    A = $this->create_error_node(C->subtype, array(C->indfirst), array(C->indlast), C->userinscription);
+    $this->reducecount++;
+    A->indfirst = C->indfirst;//NOTE - indexes may depends on C->subtype, take into account if another lexer error would be found
+    A->indlast = C->indlast;
+}
