@@ -31,15 +31,16 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 class block_formal_langs_predefined_simple_english_lexer {
   
   public function tokenize($processedstring) {
-        $lexer = new block_formal_langs_predefined_simple_english_lexer_raw(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
+        $string = $processedstring->string;
+        $file = fopen('data://text/plain;base64,' . base64_encode($string), 'r');
+        $lexer = new block_formal_langs_predefined_simple_english_lexer_raw($file);
         //Now, we are splitting text into lexemes
         $tokens = array();
         while ($token = $lexer->next_token()) {
             $tokens[] = $token;
         }
-        $stream = new block_formal_langs_token_stream();
+        $stream = $processedstring->stream;
         $stream->tokens = $tokens;
-        $processedstring->stream = $stream;
   }
 
 }
