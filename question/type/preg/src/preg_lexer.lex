@@ -382,7 +382,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
      * @param negative is this flag negative.
      */
     public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
-        $this->cccharnumber++;
+        $this->cccharnumber += qtype_preg_unicode::strlen($data);
         $this->cc->userinscription[] = $userinscription;
         switch ($type) {
         case qtype_preg_charset_flag::SET:
@@ -398,6 +398,26 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
             $this->ccgotflag = true;
             break;
         }
+    }
+
+    /**
+     * Returns the string inside a \Q...\E sequence and restores yy_buffer_index because quantifiers are greed.
+     * @param text the \Q...\E sequence.
+     * @return the string between \Q and \E.
+     */
+    public function recognize_qe_sequence($text) {
+        $text = $this->yytext();
+        $str = '';
+        $epos = qtype_preg_unicode::strpos($text, '\\E');
+        if ($epos === false) {
+            $str = qtype_preg_unicode::substr($text, 2);
+        } else {
+            $str = qtype_preg_unicode::substr($text, 2, $epos - 2);
+            // Here's a trick. Quantifiers are greed, so a part after '\Q...\E' can be matched by this rule. Reset $this->yy_buffer_index manually.
+            $tail = qtype_preg_unicode::substr($text, $epos + 2);
+            $this->yy_buffer_index -= qtype_preg_unicode::strlen($tail);
+        }
+        return $str;
     }
 
     /**
@@ -916,17 +936,7 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
     return $res;
 }
 <YYINITIAL> "\Q".*"\E"|"\Q".* {
-    $text = $this->yytext();
-    $str = '';
-    $epos = qtype_preg_unicode::strpos($text, '\\E');
-    if ($epos === false) {
-        $str = qtype_preg_unicode::substr($text, 2);
-    } else {
-        $str = qtype_preg_unicode::substr($text, 2, $epos - 2);
-        // Here's a trick. Quantifiers are greed, so a part after '\Q...\E' can be matched by this rule. Reset $this->yy_buffer_index manually.
-        $tail = qtype_preg_unicode::substr($text, $epos + 2);
-        $this->yy_buffer_index -= qtype_preg_unicode::strlen($tail);
-    }
+    $str = $this->recognize_qe_sequence($this->yytext());
     $res = array();
     for ($i = 0; $i < qtype_preg_unicode::strlen($str); $i++) {
         $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($str, $i, 1)));
@@ -1071,6 +1081,9 @@ NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
 }
 <CHARSET> "-" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, '-');
+}
+<CHARSET> "\Q".*"\E" {
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, $this->recognize_qe_sequence($this->yytext()));
 }
 <CHARSET> \\. {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_preg_unicode::substr($this->yytext(), 1, 1));
