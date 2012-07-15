@@ -423,7 +423,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token === null);
     }
     function test_lexer_charclass() {
-        $lexer = $this->create_lexer('[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d0-9][3-6][^\x61-\x{63}][^-\w\D]');
+        $lexer = $this->create_lexer('[a][abc][ab{][ab\\\\][ab\\]][a\\db][a-d0-9][3-6][^\x61-\x{63}][^-\w\D][\Q][?\E]');
         $token = $lexer->nextToken();// [a]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -463,7 +463,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->negative);
         $this->assertTrue($token->value->flags[0][0]->data == qtype_preg_unicode::code2utf8(0x61).qtype_preg_unicode::code2utf8(0x62).qtype_preg_unicode::code2utf8(0x63));
         $this->assertFalse($token->value->flags[0][0]->negative);
-        $token = $lexer->nextToken();// [^-]
+        $token = $lexer->nextToken();// [^-\w\D]
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->negative);
@@ -472,6 +472,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[1][0]->data === qtype_preg_charset_flag::DIGIT);
         $this->assertTrue($token->value->flags[1][0]->negative);
         $this->assertTrue($token->value->flags[2][0]->data == '-');
+        $this->assertFalse($token->value->flags[2][0]->negative);
+        $token = $lexer->nextToken();// [\Q][?\E]
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data == '][?');
         $this->assertFalse($token->value->flags[0][0]->negative);
     }
     function test_lexer_few_number_in_quant() {
