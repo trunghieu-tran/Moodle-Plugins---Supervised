@@ -893,7 +893,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_case_sensitive() {
+    function data_for_test_case_sensitivity1() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>false,
@@ -916,7 +916,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_case_insensitive() {
+    function data_for_test_case_sensitivity2() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -929,6 +929,49 @@ class qtype_preg_cross_tests_from_preg {
         return array('regex'=>'aBcD',
                      'modifiers'=>'i',
                      'tests'=>array($test1));
+    }
+
+    function data_for_test_case_sensitivity3() {
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'aB',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test3 = array( 'str'=>'c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+
+        $test4 = array( 'str'=>'C',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'(?:a(?i)b|c)',
+                     'modifiers'=>'i',
+                     'tests'=>array($test1, $test2, $test3, $test4));
     }
 
     // Tests for cases with ambiguity - subpatterns, quantifiers and backreferences.

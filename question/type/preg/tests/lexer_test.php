@@ -804,7 +804,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->caseinsensitive);
     }
     function test_lexer_options2() {
-        $lexer = $this->create_lexer('(?i:a(?-i:b)c)');
+        $lexer = $this->create_lexer('(?im-Js:a(?s-i:b)c)');
         $token = $lexer->nextToken();// (?i:
         $token = $lexer->nextToken();// a
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
