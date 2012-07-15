@@ -358,7 +358,9 @@ class qtype_preg_lexer extends JLexBase  {
      */
     public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
         $this->cccharnumber += qtype_preg_unicode::strlen($data);
-        $this->cc->userinscription[] = $userinscription;
+        if ($userinscription !== '') {
+            $this->cc->userinscription[] = $userinscription;
+        }
         switch ($type) {
         case qtype_preg_charset_flag::SET:
             $this->ccset .= $data;
@@ -370,7 +372,6 @@ class qtype_preg_lexer extends JLexBase  {
             $flag->set_data($type, $data);
             $flag->negative = $negative;
             $this->cc->flags[] = array($flag);
-            $this->ccgotflag = true;
             break;
         }
     }
@@ -405,6 +406,17 @@ class qtype_preg_lexer extends JLexBase  {
             $this->errors[] = new qtype_preg_lexem(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $this->yychar, $this->yychar + $this->yylength() - 1, $str);
             return null;
         }
+    }
+    public function get_special_uprop_characters($uprop) {
+        if ($uprop === 'Xps') {
+            // POSIX space: property Z or tab, NL, VT, FF, CR.
+            return qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0B).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D);
+        }
+        if ($uprop === 'Xsp') {
+            // Perl space: property Z or tab, NL, FF, CR.
+            return qtype_preg_unicode::code2utf8(0x09).qtype_preg_unicode::code2utf8(0x0A).qtype_preg_unicode::code2utf8(0x0C).qtype_preg_unicode::code2utf8(0x0D);
+        }
+        return '';
     }
     protected $yy_count_chars = true;
 
@@ -7183,15 +7195,45 @@ array(
     if ($circumflex) {
         $str = qtype_preg_unicode::substr($str, 1);
     }
-    if ($str !== 'Any') {
+    if ($str === 'Any') {
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, null, null, false, false, false, $negative));
+    } else if ($str === 'Xan' || $str === 'Xps' || $str === 'Xsp' || $str === 'Xwd') {
+        $charset = new qtype_preg_leaf_charset;
+        $charset->indfirst = $this->yychar;
+        $charset->indlast = $this->yychar + $this->yylength() - 1;
+        $charset->negative = $negative;
+        if ($str === 'Xan' || $str === 'Xwd') {
+            // Alphanumeric: union of properties L and N.
+            $flag = new qtype_preg_charset_flag;
+            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPL);
+            $charset->flags[] = array($flag);
+            $flag = new qtype_preg_charset_flag;
+            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN);
+            $charset->flags[] = array($flag);
+        }
+        if ($str === 'Xwd') {
+            // Perl word: property Xan or underscore.
+            $flag = new qtype_preg_charset_flag;
+            $flag->set_data(qtype_preg_charset_flag::SET, '_');
+            $charset->flags[] = array($flag);
+        }
+        if ($str === 'Xps' || $str === 'Xsp') {
+            $flag = new qtype_preg_charset_flag;
+            $flag->set_data(qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ);
+            $charset->flags[] = array($flag);
+            $flag = new qtype_preg_charset_flag;
+            $flag->set_data(qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str));
+            $charset->flags[] = array($flag);
+        }
+        $charset->userinscription = array($this->yytext());
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $charset);
+    } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype !== null) {
             $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative));
         } else {
             $res = null;
         }
-    } else {
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, null, null, false, false, false, $negative));
     }
     return $res;
 }
@@ -7685,13 +7727,28 @@ array(
     if ($circumflex) {
         $str = qtype_preg_unicode::substr($str, 1);
     }
-    if ($str !== 'Any') {
+    if ($str === 'Any') {
+        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+    } else if ($str === 'Xan' || $str === 'Xps' || $str === 'Xsp' || $str === 'Xwd') {
+        if ($str === 'Xan' || $str === 'Xwd') {
+            // Alphanumeric: union of properties L and N.
+            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPL, false);
+            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPN, false);
+        }
+        if ($str === 'Xwd') {
+            // Perl word: property Xan or underscore.
+            $this->add_flag_to_charset('', qtype_preg_charset_flag::SET, '_', false);
+        }
+        if ($str === 'Xps' || $str === 'Xsp') {
+            $this->add_flag_to_charset('', qtype_preg_charset_flag::UPROP, qtype_preg_charset_flag::UPROPZ, false);
+            $this->add_flag_to_charset('', qtype_preg_charset_flag::SET, $this->get_special_uprop_characters($str), false);
+        }
+        $this->cc->userinscription[] = $this->yytext();
+    } else {
         $subtype = $this->get_uprop_flag($str);
         if ($subtype !== null) {
             $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
-    } else {
-        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
     }
 }
                         case -119:
