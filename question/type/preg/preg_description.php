@@ -8,7 +8,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
@@ -102,50 +104,50 @@ abstract class qtype_preg_description_node{
 /**
  * Generic leaf class.
  */
-abstract class qtype_preg_description_leaf extends qtype_preg_node{
+abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
 }
 
 /**
  * Represents a character or a charcter set.
  */
-class qtype_preg_description_leaf_charset extends qtype_preg_leaf{
+class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
 }
 
 
 /**
  * Defines meta-characters that can't be enumerated.
  */
-class qtype_preg_description_leaf_meta extends qtype_preg_leaf{
+class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
 }
 
 /**
  * Defines simple assertions.
  */
-class qtype_preg_description_leaf_assert extends qtype_preg_leaf{
+class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
 }
 
 /**
  * Defines backreferences.
  */
-class qtype_preg_description_leaf_backref extends qtype_preg_leaf{
+class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf{
 }
 
-class qtype_preg_description_leaf_option extends qtype_preg_leaf{
+class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
 }
 
-class qtype_preg_description_leaf_recursion extends qtype_preg_leaf{
+class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
 }
 
 /**
  * Reperesents backtracking control, newline convention etc sequences like (*...).
  */
-class qtype_preg_description_leaf_control extends qtype_preg_leaf{
+class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
 }
 
 /**
  * Defines operator nodes.
  */
-abstract class qtype_preg_description_operator extends qtype_preg_node{
+abstract class qtype_preg_description_operator extends qtype_preg_description_node{
     /** @var qtype_preg_author_tool_description[] Array of operands */
     public $operands = array();
 
@@ -167,37 +169,37 @@ abstract class qtype_preg_description_operator extends qtype_preg_node{
  * Defines finite quantifiers with left and right borders, unary operator.
  * Possible errors: left border is greater than right one.
  */
-class qtype_preg_description_node_finite_quant extends qtype_preg_operator{
+class qtype_preg_description_node_finite_quant extends qtype_preg_description_operator{
 }
 
 /**
  * Defines infinite quantifiers node with the left border only, unary operator.
  */
-class qtype_preg_description_node_infinite_quant extends qtype_preg_operator{
+class qtype_preg_description_node_infinite_quant extends qtype_preg_description_operator{
 }
 
 /**
  * Defines concatenation, binary operator.
  */
-class qtype_preg_description_node_concat extends qtype_preg_operator{
+class qtype_preg_description_node_concat extends qtype_preg_description_operator{
 }
 
 /**
  * Defines alternative, binary operator.
  */
-class qtype_preg_description_node_alt extends qtype_preg_operator{
+class qtype_preg_description_node_alt extends qtype_preg_description_operator{
 }
 
 /**
  * Defines lookaround assertions, unary operator.
  */
-class qtype_preg_description_node_assert extends qtype_preg_operator{
+class qtype_preg_description_node_assert extends qtype_preg_description_operator{
 }
 
 /**
  * Defines subpatterns, unary operator.
  */
-class qtype_preg_description_node_subpatt extends qtype_preg_operator{
+class qtype_preg_description_node_subpatt extends qtype_preg_description_operator{
 }
 
 /**
@@ -205,5 +207,5 @@ class qtype_preg_description_node_subpatt extends qtype_preg_operator{
  * The first operand yes-pattern, second - no-pattern, third - the lookaround assertion (if any).
  * Possible errors: there is no backreference with such number in expression
  */
-class qtype_preg_description_node_cond_subpatt extends qtype_preg_operator{
+class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_operator{
 }
