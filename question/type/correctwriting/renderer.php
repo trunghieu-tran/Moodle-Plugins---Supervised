@@ -48,7 +48,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                foreach($analyzer->mistakes() as $mistake) {
                    $mistakemesgs[] = $mistake->get_mistake_message();
                }
-               $myfeedback  = implode('<BR>', $mistakemesgs) . "<BR>";
+               $br = html_writer::empty_tag('br');
+               $myfeedback  = implode($br, $mistakemesgs) . $br;
            }
        }
        return $myfeedback . $shortanswerfeedback; 
@@ -57,81 +58,19 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
    public function correct_response(question_attempt $qa) {
        global $CFG;
        $question = $qa->get_question();
-       $resulttext  = '<BR>';
+       $resulttext  = html_writer::empty_tag('br');
        // This data should contain base64_encoded data about user mistakes
        $analyzer = $question->matchedanalyzer;
        if ($analyzer!=null) {
            if (count($analyzer->mistakes()) != 0) {
-               $mistakecodeddata = $this->create_image_information($qa,$analyzer);
+               $mistakecodeddata = $question->create_image_information($analyzer);
                $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
-               $imagesrc = '<image src="'.$url.'">';
+               $imagesrc = html_writer::empty_tag('image', array('src' => $url));
                $resulttext = $imagesrc . $resulttext; 
            }
        }
        // TODO: Uncomment if we need original shortanswer hint
        return $resulttext /*. parent::correct_response($qa) */;
    }
-   //Creates all information about mistakes, passed into mistakes    
-   protected function create_image_information($qa,$analyzer) {
-       $question = $qa->get_question();
-       $keys = array_keys($question->answers);
-       $answer  = $question->answers[$keys[0]]->answer;
-       if ($question->matchedanswerid!=null) {
-          $answer = $question->answers[$question->matchedanswerid]->answer;
-       }
-       
-       $language = block_formal_langs::lang_object($qa->get_question()->langid);
-       //Create sections, that will be passed into an URL
-       $resultsections = array();
-       
-       //Create answer section
-       $answertokenvalues = array();
-       $answertokens = $language->create_from_string($answer);
-       foreach($answertokens->stream->tokens as $token) {
-           $answertokenvalues[] = base64_encode($token->value());
-       }
-       $resultsections[] = implode(',,,',$answertokenvalues);
-       //Create response section
-       $responsetokenvalues = array();
-       $responsetokens = $analyzer->get_corrected_response();
-       foreach($responsetokens as $token) {
-           $responsetokenvalues[] = base64_encode($token->value());
-       }
-       $resultsections[] = implode(',,,',$responsetokenvalues);
-       
-       $fixedlexemes = array();
-       $absentlexemes = array();
-       $addedlexemes  = array();
-       $movedlexemes = array();
-
-       
-       foreach($analyzer->mistakes() as $mistake) {
-           // If this is lexical mistake, we should mark some lexeme as fixed
-           if (is_a($mistake,'qtype_correctwriting_lexical_mistake')) {
-               $fixedlexemes[] = $mistake->correctedresponseindex;
-           // Track added mistakes
-           } elseif (count($mistake->answermistaken) == 0) {
-               foreach ($mistake->responsemistaken as $index) {
-                   $addedlexemes[] = $index;
-               }
-           // Track absent mistakes
-           }  elseif (count($mistake->responsemistaken)==0) {
-                foreach ($mistake->answermistaken as $index) {
-                   $absentlexemes[] = $index;
-                }
-            } else {
-                for($i = 0;$i < count($mistake->answermistaken);$i++) {
-                    $movedlexemes[] = $mistake->answermistaken[$i] . '_' . $mistake->responsemistaken[$i]; 
-                }
-            } 
-       }
-       
-       //Gather all section
-       $resultsections[] = implode(',,,',$fixedlexemes);
-       $resultsections[] = implode(',,,',$absentlexemes);
-       $resultsections[] = implode(',,,',$addedlexemes);
-       $resultsections[] = implode(',,,',$movedlexemes);
-       
-       return  base64_encode(implode(';;;',$resultsections));
-   }
+   
 }
