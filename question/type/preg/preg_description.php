@@ -67,8 +67,8 @@ abstract class qtype_preg_description_node{
     /**
      * Constructs node.
      * 
-     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node                                      
-     * @param type $matcher
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                    
+     * @param type $matcher Reference to handler, which generates nodes.
      */
     public function __construct(&$node, &$matcher) {
         $this->pregnode = $node;
@@ -146,6 +146,21 @@ class qtype_preg_description_leaf_control extends qtype_preg_leaf{
  * Defines operator nodes.
  */
 abstract class qtype_preg_description_operator extends qtype_preg_node{
+    /** @var qtype_preg_author_tool_description[] Array of operands */
+    public $operands = array();
+
+    /**
+     * Construct array of operands, using method qtype_regex_handler::from_preg_node()
+     * 
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                      
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct(&$node, &$matcher) {
+        parent::__construct($node, $matcher);
+        foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }
+    }
 }
 
 /**
