@@ -72,7 +72,7 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
 /**
  * Abstract class for both nodes (operators) and leafs (operands).
  */
-abstract class nfa_preg_node {
+abstract class qtype_preg_nfa_node {
 
     public $pregnode;    // Reference to the corresponding qtype_preg_node.
 
@@ -99,7 +99,7 @@ abstract class nfa_preg_node {
 /**
  * Class for leafs. They contruct trivial NFAs with two states and one transition between them.
  */
-class nfa_preg_leaf extends nfa_preg_node {
+class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 
     public function accept() {
         if ($this->pregnode->type === qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
@@ -126,7 +126,7 @@ class nfa_preg_leaf extends nfa_preg_node {
 /**
  * Abstract class for nodes, they construct NFAs by combining existing NFAs.
  */
-abstract class nfa_preg_operator extends nfa_preg_node {
+abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
 
     public $operands = array();    // Array of operands.
 
@@ -141,7 +141,7 @@ abstract class nfa_preg_operator extends nfa_preg_node {
 /**
  * Class for concatenation.
  */
-class nfa_preg_node_concat extends nfa_preg_operator {
+class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // First, operands create their automatons.
@@ -166,7 +166,7 @@ class nfa_preg_node_concat extends nfa_preg_operator {
 /**
  * Class for alternation.
  */
-class nfa_preg_node_alt extends nfa_preg_operator {
+class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // First, operands create their automatons.
@@ -211,7 +211,7 @@ class nfa_preg_node_alt extends nfa_preg_operator {
 /**
  * Class for infinite quantifiers (*, +, {m,}).
  */
-class nfa_preg_node_infinite_quant extends nfa_preg_operator {
+class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
     public function accept() {
         if (!$this->pregnode->greed) {
@@ -289,7 +289,7 @@ class nfa_preg_node_infinite_quant extends nfa_preg_operator {
 /**
  * Class for finite quantifiers {m, n}.
  */
-class nfa_preg_node_finite_quant extends nfa_preg_operator {
+class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
 
     /**
      * Creates an automaton for ? quantifier.
@@ -361,7 +361,7 @@ class nfa_preg_node_finite_quant extends nfa_preg_operator {
 /**
  * Class for subpatterns.
  */
-class nfa_preg_node_subpatt extends nfa_preg_operator {
+class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
@@ -384,5 +384,3 @@ class nfa_preg_node_subpatt extends nfa_preg_operator {
         $stack[] = $body;
     }
 }
-
-?>
