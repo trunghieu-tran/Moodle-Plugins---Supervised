@@ -209,6 +209,9 @@ class qtype_preg_lexer extends JLexBase  {
         case 'qtype_preg_leaf_backref':
             $result->number = $data;
             break;
+        case 'qtype_preg_leaf_control':
+            $result->name = $data;
+            break;
         case 'qtype_preg_node_finite_quant':
             $result->rightborder = $rightborder;
         case 'qtype_preg_node_infinite_quant':
