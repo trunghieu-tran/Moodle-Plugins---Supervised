@@ -107,6 +107,14 @@ IS = (u|U|l|L)
 0[xX]{H}+{IS}?                                              { return $this->create_token("constant",$this->yytext()); }
 0{D}+{IS}?                                                  { return $this->create_token("constant",$this->yytext()); }
 {D}+{IS}?                                                   { return $this->create_token("constant",$this->yytext()); }
+"#include"[" "]*"<"[^">"]+">"                                       { return $this->create_token("libinclude",$this->yytext()); }                              
+"#include"[" "]*\"[^">"]+\"                                       { return $this->create_token("relinclude",$this->yytext()); }
+"#define"                                                   { return $this->create_token("define",$this->yytext()); }
+"#if"                                                       { return $this->create_token("if",$this->yytext()); }
+"#ifdef"                                                    { return $this->create_token("ifdef",$this->yytext()); }
+"#elif"                                                     { return $this->create_token("elif",$this->yytext()); }
+"#else"                                                     { return $this->create_token("else",$this->yytext()); }
+"#endif"                                                     { return $this->create_token("else",$this->yytext()); }                              
 L?\'(\\\'|[^\'])\'                                          { return $this->create_token("character",$this->yytext()); }
 L?\"(\\\"|[^\"])+\"                                         { return $this->create_token("string",$this->yytext()); }
 {D}+{E}{FS}?                                                { return $this->create_token("constant",$this->yytext()); }
@@ -150,7 +158,7 @@ L?\"(\\\"|[^\"])+\"                                         { return $this->crea
 "^"                                                        { return $this->create_token("binxor",$this->yytext()); }
 "!"                                                        { return $this->create_token("not",$this->yytext()); }
 "~"                                                        { return $this->create_token("binnot",$this->yytext()); }
-"-"|"+"|"*"|"/"|"%"                                        { return $this->create_token("mathops",$this->yytext()); }
+"-"|"+"|"*"|"/"|"%"|">"|"<"                                { return $this->create_token("mathops",$this->yytext()); }
 "?"                                                        { return $this->create_token("question",$this->yytext()); }
 [ \t\v\n\f]                                                {  } 
 .                                                          { $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
