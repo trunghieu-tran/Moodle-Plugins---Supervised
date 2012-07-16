@@ -15,7 +15,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 /**
  * Handler, generating information for regular expression
  */
-class qtype_preg_description_author_tool_explain_graph extends qtype_regex_handler{
+class qtype_preg_author_tool_description extends qtype_regex_handler{
     
     /*
      * Construct of parent class parses the regex and does all necessary preprocessing.
@@ -31,15 +31,18 @@ class qtype_preg_description_author_tool_explain_graph extends qtype_regex_handl
     /**
      * Genegates description of regexp
      * Example of calling:
-     * description('<span class="description_node_%n%o"></span>',' operand','<span class="description">%s</span>');
+     * description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
      * 
      * @param string $whole_pattern Pattern for whole decription. Must contain %s - description.
      * @param string $numbering_pattern Pattern to track numbering. 
      Must contain: %s - description of node; 
      May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
      * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * @return string description.
      */
-    public function description($numbering_pattern,$operand_pattern,$whole_pattern=null);
+    public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
+        return '123';
+    }
     
     /**
      * Returns the engine-specific node name for the given preg_node name.
@@ -55,6 +58,7 @@ class qtype_preg_description_author_tool_explain_graph extends qtype_regex_handl
  * Generic node class.
  */
 abstract class qtype_preg_description_node{
+ 
 }
 
 /**
