@@ -53,6 +53,15 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
     protected function get_engine_node_name($pregname) {
         return 'qtype_preg_description_'.$pregname;
     }
+    
+    /**
+     * Is a preg_node_... or a preg_leaf_... supported by the engine?
+     * Returns true if node is supported or user interface string describing
+     *   what properties of node isn't supported.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        return false;    // Should be overloaded by child classes
+    }
 }
 
 
