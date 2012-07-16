@@ -35,8 +35,8 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
      * 
      * @param string $whole_pattern Pattern for whole decription. Must contain %s - description.
      * @param string $numbering_pattern Pattern to track numbering. 
-     Must contain: %s - description of node; 
-     May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
+     * Must contain: %s - description of node;
+     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
      * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
      * @return string description.
      */
@@ -65,12 +65,37 @@ abstract class qtype_preg_description_node{
     public $pregnode;
     
     /**
+     * Constructs node.
      * 
      * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node                                      
      * @param type $matcher
      */
     public function __construct(&$node, &$matcher) {
         $this->pregnode = $node;
+    }
+    
+    /**
+     * Chooses pattern for current node.
+     * 
+     * @param qtype_preg_description_node $node_parent Reference to the parent.
+     * @param string $form Required form.
+     * @return string Chosen pattern.
+     */
+    abstract public function pattern($node_parent=null,$form=null);
+    
+    /**
+     * Recursively generates description of tree (subtree).
+     * 
+     * @param string $numbering_pattern Pattern to track numbering. 
+     * Must contain: %s - description of node;
+     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
+     * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * @param qtype_preg_description_node $node_parent Reference to the parent.
+     * @param string $form Required form.
+     * @return string
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        return '123';
     }
 }
 
