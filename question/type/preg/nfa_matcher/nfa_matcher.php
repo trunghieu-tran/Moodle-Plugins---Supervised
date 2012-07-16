@@ -69,13 +69,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     public $automaton;    // An NFA corresponding to the given regex.
 
-    /**
-     * Returns prefix for the NFA engine class.
-     */
-    protected function node_prefix() {
-        return 'nfa';
-    }
-
     public function name() {
         return 'nfa_matcher';
     }
@@ -87,13 +80,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         case 'node_concat':
         case 'node_alt':
         case 'node_subpatt':
-            return 'nfa_preg_' . $pregname;
+            return 'qtype_preg_nfa_' . $pregname;
             break;
         case 'leaf_charset':
         case 'leaf_meta':
         case 'leaf_assert':
         case 'leaf_backref':
-            return 'nfa_preg_leaf';
+            return 'qtype_preg_nfa_leaf';
             break;
         }
 

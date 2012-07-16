@@ -123,7 +123,7 @@ abstract class qtype_preg_node {
     }
 
     /**
-     * Return class name without 'preg_' prefix. Interface string for the node name should be exactly
+     * Return class name without 'qtype_preg_' prefix. Interface string for the node name should be exactly
      * the same (and start from an upper-case character) if class not overloading ui_nodename method.
      */
     abstract public function name();

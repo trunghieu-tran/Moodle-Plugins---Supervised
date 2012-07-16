@@ -14,7 +14,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 * Abstract class for dfa nodes.
 * Declare any necessary for every node function as absract there, optional - with empty body
 */
-abstract class dfa_preg_node {
+abstract class qtype_preg_dfa_node {
 
     //Instance of qtype_preg_node child class
     public $pregnode;
@@ -167,7 +167,7 @@ abstract class dfa_preg_node {
     }
 }
 
-abstract class dfa_preg_leaf extends dfa_preg_node {
+abstract class qtype_preg_dfa_leaf extends qtype_preg_dfa_node {
     public function __construct($node, &$matcher) {
         parent::__construct($node, $matcher);
         $this->color = 'greenyellow';
@@ -226,7 +226,7 @@ abstract class dfa_preg_leaf extends dfa_preg_node {
         $dotcode[] = $this->write_self_to_dotcode();
     }
 }
-class dfa_preg_leaf_charset extends dfa_preg_leaf {
+class qtype_preg_dfa_leaf_charset extends qtype_preg_dfa_leaf {
 
     public function print_self($indent) {
         $this->print_indent($indent);
@@ -252,13 +252,13 @@ class dfa_preg_leaf_charset extends dfa_preg_leaf {
         return $str;
     }
 }
-class dfa_preg_leaf_meta extends dfa_preg_leaf {
+class qtype_preg_dfa_leaf_meta extends qtype_preg_dfa_leaf {
 
     const ENDREG = 186759556;
     public function number(&$connection, &$maxnum) {
         if ($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_ENDREG) {
-            $this->number = dfa_preg_leaf_meta::ENDREG;
-            $connection[dfa_preg_leaf_meta::ENDREG] = $this;
+            $this->number = qtype_preg_dfa_leaf_meta::ENDREG;
+            $connection[qtype_preg_dfa_leaf_meta::ENDREG] = $this;
         } else {
             parent::number($connection, $maxnum);
         }
@@ -322,7 +322,7 @@ class dfa_preg_leaf_meta extends dfa_preg_leaf {
         return $str;
     }
 }
-class dfa_preg_leaf_assert extends dfa_preg_leaf {
+class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
     public function accept() {
         if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
             $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
@@ -389,13 +389,7 @@ class dfa_preg_leaf_assert extends dfa_preg_leaf {
         return $str;
     }
 }
-class dfa_preg_leaf_combo extends dfa_preg_leaf {
-
-    public function print_self($indent) {
-        echo 'Error!!!<br>Combo leafs forbidden in tree, only for connection table!';
-    }
-}
-abstract class dfa_preg_operator extends dfa_preg_node {
+abstract class qtype_preg_dfa_operator extends qtype_preg_dfa_node {
     public function __construct($node, &$matcher) {
         parent::__construct($node, $matcher);
         $this->color = 'saddlebrown';
@@ -459,7 +453,7 @@ abstract class dfa_preg_operator extends dfa_preg_node {
         }
     }
 }
-class dfa_preg_node_concat extends dfa_preg_operator {
+class qtype_preg_dfa_node_concat extends qtype_preg_dfa_operator {
 
     public function nullable() {
         $secnull = $this->pregnode->operands[1]->nullable();
@@ -487,7 +481,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
     public function followpos(&$fpmap) {
         parent::followpos($fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $key) {
-            dfa_preg_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
+            qtype_preg_dfa_node::push_unique($fpmap[$key], $this->pregnode->operands[1]->firstpos);
         }
     }
 
@@ -502,7 +496,7 @@ class dfa_preg_node_concat extends dfa_preg_operator {
         return $str;
     }
 }
-class dfa_preg_node_alt extends dfa_preg_operator {
+class qtype_preg_dfa_node_alt extends qtype_preg_dfa_operator {
 
     public function nullable() {
         $firnull = $this->pregnode->operands[0]->nullable();
@@ -529,12 +523,12 @@ class dfa_preg_node_alt extends dfa_preg_operator {
         return $str;
     }
 }
-class dfa_preg_node_assert extends dfa_preg_operator {
+class qtype_preg_dfa_node_assert extends qtype_preg_dfa_operator {
     const ASSERT_MIN_NUM = 1073741824;//it's minimum number for node with assert, for different from leafs
 
     public function accept() {
-		return 'Asserts temporary unsupported!';
-		if ($this->pregnode->subtype!=qtype_preg_node_assert::SUBTYPE_PLA) {
+        return 'Asserts temporary unsupported!';
+        if ($this->pregnode->subtype!=qtype_preg_node_assert::SUBTYPE_PLA) {
             switch ($this->pregnode->subtype) {
                 case qtype_preg_node_assert::SUBTYPE_NLA:
                     $res = 'assertff';
@@ -543,8 +537,8 @@ class dfa_preg_node_assert extends dfa_preg_operator {
                     $res = 'asserttb';
                     break;
                 case qtype_preg_node_assert::SUBTYPE_NLB:
-					$res = 'assertfb';
-					break;
+                    $res = 'assertfb';
+                    break;
             }
             return get_string($res, 'qtype_preg');
         }
@@ -615,7 +609,7 @@ class dfa_preg_node_assert extends dfa_preg_operator {
         return $str;
     }
 }
-class dfa_preg_node_infinite_quant extends dfa_preg_operator {
+class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
 
     public function accept() {
         if (!$this->pregnode->greed) {
@@ -680,11 +674,10 @@ class dfa_preg_node_infinite_quant extends dfa_preg_operator {
         return $str;
     }
 }
-class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
-
+class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quant {
 
     public function followpos(&$fpmap) {
-        dfa_preg_operator::followpos($fpmap);
+        qtype_preg_dfa_operator::followpos($fpmap);
     }
 
     public function print_self($indent) {
@@ -693,4 +686,3 @@ class dfa_preg_node_finite_quant extends dfa_preg_node_infinite_quant {
         parent::print_self($indent);
     }
 }
-?>
