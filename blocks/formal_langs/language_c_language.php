@@ -11,6 +11,7 @@
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/jlex.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
 {
     public function __construct() {
@@ -50,9 +51,10 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
   public function get_errors() {
      return $this->errors;
   }
-  private function create_token($type, $value) {
+  private function create_token($class,$value) {
         // create token object
-        $res = new block_formal_langs_token_base(null, $type, $value, $this->return_pos(), $this->counter);
+        $classname = "block_formal_langs_c_language_" . $class;
+        $res = new $classname(null, $class, $value, $this->return_pos(), $this->counter);
         // increase token count
         $this->counter++;
         return $res;
@@ -1400,7 +1402,7 @@ array(
 						case -2:
 							break;
 						case 2:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -3:
 							break;
 						case 3:
@@ -1412,7 +1414,7 @@ array(
 						case -5:
 							break;
 						case 5:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -6:
 							break;
 						case 6:
@@ -1420,27 +1422,27 @@ array(
 						case -7:
 							break;
 						case 7:
-							{ return $this->create_token("dot",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -8:
 							break;
 						case 8:
-							{ return $this->create_token("assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -9:
 							break;
 						case 9:
-							{ return $this->create_token("binand",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -10:
 							break;
 						case 10:
-							{ return $this->create_token("binxor",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -11:
 							break;
 						case 11:
-							{ return $this->create_token("binor",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -12:
 							break;
 						case 12:
-							{ return $this->create_token("not",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -13:
 							break;
 						case 13:
@@ -1448,11 +1450,11 @@ array(
 						case -14:
 							break;
 						case 14:
-							{ return $this->create_token("lfbrace","{"); }
+							{ return $this->create_token("brackets","{"); }
 						case -15:
 							break;
 						case 15:
-							{ return $this->create_token("rfbrace","}"); }
+							{ return $this->create_token("brackets","}"); }
 						case -16:
 							break;
 						case 16:
@@ -1464,43 +1466,43 @@ array(
 						case -18:
 							break;
 						case 18:
-							{ return $this->create_token("lbrace",$this->yytext()); }
+							{ return $this->create_token("brackets",$this->yytext()); }
 						case -19:
 							break;
 						case 19:
-							{ return $this->create_token("rbrace",$this->yytext()); }
+							{ return $this->create_token("brackets",$this->yytext()); }
 						case -20:
 							break;
 						case 20:
-							{ return $this->create_token("lsbrace","["); }
+							{ return $this->create_token("brackets","["); }
 						case -21:
 							break;
 						case 21:
-							{ return $this->create_token("rsbrace","]"); }
+							{ return $this->create_token("brackets","]"); }
 						case -22:
 							break;
 						case 22:
-							{ return $this->create_token("binnot",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -23:
 							break;
 						case 23:
-							{ return $this->create_token("question",$this->yytext()); }
+							{ return $this->create_token("question_mark",$this->yytext()); }
 						case -24:
 							break;
 						case 24:
-							{ return $this->create_token("div_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -25:
 							break;
 						case 25:
-							{ return $this->create_token("mul_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -26:
 							break;
 						case 26:
-							{ return $this->create_token("right_shift",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -27:
 							break;
 						case 27:
-							{ return $this->create_token("ge",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -28:
 							break;
 						case 28:
@@ -1512,79 +1514,79 @@ array(
 						case -30:
 							break;
 						case 30:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -31:
 							break;
 						case 31:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -32:
 							break;
 						case 32:
-							{ return $this->create_token("left_shift",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -33:
 							break;
 						case 33:
-							{ return $this->create_token("le",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -34:
 							break;
 						case 34:
-							{ return $this->create_token("ptr_field_access",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -35:
 							break;
 						case 35:
-							{ return $this->create_token("decrement",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -36:
 							break;
 						case 36:
-							{ return $this->create_token("sub_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -37:
 							break;
 						case 37:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -38:
 							break;
 						case 38:
-							{ return $this->create_token("eq",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -39:
 							break;
 						case 39:
-							{ return $this->create_token("add_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -40:
 							break;
 						case 40:
-							{ return $this->create_token("increment",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -41:
 							break;
 						case 41:
-							{ return $this->create_token("mod_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -42:
 							break;
 						case 42:
-							{ return $this->create_token("and_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -43:
 							break;
 						case 43:
-							{ return $this->create_token("and",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -44:
 							break;
 						case 44:
-							{ return $this->create_token("xor_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -45:
 							break;
 						case 45:
-							{ return $this->create_token("or_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -46:
 							break;
 						case 46:
-							{ return $this->create_token("or",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -47:
 							break;
 						case 47:
-							{ return $this->create_token("neq",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -48:
 							break;
 						case 48:
-							{ return $this->create_token("right_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -49:
 							break;
 						case 49:
@@ -1592,19 +1594,19 @@ array(
 						case -50:
 							break;
 						case 50:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -51:
 							break;
 						case 51:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -52:
 							break;
 						case 52:
-							{ return $this->create_token("if",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -53:
 							break;
 						case 53:
-							{ return $this->create_token("left_assign",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -54:
 							break;
 						case 54:
@@ -1620,11 +1622,11 @@ array(
 						case -57:
 							break;
 						case 57:
-							{ return $this->create_token("comment",$this->yytext()); }
+							{ return $this->create_token("singleline_comment",$this->yytext()); }
 						case -58:
 							break;
 						case 58:
-							{ return $this->create_token("comment",$this->yytext()); }
+							{ return $this->create_token("multiline_comment",$this->yytext()); }
 						case -59:
 							break;
 						case 59:
@@ -1632,35 +1634,35 @@ array(
 						case -60:
 							break;
 						case 60:
-							{ return $this->create_token("else",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -61:
 							break;
 						case 61:
-							{ return $this->create_token("elif",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -62:
 							break;
 						case 62:
-							{ return $this->create_token("else",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -63:
 							break;
 						case 63:
-							{ return $this->create_token("ifdef",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -64:
 							break;
 						case 64:
-							{ return $this->create_token("define",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -65:
 							break;
 						case 65:
-							{ echo "a"; return $this->create_token("libinclude",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -66:
 							break;
 						case 66:
-							{ echo "b"; return $this->create_token("relinclude",$this->yytext()); }
+							{ return $this->create_token("preprocessor",$this->yytext()); }
 						case -67:
 							break;
 						case 68:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -68:
 							break;
 						case 69:
@@ -1668,7 +1670,7 @@ array(
 						case -69:
 							break;
 						case 70:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -70:
 							break;
 						case 71:
@@ -1676,23 +1678,23 @@ array(
 						case -71:
 							break;
 						case 72:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -72:
 							break;
 						case 73:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -73:
 							break;
 						case 74:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -74:
 							break;
 						case 75:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -75:
 							break;
 						case 76:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -76:
 							break;
 						case 77:
@@ -1704,7 +1706,7 @@ array(
 						case -78:
 							break;
 						case 80:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -79:
 							break;
 						case 81:
@@ -1712,7 +1714,7 @@ array(
 						case -80:
 							break;
 						case 82:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -81:
 							break;
 						case 83:
@@ -1720,15 +1722,15 @@ array(
 						case -82:
 							break;
 						case 84:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -83:
 							break;
 						case 85:
-							{ return $this->create_token("constant",$this->yytext()); }
+							{ return $this->create_token("numeric",$this->yytext()); }
 						case -84:
 							break;
 						case 87:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -85:
 							break;
 						case 88:
@@ -1740,7 +1742,7 @@ array(
 						case -87:
 							break;
 						case 91:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -88:
 							break;
 						case 92:
@@ -1748,7 +1750,7 @@ array(
 						case -89:
 							break;
 						case 94:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -90:
 							break;
 						case 95:
@@ -1756,7 +1758,7 @@ array(
 						case -91:
 							break;
 						case 97:
-							{ return $this->create_token("mathops",$this->yytext()); }
+							{ return $this->create_token("operators",$this->yytext()); }
 						case -92:
 							break;
 						case 98:
