@@ -58,7 +58,20 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
  * Generic node class.
  */
 abstract class qtype_preg_description_node{
- 
+    /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
+    public $pattern;
+    
+    /** @var string pattern for description of current node */
+    public $pregnode;
+    
+    /**
+     * 
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node                                      
+     * @param type $matcher
+     */
+    public function __construct(&$node, &$matcher) {
+        $this->pregnode = $node;
+    }
 }
 
 /**
