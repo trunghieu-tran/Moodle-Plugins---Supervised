@@ -20,29 +20,50 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
-    //////Initial data
-    // Regular expression as an object of qtype_preg_string.
+    /** Regular expression as an object of qtype_preg_string. */
     protected $regex;
-    // Modifiers for regular expression as an object of qtype_preg_string.
+    /** Modifiers for regular expression as an object of qtype_preg_string. */
     protected $modifiers;
-    // Regular expression handling options, may be different for different handlers.
+    /** Regular expression handling options, may be different for different handlers. */
     protected $options;
-
+    /** Regex lexer. */
     protected $lexer;
-
+    /** Regex parser. */
     protected $parser;
 
-    // The root of abstract syntax tree of the regular expression - tree consists of qtype_preg_node childs.
+    /** The root of the regex abstract syntax tree, consists of qtype_preg_node childs. */
     protected $ast_root;
-    // The root of definite syntax tree of the regular expression - tree consists of xxx_preg_node childs where xxx is engine name.
+    /** The root of the regex definite syntax tree, consists of xxx_preg_node childs where xxx is engine name. */
     protected $dst_root;
-    // The error objects array.
+    /** The error objects array. */
     protected $errors;
-    // Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored.
+    /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
     protected $anchor;
 
     public function name() {
         return 'preg_regex_handler';
+    }
+
+    /**
+     * Returns notation, actually used by matcher.
+     */
+    public function used_notation() {
+        return 'native'; // TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported.
+    }
+
+    /**
+     * Returns string of regular expression modifiers supported by this engine
+     */
+    public function get_supported_modifiers() {
+        return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
+    }
+
+    /**
+     * Returns the engine-specific node name for the given preg_node name.
+     * Overload in case of sophisticated node name schemes.
+     */
+    protected function get_engine_node_name($pregname) {
+        return $pregname;
     }
 
     /**
@@ -88,15 +109,7 @@ class qtype_preg_regex_handler {
     }
 
     protected function accept_regex() {
-        //Accept anything by default
-        return true;
-    }
-
-    /**
-     * Returns notation, actually used by matcher.
-     */
-    public function used_notation() {
-        return 'native';//TODO - php_preg_matcher should really used PCRE strict notation when conversion will be supported
+        return true; // Accept anything by default.
     }
 
     /**
@@ -119,13 +132,6 @@ class qtype_preg_regex_handler {
         } else {
             return 0;
         }
-    }
-
-    /**
-     * returns string of regular expression modifiers supported by this engine
-     */
-    public function get_supported_modifiers() {
-        return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
@@ -277,21 +283,6 @@ class qtype_preg_regex_handler {
         } else {
             return $pregnode;
         }
-    }
-
-    /**
-     * Returns engine node name having preg node name
-     * Overload in case of sophisticated node name schemes
-     */
-    protected function get_engine_node_name($pregname) {
-        return $this->node_prefix().'_preg_'.$pregname;
-    }
-
-    /**
-     * Returns prefix for engine specific node classes
-     */
-    protected function node_prefix() {
-        return null;
     }
 
     /**
