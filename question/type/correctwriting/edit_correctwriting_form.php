@@ -118,7 +118,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     $tokens = $processedstring->stream->tokens;
                     $textdata = array();
                     foreach($tokens as $token) {
-                        $textdata[] = $token->value();
+                        $textdata[] = htmlspecialchars($token->value());
                     }
                     $newtext = implode('<br />', $textdata);
                     $element=$mform->getElement('lexemedescriptions[' . $key . ']');
@@ -168,11 +168,32 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      * @param object $question the data being passed to the form.
      * @return object $question the modified data.
      */
-    protected function data_preprocessing_answers($question, $withanswerfiles = false) {        
+    protected function data_preprocessing_answers($question, $withanswerfiles = false) {
+        global $DB;    
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
         $key = 0;
+        
+        
         if (array_key_exists('options',$question) && array_key_exists('answers',$question->options)) {
-            foreach ($question->options->answers as $answer) {
+            $lang = block_formal_langs::lang_object($question->options->langid);
+        
+            $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
+            $descriptions = array();
+            if ($answerids != null) {
+                $descriptions = block_formal_langs_processed_string::get_descriptions_as_array('question_answers', $answerids);
+            }
+            
+            foreach ($question->options->answers as $id => $answer) {
+                $string = $lang->create_from_db('question_answers',$id);            
+                $string = '';
+                if (count($descriptions[$id]) != 0) {
+                   if (strlen(trim($descriptions[$id][0])) == 0) {
+                       $string = "\n";
+                   }
+                }
+                $string = $string . implode("\n", $descriptions[$id]);
+                $question->options->answers[$id]->lexemedescriptions = $string;
+            
                 $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
                 $key++;
             }
