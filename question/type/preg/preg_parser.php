@@ -894,7 +894,7 @@ static public $yy_action = array(
 #line 137 "../preg_parser.y"
     function yy_r5(){
     //ECHO 'SUBPATT '.$this->parens[$this->yystack[$this->yyidx + -2]->minor].'<br/>';
-    if ($this->yystack[$this->yyidx + -2]->minor->subtype == 'grouping') {    //grouping node
+    if ($this->yystack[$this->yyidx + -2]->minor->subtype == 'grouping') {
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     } else {
         if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
@@ -906,11 +906,11 @@ static public $yy_action = array(
         $this->_retvalue->subtype = $this->yystack[$this->yyidx + -2]->minor->subtype;
         $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
         $this->_retvalue->id = $this->idcounter++;
+        $this->_retvalue->userinscription = $this->yystack[$this->yyidx + -2]->minor->userinscription . ' ... )';
     }
-    $this->_retvalue->userinscription = $this->yystack[$this->yyidx + -2]->minor->userinscription . ' ... )';
-    $this->reducecount++;
     $this->_retvalue->indfirst = $this->yystack[$this->yyidx + -2]->minor->indfirst;
     $this->_retvalue->indlast = $this->yystack[$this->yyidx + -1]->minor->indlast + 1;
+    $this->reducecount++;
     }
 #line 920 "../preg_parser.php"
 #line 158 "../preg_parser.y"
