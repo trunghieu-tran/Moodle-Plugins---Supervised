@@ -392,12 +392,10 @@ MODIFIER = [iJmsUx]
      */
     public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
         $this->cccharnumber += qtype_preg_unicode::strlen($data);
-        if ($userinscription !== '') {
-            $this->cc->userinscription[] = $userinscription;
-        }
         switch ($type) {
         case qtype_preg_charset_flag::SET:
             $this->ccset .= $data;
+            $this->cc->userinscription[0] .= $userinscription;
             $this->form_num_interval($this->ccset, $this->cccharnumber);
             break;
         case qtype_preg_charset_flag::FLAG:
@@ -406,6 +404,7 @@ MODIFIER = [iJmsUx]
             $flag->set_data($type, $data);
             $flag->negative = $negative;
             $this->cc->flags[] = array($flag);
+            $this->cc->userinscription[] = $userinscription;
             break;
         }
     }
@@ -532,7 +531,7 @@ MODIFIER = [iJmsUx]
 <YYINITIAL> "[^"|"[" {
     $this->cc = new qtype_preg_leaf_charset;
     $this->cc->indfirst = $this->yychar;
-    $this->cc->userinscription = array();
+    $this->cc->userinscription = array('');
     $this->cc->negative = $this->yylength() === 2;
     $this->cccharnumber = 0;
     $this->ccset = '';
@@ -1200,6 +1199,9 @@ MODIFIER = [iJmsUx]
             $flag = new qtype_preg_charset_flag;
             $flag->set_data(qtype_preg_charset_flag::SET, new qtype_preg_string($this->ccset));
             $this->cc->flags[] = array($flag);
+        }
+        if ($this->cc->userinscription[0] === '') {
+            array_shift($this->cc->userinscription);
         }
         $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->cc);
     } else {
