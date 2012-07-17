@@ -137,7 +137,7 @@ expr(A) ::= expr(B) QUANT(C). {
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
-    if (B->subtype == 'grouping') {    //grouping node
+    if (B->subtype == 'grouping') {
         A = C;
     } else {
         if (B->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || B->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
@@ -149,11 +149,11 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
         A->subtype = B->subtype;
         A->operands[0] = C;
         A->id = $this->idcounter++;
+        A->userinscription = B->userinscription . ' ... )';
     }
-    A->userinscription = B->userinscription . ' ... )';
-    $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast + 1;
+    $this->reducecount++;
 }
 
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
