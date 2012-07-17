@@ -27,6 +27,24 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         
 }
 
+function block_formal_langs_octal_to_decimal_char($matches) {
+  $code = $matches[0];
+  $code = octdec($code);
+  return chr(intval($code));
+}
+
+function block_formal_langs_hex_to_decimal_char($matches) {
+   $code = $matches[0];
+   $code = hexdec($code);
+   $string = '';
+   if (strlen($matches[0]) == 2) {
+       $string = chr(intval($code));
+   }
+   else {
+       $string = mb_convert_encoding('&#' . intval($code) . ';', 'UTF-8', 'HTML-ENTITIES');
+   }
+   return $string;
+}
 
 %%
 
@@ -68,6 +86,29 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
 
         return $res;
     }
+  
+  private function create_character($string) {
+    $preprocessedstring = $this->unescapestring($string);
+    return $this->create_token("character", $preprocessedstring);
+  }
+  
+  private function create_string($string) {
+    $preprocessedstring = $this->unescapestring($string);
+    return $this->create_token("string", $preprocessedstring);
+  }
+  
+  private function unescapestring($value) {
+    $sourcearray = array("\\a", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v","\\'","\\\"","\\\\","\\?");
+    $resultarray = array("\a",  "\b",  "\f",  "\n",  "\r",  "\t",  "\v", "\'", "\"",  "\\",  "?"  );
+    $preprocessedstring = str_replace($sourcearray, $resultarray, $value);
+    $preprocessedstring = preg_replace_callback("/\\\\([0-7]+)/i",
+                                                'block_formal_langs_octal_to_decimal_char',
+                                                $preprocessedstring);
+    $preprocessedstring = preg_replace_callback("/\\\\x([0-7a-fA-F]+)/i",
+                                                'block_formal_langs_hex_to_decimal_char',
+                                                $preprocessedstring);
+    return $preprocessedstring; 
+  }
   
   private function return_pos() {
         $begin_line = $this->yyline;
@@ -117,8 +158,8 @@ IS = (u|U|l|L)
 "#elif"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
 "#else"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
 "#endif"                                                    { return $this->create_token("preprocessor",$this->yytext()); }                              
-L?\'(\\\'|[^\'])\'                                          { return $this->create_token("character",$this->yytext()); }
-L?\"(\\\"|[^\"])+\"                                         { return $this->create_token("string",$this->yytext()); }
+L?\'(\\\'|[^\'])\'                                          { return $this->create_character($this->yytext()); }
+L?\"(\\\"|[^\"])+\"                                         { return $this->create_string($this->yytext()); }
 {D}+{E}{FS}?                                                { return $this->create_token("numeric",$this->yytext()); }
 {D}*"."{D}+({E})?{FS}?                                      { return $this->create_token("numeric",$this->yytext()); }
 {D}+"."{D}*({E})?{FS}?                                      { return $this->create_token("numeric",$this->yytext()); }
