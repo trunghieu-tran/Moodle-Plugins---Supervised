@@ -85,31 +85,6 @@ class qtype_correctwriting extends qtype_shortanswer {
         if (!parent::get_question_options($question)) {
             return false;
         }
-        
-        $lang = block_formal_langs::lang_object($question->options->langid);
-        
-        $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
-        $descriptions = array();
-        if ($answerids != null) {
-            $descriptions = block_formal_langs_processed_string::get_descriptions_as_array('question_answers', $answerids);
-        }
-        // Our task is to load some symbols for each answer from lexeme tables
-        // Option answers is loaded as an associative array of id => stdClass of answer
-        // So we just need to load some answer symbols, which belongs to an array
-        // They also are loaded as stdClass
-        foreach($question->options->answers as $id => $answer) {
-            $string = $lang->create_from_db('question_answers',$id);
-            
-            // Fixing bug, when no description for first lexeme caused row shift
-            $string = '';
-            if (count($descriptions[$id]) != 0) {
-                if (strlen(trim($descriptions[$id][0])) == 0) {
-                    $string = "\n";
-                }
-            }
-            $string = $string . implode("\n", $descriptions[$id]);
-            $question->options->answers[$id]->lexemedescriptions = $string;
-        }
         return true;
     }
     
