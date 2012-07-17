@@ -1,0 +1,220 @@
+<?php
+/**
+ * Defines handler for generating description of reg exp
+ * Also defines specific tree, containing methods for generating descriptions of current node
+ *
+ * @copyright &copy; 2012 Pahomov Dmitry
+ * @author Pahomov Dmitry, Volgograd State Technical University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @package questions
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+
+/**
+ * Handler, generating information for regular expression
+ */
+class qtype_preg_author_tool_description extends qtype_regex_handler{
+    
+    /*
+     * Construct of parent class parses the regex and does all necessary preprocessing.
+     *
+     * @param string regex - regular expression to handle.
+     * @param string modifiers - modifiers of the regular expression.
+     * @param object options - options to handle regex, i.e. any necessary additional parameters.
+     */
+    public function __construct($regex = null, $modifiers = null, $options = null){
+        parent::__construct($regex, $modifiers, $options);
+    }
+    
+    /**
+     * Genegates description of regexp
+     * Example of calling:
+     * description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
+     * 
+     * @param string $whole_pattern Pattern for whole decription. Must contain %s - description.
+     * @param string $numbering_pattern Pattern to track numbering. 
+     * Must contain: %s - description of node;
+     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
+     * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * @return string description.
+     */
+    public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
+        return '123';
+    }
+    
+    /**
+     * Returns the engine-specific node name for the given preg_node name.
+     * Overload in case of sophisticated node name schemes.
+     */
+    protected function get_engine_node_name($pregname) {
+        return 'qtype_preg_description_'.$pregname;
+    }
+    
+    /**
+     * Is a preg_node_... or a preg_leaf_... supported by the engine?
+     * Returns true if node is supported or user interface string describing
+     *   what properties of node isn't supported.
+     */
+    protected function is_preg_node_acceptable($pregnode) {
+        return false;    // Should be overloaded by child classes
+    }
+}
+
+
+/**
+ * Generic node class.
+ */
+abstract class qtype_preg_description_node{
+    /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
+    public $pattern;
+    
+    /** @var string pattern for description of current node */
+    public $pregnode;
+    
+    /**
+     * Constructs node.
+     * 
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                    
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct(&$node, &$matcher) {
+        $this->pregnode = $node;
+    }
+    
+    /**
+     * Chooses pattern for current node.
+     * 
+     * @param qtype_preg_description_node $node_parent Reference to the parent.
+     * @param string $form Required form.
+     * @return string Chosen pattern.
+     */
+    abstract public function pattern($node_parent=null,$form=null);
+    
+    /**
+     * Recursively generates description of tree (subtree).
+     * 
+     * @param string $numbering_pattern Pattern to track numbering. 
+     * Must contain: %s - description of node;
+     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
+     * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * @param qtype_preg_description_node $node_parent Reference to the parent.
+     * @param string $form Required form.
+     * @return string
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        return '123';
+    }
+}
+
+/**
+ * Generic leaf class.
+ */
+abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
+}
+
+/**
+ * Represents a character or a charcter set.
+ */
+class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
+}
+
+
+/**
+ * Defines meta-characters that can't be enumerated.
+ */
+class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
+}
+
+/**
+ * Defines simple assertions.
+ */
+class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
+}
+
+/**
+ * Defines backreferences.
+ */
+class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf{
+}
+
+class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
+}
+
+class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
+}
+
+/**
+ * Reperesents backtracking control, newline convention etc sequences like (*...).
+ */
+class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
+}
+
+/**
+ * Defines operator nodes.
+ */
+abstract class qtype_preg_description_operator extends qtype_preg_description_node{
+    /** @var qtype_preg_author_tool_description[] Array of operands */
+    public $operands = array();
+
+    /**
+     * Construct array of operands, using method qtype_regex_handler::from_preg_node()
+     * 
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                      
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct(&$node, &$matcher) {
+        parent::__construct($node, $matcher);
+        foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }
+    }
+}
+
+/**
+ * Defines finite quantifiers with left and right borders, unary operator.
+ * Possible errors: left border is greater than right one.
+ */
+class qtype_preg_description_node_finite_quant extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines infinite quantifiers node with the left border only, unary operator.
+ */
+class qtype_preg_description_node_infinite_quant extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines concatenation, binary operator.
+ */
+class qtype_preg_description_node_concat extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines alternative, binary operator.
+ */
+class qtype_preg_description_node_alt extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines lookaround assertions, unary operator.
+ */
+class qtype_preg_description_node_assert extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines subpatterns, unary operator.
+ */
+class qtype_preg_description_node_subpatt extends qtype_preg_description_operator{
+}
+
+/**
+ * Defines conditional subpatterns, unary, binary or ternary operator.
+ * The first operand yes-pattern, second - no-pattern, third - the lookaround assertion (if any).
+ * Possible errors: there is no backreference with such number in expression
+ */
+class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_operator{
+}
