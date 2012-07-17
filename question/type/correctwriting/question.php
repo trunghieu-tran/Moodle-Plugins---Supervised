@@ -37,45 +37,73 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting_question extends question_graded_automatically  {
     //Fields defining a question
-    /** @var boolean whether answers should be graded case-sensitively. */
+    /** Whether answers should be graded case-sensitively. 
+     *  @var boolean
+     */
     public $usecase;
-    /** @var array of question_answer objects. */
+    /** Array of question_answer objects, presenting answers 
+     *  @var array  
+     */
     public $answers = array();
     //Typical answer objects usually contains answer (string), fraction and feedback fields
     //Our answer object should also contain elementnames array, with teacher-given sematic names 
     //for either important nodes (when syntax analysis is posssible) or all tokens (otherwise).
-    //Whether question is casesensitivity
-    public $casesensivity = true;
-    //Threshold, defining maximum percent of token length mistake weight could be to provide a valid matched pair
+    /** Threshold, defining maximum percent of token length mistake weight could be to provide a valid matched pair
+     *  @var int
+     */
     public $lexicalerrorthreshold = 0;
-    //Weight of lexical error 
+    /** Weight of lexical error 
+     *  @var float
+     */
     public $lexicalerrorweight = 0.1;
     
-    //Language id in the languages table
+    /** Language id in the languages table
+     *  @var int 
+     */
     public $langid = 0;
     
     
     //Other necessary question data like penalty for each type of mistakes etc
 
     
-    // @var float weight of error, when one lexeme is moved from one place to another
+    /** Weight of error, when one lexeme is moved from one place to another
+     *  @var float 
+     */ 
     public $movedmistakeweight = 0.1;
-    // @var float weight of error, when one lexeme in response is absent
-    public $absentmistakeweight = 0.1;
-    // @var float weight of error, when one lexeme is added to response
+    /** Weight of error, when one lexeme in response is absent
+     *  @var float
+     */
+    public $absentmistakeweight = 0.1; 
+    /** Weight of error, when one lexeme is added to response
+     *  @var float
+     */
     public $addedmistakeweight = 0.1;
     
     
-    // @var float minimum grade for non-exact match answer
+    /** Minimum grade for non-exact match answer
+     *  @var float
+     */      
     public $hintgradeborder = 0.9;
-    // @var maximum mistake percent to length of answer in lexemes  for answer to be matched
+    /** Maximum mistake percent to length of answer in lexemes  for answer to be matched
+     *  @var float
+     */     
     public $maxmistakepercentage = 0.7;
     
-    // Some cached grade results in order to not recompute everything, because sometimes grade_response 
-    // is being called two times
+    /** Whether cache is valid
+     *  @var boolean
+     */
     public $gradecachevalid = false;
+    /** A cached matched answer id 
+     *  @var int
+     */
     public $matchedanswerid = null;
+    /** A cached matched analyzer
+     *  @var qtype_correctwriting_lexical_analyzer
+     */
     public $matchedanalyzer = null;
+    /** A cached resulting graded state
+     *  @var array
+     */
     public $matchedgradestate = null;
     
     // Returns expected data from form
