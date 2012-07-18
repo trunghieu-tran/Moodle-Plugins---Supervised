@@ -33,7 +33,12 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
     /**
      * Genegates description of regexp
      * Example of calling:
+     * 
      * description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
+     * 
+     * Operator with id=777 will be plased into: <span class="description_node_777">abc</span>.
+     * User defined parts of regex with id=777 will be placed id: <span class="description_node_777  operand">%1 or %2</span>.
+     * Whole string will be placed into <span class="description">string</span>
      * 
      * @param string $whole_pattern Pattern for whole decription. Must contain %s - description.
      * @param string $numbering_pattern Pattern to track numbering. 
@@ -44,6 +49,13 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
      */
     public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
         return '123';
+    }
+    
+    /**
+     * Calling default description($numbering_pattern,$operand_pattern,$whole_pattern=null with default params
+     */
+    public function default_description(){
+        custum_description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
     }
     
     /**
@@ -105,21 +117,21 @@ abstract class qtype_preg_description_node{
      * @param string $form Required form.
      * @return string
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
-        return '123';
-    }
+    abstract public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null);
 }
 
 /**
  * Generic leaf class.
  */
 abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
+    
 }
 
 /**
  * Represents a character or a charcter set.
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
+
 }
 
 
