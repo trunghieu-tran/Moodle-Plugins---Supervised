@@ -1145,7 +1145,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         if ($end > $str->length()) {
             return new qtype_poasquestion_string('');
         }
-        return $str->substr($start + $length, $end - $start - $length);
+        return $str->substring($start + $length, $end - $start - $length);
     }
 
     public function tohr() {

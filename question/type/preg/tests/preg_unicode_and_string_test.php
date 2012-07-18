@@ -4,6 +4,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Unit tests for preg string class.

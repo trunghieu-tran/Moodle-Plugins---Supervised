@@ -217,7 +217,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $bestmatchresult = $matchresults;
-                $fitness = qtype_preg_unicode::strlen($response['answer']);
+                $fitness = qtype_poasquestion_string::strlen($response['answer']);
                 break;
             }
 
@@ -410,17 +410,17 @@ class qtype_preg_question extends question_graded_automatically
 
             $wronghead = '';
             if ($firstindex > 0) {//if there is wrong heading
-                $wronghead = qtype_preg_unicode::substr($currentanswer, 0, $firstindex);
+                $wronghead = qtype_poasquestion_string::substr($currentanswer, 0, $firstindex);
             }
 
             $correctpart = '';
             if ($firstindex != qtype_preg_matching_results::NO_MATCH_FOUND) {//there were any matched characters
-                $correctpart = qtype_preg_unicode::substr($currentanswer, $firstindex, $length);
+                $correctpart = qtype_poasquestion_string::substr($currentanswer, $firstindex, $length);
             }
 
             $correctbeforehint = $correctpart;
-            if ($correctbeforehint !== '' && $matchresults->correctendingstart != qtype_preg_unicode::strlen($wronghead) + qtype_preg_unicode::strlen($correctpart)) {//hint starts before match fail position
-                $correctbeforehint = qtype_preg_unicode::substr($correctpart, 0, $matchresults->correctendingstart - qtype_preg_unicode::strlen($wronghead));
+            if ($correctbeforehint !== '' && $matchresults->correctendingstart != qtype_poasquestion_string::strlen($wronghead) + qtype_poasquestion_string::strlen($correctpart)) {//hint starts before match fail position
+                $correctbeforehint = qtype_poasquestion_string::substr($correctpart, 0, $matchresults->correctendingstart - qtype_poasquestion_string::strlen($wronghead));
             }
 
             $hintedpart = null;
@@ -436,8 +436,8 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             $wrongtail = '';
-            if ($firstindex + $length < qtype_preg_unicode::strlen($currentanswer)) {//if there is wrong tail
-                $wrongtail =  qtype_preg_unicode::substr($currentanswer, $firstindex + $length, qtype_preg_unicode::strlen($currentanswer) - $firstindex - $length);
+            if ($firstindex + $length < qtype_poasquestion_string::strlen($currentanswer)) {//if there is wrong tail
+                $wrongtail =  qtype_poasquestion_string::substr($currentanswer, $firstindex + $length, qtype_poasquestion_string::strlen($currentanswer) - $firstindex - $length);
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail,
                             'correctbeforehint' =>  $correctbeforehint, 'deltail' => $deltail);
@@ -492,7 +492,7 @@ class qtype_preg_question extends question_graded_automatically
     public function insert_subpatterns($subject, $response, $matchresults) {
 
         //Sanity check
-        if (qtype_preg_unicode::strpos($subject, '{$') === false || qtype_preg_unicode::strpos($subject, '}') === false) {
+        if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
             //There are no placeholders for sure
             return $subject;
         }
@@ -508,7 +508,7 @@ class qtype_preg_question extends question_graded_automatically
                 $startindex = $matchresults->index_first($i);
                 $length = $matchresults->length($i);
                 if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $replace = qtype_preg_unicode::substr($answer, $startindex, $length);
+                    $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
                 } else {
                     $replace = '';
                 }
