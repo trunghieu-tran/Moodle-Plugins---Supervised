@@ -30,8 +30,8 @@ class qtype_preg_error {
 class qtype_preg_parsing_error extends qtype_preg_error {
 
     public function __construct($regex, $parsernode) {
-        $this->index_first = $parsernode->firstindxs[0];
-        $this->index_last = $parsernode->lastindxs[0];
+        $this->index_first = $parsernode->indfirst;
+        $this->index_last = $parsernode->indlast;
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
     }
 }

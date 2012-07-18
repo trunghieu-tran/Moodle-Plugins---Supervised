@@ -1508,10 +1508,6 @@ class qtype_preg_node_error extends qtype_preg_node {
                                    self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'unknowncontrolsequence',
                                    self::SUBTYPE_INCORRECT_RANGE              => 'incorrectrange'
                                    );
-
-    /** Arrays of indexes in regex string describing error to highlight to the user (and include in message) - first and last. */
-    public $firstindxs;
-    public $lastindxs;
     /** Additional info. */
     public $addinfo;
 
@@ -1521,8 +1517,6 @@ class qtype_preg_node_error extends qtype_preg_node {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
-        $this->firstindxs = array();
-        $this->lastindxs = array();
         $this->addinfo = null;
     }
     public function write_to_dot_file($file) {
@@ -1533,8 +1527,8 @@ class qtype_preg_node_error extends qtype_preg_node {
      */
     public function error_string() {
         $a = new stdClass;
-        $a->indfirst = $this->firstindxs[0];
-        $a->indlast = $this->lastindxs[0];
+        $a->indfirst = $this->indfirst;
+        $a->indlast = $this->indlast;
         $a->addinfo = $this->addinfo;
         return get_string(qtype_preg_node_error::$errstrs[$this->subtype], 'qtype_preg', $a);
     }
