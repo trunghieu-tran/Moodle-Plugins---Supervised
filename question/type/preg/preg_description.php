@@ -11,13 +11,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**
  * Handler, generating information for regular expression
  */
-class qtype_preg_author_tool_description extends qtype_regex_handler{
+class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     
     /*
      * Construct of parent class parses the regex and does all necessary preprocessing.
@@ -48,14 +49,20 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
      * @return string description.
      */
     public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
-        return '123';
+        
+        $string = $this->dst_root->description($numbering_pattern,$operand_pattern,null,null);
+        var_dump($string);
+        $string = str_replace('%s',$string,$whole_pattern);
+        var_dump($string);
+        return (string)$string;
     }
     
     /**
      * Calling default description($numbering_pattern,$operand_pattern,$whole_pattern=null with default params
      */
     public function default_description(){
-        custum_description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
+       
+        return (string)$this->description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
     }
     
     /**
@@ -63,6 +70,7 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
      * Overload in case of sophisticated node name schemes.
      */
     protected function get_engine_node_name($pregname) {
+        
         return 'qtype_preg_description_'.$pregname;
     }
     
@@ -72,8 +80,10 @@ class qtype_preg_author_tool_description extends qtype_regex_handler{
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
+        
         return false;    // Should be overloaded by child classes
     }
+    
 }
 
 
@@ -93,7 +103,8 @@ abstract class qtype_preg_description_node{
      * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                    
      * @param type $matcher Reference to handler, which generates nodes.
      */
-    public function __construct(&$node, &$matcher) {
+    public function __construct($node, $matcher) {
+        
         $this->pregnode = $node;
     }
     
@@ -124,12 +135,19 @@ abstract class qtype_preg_description_node{
      * 
      * @param string $s same as in get_string
      */
-    public function get_string_s($s){
+    /*public function get_string_s($s){
         $return = get_string($s);
         if($return == null){
             throw new coding_exception($s.' is missing in current lang file of preg description', 'ask localizator of preg description module');
         }
         return $return;
+    }*/
+    
+    /**
+     * returns true if engine support the node, rejection string otherwise
+     */
+    public function accept() {
+        return true;
     }
 }
 
@@ -138,6 +156,22 @@ abstract class qtype_preg_description_node{
  */
 abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
     
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        $this->pattern = $this->pattern($node_parent,$form);
+        return $this->pattern;
+    }
 }
 
 /**
@@ -151,10 +185,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * @param qtype_preg_charset_flag $flag flag gor description
      */
     private function flag_pattern($flag){
-        $pattern_name = 'description_charflag_'.$flag->type;
-        $pattern = get_string_s($pattern_name);
+        $pattern_name = 'description_charflag_'.$flag->data;
+        $pattern = get_string($pattern_name,'qtype_preg');
         if($flag->negative == true){
-            $pattern = str_replace('%char',$pattern,get_string_s('description_charset_char_neg'));
+            $pattern = str_replace('%char',$pattern,get_string('description_charset_char_neg','qtype_preg'));
         }
         return $pattern;
     }
@@ -166,26 +200,36 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         
         $characters = array();//array of strings
         $result_pattern = '';
-        foreach ($pregnode->flags as $i => $outer) {
+        foreach ($this->pregnode->flags as $i => $outer) {
             foreach ($outer as $j => $flag){
-                array_push($symbols,$this->flag_pattern($flag));
+                if($flag->type == qtype_preg_charset_flag::SET){
+                    $enum_characters = $flag->data->string();
+                    for ($index = 0; $index < strlen($enum_characters); $index++) {
+                        array_push($characters,$enum_characters[$index]);
+                    }
+                }
+                else if ($flag->type == qtype_preg_charset_flag::FLAG)
+                {
+                    array_push($characters,$this->flag_pattern($flag));
+                }
+                // TODO other flags
             }
         }
-        if(count($symbols)==1){
-            $result_pattern = get_string_s('description_charset_one');
-            $result_pattern = str_replace('%character', $symbols[0], $result_pattern);
+
+        if(count($characters)==1){
+            $result_pattern = str_replace('%character', $characters[0], get_string('description_charset_one','qtype_preg'));
         }
         else{
             $count = count($characters);
             $characters_string = '';
             foreach ($characters as $i => $char) {
-                $characters_string .= $char.(($i==$count) ? '' : ', ');
+                $characters_string .= $char.(($i==$count-1) ? '' : ', ');
             }
-            if($pregnode->negative == false){
-                $result_pattern = get_string_s('description_charset');
+            if($this->pregnode->negative == false){
+                $result_pattern = get_string('description_charset','qtype_preg');
             }
             else{
-                $result_pattern = get_string_s('description_charset_negative');
+                $result_pattern = get_string('description_charset_negative','qtype_preg');
             }
             $result_pattern = str_replace('%characters', $characters_string, $result_pattern);
         }
@@ -196,7 +240,9 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
     public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
-        return
+        
+        $this->pattern = $this->pattern();
+        return $this->pattern;
     }
 }
 
@@ -205,30 +251,126 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
  * Defines meta-characters that can't be enumerated.
  */
 class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines simple assertions.
  */
 class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines backreferences.
  */
 class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Reperesents backtracking control, newline convention etc sequences like (*...).
  */
 class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
@@ -250,6 +392,22 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
             array_push($this->operands, $matcher->from_preg_node($operand));
         }
     }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
@@ -257,36 +415,132 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
  * Possible errors: left border is greater than right one.
  */
 class qtype_preg_description_node_finite_quant extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines infinite quantifiers node with the left border only, unary operator.
  */
 class qtype_preg_description_node_infinite_quant extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines concatenation, binary operator.
  */
 class qtype_preg_description_node_concat extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines alternative, binary operator.
  */
 class qtype_preg_description_node_alt extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines lookaround assertions, unary operator.
  */
 class qtype_preg_description_node_assert extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
  * Defines subpatterns, unary operator.
  */
 class qtype_preg_description_node_subpatt extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
 
 /**
@@ -295,4 +549,20 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
  * Possible errors: there is no backreference with such number in expression
  */
 class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_operator{
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        return '123';
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        
+        return '123';
+    }
 }
