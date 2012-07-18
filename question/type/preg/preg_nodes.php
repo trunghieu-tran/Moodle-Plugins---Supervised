@@ -10,6 +10,8 @@
  * @package questions
  */
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+
 /**
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
@@ -324,7 +326,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 // Check all the returned ranges.
                 foreach ($ranges as $range) {
                     for ($i = $range[0]; $i <= $range[1]; $i++) {
-                        $c = new qtype_preg_string(qtype_preg_unicode::code2utf8($i));
+                        $c = new qtype_poasquestion_string(qtype_poasquestion_string::code2utf8($i));
                         //if ($this->match($c, 0, $l, true)) {
                         return $c;
                         //}
@@ -771,7 +773,7 @@ class qtype_preg_charset_flag {
             } else {
                 $res = new qtype_preg_charset_flag;
                 if ($result[0] === '-') {
-                    $res->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_unicode::substr($result, 1));
+                    $res->set_data(qtype_preg_charset_flag::FLAG, qtype_poasquestion_string::substr($result, 1));
                     $res->negative = true;
                 } else {
                     $res->set_data(qtype_preg_charset_flag::FLAG, $result);
@@ -783,7 +785,7 @@ class qtype_preg_charset_flag {
                 return false;
             }
             $res = new qtype_preg_charset_flag;
-            $str = new qtype_preg_string('');
+            $str = new qtype_poasquestion_string('');
             for ($i = 0; $i < $other->data->length(); $i++) {
                 if ($this->match($other->data, $i)) {
                     $str->concatenate($other->data[$i]);
@@ -801,9 +803,9 @@ class qtype_preg_charset_flag {
                 $res = new qtype_preg_charset_flag;
                 $str = clone $this->data;
                 $str->concatenate($other->data);
-                $resstr = new qtype_preg_string('');
+                $resstr = new qtype_poasquestion_string('');
                 for ($i = 0; $i < $str->length(); $i++) {
-                    if (qtype_preg_unicode::strpos($str, $str[$i]) == $i) {
+                    if (qtype_poasquestion_string::strpos($str, $str[$i]) == $i) {
                         $resstr->concatenate($str[$i]);
                     }
                 }
@@ -814,7 +816,7 @@ class qtype_preg_charset_flag {
                 $res->set_data(qtype_preg_charset_flag::SET, $resstr);
             } else if ($this->negative && !$other->negative) {
                 $res = new qtype_preg_charset_flag;
-                $str = new qtype_preg_string('');
+                $str = new qtype_poasquestion_string('');
                 for ($i = 0; $i < $other->data->length(); $i++) {
                     if ($this->match($other->data, $i)) {
                         $str->concatenate($other->data[$i]);
@@ -827,7 +829,7 @@ class qtype_preg_charset_flag {
                 return $res;
             } else {
                 $res = new qtype_preg_charset_flag;
-                $str = new qtype_preg_string('');
+                $str = new qtype_poasquestion_string('');
                 for ($i = 0; $i < $this->data->length(); $i++) {
                     if ($other->match($this->data, $i)) {
                         $str->concatenate($this->data[$i]);
@@ -947,7 +949,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
-        return new qtype_preg_string('');
+        return new qtype_poasquestion_string('');
     }
 
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
@@ -1136,12 +1138,12 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // TODO: check for assertions in case of $length == 0
         if (!$matcherstateobj->is_subpattern_captured($this->number)) {
-            return new qtype_preg_string('');
+            return new qtype_poasquestion_string('');
         }
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $matcherstateobj->length($this->number);
         if ($end > $str->length()) {
-            return new qtype_preg_string('');
+            return new qtype_poasquestion_string('');
         }
         return $str->substr($start + $length, $end - $start - $length);
     }

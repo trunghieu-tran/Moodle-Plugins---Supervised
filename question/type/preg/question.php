@@ -26,10 +26,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
