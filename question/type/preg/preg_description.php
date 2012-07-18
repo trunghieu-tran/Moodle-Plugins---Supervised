@@ -118,6 +118,19 @@ abstract class qtype_preg_description_node{
      * @return string
      */
     abstract public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null);
+    
+    /**
+     * if $s nor defined in lang file throw exeption
+     * 
+     * @param string $s same as in get_string
+     */
+    public function get_string_s($s){
+        $return = get_string($s);
+        if($return == null){
+            throw new coding_exception($s.' is missing in current lang file of preg description', 'ask localizator of preg description module');
+        }
+        return $return;
+    }
 }
 
 /**
@@ -131,7 +144,60 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
  * Represents a character or a charcter set.
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
-
+    
+    /**
+     * Generates description of current flag
+     * 
+     * @param qtype_preg_charset_flag $flag flag gor description
+     */
+    private function flag_pattern($flag){
+        $pattern_name = 'description_charflag_'.$flag->type;
+        $pattern = get_string_s($pattern_name);
+        if($flag->negative == true){
+            $pattern = str_replace('%char',$pattern,get_string_s('description_charset_char_neg'));
+        }
+        return $pattern;
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::pattern()
+     */
+    public function pattern($node_parent=null,$form=null){
+        
+        $characters = array();//array of strings
+        $result_pattern = '';
+        foreach ($pregnode->flags as $i => $outer) {
+            foreach ($outer as $j => $flag){
+                array_push($symbols,$this->flag_pattern($flag));
+            }
+        }
+        if(count($symbols)==1){
+            $result_pattern = get_string_s('description_charset_one');
+            $result_pattern = str_replace('%character', $symbols[0], $result_pattern);
+        }
+        else{
+            $count = count($characters);
+            $characters_string = '';
+            foreach ($characters as $i => $char) {
+                $characters_string .= $char.(($i==$count) ? '' : ', ');
+            }
+            if($pregnode->negative == false){
+                $result_pattern = get_string_s('description_charset');
+            }
+            else{
+                $result_pattern = get_string_s('description_charset_negative');
+            }
+            $result_pattern = str_replace('%characters', $characters_string, $result_pattern);
+        }
+        return $result_pattern;
+    }
+    
+    /**
+     * Redifinition of abstruct qtype_preg_description_node::description()
+     */
+    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+        return
+    }
 }
 
 
