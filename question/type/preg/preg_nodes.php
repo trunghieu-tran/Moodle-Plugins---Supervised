@@ -111,7 +111,7 @@ abstract class qtype_preg_node {
     /** Subtype, defined by a child class. */
     public $subtype;
     /** Error data for the subtype. */
-    public $error = false;
+    public $error = null;
     /** Indexes of first and last characters of the node in the regex. */
     public $indfirst = -1;
     public $indlast = -1;
