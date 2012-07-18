@@ -45,6 +45,22 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Returns the infix for DST node names which are named like 'qtype_preg_' . $infix . '_' . $pregnodename.
+     * Should be overloaded in child classes.
+     */
+    protected function node_infix() {
+        return '';
+    }
+
+    /**
+     * Returns the engine-specific node name for the given preg_node name.
+     * Overload in case of sophisticated node name schemes.
+     */
+    protected function get_engine_node_name($pregname) {
+        return 'qtype_preg_' . $this->node_infix() . '_' . $pregname;
+    }
+
+    /**
      * Returns notation, actually used by matcher.
      */
     public function used_notation() {
@@ -56,14 +72,6 @@ class qtype_preg_regex_handler {
      */
     public function get_supported_modifiers() {
         return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
-    }
-
-    /**
-     * Returns the engine-specific node name for the given preg_node name.
-     * Overload in case of sophisticated node name schemes.
-     */
-    protected function get_engine_node_name($pregname) {
-        return $pregname;
     }
 
     /**
