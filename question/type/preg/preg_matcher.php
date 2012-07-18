@@ -289,7 +289,7 @@ class qtype_preg_matching_results {
         $wronghead = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] > 0) {//if there is wrong heading
-                $wronghead = $this->str->substr(0, $this->index_first[$subpattern]);
+                $wronghead = $this->str->substring(0, $this->index_first[$subpattern]);
             }
         } else {//No match, assuming all string is wrong heading (to display hint after it)
             $wronghead = $this->str;
@@ -305,7 +305,7 @@ class qtype_preg_matching_results {
         $correctpart = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
             if (isset($this->index_first[$subpattern]) && $this->index_first[$subpattern] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $correctpart = $this->str->substr($this->index_first[$subpattern], $this->length[$subpattern]);
+                $correctpart = $this->str->substring($this->index_first[$subpattern], $this->length[$subpattern]);
             }
         }
         return $correctpart->string();
@@ -319,7 +319,7 @@ class qtype_preg_matching_results {
         $wrongtail = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
             if ($this->index_first[$subpattern] + $this->length[$subpattern] < qtype_poasquestion_string::strlen($this->str) && $this->length[$subpattern]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail = $this->str->substr($this->index_first[$subpattern] + $this->length[$subpattern], $this->str->length() - $this->index_first[$subpattern] - $this->length[$subpattern]);
+                $wrongtail = $this->str->substring($this->index_first[$subpattern] + $this->length[$subpattern], $this->str->length() - $this->index_first[$subpattern] - $this->length[$subpattern]);
             }
         }
         return $wrongtail->string();
@@ -331,7 +331,7 @@ class qtype_preg_matching_results {
     public function correct_before_hint() {
         $correctbeforehint = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
-            $correctbeforehint = $this->str->substr($this->index_first[0], $this->extensionstart - $this->index_first[0]);
+            $correctbeforehint = $this->str->substring($this->index_first[0], $this->extensionstart - $this->index_first[0]);
         }
         return $correctbeforehint->string();
     }
@@ -343,7 +343,7 @@ class qtype_preg_matching_results {
         $wrongtail = new qtype_poasquestion_string('');
         if ($this->is_match()) {//There is match
             if ($this->extensionstart < $this->str->length() && $this->length[0]!== qtype_preg_matching_results::NO_MATCH_FOUND) {//if there is wrong tail
-                $wrongtail = $this->str->substr($this->extensionstart, $this->str->length() - $this->extensionstart);
+                $wrongtail = $this->str->substring($this->extensionstart, $this->str->length() - $this->extensionstart);
             }
         }
         return $wrongtail->string();
@@ -357,7 +357,7 @@ class qtype_preg_matching_results {
         if ($this->extendedmatch !== null) {
             $extendedstr = $this->extendedmatch->str();
             if ($this->extendedmatch->extensionstart < $extendedstr->length()) {
-                $extension = $extendedstr->substr($this->extendedmatch->extensionstart, $extendedstr->length() - $this->extendedmatch->extensionstart);
+                $extension = $extendedstr->substring($this->extendedmatch->extensionstart, $extendedstr->length() - $this->extendedmatch->extensionstart);
             }
         }
         return $extension->string();

@@ -384,7 +384,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info($newresult->str()->substr(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
+                        $newresult->set_source_info($newresult->str()->substring(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
 
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
