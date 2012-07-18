@@ -273,7 +273,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         foreach($answers as $id => $answer) {
             $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
             //Get lexeme count from answer
-            $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+            $answerstring = $language->create_from_string($answer->answer);
             $answertokencount = count($answerstring->stream->tokens);
             // Check, whether answer is partially correct
             $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
