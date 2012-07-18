@@ -197,13 +197,15 @@ class qtype_preg_lexer extends JLexBase  {
         }
         switch($name) {
         case 'qtype_preg_leaf_charset':
-            $flag = new qtype_preg_charset_flag;
-            $flag->negative = $negative;
-            if ($subtype === qtype_preg_charset_flag::SET) {
-                $data = new qtype_poasquestion_string($data);
+            if ($data !== null) {
+                $flag = new qtype_preg_charset_flag;
+                $flag->negative = $negative;
+                if ($subtype === qtype_preg_charset_flag::SET) {
+                    $data = new qtype_poasquestion_string($data);
+                }
+                $flag->set_data($subtype, $data);
+                $result->flags = array(array($flag));
             }
-            $flag->set_data($subtype, $data);
-            $result->flags = array(array($flag));
             $result->israngecalculated = false;
             break;
         case 'qtype_preg_leaf_backref':
@@ -262,12 +264,8 @@ class qtype_preg_lexer extends JLexBase  {
      * @return mixed null if everything is correct, an error object otherwise.
      */
     protected function form_num_interval(&$cc, &$cclength) {
-        $actuallength = $cclength;
-        if (qtype_poasquestion_string::substr($cc, 0, 1) === '^') {
-            $actuallength--;
-        }
         // Check if there are enough characters in before.
-        if ($actuallength < 3 || qtype_poasquestion_string::substr($cc, $cclength - 2, 1) !== '-') {
+        if ($cclength < 3 || qtype_poasquestion_string::substr($cc, $cclength - 2, 1) !== '-') {
             return;
         }
         $startchar = qtype_poasquestion_string::substr($cc, $cclength - 3, 1);
@@ -284,6 +282,10 @@ class qtype_preg_lexer extends JLexBase  {
             }
             return null;
         } else {
+            // Delete last 3 characters.
+            $cclength -= 3;
+            $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
+            // Form the error node.
             $error = new qtype_preg_node_error();
             $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
             $error->indfirst = $this->yychar - 2;
@@ -430,8 +432,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY;
             $error->indfirst = $this->yychar;
             $error->indlast = $this->yychar + $this->yylength() - 1;
-            $error->userinscription = $str;
-            $error;
+            $error->userinscription = $this->yytext();
             return null;
         }
     }
@@ -7092,10 +7093,11 @@ array(
                             break;
                         case 47:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 2);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 2);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str, $error);
-    $node = $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
+    $node = $this->form_node(array($text), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
     if ($error !== null) {
         $node->error = array($error);
     }
@@ -7224,18 +7226,19 @@ array(
                             break;
                         case 59:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $circumflex = (qtype_poasquestion_string::substr($str, 0, 1) === '^');
     $negative = ($negative xor $circumflex);
     if ($circumflex) {
         $str = qtype_poasquestion_string::substr($str, 1);
     }
     if ($str === 'Any') {
-        $node = $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, null, null, false, false, false, $negative);
+        $node = $this->form_node(array($text), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, null, null, false, false, false, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str, $error);
-        $node = $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
+        $node = $this->form_node(array($text), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
         if ($error !== null) {
             $node->error = array($error);
         }
@@ -7264,7 +7267,7 @@ array(
         $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
         $error->indfirst = $this->yychar + 1;
         $error->indlast = $this->yychar + $this->yylength() - 2;
-        $error->userinscription = $text;
+        $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
         $node->error = $error;
     }
     return $this->form_res(preg_parser_yyParser::QUANT, $node);
@@ -7703,13 +7706,15 @@ array(
                             break;
                         case 114:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 2);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 2);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str, $error);
     if ($error !== null) {
+        $this->charset->userinscription[] = $text;
         $this->charset->error[] = $error;
     } else {
-        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
                         case -115:
@@ -7726,7 +7731,9 @@ array(
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
     $error->indfirst = $this->yychar;
     $error->indlast = $this->yychar + $this->yylength() - 1;
-    $error->userinscription = $this->yytext();
+    $userinscription = $this->yytext();
+    $error->userinscription = $userinscription;
+    $this->charset->userinscription[] = $userinscription;
     $this->charset->error[] = $error;
 }
                         case -117:
@@ -7739,21 +7746,23 @@ array(
                             break;
                         case 118:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $circumflex = (qtype_poasquestion_string::substr($str, 0, 1) === '^');
     $negative = ($negative xor $circumflex);
     if ($circumflex) {
         $str = qtype_poasquestion_string::substr($str, 1);
     }
     if ($str === 'Any') {
-        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
     } else {
         $subtype = $this->get_uprop_flag($str, $error);
         if ($error !== null) {
+            $this->charset->userinscription[] = $text;
             $this->charset->error[] = $error;
         } else {
-            $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
     }
 }
@@ -7966,10 +7975,11 @@ array(
                             break;
                         case 141:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 2);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 2);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str, $error);
-    $node = $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
+    $node = $this->form_node(array($text), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::UPROP, $subtype, null, null, false, false, false, $negative);
     if ($error !== null) {
         $node->error = array($error);
     }
@@ -8040,7 +8050,7 @@ array(
         $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
         $error->indfirst = $this->yychar + 1;
         $error->indlast = $this->yychar + $this->yylength() - 2;
-        $error->userinscription = $text;
+        $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
         $node->error = $error;
     }
     return $this->form_res(preg_parser_yyParser::QUANT, $node);
@@ -8072,13 +8082,15 @@ array(
                             break;
                         case 149:
                             {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 2);
-    $negative = (qtype_poasquestion_string::substr($this->yytext(), 1, 1) === 'P');
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 2);
+    $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
     $subtype = $this->get_uprop_flag($str, $error);
     if ($error !== null) {
+        $this->charset->userinscription[] = $text;
         $this->charset->error[] = $error;
     } else {
-        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
                         case -149:
