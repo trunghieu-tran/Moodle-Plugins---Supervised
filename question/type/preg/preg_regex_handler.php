@@ -11,18 +11,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
-    /** Regular expression as an object of qtype_preg_string. */
+    /** Regular expression as an object of qtype_poasquestion_string. */
     protected $regex;
-    /** Modifiers for regular expression as an object of qtype_preg_string. */
+    /** Modifiers for regular expression as an object of qtype_poasquestion_string. */
     protected $modifiers;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
@@ -71,7 +70,7 @@ class qtype_preg_regex_handler {
      * Returns string of regular expression modifiers supported by this engine
      */
     public function get_supported_modifiers() {
-        return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
+        return new qtype_poasquestion_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
@@ -91,7 +90,7 @@ class qtype_preg_regex_handler {
 
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
-            $modifiers = new qtype_preg_string($modifiers);
+            $modifiers = new qtype_poasquestion_string($modifiers);
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i = 0; $i < $modifiers->length(); $i++) {
                 $mod = $modifiers[$i];
@@ -100,10 +99,10 @@ class qtype_preg_regex_handler {
                 }
             }
         } else {
-            $modifiers = new qtype_preg_string('');
+            $modifiers = new qtype_poasquestion_string('');
         }
 
-        $this->regex = new qtype_preg_string($regex);
+        $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
         $this->options = $options;
         //do parsing
@@ -210,7 +209,7 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
-        $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
+        $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
         $this->parser = new preg_parser_yyParser;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {

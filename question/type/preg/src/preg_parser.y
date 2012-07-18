@@ -1,7 +1,7 @@
 %name preg_parser_
 %include{
+    require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
-    require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 }
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
@@ -174,7 +174,7 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     A->operands[2] = new qtype_preg_node_assert;
     A->operands[2]->subtype = D->subtype;
     A->operands[2]->operands[0] = B;
-    A->operands[2]->userinscription = qtype_preg_unicode::substr(D->userinscription, 2) . ' ... )';
+    A->operands[2]->userinscription = qtype_poasquestion_string::substr(D->userinscription, 2) . ' ... )';
     A->operands[2]->id = $this->idcounter++;
 
     A->userinscription = D->userinscription . ' ... ) ... | .... )';
