@@ -102,11 +102,11 @@ $string['description_esc_z'] = 'at the end of the subject';
 $string['description_esc_g'] = 'at the first matching position in the subject';
 //TYPE_LEAF_BACKREF
 $string['description_backref'] = 'back reference to subpattern #%number';
-$string['description_backref_name'] = 'back reference to subpattern “%name”';
+$string['description_backref_name'] = 'back reference to subpattern "%name"';
 //TYPE_LEAF_RECURSION
 $string['description_recursion_all'] = 'recursive match with whole regular expression                                 ';
 $string['description_recursion'] = 'recursive match with subpattern #%number';
-$string['description_recursion_name'] = 'recursive match with subpattern  “%name”';
+$string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
 //TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'caseless';
 $string['description_option_s'] = 'dot metacharacter matches \n in following';
@@ -140,18 +140,18 @@ $string['description_assert_nla'] = 'further text should not match: "%1"';
 $string['description_assert_plb'] = 'preceding text should match: "%1"';
 $string['description_assert_nlb'] = 'preceding text should not match: "%1"';
 //TYPE_NODE_SUBPATT
-$string['description_subpattern'] = 'subpattern #%number: %1;';
-$string['description_subpattern_once'] = 'once checked subpattern #%number: %1;';
+$string['description_subpattern'] = 'subpattern #%number:[ %1 ];';
+$string['description_subpattern_once'] = 'once checked subpattern #%number:[ %1 ];';
 //TYPE_NODE_COND_SUBPATT
 $string['description_cond_subpatt_pla'] = 'if the further text matches "%1" then check: %2 ; else check : %3;';
 $string['description_cond_subpatt_nla'] = 'if the further text does not match "%1" then check: %2 ; else check: %3;';
 $string['description_cond_subpatt_plb'] = 'if the preceding text matches "%1" then check: %2 ; else check: %3;';
 $string['description_cond_subpatt_nlb'] = 'if the preceding text does not match "%1" then check: %2 ; else check: %3;';
 $string['description_cond_subpatt_backref'] = 'If the subpattern #%number has been successfully matched then check: %2 ; else check: %3;';
-$string['description_cond_subpatt_backref_name'] = 'If the subpattern “%name” has been successfully matched then check: %2 ; else check: %3;';
+$string['description_cond_subpatt_backref_name'] = 'If the subpattern "%name" has been successfully matched then check: %2 ; else check: %3;';
 $string['description_cond_subpatt_recursive_all'] = 'If the whole pattern has been successfully recursively matched then check: %2 ; else check: %3;';
 $string['description_cond_subpatt_recursive'] = 'If the pattern#%number has been successfully recursively matched then check: %2 ; else check: %3;';
-$string['description_cond_subpatt_recursive_name'] = 'If the pattern “%name” has been successfully recursively matched then check: %2 ; else check: %3;';
+$string['description_cond_subpatt_recursive_name'] = 'If the pattern "%name" has been successfully recursively matched then check: %2 ; else check: %3;';
 //TYPE_LEAF_CONTROL
 $string['description_control_accept'] = 'force successful subpattern match';
 $string['description_control_fail'] = 'force fail';
