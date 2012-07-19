@@ -135,6 +135,35 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->greed);
         $this->assertTrue(!$token->value->possessive);
     }
+    function test_lexer_tricky_brackets() {
+        $lexer = $this->create_lexer('a{1,2}{}]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->type == qtype_preg_charset_flag::SET);
+        $this->assertTrue($token->value->flags[0][0]->data == 'a');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT);
+        $this->assertTrue($token->value->leftborder == 1);
+        $this->assertTrue($token->value->rightborder == 2);
+        $this->assertTrue($token->value->greed);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->type == qtype_preg_charset_flag::SET);
+        $this->assertTrue($token->value->flags[0][0]->data == '{');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->type == qtype_preg_charset_flag::SET);
+        $this->assertTrue($token->value->flags[0][0]->data == '}');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->type == qtype_preg_charset_flag::SET);
+        $this->assertTrue($token->value->flags[0][0]->data == ']');
+    }
     function test_lexer_backslash() {
         $lexer = $this->create_lexer('\\\\\\*\\[\23\9\023\x\x23\x{7ff}\d\s\t\b\B\>\<\%((((((((((((\g15\12\g{15}\g{-2}\a\e\f\n\r\cz\c{\c;\u3f1\U\uffff\p{Greek}\P{Lt}\P{^M}\PL[ab\p{Xps}]\p{Xwd}');
         $token = $lexer->nextToken();// \\
