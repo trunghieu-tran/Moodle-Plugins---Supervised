@@ -25,6 +25,10 @@ class qtype_preg_lexer extends JLexBase  {
     protected $backrefsexist;
     protected $optstack;
     protected $optcount;
+    protected $charset;
+    protected $charsetcount;
+    protected $charsetset;
+    protected $charsetuserinscription;
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -322,7 +326,7 @@ class qtype_preg_lexer extends JLexBase  {
     public function mod_top_opt($set, $unset) {
         // Some sanity checks.
         for ($i = 0; $i < $set->length(); $i++) {
-            if ($unset->contains($set[$i])) { // Setting and unsetting modifier at the same time is error.
+            if ($unset->contains($set[$i]) !== false) { // Setting and unsetting modifier at the same time is error.
                 $error = new qtype_preg_node_error();
                 $error->subtype = qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER;
                 $error->indfirst = $this->yychar;
@@ -378,9 +382,10 @@ class qtype_preg_lexer extends JLexBase  {
      * @param negative is this flag negative.
      */
     public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
-        $this->charsetcount += qtype_poasquestion_string::strlen($data);
+        $this->charsetuserinscription .= $userinscription;
         switch ($type) {
         case qtype_preg_charset_flag::SET:
+            $this->charsetcount += qtype_poasquestion_string::strlen($data);
             $this->charsetset .= $data;
             $this->charset->userinscription[0] .= $userinscription;
             $error = $this->form_num_interval($this->charsetset, $this->charsetcount);
@@ -457,6 +462,7 @@ class qtype_preg_lexer extends JLexBase  {
     $this->charset                 = null;
     $this->charsetcount            = 0;
     $this->charsetset              = '';
+    $this->charsetuserinscription  = '';
     }
 
     private function yy_do_eof () {
@@ -467,7 +473,7 @@ class qtype_preg_lexer extends JLexBase  {
         $error->subtype = qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET;
         $error->indfirst = $this->charset->indfirst;
         $error->indlast = $this->yychar - 1;
-        $error->userinscription = '';
+        $error->userinscription = $this->charsetuserinscription;
         $this->errors[] = $error;
     }
         }
@@ -6724,6 +6730,7 @@ array(
     $this->charset->error = array();
     $this->charsetcount = 0;
     $this->charsetset = '';
+    $this->charsetuserinscription = $this->yytext();
     $this->yybegin(self::CHARSET);
 }
                         case -7:
@@ -7043,7 +7050,7 @@ array(
     }
     $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     if ($error !== null) {
-        $this->error[] = $error;
+        $this->errors[] = $error;
     }
     return $this->nextToken();
 }
@@ -7181,7 +7188,7 @@ array(
     $this->push_opt_lvl();
     $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     if ($error !== null) {
-        $this->error[] = $error;
+        $this->errors[] = $error;
     }
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
@@ -7594,6 +7601,7 @@ array(
     $this->charset = null;
     $this->charsetcount = 0;
     $this->charsetset = '';
+    $this->charsetuserinscription = '';
     $this->yybegin(self::YYINITIAL);
     return $res;
 }
@@ -7713,6 +7721,7 @@ array(
     if ($error !== null) {
         $this->charset->userinscription[] = $text;
         $this->charset->error[] = $error;
+        $this->charsetuserinscription .= $text;
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -7727,14 +7736,15 @@ array(
                             break;
                         case 116:
                             {
+    $text = $this->yytext();
     $error = new qtype_preg_node_error();
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
     $error->indfirst = $this->yychar;
     $error->indlast = $this->yychar + $this->yylength() - 1;
-    $userinscription = $this->yytext();
-    $error->userinscription = $userinscription;
-    $this->charset->userinscription[] = $userinscription;
+    $error->userinscription = $text;
+    $this->charset->userinscription[] = $text;
     $this->charset->error[] = $error;
+    $this->charsetuserinscription .= $text;
 }
                         case -117:
                             break;
@@ -7761,6 +7771,7 @@ array(
         if ($error !== null) {
             $this->charset->userinscription[] = $text;
             $this->charset->error[] = $error;
+            $this->charsetuserinscription .= $text;
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -7890,6 +7901,7 @@ array(
     $this->charset->error = array();
     $this->charsetcount = 0;
     $this->charsetset = '';
+    $this->charsetuserinscription = $this->yytext();
     $this->yybegin(self::CHARSET);
 }
                         case -135:
@@ -8089,6 +8101,7 @@ array(
     if ($error !== null) {
         $this->charset->userinscription[] = $text;
         $this->charset->error[] = $error;
+        $this->charsetuserinscription .= $text;
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
