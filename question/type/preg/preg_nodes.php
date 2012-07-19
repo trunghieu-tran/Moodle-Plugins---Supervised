@@ -1495,7 +1495,7 @@ class qtype_preg_node_error extends qtype_preg_node {
     const SUBTYPE_INCORRECT_RANGE = 'incorrect_range_node_error';
 
     /** Error strings names in qtype_preg.php lang file. */
-    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'incorrectregex',
+    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'PCREincorrectregex',
                                    self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'threealtincondsubpatt',
                                    self::SUBTYPE_WRONG_CLOSE_PAREN            => 'unopenedparen',
                                    self::SUBTYPE_WRONG_OPEN_PAREN             => 'unclosedparen',

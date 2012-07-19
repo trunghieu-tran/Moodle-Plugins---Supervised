@@ -12,7 +12,11 @@ class qtype_preg_error {
     public $index_last;
 
     protected function highlight_regex($regex, $indfirst, $indlast) {
-        return qtype_poasquestion_string::substr($regex, 0, $indfirst) . '<b>' . qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_poasquestion_string::substr($regex, $indlast + 1);
+        if ($indfirst >= 0 && $indlast >= 0) {
+            return qtype_poasquestion_string::substr($regex, 0, $indfirst) . '<b>' . qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_poasquestion_string::substr($regex, $indlast + 1);
+        } else {
+            return $regex;
+        }
     }
 
      public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2) {
