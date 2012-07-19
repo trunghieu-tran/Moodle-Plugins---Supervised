@@ -11,18 +11,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_regex_handler {
 
-    /** Regular expression as an object of qtype_preg_string. */
+    /** Regular expression as an object of qtype_poasquestion_string. */
     protected $regex;
-    /** Modifiers for regular expression as an object of qtype_preg_string. */
+    /** Modifiers for regular expression as an object of qtype_poasquestion_string. */
     protected $modifiers;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
@@ -45,6 +44,22 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Returns the infix for DST node names which are named like 'qtype_preg_' . $infix . '_' . $pregnodename.
+     * Should be overloaded in child classes.
+     */
+    protected function node_infix() {
+        return '';
+    }
+
+    /**
+     * Returns the engine-specific node name for the given preg_node name.
+     * Overload in case of sophisticated node name schemes.
+     */
+    protected function get_engine_node_name($pregname) {
+        return 'qtype_preg_' . $this->node_infix() . '_' . $pregname;
+    }
+
+    /**
      * Returns notation, actually used by matcher.
      */
     public function used_notation() {
@@ -55,15 +70,7 @@ class qtype_preg_regex_handler {
      * Returns string of regular expression modifiers supported by this engine
      */
     public function get_supported_modifiers() {
-        return new qtype_preg_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
-    }
-
-    /**
-     * Returns the engine-specific node name for the given preg_node name.
-     * Overload in case of sophisticated node name schemes.
-     */
-    protected function get_engine_node_name($pregname) {
-        return $pregname;
+        return new qtype_poasquestion_string('i'); // Any qtype_preg_matcher who intends to work with this question should support case insensitivity.
     }
 
     /**
@@ -83,7 +90,7 @@ class qtype_preg_regex_handler {
 
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
-            $modifiers = new qtype_preg_string($modifiers);
+            $modifiers = new qtype_poasquestion_string($modifiers);
             $supportedmodifiers = $this->get_supported_modifiers();
             for ($i = 0; $i < $modifiers->length(); $i++) {
                 $mod = $modifiers[$i];
@@ -92,10 +99,10 @@ class qtype_preg_regex_handler {
                 }
             }
         } else {
-            $modifiers = new qtype_preg_string('');
+            $modifiers = new qtype_poasquestion_string('');
         }
 
-        $this->regex = new qtype_preg_string($regex);
+        $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
         $this->options = $options;
         //do parsing
@@ -202,7 +209,7 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
-        $this->lexer->mod_top_opt($this->modifiers, new qtype_preg_string(''));
+        $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
         $this->parser = new preg_parser_yyParser;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
@@ -213,20 +220,18 @@ class qtype_preg_regex_handler {
                 }
             }
         }
-        $lexerrors = $this->lexer->get_errors();
-        foreach ($lexerrors as $lexerror) {
-            $this->parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
-        }
         $this->parser->doParse(0, 0);
-        if ($this->parser->get_error()) {
-            $errornodes = $this->parser->get_error_nodes();
-            $parseerrors = array();
-            //Generate parser error messages
-            foreach($errornodes as $node) {
-                $parseerrors[] = new qtype_preg_parsing_error($regex, $node);
-            }
-            $this->errors = array_merge($this->errors, $parseerrors);
-        } else {
+        // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
+        $lexerrors = $this->lexer->get_errors();
+        foreach ($lexerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        // Parser contains other errors inside AST nodes.
+        $parseerrors = $this->parser->get_error_nodes();
+        foreach($parseerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        if (count($this->errors) === 0) {
             $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();

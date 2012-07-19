@@ -1,5 +1,7 @@
 <?php
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+
 class qtype_preg_error {
 
     // Human-understandable error message.
@@ -10,7 +12,11 @@ class qtype_preg_error {
     public $index_last;
 
     protected function highlight_regex($regex, $indfirst, $indlast) {
-        return qtype_preg_unicode::substr($regex, 0, $indfirst) . '<b>' . qtype_preg_unicode::substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_preg_unicode::substr($regex, $indlast + 1);
+        if ($indfirst >= 0 && $indlast >= 0) {
+            return qtype_poasquestion_string::substr($regex, 0, $indfirst) . '<b>' . qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_poasquestion_string::substr($regex, $indlast + 1);
+        } else {
+            return $regex;
+        }
     }
 
      public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2) {
@@ -28,8 +34,8 @@ class qtype_preg_error {
 class qtype_preg_parsing_error extends qtype_preg_error {
 
     public function __construct($regex, $parsernode) {
-        $this->index_first = $parsernode->firstindxs[0];
-        $this->index_last = $parsernode->lastindxs[0];
+        $this->index_first = $parsernode->indfirst;
+        $this->index_last = $parsernode->indlast;
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
     }
 }
@@ -41,8 +47,8 @@ class qtype_preg_accepting_error extends qtype_preg_error {
      * Returns a string with first character converted to upper case.
      */
     public function uppercase_first_letter($str) {
-        $firstchar = qtype_preg_unicode::strtoupper(qtype_preg_unicode::substr($str, 0, 1));
-        $rest = qtype_preg_unicode::substr($str, 1, qtype_preg_unicode::strlen($str));
+        $firstchar = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($str, 0, 1));
+        $rest = qtype_poasquestion_string::substr($str, 1, qtype_poasquestion_string::strlen($str));
         return $firstchar.$rest;
     }
 
@@ -77,7 +83,7 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a = new stdClass;
         if ($indexes['start'] == -1 && $indexes['end'] == -2) {
             $a->indfirst = 0;
-            $a->indlast = qtype_preg_unicode::strlen($regex) - 1;
+            $a->indlast = qtype_poasquestion_string::strlen($regex) - 1;
         } else {
             $a->indfirst = $indexes['start'];
             $a->indlast = $indexes['end'];

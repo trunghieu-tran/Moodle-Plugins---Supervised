@@ -3,7 +3,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Unit tests for preg string class.
@@ -14,11 +15,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
 class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
 
     function test_string() {
-        $str1 = new qtype_preg_string('аzб');
-        $str2 = new qtype_preg_string('йц者');
-        $str3 = new qtype_preg_string($str1 . $str2);
+        $str1 = new qtype_poasquestion_string('аzб');
+        $str2 = new qtype_poasquestion_string('йц者');
+        $str3 = new qtype_poasquestion_string($str1 . $str2);
 
-        $this->assertTrue(is_a($str3, 'qtype_preg_string'));
+        $this->assertTrue(is_a($str3, 'qtype_poasquestion_string'));
         $this->assertTrue($str3->string() === 'аzбйц者');
         $this->assertTrue($str3->length() === 6);
         $this->assertTrue($str3[-1] === null);
@@ -36,7 +37,7 @@ class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
         $str3[4] = '者';
         $str3[6] = 'ه';
         $str3->concatenate('ab');
-        $str3->concatenate(new qtype_preg_string('ёя'));
+        $str3->concatenate(new qtype_poasquestion_string('ёя'));
 
         $this->assertTrue($str3->length() === 11);
         $this->assertTrue($str3[-1] === null);
@@ -100,37 +101,37 @@ class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_get_ranges_from_charset() {
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_preg_string('a'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('a'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_preg_unicode::ord('a'));
+        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_preg_string('ab'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('ab'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_preg_unicode::ord('b'));
+        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_preg_string('abc'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abc'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_preg_unicode::ord('c'));
+        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('c'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_preg_string('abde'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abde'));
         $this->assertTrue(count($ranges) === 2);
-        $this->assertTrue($ranges[0][0] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_preg_unicode::ord('b'));
-        $this->assertTrue($ranges[1][0] === qtype_preg_unicode::ord('d'));
-        $this->assertTrue($ranges[1][1] === qtype_preg_unicode::ord('e'));
+        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
+        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('d'));
+        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('e'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_preg_string('acdfghj'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('acdfghj'));
         $this->assertTrue(count($ranges) === 4);
-        $this->assertTrue($ranges[0][0] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_preg_unicode::ord('a'));
-        $this->assertTrue($ranges[1][0] === qtype_preg_unicode::ord('c'));
-        $this->assertTrue($ranges[1][1] === qtype_preg_unicode::ord('d'));
-        $this->assertTrue($ranges[2][0] === qtype_preg_unicode::ord('f'));
-        $this->assertTrue($ranges[2][1] === qtype_preg_unicode::ord('h'));
-        $this->assertTrue($ranges[3][0] === qtype_preg_unicode::ord('j'));
-        $this->assertTrue($ranges[3][1] === qtype_preg_unicode::ord('j'));
+        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('c'));
+        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('d'));
+        $this->assertTrue($ranges[2][0] === qtype_poasquestion_string::ord('f'));
+        $this->assertTrue($ranges[2][1] === qtype_poasquestion_string::ord('h'));
+        $this->assertTrue($ranges[3][0] === qtype_poasquestion_string::ord('j'));
+        $this->assertTrue($ranges[3][1] === qtype_poasquestion_string::ord('j'));
     }
 }

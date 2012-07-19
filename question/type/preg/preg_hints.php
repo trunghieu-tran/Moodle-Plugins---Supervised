@@ -25,8 +25,8 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Hint class for showing matching part of a response (along with unmatched head and tail)
@@ -84,7 +84,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
                     $hint .= $renderer->render_tobecontinued();
                 }
                 $wrongtail = '';
-                if (qtype_preg_unicode::strlen($hint) == 0) {
+                if (qtype_poasquestion_string::strlen($hint) == 0) {
                     $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
@@ -168,15 +168,15 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function hinted_string($matchresults) {
         //One-character hint
         $hintedstring = $matchresults->string_extension();
-        if (qtype_preg_unicode::strlen($hintedstring) > 0) {
-            return qtype_preg_unicode::substr($hintedstring, 0, 1);
+        if (qtype_poasquestion_string::strlen($hintedstring) > 0) {
+            return qtype_poasquestion_string::substr($hintedstring, 0, 1);
         }
         return '';
     }
 
     public function to_be_continued($matchresults) {
         $hintedstring = $matchresults->string_extension();
-        return qtype_preg_unicode::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
+        return qtype_poasquestion_string::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
     }
 
 }
