@@ -220,20 +220,18 @@ class qtype_preg_regex_handler {
                 }
             }
         }
-        $lexerrors = $this->lexer->get_errors();
-        foreach ($lexerrors as $lexerror) {
-            $this->parser->doParse(preg_parser_yyParser::LEXERROR, $lexerror);
-        }
         $this->parser->doParse(0, 0);
-        if ($this->parser->get_error()) {
-            $errornodes = $this->parser->get_error_nodes();
-            $parseerrors = array();
-            //Generate parser error messages
-            foreach($errornodes as $node) {
-                $parseerrors[] = new qtype_preg_parsing_error($regex, $node);
-            }
-            $this->errors = array_merge($this->errors, $parseerrors);
-        } else {
+        // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
+        $lexerrors = $this->lexer->get_errors();
+        foreach ($lexerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        // Parser contains other errors inside AST nodes.
+        $parseerrors = $this->parser->get_error_nodes();
+        foreach($parseerrors as $node) {
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+        if (count($this->errors) === 0) {
             $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();

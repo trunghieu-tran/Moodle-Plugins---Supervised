@@ -325,6 +325,7 @@ class qtype_preg_lexer extends JLexBase  {
     }
     public function mod_top_opt($set, $unset) {
         // Some sanity checks.
+        $errorfound = false;
         for ($i = 0; $i < $set->length(); $i++) {
             if ($unset->contains($set[$i]) !== false) { // Setting and unsetting modifier at the same time is error.
                 $error = new qtype_preg_node_error();
@@ -332,19 +333,21 @@ class qtype_preg_lexer extends JLexBase  {
                 $error->indfirst = $this->yychar;
                 $error->indlast = $this->yychar + $this->yylength() - 1;
                 $error->userinscription = $set[$i];
-                return $error;
+                $this->errors[] = $error;
+                $errorfound = true;
             }
         }
-        // If errors don't exist, set and unset local modifiers.
-        for ($i = 0; $i < $set->length(); $i++) {
-            $modname = $set[$i];
-            $this->optstack[$this->optcount - 1]->$modname = true;
+        if (!$errorfound) {
+            // If errors don't exist, set and unset local modifiers.
+            for ($i = 0; $i < $set->length(); $i++) {
+                $modname = $set[$i];
+                $this->optstack[$this->optcount - 1]->$modname = true;
+            }
+            for ($i = 0; $i < $unset->length(); $i++) {
+                $modname = $unset[$i];
+                $this->optstack[$this->optcount - 1]->$modname = false;
+            }
         }
-        for ($i = 0; $i < $unset->length(); $i++) {
-            $modname = $unset[$i];
-            $this->optstack[$this->optcount - 1]->$modname = false;
-        }
-        return null;
     }
     /**
      * Adds a named subpattern to the map.
@@ -438,6 +441,7 @@ class qtype_preg_lexer extends JLexBase  {
             $error->indfirst = $this->yychar;
             $error->indlast = $this->yychar + $this->yylength() - 1;
             $error->userinscription = $this->yytext();
+            $error->addinfo = $str;
             return null;
         }
     }
@@ -7048,10 +7052,7 @@ array(
         $set = qtype_poasquestion_string::substr($this->yytext(), 2, $this->yylength() - 3);
         $unset = '';
     }
-    $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
-    if ($error !== null) {
-        $this->errors[] = $error;
-    }
+    $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     return $this->nextToken();
 }
                         case -42:
@@ -7186,10 +7187,7 @@ array(
         $unset = '';
     }
     $this->push_opt_lvl();
-    $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
-    if ($error !== null) {
-        $this->errors[] = $error;
-    }
+    $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
@@ -7213,12 +7211,14 @@ array(
                             break;
                         case 57:
                             {
-    $node = $this->form_node($this->yytext(), 'qtype_preg_leaf_control');
+    $text = $this->yytext();
+    $node = $this->form_node($text, 'qtype_preg_leaf_control');
     $error = new qtype_preg_node_error();
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE;
     $error->indfirst = $this->yychar;
     $error->indlast = $this->yychar + $this->yylength() - 1;
-    $error->userinscription = $this->yytext();
+    $error->userinscription = $text;
+    $error->addinfo = $text;
     $node->error = $error;
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
 }
@@ -7742,6 +7742,7 @@ array(
     $error->indfirst = $this->yychar;
     $error->indlast = $this->yychar + $this->yylength() - 1;
     $error->userinscription = $text;
+    $error->addinfo = $text;
     $this->charset->userinscription[] = $text;
     $this->charset->error[] = $error;
     $this->charsetuserinscription .= $text;

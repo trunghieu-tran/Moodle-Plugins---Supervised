@@ -6,21 +6,16 @@
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     private $root;
-    // Are there any errors during the parsing.
-    private $error;
-    // Copies of qtype_preg_node_error for errors during the parsing.
+    // Objects of qtype_preg_node_error for errors during the parsing.
     private $errornodes;
     // Count of reduces made.
     private $reducecount;
     // Open-parenthesis strings.
     private $parens;
-    // Quantifier strings.
-    private $quants;
     // Node id counter.
     private $idcounter;
 
     function __construct() {
-        $this->error = false;
         $this->errornodes = array();
         $this->reducecount = 0;
         $this->parens = array('grouping' => '(?:',
@@ -42,7 +37,7 @@
     }
 
     function get_error() {
-        return $this->error;
+        return (count($this->errornodes) > 0);
     }
 
     public function get_error_nodes() {
@@ -64,14 +59,26 @@
         $newnode->indlast = $indlast;
         $newnode->addinfo = $addinfo;
         $this->errornodes[] = $newnode;
-        $this->error = true;
         return $newnode;
+    }
+
+    /**
+     * Creates error node(s) if there is an error in the given node.
+     * @param node the node to be checked.
+     */
+    protected function create_error_node_from_lexer($node) {
+        if (is_array($node->error)) {
+            foreach ($node->error as $error) {
+                $this->create_error_node($error->subtype, $error->indfirst, $error->indlast, $error->addinfo);
+            }
+        } else if ($node->error !== null) {
+            $this->create_error_node($node->error->subtype, $node->error->indfirst, $node->error->indlast, $node->error->addinfo);
+        }
     }
 }
 %parse_failure {
-    if (!$this->error) {
+    if (count($this->errornodes) === 0) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR);
-        $this->error = true;
     }
 }
 %nonassoc ERROR_PREC_VERY_SHORT.
@@ -129,6 +136,7 @@ expr(A) ::= expr(B) QUANT(C). {
     $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
+    $this->create_error_node_from_lexer(C);
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
@@ -183,16 +191,13 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
     A = B;
-    A->userinscription = B->userinscription;
     A->id = $this->idcounter++;
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
+    $this->create_error_node_from_lexer(B);
 }
 
 lastexpr(A) ::= expr(B). {
     A = B;
-    A->userinscription = B->userinscription;
     $this->reducecount++;
 }
 
@@ -270,15 +275,6 @@ expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
     A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->indfirst,  B->indlast);
-    $this->reducecount++;
-}
-
-lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
-    A = $this->create_error_node(C->subtype, C->indfirst, C->indlast, C->userinscription);
-    $this->reducecount++;
-}
-
-lastexpr(A) ::= LEXERROR(C). {
-    A = $this->create_error_node(C->subtype, C->indfirst, C->indlast, C->userinscription);
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
 }
