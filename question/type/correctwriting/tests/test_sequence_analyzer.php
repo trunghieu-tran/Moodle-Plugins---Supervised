@@ -9,7 +9,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+global $CFG;  
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
  
  /**
@@ -65,7 +65,7 @@ function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues)
   * This class contains the test cases for the sequence analyzer.
   * Currently lcs() function is being tested
   */
- class qtype_correctwriting_sequence_analyzer_simpletest extends UnitTestCase {
+ class qtype_correctwriting_sequence_analyzer_test extends PHPUnit_Framework_TestCase {
     // Tests lcs() function with case, when answer is equal to response
     public function test_equal_correctedresponse() {
        $types = array('noun', 'verb', 'verb', 'exclamation_mark');
