@@ -61,8 +61,10 @@ class qtype_correctwriting_question extends question_graded_automatically  {
      *  @var int 
      */
     public $langid = 0;
-    
-    
+    /** Language object, used in language 
+     *  @var blocks_formal_langs_abstract_language
+     */
+    public $usedlanguage = null;
     //Other necessary question data like penalty for each type of mistakes etc
 
     
@@ -151,7 +153,20 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         return get_string('pleaseenterananswer', 'qtype_correctwriting');
     }
-    
+    /** Returns used language in question
+        @return block_formal_langs_abstract_language used language
+     */
+    public function get_used_language() {
+        if ($this->usedlanguage == null) {
+            $this->usedlanguage = block_formal_langs::lang_object($this->langid);
+        }
+        return $this->usedlanguage;
+    }
+    /** Flushes cached data. TODO: Remove
+      */
+    public function invalidate_cache() {
+        $this->gradecachevalid = false;
+    }
     /**  Performs grading response, using lexical analyzer.
          @param array $response student response  as array ( 'answer' => string of student response )
      */
@@ -268,7 +283,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         $matchedanalyzer = null;
         $fraction = -1;
         // Get language
-        $language = block_formal_langs::lang_object($this->langid);
+        $language = $this->get_used_language();
         // Scan answers for match
         foreach($answers as $id => $answer) {
             $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
