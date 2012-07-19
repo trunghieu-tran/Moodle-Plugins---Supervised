@@ -9,14 +9,15 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
+global $CFG;
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
 
  /**
   * This class contains the test cases for the is_same() function of token_base.
   * TODO Move it to formallangs if needed
   */
-class qtype_correctwriting_token_base_is_same extends UnitTestCase {
+class block_formal_langs_token_base_is_same extends PHPUnit_Framework_TestCase {
     // Case, when a tokens are totally equal
     public function test_equal_tokens() {
         $answer = new block_formal_langs_token_base(null, 'type', 'value', true, null);
