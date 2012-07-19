@@ -8,6 +8,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+
 class qtype_preg_unicode extends textlib {
 
     public static function min_possible_code() {
@@ -7591,41 +7594,6 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2028, 1=>0x2029));
     }
 
-    /******************************************************************/
-
-    /**
-     * Returns the code of a UTF-8 character.
-     * @param utf8chr - a UTF-8 character.
-     * @return its code.
-     */
-    public static function ord($utf8chr) {
-        if ($utf8chr === '') {
-            return 0;
-        }
-
-        $ord0 = ord($utf8chr{0});
-        if ($ord0 >= 0 && $ord0 <= 127) {
-            return $ord0;
-        }
-
-        $ord1 = ord($utf8chr{1});
-        if ($ord0 >= 192 && $ord0 <= 223) {
-            return ($ord0 - 192) * 64 + ($ord1 - 128);
-        }
-
-        $ord2 = ord($utf8chr{2});
-        if ($ord0 >= 224 && $ord0 <= 239) {
-            return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-        }
-
-        $ord3 = ord($utf8chr{3});
-        if ($ord0 >= 240 && $ord0 <= 247) {
-            return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-        }
-
-        return false;
-    }
-
     /**
      * Returns unicode ranges which $utf8str characters belongs to.
      * @param utf8str UTF-8 string.
@@ -7633,8 +7601,8 @@ class qtype_preg_unicode extends textlib {
      */
     public static function get_ranges($utf8str) {
         $result = array();
-        for ($i = 0; $i < self::strlen($utf8str); $i++) {
-            $code = self::ord(self::substr($utf8str, $i, 1));
+        for ($i = 0; $i < qtype_poasquestion_string::strlen($utf8str); $i++) {
+            $code = qtype_poasquestion_string::ord(qtype_poasquestion_string::substr($utf8str, $i, 1));
             foreach (self::$ranges as $name => $range) {
                 if ($code >= $range[0] && $code < $range[1]) {
                     if (!array_key_exists($name, $result)) {
@@ -7648,14 +7616,14 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
-     * @param $charset object of qtype_preg_string.
+     * @param $charset object of qtype_poasquestion_string.
      */
     public static function get_ranges_from_charset($charset) {
         $result = array();
         $previous = -1;
         for ($i = 0; $i < $charset->length(); $i++) {
             $str = $charset[$i];
-            $newnum = self::ord($str);
+            $newnum = qtype_poasquestion_string::ord($str);
             if ($previous === -1) {
                 $toadd = array(0 => $newnum);
             } else {
@@ -7726,7 +7694,7 @@ class qtype_preg_unicode extends textlib {
         if ($utf8chr === null || $utf8chr === '') {
             return false;
         }
-        $ord = self::ord($utf8chr);
+        $ord = qtype_poasquestion_string::ord($utf8chr);
         foreach ($ranges as $range) {
             if ($range[0] <= $ord && $ord <= $range[1]) {
                 return true;

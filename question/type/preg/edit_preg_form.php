@@ -2,7 +2,7 @@
 /**
  * Defines the editing form for the preg question type.
  *
- * @copyright &copy; 2008  Sychev Oleg 
+ * @copyright &copy; 2008  Sychev Oleg
  * @author Sychev Oleg, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -58,7 +58,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         foreach ($engines as $engine => $enginename) {
             $questionobj = new qtype_preg_question;
             $querymatcher = $questionobj->get_query_matcher($engine);
-            if (!$querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING) || 
+            if (!$querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING) ||
                 !$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)
                 ) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
@@ -126,7 +126,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             }
             $i++;
         }
-        
+
         if ($correctanswermatch == false) {
             $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
         }

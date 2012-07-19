@@ -161,7 +161,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Returns an array of states which can be reached without consuming characters.
      * @param qtype_preg_nfa_processing_state startstate state to go from.
-     * @param qtype_preg_string str string being matched.
+     * @param qtype_poasquestion_string str string being matched.
      * @param int startpos start position of matching.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
@@ -202,7 +202,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
-     * @param qtype_preg_string str string being matched.
+     * @param qtype_poasquestion_string str string being matched.
      * @param int startpos - start position of matching.
      * @param qtype_preg_nfa_processing_state laststate - the last state of the automaton, an object of qtype_preg_nfa_processing_state.
      * @param bool fulllastmatch - was the last transition captured fully, not partially?
@@ -316,7 +316,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the longest match using a string as input. Matching is proceeded from a given start position.
-     * @param qtype_preg_string str - the original input string.
+     * @param qtype_poasquestion_string str - the original input string.
      * @param int startpos - index of the start position to match.
      * @return - the longest character sequence matched.
      */
@@ -384,7 +384,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newresult->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newresult->set_source_info($newresult->str()->substr(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
+                        $newresult->set_source_info($newresult->str()->substring(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
 
                         $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
                         if ($path !== null) {
