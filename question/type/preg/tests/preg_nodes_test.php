@@ -142,4 +142,33 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
     }
+
+    function test_syntax_errors() {
+        $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
+        $errors = $handler->get_error_objects();
+        $this->assertTrue(count($errors) == 11);
+        $this->assertTrue($errors[0]->index_first == 31); // Setting and unsetting modifier.
+        $this->assertTrue($errors[0]->index_last == 36);
+        $this->assertTrue($errors[1]->index_first == 62); // Unclosed charset.
+        $this->assertTrue($errors[1]->index_last == 65);
+        $this->assertTrue($errors[2]->index_first == 0);  // Unknown control sequence.
+        $this->assertTrue($errors[2]->index_last == 6);
+        $this->assertTrue($errors[3]->index_first == 7);  // Wrong closing paren.
+        $this->assertTrue($errors[3]->index_last == 7);
+        $this->assertTrue($errors[4]->index_first == 9);  // Three alternatives in the conditional subpattern.
+        $this->assertTrue($errors[4]->index_last == 21);
+        $this->assertTrue($errors[5]->index_first == 25); // Quantifier without operand.
+        $this->assertTrue($errors[5]->index_last == 29);
+        $this->assertTrue($errors[6]->index_first == 26); // Wrong quantifier ranges.
+        $this->assertTrue($errors[6]->index_last == 28);
+        $this->assertTrue($errors[7]->index_first == 38); // Unknown POSIX class.
+        $this->assertTrue($errors[7]->index_last == 48);
+        $this->assertTrue($errors[8]->index_first == 50); // Unknown Unicode property.
+        $this->assertTrue($errors[8]->index_last == 61);
+        $this->assertTrue($errors[9]->index_first == 22); // Empty parens.
+        $this->assertTrue($errors[9]->index_last == 23);
+        $this->assertTrue($errors[10]->index_first == 8); // Wrong opening paren.
+        $this->assertTrue($errors[10]->index_last == 8);
+
+    }
 }
