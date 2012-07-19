@@ -311,6 +311,10 @@ MODIFIER = [iJmsUx]
         $startchar = qtype_poasquestion_string::substr($cc, $cclength - 3, 1);
         $endchar = qtype_poasquestion_string::substr($cc, $cclength - 1, 1);
         if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
+            // Modify userinscription;
+            $userinscriptionlength = qtype_poasquestion_string::strlen($this->charset->userinscription[0]);
+            $this->charset->userinscription[0] = qtype_poasquestion_string::substr($this->charset->userinscription[0], 0, $userinscriptionlength - 3);
+            $this->charset->userinscription[] = $startchar . '-' . $endchar;
             // Replace last 3 characters by all the characters between them.
             $cc = qtype_poasquestion_string::substr($cc, 0, $cclength - 3);
             $cclength -= 3;
@@ -593,6 +597,10 @@ MODIFIER = [iJmsUx]
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
+    return $res;
+}
+<YYINITIAL> ["{}]"] {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
     return $res;
 }
 <YYINITIAL> "(?#"[^)]*")" {       // Comment.

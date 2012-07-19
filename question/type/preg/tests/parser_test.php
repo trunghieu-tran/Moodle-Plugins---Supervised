@@ -92,7 +92,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_aster() {
-        $parser = $this->run_parser('(?:ab)*', $errornodes);
+        $parser = $this->run_parser('(?:[a-z\w]b)*', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription === '*');
@@ -102,7 +102,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->userinscription === '');
         $this->assertTrue($root->operands[0]->id == 2);
         $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data == 'a');
+        $this->assertTrue($root->operands[0]->operands[0]->userinscription === array('a-z', '\w'));
         $this->assertTrue($root->operands[0]->operands[0]->id == 0);
         $this->assertTrue($root->operands[0]->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data == 'b');
@@ -110,18 +110,18 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_parser_id_plus() {
-        $parser = $this->run_parser('(?:[\wa-z\d])++', $errornodes);
+        $parser = $this->run_parser('(?:[\wab-yz\d])++', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
         $this->assertTrue($root->userinscription === '++');
         $this->assertTrue($root->indfirst === 0);
-        $this->assertTrue($root->indlast === 14);
+        $this->assertTrue($root->indlast === 16);
         $this->assertTrue($root->id == 1);
         $this->assertTrue($root->possessive);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->userinscription === array('a-z', '\w', '\d'));
+        $this->assertTrue($root->operands[0]->userinscription === array('az', '\w', 'b-y', '\d'));
         $this->assertTrue($root->operands[0]->indfirst == 0);
-        $this->assertTrue($root->operands[0]->indlast == 12);
+        $this->assertTrue($root->operands[0]->indlast == 14);
         $this->assertTrue($root->operands[0]->id == 0);
     }
 
@@ -415,7 +415,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[1]->indfirst == 10);
         $root = $parser->get_root();
-        var_dump($root);
+        //var_dump($root);
         // Several unopened and unclosed parenthesis.
         $parser = $this->run_parser(')a)b)e(((g(', $errornodes);
         $this->assertTrue($parser->get_error());
