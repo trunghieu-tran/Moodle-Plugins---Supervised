@@ -83,7 +83,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
 /**
  * Represents auxiliary class for extra checks. The extra checks are performed by cross-tester
@@ -242,7 +242,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $str = $obtained->string_extension();
             }
             $regex = $pattern = '/(*UTF8)' . $expected['next'] . '/';
-            $char = qtype_preg_unicode::substr($str, 0, 1);
+            $char = qtype_poasquestion_string::substr($str, 0, 1);
             $nextpassed = (($expected['next'] === $str && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
                            ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && preg_match($pattern, $char)));
         }

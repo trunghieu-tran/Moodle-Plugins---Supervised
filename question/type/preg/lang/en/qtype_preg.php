@@ -82,6 +82,7 @@ $string['unclosedsqbrackets'] = 'Regex syntax error: missing a closing bracket \
 $string['ungreedyquant'] = 'ungreedy quantifiers';
 $string['unopenedparen'] = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}';
 $string['setunsetmod'] = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}';
+$string['unknowncontrolsequence'] = 'Unknown control sequence: {$a->addinfo}';
 $string['unknownunicodeproperty'] = 'Unknown unicode property: {$a->addinfo}';
 $string['unknownposixclass'] = 'Unknown posix class: {$a->addinfo}';
 $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by the {$a->engine}';

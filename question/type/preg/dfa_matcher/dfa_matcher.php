@@ -61,8 +61,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return 'dfa_matcher';
     }
 
-    protected function get_engine_node_name($pregname) {
-        return 'qtype_preg_dfa_' . $pregname;
+    protected function node_infix() {
+        return 'dfa';
     }
 
     /**

@@ -10,7 +10,7 @@
  * @package questions
  */
 
-require_once($CFG->dirroot . '/question/type/preg/preg_string.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
@@ -32,7 +32,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     * Returns string of regular expression modifiers supported by this engine
     */
     public function get_supported_modifiers() {
-        return new qtype_preg_string('imsxeADSUX');
+        return new qtype_poasquestion_string('imsxeADSUX');
     }
 
     /**
