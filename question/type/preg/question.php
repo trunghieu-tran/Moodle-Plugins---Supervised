@@ -320,7 +320,7 @@ class qtype_preg_question extends question_graded_automatically
             $matchingoptions = new qtype_preg_matching_options;
             //We need extension to hint next character or to generate correct answer if none is supplied
             $matchingoptions->extensionneeded = $this->usehint || trim($this->correctanswer) == '';
-            if($answerid !== null) {
+            if($answerid !== null && $answerid > 0) {
                 $feedback = $this->answers[$answerid]->feedback;
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
                     $matchingoptions->capturesubpatterns = false;
