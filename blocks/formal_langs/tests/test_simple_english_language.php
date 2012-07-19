@@ -9,12 +9,13 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+global $CFG; 
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php'); 
 
  /**
   * Tests a simple english language
   */
-class block_formal_langs_simple_english_language_test extends UnitTestCase {
+class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_TestCase {
     // Tests a lexer of simple english language
     public function test_lexer() {
         $lang = new block_formal_langs_language_simple_english();
