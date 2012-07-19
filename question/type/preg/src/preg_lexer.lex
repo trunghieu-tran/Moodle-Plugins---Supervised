@@ -31,6 +31,7 @@ MODIFIER = [iJmsUx]
     $this->charset                 = null;
     $this->charsetcount            = 0;
     $this->charsetset              = '';
+    $this->charsetuserinscription  = '';
 
 %init}
 %eof{
@@ -39,7 +40,7 @@ MODIFIER = [iJmsUx]
         $error->subtype = qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET;
         $error->indfirst = $this->charset->indfirst;
         $error->indlast = $this->yychar - 1;
-        $error->userinscription = '';
+        $error->userinscription = $this->charsetuserinscription;
         $this->errors[] = $error;
     }
 %eof}
@@ -52,6 +53,10 @@ MODIFIER = [iJmsUx]
     protected $backrefsexist;
     protected $optstack;
     protected $optcount;
+    protected $charset;
+    protected $charsetcount;
+    protected $charsetset;
+    protected $charsetuserinscription;
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -360,7 +365,7 @@ MODIFIER = [iJmsUx]
     public function mod_top_opt($set, $unset) {
         // Some sanity checks.
         for ($i = 0; $i < $set->length(); $i++) {
-            if ($unset->contains($set[$i])) { // Setting and unsetting modifier at the same time is error.
+            if ($unset->contains($set[$i]) !== false) { // Setting and unsetting modifier at the same time is error.
                 $error = new qtype_preg_node_error();
                 $error->subtype = qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER;
                 $error->indfirst = $this->yychar;
@@ -419,9 +424,10 @@ MODIFIER = [iJmsUx]
      * @param negative is this flag negative.
      */
     public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
-        $this->charsetcount += qtype_poasquestion_string::strlen($data);
+        $this->charsetuserinscription .= $userinscription;
         switch ($type) {
         case qtype_preg_charset_flag::SET:
+            $this->charsetcount += qtype_poasquestion_string::strlen($data);
             $this->charsetset .= $data;
             $this->charset->userinscription[0] .= $userinscription;
             $error = $this->form_num_interval($this->charsetset, $this->charsetcount);
@@ -571,6 +577,7 @@ MODIFIER = [iJmsUx]
     $this->charset->error = array();
     $this->charsetcount = 0;
     $this->charsetset = '';
+    $this->charsetuserinscription = $this->yytext();
     $this->yybegin(self::CHARSET);
 }
 <YYINITIAL> "(" {
@@ -1058,7 +1065,7 @@ MODIFIER = [iJmsUx]
     }
     $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     if ($error !== null) {
-        $this->error[] = $error;
+        $this->errors[] = $error;
     }
     return $this->nextToken();
 }
@@ -1074,7 +1081,7 @@ MODIFIER = [iJmsUx]
     $this->push_opt_lvl();
     $error = $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
     if ($error !== null) {
-        $this->error[] = $error;
+        $this->errors[] = $error;
     }
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
@@ -1152,14 +1159,15 @@ MODIFIER = [iJmsUx]
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::XDIGIT, $negative);
 }
 <CHARSET> "[:"[^\]]*":]"|"[^:"[^\]]*":]" {
+    $text = $this->yytext();
     $error = new qtype_preg_node_error();
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
     $error->indfirst = $this->yychar;
     $error->indlast = $this->yychar + $this->yylength() - 1;
-    $userinscription = $this->yytext();
-    $error->userinscription = $userinscription;
-    $this->charset->userinscription[] = $userinscription;
+    $error->userinscription = $text;
+    $this->charset->userinscription[] = $text;
     $this->charset->error[] = $error;
+    $this->charsetuserinscription .= $text;
 }
 <CHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
@@ -1169,6 +1177,7 @@ MODIFIER = [iJmsUx]
     if ($error !== null) {
         $this->charset->userinscription[] = $text;
         $this->charset->error[] = $error;
+        $this->charsetuserinscription .= $text;
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -1189,6 +1198,7 @@ MODIFIER = [iJmsUx]
         if ($error !== null) {
             $this->charset->userinscription[] = $text;
             $this->charset->error[] = $error;
+            $this->charsetuserinscription .= $text;
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -1272,6 +1282,7 @@ MODIFIER = [iJmsUx]
     $this->charset = null;
     $this->charsetcount = 0;
     $this->charsetset = '';
+    $this->charsetuserinscription = '';
     $this->yybegin(self::YYINITIAL);
     return $res;
 }
