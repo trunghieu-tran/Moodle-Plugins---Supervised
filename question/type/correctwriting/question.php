@@ -95,6 +95,10 @@ class qtype_correctwriting_question extends question_graded_automatically  {
      *  @var boolean
      */
     public $gradecachevalid = false;
+    /** A cached response 
+     *  @var string
+     */
+    public $gradecachedanswer = '';
     /** A cached matched answer id 
      *  @var int
      */
@@ -146,7 +150,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         @return string validation error
       */
     public function get_validation_error(array $response) {        
-        print_r($response);
+        //print_r($response);
         
         if ($this->is_gradable_response($response)) {
             return '';
@@ -171,7 +175,14 @@ class qtype_correctwriting_question extends question_graded_automatically  {
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function grade_response(array $response) {
-        if ($this->gradecachevalid == true) {
+        $this->get_best_fit_answer($response);
+        return $this->matchedgradestate;
+    }
+    /**  Returns a best fit answer, for specified response and saves results into a cache
+         @param array $response student response  as array ( 'answer' => string of student response )
+     */
+    public function get_best_fit_answer(array $response) {
+        if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
             return $this->matchedgradestate;
         }
         
@@ -184,6 +195,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         
         $this->gradecachevalid = true;
+        $this->gradecachedanswer = $response['answer'];
         
         $questionclasses = $this->split_exactmatch_and_nonexactmatch_answers();
         $matched = $this->check_exact_match_answers($response['answer'], $questionclasses['exact']);
@@ -193,7 +205,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                 $this->grade_as_wrong_response_to_max_fraction($response['answer']);
             }
         }
-        return $this->matchedgradestate;
+        return $this->answers[$this->matchedanswerid];
     }
     /** Computes a fraction of student response, based on alayzer
         @param float  $fraction maximum fraction of student response
@@ -343,9 +355,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function get_matching_answer(array $response) {
-        if ($this->gradecachevalid == false) {
-            $this->matchedgradestate = $this->grade_response($response);
-        }
+        $this->get_best_fit_answer($response);
         // Handle obstacle when no answer matched
         if ($this->matchedanswerid == null) {
             $keys = array_keys($this->answers);
