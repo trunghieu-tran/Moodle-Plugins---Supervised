@@ -11,9 +11,10 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Generates the output for preg questions.
@@ -77,7 +78,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         } elseif ($options->feedback == question_display_options::VISIBLE) {//specific feedback is possible, render correctness - TODO - decide when to render correctness
             $hintobj =  $question->hint_object('hintmatchingpart');
             $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
-            if (qtype_preg_unicode::strlen($hintmessage) > 0) {
+            if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
                 $hintmessage .= html_writer::empty_tag('br');
             }
         }
