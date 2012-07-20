@@ -15,6 +15,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+require_once($CFG->dirroot . '/question/engine/states.php');
 
 /**
  * Generates the output for preg questions.
@@ -87,10 +88,14 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return $hintmessage.$output;
     }
 
+    public static function feedback_class_static($fraction) {
+        return question_state::graded_state_for_fraction($fraction)->get_feedback_class();
+    }
+
     /** Renders matched part of the response */
     public static function render_matched($str) {
         if ($str !== '') {
-            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(1)));
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => self::feedback_class_static(1)));
         }
         return '';
     }
@@ -98,7 +103,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders unmatched part of the response */
     public static function render_unmatched($str) {
         if ($str !== '') {
-            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0)));
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => self::feedback_class_static(0)));
         }
         return '';
     }
@@ -106,7 +111,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders hinted part of the response*/
     public static function render_hinted($str) {
         if ($str !== '') {
-            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0.5)));
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->self::feedback_class_static(0.5)));
         }
         return '';
     }
@@ -114,7 +119,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     /** Renders part of the response that should be deleted*/
     public static function render_deleted($str) {
         if ($str !== '') {
-            return html_writer::tag('span', html_writer::tag('del', htmlspecialchars($str)), array('class' => $this->feedback_class(0)));
+            return html_writer::tag('span', html_writer::tag('del', htmlspecialchars($str)), array('class' => $this->self::feedback_class_static(0)));
         }
         return '';
     }
