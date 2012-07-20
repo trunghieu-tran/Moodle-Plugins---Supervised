@@ -49,7 +49,11 @@
 
         // get the regex.
         while ($i < strlen($line) && $line[$i] !== $TAB) {
-            $regex .= $line[$i];
+            $ch = $line[$i];
+            if ($ch === "\\") {
+                $ch = "\\\\";
+            }
+            $regex .= $ch;
             $i++;
         }
 
@@ -60,7 +64,11 @@
 
         // get the string.
         while ($i < strlen($line) && $line[$i] !== $TAB) {
-            $string .= $line[$i];
+            $ch = $line[$i];
+            if ($ch === "\\") {
+                $ch = "\\\\";
+            }
+            $string .= $ch;
             $i++;
         }
         if ($string === 'NULL') {
@@ -104,8 +112,10 @@
                 continue;
             }
             if ($indexes[$j] === ')') {
-                $index_first[] = (int)$index1;
-                $length[] = (int)$index2 - (int)$index1;
+                if ($index1 !== '?' && $index2 !== '?') {
+                    $index_first[] = (int)$index1;
+                    $length[] = (int)$index2 - (int)$index1;
+                }
                 continue;
             }
             if ($first) {
