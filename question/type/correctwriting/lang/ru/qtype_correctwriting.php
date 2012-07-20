@@ -3,7 +3,7 @@
 //Lang string file for the correct writing question type
 
 $string['correctwriting'] = 'Correct writing';
-$string['movedmistakemessage'] = '{$a->description} перемещена ';
+$string['movedmistakemessage'] = '{$a->description} перемещен ';
 $string['movedmistakemessagenodescription'] = '{$a->value}, которая находится {$a->line}:{$a->position} перемещена ';
 $string['addedmistakemessage'] = '"{$a->value}" at {$a->line}:{$a->position} - лишняя в ответе ';
 $string['absentmistakemessage'] = '{$a->description} отсутствует в ответе ';
@@ -32,3 +32,7 @@ $string['writemoredescriptions']  = 'Количество описаний ме�
 $string['writelessdescriptions']  = 'Количество описаний больше количества лексем';
 $string['foundlexicalerrors']  = 'В вашем ответе обнаружены лексические ошибки. Пожалуйста, исправьте следующие ошибки: ';
 $string['foundmistakes'] = 'В вашем ответе обнаружены следующие ошибки:';
+$string['clanguageunmatchedquote'] = 'Не закрыта кавычка на позиции {$a->line}:{$a->col}';
+$string['clanguageunmatchedsquote'] = 'Не закрыта кавычка на позиции {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'Неизвестный символ "{$a->value}" на позиции {$a->line}:{$a->col}';
+$string['clanguagemulticharliteral'] = 'Символьный литерал из нескольких символов на позиции {$a->line}:{$a->col}';
