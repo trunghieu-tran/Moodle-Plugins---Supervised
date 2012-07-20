@@ -142,6 +142,29 @@ class qtype_preg_question extends question_graded_automatically
         parent::__construct();
     }
 
+    public static function question_from_regex($regex, $usecase, $exactmatch, $engine, $notation) {
+
+        $question = new qtype_preg_question;
+        $question->usecase = $usecase;
+        $question->correctanswer = '';
+        $question->exactmatch = $exactmatch;
+        $querymatcher = $question->get_query_matcher($engine);
+        $question->usehint = $querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $question->hintpenalty = 0;
+        $question->hintgradeborder = 1;
+        $question->engine = $engine;
+        $question->notation = $notation;
+
+        $answer = new stdClass();
+        $answer->id = 100;
+        $answer->answer = $regex;
+        $answer->fraction = 1;
+        $answer->feedback = '';
+
+        $question->answers = array(100=>$answer);
+        return $question;
+    }
+
     public function get_expected_data() {
         //Note: not using PARAM_RAW_TRIMMED cause it'll interfere with next character hinting is most ungraceful way: disabling it just when you try to get a first letter of the next word
         return array('answer' => PARAM_RAW);
