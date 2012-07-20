@@ -37,21 +37,11 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_draw_ast() {
-        $parser = $this->run_parser('(ab|cd*$){3,100}');
+        $parser = $this->run_parser('(ab|cd*$|){3,100}');
         $root = $parser->get_root();
-
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nodes');
-        $dotfn = $dir . 'ast_test.dot';
-
-        $dotfile = fopen($dotfn, 'w');
-
-        fprintf($dotfile, "digraph {\n");
-        $root->write_to_dot_file($dotfile);
-        fprintf($dotfile, "}");
-        fclose($dotfile);
-
-        $regexhandler->execute_dot($dotfn, 'ast_test.jpg');
+        qtype_preg_regex_handler::execute_dot($root->dot_script(true), $dir . 'ast_test.png');
     }
     /*function test_simple() {//[asdf]
         $this->matcher->input_fa('0->asdf->1;');

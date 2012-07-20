@@ -131,11 +131,11 @@ abstract class qtype_preg_node {
     abstract public function name();
 
     /**
-     * Writes this node to a .dot file - used for debugging.
-     * @param file the opened output file.
-     * @return name of the node in the .dot file.
+     * Returns the dot script corresponding to this node.
+     * @param adddigraph if true, adds the "digraph {\n" to the start and "}" to the end.
+     * @return the dot script corresponding to this node.
      */
-    abstract public function write_to_dot_file($file);
+    abstract public function dot_script($adddigraph);
 
 
     /**
@@ -165,7 +165,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         }
     }
 
-    public function write_to_dot_file($file) {
+    public function dot_script($adddigraph) {
+        $result = '';
+        // Add "digraph {" string if necessary.
+        if ($adddigraph) {
+            $result .= "digraph {\n";
+        }
+        // $this->userinscription can be either a string or an array of strings.
         if (is_array($this->userinscription)) {
             $userinscription = '[';
             foreach ($this->userinscription as $tmp) {
@@ -175,9 +181,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else {
             $userinscription = $this->userinscription;
         }
-        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
-        fwrite($file, $str . ";\n");
-        return $str;
+        $result .= '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . "\";\n";
+        // Add "}" string if necessary.
+        if ($adddigraph) {
+            $result .= "}";
+        }
+        return $result;
     }
 
     /**
@@ -1278,15 +1287,22 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         }
     }
 
-    public function write_to_dot_file($file) {
-        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
-        foreach ($this->operands as $operand) {
-            $operandstr = $operand->write_to_dot_file($file);
-            fwrite($file, $str . '->' . $operandstr . ";\n");
+    public function dot_script($adddigraph) {
+        $result = '';
+        // Add "digraph {" string if necessary.
+        if ($adddigraph) {
+            $result .= "digraph {\n";
         }
-
-        fwrite($file, $str . ";\n");
-        return $str;
+        $thisstr = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
+        foreach ($this->operands as $operand) {
+            $operandstr = $operand->dot_script(false);
+            $result .= $thisstr . '->' . $operandstr;
+        }
+        // Add "}" string if necessary.
+        if ($adddigraph) {
+            $result .= "}";
+        }
+        return $result;
     }
 }
 
@@ -1519,7 +1535,8 @@ class qtype_preg_node_error extends qtype_preg_node {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->addinfo = null;
     }
-    public function write_to_dot_file($file) {
+    public function dot_script($write) {
+        // TODO
     }
 
     /**
