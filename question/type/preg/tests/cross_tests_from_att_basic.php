@@ -56,7 +56,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\)",
+        return array( 'regex'=>"\\)",
                       'tests'=>array($test1));
     }
 
@@ -98,7 +98,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\}",
+        return array( 'regex'=>"\\}",
                       'tests'=>array($test1));
     }
 
@@ -112,7 +112,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\]",
+        return array( 'regex'=>"\\]",
                       'tests'=>array($test1));
     }
 
@@ -196,7 +196,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\^a",
+        return array( 'regex'=>"\\^a",
                       'tests'=>array($test1));
     }
 
@@ -210,7 +210,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"a\^",
+        return array( 'regex'=>"a\\^",
                       'tests'=>array($test1));
     }
 
@@ -238,7 +238,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"a\$",
+        return array( 'regex'=>"a\\$",
                       'tests'=>array($test1));
     }
 
@@ -442,8 +442,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"aef",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>1),
-                        'length'=>array(0=>3,1=>0,2=>0,3=>1),
+                        'index_first'=>array(0=>0,3=>1),
+                        'length'=>array(0=>3,3=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -484,8 +484,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"ab",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>1),
-                        'length'=>array(0=>2,1=>0,2=>1),
+                        'index_first'=>array(0=>0,2=>1),
+                        'length'=>array(0=>2,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -804,7 +804,7 @@ class qtype_preg_cross_tests_from_att_basic  {
     }
 
     function data_for_test_att_basic_57() {
-        $test1 = array( 'str'=>"\n",
+        $test1 = array( 'str'=>"\\n",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -813,12 +813,12 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\n",
+        return array( 'regex'=>"\\n",
                       'tests'=>array($test1));
     }
 
     function data_for_test_att_basic_58() {
-        $test1 = array( 'str'=>"\n",
+        $test1 = array( 'str'=>"\\n",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -827,12 +827,12 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\n",
+        return array( 'regex'=>"\\n",
                       'tests'=>array($test1));
     }
 
     function data_for_test_att_basic_59() {
-        $test1 = array( 'str'=>"\n",
+        $test1 = array( 'str'=>"\\n",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -846,7 +846,7 @@ class qtype_preg_cross_tests_from_att_basic  {
     }
 
     function data_for_test_att_basic_60() {
-        $test1 = array( 'str'=>"\na",
+        $test1 = array( 'str'=>"\\na",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -855,7 +855,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\na",
+        return array( 'regex'=>"\\na",
                       'tests'=>array($test1));
     }
 
@@ -897,7 +897,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\* */?)0*[6-7]))([^0-9]|$)",
+        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
                       'tests'=>array($test1));
     }
 
@@ -911,7 +911,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\* */?)0*[6-7]))([^0-9]|$)",
+        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
                       'tests'=>array($test1));
     }
 
@@ -925,7 +925,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\* */?)0*[6-7]))([^0-9]|$)",
+        return array( 'regex'=>"(^|[ (,;])((([Ff]eb[^ ]* *|0*2/|\\* */?)0*[6-7]))([^0-9]|$)",
                       'tests'=>array($test1));
     }
 
@@ -1014,7 +1014,7 @@ class qtype_preg_cross_tests_from_att_basic  {
     }
 
     function data_for_test_att_basic_72() {
-        $test1 = array( 'str'=>"\x01\xff",
+        $test1 = array( 'str'=>"\\x01\\xff",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -1569,7 +1569,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"a\(b",
+        return array( 'regex'=>"a\\(b",
                       'tests'=>array($test1));
     }
 
@@ -1583,7 +1583,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"a\(*b",
+        return array( 'regex'=>"a\\(*b",
                       'tests'=>array($test1));
     }
 
@@ -1597,7 +1597,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"a\(*b",
+        return array( 'regex'=>"a\\(*b",
                       'tests'=>array($test1));
     }
 
@@ -2207,8 +2207,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Qaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>10),
-                        'length'=>array(0=>15,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>10),
+                        'length'=>array(0=>15,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2221,8 +2221,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Mo'ammar Gadhafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2235,8 +2235,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Kaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>10),
-                        'length'=>array(0=>15,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>10),
+                        'length'=>array(0=>15,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2249,8 +2249,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Qadhafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>10),
-                        'length'=>array(0=>15,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>10),
+                        'length'=>array(0=>15,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2263,8 +2263,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Gadafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>10),
-                        'length'=>array(0=>14,1=>0,2=>1),
+                        'index_first'=>array(0=>0,2=>10),
+                        'length'=>array(0=>14,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2277,8 +2277,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Mu'ammar Qadafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>15,1=>0,2=>1),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>15,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2291,8 +2291,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Moamar Gaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>9),
-                        'length'=>array(0=>14,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>9),
+                        'length'=>array(0=>14,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2305,8 +2305,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Mu'ammar Qadhdhafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>13),
-                        'length'=>array(0=>18,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>13),
+                        'length'=>array(0=>18,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2319,8 +2319,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Khaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2333,8 +2333,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Ghaddafy",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2347,8 +2347,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Ghadafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>15,1=>0,2=>1),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>15,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2361,8 +2361,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Ghaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2375,8 +2375,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muamar Kaddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>9),
-                        'length'=>array(0=>14,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>9),
+                        'length'=>array(0=>14,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2389,8 +2389,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Quathafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2403,8 +2403,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Muammar Gheddafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>16,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>16,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2417,8 +2417,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Moammar Khadafy",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>11),
-                        'length'=>array(0=>15,1=>0,2=>1),
+                        'index_first'=>array(0=>0,2=>11),
+                        'length'=>array(0=>15,2=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2431,8 +2431,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"Moammar Qudhafi",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>10),
-                        'length'=>array(0=>15,1=>0,2=>2),
+                        'index_first'=>array(0=>0,2=>10),
+                        'length'=>array(0=>15,2=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2501,8 +2501,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>3,2=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2557,8 +2557,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"bar!bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0),
-                        'length'=>array(0=>7,1=>3,2=>0,3=>3),
+                        'index_first'=>array(0=>0,1=>0,3=>0),
+                        'length'=>array(0=>7,1=>3,3=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2571,8 +2571,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"foo!bar!bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>4,1=>4,2=>0,3=>4),
-                        'length'=>array(0=>7,1=>3,2=>0,3=>3),
+                        'index_first'=>array(0=>4,1=>4,3=>4),
+                        'length'=>array(0=>7,1=>3,3=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2725,8 +2725,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"foo!bar!bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>4,5=>8),
-                        'length'=>array(0=>11,1=>11,2=>0,3=>0,4=>4,5=>3),
+                        'index_first'=>array(0=>0,1=>0,4=>4,5=>8),
+                        'length'=>array(0=>11,1=>11,4=>4,5=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2739,8 +2739,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>3,2=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2767,8 +2767,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"foo!bar!bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>4,4=>8),
-                        'length'=>array(0=>11,1=>0,2=>0,3=>4,4=>3),
+                        'index_first'=>array(0=>0,3=>4,4=>8),
+                        'length'=>array(0=>11,3=>4,4=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2795,8 +2795,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0),
-                        'length'=>array(0=>3,1=>3,2=>0,3=>3),
+                        'index_first'=>array(0=>0,1=>0,3=>0),
+                        'length'=>array(0=>3,1=>3,3=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2823,8 +2823,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"foo!bar!bas",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>4,5=>8),
-                        'length'=>array(0=>11,1=>11,2=>0,3=>0,4=>4,5=>3),
+                        'index_first'=>array(0=>0,1=>0,4=>4,5=>8),
+                        'length'=>array(0=>11,1=>11,4=>4,5=>3),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -2862,7 +2862,7 @@ class qtype_preg_cross_tests_from_att_basic  {
     }
 
     function data_for_test_att_basic_204() {
-        $test1 = array( 'str'=>"\XXX",
+        $test1 = array( 'str'=>"\\XXX",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
@@ -2871,12 +2871,12 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>".*(\\XXX).*",
+        return array( 'regex'=>".*(\\\\XXX).*",
                       'tests'=>array($test1));
     }
 
     function data_for_test_att_basic_205() {
-        $test1 = array( 'str'=>"\XXX",
+        $test1 = array( 'str'=>"\\XXX",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -2885,7 +2885,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\\XXX",
+        return array( 'regex'=>"\\\\XXX",
                       'tests'=>array($test1));
     }
 
@@ -2904,7 +2904,7 @@ class qtype_preg_cross_tests_from_att_basic  {
     }
 
     function data_for_test_att_basic_207() {
-        $test1 = array( 'str'=>"\000",
+        $test1 = array( 'str'=>"\\000",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
@@ -2913,12 +2913,12 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>".*(\\000).*",
+        return array( 'regex'=>".*(\\\\000).*",
                       'tests'=>array($test1));
     }
 
     function data_for_test_att_basic_208() {
-        $test1 = array( 'str'=>"\000",
+        $test1 = array( 'str'=>"\\000",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -2927,7 +2927,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
 
-        return array( 'regex'=>"\\000",
+        return array( 'regex'=>"\\\\000",
                       'tests'=>array($test1));
     }
 }
