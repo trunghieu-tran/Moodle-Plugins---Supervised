@@ -192,8 +192,12 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * Compares obtained results with expected and writes all flags.
      */
     function compare_results($regex, $modifiers, &$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$lengthpassed, &$nextpassed, &$leftpassed) {
-        $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
         $fullpassed = ($expected['full'] === $obtained->full);
+        if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
+            $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
+        } else {
+            $ismatchpassed = $fullpassed;
+        }
 
         // If no match found, generate arrays of qtype_preg_matching_results::NO_MATCH_FOUND; use $expected otherwise.
         if ($obtained->is_match()) {
