@@ -119,7 +119,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         if ($this->could_show_hint($matchresults)) {
             $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
             $correctpart = qtype_preg_renderer::render_matched($matchresults->matched_part());
-            $wrongtail = $qtype_preg_renderer::render_unmatched($matchresults->match_tail());
+            $wrongtail = qtype_preg_renderer::render_unmatched($matchresults->match_tail());
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
