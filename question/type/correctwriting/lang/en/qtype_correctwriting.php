@@ -32,3 +32,7 @@ $string['writemoredescriptions']  = 'Supplied amount of descriptions are less th
 $string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
 $string['foundlexicalerrors']  = 'There are lexical errors in your answer. Please consider fixing following errors: ';
 $string['foundmistakes'] = 'There are mistakes in your response:';
+$string['clanguageunmatchedquote'] = 'There is unmatched quote at {$a->line}:{$a->col}';
+$string['clanguageunmatchedsquote'] = 'There is unmatched single quote at {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'There is unknown symbol "{$a->value}" at {$a->line}:{$a->col}';
+$string['clanguagemulticharliteral'] = 'There is multicharacter literal at {$a->line}:{$a->col}';

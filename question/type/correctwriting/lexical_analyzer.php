@@ -21,7 +21,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/base_token.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/lexical_mistakes.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 //Other necessary requires
 
 class qtype_correctwriting_lexical_analyzer {
@@ -36,6 +39,8 @@ class qtype_correctwriting_lexical_analyzer {
     protected $response;//Array of response tokens
     protected $mistakes;//Array of mistake objects - student errors (merged from all stages)
 
+    protected $fitness;//Fitness, used to choose appropriate analyzer
+    protected $correctedresponse; // Generated response stream (because we need to build image)
     /**
      * Do all processing and fill all member variables
      *
@@ -52,6 +57,45 @@ class qtype_correctwriting_lexical_analyzer {
         $this->responsestr = $responsestr;
         $this->question = $question;
         
+        $language = $question->get_used_language();
+        $responsestring = $language->create_from_string($responsestr); 
+        $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+        // We assume that, lexical analyzer must fix all the lexical mistakes and find them at all
+        // Because, why not? He must fix a lexical mistakes, but if can't fix stuff, he can put some mistakes.
+        // If question starts working with lexical errors, what should it do? Which mistakes should it take - 
+        // lexical_analyzer's or own? How he maanages to split lexical_analyzer's mistakes from sequence_analyzer's
+        // Do we need another loop with is_a?
+        $mistakes = array();
+        if (count($responsestring->stream->tokens) != 0) {
+            foreach($responsestring->stream->tokens as $index => $token) {
+                if (is_a($token, "block_formal_langs_c_language_character")) {
+                    $value = $token->value();
+                    $len = strlen($token->value());
+                    if ($value[0] == 'L') {
+                        $len = $len - 1;
+                    }
+                    if ($len > 3) {
+                       $mistakes[] = new qtype_correctwriting_c_language_multicharacter_literal($question, $responsestring, $token);
+                    }
+                }
+                if (is_a($token,"block_formal_langs_c_language_unknown")) {
+                    $value = $token->value();
+                    if ($value == '"') {
+                        $mistakes[] = new qtype_correctwriting_c_language_unmatched_quote_mistake($question, $responsestring, $token);
+                    } elseif ($value == "\'") {
+                        $mistakes[] = new qtype_correctwriting_c_language_unmatched_single_quote_mistake($question, $responsestring, $token);
+                    } else {
+                        $mistakes[] = new qtype_correctwriting_c_language_unknown_symbol_mistake($question, $responsestring, $token);
+                    }
+                }
+            }
+        }
+
+        
+        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $responsestring);
+        $this->correctedresponse= $responsestring->stream->tokens;
+        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        $this->fitness = $analyzer->fitness();
         //TODO:
         //0. Create language object
         //1. Scan answer and response - Pashaev
@@ -68,6 +112,9 @@ class qtype_correctwriting_lexical_analyzer {
         //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
     }
 
+    public function get_corrected_response() {
+        return $this->correctedresponse;
+    }
     /**
      * Returns an array of mistakes objects for given matches_group object
      */
@@ -81,6 +128,7 @@ class qtype_correctwriting_lexical_analyzer {
     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
     */
     public function fitness() {
+        return $this->fitness;
     }
 
     public function mistakes() {
