@@ -14,3 +14,7 @@ $plugin->version  = 2012021400;
 $plugin->requires = 2011121310;
 $plugin->release = 'Formal languages 2.2';
 $plugin->maturity = MATURITY_STABLE;
+
+$plugin->dependencies = array(
+    'qtype_poasquestion' => 2012060900
+);
