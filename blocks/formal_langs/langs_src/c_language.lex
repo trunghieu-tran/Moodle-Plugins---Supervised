@@ -158,7 +158,7 @@ IS = (u|U|l|L)
 "#elif"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
 "#else"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
 "#endif"                                                    { return $this->create_token("preprocessor",$this->yytext()); }                              
-L?\'(\\\'|[^\'])\'                                          { return $this->create_character($this->yytext()); }
+L?\'(\\\'|[^\'])+\'                                          { return $this->create_character($this->yytext()); }
 L?\"(\\\"|[^\"])+\"                                         { return $this->create_string($this->yytext()); }
 {D}+{E}{FS}?                                                { return $this->create_token("numeric",$this->yytext()); }
 {D}*"."{D}+({E})?{FS}?                                      { return $this->create_token("numeric",$this->yytext()); }
