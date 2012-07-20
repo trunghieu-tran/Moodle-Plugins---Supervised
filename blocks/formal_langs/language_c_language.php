@@ -62,7 +62,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
      $a->position = $this->yycol;
      $a->symbol = $symbol;
      $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
-     $this->counter++;
+     //$this->counter++;
      $this->errors[] = $res;
   }
   public function get_errors() {

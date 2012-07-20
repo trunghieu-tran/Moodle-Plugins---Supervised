@@ -69,7 +69,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
      $a->position = $this->yycol;
      $a->symbol = $symbol;
      $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
-     $this->counter++;
+     //$this->counter++;
      $this->errors[] = $res;
   }
   
