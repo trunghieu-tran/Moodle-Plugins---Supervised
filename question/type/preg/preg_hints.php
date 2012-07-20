@@ -71,25 +71,25 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
      */
-    public function render_stringextension_hint($renderer, $response) {
+    public function render_stringextension_hint($response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {//hint could be computed
             if (!$matchresults->full) {//there is a hint to show
-                $wronghead = $renderer->render_unmatched($matchresults->match_heading());
-                $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
-                $hint = $renderer->render_hinted($this->hinted_string($matchresults));
+                $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
+                $correctpart = qtype_preg_renderer::render_matched($matchresults->correct_before_hint());
+                $hint = qtype_preg_renderer::render_hinted($this->hinted_string($matchresults));
                 if ($this->to_be_continued($matchresults)) {
-                    $hint .= $renderer->render_tobecontinued();
+                    $hint .= qtype_preg_renderer::render_tobecontinued();
                 }
                 $wrongtail = '';
                 if (qtype_poasquestion_string::strlen($hint) == 0) {
-                    $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
+                    $wrongtail = qtype_preg_renderer::render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
             } else {//No hint, due to full match
-                return qtype_preg_hintmatchingpart::render_hint($renderer, $response);
+                return qtype_preg_hintmatchingpart::render_hint($response);
             }
         }
         return '';
@@ -112,14 +112,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response
      */
-    public function render_hint($renderer, $response) {
+    public function render_hint($response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
-            $correctpart = $renderer->render_matched($matchresults->matched_part());
-            $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
+            $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
+            $correctpart = qtype_preg_renderer::render_matched($matchresults->matched_part());
+            $wrongtail = $qtype_preg_renderer::render_unmatched($matchresults->match_tail());
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
