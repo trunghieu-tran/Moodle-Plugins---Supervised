@@ -142,7 +142,6 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             foreach ($errors as $error) {
                 if (is_a($error, 'qtype_preg_parsing_error')) {    // Error messages are displayed for parsing errors only.
                     echo 'Regex incorrect: ' . $error->errormsg . '<br/>';
-                    $this->assertTrue(false);
                 }
             }
             return true;
@@ -300,8 +299,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $this->assertTrue($assertionstrue || $nextpassed);
         if (!$nextpassed) {
             echo "$enginename failed 'NEXT' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected full: ' . $expected['next']               . $this->eol .
-                 'obtained full: ' . $obtained->string_extension()   . $this->eol .
+                 'expected next: ' . $expected['next']               . $this->eol .
+                 'obtained next: ' . $obtained->string_extension()   . $this->eol .
                  'source class:  ' . $testdataclassname . $this->eol . $this->eol;
         }
 
@@ -309,8 +308,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$leftpassed) {
             echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected full: ' . print_r($expected['left'])      . $this->eol .
-                 'obtained full: ' . $obtained->left                 . $this->eol .
+                 'expected left: ' . print_r($expected['left'])      . $this->eol .
+                 'obtained left: ' . $obtained->left                 . $this->eol .
                  'source class:  ' . $testdataclassname . $this->eol . $this->eol;
         }
     }
@@ -338,7 +337,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $matcher = new $enginename($regex, $modifiers);
                     } catch (Exception $e) {
                         $exception = true;
-                        echo "EXCEPTION CATCHED WHILE BUILDING MATCHER, test name is " . $curtestmethod . chr(10);
+                        echo "EXCEPTION CATCHED WHILE BUILDING MATCHER, test name is " . $curtestmethod . $this->eol;
                     }
                     if (!$exception && !$this->check_for_errors($matcher)) {
                         try {
