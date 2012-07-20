@@ -11,7 +11,7 @@
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/jlex.php');
+require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language

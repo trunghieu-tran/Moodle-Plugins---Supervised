@@ -11,7 +11,7 @@
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/jlex.php');
+require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/simple_english_tokens.php');
 
 class block_formal_langs_language_simple_english extends block_formal_langs_predefined_language
