@@ -1,5 +1,13 @@
 <?php
 
+    /**
+     * Переводчик тестов из формата AT & T в формат кросс-тестов.
+     * Имена входных и выходных файлов задаются пере
+     * @author Valeriy Streltsov
+     */
+
+    $INPUT_FILENAME = 'basic.dat.txt';
+    $OUTPUT_FILENAME = 'result.txt'
     $COMMENT_COUNT = 2;
     $TAB = '	';
     $SPACE = ' ';
@@ -10,8 +18,8 @@
     $TAB4 = '                      ';
     $FUNCTION_PREFIX = 'function data_for_test_att_basic_';
 
-    $in = fopen('basic.dat.txt', 'r');
-    $out = fopen('result.txt', 'w');
+    $in = fopen($INPUT_FILENAME, 'r');
+    $out = fopen($OUTPUT_FILENAME, 'w');
 
     for ($i = 0; $i < $COMMENT_COUNT; $i++) {
         fgets($in);
@@ -115,6 +123,9 @@
                 if ($index1 !== '?' && $index2 !== '?') {
                     $index_first[] = (int)$index1;
                     $length[] = (int)$index2 - (int)$index1;
+                } else {
+                    $index_first[] = -1;
+                    $length[] = -1;
                 }
                 continue;
             }
@@ -127,11 +138,15 @@
         $index2write = '';
         $length2write = '';
         foreach ($index_first as $key => $value) {
-            $index2write .= $key . '=>' . $value . ',';
+            if ($value !== -1) {
+                $index2write .= $key . '=>' . $value . ',';
+            }
         }
         $index2write = 'array(' . substr($index2write, 0, strlen($index2write) - 1) . ')';
         foreach ($length as $key => $value) {
-            $length2write .= $key . '=>' . $value . ',';
+            if ($value !== -1) {
+                $length2write .= $key . '=>' . $value . ',';
+            }
         }
         $length2write = 'array(' . substr($length2write, 0, strlen($length2write) - 1) . ')';
 
