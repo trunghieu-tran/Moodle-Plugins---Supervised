@@ -1003,21 +1003,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->greed);
         $this->assertTrue(!$token->value->possessive);
     }
-    function test_lexer_pcre_compatibility() {
-        global $CFG;
-        $file = fopen($CFG->dirroot . '/question/type/preg/tests/pcre_lexer_testinput1.txt', 'r');
-        $counter = 0;
-        while (!feof($file)) {
-            $str = fgets($file);
-            //echo $counter++.'<br/>';
-            if ($str !== '') {
-                $lexer = $this->create_lexer('\\Q');
-                while ($token = $lexer->nextToken())
-                    ;
-            }
-        }
-        fclose($file);
-    }
     function test_lexer_control_sequences() {
         $lexer = $this->create_lexer('(*ACCEPT)(*FAIL)(*F)(*MARK:NAME0)(*:NAME1)(*COMMIT)(*PRUNE)(*PRUNE:NAME2)(*SKIP)(*SKIP:NAME3)(*THEN)(*THEN:NAME4)(*CR)(*LF)(*CRLF)(*ANYCRLF)(*ANY)(*BSR_ANYCRLF)(*BSR_UNICODE)(*NO_START_OPT)(*UTF8)(*UTF16)(*UCP)(*SQUIRREL)');
         $token = $lexer->nextToken();

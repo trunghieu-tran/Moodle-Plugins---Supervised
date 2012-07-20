@@ -620,7 +620,7 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_COMMIT));
     return $res;
 }
-<YYINITIAL> "(*PRUNE)" {
+<YYINITIAL> "(*PRUNE":?")" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
     return $res;
 }
@@ -632,7 +632,7 @@ MODIFIER = [iJmsUx]
     $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
     return $res;
 }
-<YYINITIAL> "(*SKIP)" {
+<YYINITIAL> "(*SKIP":?")" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP));
     return $res;
 }
