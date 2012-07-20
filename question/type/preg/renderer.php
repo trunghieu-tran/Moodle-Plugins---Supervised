@@ -73,11 +73,11 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //if ($options->correctness == question_display_options::VISIBLE) {
         if ($hintkey !== '') {//hint requested
             $hintobj = $question->hint_object($hintkey);
-            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
+            $hintmessage = $hintobj->render_hint(array('answer' => $currentanswer));
             $hintmessage .= html_writer::empty_tag('br');
         } elseif ($options->feedback == question_display_options::VISIBLE) {//specific feedback is possible, render correctness - TODO - decide when to render correctness
             $hintobj =  $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
+            $hintmessage = $hintobj->render_hint(array('answer' => $currentanswer));
             if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
                 $hintmessage .= html_writer::empty_tag('br');
             }
@@ -88,7 +88,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders matched part of the response */
-    public function render_matched($str) {
+    public static function render_matched($str) {
         if ($str !== '') {
             return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(1)));
         }
@@ -96,7 +96,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders unmatched part of the response */
-    public function render_unmatched($str) {
+    public static function render_unmatched($str) {
         if ($str !== '') {
             return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0)));
         }
@@ -104,7 +104,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders hinted part of the response*/
-    public function render_hinted($str) {
+    public static function render_hinted($str) {
         if ($str !== '') {
             return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0.5)));
         }
@@ -112,7 +112,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders part of the response that should be deleted*/
-    public function render_deleted($str) {
+    public static function render_deleted($str) {
         if ($str !== '') {
             return html_writer::tag('span', html_writer::tag('del', htmlspecialchars($str)), array('class' => $this->feedback_class(0)));
         }
@@ -120,7 +120,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders part of the response that should be inserted*/
-    public function render_inserted($str) {
+    public static function render_inserted($str) {
         if ($str !== '') {
             return html_writer::tag('ins', htmlspecialchars($str));
         }
@@ -128,7 +128,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     }
 
     /** Renders to be continued specifier*/
-    public function render_tobecontinued() {
+    public static function render_tobecontinued() {
         return get_string('tobecontinued', 'qtype_preg', null);
     }
 
