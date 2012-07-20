@@ -599,10 +599,6 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
     return $res;
 }
-<YYINITIAL> ["{}]"] {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
-    return $res;
-}
 <YYINITIAL> "(?#"[^)]*")" {       // Comment.
     return $this->nextToken();
 }
@@ -1109,6 +1105,10 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
     return $res;
 }
+<YYINITIAL> . {
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
+    return $res;
+}
 <CHARSET> "[:alnum:]"|"[:^alnum:]" {
     $negative = ($this->yytext() === '[:^alnum:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALNUM, $negative);
@@ -1212,15 +1212,6 @@ MODIFIER = [iJmsUx]
         }
     }
 }
-<CHARSET> \\\\ {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, '\\');
-}
-<CHARSET> "\[" {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, '[');
-}
-<CHARSET> "\]" {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, ']');
-}
 <CHARSET> \\0[0-7][0-7][0-7]? {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($this->yytext(), 1))));
 }
@@ -1256,12 +1247,6 @@ MODIFIER = [iJmsUx]
 }
 <CHARSET> "\t" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
-}
-<CHARSET> "^" {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, '^');
-}
-<CHARSET> "-" {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, '-');
 }
 <CHARSET> "\Q".*"\E" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, $this->recognize_qe_sequence($this->yytext()));
