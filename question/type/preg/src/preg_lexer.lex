@@ -1165,7 +1165,7 @@ MODIFIER = [iJmsUx]
     $negative = ($this->yytext() === '[^:xdigit:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::XDIGIT, $negative);
 }
-<CHARSET> "[:"[^\]]*":]"|"[^:"[^\]]*":]" {
+<CHARSET> "[:"[^\]]*":]"|"[^:"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $error = new qtype_preg_node_error();
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
