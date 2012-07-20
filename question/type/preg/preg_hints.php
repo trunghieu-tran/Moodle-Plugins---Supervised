@@ -164,7 +164,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function render_hint($renderer, $response) {
         return $this->render_stringextension_hint($renderer, $response);
     }
-	
+
     public function hinted_string($matchresults) {
         //One-character hint
         $hintedstring = $matchresults->string_extension();
