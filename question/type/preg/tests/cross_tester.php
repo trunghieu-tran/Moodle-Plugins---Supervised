@@ -192,7 +192,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $modifiers, &$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$length, &$nextpassed, &$leftpassed) {
+    function compare_results($regex, $modifiers, &$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$lengthpassed, &$nextpassed, &$leftpassed) {
         $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
         $fullpassed = ($expected['full'] === $obtained->full);
 
@@ -207,11 +207,28 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         // Checking indexes.
         if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
-            $indexfirstpassed = ($index_first_expected === $obtained->index_first);
-            $length = ($length_expected === $obtained->length);
+            $indexfirstpassed = true;
+            foreach ($obtained->index_first as $key => $index) {
+                $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $index_first_expected) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                          (array_key_exists($key, $index_first_expected) && $index_first_expected[$key] === $obtained->index_first[$key]));
+                if (!$indexfirstpassed) {
+                    break;
+                }
+            }
+
+            $lengthpassed = true;
+            foreach ($obtained->length as $key => $index) {
+                $lengthpassed = $lengthpassed && ((!array_key_exists($key, $length_expected) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                  (array_key_exists($key, $length_expected) && $length_expected[$key] === $obtained->length[$key]));
+                if (!$lengthpassed) {
+                    break;
+                }
+            }
         } else {
-            $indexfirstpassed = ($index_first_expected[0] === $obtained->index_first[0]);
-            $length = ($length_expected[0] === $obtained->length[0]);
+            $indexfirstpassed = (!array_key_exists(0, $index_first_expected) && $obtained->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                (array_key_exists(0, $index_first_expected) && $index_first_expected[0] === $obtained->index_first[0]);
+            $lengthpassed = (!array_key_exists(0, $length_expected) && $obtained->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                            (array_key_exists(0, $length_expected) && $length_expected[0] === $obtained->length[0]);
         }
 
         // Checking next possible character.
@@ -235,13 +252,13 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         if ($this->doextrachecks) {
             $this->do_extra_check($regex, $modifiers, $obtained);
         }
-        return $ismatchpassed && $fullpassed && $indexfirstpassed && $length && $nextpassed && $leftpassed;
+        return $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $nextpassed && $leftpassed;
     }
 
     /**
      * Does assertions for every field. if assertionstrue === true then error messages displayed only.
      */
-    function do_assertions($enginename, $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $length, $nextpassed, $leftpassed, $testdataclassname, $assertionstrue = false) {
+    function do_assertions($enginename, $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed, $testdataclassname, $assertionstrue = false) {
 
         // is_match
         $this->assertTrue($assertionstrue || $ismatchpassed);
@@ -271,8 +288,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         }
 
         // length
-        $this->assertTrue($assertionstrue || $length);
-        if (!$length) {
+        $this->assertTrue($assertionstrue || $lengthpassed);
+        if (!$lengthpassed) {
             echo "$enginename failed 'LENGTH' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected length: '; print_r($expected['length']); echo $this->eol .
                  'obtained length: '; print_r($obtained->length);   echo $this->eol .
@@ -321,23 +338,28 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $matcher = new $enginename($regex, $modifiers);
                     } catch (Exception $e) {
                         $exception = true;
-                        echo "EXCEPTION CATCHED, test name is " . $curtestmethod . chr(10);
+                        echo "EXCEPTION CATCHED WHILE BUILDING MATCHER, test name is " . $curtestmethod . chr(10);
                     }
                     if (!$exception && !$this->check_for_errors($matcher)) {
-                        // Iterate over all tests.
-                        foreach ($data['tests'] as $expected) {
-                            $str = $expected['str'];
-                            $matcher->match($str);
-                            $obtained = $matcher->get_match_results();
-                            // Now the results are obtained, let us check them!
-                            $ismatchpassed = false;
-                            $fullpassed = false;
-                            $indexfirstpassed = false;
-                            $length = false;
-                            $nextpassed = false;
-                            $leftpassed = false;
-                            $this->compare_results($regex, $modifiers, $matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $length, $nextpassed, $leftpassed);
-                            $this->do_assertions($this->engine_name(), $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $length, $nextpassed, $leftpassed, $testdataclassname, true);
+                        try {
+                            // Iterate over all tests.
+                            foreach ($data['tests'] as $expected) {
+                                $str = $expected['str'];
+                                $matcher->match($str);
+                                $obtained = $matcher->get_match_results();
+                                // Now the results are obtained, let us check them!
+                                $ismatchpassed = false;
+                                $fullpassed = false;
+                                $indexfirstpassed = false;
+                                $lengthpassed = false;
+                                $nextpassed = false;
+                                $leftpassed = false;
+                                $this->compare_results($regex, $modifiers, $matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed);
+                                $this->do_assertions($this->engine_name(), $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed, $testdataclassname, true);
+                            }
+                        } catch (Exception $e) {
+                            $exception = true;
+                            echo "EXCEPTION CATCHED WHILE CHECKING RESULTS, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
                         }
                     }
                 }
