@@ -1109,63 +1109,63 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
     return $res;
 }
-<CHARSET> "[:alnum:]"|"[^:alnum:]" {
-    $negative = ($this->yytext() === '[^:alnum:]');
+<CHARSET> "[:alnum:]"|"[:^alnum:]" {
+    $negative = ($this->yytext() === '[:^alnum:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALNUM, $negative);
 }
-<CHARSET> "[:alpha:]"|"[^:alpha:]" {
-    $negative = ($this->yytext() === '[^:alpha:]');
+<CHARSET> "[:alpha:]"|"[:^alpha:]" {
+    $negative = ($this->yytext() === '[:^alpha:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALPHA, $negative);
 }
-<CHARSET> "[:ascii:]"|"[^:ascii:]" {
-    $negative = ($this->yytext() === '[^:ascii:]');
+<CHARSET> "[:ascii:]"|"[:^ascii:]" {
+    $negative = ($this->yytext() === '[:^ascii:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ASCII, $negative);
 }
-<CHARSET> "\h"|"\H"|"[:blank:]"|"[^:blank:]" {
-    $negative = ($this->yytext() === '\H' || $this->yytext() === '[^:blank:]');
+<CHARSET> "\h"|"\H"|"[:blank:]"|"[:^blank:]" {
+    $negative = ($this->yytext() === '\H' || $this->yytext() === '[:^blank:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $negative);
 }
-<CHARSET> "[:cntrl:]"|"[^:cntrl:]" {
-    $negative = ($this->yytext() === '[^:cntrl:]');
+<CHARSET> "[:cntrl:]"|"[:^cntrl:]" {
+    $negative = ($this->yytext() === '[:^cntrl:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::CNTRL, $negative);
 }
-<CHARSET> "\d"|"\D"|"[:digit:]"|"[^:digit:]" {
-    $negative = ($this->yytext() === '\D' || $this->yytext() === '[^:digit:]');
+<CHARSET> "\d"|"\D"|"[:digit:]"|"[:^digit:]" {
+    $negative = ($this->yytext() === '\D' || $this->yytext() === '[:^digit:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $negative);
 }
-<CHARSET> "[:graph:]"|"[^:graph:]" {
-    $negative = ($this->yytext() === '[^:graph:]');
+<CHARSET> "[:graph:]"|"[:^graph:]" {
+    $negative = ($this->yytext() === '[:^graph:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::GRAPH, $negative);
 }
-<CHARSET> "[:lower:]"|"[^:lower:]" {
-    $negative = ($this->yytext() === '[^:lower:]');
+<CHARSET> "[:lower:]"|"[:^lower:]" {
+    $negative = ($this->yytext() === '[:^lower:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::LOWER, $negative);
 }
-<CHARSET> "[:print:]"|"[^:print:]" {
-    $negative = ($this->yytext() === '[^:print:]');
+<CHARSET> "[:print:]"|"[:^print:]" {
+    $negative = ($this->yytext() === '[:^print:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
 }
-<CHARSET> "[:punct:]"|"[^:punct:]" {
-    $negative = ($this->yytext() === '[^:punct:]');
+<CHARSET> "[:punct:]"|"[:^punct:]" {
+    $negative = ($this->yytext() === '[:^punct:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PUNCT, $negative);
 }
-<CHARSET> "\s"|"\S"|"[:space:]"|"[^:space:]"  {
-    $negative = ($this->yytext() === '\S' || $this->yytext() === '[^:space:]');
+<CHARSET> "\s"|"\S"|"[:space:]"|"[:^space:]"  {
+    $negative = ($this->yytext() === '\S' || $this->yytext() === '[:^space:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $negative);
 }
-<CHARSET> "[:upper:]"|"[^:upper:]" {
-    $negative = ($this->yytext() === '[^:upper:]');
+<CHARSET> "[:upper:]"|"[:^upper:]" {
+    $negative = ($this->yytext() === '[:^upper:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::UPPER, $negative);
 }
-<CHARSET> "\w"|"\W"|"[:word:]"|"[^:word:]" {
-    $negative = ($this->yytext() === '\W' || $this->yytext() === '[^:word:]');
+<CHARSET> "\w"|"\W"|"[:word:]"|"[:^word:]" {
+    $negative = ($this->yytext() === '\W' || $this->yytext() === '[:^word:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $negative);
 }
-<CHARSET> "[:xdigit:]"|"[^:xdigit:]" {
-    $negative = ($this->yytext() === '[^:xdigit:]');
+<CHARSET> "[:xdigit:]"|"[:^xdigit:]" {
+    $negative = ($this->yytext() === '[:^xdigit:]');
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::XDIGIT, $negative);
 }
-<CHARSET> "[:"[^\]]*":]"|"[^:"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
+<CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $error = new qtype_preg_node_error();
     $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
