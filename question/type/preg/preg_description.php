@@ -89,10 +89,10 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
  * Generic node class.
  */
 abstract class qtype_preg_description_node{
-    /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
+    /** @var string pattern for description of current node */    
     public $pattern;
     
-    /** @var string pattern for description of current node */
+    /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
     public $pregnode;
     
     /**
@@ -166,7 +166,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        return 'seems like this pattern() for this node didnt redefined';
     }
     
     /**
@@ -251,14 +251,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         return $result_pattern;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
-        
-        $this->pattern = $this->pattern();
-        return $this->pattern;
-    }
 }
 
 
@@ -272,16 +264,16 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        return self::get_form_string('description_empty');
     }
     
     /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
+     * returns true if engine support the node, rejection string otherwise
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
-        
-        return '123';
+    public function accept() {
+        return ($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY)?true:false;
     }
+    
 }
 
 /**
