@@ -10,6 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 abstract class qtype_preg_author_tool extends qtype_preg_regex_handler
