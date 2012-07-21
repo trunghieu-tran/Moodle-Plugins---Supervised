@@ -44,13 +44,12 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      * @param string $whole_pattern Pattern for whole decription. Must contain %s - description.
      * @param string $numbering_pattern Pattern to track numbering. 
      * Must contain: %s - description of node;
-     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
-     * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * May contain:  %n - id node.
      * @return string description.
      */
-    public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
+    public function description($numbering_pattern,$whole_pattern=null){
         
-        $string = $this->dst_root->description($numbering_pattern,$operand_pattern,null,null);;
+        $string = $this->dst_root->description($numbering_pattern,null,null);;
         $string = str_replace('%s',$string,$whole_pattern);
         return (string)$string;
     }
@@ -60,7 +59,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function default_description(){
        
-        return (string)$this->description('<span class="description_node_%n%o">%s</span>',' operand','<span class="description">%s</span>');
+        return (string)$this->description('<span class="description_node_%n">%s</span>','<span class="description">%s</span>');
     }
     
     /**
@@ -120,13 +119,12 @@ abstract class qtype_preg_description_node{
      * 
      * @param string $numbering_pattern Pattern to track numbering. 
      * Must contain: %s - description of node;
-     * May contain:  %n - id node; %o - substring to highlight operands, determined by $operand_pattern.
-     * @param string $operand_pattern Will be substituted in place %o in $numbering_pattern
+     * May contain:  %n - id node.
      * @param qtype_preg_description_node $node_parent Reference to the parent.
      * @param string $form Required form.
      * @return string
      */
-    abstract public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null);
+    abstract public function description($numbering_pattern,$node_parent=null,$form=null);
     
     /**
      * if $s nor defined in lang file throw exeption
@@ -172,7 +170,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         $this->pattern = $this->pattern($node_parent,$form);
         return $this->pattern;
@@ -201,7 +199,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             if($flag->negative == true){
                 // using charset pattern 'description_charset_one_neg' because char pattern 'description_char_neg' has a <span> tag, 
                 // but dont need to highlight this
-                $characters[] = str_replace('%characters',self::get_form_string($pattern_pseudonym),self::get_form_string('description_charset_one_neg') );
+                $characters[] = self::get_form_string($pattern_pseudonym);
+                $characters[0] = str_replace('%characters',$characters[0],self::get_form_string('description_charset_one_neg') );
             }
             else{
                 $characters[] = self::get_form_string($pattern_pseudonym);
@@ -328,7 +327,7 @@ class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -347,7 +346,7 @@ class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -366,7 +365,7 @@ class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -388,7 +387,7 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -425,7 +424,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -448,7 +447,7 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -470,7 +469,7 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -492,7 +491,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -514,7 +513,7 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -536,7 +535,7 @@ class qtype_preg_description_node_assert extends qtype_preg_description_operator
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -558,7 +557,7 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }
@@ -582,7 +581,7 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,$node_parent=null,$form=null){
         
         return '123';
     }

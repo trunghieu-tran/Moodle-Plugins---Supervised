@@ -22,7 +22,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_charset($regex, $expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        $result = $handler->description('<span class="description_node_%n%o">%s</span>',' operand','%s');
+        $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
  
@@ -40,7 +40,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_meta()
     {
         $handler = new qtype_preg_author_tool_description('a|b|',null,null);
-        $result = $handler->description('<span class="description_node_%n%o">%s</span>',' operand','%s');
+        $result = $handler->description('%s','%s');
         $expected = 'sdas';
         $this->assertEquals($result, $expected);
     }
