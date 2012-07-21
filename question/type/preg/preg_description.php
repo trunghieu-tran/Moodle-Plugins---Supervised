@@ -200,10 +200,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             $pattern_pseudonym = 'description_charflag_'.$flag->data;
             $characters[] = self::get_form_string($pattern_pseudonym);
             if($flag->negative == true){
-                $pattern_pseudonym = 'description_charset_one_neg';
+                $pattern_pseudonym = 'description_char_neg';
             }
             else{
-                $pattern_pseudonym = 'description_charset_one';
+                $pattern_pseudonym = 'description_char';
             }
             $characters[0] = str_replace('%char',$characters[0],self::get_form_string($pattern_pseudonym) );
             
@@ -211,7 +211,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             
             $characters = str_split($flag->data->string());
             foreach ($characters as &$value) {
-                $value = str_replace('%char',$value,self::get_form_string('description_charset_one') );
+                $value = str_replace('%char',$value,self::get_form_string('description_char') );
             }
         }
         return $characters;
@@ -230,17 +230,17 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             $characters = array_merge($characters,self::flag_to_array($outer[0]));
         }
 
-        if(count($characters)==1 && $this->pregnode->negative == false)
-        {
+        if(count($characters)==1 && $this->pregnode->negative == false){
             $result_pattern = $characters[0];
         }
         else{
-            
-            if($this->pregnode->negative == false){
-                    $result_pattern = self::get_form_string('description_charset');
-                }
+            if(count($characters)==1 && $this->pregnode->negative == true){
+                $result_pattern = self::get_form_string('description_charset_one_neg');
+            }else if($this->pregnode->negative == false){
+                $result_pattern = self::get_form_string('description_charset');
+            }
             else{
-                    $result_pattern = self::get_form_string('description_charset_negative');
+                $result_pattern = self::get_form_string('description_charset_negative');
             }
             $result_pattern = str_replace('%characters', implode(", ", $characters),$result_pattern);
             
