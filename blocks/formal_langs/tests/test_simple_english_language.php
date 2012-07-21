@@ -31,12 +31,11 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
     }
     // Test a lexer in order to get no faules
     public function test_fault() {
-        // Some bug in poas_question::string won't allow to do so.
-        //$lang = new block_formal_langs_language_simple_english();
-        //$processedstring = $lang->create_from_string('!><ûמûהגמûהג{}\'\"    @@@!!%');
-        //$result = $processedstring->stream->tokens;
+        $lang = new block_formal_langs_language_simple_english();
+        $processedstring = $lang->create_from_string('!><ûמûהגמûהג{}\'\"    @@@!!%');
+        $result = $processedstring->stream->tokens;
         // If no exception thrown, than everything is good. 
-        //$this->assertTrue( true );
+        $this->assertTrue( true );
     }
 }
  ?>
