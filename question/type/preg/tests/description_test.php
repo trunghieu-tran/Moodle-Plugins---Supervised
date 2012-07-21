@@ -22,17 +22,19 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_charset($regex, $expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     } 
     public function charset_provider()
     {
         return array(
-          array('[^[^:word:]abc\pL]','any symbol except the following: not \w AND [:word:], Letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
+          array('[^[:^word:]abc\pL]','any symbol except the following: not \w AND [:word:], Letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
           array('a','<span style="color:red">a</span>'),
           array('[^a]','not <span style="color:red">a</span>'),
           array('\w','\w AND [:word:]'),
           array('\W','not \w AND [:word:]'),
+          //array('[a-z]','fgh'),
         );
     }
     
@@ -50,7 +52,6 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_assert($regex, $expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
