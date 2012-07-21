@@ -24,8 +24,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }
- 
+    } 
     public function charset_provider()
     {
         return array(
@@ -43,5 +42,28 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $expected = 'sdas';
         $this->assertEquals($result, $expected);
+    }
+    
+    /**
+     * @dataProvider assert_provider
+     */
+    public function test_assert($regex, $expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    public function assert_provider()
+    {
+        return array(
+          array('^','beginning of the string'),
+          array('$','end of the string'),
+          array('\b','at a word boundary'),
+          array('\B','not at a word boundary'),
+          array('\A','at the start of the subject'),
+          array('\Z','at the end of the subject'),
+          array('\G','at the first matching position in the subject')
+        );
     }
 }

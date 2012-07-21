@@ -97,6 +97,7 @@ $string['description_empty'] = 'nothing';
 $string['description_circumflex'] = 'beginning of the string';
 $string['description_dollar'] = 'end of the string';
 $string['description_wordbreak'] = 'at a word boundary';
+$string['description_wordbreak_neg'] = 'not at a word boundary';
 $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
 $string['description_esc_g'] = 'at the first matching position in the subject';
