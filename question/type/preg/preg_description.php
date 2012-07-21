@@ -50,10 +50,8 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function description($numbering_pattern,$operand_pattern,$whole_pattern=null){
         
-        $string = $this->dst_root->description($numbering_pattern,$operand_pattern,null,null);
-        var_dump($string);
+        $string = $this->dst_root->description($numbering_pattern,$operand_pattern,null,null);;
         $string = str_replace('%s',$string,$whole_pattern);
-        var_dump($string);
         return (string)$string;
     }
     
@@ -134,14 +132,21 @@ abstract class qtype_preg_description_node{
      * if $s nor defined in lang file throw exeption
      * 
      * @param string $s same as in get_string
+     * @param string $form Required form.
      */
-    /*public function get_string_s($s){
+    public static function get_form_string($s,$form=null){
+        
+        if(isset($form)){
+            $s.='_'.$form;
+        }
+        /* exeption throws automaticly?
         $return = get_string($s);
         if($return == null){
             throw new coding_exception($s.' is missing in current lang file of preg description', 'ask localizator of preg description module');
         }
-        return $return;
-    }*/
+        return $return;*/
+        return get_string($s,'qtype_preg');
+    }
     
     /**
      * returns true if engine support the node, rejection string otherwise
@@ -180,17 +185,36 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     
     /**
-     * Generates description of current flag
+     * Convertes charset flag to array of descriptions(strings)
      * 
      * @param qtype_preg_charset_flag $flag flag gor description
+     * @return string[]|string array of descriptions of current flag
      */
-    private function flag_pattern($flag){
-        $pattern_name = 'description_charflag_'.$flag->data;
-        $pattern = get_string($pattern_name,'qtype_preg');
-        if($flag->negative == true){
-            $pattern = str_replace('%char',$pattern,get_string('description_charset_char_neg','qtype_preg'));
+    private static function flag_to_array($flag) {
+        
+        $characters = array();//array of strings
+        $pattern_pseudonym = '';//pseudonym of localized string
+        
+        if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
+                
+            $pattern_pseudonym = 'description_charflag_'.$flag->data;
+            $characters[] = self::get_form_string($pattern_pseudonym);
+            if($flag->negative == true){
+                $pattern_pseudonym = 'description_charset_one_neg';
+            }
+            else{
+                $pattern_pseudonym = 'description_charset_one';
+            }
+            $characters[0] = str_replace('%char',$characters[0],self::get_form_string($pattern_pseudonym) );
+            
+        } else if ($flag->type === qtype_preg_charset_flag::SET) {
+            
+            $characters = str_split($flag->data->string());
+            foreach ($characters as &$value) {
+                $value = str_replace('%char',$value,self::get_form_string('description_charset_one') );
+            }
         }
-        return $pattern;
+        return $characters;
     }
     
     /**
@@ -198,40 +222,28 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      */
     public function pattern($node_parent=null,$form=null){
         
-        $characters = array();//array of strings
         $result_pattern = '';
-        foreach ($this->pregnode->flags as $i => $outer) {
-            foreach ($outer as $j => $flag){
-                if($flag->type == qtype_preg_charset_flag::SET){
-                    $enum_characters = $flag->data->string();
-                    for ($index = 0; $index < strlen($enum_characters); $index++) {
-                        array_push($characters,$enum_characters[$index]);
-                    }
-                }
-                else if ($flag->type == qtype_preg_charset_flag::FLAG)
-                {
-                    array_push($characters,$this->flag_pattern($flag));
-                }
-                // TODO other flags
-            }
+        $characters = array();
+        
+        foreach ($this->pregnode->flags as $outer) {
+
+            $characters = array_merge($characters,self::flag_to_array($outer[0]));
         }
 
-        if(count($characters)==1){
-            $result_pattern = str_replace('%character', $characters[0], get_string('description_charset_one','qtype_preg'));
+        if(count($characters)==1 && $this->pregnode->negative == false)
+        {
+            $result_pattern = $characters[0];
         }
         else{
-            $count = count($characters);
-            $characters_string = '';
-            foreach ($characters as $i => $char) {
-                $characters_string .= $char.(($i==$count-1) ? '' : ', ');
-            }
+            
             if($this->pregnode->negative == false){
-                $result_pattern = get_string('description_charset','qtype_preg');
-            }
+                    $result_pattern = self::get_form_string('description_charset');
+                }
             else{
-                $result_pattern = get_string('description_charset_negative','qtype_preg');
+                    $result_pattern = self::get_form_string('description_charset_negative');
             }
-            $result_pattern = str_replace('%characters', $characters_string, $result_pattern);
+            $result_pattern = str_replace('%characters', implode(", ", $characters),$result_pattern);
+            
         }
         return $result_pattern;
     }
