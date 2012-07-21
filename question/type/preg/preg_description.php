@@ -286,23 +286,26 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
      */
     public function pattern($node_parent=null,$form=null){
         $pattern ='';
-        switch ($this->pregnode->subtype) {
-            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX :
+        switch ($this->pregnode->userinscription) {
+            case '^' :
                 $pattern = self::get_form_string('description_circumflex');
-                break;          
-            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR :
+                break;
+            case '$' :
                 $pattern = self::get_form_string('description_dollar');
                 break;            
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK :
+            case '\b' :
                 $pattern = self::get_form_string('description_wordbreak');
-                break;            
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_A :
+                break;
+            case '\B' :
+                $pattern = self::get_form_string('description_wordbreak_neg');
+                break;
+            case '\A' :
                 $pattern = self::get_form_string('description_esc_a');
-                break;           
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z :
+                break;   
+            case '\Z' :
                 $pattern = self::get_form_string('description_esc_z');
-                break;            
-            case qtype_preg_leaf_assert::SUBTYPE_ESC_G :
+                break;  
+            case '\G' :
                 $pattern = self::get_form_string('description_esc_g');
                 break;
         }
