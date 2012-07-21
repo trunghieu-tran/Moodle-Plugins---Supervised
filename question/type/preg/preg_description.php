@@ -271,7 +271,8 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
      * returns true if engine support the node, rejection string otherwise
      */
     public function accept() {
-        return ($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY)?true:false;
+        $flag = $this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+        return ($flag) ? true : false;
     }
     
 }
@@ -285,17 +286,30 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        
-        return '123';
+        $pattern ='';
+        switch ($this->pregnode->subtype) {
+            case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX :
+                $pattern = self::get_form_string('description_circumflex');
+                break;          
+            case qtype_preg_leaf_assert::SUBTYPE_DOLLAR :
+                $pattern = self::get_form_string('description_dollar');
+                break;            
+            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK :
+                $pattern = self::get_form_string('description_wordbreak');
+                break;            
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_A :
+                $pattern = self::get_form_string('description_esc_a');
+                break;           
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_Z :
+                $pattern = self::get_form_string('description_esc_z');
+                break;            
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_G :
+                $pattern = self::get_form_string('description_esc_g');
+                break;
+        }
+        return $pattern;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$operand_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
