@@ -8,6 +8,7 @@
  * @author     Oleg Sychev, Sergey Pashaev, Maria Birukova
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_string.php');
 
 class block_formal_langs_ast {
 
