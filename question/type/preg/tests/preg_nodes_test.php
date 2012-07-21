@@ -52,14 +52,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // Matching at the end of the string.
-        $res = $backref->match(new qtype_preg_string('abc'), 3, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('abc'), 3, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, 'abc');
         // The string doesn't match with backref at all.
-        $res = $backref->match(new qtype_preg_string('abcdef'), 3, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abcdef'), 2, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('abcdef'), 3, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, 'abc');
@@ -75,14 +75,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // Reaching the end of the string.
-        $res = $backref->match(new qtype_preg_string('abcab'), 3, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('abcab'), 3, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 2);
         $this->assertEquals($ch, 'c');
         // The string matches backref partially.
-        $res = $backref->match(new qtype_preg_string('abcacd'), 3, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abcdef'), 2, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('abcacd'), 3, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abcdef'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 1);
         $this->assertEquals($ch, 'bc');
@@ -97,8 +97,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->number = 1;
         $backref->matcher = $matcher;
 
-        $res = $backref->match(new qtype_preg_string('abcabc'), 3, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abc'), 3, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('abcabc'), 3, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 3, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEquals($length, 3);
         $this->assertEquals($ch, '');
@@ -114,8 +114,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->number = 1;
         $backref->matcher = $matcher;
 
-        $res = $backref->match(new qtype_preg_string(''), 0, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string(''), -1, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string(''), 0, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string(''), -1, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, '');
@@ -131,15 +131,44 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // 2 characters matched
-        $res = $backref->match(new qtype_preg_string('aba'), 2, $length, false, $matcher->get_match_results());
-        $ch = $backref->next_character(new qtype_preg_string('abc'), 2, $length, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('aba'), 2, $length, false, $matcher->get_match_results());
+        $ch = $backref->next_character(new qtype_poasquestion_string('abc'), 2, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 1);
         $this->assertEquals($ch, 'b');
         // Emptiness matched.
         $matcher->match('xyz');
-        $res = $backref->match(new qtype_preg_string('xyz'), 0, $length, false, $matcher->get_match_results());
+        $res = $backref->match(new qtype_poasquestion_string('xyz'), 0, $length, false, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
+    }
+
+    function test_syntax_errors() {
+        $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
+        $errors = $handler->get_error_objects();
+        $this->assertTrue(count($errors) == 11);
+        $this->assertTrue($errors[0]->index_first == 31); // Setting and unsetting modifier.
+        $this->assertTrue($errors[0]->index_last == 36);
+        $this->assertTrue($errors[1]->index_first == 62); // Unclosed charset.
+        $this->assertTrue($errors[1]->index_last == 65);
+        $this->assertTrue($errors[2]->index_first == 0);  // Unknown control sequence.
+        $this->assertTrue($errors[2]->index_last == 6);
+        $this->assertTrue($errors[3]->index_first == 7);  // Wrong closing paren.
+        $this->assertTrue($errors[3]->index_last == 7);
+        $this->assertTrue($errors[4]->index_first == 9);  // Three alternatives in the conditional subpattern.
+        $this->assertTrue($errors[4]->index_last == 21);
+        $this->assertTrue($errors[5]->index_first == 25); // Quantifier without operand.
+        $this->assertTrue($errors[5]->index_last == 29);
+        $this->assertTrue($errors[6]->index_first == 26); // Wrong quantifier ranges.
+        $this->assertTrue($errors[6]->index_last == 28);
+        $this->assertTrue($errors[7]->index_first == 38); // Unknown POSIX class.
+        $this->assertTrue($errors[7]->index_last == 48);
+        $this->assertTrue($errors[8]->index_first == 50); // Unknown Unicode property.
+        $this->assertTrue($errors[8]->index_last == 61);
+        $this->assertTrue($errors[9]->index_first == 22); // Empty parens.
+        $this->assertTrue($errors[9]->index_last == 23);
+        $this->assertTrue($errors[10]->index_first == 8); // Wrong opening paren.
+        $this->assertTrue($errors[10]->index_last == 8);
+
     }
 }

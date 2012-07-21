@@ -26,10 +26,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
@@ -142,6 +142,29 @@ class qtype_preg_question extends question_graded_automatically
         parent::__construct();
     }
 
+    public static function question_from_regex($regex, $usecase, $exactmatch, $engine, $notation) {
+
+        $question = new qtype_preg_question;
+        $question->usecase = $usecase;
+        $question->correctanswer = '';
+        $question->exactmatch = $exactmatch;
+        $querymatcher = $question->get_query_matcher($engine);
+        $question->usehint = $querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $question->hintpenalty = 0;
+        $question->hintgradeborder = 1;
+        $question->engine = $engine;
+        $question->notation = $notation;
+
+        $answer = new stdClass();
+        $answer->id = 100;
+        $answer->answer = $regex;
+        $answer->fraction = 1;
+        $answer->feedback = '';
+
+        $question->answers = array(100=>$answer);
+        return $question;
+    }
+
     public function get_expected_data() {
         //Note: not using PARAM_RAW_TRIMMED cause it'll interfere with next character hinting is most ungraceful way: disabling it just when you try to get a first letter of the next word
         return array('answer' => PARAM_RAW);
@@ -217,7 +240,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $bestmatchresult = $matchresults;
-                $fitness = qtype_preg_unicode::strlen($response['answer']);
+                $fitness = qtype_poasquestion_string::strlen($response['answer']);
                 break;
             }
 
@@ -320,7 +343,7 @@ class qtype_preg_question extends question_graded_automatically
             $matchingoptions = new qtype_preg_matching_options;
             //We need extension to hint next character or to generate correct answer if none is supplied
             $matchingoptions->extensionneeded = $this->usehint || trim($this->correctanswer) == '';
-            if($answerid !== null) {
+            if($answerid !== null && $answerid > 0) {
                 $feedback = $this->answers[$answerid]->feedback;
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
                     $matchingoptions->capturesubpatterns = false;
@@ -410,17 +433,17 @@ class qtype_preg_question extends question_graded_automatically
 
             $wronghead = '';
             if ($firstindex > 0) {//if there is wrong heading
-                $wronghead = qtype_preg_unicode::substr($currentanswer, 0, $firstindex);
+                $wronghead = qtype_poasquestion_string::substr($currentanswer, 0, $firstindex);
             }
 
             $correctpart = '';
             if ($firstindex != qtype_preg_matching_results::NO_MATCH_FOUND) {//there were any matched characters
-                $correctpart = qtype_preg_unicode::substr($currentanswer, $firstindex, $length);
+                $correctpart = qtype_poasquestion_string::substr($currentanswer, $firstindex, $length);
             }
 
             $correctbeforehint = $correctpart;
-            if ($correctbeforehint !== '' && $matchresults->correctendingstart != qtype_preg_unicode::strlen($wronghead) + qtype_preg_unicode::strlen($correctpart)) {//hint starts before match fail position
-                $correctbeforehint = qtype_preg_unicode::substr($correctpart, 0, $matchresults->correctendingstart - qtype_preg_unicode::strlen($wronghead));
+            if ($correctbeforehint !== '' && $matchresults->correctendingstart != qtype_poasquestion_string::strlen($wronghead) + qtype_poasquestion_string::strlen($correctpart)) {//hint starts before match fail position
+                $correctbeforehint = qtype_poasquestion_string::substr($correctpart, 0, $matchresults->correctendingstart - qtype_poasquestion_string::strlen($wronghead));
             }
 
             $hintedpart = null;
@@ -436,8 +459,8 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             $wrongtail = '';
-            if ($firstindex + $length < qtype_preg_unicode::strlen($currentanswer)) {//if there is wrong tail
-                $wrongtail =  qtype_preg_unicode::substr($currentanswer, $firstindex + $length, qtype_preg_unicode::strlen($currentanswer) - $firstindex - $length);
+            if ($firstindex + $length < qtype_poasquestion_string::strlen($currentanswer)) {//if there is wrong tail
+                $wrongtail =  qtype_poasquestion_string::substr($currentanswer, $firstindex + $length, qtype_poasquestion_string::strlen($currentanswer) - $firstindex - $length);
             }
             return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedpart' => $hintedpart, 'wrongtail' => $wrongtail,
                             'correctbeforehint' =>  $correctbeforehint, 'deltail' => $deltail);
@@ -492,7 +515,7 @@ class qtype_preg_question extends question_graded_automatically
     public function insert_subpatterns($subject, $response, $matchresults) {
 
         //Sanity check
-        if (qtype_preg_unicode::strpos($subject, '{$') === false || qtype_preg_unicode::strpos($subject, '}') === false) {
+        if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
             //There are no placeholders for sure
             return $subject;
         }
@@ -508,7 +531,7 @@ class qtype_preg_question extends question_graded_automatically
                 $startindex = $matchresults->index_first($i);
                 $length = $matchresults->length($i);
                 if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $replace = qtype_preg_unicode::substr($answer, $startindex, $length);
+                    $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
                 } else {
                     $replace = '';
                 }
