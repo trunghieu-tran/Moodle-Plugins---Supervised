@@ -104,29 +104,28 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * Creates text file with dot instructions.
      */
     public function create_dot() {
-        $instr[] = 'digraph {';
-        $instr[] = 'rankdir = LR';
+        $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            $iter->id = ++$counter;
-            
+            $iter->id = ++$this->counter;
+
             if ($iter->shape == 'record')
-                $instr[] = '\"nd' . $counter . '\" [shape=record, color=black, label=' . compute_html($iter->label) . ']';
+                $instr .= '\"nd' . $iter->id . '\" [shape=record, color=black, label=' . compute_html($iter->label) . '];';
             else
-                $instr[] = '\"nd' . $counter . '\" [shape=") + (*iter)->shape + string(", color=' . $iter->color . ', label=\"' . $iter->label . '\"]';
+                $instr .= '\"nd' . $iter->id . '\" [shape=") + (*iter)->shape + string(", color=' . $iter->color . ', label=\"' . $iter->label . '\"];';
         }
 
         foreach ($this->subgraphs as $iter) {
-            process_subgraph($iter, $instr); 
+            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr); 
         }
 
         foreach ($this->links as $iter) {
-            $instr[] = '\"nd' . $iter->source->id . '\" -> \"nd';
+            $instr .= '\"nd' . $iter->source->id . '\" -> \"nd';
 
-            $instr[count($instr) - 1] .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"]';
+            $instr .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"];';
         }
 
-        $instr[] = '}';
+        $instr .= '}';
         
         return $instr;
     }
@@ -196,30 +195,30 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * @param instr - array of dot instructions
      */
     private static function process_subgraph(&$gr, &$instr) {
-        ++$counter;
-        
-        $instr[] = 'subgraph \"cluster_' . $counter . '\" {';
-        $instr[] = 'style=' . $gr->style;
-        $instr[] = 'label=\"' . $gr->label . '\"';
+        $instr .= 'subgraph \"cluster_' . (++$gr->counter) . '\" {';
+        $instr .= 'style=' . $gr->style . ';';
+        $instr .= 'label=\"' . $gr->label . '\";';
 
         foreach ($gr->nodes as $iter) {
+            $iter->id = ++$gr->counter;
+
             if ($iter->shape == 'record')
-                $instr[] = '\"nd' . $iter->id . '\" [shape=record, color=black, label=' . compute_html($iter->label) . ']';
+                $instr .= '\"nd' . $iter->id . '\" [shape=record, color=black, label=' . compute_html($iter->label) . '];';
             else
-                $instr[] = '\"nd' . $iter->id . '\" [shape=' . $iter->shape . ', color=' . $iter->color . ', label=\"' . $iter->label . '\"]';
+                $instr .= '\"nd' . $iter->id . '\" [shape=' . $iter->shape . ', color=' . $iter->color . ', label=\"' . $iter->label . '\"];';
         }
 
         foreach ($gr->subgraphs as $iter) {
-            process_subgraph($iter, $instr);
+            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr);
         }
 
         foreach ($gr->links as $iter) {
-            $instr[] = '\"nd' . $iter->source->id . '\" -> \"nd';
+            $instr .= '\"nd' . $iter->source->id . '\" -> \"nd';
 
-            $instr[count($instr) - 1] .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"]';
+            $instr .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"];';
         }
 
-        $instr[] = '}';
+        $instr .= '}';
     }
 
 }

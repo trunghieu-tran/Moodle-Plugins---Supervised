@@ -197,19 +197,64 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
     }
     
-    //~ function test_create_graph_nothing()
-    //~ {
-        //~ $tree = new qtype_preg_author_tool_explain_graph('');
-//~ 
-        //~ $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-        //~ $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon);
-        //~ $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon);
-        //~ $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[1]);
-//~ 
-        //~ $result = $tree->create_graph();
-        //~ 
-        //~ $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with nothing!');
-    //~ }
+    function test_create_graph_assert_and_subgraph()
+    {
+        $tree = new qtype_preg_author_tool_explain_graph('^(a)');
+
+        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('submask #1', 'solid');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('a', 'ellipse', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('Begining of line', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
+
+        $result = $tree->create_graph();
+        
+        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
+
+        //---------------------------------------------------------------------------
+
+        $tree = new qtype_preg_author_tool_explain_graph('a(\b)');
+
+        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('submask #1', 'solid');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('A word border', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('a', 'ellipse', 'black', $etalon);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[2]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
+
+        $result = $tree->create_graph();
+        
+        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
+
+         //---------------------------------------------------------------------------
+
+        $tree = new qtype_preg_author_tool_explain_graph('^(a)$');
+
+        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('submask #1', 'solid');
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('a', 'ellipse', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[2]);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon);
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('Begining of line', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('End of line', $etalon->subgraphs[0]->nodes[2], $etalon->nodes[1]);
+
+        $result = $tree->create_graph();
+        
+        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
+    }
 }
 
 ?>
