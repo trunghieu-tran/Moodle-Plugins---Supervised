@@ -29,9 +29,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function charset_provider()
     {
         return array(
-          array('[^[^:word:]abc\pL]','any symbol except the following: not <span style="color:red">\w AND [:word:]</span>, <span style="color:red">Letter</span>, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
+          array('[^[^:word:]abc\pL]','any symbol except the following: not \w AND [:word:], Letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
           array('a','<span style="color:red">a</span>'),
           array('[^a]','not <span style="color:red">a</span>'),
+          array('\w','\w AND [:word:]'),
+          array('\W','not \w AND [:word:]'),
         );
     }
 }
