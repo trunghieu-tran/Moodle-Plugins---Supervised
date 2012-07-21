@@ -196,19 +196,19 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         $pattern_pseudonym = '';//pseudonym of localized string
         
         if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
-                
-            $pattern_pseudonym = 'description_charflag_'.$flag->data;
-            $characters[] = self::get_form_string($pattern_pseudonym);
+            // flag is something like \w or \pL    
+            $pattern_pseudonym = 'description_charflag_'.$flag->data;            
             if($flag->negative == true){
-                $pattern_pseudonym = 'description_char_neg';
+                // using charset pattern 'description_charset_one_neg' because char pattern 'description_char_neg' has a <span> tag, 
+                // but dont need to highlight this
+                $characters[] = str_replace('%characters',self::get_form_string($pattern_pseudonym),self::get_form_string('description_charset_one_neg') );
             }
             else{
-                $pattern_pseudonym = 'description_char';
+                $characters[] = self::get_form_string($pattern_pseudonym);
             }
-            $characters[0] = str_replace('%char',$characters[0],self::get_form_string($pattern_pseudonym) );
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
-            
+            // flag is simple enumeration of characters
             $characters = str_split($flag->data->string());
             foreach ($characters as &$value) {
                 $value = str_replace('%char',$value,self::get_form_string('description_char') );
@@ -231,6 +231,9 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         }
 
         if(count($characters)==1 && $this->pregnode->negative == false){
+            // Simulation of: 
+            // $string['description_charset_one'] = '%characters'; 
+            // w/o calling functions
             $result_pattern = $characters[0];
         }
         else{
