@@ -178,10 +178,11 @@ $string['description_control_ucp'] = 'PCRE_UCP';
 //TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
-$string['description_charset_one'] = '<span style="color:red">%char</span>';//??
-$string['description_charset_one_neg'] = 'not <span style="color:red">%char</span>';
+$string['description_charset_one_neg'] = 'not %characters';
 //CHARSET FLAGS
 // TODO correct charset flags
+$string['description_char'] = '<span style="color:red">%char</span>';//??
+$string['description_char_neg'] = 'not <span style="color:red">%char</span>';
 $string['description_charflag_digit'] = '\d AND [:digit:]';
 $string['description_charflag_xdigit'] = '[:xdigit:]';
 $string['description_charflag_space'] = '\s AND [:space:]';
