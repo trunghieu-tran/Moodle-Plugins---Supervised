@@ -182,15 +182,26 @@ class qtype_correctwriting_question extends question_graded_automatically  {
          @param array $response student response  as array ( 'answer' => string of student response )
      */
     public function get_best_fit_answer(array $response) {
+        // Check, for cache, and make it lowercase to prevent some odd executions
+        if (is_a($response['answer'],'qtype_poasquestion_string') == false) {
+            $response['answer'] = new qtype_poasquestion_string($response['answer']);
+        }
+        if (!$this->usecase) {
+            $response['answer']->tolower();
+        }
         if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
             return $this->matchedgradestate;
         }
         
+        foreach($this->answers as $id => $answer) {
+            if (is_a($answer->answer,'qtype_poasquestion_string') == false) {
+                $answer->answer = new qtype_poasquestion_string($answer->answer);
+            }
+        }
         // Make all symbols lowercase, when non case-sensitive settings
         if (!$this->usecase) {
-            $response['answer'] = strtolower($response['answer']);
             foreach($this->answers as $id => $answer) {
-                $answer->answer = strtolower($answer->answer);
+                $answer->answer->tolower();
             }
         }
         
