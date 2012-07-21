@@ -155,7 +155,11 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
     public function scan(&$processedstring) {
          // Lexer must be a valid JLexPHP class, or implement next_token() and get_errors()
         $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
-        $this->scaner = new $scanerclass(fopen('data://text/plain;base64,' . base64_encode($processedstring->string), 'r'));
+        $string = $processedstring->string;
+        if (is_a($string,'qtype_poasquestion_string') == true) {
+            $string = $string->string();
+        }
+        $this->scaner = new $scanerclass(fopen('data://text/plain;base64,' . base64_encode($string), 'r'));
         //Now, we are splitting text into lexemes
         $tokens = array();
         while ($token = $this->scaner->next_token()) {
