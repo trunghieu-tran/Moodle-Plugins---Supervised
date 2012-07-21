@@ -178,8 +178,8 @@ $string['description_control_ucp'] = 'PCRE_UCP';
 //TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
-$string['description_charset_one'] = '%character';//??
-$string['description_charset_char_neg'] = 'not %char';
+$string['description_charset_one'] = '<span style="color:red">%char</span>';//??
+$string['description_charset_one_neg'] = 'not <span style="color:red">%char</span>';
 //CHARSET FLAGS
 // TODO correct charset flags
 $string['description_charflag_digit'] = '\d AND [:digit:]';
@@ -193,7 +193,7 @@ $string['description_charflag_cntrl'] = '[:ctrl:]';
 $string['description_charflag_graph'] = '[:graph:]';
 $string['description_charflag_lower'] = '[:lower:]';
 $string['description_charflag_upper'] = '[:upper:]';
-$string['description_charflag_print'] = '[:print:] PRIN, because PRINT is php keyword';
+$string['description_charflag_print'] = '[:print:]';
 $string['description_charflag_punct'] = '[:punct:]';
 $string['description_charflag_hspace'] = '\h';
 $string['description_charflag_vspace'] = '\v';
