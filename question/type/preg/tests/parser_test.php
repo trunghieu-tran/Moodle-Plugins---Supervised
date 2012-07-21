@@ -36,7 +36,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('a|', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->id === 1);
+        $this->assertTrue($root->id === 2);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
         $this->assertTrue($root->operands[0]->id == 0);
