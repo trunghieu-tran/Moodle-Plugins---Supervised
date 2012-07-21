@@ -180,7 +180,11 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
 
         // Calculate node name, dot script and style.
         $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
-        $style = $nodename . '[style = ' . 'dotted' . '];'; // TODO: get real styles.
+        if ($styleprovider !== null) {
+            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
+        } else {
+            $style = '';
+        }
 
         // Form the result.
         $dotscript = $nodename . ';';
@@ -1292,7 +1296,11 @@ abstract class qtype_preg_operator extends qtype_preg_node {
 
     public function dot_script($styleprovider, $isroot = true) {
         $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
-        $style = $nodename . '[style = ' . 'dotted' . '];'; // TODO: get real styles.
+        if ($styleprovider !== null) {
+            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
+        } else {
+            $style = '';
+        }
 
         // Get child dot scripts and styles.
         $childscripts = array();
@@ -1547,7 +1555,7 @@ class qtype_preg_node_error extends qtype_preg_node {
         $this->addinfo = null;
     }
     public function dot_script($styleprovider, $isroot = true) {
-        // TODO
+        return qtype_preg_leaf::dot_script($styleprovider, $isroot); // TODO
     }
 
     /**
