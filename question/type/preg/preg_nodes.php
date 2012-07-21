@@ -131,11 +131,12 @@ abstract class qtype_preg_node {
     abstract public function name();
 
     /**
-     * Writes this node to a .dot file - used for debugging.
-     * @param file the opened output file.
-     * @return name of the node in the .dot file.
+     * Returns the dot script corresponding to this node.
+     * @param styleprovider an object prividing styles for different node types.
+     * @param isroot if true, adds the "digraph {\n" to the start and "}" to the end.
+     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
      */
-    abstract public function write_to_dot_file($file);
+    abstract public function dot_script($styleprovider, $isroot = true);
 
 
     /**
@@ -165,7 +166,8 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         }
     }
 
-    public function write_to_dot_file($file) {
+    public function dot_script($styleprovider, $isroot = true) {
+        // $this->userinscription can be either a string or an array of strings.
         if (is_array($this->userinscription)) {
             $userinscription = '[';
             foreach ($this->userinscription as $tmp) {
@@ -175,9 +177,23 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         } else {
             $userinscription = $this->userinscription;
         }
-        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
-        fwrite($file, $str . ";\n");
-        return $str;
+
+        // Calculate node name, dot script and style.
+        $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
+        if ($styleprovider !== null) {
+            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
+        } else {
+            $style = '';
+        }
+
+        // Form the result.
+        $dotscript = $nodename . ';';
+        if ($isroot) {
+            $dotscript = 'digraph {' . $style . $dotscript . '}';
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
     }
 
     /**
@@ -1278,15 +1294,34 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         }
     }
 
-    public function write_to_dot_file($file) {
-        $str = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
-        foreach ($this->operands as $operand) {
-            $operandstr = $operand->write_to_dot_file($file);
-            fwrite($file, $str . '->' . $operandstr . ";\n");
+    public function dot_script($styleprovider, $isroot = true) {
+        $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
+        if ($styleprovider !== null) {
+            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
+        } else {
+            $style = '';
         }
 
-        fwrite($file, $str . ";\n");
-        return $str;
+        // Get child dot scripts and styles.
+        $childscripts = array();
+        foreach ($this->operands as $operand) {
+            $tmp = $operand->dot_script($styleprovider, false);
+            $childscripts[] = $tmp[0];
+            $style .= $tmp[1];
+        }
+
+        // Form the result.
+        $dotscript = '';
+        foreach ($childscripts as $childscript) {
+            $dotscript .= $nodename . '->' . $childscript;
+        }
+        if ($isroot) {
+            $dotscript = 'digraph {' . $style . $dotscript . '}';
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
+        return $result;
     }
 }
 
@@ -1519,7 +1554,8 @@ class qtype_preg_node_error extends qtype_preg_node {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->addinfo = null;
     }
-    public function write_to_dot_file($file) {
+    public function dot_script($styleprovider, $isroot = true) {
+        return qtype_preg_leaf::dot_script($styleprovider, $isroot); // TODO
     }
 
     /**

@@ -161,8 +161,8 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, $response) {
-        return $this->render_stringextension_hint($renderer, $response);
+    public function render_hint($response) {
+        return $this->render_stringextension_hint($response);
     }
 
     public function hinted_string($matchresults) {
