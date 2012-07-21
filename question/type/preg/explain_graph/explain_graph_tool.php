@@ -12,7 +12,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/preg/explain_graph/explain_graph_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/explain_graph/explain_graph_misc.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_author_tool.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_authors_tool.php');
 
 /**
  * Class "handler" for regular expression's graph.
