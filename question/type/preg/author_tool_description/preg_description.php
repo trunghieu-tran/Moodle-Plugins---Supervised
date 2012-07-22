@@ -619,16 +619,15 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        $pattern_t = '';
+        if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
+            $pattern_t = self::get_form_string('description_subpattern');
+        } else {
+            $pattern_t = self::get_form_string('description_subpattern_once');
+        }
+        return $pattern_t;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
@@ -646,11 +645,4 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
         return '123';
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
