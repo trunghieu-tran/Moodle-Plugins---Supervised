@@ -89,3 +89,12 @@ $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a
 $string['unsupportedmodifier'] = 'Error: modifier {$a->modifier} isn\'t supported by the {$a->classname}.';
 $string['usehint'] = 'Allow next characters hinting';
 $string['usehint_help'] = 'In behaviours which allow multiple tries (e.g. adaptive or interactive) show students the \'Hint next character\' button that allows to get a one-character hint with applying the \'Hint next character penalty\'. Not all matching engines support hinting.';
+//This is string for authors tool
+$string['regexeditheader'] = 'Input regex';
+$string['regexeditheader_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regeximgheader'] = 'Interactive tree/explaining graph';
+$string['regeximgheader_help'] = 'Here you can see interactive tree and explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regexdescriptionheader'] = 'Description';
+$string['regexdescriptionheader_help'] = 'Here you can see description of regular expression.';
+$string['regexmatchheader'] = 'Input string for check';
+$string['regexmatchheader_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
