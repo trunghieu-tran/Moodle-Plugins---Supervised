@@ -390,83 +390,45 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        //TODO - minimaze qtype_preg_description_leaf_control::pattern
         $pattern_t = '';
-        switch ($this->pregnode->subtype) {
-            case qtype_preg_leaf_control::SUBTYPE_ACCEPT :
-                $pattern_t = self::get_form_string('description_control_accept');
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_FAIL :
-                $pattern_t = self::get_form_string('description_control_fail');
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_MARK_NAME :
-                $pattern_t = self::get_form_string('description_control_name');
-                break;            
-            // backtrack options...            
-            case qtype_preg_leaf_control::SUBTYPE_COMMIT :
-                $pattern_t = self::get_form_string('description_control_backtrack');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_commit'),$pattern_t);
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_PRUNE :
-                $pattern_t = self::get_form_string('description_control_backtrack');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_commit_prune'),$pattern_t);
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_SKIP :
-                $pattern_t = self::get_form_string('description_control_backtrack');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_skip'),$pattern_t);
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_SKIP_NAME :
-                $pattern_t = self::get_form_string('description_control_backtrack');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_skip_name'),$pattern_t);
-                $pattern_t = str_replace('%name', $this->pregnode->name,$pattern_t);
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_THEN :
-                $pattern_t = self::get_form_string('description_control_backtrack');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_then'),$pattern_t);
-                break;           
-            // newline marches...          
-            case qtype_preg_leaf_control::SUBTYPE_CR :
-                $pattern_t = self::get_form_string('description_control_newline');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_cr'),$pattern_t);
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_LF :
-                $pattern_t = self::get_form_string('description_control_newline');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_lf'),$pattern_t);
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_CRLF :
-                $pattern_t = self::get_form_string('description_control_newline');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_crlf'),$pattern_t);
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_ANYCRLF :
-                $pattern_t = self::get_form_string('description_control_newline');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_anycrlf'),$pattern_t);
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_ANY :
-                $pattern_t = self::get_form_string('description_control_newline');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_any'),$pattern_t);
-                break;            
-            // \R matches...           
-            case qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF :
-                $pattern_t = self::get_form_string('description_control_r');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_bsr_anycrlf'),$pattern_t);
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE :
-                $pattern_t = self::get_form_string('description_control_r');
-                $pattern_t = str_replace('%what', self::get_form_string('description_control_bsr_unicode'),$pattern_t);
-                break;           
-            // start options...            
-            case qtype_preg_leaf_control::SUBTYPE_NO_START_OPT :
-                $pattern_t = self::get_form_string('description_control_no_start_opt');
-                break;            
-            case qtype_preg_leaf_control::SUBTYPE_UTF8 :
-                $pattern_t = self::get_form_string('description_control_utf8');
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_UTF16 :
-                $pattern_t = self::get_form_string('description_control_utf16');
-                break;           
-            case qtype_preg_leaf_control::SUBTYPE_UCP :
-                $pattern_t = self::get_form_string('description_control_ucp');
-                break;
+
+        if($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ACCEPT ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_FAIL ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_MARK_NAME ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_NO_START_OPT ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF8 ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UTF1 ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_UCP) {
+            
+            $pattern_t = self::get_form_string('description_'.$this->pregnode->subtype);
+            
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_COMMIT ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_PRUNE ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_THEN ) {
+            
+            $pattern_t = self::get_form_string('description_control_backtrack');
+            $pattern_t = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype),$pattern_t);       
+            
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_SKIP_NAME){
+            
+            $pattern_t = self::get_form_string('description_control_backtrack');
+            $pattern_t = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype),$pattern_t);
+            $pattern_t = str_replace('%name', $this->pregnode->name,$pattern_t);
+        
+            
+        } else if ($this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CR ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_LF ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_CRLF ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANYCRLF ||
+                $this->pregnode->subtype === qtype_preg_leaf_control::SUBTYPE_ANY) {
+            
+            $pattern_t = self::get_form_string('description_control_newline');
+            $pattern_t = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype),$pattern_t);
+
+        } else {
+            $pattern_t = self::get_form_string('description_control_r');
+            $pattern_t = str_replace('%what', self::get_form_string('description_'.$this->pregnode->subtype),$pattern_t);
         }
         return $pattern_t;
     }
