@@ -115,4 +115,25 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('a|b|c','<span style="color:red">a</span> or <span style="color:red">b</span> or <span style="color:red">c</span>'),
         );
     }
+    
+    /**
+     * @dataProvider nassert_provider
+     */
+    public function test_nassert($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function nassert_provider()
+    {
+        return array(
+          array('(?=abc)g','jh'),
+          array('(?!abc)g','dg'),
+          array('(?<=abc)g','jh'),
+          array('(?<!abc)g','dg'),
+        );
+    }
 }
