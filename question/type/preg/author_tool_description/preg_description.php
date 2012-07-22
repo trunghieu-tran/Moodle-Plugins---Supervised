@@ -186,7 +186,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * Convertes charset flag to array of descriptions(strings)
      * 
      * @param qtype_preg_charset_flag $flag flag gor description
-     * @param string[] $characters enumeration of characters in charset
+     * @param string[] $characters enumeration of descriptions in charset
      */
     private static function flag_to_array($flag,&$characters) {
         
