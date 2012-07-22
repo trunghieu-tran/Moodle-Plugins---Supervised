@@ -88,7 +88,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
  */
 abstract class qtype_preg_description_node{
     /** @var string pattern for description of current node */    
-    public $pattern;
+    public $pattern_t;
     
     /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
     public $pregnode;
@@ -199,20 +199,20 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     private static function flag_to_array($flag,&$characters) {
         
         $temp_str = '';
-        $pattern_pseudonym = '';//pseudonym of localized string
+        $pseudonym = '';//pseudonym of localized string
         
         if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
             
             // current flag is something like \w or \pL    
-            $pattern_pseudonym = 'description_charflag_'.$flag->data;            
+            $pseudonym = 'description_charflag_'.$flag->data;            
             if($flag->negative == true){
                 // using charset pattern 'description_charset_one_neg' because char pattern 'description_char_neg' has a <span> tag, 
                 // but dont need to highlight this
-                $temp_str = self::get_form_string($pattern_pseudonym);
+                $temp_str = self::get_form_string($pseudonym);
                 $characters[] = str_replace('%characters',$temp_str,self::get_form_string('description_charset_one_neg') );
             }
             else{
-                $characters[] = self::get_form_string($pattern_pseudonym);
+                $characters[] = self::get_form_string($pseudonym);
             }
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
@@ -303,31 +303,31 @@ class qtype_preg_description_leaf_assert extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        $pattern ='';
+        $pattern_t ='';
         switch ($this->pregnode->userinscription) {
             case '^' :
-                $pattern = self::get_form_string('description_circumflex');
+                $pattern_t = self::get_form_string('description_circumflex');
                 break;
             case '$' :
-                $pattern = self::get_form_string('description_dollar');
+                $pattern_t = self::get_form_string('description_dollar');
                 break;            
             case '\b' :
-                $pattern = self::get_form_string('description_wordbreak');
+                $pattern_t = self::get_form_string('description_wordbreak');
                 break;
             case '\B' :
-                $pattern = self::get_form_string('description_wordbreak_neg');
+                $pattern_t = self::get_form_string('description_wordbreak_neg');
                 break;
             case '\A' :
-                $pattern = self::get_form_string('description_esc_a');
+                $pattern_t = self::get_form_string('description_esc_a');
                 break;   
             case '\Z' :
-                $pattern = self::get_form_string('description_esc_z');
+                $pattern_t = self::get_form_string('description_esc_z');
                 break;  
             case '\G' :
-                $pattern = self::get_form_string('description_esc_g');
+                $pattern_t = self::get_form_string('description_esc_g');
                 break;
         }
-        return $pattern;
+        return $pattern_t;
     }
     
 }
@@ -341,9 +341,9 @@ class qtype_preg_description_leaf_backref extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        $pattern = self::get_form_string('description_backref');
-        $pattern = str_replace('%number', $this->pregnode->number,$pattern);
-        return $pattern;
+        $pattern_t = self::get_form_string('description_backref');
+        $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+        return $pattern_t;
     }
     
 }
@@ -368,15 +368,15 @@ class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
      */
     public function pattern($node_parent=null,$form=null){
         
-        $pattern = '';
+        $pattern_t = '';
         if($this->pregnode->number === 0){
-             $pattern = self::get_form_string('description_recursion_all');
+             $pattern_t = self::get_form_string('description_recursion_all');
         }
         else{
-             $pattern = self::get_form_string('description_recursion');
-             $pattern = str_replace('%number', $this->pregnode->number,$pattern);
+             $pattern_t = self::get_form_string('description_recursion');
+             $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
         }
-        return $pattern;
+        return $pattern_t;
     }
     
 }
@@ -391,84 +391,84 @@ class qtype_preg_description_leaf_control extends qtype_preg_description_leaf{
      */
     public function pattern($node_parent=null,$form=null){
         //TODO - minimaze qtype_preg_description_leaf_control::pattern
-        $pattern = '';
+        $pattern_t = '';
         switch ($this->pregnode->subtype) {
             case qtype_preg_leaf_control::SUBTYPE_ACCEPT :
-                $pattern = self::get_form_string('description_control_accept');
+                $pattern_t = self::get_form_string('description_control_accept');
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_FAIL :
-                $pattern = self::get_form_string('description_control_fail');
+                $pattern_t = self::get_form_string('description_control_fail');
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_MARK_NAME :
-                $pattern = self::get_form_string('description_control_name');
+                $pattern_t = self::get_form_string('description_control_name');
                 break;            
             // backtrack options...            
             case qtype_preg_leaf_control::SUBTYPE_COMMIT :
-                $pattern = self::get_form_string('description_control_backtrack');
-                $pattern = str_replace('%what', self::get_form_string('description_control_commit'),$pattern);
+                $pattern_t = self::get_form_string('description_control_backtrack');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_commit'),$pattern_t);
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_PRUNE :
-                $pattern = self::get_form_string('description_control_backtrack');
-                $pattern = str_replace('%what', self::get_form_string('description_control_commit_prune'),$pattern);
+                $pattern_t = self::get_form_string('description_control_backtrack');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_commit_prune'),$pattern_t);
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_SKIP :
-                $pattern = self::get_form_string('description_control_backtrack');
-                $pattern = str_replace('%what', self::get_form_string('description_control_skip'),$pattern);
+                $pattern_t = self::get_form_string('description_control_backtrack');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_skip'),$pattern_t);
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_SKIP_NAME :
-                $pattern = self::get_form_string('description_control_backtrack');
-                $pattern = str_replace('%what', self::get_form_string('description_control_skip_name'),$pattern);
-                $pattern = str_replace('%name', $this->pregnode->name,$pattern);
+                $pattern_t = self::get_form_string('description_control_backtrack');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_skip_name'),$pattern_t);
+                $pattern_t = str_replace('%name', $this->pregnode->name,$pattern_t);
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_THEN :
-                $pattern = self::get_form_string('description_control_backtrack');
-                $pattern = str_replace('%what', self::get_form_string('description_control_then'),$pattern);
+                $pattern_t = self::get_form_string('description_control_backtrack');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_then'),$pattern_t);
                 break;           
             // newline marches...          
             case qtype_preg_leaf_control::SUBTYPE_CR :
-                $pattern = self::get_form_string('description_control_newline');
-                $pattern = str_replace('%what', self::get_form_string('description_control_cr'),$pattern);
+                $pattern_t = self::get_form_string('description_control_newline');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_cr'),$pattern_t);
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_LF :
-                $pattern = self::get_form_string('description_control_newline');
-                $pattern = str_replace('%what', self::get_form_string('description_control_lf'),$pattern);
+                $pattern_t = self::get_form_string('description_control_newline');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_lf'),$pattern_t);
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_CRLF :
-                $pattern = self::get_form_string('description_control_newline');
-                $pattern = str_replace('%what', self::get_form_string('description_control_crlf'),$pattern);
+                $pattern_t = self::get_form_string('description_control_newline');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_crlf'),$pattern_t);
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_ANYCRLF :
-                $pattern = self::get_form_string('description_control_newline');
-                $pattern = str_replace('%what', self::get_form_string('description_control_anycrlf'),$pattern);
+                $pattern_t = self::get_form_string('description_control_newline');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_anycrlf'),$pattern_t);
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_ANY :
-                $pattern = self::get_form_string('description_control_newline');
-                $pattern = str_replace('%what', self::get_form_string('description_control_any'),$pattern);
+                $pattern_t = self::get_form_string('description_control_newline');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_any'),$pattern_t);
                 break;            
             // \R matches...           
             case qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF :
-                $pattern = self::get_form_string('description_control_r');
-                $pattern = str_replace('%what', self::get_form_string('description_control_bsr_anycrlf'),$pattern);
+                $pattern_t = self::get_form_string('description_control_r');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_bsr_anycrlf'),$pattern_t);
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE :
-                $pattern = self::get_form_string('description_control_r');
-                $pattern = str_replace('%what', self::get_form_string('description_control_bsr_unicode'),$pattern);
+                $pattern_t = self::get_form_string('description_control_r');
+                $pattern_t = str_replace('%what', self::get_form_string('description_control_bsr_unicode'),$pattern_t);
                 break;           
             // start options...            
             case qtype_preg_leaf_control::SUBTYPE_NO_START_OPT :
-                $pattern = self::get_form_string('description_control_no_start_opt');
+                $pattern_t = self::get_form_string('description_control_no_start_opt');
                 break;            
             case qtype_preg_leaf_control::SUBTYPE_UTF8 :
-                $pattern = self::get_form_string('description_control_utf8');
+                $pattern_t = self::get_form_string('description_control_utf8');
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_UTF16 :
-                $pattern = self::get_form_string('description_control_utf16');
+                $pattern_t = self::get_form_string('description_control_utf16');
                 break;           
             case qtype_preg_leaf_control::SUBTYPE_UCP :
-                $pattern = self::get_form_string('description_control_ucp');
+                $pattern_t = self::get_form_string('description_control_ucp');
                 break;
         }
-        return $pattern;
+        return $pattern_t;
     }
     
 }
@@ -498,7 +498,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        return 'seems like this pattern() for this node didnt redefined';
     }
     
     /**
@@ -506,7 +506,25 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
      */
     public function description($numbering_pattern,$node_parent=null,$form=null){
         
-        return '123';
+        $description = '';
+        $child_description = '';
+        $form = '';
+        $matches = array();
+        
+        $this->pattern = $this->pattern($node_parent,$form);
+        $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
+        
+        $i=1;
+        $find = '/%'.$i.'(\w+)?/';
+        while((count($this->operands) >= $i) && preg_match($find,$description,$matches)){
+            $form = (count($matches)>=2) ? $matches[1] : null;
+            $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
+            var_dump($matches[0]);
+            $description = str_replace($matches[0],$child_description,$description);
+            $i++;
+            $find = '/%'.$i.'(\w+)?/';
+        }
+        return $description;
     }
 }
 
@@ -521,7 +539,7 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        return 'seems like this pattern() for this node didnt redefined';
     }
     
     /**
@@ -564,17 +582,30 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        
-        return '123';
+        $pattern_t = '';
+        $type1 = $this->operands[0]->pregnode->type;
+        $type2 = $this->operands[1]->pregnode->type;
+        /*if($type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                count($this->operands[0]->pregnode->flags)===1 &&
+                $this->operands[0]->pregnode->flags[0][0]->type===qtype_preg_charset_flag::SET &&
+                $this->operands[0]->pregnode->flags[0][0]->data->length()===1 &&
+                $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                count($this->operands[1]->pregnode->flags)===1 &&
+                $this->operands[1]->pregnode->flags[0][0]->type===qtype_preg_charset_flag::SET &&
+                $this->operands[1]->pregnode->flags[0][0]->data->length()===1 ) {
+            
+            $pattern_t = self::get_form_string('description_concat_short');*/
+            
+        if($type1===qtype_preg_node::TYPE_NODE_ASSERT || $type2===qtype_preg_node::TYPE_NODE_ASSERT){
+            $pattern_t = self::get_form_string('description_concat_wo_union');
+        } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT){
+            $pattern_t = self::get_form_string('description_concat_wcomma');
+        } else {
+            $pattern_t = self::get_form_string('description_concat');
+        }
+        return $pattern_t;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
@@ -587,16 +618,18 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator{
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        $pattern_t = '';
+        $type1 = $this->operands[0]->pregnode->type;
+        $type2 = $this->operands[1]->pregnode->type;
+            
+        if($type1 === qtype_preg_node::TYPE_NODE_ALT){
+            $pattern_t = self::get_form_string('description_alt_wcomma');
+        } else {
+            $pattern_t = self::get_form_string('description_alt');
+        }
+        return $pattern_t;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
