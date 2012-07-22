@@ -481,7 +481,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         while((count($this->operands) >= $i) && preg_match($find,$description,$matches)){
             $form = (count($matches)>=2) ? $matches[1] : null;
             $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
-            var_dump($matches[0]);
+            //var_dump($matches[0]);
             $description = str_replace($matches[0],$child_description,$description);
             $i++;
             $find = '/%'.$i.'(\w+)?/';

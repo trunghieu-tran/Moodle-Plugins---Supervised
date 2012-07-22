@@ -28,12 +28,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function charset_provider()
     {
         return array(
-          array('[^[:^word:]abc\pL]','any symbol except the following: not \w AND [:word:], Letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
+          array('[^[:^word:]abc\pL]','any symbol except the following: not word character, letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
           array('a','<span style="color:red">a</span>'),
           array('[^a]','not <span style="color:red">a</span>'),
-          array('\w','\w AND [:word:]'),
-          array('\W','not \w AND [:word:]'),
-          array('\0113','fgh'),
+          array('\w','word character'),
+          array('\W','not word character')
         );
     }
     
@@ -93,7 +92,8 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('ab','<span style="color:red">a</span> then <span style="color:red">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:red">a</span>, <span style="color:red">|</span>, <span style="color:red">b</span>; then <span style="color:red">c</span>'),
           array('abc','<span style="color:red">a</span> then <span style="color:red">b</span> then <span style="color:red">c</span>'),
-        );
+          array('\0113','character with hex code 9 then <span style="color:red">3</span>'),
+         );
     }
     
     /**
@@ -119,7 +119,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider nassert_provider
      */
-    public function test_nassert($regex,$expected)
+    /*public function test_nassert($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
@@ -135,7 +135,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?<=abc)g','jh'),
           array('(?<!abc)g','dg'),
         );
-    }
+    }*/
     
     /**
      * @dataProvider quant_provider
