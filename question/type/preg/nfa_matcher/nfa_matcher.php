@@ -37,26 +37,63 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
 
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
         $parentresult = parent::worse_than($other, $orequal, $longestmatch, $areequal);
-        if ($areequal === true) {
-            // Leftmost rule.
-            foreach ($this->index_first as $key => $value) {
-                if ($key !== 0 && $value === qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    return true;
-                } else if ($key !== 0 && $value !== qtype_preg_matching_results::NO_MATCH_FOUND && $other->index_first[$key] === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    return false;
-                }
-            }
-            // Repeating rule.
-            foreach ($this->length as $key => $value) {
-                if ($key !== 0 && $value < $other->length[$key]) {
-                    return true;
-                } else if ($key !== 0 && $value > $other->length[$key]) {
-                    return false;
-                }
-            }
-        } else {
+        if ($areequal === false) {
             return $parentresult;
         }
+
+        // Leftmost rule.
+        foreach ($this->index_first as $key => $index1) {
+            if ($key === 0) {
+                continue;
+            }
+
+            $index2 = $other->index_first[$key];
+            $length1 = $this->length[$key];
+            $length2 = $other->length[$key];
+
+            // Subexpressions starting earlier take priority over ones starting later.
+            /*if ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return true;
+            }
+            if ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return false;
+            }
+
+            $repeating2 = ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 >= $index1 + $length1);
+            $repeating1 = ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 >= $index2 + $length2);
+
+            // Subexpressions also correspond the leftmost-longest rule.
+            if (($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 < $index1 && !$repeating1) ||
+                ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === $index1 && $length2 > $length1)) {
+                return true;
+            }
+            if (($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 < $index2 && !$repeating2) ||
+                ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === $index2 && $length1 > $length2)) {
+                return false;
+            }*/
+
+            // Leftmost-longest rule.
+            if (($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 < $index1) ||
+                ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === $index1 && $length2 > $length1)) {
+                return true;
+            }
+            if (($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 < $index2) ||
+                ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === $index2 && $length1 > $length2)) {
+                return false;
+            }
+
+            // Repeating rule.
+            if ($this->index_first[$key] < $other->index_first[$key]) {
+                return true;
+            }
+            if ($this->index_first[$key] > $other->index_first[$key]) {
+                return false;
+            }
+        }
+        return false;
+
     }
 
     public function concatenate_char_to_str($char) {
