@@ -22,7 +22,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_charset($regex, $expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        var_dump($handler);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     } 
@@ -34,7 +34,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[^a]','not <span style="color:red">a</span>'),
           array('\w','\w AND [:word:]'),
           array('\W','not \w AND [:word:]'),
-          array('[\xFF]','fgh'),
+          array('[- .,\t\na-zA-Z0-9]','fgh'),
         );
     }
     
