@@ -7617,26 +7617,27 @@ class qtype_preg_unicode extends textlib {
 
     /**
      * @param $charset object of qtype_poasquestion_string.
+     * @return a sorted array of trivial ranges corresponding to the given charset.
      */
     public static function get_ranges_from_charset($charset) {
-        $result = array();
-        $previous = -1;
+        $ords = array();
         for ($i = 0; $i < $charset->length(); $i++) {
-            $str = $charset[$i];
-            $newnum = qtype_poasquestion_string::ord($str);
-            if ($previous === -1) {
-                $toadd = array(0 => $newnum);
-            } else {
-                if ($newnum !== $previous + 1) {
-                    $toadd[1] = $previous;
-                    $result[] = $toadd;
-                    $toadd = array(0 => $newnum);
-                }
-            }
-            $previous = $newnum;
+            $ords[] = qtype_poasquestion_string::ord($charset[$i]);
         }
-        $toadd[1] = $previous;
-        $result[] = $toadd;
+        sort($ords, SORT_NUMERIC);
+        $prevord = $ords[0];
+        $result = array(array($prevord, $prevord));
+        $index = 0;
+        for ($i = 1; $i < count($ords); $i++) {
+            $neword = $ords[$i];
+            if ((int)$neword == (int)$prevord + 1) {
+                $result[$index][1]++;
+            } else {
+                $result[] = array($neword, $neword);
+                $index++;
+            }
+            $prevord = $neword;
+        }
         return $result;
     }
 
@@ -7695,11 +7696,6 @@ class qtype_preg_unicode extends textlib {
             return false;
         }
         $ord = qtype_poasquestion_string::ord($utf8chr);
-        foreach ($ranges as $range) {
-            if ($range[0] <= $ord && $ord <= $range[1]) {
-                return true;
-            }
-        }
-        return false;
+        return (self::search_number_binary($ord, $ranges) !== false);
     }
 }
