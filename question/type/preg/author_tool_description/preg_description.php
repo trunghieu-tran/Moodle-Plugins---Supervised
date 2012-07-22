@@ -66,9 +66,8 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      * Returns the engine-specific node name for the given preg_node name.
      * Overload in case of sophisticated node name schemes.
      */
-    protected function get_engine_node_name($pregname) {
-        
-        return 'qtype_preg_description_'.$pregname;
+    protected function node_infix() {
+        return 'description';
     }
     
     /**
