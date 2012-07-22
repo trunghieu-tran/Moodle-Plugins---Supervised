@@ -33,7 +33,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[^a]','not <span style="color:red">a</span>'),
           array('\w','\w AND [:word:]'),
           array('\W','not \w AND [:word:]'),
-          array('[[:word:]\pL[:print:]]','fgh'),
+          array('\0113','fgh'),
         );
     }
     
@@ -134,6 +134,31 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?!abc)g','dg'),
           array('(?<=abc)g','jh'),
           array('(?<!abc)g','dg'),
+        );
+    }
+    
+    /**
+     * @dataProvider quant_provider
+     */
+    public function test_quant($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function quant_provider()
+    {
+        return array(
+          array('g{,1}','jh'),
+          array('g+','dg'),
+          array('g*','jh'),
+          array('g?','dg'),
+          array('g{0,1}','jh'),
+          array('g{0,}','dg'),
+          array('g{1,}','jh'),
+          array('g{2,5}','dg'),
         );
     }
 }

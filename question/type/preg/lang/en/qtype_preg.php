@@ -117,17 +117,17 @@ $string['description_option_x'] = 'ignore white space';
 $string['description_option_U'] = 'quantifiers ungreedy by default';
 $string['description_option_J'] = 'allow duplicate names';
 //TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times (%greed)';
-$string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing (%greed)';
-$string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times  (%greed)';
+$string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
+$string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
+$string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 //TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '%1 is repeated at least %leftborder times (%greed)';
-$string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing (%greed)';
-$string['description_infinite_quant_1'] = '%1 is repeated any number of times (%greed)';
+$string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
+$string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
+$string['description_infinite_quant_1'] = '%1 is repeated any number of times%greed';
 //%greed
-$string['description_quant_lazy'] = 'lazy quantifier';
-$string['description_quant_greed'] = 'greed quantifier';
-$string['description_quant_possessive'] = 'possessive quantifier';
+$string['description_quant_lazy'] = ' (lazy quantifier)';
+$string['description_quant_greed'] = ' (greed quantifier)';
+$string['description_quant_possessive'] = ' (possessive quantifier)';
 //TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';
 $string['description_concat_wcomma'] = '%1 then %2';
