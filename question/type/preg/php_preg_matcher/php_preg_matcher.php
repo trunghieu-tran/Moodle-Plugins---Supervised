@@ -90,7 +90,11 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $matchresults->full = true;//No partial matching from preg_match
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
-                $matchresults->length[$i] = strlen($match[0]);
+                if ($match[1] !== -1) {
+                    $matchresults->length[$i] = strlen($match[0]);
+                } else {
+                    $matchresults->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                }
             }
         }
 
