@@ -146,7 +146,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
      */
     public function &create_graph() {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-        
+
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph);
         $graph->entries[] = end($graph->nodes);
         $graph->exits[] = end($graph->nodes);

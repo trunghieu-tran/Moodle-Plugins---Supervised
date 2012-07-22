@@ -98,7 +98,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $this->style   = $stl;
     }
     
-    private $counter = 0; // counter for generating id for nodes in graph
+    private static $counter = 0; // counter for generating id for nodes in graph
     
     /**
      * Creates text file with dot instructions.
@@ -107,22 +107,24 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            $iter->id = ++$this->counter;
+            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
-                $instr .= '\"nd' . $iter->id . '\" [shape=record, color=black, label=' . compute_html($iter->label) . '];';
+            {
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . '];';
+            }
             else
-                $instr .= '\"nd' . $iter->id . '\" [shape=") + (*iter)->shape + string(", color=' . $iter->color . ', label=\"' . $iter->label . '\"];';
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"];';
         }
 
         foreach ($this->subgraphs as $iter) {
-            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr); 
+            qtype_preg_author_tool_explain_graph_subgraph::process_subgraph($iter, $instr);
         }
 
         foreach ($this->links as $iter) {
-            $instr .= '\"nd' . $iter->source->id . '\" -> \"nd';
+            $instr .= '"nd' . $iter->source->id . '" -> "nd';
 
-            $instr .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"];';
+            $instr .= $iter->destination->id . '" [label="' . $iter->label . '"];';
         }
 
         $instr .= '}';
@@ -138,49 +140,48 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $elements = array();
         $result = '';
         if (count($lbl)) {
-            if (count($lbl) == 1 and $lbl[0] != '^') {
+            if (strlen($lbl) == 1 && $lbl[0] != '^') {
                 return $lbl;
             }
 
-            $tmpstring[] = 'a'; 
+            $tmpstring = 'a';
             $invert = false;
-            $copy = '';
             
             if ($lbl[0] == '^') {
                 $invert = true;
                 $copy = substr($lbl, 1);
             }
             else $copy = $lbl;
-            
-            foreach ($copy as $iter) {
-                $tmpstring[0] = $iter;
-                if ($iter == '-')
+
+            for ($i = 0; $i < strlen($copy); ++$i) {
+                $tmpstring[0] = $copy[$i];
+                if ($copy[$i] == '-')
                 {
-                    if ($iter == $copy[0]) {
+                    if ($copy[$i] == $copy[0]) {
                         $elements[] = $tmpstring;
                     }
                     else {
                         $elements[count($elements) - 1] .= '..';
-                        next($copy);
-                        $tmpstring[0] = $iter;
+                        ++$i;
+                        $tmpstring[0] = $copy[$i];
                         $elements[count($elements) - 1] .= $tmpstring;
                     }
                 }
                 else $elements[] = $tmpstring;
             }
 
-            $result .= '<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD COLSPAN=\"';
+            $result .= '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD COLSPAN="';
             $result .= (count($elements)*2 - 1);
             if ($invert)
-                $result .= '\"><font face=\"Arial\">Any character except of</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">Any character except of</font></TD></TR><TR>';
             else
-                $result .= '\"><font face=\"Arial\">Any character of</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">Any character of</font></TD></TR><TR>';
 
             for ($i = 0; $i != count($elements); ++$i) {
-                $result .= '<TD>' . $elements[i] . '</TD>';
+                $result .= '<TD>' . $elements[$i] . '</TD>';
                 ++$i;
                 if ($i != count($elements))
-                    $result .= '<TD><font color=\"red\">OR</font></TD>';
+                    $result .= '<TD><font color="red">OR</font></TD>';
                 --$i;
             }
             
@@ -195,17 +196,17 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * @param instr - array of dot instructions
      */
     private static function process_subgraph(&$gr, &$instr) {
-        $instr .= 'subgraph \"cluster_' . (++$gr->counter) . '\" {';
+        $instr .= 'subgraph "cluster_' . (++qtype_preg_author_tool_explain_graph_subgraph::$counter) . '" {';
         $instr .= 'style=' . $gr->style . ';';
-        $instr .= 'label=\"' . $gr->label . '\";';
+        $instr .= 'label="' . $gr->label . '";';
 
         foreach ($gr->nodes as $iter) {
-            $iter->id = ++$gr->counter;
+            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
-                $instr .= '\"nd' . $iter->id . '\" [shape=record, color=black, label=' . compute_html($iter->label) . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . '];';
             else
-                $instr .= '\"nd' . $iter->id . '\" [shape=' . $iter->shape . ', color=' . $iter->color . ', label=\"' . $iter->label . '\"];';
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"];';
         }
 
         foreach ($gr->subgraphs as $iter) {
@@ -213,9 +214,9 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         }
 
         foreach ($gr->links as $iter) {
-            $instr .= '\"nd' . $iter->source->id . '\" -> \"nd';
+            $instr .= '"nd' . $iter->source->id . '" -> "nd';
 
-            $instr .= $iter->destination->id . '\" [label=\"' . $iter->label . '\"];';
+            $instr .= $iter->destination->id . '" [label="' . $iter->label . '"];';
         }
 
         $instr .= '}';
