@@ -208,9 +208,16 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
             // flag is simple enumeration of characters
-            $characters = str_split($flag->data->string());
-            foreach ($characters as &$value) {
-                $value = str_replace('%char',$value,self::get_form_string('description_char') );
+            for ($i=0; $i < $flag->data->length(); $i++) {
+                if (ctype_graph ( $flag->data[$i])) {
+                    $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char') );  
+                }
+                else if ($flag->data[$i]===' ') {
+                    $characters[] = self::get_form_string('description_char_space');
+                }
+                else{
+                    $characters[] = str_replace('%code',qtype_poasquestion_string::ord($flag->data[$i]),self::get_form_string('description_char_16value') );  
+                }
             }
         }
         return $characters;
