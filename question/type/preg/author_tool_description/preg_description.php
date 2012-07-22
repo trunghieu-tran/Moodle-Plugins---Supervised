@@ -642,7 +642,23 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        $pattern_t = '';
+        if($this->pregnode->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_BACKREF){
+            $pattern_t = self::get_form_string('description_backref_node_cond_subpatt');
+            $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+        }
+        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_RECURSIVE){
+            if($this->pregnode->number===0){
+                $pattern_t = self::get_form_string('description_recursive_node_cond_subpatt_all');
+            }
+            else {
+                $pattern_t = self::get_form_string('description_recursive_node_cond_subpatt');
+                $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+            }
+        }
+        else {
+            $pattern_t = self::get_form_string('description_'.$this->pregnode->subtype);
+        }
     }
     
 }
