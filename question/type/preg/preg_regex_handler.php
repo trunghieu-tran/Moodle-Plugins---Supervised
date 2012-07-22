@@ -310,26 +310,37 @@ class qtype_preg_regex_handler {
      * @param filename the absolute path to the resulting image file.
      */
     public static function execute_dot($dotscript, $filename) {
-        global $CFG;
-        $descriptorspec = array(0 => array('pipe', 'r'), // stdin is a pipe that the child will read from
-                                1 => array('pipe', 'w'), // stdout is a pipe that the child will write to
-                                2 => array('pipe', 'w')  // stderr is a pipe that the child will write to
-                                );
         $type = pathinfo($filename, PATHINFO_EXTENSION);
-        $cmd = (!empty($CFG->pathtodot) ? $CFG->pathtodot : 'dot') . " -T$type -o\"$filename\"";
-        $process = proc_open($cmd, $descriptorspec, $pipes, "/tmp", array());
-        if (is_resource($process)) {
-            fwrite($pipes[0], $dotscript);
-            fclose($pipes[0]);
-            $err = stream_get_contents($pipes[2]);
-            if (!empty($err)) {
-                echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
-            }
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
+        $cmd = escapeshellarg(!empty($CFG->pathtodot) ?  $CFG->pathtodot : 'dot') . " -T$type -o\"$filename\"";
+        if (strpos(strtolower(php_uname()), 'windows') !== false) {
+            // There is a weird bug on Windows when calling proc_open with filename containing spaces, so use exec().
+            $dotfilename = $filename . '.dot';
+            $dotfile = fopen($dotfilename, 'w');
+            fwrite($dotfile, $dotscript);
+            fclose($dotfile);
+            $cmd .= " -Kdot $dotfilename";
+            exec($cmd);
+            unlink($dotfilename);
         } else {
-            echo "failed to execute cmd \"$cmd\"";
+            global $CFG;
+            $descriptorspec = array(0 => array('pipe', 'r'), // Stdin is a pipe that the child will read from.
+                                    1 => array('pipe', 'w'), // Stdout is a pipe that the child will write to.
+                                    2 => array('pipe', 'w')  // Stderr is a pipe that the child will write to.
+                                    );
+            $process = proc_open($cmd, $descriptorspec, $pipes, dirname($filename), array());
+            if (is_resource($process)) {
+                fwrite($pipes[0], $dotscript);
+                fclose($pipes[0]);
+                $err = stream_get_contents($pipes[2]);
+                if (!empty($err)) {
+                    //echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
+                }
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                proc_close($process);
+            } else {
+                //echo "failed to execute cmd \"$cmd\"";
+            }
         }
     }
 }
