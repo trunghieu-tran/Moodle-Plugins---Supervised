@@ -57,7 +57,7 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
             this.callback = false;
         }
         
-        Y.one('#dialog .message').load('http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
+        Y.one('#dialog .message').load('http://localhost:62774/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
     }
 
     var i=0;

@@ -93,7 +93,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $answersinstruct = $mform->getElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_preg'));
 
-        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost/moodle/question/type/preg/regex_test_push.js"></script></div>');
+        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost:62774/question/type/preg/regex_test_push.js"></script></div>');
     }
 
     function validation($data, $files) {

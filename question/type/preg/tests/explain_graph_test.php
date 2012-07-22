@@ -29,6 +29,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
 
         $result = $tree->create_graph();
 
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo1.png');
+
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with subpattern!');
         
         //-----------------------------------------------------------------------------
@@ -43,6 +45,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[2]);
         
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo2.png');
  
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with grouping!');
     }
@@ -66,6 +70,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[5]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo3.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with alternative!');
     }
@@ -82,6 +88,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo4.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with charclass!');
     }
@@ -98,6 +106,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo5.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with alone meta!');
     }
@@ -114,6 +124,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[1]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo6.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with alone simple!');
     }
@@ -128,6 +140,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('Begining of line\nEnd of line', $etalon->nodes[0], $etalon->nodes[1]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo7.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with asserts!');
     }
@@ -145,6 +159,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
         
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo8.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with quantifier +!');
         
@@ -161,6 +177,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
         
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo9.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with quantifier *!');
         
@@ -177,6 +195,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
         
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo10.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with quantifier ?!');
         
@@ -193,6 +213,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
         
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo11.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with quantifier {}!');
     }
@@ -212,6 +234,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('Begining of line', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo12.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)!');
 
@@ -232,6 +256,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo13.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph a(\b)!');
 
@@ -252,6 +278,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
         $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('End of line', $etalon->subgraphs[0]->nodes[2], $etalon->nodes[1]);
 
         $result = $tree->create_graph();
+
+        //qtype_preg_author_tool_explain_graph::execute_dot($result->create_dot(), 'C:\Users\User\Desktop\ololo14.png');
         
         $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
     }

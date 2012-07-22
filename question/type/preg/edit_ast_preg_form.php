@@ -46,21 +46,21 @@ class qtype_preg_authors_tool_form extends moodleform {
             
             //Generate tree image
             $tree = new qtype_preg_author_tool_explain_tree($regextext);            
-            qtype_preg_regex_handler::execute_dot($tree->create_dot(),'/var/www/moodle/question/type/preg/tmp_img/tree.png');
+            qtype_preg_regex_handler::execute_dot($tree->create_dot(),'C:\Users\User\Documents\Moodle_for_practice\question\type\preg\tmp\tree.png');
             
             //Generate graph image
             $tmp_graph = new qtype_preg_author_tool_explain_graph($regextext);
             $graph = $tmp_graph->create_graph();
             //var_dump($graph);       
-            qtype_preg_regex_handler::execute_dot($graph->create_dot(),'/var/www/moodle/question/type/preg/tmp_img/graph.png');
+            qtype_preg_regex_handler::execute_dot($graph->create_dot(),'C:\Users\User\Documents\Moodle_for_practice\question\type\preg\tmp\graph.png');
             
             //Add generated images
-            $mform->addElement('html', 'Interactive tree</br><img src="http://localhost/moodle/question/type/preg/tmp_img/tree.png" /></br>');        
-            $mform->addElement('html', 'Graph</br><img src="http://localhost/moodle/question/type/preg/tmp_img/graph.png" />');
+            $mform->addElement('html', 'Interactive tree</br><img src="http://localhost:62774/question/type/preg/tmp/tree.png" /></br>');        
+            $mform->addElement('html', 'Graph</br><img src="http://localhost:62774/question/type/preg/tmp/graph.png" />');
         } else {
             $mform->setDefault('regextext', 'input regex');
-            $mform->addElement('html', 'Interactive tree</br><img src="http://localhost/moodle/question/type/preg/tmp_img/tree_def.png" /></br>');        
-            $mform->addElement('html', 'Graph</br><img src="http://localhost/moodle/question/type/preg/tmp_img/graph_def.png" />');
+            $mform->addElement('html', 'Interactive tree</br><img src="http://localhost:62774/question/type/preg/tmp/tree_def.png" /></br>');        
+            $mform->addElement('html', 'Graph</br><img src="http://localhost:62774/question/type/preg/tmp/graph_def.png" />');
         }
         
         //Add description on form
