@@ -58,10 +58,10 @@ class qtype_preg_author_tool_node_leaf extends qtype_preg_author_tool_tree_node 
                 }
 
                 $tmp .= ']';
-                return '[label="'.$tmp.'"]';
+                return '[label="'.$tmp.'", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
             } else {
-                return '[label="'.$this->pregnode->userinscription[0].'"]';
+                return '[label="'.$this->pregnode->userinscription[0].'", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             
             return '[label="Unknown node subtype"]';
@@ -69,7 +69,7 @@ class qtype_preg_author_tool_node_leaf extends qtype_preg_author_tool_tree_node 
         case qtype_preg_node::TYPE_LEAF_META:
     
             if($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY){
-                return'[label="EMPTY", shape="square"]';
+                return'[label="EMPTY", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             /*elseIf($this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_ENDREG){
                 return'[label=\"Unknown node subtype\"]';
@@ -80,34 +80,34 @@ class qtype_preg_author_tool_node_leaf extends qtype_preg_author_tool_tree_node 
         case qtype_preg_node::TYPE_LEAF_ASSERT:
         
             if($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX){
-                return'[label="^"]';
+                return'[label="^", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_DOLLAR){
-                return'[label="$"]';
+                return'[label="$", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_WORDBREAK){
-                return'[label="\\b"]';
+                return'[label="\\b", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_A){
-                return'[label="\\A"]';
+                return'[label="\\A", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_Z){
-                return'[label="\\Z"]';
+                return'[label="\\Z", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_G){
-                return'[label="\\G"]';
+                return'[label="\\G", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             return'[label="Unknown node subtype"]';
             
         case qtype_preg_node::TYPE_LEAF_BACKREF:
         
-            $subtype_node = $this->pregnode->number;
-            return'[label="Backref(submask is $subtype_node)"]';
+            //$subtype_node = $this->pregnode->number;
+            return'[label="Backref(submask is '.$this->pregnode->number.')", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
         case qtype_preg_node::TYPE_LEAF_RECURSION:
         
             $subtype_node = $this->pregnode->number;//TODO: use this variable
-            return'[label="RECURSION", shape="square"]';
+            return'[label="RECURSION", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
         }
         
         return'[label="Unknown node type"]';
@@ -126,40 +126,37 @@ class qtype_preg_author_tool_node_operator extends qtype_preg_author_tool_tree_n
 
     }
     public function node_info_tree(){
-        
-        $type_node;
-        $subtype_node;
 
         switch($this->pregnode->type){
             
         case qtype_preg_node::TYPE_NODE_FINITE_QUANT:
         
-            $left_bord=$this->pregnode->leftborder;
-            $right_bord=$this->pregnode->rightborder;
+            /*$left_bord=$this->pregnode->leftborder;
+            $right_bord=$this->pregnode->rightborder;*/
             
-            return'[label="Finite quantificator:\nleft border is '.$left_bord.';\nright border is '.$right_bord.'", shape="square"]';
+            return'[label="Finite quantificator:\nleft border is '.$this->pregnode->leftborder.';\nright border is '.$this->pregnode->rightborder.'", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
         case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
         
-            $left_bord=$this->pregnode->leftborder;
+            //$left_bord=$this->pregnode->leftborder;
             
-            return'[label="Infinite quantificator:\nleft border is '.$left_bord.'", shape="square"]';
+            return'[label="Infinite quantificator:\nleft border is '.$this->pregnode->leftborder.'", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
         case qtype_preg_node::TYPE_NODE_CONCAT:
         
-            return'[label="СONCAT", shape="square"]';
+            return'[label="СONCAT", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
         case qtype_preg_node::TYPE_NODE_ALT:
         
-            return'[label="ALTERNATIVE", shape="square"]';
+            return'[label="ALTERNATIVE", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             
         case qtype_preg_node::TYPE_NODE_SUBPATT:
         
             if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
-                return'[label="SUBPATTERN", shape="square"]';
+                return'[label="SUBPATTERN", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             elseIf($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY){
-                return'[label="ONCE-ONLY SUBPATTERN", shape="square"]';
+                return'[label="ONCE-ONLY SUBPATTERN", shape="square", tooltip="'.$this->pregnode->id.'", id="'.$this->pregnode->id.'"]';
             }
             return'[label="Unknown node subtype"]';
         }
@@ -203,7 +200,7 @@ class qtype_preg_author_tool_explain_tree extends qtype_preg_author_tool{
         $dot_instructions='';//String with the instructions on the dot language
         
         //Filling array $dot_instructions
-        $dot_instructions .= 'digraph{'.chr(10);
+        $dot_instructions .= 'digraph "id_tree"{'.chr(10);
         $dot_instructions .= 'rankdir = LR'.chr(10);
         
         $dot_instructions .= chr(34).'node'.$this->dst_root->pregnode->id.chr(34).$this->dst_root->node_info_tree().chr(10);
