@@ -7616,6 +7616,30 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
+     * Makes a set of ranges negative.
+     * @param ranges array of ranges to negate.
+     * @return array of ranges which are negation of the given.
+     */
+    public static function negate_ranges($ranges) {
+        $size = count($ranges);
+        $maxcode = self::max_possible_code();
+        if ($size === 0) {
+            return array(array(0, $maxcode));
+        }
+        $result = array();
+        if ($ranges[0][0] > 0) {
+            $result[] = array(0, $ranges[0][0] - 1);
+        }
+        for ($i = 0; $i < $size - 1; $i++) {
+            $result[] = array($ranges[$i][1] + 1, $ranges[$i + 1][0] - 1);
+        }
+        if ($ranges[$size - 1][1] < $maxcode) {
+            $result[] = array($ranges[$size - 1][1] + 1, $maxcode);
+        }
+        return $result;
+    }
+
+    /**
      * @param $charset object of qtype_poasquestion_string.
      * @return a sorted array of trivial ranges corresponding to the given charset.
      */

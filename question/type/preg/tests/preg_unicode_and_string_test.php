@@ -175,4 +175,38 @@ class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(qtype_preg_unicode::search_number_binary(10, $ranges) === 0);
         $this->assertTrue(qtype_preg_unicode::search_number_binary(0, $ranges) === false);
     }
+
+    function test_ranges_negation() {
+        $maxcode = qtype_preg_unicode::max_possible_code();
+        // Empty array.
+        $ranges = array();
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, $maxcode)));
+        // One big range from 0 to maxcode.
+        $ranges = array(array(0, $maxcode));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array());
+        // Only 0.
+        $ranges = array(array(0, 0));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(1, $maxcode)));
+        // Only maxcode.
+        $ranges = array(array($maxcode, $maxcode));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, $maxcode - 1)));
+        // Only one number.
+        $ranges = array(array(4, 4));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, 3), array(5, $maxcode)));
+        // Range from 1 to $maxcode - 1
+        $ranges = array(array(1, $maxcode - 1));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, 0), array($maxcode, $maxcode)));
+        // Few ranges starting from 0.
+        $ranges = array(array(0, 3), array(5, 5), array(9, 15));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(4, 4), array(6, 8), array(16, $maxcode)));
+        // Few ranges ending with maxcode.
+        $ranges = array(array(3, 3), array(7, 7), array(9, $maxcode));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, 2), array(4, 6), array(8, 8)));
+        // Few ranges starting from 0 and ending with maxcode.
+        $ranges = array(array(0, 3), array(7, 7), array(9, 9), array(11, 11), array(14, 20), array(23, $maxcode));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(4, 6), array(8, 8), array(10, 10), array(12, 13), array(21, 22)));
+        // Few ranges not including 0 and maxcode.
+        $ranges = array(array(3, 3), array(7, 7), array(9, 18));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, 2), array(4, 6), array(8, 8), array(19, $maxcode)));
+    }
 }
