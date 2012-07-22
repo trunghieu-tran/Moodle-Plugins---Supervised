@@ -4,7 +4,7 @@
  * Also defines specific tree, containing methods for generating descriptions of current node
  *
  * @copyright &copy; 2012 Pahomov Dmitry
- * @author Pahomov Dmitry, Volgograd State Technical University
+ * @author Pahomov Dmitry
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -51,7 +51,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
         
         $string = $this->dst_root->description($numbering_pattern,null,null);;
         $string = str_replace('%s',$string,$whole_pattern);
-        return (string)$string;
+        return $string;
     }
     
     /**
@@ -59,7 +59,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function default_description(){
        
-        return (string)$this->description('<span class="description_node_%n">%s</span>','<span class="description">%s</span>');
+        return $this->description('<span class="description_node_%n">%s</span>','<span class="description">%s</span>');
     }
     
     /**
@@ -76,7 +76,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
-        
+       
         return false;    // Should be overloaded by child classes
     }
     
@@ -126,7 +126,7 @@ abstract class qtype_preg_description_node{
     abstract public function description($numbering_pattern,$node_parent=null,$form=null);
     
     /**
-     * if $s nor defined in lang file throw exeption
+     * gets localized string, if required a form it gets localized string for required form
      * 
      * @param string $s same as in get_string
      * @param string $form Required form.
@@ -151,6 +151,15 @@ abstract class qtype_preg_description_node{
     public function accept() {
         return true;
     }
+    
+    /**
+     * Puts $s instead of %s in numbering pattern. Puts node id instead of %n.
+     * 
+     * @param type $s this string will be placed instead of %s
+     */
+    protected function numbering_pattern($numbering_pattern,$s){       
+        return str_replace('%s',$s,str_replace('%n',$this->pregnode->id,$numbering_pattern));
+    }
 }
 
 /**
@@ -172,7 +181,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
     public function description($numbering_pattern,$node_parent=null,$form=null){
         
         $this->pattern = $this->pattern($node_parent,$form);
-        return $this->pattern;
+        return $this->numbering_pattern($numbering_pattern,$this->pattern);
     }
 }
 
@@ -193,6 +202,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         $pattern_pseudonym = '';//pseudonym of localized string
         
         if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
+            
             // current flag is something like \w or \pL    
             $pattern_pseudonym = 'description_charflag_'.$flag->data;            
             if($flag->negative == true){
@@ -206,6 +216,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             }
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
+            
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
                 if (ctype_graph ( $flag->data[$i])) { //is ctype_graph correct for utf8 string?
@@ -218,6 +229,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                     $characters[] = str_replace('%code',qtype_poasquestion_string::ord($flag->data[$i]),self::get_form_string('description_char_16value') );  
                 }
             }
+            
         }
         //return $characters;
     }

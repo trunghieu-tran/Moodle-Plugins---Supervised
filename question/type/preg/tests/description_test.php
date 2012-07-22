@@ -4,7 +4,7 @@
  * Unit tests for (some of) question/type/preg/question.php.
  *
  * @copyright &copy; 2012 Pahomov Dmitry
- * @author Oleg Sychev
+ * @author Pahomov Dmitry
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package question
  */
