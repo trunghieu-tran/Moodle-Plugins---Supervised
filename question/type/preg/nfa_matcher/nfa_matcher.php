@@ -48,9 +48,9 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
             }
             // Repeating rule.
             foreach ($this->length as $key => $value) {
-                if ($key !== 0 && $this->index_first[$key] < $other->index_first[$key]) {
+                if ($key !== 0 && $value < $other->length[$key]) {
                     return true;
-                } else if ($key !== 0 && $this->index_first[$key] > $other->index_first[$key]) {
+                } else if ($key !== 0 && $value > $other->length[$key]) {
                     return false;
                 }
             }
