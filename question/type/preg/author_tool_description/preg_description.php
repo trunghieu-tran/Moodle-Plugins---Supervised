@@ -501,16 +501,35 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
      */
     public function pattern($node_parent=null,$form=null){
         
-        return 'seems like this pattern() for this node didnt redefined';
+        $pattern_t ='';
+        $greed_pattern='';
+        if($this->pregnode->leftborder===0){
+            $pattern_t = self::get_form_string('description_finite_quant_0');
+            $pattern_t = str_replace('%rightborder',$this->pregnode->rightborder,$pattern_t);
+        }
+        else if ($this->pregnode->leftborder===0) {
+            $pattern_t = self::get_form_string('description_finite_quant_1');
+            $pattern_t = str_replace('%rightborderr',$this->pregnode->rightborder,$pattern_t);
+        }
+        else {
+            $pattern_t = self::get_form_string('description_finite_quant');
+            $pattern_t = str_replace('%rightborder',$this->pregnode->rightborder,$pattern_t);
+            $pattern_t = str_replace('%leftborder',$this->pregnode->leftborder,$pattern_t);
+        }
+        
+        if($this->pregnode->lazy==true){
+            $greed_pattern = self::get_form_string('description_quant_lazy');
+        }
+        else if ($this->pregnode->greed==true) {
+            $greed_pattern = self::get_form_string('description_quant_greed');
+        }
+        else if ($this->pregnode->possessive==true) {
+            $greed_pattern = self::get_form_string('description_quant_possessive');
+        }
+        $pattern_t = str_replace('%greed',$greed_pattern,$pattern_t);
+        return $pattern_t;
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
@@ -523,16 +542,32 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
-    }
-    
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
+        $pattern_t ='';
+        $greed_pattern='';
+        if($this->pregnode->leftborder===0){
+            $pattern_t = self::get_form_string('description_infinite_quant_0');
+        }
+        else if ($this->pregnode->leftborder===0) {
+            $pattern_t = self::get_form_string('description_infinite_quant_1');
+        }
+        else {
+            $pattern_t = self::get_form_string('description_infinite_quant');
+            $pattern_t = str_replace('%leftborder',$this->pregnode->leftborder,$pattern_t);
+        }
         
-        return '123';
+        if($this->pregnode->lazy==true){
+            $greed_pattern = self::get_form_string('description_quant_lazy');
+        }
+        else if ($this->pregnode->greed==true) {
+            $greed_pattern = self::get_form_string('description_quant_greed');
+        }
+        else if ($this->pregnode->possessive==true) {
+            $greed_pattern = self::get_form_string('description_quant_possessive');
+        }
+        $pattern_t = str_replace('%greed',$greed_pattern,$pattern_t);
+        return $pattern_t;
     }
+
 }
 
 /**
