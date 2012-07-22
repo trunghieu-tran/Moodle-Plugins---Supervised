@@ -186,30 +186,30 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * Convertes charset flag to array of descriptions(strings)
      * 
      * @param qtype_preg_charset_flag $flag flag gor description
-     * @return string[]|string array of descriptions of current flag
+     * @param string[] $characters enumeration of characters in charset
      */
-    private static function flag_to_array($flag) {
+    private static function flag_to_array($flag,&$characters) {
         
-        $characters = array();//array of strings
+        $temp_str = '';
         $pattern_pseudonym = '';//pseudonym of localized string
         
         if ($flag->type === qtype_preg_charset_flag::FLAG || $flag->type === qtype_preg_charset_flag::UPROP) {
-            // flag is something like \w or \pL    
+            // current flag is something like \w or \pL    
             $pattern_pseudonym = 'description_charflag_'.$flag->data;            
             if($flag->negative == true){
                 // using charset pattern 'description_charset_one_neg' because char pattern 'description_char_neg' has a <span> tag, 
                 // but dont need to highlight this
-                $characters[] = self::get_form_string($pattern_pseudonym);
-                $characters[0] = str_replace('%characters',$characters[0],self::get_form_string('description_charset_one_neg') );
+                $temp_str = self::get_form_string($pattern_pseudonym);
+                $characters[] = str_replace('%characters',$temp_str,self::get_form_string('description_charset_one_neg') );
             }
             else{
                 $characters[] = self::get_form_string($pattern_pseudonym);
             }
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
-            // flag is simple enumeration of characters
+            // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
-                if (ctype_graph ( $flag->data[$i])) {
+                if (ctype_graph ( $flag->data[$i])) { //is ctype_graph correct for utf8 string?
                     $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char') );  
                 }
                 else if ($flag->data[$i]===' ') {
@@ -220,7 +220,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                 }
             }
         }
-        return $characters;
+        //return $characters;
     }
     
     /**
@@ -233,7 +233,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         
         foreach ($this->pregnode->flags as $outer) {
 
-            $characters = array_merge($characters,self::flag_to_array($outer[0]));
+            self::flag_to_array($outer[0],$characters);
         }
 
         if(count($characters)==1 && $this->pregnode->negative == false){
