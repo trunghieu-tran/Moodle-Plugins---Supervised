@@ -137,10 +137,10 @@ $string['description_concat_short'] = '%1%2';
 $string['description_alt'] = '%1 or %2';
 $string['description_alt_wcomma'] = '%1 or %2';
 //TYPE_NODE_ASSERT
-$string['description_assert_pla'] = 'further text should match: "%1"';
-$string['description_assert_nla'] = 'further text should not match: "%1"';
-$string['description_assert_plb'] = 'preceding text should match: "%1"';
-$string['description_assert_nlb'] = 'preceding text should not match: "%1"';
+$string['description_pla_node_assert'] = 'further text should match: [%1]';
+$string['description_nla_node_assert'] = 'further text should not match: [%1]';
+$string['description_plb_node_assert'] = 'preceding text should match: [%1]';
+$string['description_nlb_node_assert'] = 'preceding text should not match: [%1]';
 //TYPE_NODE_SUBPATT
 $string['description_subpattern'] = 'subpattern #%number:[ %1 ];';
 $string['description_subpattern_once'] = 'once checked subpattern #%number:[ %1 ];';

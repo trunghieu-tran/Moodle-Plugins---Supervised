@@ -642,16 +642,9 @@ class qtype_preg_description_node_assert extends qtype_preg_description_operator
      */
     public function pattern($node_parent=null,$form=null){
         
-        return '123';
+        return self::get_form_string('description_'.$this->pregnode->type);
     }
     
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::description()
-     */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
-        
-        return '123';
-    }
 }
 
 /**
