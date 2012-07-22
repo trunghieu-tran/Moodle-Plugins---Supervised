@@ -134,4 +134,45 @@ class qtype_preg_unicode_and_string_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($ranges[3][0] === qtype_poasquestion_string::ord('j'));
         $this->assertTrue($ranges[3][1] === qtype_poasquestion_string::ord('j'));
     }
+
+    function test_ranges_binary_search() {
+        // Casual search.
+        $ranges = array(array(0, 1), array(2, 5), array(11, 13), array(14, 15));
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(0, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(1, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(2, $ranges) === 1);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(3, $ranges) === 1);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(4, $ranges) === 1);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(5, $ranges) === 1);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(11, $ranges) === 2);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(12, $ranges) === 2);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(13, $ranges) === 2);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(14, $ranges) === 3);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(15, $ranges) === 3);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(-1, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(6, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(7, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(8, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(9, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(10, $ranges) === false);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(16, $ranges) === false);
+        // Empty ranges.
+        $ranges = array();
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(1, $ranges) === false);
+        // Ranges consisting of one character.
+        $ranges = array(array(0, 0), array(1, 1), array(3, 3));
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(0, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(1, $ranges) === 1);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(3, $ranges) === 2);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(2, $ranges) === false);
+        // Only one trivial range.
+        $ranges = array(array(0, 10));
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(0, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(10, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(11, $ranges) === false);
+        // Only one trivial range of one character.
+        $ranges = array(array(10, 10));
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(10, $ranges) === 0);
+        $this->assertTrue(qtype_preg_unicode::search_number_binary(0, $ranges) === false);
+    }
 }

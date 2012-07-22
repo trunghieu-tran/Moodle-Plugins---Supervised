@@ -7595,24 +7595,24 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
-     * Returns unicode ranges which $utf8str characters belongs to.
-     * @param utf8str UTF-8 string.
-     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
+     * Searches the index of the range in an array of ranges containing the given number.
+     * @param code the number to search for.
+     * @return the index of the range containing this code, false if not found.
      */
-    public static function get_ranges($utf8str) {
-        $result = array();
-        for ($i = 0; $i < qtype_poasquestion_string::strlen($utf8str); $i++) {
-            $code = qtype_poasquestion_string::ord(qtype_poasquestion_string::substr($utf8str, $i, 1));
-            foreach (self::$ranges as $name => $range) {
-                if ($code >= $range[0] && $code < $range[1]) {
-                    if (!array_key_exists($name, $result)) {
-                        $result[$name] = $range;
-                    }
-                    break;
-                }
+    public static function search_number_binary($code, $ranges) {
+        $start = 0;
+        $end = count($ranges) - 1;
+        while ($end >= $start) {
+            $middle = $start + (int)(($end - $start) / 2);
+            if ($ranges[$middle][1] < $code) {
+                $start = $middle + 1;
+            } else if ($ranges[$middle][0] > $code) {
+                $end = $middle - 1;
+            } else if ($ranges[$middle][0] <= $code && $ranges[$middle][1] >= $code) {
+                return $middle;
             }
         }
-        return $result;
+        return false;
     }
 
     /**
