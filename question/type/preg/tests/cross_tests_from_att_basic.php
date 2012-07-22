@@ -4,7 +4,7 @@ defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FO
 
 class qtype_preg_cross_tests_from_att_basic  {
 
-    function data_for_test_att_basic_0() {
+        function data_for_test_att_basic_0() {
         $test1 = array( 'str'=>"abracadabracadabra",
                         'is_match'=>true,
                         'full'=>true,
@@ -803,7 +803,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                       'tests'=>array($test1));
     }
 
-    function data_for_test_att_basic_57() {
+    /*function data_for_test_att_basic_57() {
         $test1 = array( 'str'=>"\\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -857,7 +857,7 @@ class qtype_preg_cross_tests_from_att_basic  {
 
         return array( 'regex'=>"\\na",
                       'tests'=>array($test1));
-    }
+    }*/
 
     function data_for_test_att_basic_61() {
         $test1 = array( 'str'=>"abc",
@@ -891,8 +891,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"feb 6,",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>6),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>5),
+                        'length'=>array(0=>6,1=>0,2=>5,3=>5,4=>4,5=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -905,8 +905,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"2/7",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>3),
+                        'length'=>array(0=>3,1=>0,2=>3,3=>3,4=>2,5=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -919,8 +919,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"feb 1,Feb 6",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>6),
+                        'index_first'=>array(0=>5,1=>5,2=>6,3=>6,4=>6,5=>11),
+                        'length'=>array(0=>6,1=>1,2=>5,3=>5,4=>4,5=>0),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -933,8 +933,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"x",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>1,1=>1,2=>1),
+                        'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0,13=>0,14=>0,15=>0,16=>0,17=>0,18=>0,19=>0,20=>0,21=>0,22=>0,23=>0,24=>0,25=>0,26=>0,27=>0,28=>0,29=>0,30=>0),
+                        'length'=>array(0=>1,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -947,8 +947,8 @@ class qtype_preg_cross_tests_from_att_basic  {
         $test1 = array( 'str'=>"xx",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1,2=>1),
-                        'length'=>array(0=>2,1=>1,2=>1),
+                        'index_first'=>array(0=>0,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1),
+                        'length'=>array(0=>2,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -1018,7 +1018,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
+                        'length'=>array(0=>8),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -1475,7 +1475,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                       'tests'=>array($test1));
     }
 
-    function data_for_test_att_basic_105() {
+    /*function data_for_test_att_basic_105() {
         $test1 = array( 'str'=>"a]b",
                         'is_match'=>true,
                         'full'=>true,
@@ -1487,7 +1487,7 @@ class qtype_preg_cross_tests_from_att_basic  {
 
         return array( 'regex'=>"a[]]b",
                       'tests'=>array($test1));
-    }
+    }*/
 
     function data_for_test_att_basic_106() {
         $test1 = array( 'str'=>"aed",
@@ -1517,7 +1517,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                       'tests'=>array($test1));
     }
 
-    function data_for_test_att_basic_108() {
+    /*function data_for_test_att_basic_108() {
         $test1 = array( 'str'=>"adc",
                         'is_match'=>true,
                         'full'=>true,
@@ -1529,7 +1529,7 @@ class qtype_preg_cross_tests_from_att_basic  {
 
         return array( 'regex'=>"a[^]b]c",
                       'tests'=>array($test1));
-    }
+    }*/
 
     function data_for_test_att_basic_109() {
         $test1 = array( 'str'=>"abc",
