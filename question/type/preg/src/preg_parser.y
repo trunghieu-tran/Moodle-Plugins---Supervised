@@ -54,6 +54,7 @@
      */
     protected function create_error_node($subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
         $newnode = new qtype_preg_node_error;
+        $newnode->id = $this->idcounter++;
         $newnode->subtype = $subtype;
         $newnode->indfirst = $indfirst;
         $newnode->indlast = $indlast;
@@ -122,6 +123,7 @@ expr(A) ::= expr(B) ALT. {
     A->operands[0] = B;
     A->operands[1] = new qtype_preg_leaf_meta;
     A->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+    A->operands[1]->id = $this->idcounter++;
     A->userinscription = '|';
     A->id = $this->idcounter++;
     $this->reducecount++;

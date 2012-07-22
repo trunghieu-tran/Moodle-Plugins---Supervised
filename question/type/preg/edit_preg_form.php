@@ -13,6 +13,27 @@ require_once($CFG->dirroot.'/question/type/shortanswer/edit_shortanswer_form.php
  */
 class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
+     * This is overdrived method.
+     * Get the list of form elements to repeat, one for each answer.
+     * @param object $mform the form being built.
+     * @param $label the label to use for each option.
+     * @param $gradeoptions the possible grades for each answer.
+     * @param $repeatedoptions reference to array of repeated options to fill
+     * @param $answersoption reference to return the name of $question->options
+     *      field holding an array of answers
+     * @return array of form fields.
+     */
+    function get_per_answer_fields($mform, $label, $gradeoptions,
+            &$repeatedoptions, &$answersoption) {
+            $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption);
+            
+            $mform->registerNoSubmitButton('regextest');
+            $repeated[] = & $mform->createElement('submit', 'regextest', 'Test regex');
+            
+            //$repeated[] = $mform->createElement('html', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For test regex push this button<input type="submit" formaction="http://localhost/moodle/question/type/preg/ast_preg_form.php" formtarget="_blank" value="Test regex">');
+            return $repeated;
+    }
+    /**
      * Add question-type specific form fields.
      *
      * @param MoodleQuickForm $mform the form being built.
@@ -72,6 +93,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $answersinstruct = $mform->getElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_preg'));
 
+        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost:62774/question/type/preg/regex_test_push.js"></script></div>');
     }
 
     function validation($data, $files) {
