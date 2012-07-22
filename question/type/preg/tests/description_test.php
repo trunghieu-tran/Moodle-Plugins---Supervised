@@ -70,9 +70,49 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_backref()
     {
         $handler = new qtype_preg_author_tool_description('\1',null,null);
-        var_dump($handler);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
-        $expected = 'sdas';
+        $expected = 'back reference to subpattern #1';
         $this->assertEquals($result, $expected);
+    }
+    
+    /**
+     * @dataProvider concat_provider
+     */
+    public function test_concat($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function concat_provider()
+    {
+        return array(
+          array('ab','<span style="color:red">a</span> then <span style="color:red">b</span>'),
+          array('[a|b]c','one of the following characters: <span style="color:red">a</span>, <span style="color:red">|</span>, <span style="color:red">b</span>; then <span style="color:red">c</span>'),
+          array('abc','<span style="color:red">a</span> then <span style="color:red">b</span> then <span style="color:red">c</span>'),
+        );
+    }
+    
+    /**
+     * @dataProvider alt_provider
+     */
+    public function test_alt($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function alt_provider()
+    {
+        return array(
+          array('a|b','<span style="color:red">a</span> or <span style="color:red">b</span>'),
+          array('a|b|','<span style="color:red">a</span> or <span style="color:red">b</span> or nothing'),
+          array('a|b|c','<span style="color:red">a</span> or <span style="color:red">b</span> or <span style="color:red">c</span>'),
+        );
     }
 }

@@ -130,12 +130,12 @@ $string['description_quant_greed'] = 'greed quantifier';
 $string['description_quant_possessive'] = 'possessive quantifier';
 //TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';
-$string['description_concat_ notfirst'] = '%1 then %2';
+$string['description_concat_wcomma'] = '%1 then %2';
 $string['description_concat_wo_union'] = '%1  %2';
 $string['description_concat_short'] = '%1%2';
 //TYPE_NODE_ALT
 $string['description_alt'] = '%1 or %2';
-$string['description_alt_ notfirst'] = '%1 or %2';
+$string['description_alt_wcomma'] = '%1 or %2';
 //TYPE_NODE_ASSERT
 $string['description_assert_pla'] = 'further text should match: "%1"';
 $string['description_assert_nla'] = 'further text should not match: "%1"';
