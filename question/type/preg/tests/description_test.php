@@ -89,9 +89,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function concat_provider()
     {
         return array(
-          array('ab','<span style="color:red">a</span> then <span style="color:red">b</span>'),
+          array('ab','<span style="color:red">a</span><span style="color:red">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:red">a</span>, <span style="color:red">|</span>, <span style="color:red">b</span>; then <span style="color:red">c</span>'),
-          array('abc','<span style="color:red">a</span> then <span style="color:red">b</span> then <span style="color:red">c</span>'),
+          array('abc','<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>'),
           array('\0113','character with hex code 9 then <span style="color:red">3</span>'),
          );
     }
