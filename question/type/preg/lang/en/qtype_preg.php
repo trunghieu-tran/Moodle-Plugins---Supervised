@@ -144,7 +144,7 @@ $string['description_quant_possessive'] = ' (possessive quantifier)';
 //TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';
 $string['description_concat_wcomma'] = '%1 then %2';
-$string['description_concat_wo_union'] = '%1  %2';
+$string['description_concat_and'] = '%1 and %2';
 $string['description_concat_short'] = '%1%2';
 //TYPE_NODE_ALT
 $string['description_alt'] = '%1 or %2';
