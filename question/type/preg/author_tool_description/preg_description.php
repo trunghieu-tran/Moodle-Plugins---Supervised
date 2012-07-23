@@ -632,21 +632,28 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
      */
     public function pattern($node_parent=null,$form=null){
         $pattern_t = '';
-        $pattern_short = self::get_form_string('description_concat_short');
         $type1 = $this->operands[0]->pregnode->type;
         $type2 = $this->operands[1]->pregnode->type;
+        $subtype1 = $this->operands[0]->pregnode->subtype;
+        $subtype2 = $this->operands[1]->pregnode->subtype;
         
         $need_short_pattern = $type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
                 $this->operands[0]->is_one_char() &&
                 $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
                 $this->operands[1]->is_one_char();
         $need_contiune_short_pattern = $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
-                 $this->operands[0]->pattern===$pattern_short;
+                $this->operands[0]->operands[1]->pregnode->type===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                $this->operands[0]->operands[1]->is_one_char();
+        $first_ahead_assert = $subtype1===qtype_preg_node_assert::SUBTYPE_PLA || $subtype1===qtype_preg_node_assert::SUBTYPE_NLA;
+        $second_behindassert = $subtype2===qtype_preg_node_assert::SUBTYPE_PLB || $subtype2===qtype_preg_node_assert::SUBTYPE_NLB;
+        $aheadassert_in_prev_concat = $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
+                ($this->operands[0]->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_PLA ||
+                $this->operands[0]->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_NLA);
         
         if($need_short_pattern || $need_contiune_short_pattern) {       
-            $pattern_t = $pattern_short;
-        } else if($type1===qtype_preg_node::TYPE_NODE_ASSERT || $type2===qtype_preg_node::TYPE_NODE_ASSERT){
-            $pattern_t = self::get_form_string('description_concat_wo_union');
+            $pattern_t = self::get_form_string('description_concat_short');
+        } else if($first_ahead_assert || $second_behindassert || $aheadassert_in_prev_concat){
+            $pattern_t = self::get_form_string('description_concat_and');
         } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT){
             $pattern_t = self::get_form_string('description_concat_wcomma');
         } else {
