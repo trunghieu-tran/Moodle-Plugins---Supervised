@@ -197,6 +197,15 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     
+    public function is_one_char(){
+        $flag = $this->pregnode->flags[0][0];
+        return count($this->pregnode->flags)===1 && 
+            $flag->type===qtype_preg_charset_flag::SET &&
+            $flag->data->length()===1 && 
+            qtype_preg_unicode::is_in_range($flag->data[0],qtype_preg_unicode::graph_ranges());
+    }
+    
+    
     /**
      * Convertes charset flag to array of descriptions(strings)
      * 
@@ -623,20 +632,20 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
      */
     public function pattern($node_parent=null,$form=null){
         $pattern_t = '';
+        $pattern_short = self::get_form_string('description_concat_short');
         $type1 = $this->operands[0]->pregnode->type;
         $type2 = $this->operands[1]->pregnode->type;
-        /*if($type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
-                count($this->operands[0]->pregnode->flags)===1 &&
-                $this->operands[0]->pregnode->flags[0][0]->type===qtype_preg_charset_flag::SET &&
-                $this->operands[0]->pregnode->flags[0][0]->data->length()===1 &&
+        
+        $need_short_pattern = $type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                $this->operands[0]->is_one_char() &&
                 $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
-                count($this->operands[1]->pregnode->flags)===1 &&
-                $this->operands[1]->pregnode->flags[0][0]->type===qtype_preg_charset_flag::SET &&
-                $this->operands[1]->pregnode->flags[0][0]->data->length()===1 ) {
-            
-            $pattern_t = self::get_form_string('description_concat_short');*/
-            
-        if($type1===qtype_preg_node::TYPE_NODE_ASSERT || $type2===qtype_preg_node::TYPE_NODE_ASSERT){
+                $this->operands[1]->is_one_char();
+        $need_contiune_short_pattern = $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
+                 $this->operands[0]->pattern===$pattern_short;
+        
+        if($need_short_pattern || $need_contiune_short_pattern) {       
+            $pattern_t = $pattern_short;
+        } else if($type1===qtype_preg_node::TYPE_NODE_ASSERT || $type2===qtype_preg_node::TYPE_NODE_ASSERT){
             $pattern_t = self::get_form_string('description_concat_wo_union');
         } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT){
             $pattern_t = self::get_form_string('description_concat_wcomma');
