@@ -140,13 +140,13 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider quant_provider
      */
-    /*public function test_quant($regex,$expected)
+    public function test_quant($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }*/
+    }
     
     public function quant_provider()
     {
