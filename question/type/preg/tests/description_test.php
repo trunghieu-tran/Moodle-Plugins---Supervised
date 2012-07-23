@@ -176,4 +176,13 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $expected = 'subpattern #1: [<span style="color:red">a</span>caseless: <span style="color:red">b</span>] then case sensitive: <span style="color:red">c</span>'; 
         $this->assertEquals($result, $expected);
     }
+    
+    public function test_numbering()
+    {
+        $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
+        //var_dump($handler);
+        $result = $handler->default_description();
+        $expected = 'asd'; 
+        $this->assertEquals($result, $expected);
+    }
 }
