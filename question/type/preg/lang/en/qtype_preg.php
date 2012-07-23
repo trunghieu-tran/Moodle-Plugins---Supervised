@@ -155,18 +155,18 @@ $string['description_nla_node_assert'] = 'further text should not match: [%1]';
 $string['description_plb_node_assert'] = 'preceding text should match: [%1]';
 $string['description_nlb_node_assert'] = 'preceding text should not match: [%1]';
 //TYPE_NODE_SUBPATT
-$string['description_subpattern'] = 'subpattern #%number: [%1];';
-$string['description_subpattern_once'] = 'once checked subpattern #%number: [%1];';
+$string['description_subpattern'] = 'subpattern #%number: [%1]';
+$string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
 //TYPE_NODE_COND_SUBPATT
-$string['description_pla_node_cond_subpatt'] = 'if the further text matches [%1] then check: [%2] ; else check: [%3];';
-$string['description_nla_node_cond_subpatt'] = 'if the further text does not match [%1] then check: [%2] ; else check: [%3];';
-$string['description_plb_node_cond_subpatt'] = 'if the preceding text matches [%1] then check: [%2] ; else check: [%3];';
-$string['description_nlb_node_cond_subpatt'] = 'if the preceding text does not match [%1] then check: [%2] ; else check: [%3];';
-$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%2]; else check: [%3];';
-$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%2]; else check: [%3];';
-$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%2]; else check: [%3];';
-$string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%2]; else check: [%3];';
-$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%2]; else check: [%3];';
+$string['description_pla_node_cond_subpatt'] = 'if the further text matches [%1] then check: [%2] else check: [%3]';
+$string['description_nla_node_cond_subpatt'] = 'if the further text does not match [%1] then check: [%2] else check: [%3]';
+$string['description_plb_node_cond_subpatt'] = 'if the preceding text matches [%1] then check: [%2] else check: [%3]';
+$string['description_nlb_node_cond_subpatt'] = 'if the preceding text does not match [%1] then check: [%2] else check: [%3]';
+$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%2] else check: [%3]';
+$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%2] else check: [%3]';
+$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%2] else check: [%3]';
+$string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%2] else check: [%3]';
+$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%2] else check: [%3]';
 //TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
