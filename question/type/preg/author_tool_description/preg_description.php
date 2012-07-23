@@ -50,8 +50,10 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function description($numbering_pattern,$whole_pattern=null){
         
-        $string = $this->dst_root->description($numbering_pattern,null,null);;
-        $string = str_replace('%s',$string,$whole_pattern);
+        $string = $this->dst_root->description($numbering_pattern,null,null);
+        if($whole_patter !== null){
+            $string = str_replace('%s',$string,$whole_pattern);
+        }
         return $string;
     }
     
@@ -60,7 +62,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function default_description(){
        
-        return $this->description('<span class="description_node_%n">%s</span>','<span class="description">%s</span>');
+        return $this->description('<span class="description_node_%n">%s</span>');
     }
     
     /**
@@ -78,7 +80,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     protected function is_preg_node_acceptable($pregnode) {
        
-        return false;    // Should be overloaded by child classes
+        return true;
     }
     
 }
