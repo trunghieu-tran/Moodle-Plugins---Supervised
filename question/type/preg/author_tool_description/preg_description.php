@@ -539,11 +539,18 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         
         $pattern_t ='';
         $greed_pattern='';
-        if($this->pregnode->leftborder===0){
-            $pattern_t = self::get_form_string('description_finite_quant_0');
-            $pattern_t = str_replace('%rightborder',$this->pregnode->rightborder,$pattern_t);
+        if($this->pregnode->leftborder===0 ){
+            if($this->pregnode->rightborder ===1){
+                $pattern_t = self::get_form_string('description_finite_quant_01');
+                $pattern_t = str_replace('%rightborder',$this->pregnode->rightborder,$pattern_t);
+            }
+            else {
+                $pattern_t = self::get_form_string('description_finite_quant_0');
+                $pattern_t = str_replace('%rightborder',$this->pregnode->rightborder,$pattern_t);
+            }
+            
         }
-        else if ($this->pregnode->leftborder===0) {
+        else if ($this->pregnode->leftborder===1) {
             $pattern_t = self::get_form_string('description_finite_quant_1');
             $pattern_t = str_replace('%rightborderr',$this->pregnode->rightborder,$pattern_t);
         }
