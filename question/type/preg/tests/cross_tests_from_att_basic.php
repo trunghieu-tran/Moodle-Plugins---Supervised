@@ -1475,7 +1475,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                       'tests'=>array($test1));
     }
 
-    /*function data_for_test_att_basic_105() {
+    function data_for_test_att_basic_105() {
         $test1 = array( 'str'=>"a]b",
                         'is_match'=>true,
                         'full'=>true,
@@ -1487,7 +1487,7 @@ class qtype_preg_cross_tests_from_att_basic  {
 
         return array( 'regex'=>"a[]]b",
                       'tests'=>array($test1));
-    }*/
+    }
 
     function data_for_test_att_basic_106() {
         $test1 = array( 'str'=>"aed",
@@ -1517,7 +1517,7 @@ class qtype_preg_cross_tests_from_att_basic  {
                       'tests'=>array($test1));
     }
 
-    /*function data_for_test_att_basic_108() {
+    function data_for_test_att_basic_108() {
         $test1 = array( 'str'=>"adc",
                         'is_match'=>true,
                         'full'=>true,
@@ -1529,7 +1529,7 @@ class qtype_preg_cross_tests_from_att_basic  {
 
         return array( 'regex'=>"a[^]b]c",
                       'tests'=>array($test1));
-    }*/
+    }
 
     function data_for_test_att_basic_109() {
         $test1 = array( 'str'=>"abc",

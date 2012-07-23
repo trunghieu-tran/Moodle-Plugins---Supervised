@@ -576,15 +576,19 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, false, true, false));
     return $res;
 }
-<YYINITIAL> "[^"|"[" {
+<YYINITIAL> "[^"|"["|"[^]"|"[]" {
+    $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
     $this->charset->userinscription = array('');
-    $this->charset->negative = $this->yylength() === 2;
+    $this->charset->negative = ($text === '[^' || $text === '[^]');
     $this->charset->error = array();
     $this->charsetcount = 0;
     $this->charsetset = '';
-    $this->charsetuserinscription = $this->yytext();
+    $this->charsetuserinscription = $text;
+    if ($text === '[^]' || $text === '[]') {
+        $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
+    }
     $this->yybegin(self::CHARSET);
 }
 <YYINITIAL> "(" {
