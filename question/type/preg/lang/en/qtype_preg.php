@@ -121,12 +121,13 @@ $string['description_recursion_all'] = 'recursive match with whole regular expre
 $string['description_recursion'] = 'recursive match with subpattern #%number';
 $string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
 //TYPE_LEAF_OPTIONS
-$string['description_option_i'] = 'caseless';
-$string['description_option_s'] = 'dot metacharacter matches \n in following';
-$string['description_option_m'] = 'multiline matching';
-$string['description_option_x'] = 'ignore white space';
-$string['description_option_U'] = 'quantifiers ungreedy by default';
-$string['description_option_J'] = 'allow duplicate names';
+$string['description_option_i'] = 'caseless: ';
+$string['description_unsetoption_i'] = 'case sensitive: ';
+/*$string['description_option_s'] = 'dot metacharacter matches \n in following:[%text]';
+$string['description_option_m'] = 'multiline matching:[%text]';
+$string['description_option_x'] = 'ignore white space:[%text]';
+$string['description_option_U'] = 'quantifiers ungreedy by default:[%text]';
+$string['description_option_J'] = 'allow duplicate names:[%text]';*/
 //TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';

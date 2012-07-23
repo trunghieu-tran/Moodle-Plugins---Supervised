@@ -49,9 +49,10 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      * @return string description.
      */
     public function description($numbering_pattern,$whole_pattern=null){
-        
-        $string = $this->dst_root->description($numbering_pattern,null,null);
-        if($whole_patter !== null){
+
+        $options = array('caseinsensitive' => false);
+        $string = $this->dst_root->description($numbering_pattern,$options,null,null);
+        if($whole_pattern !== null){
             $string = str_replace('%s',$string,$whole_pattern);
         }
         return $string;
@@ -126,7 +127,7 @@ abstract class qtype_preg_description_node{
      * @param string $form Required form.
      * @return string
      */
-    abstract public function description($numbering_pattern,$node_parent=null,$form=null);
+    abstract public function description($numbering_pattern,&$options,$node_parent=null,$form=null);
     
     /**
      * gets localized string, if required a form it gets localized string for required form
@@ -181,10 +182,13 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,&$options,$node_parent=null,$form=null){
         
+        $description ='';
         $this->pattern = $this->pattern($node_parent,$form);
-        return $this->numbering_pattern($numbering_pattern,$this->pattern);
+        $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
+        qtype_preg_description_leaf_option::check_options($this,$description,$options);
+        return $description;
     }
 }
 
@@ -286,15 +290,7 @@ class qtype_preg_description_leaf_meta extends qtype_preg_description_leaf{
         
         return self::get_form_string('description_empty');
     }
-    
-    /**
-     * returns true if engine support the node, rejection string otherwise
-     */
-    public function accept() {
-        $flag = $this->pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-        return ($flag) ? true : false;
-    }
-    
+       
 }
 
 /**
@@ -359,9 +355,45 @@ class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
     public function pattern($node_parent=null,$form=null){
         
         // TODO - pattern
-        return('TODO - qtype_preg_description_leaf_optio');
+        return('nodes of options dont presents in trees now...');
     }
     
+    /**
+     * Using in description functions. 
+     * Checks the need for the substitution leaf_options patterns
+     * 
+     * @param qtype_preg_description_node $node current node
+     * @param string $node_pattern description of current node
+     * @param array $options array of options
+     */
+    public static function check_options($node,&$node_pattern,&$options){
+        
+        if(isset($node->pregnode->caseinsensitive)){
+
+            //$options['caseinsensitive'] = ($node->pregnode->caseinsensitive === true )?true:false;
+            if($node->pregnode->caseinsensitive === true && $options['caseinsensitive']===false){
+                $options['caseinsensitive'] = true;
+                $node_pattern = self::get_form_string('description_option_i').$node_pattern;
+            }
+            if($node->pregnode->caseinsensitive === false && $options['caseinsensitive']===true){
+                $options['caseinsensitive'] = false;
+                $node_pattern = self::get_form_string('description_unsetoption_i').$node_pattern;
+                var_dump(1);
+                
+            }
+        }
+        /*else{
+            $need_pattern = $node->pregnode->type===qtype_preg_node::TYPE_NODE_SUBPATT || 
+                    $node->pregnode->type===qtype_preg_node::TYPE_NODE_COND_SUBPATT ||
+                    (count($node->pregnode->operands)>=2 && isset($node->operand[1]->pregnode->caseinsensitive) && 
+                     $node->operand[1]->pregnode->caseinsensitive===false);
+            if($need_pattern){    
+                $node_pattern = self::caseinsensitive($node_pattern);
+                var_dump($node_pattern);
+            }
+        }*/
+    }
+   
 }
 
 class qtype_preg_description_leaf_recursion extends qtype_preg_description_leaf{
@@ -469,7 +501,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
     /**
      * Redifinition of abstruct qtype_preg_description_node::description()
      */
-    public function description($numbering_pattern,$node_parent=null,$form=null){
+    public function description($numbering_pattern,&$options,$node_parent=null,$form=null){
         
         $description = '';
         $child_description = '';
@@ -480,15 +512,16 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
         
         $i=1;
-        $find = '/%'.$i.'(\w+)?/';
+        $find = '/%(\w+)?'.$i.'/';
         while((count($this->operands) >= $i) && preg_match($find,$description,$matches)){
             $form = (count($matches)>=2) ? $matches[1] : null;
-            $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
+            $child_description = $this->operands[$i-1]->description($numbering_pattern,$options,$this,$form);
             //var_dump($matches[0]);
             $description = str_replace($matches[0],$child_description,$description);
             $i++;
-            $find = '/%'.$i.'(\w+)?/';
+            $find = '/%(\w+)?'.$i.'(\w+)?/';
         }
+        qtype_preg_description_leaf_option::check_options($this,$description,$options);
         return $description;
     }
 }
@@ -663,6 +696,7 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
         } else {
             $pattern_t = self::get_form_string('description_subpattern_once');
         }
+        $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
         return $pattern_t;
     }
     
