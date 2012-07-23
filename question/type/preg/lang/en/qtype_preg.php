@@ -3,11 +3,11 @@
 $string['addmoreanswerblanks'] = 'Adding a regular expression options';
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the choosen engine doesn\'t support subpatterns capturing you should use only {$0}.</p>';
 $string['answerno'] = 'Answer {$a}';
-$string['asserttf'] = 'Positive lookahead assertion';
-$string['assertff'] = 'Negative lookahead assertion';
-$string['asserttb'] = 'Positive lookbehind assertion';
-$string['assertfb'] = 'Negative lookbehind assertion';
-$string['escg'] = 'Escape G';
+//$string['asserttf'] = 'Positive lookahead assertion';
+//$string['assertff'] = 'Negative lookahead assertion';
+//$string['asserttb'] = 'Positive lookbehind assertion';
+//$string['assertfb'] = 'Negative lookbehind assertion';
+//$string['escg'] = 'Escape G';
 $string['charhintpenalty'] = 'Penalty for the next character hint';
 $string['charhintpenalty_help'] = 'Penalty for getting the one-character hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints). These penalties are mutually exclusive.';
 $string['lexemhintpenalty'] = 'Penalty for the next lexem hint';
@@ -35,10 +35,7 @@ $string['PCREincorrectregex'] = 'Incorrect regular expression - syntax error! Co
 $string['langselect'] = 'Language';
 $string['langselect_help'] = 'For next lexem hint you should choose a language, which is used to break answers down to lexems. Each language has it own rules for lexems. Languages are defined using \'Formal languages block\'';
 $string['largefa'] = 'Too large finite automaton';
-$string['leaf_assert'] = 'simple assertion';
-$string['leaf_backref'] = 'backreference';
-$string['leaf_charset'] = 'character set';
-$string['leaf_meta'] = 'meta-character or escape-sequence';
+
 $string['lexemusername'] = 'Student-visible name for lexem';
 $string['lexemusername_help'] = 'Your students probably won\'t know that an atomic part of the language they learn is called <b>lexem</b>. They may prefer to call it "word" or "number" or something. You may define a name for lexem that would be shown on the "Hint next lexem" button there.';
 $string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression in the question editing form';
@@ -46,13 +43,7 @@ $string['maxerrorsshownlabel'] = 'Maximum number of errors shown';
 $string['nfa_matcher'] = 'Nondeterministic finite state automata';
 $string['noabstractaccept'] = 'Matching by abstract matcher';
 $string['nocorrectanswermatch'] = 'No maximum grade regular expression matches the correct answer';
-$string['node_alt'] = 'alternative';
-$string['node_assert'] = 'assertion';
-$string['node_concat'] = 'concatenation';
-$string['node_cond_subpatt'] = 'conditional subpattern';
-$string['node_finite_quant'] = 'finite quantifier';
-$string['node_infinite_quant'] = 'infinite quantifier';
-$string['node_subpatt'] = 'subpattern';
+
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal the hint grade border. This disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
 $string['notation'] = 'Regular expression notation';
@@ -89,6 +80,52 @@ $string['usehint_help'] = 'In behaviours which allow multiple tries (e.g. adapti
 $string['usecharhint_help'] = 'In behaviours which allow multiple tries (e.g. adaptive or interactive) show students the \'Hint next character\' button that allows to get a one-character hint with applying the \'Hint next character penalty\'. Not all matching engines support hinting.';
 $string['uselexemhint'] = 'Allow next lexem (word, number, punctuation mark) hinting';
 $string['uselexemhint_help'] = '<p>In behaviours which allow multiple tries (e.g. adaptive or interactive) show students the \'Hint next word\' button that allows to get a hint either completing current lexem or showing next one if lexem is complete with applying the \'Hint next lexem penalty\'. Not all matching engines support hinting.</p><p><b>Lexem</b> is an atomic part of the language: a word, number, punctuation mark, operator etc.</p>';
+
+/******* Abstract syntax tree nodes descriptions *******/
+// Types.
+$string['node_abstract']            = 'abstract node';
+$string['leaf_charset']             = 'character set';
+$string['leaf_meta']                = 'meta-character or escape-sequence';
+$string['leaf_assert']              = 'simple assertion';
+$string['leaf_backref']             = 'backreference';
+$string['leaf_recursion']           = 'recursion';
+$string['leaf_control']             = 'control sequence';
+$string['leaf_options']             = 'modifier';   // TODO: remove?
+$string['node_finite_quant']        = 'finite quantifier';
+$string['node_infinite_quant']      = 'infinite quantifier';
+$string['node_concat']              = 'concatenation';
+$string['node_alt']                 = 'alternative';
+$string['node_assert']              = 'lookaround assertion';
+$string['node_subpatt']             = 'subpattern';
+$string['node_cond_subpatt']        = 'conditional subpattern';
+$string['node_error']               = 'syntax error';
+// Subtypes.
+$string['empty_leaf_meta']          = 'emptiness';
+$string['circumflex_leaf_assert']   = '^ assertion';    // TODO: add other assertions when they will be done.
+$string['dollar_leaf_assert']       = '$ assertion';
+$string['wordbreak_leaf_assert']    = '\b and \B assertions';
+$string['esc_a_leaf_assert']        = '\A assertion';
+$string['esc_z_leaf_assert']        = '\a and \Z assertion';
+$string['esc_g_leaf_assert']        = '\G assertion';
+$string['accept_leaf_control'       = '';   // TODO
+$string['fail_leaf_control'         = '';
+$string['mark_name_leaf_control'    = '';
+$string['commit_leaf_control'       = '';
+$string['prune_leaf_control'        = '';
+$string['skip_leaf_control'         = '';
+$string['skip_name_leaf_control'    = '';
+$string['then_leaf_control'         = '';
+$string['cr_leaf_control'           = '';
+$string['lf_leaf_control'           = '';
+$string['crlf_leaf_control'         = '';
+$string['anycrlf_leaf_control'      = '';
+$string['any_leaf_control'          = '';
+$string['bsr_anycrlf_leaf_control'  = '';
+$string['bsr_unicode_leaf_control'  = '';
+$string['no_start_opt_leaf_control' = '';
+$string['utf8_leaf_control'         = '';
+$string['utf16_leaf_control'        = '';
+$string['ucp_leaf_control'          = '';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
