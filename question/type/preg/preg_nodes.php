@@ -1502,7 +1502,7 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
 /**
  * Defines error nodes, used when syntax errors in the regular expression occur.
  */
-class qtype_preg_node_error extends qtype_preg_node {
+class qtype_preg_node_error extends qtype_preg_operator {
 
     /** Unknown parse error. */
     const SUBTYPE_UNKNOWN_ERROR = 'unknown_error_node_error';
