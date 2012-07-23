@@ -29,9 +29,9 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $regular->usecase = false;
         $regular->correctanswer = 'Do cats eat bats?';
         $regular->exactmatch = true;
-        $regular->usehint = true;
+        $regular->usecharhint = true;
         $regular->penalty = 0.1;
-        $regular->hintpenalty = 0.2;
+        $regular->charhintpenalty = 0.2;
         $regular->hintgradeborder = 0.6;
         $regular->engine = 'nfa_matcher';
         $regular->notation = 'native';
@@ -79,9 +79,9 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $subpatt->usecase = false;
         $subpatt->correctanswer = 'cdefgh';
         $subpatt->exactmatch = true;
-        $subpatt->usehint = true;
+        $subpatt->usecharhint = true;
         $subpatt->penalty = 0.1;
-        $subpatt->hintpenalty = 0.2;
+        $subpatt->charhintpenalty = 0.2;
         $subpatt->hintgradeborder = 0.6;
         $subpatt->engine = 'nfa_matcher';
         $subpatt->notation = 'native';
