@@ -91,6 +91,6 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('toolargefa', 'qtype_preg', $a);
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('too_large_fa', 'qtype_preg', $a);
     }
 }
