@@ -150,14 +150,14 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function hint_available($response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        return parent::hint_available($response) && $this->question->usehint && !$matchresults->full;
+        return parent::hint_available($response) && $this->question->usecharhint && !$matchresults->full;
     }
 
     /**
      * Returns penalty for using specific hint of given hint type (possibly for given response)
      */
     public function penalty_for_specific_hint($response = null) {
-            return $this->question->hintpenalty;
+            return $this->question->charhintpenalty;
     }
 
     ////qtype_preg_matching_hint functions implementation

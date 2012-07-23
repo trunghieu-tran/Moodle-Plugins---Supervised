@@ -8,6 +8,7 @@
  * @package questions
  */
 require_once($CFG->dirroot.'/question/type/shortanswer/edit_shortanswer_form.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 /**
  * preg editing form definition.
  */
@@ -34,13 +35,30 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setDefault('notation', $CFG->qtype_preg_defaultnotation);
         $mform->addHelpButton('notation', 'notation', 'qtype_preg');
 
-        $mform->addElement('selectyesno', 'usehint', get_string('usehint','qtype_preg'));
-        $mform->setDefault('usehint',0);
-        $mform->addHelpButton('usehint','usehint','qtype_preg');
-        $mform->addElement('text', 'hintpenalty', get_string('hintpenalty','qtype_preg'), array('size' => 3));
-        $mform->setDefault('hintpenalty','0.2');
-        $mform->setType('hintpenalty', PARAM_NUMBER);
-        $mform->addHelpButton('hintpenalty','hintpenalty','qtype_preg');
+        $mform->addElement('selectyesno', 'usecharhint', get_string('usecharhint','qtype_preg'));
+        $mform->setDefault('usecharhint',0);
+        $mform->addHelpButton('usecharhint','usecharhint','qtype_preg');
+        $mform->addElement('text', 'charhintpenalty', get_string('charhintpenalty','qtype_preg'), array('size' => 3));
+        $mform->setDefault('charhintpenalty','0.2');
+        $mform->setType('charhintpenalty', PARAM_NUMBER);
+        $mform->addHelpButton('charhintpenalty','charhintpenalty','qtype_preg');
+
+        $mform->addElement('selectyesno', 'uselexemhint', get_string('uselexemhint','qtype_preg'));
+        $mform->setDefault('uselexemhint',0);
+        $mform->addHelpButton('uselexemhint','uselexemhint','qtype_preg');
+        $mform->addElement('text', 'lexemhintpenalty', get_string('lexemhintpenalty','qtype_preg'), array('size' => 3));
+        $mform->setDefault('lexemhintpenalty','0.4');
+        $mform->setType('lexemhintpenalty', PARAM_NUMBER);
+        $mform->addHelpButton('lexemhintpenalty','lexemhintpenalty','qtype_preg');
+        $langs = block_formal_langs::available_langs();//TODO - add context
+        $mform->addElement('select','langid',get_string('langselect','qtype_preg'),$langs);
+        $mform->setDefault('langid',2);//TODO - add admin setting
+        $mform->addHelpButton('langid','langselect','qtype_preg');
+        $mform->addElement('text', 'lexemusername', get_string('lexemusername','qtype_preg'), array('size' => 54));
+        $mform->setDefault('lexemusername','word');
+        $mform->addHelpButton('lexemusername','lexemusername','qtype_preg');
+        $mform->setAdvanced('lexemusername');
+
         $creategrades = get_grade_options();
         $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
         $mform->setDefault('hintgradeborder',1);
@@ -62,8 +80,12 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 !$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)
                 ) {
                 $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
-                $mform->disabledIf('usehint','engine', 'eq', $engine);
-                $mform->disabledIf('hintpenalty','engine', 'eq', $engine);
+                $mform->disabledIf('usecharhint','engine', 'eq', $engine);
+                $mform->disabledIf('charhintpenalty','engine', 'eq', $engine);
+                $mform->disabledIf('uselexemhint','engine', 'eq', $engine);
+                $mform->disabledIf('lexemhintpenalty','engine', 'eq', $engine);
+                $mform->disabledIf('langid','engine', 'eq', $engine);
+                $mform->disabledIf('lexemusername','engine', 'eq', $engine);
             }
         }
 
@@ -88,8 +110,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $data['hintgradeborder'] = 1;
         }
 
-        if (!array_key_exists('usehint', $data)) {
-            $data['usehint'] = false;
+        if (!array_key_exists('usecharhint', $data)) {
+            $data['usecharhint'] = false;
         }
 
         $i = 0;
@@ -131,7 +153,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
         }
 
-        if ($passhintgradeborder == false && $data['usehint']) {//no asnwer pass hint grade border
+        if ($passhintgradeborder == false && $data['usecharhint']) {//no asnwer pass hint grade border
             $errors['hintgradeborder']=get_string('nohintgradeborderpass','qtype_preg');
         }
 
