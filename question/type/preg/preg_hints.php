@@ -71,25 +71,25 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
      */
-    public function render_stringextension_hint($response) {
+    public function render_stringextension_hint($renderer, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {//hint could be computed
             if (!$matchresults->full) {//there is a hint to show
-                $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
-                $correctpart = qtype_preg_renderer::render_matched($matchresults->correct_before_hint());
-                $hint = qtype_preg_renderer::render_hinted($this->hinted_string($matchresults));
+                $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+                $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
+                $hint = $renderer->render_hinted($this->hinted_string($matchresults));
                 if ($this->to_be_continued($matchresults)) {
-                    $hint .= qtype_preg_renderer::render_tobecontinued();
+                    $hint .= $renderer->render_tobecontinued();
                 }
                 $wrongtail = '';
                 if (qtype_poasquestion_string::strlen($hint) == 0) {
-                    $wrongtail = qtype_preg_renderer::render_deleted($matchresults->tail_to_delete());
+                    $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
             } else {//No hint, due to full match
-                return qtype_preg_hintmatchingpart::render_hint($response);
+                return qtype_preg_hintmatchingpart::render_hint($renderer, $response);
             }
         }
         return '';
@@ -112,14 +112,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response
      */
-    public function render_hint($response) {
+    public function render_hint($renderer, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
-            $correctpart = qtype_preg_renderer::render_matched($matchresults->matched_part());
-            $wrongtail = qtype_preg_renderer::render_unmatched($matchresults->match_tail());
+            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+            $correctpart = $renderer->render_matched($matchresults->matched_part());
+            $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
@@ -150,21 +150,21 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function hint_available($response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        return parent::hint_available($response) && $this->question->usehint && !$matchresults->full;
+        return parent::hint_available($response) && $this->question->usecharhint && !$matchresults->full;
     }
 
     /**
      * Returns penalty for using specific hint of given hint type (possibly for given response)
      */
     public function penalty_for_specific_hint($response = null) {
-            return $this->question->hintpenalty;
+            return $this->question->charhintpenalty;
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($response) {
-        return $this->render_stringextension_hint($response);
+    public function render_hint($renderer, $response) {
+        return $this->render_stringextension_hint($renderer, $response);
     }
-
+	
     public function hinted_string($matchresults) {
         //One-character hint
         $hintedstring = $matchresults->string_extension();

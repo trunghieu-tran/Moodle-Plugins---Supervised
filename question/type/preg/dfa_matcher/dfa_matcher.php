@@ -167,7 +167,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                     }
                 }
                 if (($passcount > $this->maxpasscount || $statecount > $this->maxstatecount) && $this->maxstatecount != 0 && $this->maxpasscount != 0) {
-                    $this->errors[] = get_string('toolargefa', 'qtype_preg');
+                    $this->errors[] = get_string('too_large_fa', 'qtype_preg');
                     return;
                 }
             }
@@ -607,13 +607,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         set_time_limit(100);
         global $CFG;
         $this->picnum=0;
-        if (isset($CFG->qtype_preg_dfastatecount)) {
-            $this->maxstatecount = $CFG->qtype_preg_dfastatecount;
+        if (isset($CFG->qtype_preg_dfa_state_limit)) {
+            $this->maxstatecount = $CFG->qtype_preg_dfa_state_limit;
         } else {
             $this->maxstatecount = 0;
         }
-        if (isset($CFG->qtype_preg_dfapasscount)) {
-            $this->maxpasscount = $CFG->qtype_preg_dfapasscount;
+        if (isset($CFG->qtype_preg_dfa_transition_limit)) {
+            $this->maxpasscount = $CFG->qtype_preg_dfa_transition_limit;
         } else {
             $this->maxpasscount = 0;
         }
