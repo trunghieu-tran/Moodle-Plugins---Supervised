@@ -641,7 +641,9 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
                 $this->operands[0]->is_one_char() &&
                 $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
                 $this->operands[1]->is_one_char();
-        $need_contiune_short_pattern = $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
+        $need_contiune_short_pattern = $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
+                $this->operands[1]->is_one_char() &&
+                $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
                 $this->operands[0]->operands[1]->pregnode->type===qtype_preg_node::TYPE_LEAF_CHARSET &&
                 $this->operands[0]->operands[1]->is_one_char();
         $first_ahead_assert = $subtype1===qtype_preg_node_assert::SUBTYPE_PLA || $subtype1===qtype_preg_node_assert::SUBTYPE_NLA;
