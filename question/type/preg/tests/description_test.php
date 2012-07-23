@@ -1,7 +1,7 @@
-<?
+<?php
 
 /**
- * Unit tests for (some of) question/type/preg/question.php.
+ * tests for /question/type/preg/author_tool_description/preg_description.php'
  *
  * @copyright &copy; 2012 Pahomov Dmitry
  * @author Pahomov Dmitry
@@ -140,13 +140,13 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider quant_provider
      */
-    public function test_quant($regex,$expected)
+    /*public function test_quant($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }
+    }*/
     
     public function quant_provider()
     {
@@ -160,5 +160,16 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('g{1,}','jh'),
           array('g{2,5}','dg'),
         );
+    }
+    
+    
+    
+    public function test_option()
+    {
+        $handler = new qtype_preg_author_tool_description('(a(?i)b)c',null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $expected = '2321'; 
+        $this->assertEquals($result, $expected);
     }
 }
