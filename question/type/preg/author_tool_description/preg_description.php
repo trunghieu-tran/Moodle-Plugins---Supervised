@@ -14,6 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Handler, generating information for regular expression
@@ -219,7 +220,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
-                if (ctype_graph ( $flag->data[$i])) { //is ctype_graph correct for utf8 string?
+                if (qtype_preg_unicode::is_in_range($flag->data[$i],qtype_preg_unicode::graph_ranges())) { //is ctype_graph correct for utf8 string?
                     $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char') );  
                 }
                 else if ($flag->data[$i]===' ') {
