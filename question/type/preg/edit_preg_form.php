@@ -17,7 +17,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *
      * @param MoodleQuickForm $mform the form being built.
      */
-    function definition_inner(&$mform) {
+    function definition_inner($mform) {
         global $CFG;
 
         question_bank::load_question_definition_classes($this->qtype());
