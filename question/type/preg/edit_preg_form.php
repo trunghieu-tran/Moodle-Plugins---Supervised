@@ -26,7 +26,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      */
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
-            $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption);
+            $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
             
             $mform->registerNoSubmitButton('regextest');
             $repeated[] = & $mform->createElement('submit', 'regextest', 'Test regex');
