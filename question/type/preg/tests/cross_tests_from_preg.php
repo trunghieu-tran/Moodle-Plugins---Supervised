@@ -3036,7 +3036,6 @@ class qtype_preg_cross_tests_from_preg {
     }
 
     function data_for_test_uprops_and_posix_negative() {
-
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
@@ -3058,7 +3057,6 @@ class qtype_preg_cross_tests_from_preg {
     }
 
     function data_for_test_uprops_and_posix_negative_negative() {
-
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
@@ -3072,6 +3070,14 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>NOMATCH),
                         'length'=>array(0=>NOMATCH),
+                        'left'=>array(1),
+                        'next'=>'[^\P{C}[:^alpha:]\H]');
+
+        $test3 = array( 'str'=>'alnum characters here',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>21),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
