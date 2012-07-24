@@ -31,12 +31,11 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     // Test a lexer in order to get no faules
     public function test_fault() {
         $lang = new block_formal_langs_language_c_language();
-        // Due to some bugs in string, we can't do this (some stuff in poas_question::ord)
-        // $processedstring = $lang->create_from_string('!><ûîûäâîûäâ{}\'   @@@!!% "  ');
-        // $result = $processedstring->stream->tokens;
-        // $this->assertTrue( count($processedstring->stream->errors) != 0);
+        $processedstring = $lang->create_from_string('!><Ñ‹Ğ¾Ñ‹Ğ´Ğ²Ğ¾Ñ‹Ğ´Ğ²{}\'   @@@!!% "  ');
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue( count($processedstring->stream->errors) != 0);
         // If no exception thrown, than everything is good. 
-        // $this->assertTrue( true );
+        $this->assertTrue( true );
     }
     
     // Test a string and char analysis
