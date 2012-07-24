@@ -49,6 +49,7 @@ $string['pluginname_link'] = 'question/type/preg';
 $string['pluginnameadding'] = 'Adding a regular expression question';
 $string['pluginnameediting'] = 'Editing a regular expression question';
 $string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. Using behaviours with multiple tries can give a hint by telling a next correct character.<br/>You can use it without knowing regular expression to get hinting by using the \'Moodle shortanswer\' notation.';
+$string['preg_regex_handler'] = 'Regex handler';
 $string['questioneditingheading'] = 'Question editing settings';
 $string['subpattern'] = 'Subpattern';
 $string['tobecontinued'] = '...';
