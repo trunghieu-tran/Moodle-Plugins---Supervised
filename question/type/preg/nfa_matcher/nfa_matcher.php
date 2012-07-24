@@ -216,7 +216,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstate = array_pop($curstates);
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
                     $length = 0;
-                    if (!$transition->pregleaf->consumes($curstate) && $transition->pregleaf->match($str, $startpos + $curstate->length[0], $length, !$transition->pregleaf->caseinsensitive, $curstate)) {
+                    if (!$transition->pregleaf->consumes($curstate) && $transition->pregleaf->match($str, $startpos + $curstate->length[0], $length, $curstate)) {
                         // Create a new state.
                         $newstate = new qtype_preg_nfa_processing_state(false, $curstate->index_first, $curstate->length, $curstate->index_first_new,
                                                                         $curstate->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
@@ -393,7 +393,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $curstate = array_pop($curstates);
                 foreach ($states[$curstate]->state->outgoing_transitions() as $transition) {
                     $length = 0;
-                    if ($transition->pregleaf->match($str, $startpos + $states[$curstate]->length[0], $length, !$transition->pregleaf->caseinsensitive, $states[$curstate])) {
+                    if ($transition->pregleaf->match($str, $startpos + $states[$curstate]->length[0], $length, $states[$curstate])) {
                         // Create a new state.
                         $newstate = new qtype_preg_nfa_processing_state(false, $states[$curstate]->index_first, $states[$curstate]->length, $states[$curstate]->index_first_new,
                                                                         $states[$curstate]->length_new, qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
