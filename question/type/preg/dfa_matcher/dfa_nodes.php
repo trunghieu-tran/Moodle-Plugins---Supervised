@@ -347,7 +347,7 @@ class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $subtype = 'dollar';
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
                 $subtype = 'word break';
                 break;
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
@@ -375,7 +375,7 @@ class qtype_preg_dfa_leaf_assert extends qtype_preg_dfa_leaf {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $subtype = 'dollar';
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
                 $subtype = 'word break';
                 break;
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:

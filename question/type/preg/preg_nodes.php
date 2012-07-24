@@ -971,7 +971,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     /** $ */
     const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
     /** \b */
-    const SUBTYPE_WORDBREAK = 'wordbreak_leaf_assert';
+    const SUBTYPE_ESC_B = 'esc_b_leaf_assert';
     /** \A */
     const SUBTYPE_ESC_A = 'esc_a_leaf_assert';
     /** \z */
@@ -1000,7 +1000,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $result = ($pos === $str->length());
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
                 $alnumrange = qtype_preg_unicode::alnum_ranges();
                 $start = $pos === 0 && ($str[0] === '_' || qtype_preg_unicode::is_in_range($str[0], $alnumrange));
                 $end = $pos === $str->length() && ($str[$pos - 1] === '_' || qtype_preg_unicode::is_in_range($str[$pos - 1], $alnumrange));
@@ -1022,6 +1022,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         switch ($this->subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if ($this->negative) {
                     return 'notstringstart';
@@ -1037,7 +1038,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
                     return '';
                 }
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
                 if ($this->negative) {
                     return 'notwordchar';
                 } else {
@@ -1049,6 +1050,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     public function tohr() {
         switch ($this->subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_ESC_A:    // Because there can be only one line is the response.
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 $type = '^';
                 break;
@@ -1056,7 +1058,7 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                 $type = '$';
                 break;
-            case qtype_preg_leaf_assert::SUBTYPE_WORDBREAK:
+            case qtype_preg_leaf_assert::SUBTYPE_ESC_B:
                 $type = '\\b';
                 break;
         }
