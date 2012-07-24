@@ -5,6 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     protected $matcher;
@@ -27,10 +28,6 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
                 }
             }
         }
-        $lexerrors = $lexer->get_errors();
-        foreach ($lexerrors as $errstring) {
-            $parser->doParse(preg_parser_yyParser::LEXERROR, $errstring);
-        }
         $parser->doParse(0, 0);
         fclose($pseudofile);
         return $parser;
@@ -41,7 +38,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
         $root = $parser->get_root();
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nodes');
-        qtype_preg_regex_handler::execute_dot($root->dot_script(null), $dir . 'ast_test.png');
+        qtype_preg_regex_handler::execute_dot($root->dot_script(new qtype_preg_dot_style_provider()), $dir . 'ast_test.png');
     }
     /*function test_simple() {//[asdf]
         $this->matcher->input_fa('0->asdf->1;');
