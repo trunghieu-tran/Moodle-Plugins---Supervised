@@ -101,14 +101,6 @@ abstract class qtype_preg_nfa_node {
  */
 class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
 
-    public function accept() {
-        if ($this->pregnode->type === qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
-            $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
-            return $leafdesc . ' \G';
-        }
-        return true;
-    }
-
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
         $start = new qtype_preg_fa_state($automaton);
@@ -212,13 +204,6 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
  * Class for infinite quantifiers (*, +, {m,}).
  */
 class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
-
-    public function accept() {
-        if (!$this->pregnode->greed) {
-            return get_string('ungreedyquant', 'qtype_preg');
-        }
-        return true;
-    }
 
     /**
      * Creates an automaton for * or {0,} quantifier.
