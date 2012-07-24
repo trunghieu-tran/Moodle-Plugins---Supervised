@@ -149,6 +149,16 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         return false;
     }
 
+    function check_next_character($regex, $char) {
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $leaf = $lexer->nextToken()->value;
+        $res = $leaf->match(new qtype_poasquestion_string($char), 0, $length, false);
+        fclose($pseudofile);
+        return $res;
+    }
+
     /**
      * Performs some extra checks on results which contain generated ending of a partial match.
      * @param $regex - regular expression.
@@ -241,10 +251,10 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             if ($obtained->extendedmatch !== null) {
                 $str = $obtained->string_extension();
             }
-            $regex = $pattern = '/(*UTF8)' . $expected['next'] . '/';
+            $pattern = $expected['next'];
             $char = qtype_poasquestion_string::substr($str, 0, 1);
             $nextpassed = (($expected['next'] === $str && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && preg_match($pattern, $char)));
+                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
         }
 
         // Checking number of characters left.
@@ -312,7 +322,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
         if (!$leftpassed) {
             echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected left: ' . print_r($expected['left'])      . $this->eol .
+                 'expected left: ' . $expected['left'][0]            . $this->eol .
                  'obtained left: ' . $obtained->left                 . $this->eol .
                  'source class:  ' . $testdataclassname . $this->eol . $this->eol;
         }
