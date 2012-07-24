@@ -7595,48 +7595,73 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
-     * Returns unicode ranges which $utf8str characters belongs to.
-     * @param utf8str UTF-8 string.
-     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
+     * Searches the index of the range in an array of ranges containing the given number.
+     * @param code the number to search for.
+     * @return the index of the range containing this code, false if not found.
      */
-    public static function get_ranges($utf8str) {
-        $result = array();
-        for ($i = 0; $i < qtype_poasquestion_string::strlen($utf8str); $i++) {
-            $code = qtype_poasquestion_string::ord(qtype_poasquestion_string::substr($utf8str, $i, 1));
-            foreach (self::$ranges as $name => $range) {
-                if ($code >= $range[0] && $code < $range[1]) {
-                    if (!array_key_exists($name, $result)) {
-                        $result[$name] = $range;
-                    }
-                    break;
-                }
+    public static function search_number_binary($code, $ranges) {
+        $start = 0;
+        $end = count($ranges) - 1;
+        while ($end >= $start) {
+            $middle = $start + (int)(($end - $start) / 2);
+            if ($ranges[$middle][1] < $code) {
+                $start = $middle + 1;
+            } else if ($ranges[$middle][0] > $code) {
+                $end = $middle - 1;
+            } else if ($ranges[$middle][0] <= $code && $ranges[$middle][1] >= $code) {
+                return $middle;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Makes a set of ranges negative.
+     * @param ranges array of ranges to negate.
+     * @return array of ranges which are negation of the given.
+     */
+    public static function negate_ranges($ranges) {
+        $size = count($ranges);
+        $maxcode = self::max_possible_code();
+        if ($size === 0) {
+            return array(array(0, $maxcode));
+        }
+        $result = array();
+        if ($ranges[0][0] > 0) {
+            $result[] = array(0, $ranges[0][0] - 1);
+        }
+        for ($i = 0; $i < $size - 1; $i++) {
+            $result[] = array($ranges[$i][1] + 1, $ranges[$i + 1][0] - 1);
+        }
+        if ($ranges[$size - 1][1] < $maxcode) {
+            $result[] = array($ranges[$size - 1][1] + 1, $maxcode);
         }
         return $result;
     }
 
     /**
      * @param $charset object of qtype_poasquestion_string.
+     * @return a sorted array of trivial ranges corresponding to the given charset.
      */
     public static function get_ranges_from_charset($charset) {
-        $result = array();
-        $previous = -1;
+        $ords = array();
         for ($i = 0; $i < $charset->length(); $i++) {
-            $str = $charset[$i];
-            $newnum = qtype_poasquestion_string::ord($str);
-            if ($previous === -1) {
-                $toadd = array(0 => $newnum);
-            } else {
-                if ($newnum !== $previous + 1) {
-                    $toadd[1] = $previous;
-                    $result[] = $toadd;
-                    $toadd = array(0 => $newnum);
-                }
-            }
-            $previous = $newnum;
+            $ords[] = qtype_poasquestion_string::ord($charset[$i]);
         }
-        $toadd[1] = $previous;
-        $result[] = $toadd;
+        sort($ords, SORT_NUMERIC);
+        $prevord = $ords[0];
+        $result = array(array($prevord, $prevord));
+        $index = 0;
+        for ($i = 1; $i < count($ords); $i++) {
+            $neword = $ords[$i];
+            if ((int)$neword == (int)$prevord + 1) {
+                $result[$index][1]++;
+            } else {
+                $result[] = array($neword, $neword);
+                $index++;
+            }
+            $prevord = $neword;
+        }
         return $result;
     }
 
@@ -7695,11 +7720,6 @@ class qtype_preg_unicode extends textlib {
             return false;
         }
         $ord = qtype_poasquestion_string::ord($utf8chr);
-        foreach ($ranges as $range) {
-            if ($range[0] <= $ord && $ord <= $range[1]) {
-                return true;
-            }
-        }
-        return false;
+        return (self::search_number_binary($ord, $ranges) !== false);
     }
 }

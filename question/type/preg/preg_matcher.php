@@ -516,7 +516,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //Starting positions loop
-        for ($j = 0; $j < $rightborder && !$result->best(); $j++) {
+        for ($j = 0; $j <= $rightborder && !$result->best(); $j++) {
             $tmp = $this->match_from_pos($str, $j);
             if ($result->worse_than($tmp)) {
                 $result = $tmp;

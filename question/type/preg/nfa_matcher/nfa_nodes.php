@@ -41,11 +41,11 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
         global $CFG;
         $this->statelimit = 250;
         $this->transitionlimit = 250;
-        if (isset($CFG->qtype_preg_nfastatelimit)) {
-            $this->statelimit = $CFG->qtype_preg_nfastatelimit;
+        if (isset($CFG->qtype_preg_nfa_transition_limit)) {
+            $this->statelimit = $CFG->qtype_preg_nfa_transition_limit;
         }
-        if (isset($CFG->qtype_preg_nfatransitionlimit)) {
-            $this->transitionlimit = $CFG->qtype_preg_nfatransitionlimit;
+        if (isset($CFG->qtype_preg_nfa_state_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_nfa_state_limit;
         }
     }
 
