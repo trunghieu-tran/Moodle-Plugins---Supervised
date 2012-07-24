@@ -7,7 +7,7 @@
      */
 
     $INPUT_FILENAME = 'basic.dat.txt';
-    $OUTPUT_FILENAME = 'result.txt'
+    $OUTPUT_FILENAME = 'result.txt';
     $COMMENT_COUNT = 2;
     $TAB = '	';
     $SPACE = ' ';

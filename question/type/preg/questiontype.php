@@ -52,17 +52,29 @@ class qtype_preg extends qtype_shortanswer {
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'qtype_preg');
-        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder', 'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
     }
 
     function save_question_options($question) {
         //Fill in some data that could be absent due to disabling form controls
-        if (!isset($question->usehint)) {
-            $question->usehint = false;
+        if (!isset($question->usecharhint)) {
+            $question->usecharhint = false;
         }
-        if (!isset($question->hintpenalty)) {
-            $question->hintpenalty = 0;
+        if (!isset($question->charhintpenalty)) {
+            $question->charhintpenalty = 0;
+        }
+        if (!isset($question->uselexemhint)) {
+            $question->uselexemhint = false;
+        }
+        if (!isset($question->lexemhintpenalty)) {
+            $question->lexemhintpenalty = 0;
+        }
+        if (!isset($question->lexemusername)) {
+            $question->lexemusername = '';
+        }
+        if (!isset($question->langid)) {
+            $question->langid = 0;
         }
         if (!isset($question->hintgradeborder)) {
             $question->hintgradeborder = 1;
@@ -72,7 +84,8 @@ class qtype_preg extends qtype_shortanswer {
         $questionobj = new qtype_preg_question;
         $querymatcher = $questionobj->get_query_matcher($question->engine);
         if (!$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-            $question->usehint = false;
+            $question->usecharhint = false;
+            $question->uselexemhint = false;
         }
 
         parent::save_question_options($question);

@@ -56,7 +56,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp,'test') === false) {//preg_match returns false when regular expression contains error
-            $this->errors[] = new qtype_preg_error(get_string('PCREincorrectregex','qtype_preg'));
+            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex','qtype_preg'));
             return false;
         }
 
@@ -90,7 +90,11 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $matchresults->full = true;//No partial matching from preg_match
             foreach ($matches as $i => $match) {
                 $matchresults->index_first[$i] = $match[1];
-                $matchresults->length[$i] = strlen($match[0]);
+                if ($match[1] !== -1) {
+                    $matchresults->length[$i] = strlen($match[0]);
+                } else {
+                    $matchresults->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                }
             }
         }
 

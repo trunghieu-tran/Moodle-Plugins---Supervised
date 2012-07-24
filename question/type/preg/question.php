@@ -119,16 +119,24 @@ class qtype_preg_question extends question_graded_automatically
     public $correctanswer;
     /** @var boolean should the match be exact or any match within answer is ok. */
     public $exactmatch;
-    /** @var boolean availability of hints in behavours with multiple attempts. */
-    public $usehint;
+    /** @var boolean availability of hints in behaviours with multiple attempts. */
+    public $usecharhint;
     /** @var number penalty for a hint. */
-    public $hintpenalty;
+    public $charhintpenalty;
     /** @var number only answers with fraction >= hintgradeborder would be used for hinting. */
     public $hintgradeborder;
     /** @var string matching engine to use. */
     public $engine;
     /** @var string notation, used to write answers. */
     public $notation;
+    /** @var boolean availability of next lexem hints in behaviours with multiple attempts.*/
+    public $uselexemhint;
+    /** @var number penalty for a next lexem hint. */
+    public $lexemhintpenalty;
+    /** @var string id of the language, used to write answers (cf. blocks/formal_langs for more details). */
+    public $langid;
+    /** @var preferred name for a lexem by the teacher. */
+    public $lexemusername;
 
     //Other fields
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
@@ -149,8 +157,8 @@ class qtype_preg_question extends question_graded_automatically
         $question->correctanswer = '';
         $question->exactmatch = $exactmatch;
         $querymatcher = $question->get_query_matcher($engine);
-        $question->usehint = $querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
-        $question->hintpenalty = 0;
+        $question->usecharhint = $querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $question->charhintpenalty = 0;
         $question->hintgradeborder = 1;
         $question->engine = $engine;
         $question->notation = $notation;
@@ -342,7 +350,7 @@ class qtype_preg_question extends question_graded_automatically
             //Create and fill options object
             $matchingoptions = new qtype_preg_matching_options;
             //We need extension to hint next character or to generate correct answer if none is supplied
-            $matchingoptions->extensionneeded = $this->usehint || trim($this->correctanswer) == '';
+            $matchingoptions->extensionneeded = $this->usecharhint || trim($this->correctanswer) == '';
             if($answerid !== null && $answerid > 0) {
                 $feedback = $this->answers[$answerid]->feedback;
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
@@ -569,7 +577,7 @@ class qtype_preg_question extends question_graded_automatically
     */
     public function available_specific_hint_types() {
         $hinttypes = array();
-        if ($this->usehint) {
+        if ($this->usecharhint) {
             $hinttypes['hintnextchar'] = get_string('hintnextchar','qtype_preg');
         }
         return $hinttypes;
