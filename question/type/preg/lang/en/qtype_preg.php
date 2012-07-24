@@ -22,7 +22,7 @@ $string['engine_help'] = '<p>There is no \'best\' matching enginge, so you can c
 $string['exactmatch'] = 'Exact matching';
 $string['exactmatch_help'] = '<p>By default regular expression matching returns true if there is at least one match in the given string (answer). Exact matching means that the match must be the entire string.</p><p>Set this to Yes, if you write regular expressions for full student\'s answers. Setting this to No gives you additional flexibility: you can specify an answer with low (or zero) grade to catch common errors and give comments on them. You still can specify exact matches for some of your regular expressions if you start them with ^ and end with $.</p>';
 $string['hintgradeborder'] = 'Hint grade border';
-$string['hintgradeborder_help'] = 'Answers with the grade less then the hint grade border won\'t be used in hinting.';
+$string['hintgradeborder_help'] = 'Answers with the grade less than the hint grade border won\'t be used in hinting.';
 $string['hintnextchar'] = 'next correct character';
 $string['langselect'] = 'Language';
 $string['langselect_help'] = 'For next lexem hint you should choose a language, which is used to break answers down to lexems. Each language has it own rules for lexems. Languages are defined using \'Formal languages block\'';
@@ -142,7 +142,8 @@ $string['error_setunsetmod']            = 'Setting and unsetting the {$a->addinf
 $string['error_unknownunicodeproperty'] = 'Unknown unicode property: {$a->addinfo}.';
 $string['error_unknownposixclass']      = 'Unknown posix class: {$a->addinfo}.';
 $string['error_unknowncontrolsequence'] = 'Unknown control sequence: {$a->addinfo}.';
-$string['error_incorrectrange']         = 'Incorrect range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater then the right border.';
+$string['error_incorrectcharsetrange']  = 'Incorrect character range in position from  {$a->indfirst} to {$a->indlast}: the left character is "greater" than the right one.';
+$string['error_incorrectquantrange']    = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
 
 
 /******* DFA and NFA limitations *******/

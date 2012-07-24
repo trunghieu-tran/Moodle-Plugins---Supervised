@@ -1142,7 +1142,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a-0]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE);
         $this->assertTrue($token->value->error[0]->indfirst === 1);
         $this->assertTrue($token->value->error[0]->indlast === 3);
         $lexer = $this->create_lexer('{2,2}');
@@ -1151,7 +1151,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('{127,11}');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($token->value->error->indfirst === 1);
         $this->assertTrue($token->value->error->indlast === 6);
         $lexer = $this->create_lexer('\p{b}[\pB][[:c:]]{4,3}+[^az-yb]\pO[\p{4}]');
@@ -1194,7 +1194,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indfirst === 17);
         $this->assertTrue($token->value->indlast === 22);
         $this->assertTrue($token->value->userinscription === '{4,3}+');
-        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($token->value->error->indfirst === 18);
         $this->assertTrue($token->value->error->indlast === 21);
         $this->assertTrue($token->value->error->userinscription === '4,3');
@@ -1205,7 +1205,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indlast === 30);
         $this->assertTrue($token->value->userinscription === array('az-yb'));
         $this->assertTrue($token->value->flags[0][0]->data == 'ab');
-        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE);
         $this->assertTrue($token->value->error[0]->indfirst === 26);
         $this->assertTrue($token->value->error[0]->indlast === 28);
         $this->assertTrue($token->value->error[0]->userinscription === 'z-y');

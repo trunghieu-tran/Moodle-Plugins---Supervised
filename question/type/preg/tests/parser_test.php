@@ -593,7 +593,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[4]->indlast == 29);
         $this->assertTrue(empty($errornodes[4]->operands));
         $this->assertTrue($errornodes[5]->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[5]->subtype == qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($errornodes[5]->subtype == qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($errornodes[5]->indfirst == 26);
         $this->assertTrue($errornodes[5]->indlast == 28);
         $this->assertTrue(empty($errornodes[5]->operands));

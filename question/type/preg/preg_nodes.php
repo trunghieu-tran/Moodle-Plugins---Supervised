@@ -1504,8 +1504,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_UNKNOWN_POSIX_CLASS = 'unknown_posix_class_node_error';
     /** Unknown control sequence (*...). */
     const SUBTYPE_UNKNOWN_CONTROL_SEQUENCE = 'unknown_control_sequence_node_error';
-    /** Incorrect ranges in a quantifier or a character set: {5,3} or [z-a]. **/
-    const SUBTYPE_INCORRECT_RANGE = 'incorrect_range_node_error';
+    /** Incorrect character set range: [z-a]. **/
+    const SUBTYPE_INCORRECT_CHARSET_RANGE = 'incorrect_charset_range_node_error';
+    /** Incorrect quantifier ranges: {5,3}. **/
+    const SUBTYPE_INCORRECT_QUANT_RANGE = 'incorrect_quant_range_node_error';
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
@@ -1519,7 +1521,8 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'error_unknownunicodeproperty',
                                    self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'error_unknownposixclass',
                                    self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'error_unknowncontrolsequence',
-                                   self::SUBTYPE_INCORRECT_RANGE              => 'error_incorrectrange'
+                                   self::SUBTYPE_INCORRECT_CHARSET_RANGE      => 'error_incorrectcharsetrange',
+                                   self::SUBTYPE_INCORRECT_QUANT_RANGE        => 'error_incorrectquantrange'
                                    );
     /** Additional info. */
     public $addinfo;

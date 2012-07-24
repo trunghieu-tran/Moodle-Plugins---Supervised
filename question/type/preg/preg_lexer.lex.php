@@ -295,7 +295,7 @@ class qtype_preg_lexer extends JLexBase  {
             $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
             // Form the error node.
             $error = new qtype_preg_node_error();
-            $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
+            $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE;
             $error->indfirst = $this->yychar - 2;
             $error->indlast = $this->yychar + $this->yylength() - 1;
             $error->userinscription = $startchar . '-' . $endchar;
@@ -7316,7 +7316,7 @@ array(
     $node = $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive);
     if ($leftborder > $rightborder) {
         $error = new qtype_preg_node_error();
-        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
+        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE;
         $error->indfirst = $this->yychar + 1;
         $error->indlast = $this->yychar + $this->yylength() - 2;
         $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
@@ -8086,7 +8086,7 @@ array(
     $node = $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive);
     if ($leftborder > $rightborder) {
         $error = new qtype_preg_node_error();
-        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
+        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE;
         $error->indfirst = $this->yychar + 1;
         $error->indlast = $this->yychar + $this->yylength() - 2;
         $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
