@@ -72,7 +72,7 @@ interface qtype_preg_matcher_state {
 abstract class qtype_preg_node {
 
     /** Abstract node class, not representing real things. */
-    const TYPE_ABSTRACT = 'abstract';
+    const TYPE_ABSTRACT = 'node_abstract';
     /** A character or a character set. */
     const TYPE_LEAF_CHARSET = 'leaf_charset';
     /** Meta-character or escape sequence matching with a set of characters that couldn't be enumerated. */
@@ -87,8 +87,6 @@ abstract class qtype_preg_node {
     const TYPE_LEAF_CONTROL = 'leaf_control';
     /** Option set. */
     const TYPE_LEAF_OPTIONS = 'leaf_options';
-    /** Combination of few leaf. */
-    const TYPE_LEAF_COMBO = 'leaf_combo';
     /** Finite quantifier. */
     const TYPE_NODE_FINITE_QUANT = 'node_finite_quant';
     /** Infinite quantifier. */
@@ -167,29 +165,12 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     }
 
     public function dot_script($styleprovider, $isroot = true) {
-        // $this->userinscription can be either a string or an array of strings.
-        if (is_array($this->userinscription)) {
-            $userinscription = '[';
-            foreach ($this->userinscription as $tmp) {
-                $userinscription .= $tmp;
-            }
-            $userinscription .= ']';
-        } else {
-            $userinscription = $this->userinscription;
-        }
-
-        // Calculate node name, dot script and style.
-        $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $userinscription . '"';
-        if ($styleprovider !== null) {
-            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
-        } else {
-            $style = '';
-        }
-
-        // Form the result.
+        // Calculate the node name, style and the result.
+        $nodename = $this->id;
+        $style = $nodename . $styleprovider->get_style($this) . ';';
         $dotscript = $nodename . ';';
         if ($isroot) {
-            $dotscript = 'digraph {' . $style . $dotscript . '}';
+            $dotscript = $styleprovider->get_dot_head() . $style . $dotscript . $styleprovider->get_dot_tail();
             return $dotscript;
         } else {
             return array($dotscript, $style);
@@ -1295,12 +1276,9 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     }
 
     public function dot_script($styleprovider, $isroot = true) {
-        $nodename = '"id = ' . $this->id . '\n' . $this->name() . '\n' . $this->userinscription . '"';
-        if ($styleprovider !== null) {
-            $style = $nodename . $styleprovider->get_style($this->type, $this->subtype) . ';';
-        } else {
-            $style = '';
-        }
+        // Calculate the node name and style.
+        $nodename = $this->id;
+        $style = $nodename . $styleprovider->get_style($this) . ';';
 
         // Get child dot scripts and styles.
         $childscripts = array();
@@ -1316,7 +1294,7 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $dotscript .= $nodename . '->' . $childscript;
         }
         if ($isroot) {
-            $dotscript = 'digraph {' . $style . $dotscript . '}';
+            $dotscript = $styleprovider->get_dot_head() . $style . $dotscript . $styleprovider->get_dot_tail();
             return $dotscript;
         } else {
             return array($dotscript, $style);
@@ -1530,18 +1508,18 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_INCORRECT_RANGE = 'incorrect_range_node_error';
 
     /** Error strings names in qtype_preg.php lang file. */
-    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'PCREincorrectregex',
-                                   self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'threealtincondsubpatt',
-                                   self::SUBTYPE_WRONG_CLOSE_PAREN            => 'unopenedparen',
-                                   self::SUBTYPE_WRONG_OPEN_PAREN             => 'unclosedparen',
-                                   self::SUBTYPE_EMPTY_PARENS                 => 'emptyparens',
-                                   self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'quantifieratstart',
-                                   self::SUBTYPE_UNCLOSED_CHARSET             => 'unclosedsqbrackets',
-                                   self::SUBTYPE_SET_UNSET_MODIFIER           => 'setunsetmod',
-                                   self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'unknownunicodeproperty',
-                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'unknownposixclass',
-                                   self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'unknowncontrolsequence',
-                                   self::SUBTYPE_INCORRECT_RANGE              => 'incorrectrange'
+    public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
+                                   self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'error_threealtincondsubpatt',
+                                   self::SUBTYPE_WRONG_CLOSE_PAREN            => 'error_unopenedparen',
+                                   self::SUBTYPE_WRONG_OPEN_PAREN             => 'error_unclosedparen',
+                                   self::SUBTYPE_EMPTY_PARENS                 => 'error_emptyparens',
+                                   self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'error_quantifieratstart',
+                                   self::SUBTYPE_UNCLOSED_CHARSET             => 'error_unclosedsqbrackets',
+                                   self::SUBTYPE_SET_UNSET_MODIFIER           => 'error_setunsetmod',
+                                   self::SUBTYPE_UNKNOWN_UNICODE_PROPERTY     => 'error_unknownunicodeproperty',
+                                   self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'error_unknownposixclass',
+                                   self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'error_unknowncontrolsequence',
+                                   self::SUBTYPE_INCORRECT_RANGE              => 'error_incorrectrange'
                                    );
     /** Additional info. */
     public $addinfo;
@@ -1553,9 +1531,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->addinfo = null;
-    }
-    public function dot_script($styleprovider, $isroot = true) {
-        return qtype_preg_leaf::dot_script($styleprovider, $isroot); // TODO
     }
 
     /**
