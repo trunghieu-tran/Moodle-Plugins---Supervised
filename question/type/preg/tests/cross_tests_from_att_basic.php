@@ -2,9 +2,9 @@
 
 defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
 
-class qtype_preg_cross_tests_from_att_basic  {
+class qtype_preg_cross_tests_from_att_basic {
 
-        function data_for_test_att_basic_0() {
+    function data_for_test_att_basic_0() {
         $test1 = array( 'str'=>"abracadabracadabra",
                         'is_match'=>true,
                         'full'=>true,
