@@ -146,8 +146,7 @@ class qtype_preg_regex_handler {
      * @return bool if parsing needed
      */
     protected function is_parsing_needed() {
-        //most engines will need parsing
-        return true;
+        return true;    // Most engines will need parsing.
     }
 
     /**
@@ -179,12 +178,47 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Access function to AST root.
+     * Used mainly for unit-testing and avoiding re-parsing
+     */
+    public function get_ast_root() {
+        return $this->ast_root;
+    }
+
+    public function is_regex_anchored($start = true) {
+        if ($start) {
+            return $this->anchor->start;
+        } else {
+            return $this->anchor->end;
+        }
+    }
+
+    /**
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
      * Returns true if node is supported or user interface string describing
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
         return false;    // Should be overloaded by child classes
+    }
+
+    protected function look_for_circumflex($root) {
+        if (is_a($root, 'qtype_preg_leaf')) {
+            return ($root->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        } else if (is_a($root, 'qtype_preg_node_infinite_quant')) {
+            $operand = $root->operands[0];
+            return ($root->leftborder === 0 && is_a($operand, 'qtype_preg_leaf_charset') &&
+                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
+        } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
+            return $this->look_for_circumflex($root->operands[0]);
+        } else if (is_a($root, 'qtype_preg_node_alt')) {
+            $result = true;
+            foreach ($root->operands as $operand) {
+                $result = $result && $this->look_for_circumflex($operand);
+            }
+            return $result;
+        }
+        return false;
     }
 
     /**
@@ -196,7 +230,7 @@ class qtype_preg_regex_handler {
     public function look_for_anchors() {
         //TODO(performance) - write real code, for now think no anchoring is in expressions
         $this->anchor = new stdClass;
-        $this->anchor->start = false;
+        $this->anchor->start = $this->look_for_circumflex($this->ast_root);
         $this->anchor->end = false;
     }
 
@@ -253,14 +287,6 @@ class qtype_preg_regex_handler {
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
         }
-    }
-
-    /**
-     * Access function to AST root.
-     * Used mainly for unit-testing and avoiding re-parsing
-     */
-    public function get_ast_root() {
-        return $this->ast_root;
     }
 
     /**
