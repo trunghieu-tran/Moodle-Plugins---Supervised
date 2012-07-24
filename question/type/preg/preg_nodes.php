@@ -126,7 +126,9 @@ abstract class qtype_preg_node {
      * Return class name without 'qtype_preg_' prefix. Interface string for the node name should be exactly
      * the same (and start from an upper-case character) if class not overloading ui_nodename method.
      */
-    abstract public function name();
+    public function name() {
+        return $this->type;
+    }
 
     /**
      * Returns the dot script corresponding to this node.
@@ -263,10 +265,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 $this->flags[$ind1] = $cur;
             }
         }
-    }
-
-    public function name() {
-        return 'leaf_charset';
     }
 
     protected function calc_ranges() {
@@ -935,9 +933,6 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_LEAF_META;
     }
-    public function name() {
-        return 'leaf_meta';
-    }
 
     //TODO - ui_nodename()
 
@@ -990,10 +985,6 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     public function consumes($matcherstateobj = null) {
         return 0;
-    }
-
-    public function name() {
-        return 'leaf_assert';
     }
 
     //TODO - ui_nodename()
@@ -1128,10 +1119,6 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         return $result;
     }
 
-    public function name() {
-        return 'leaf_backref';
-    }
-
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // TODO: check for assertions in case of $length == 0
         if (!$matcherstateobj->is_subpattern_captured($this->number)) {
@@ -1160,9 +1147,6 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');
     }
-    public function name() {
-        return 'leaf_option';
-    }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
     }
@@ -1180,9 +1164,6 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
     }
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for qtype_preg_leaf_recursion class before use it!');
-    }
-    public function name() {
-        return 'leaf_recursion';
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implements abstract function character for qtype_preg_leaf_recursion class before use it!');
@@ -1247,9 +1228,6 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     }
     protected function match_inner($str, $pos, &$length, $cs, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
-    }
-    public function name() {
-        return 'leaf_control';
     }
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
@@ -1324,11 +1302,6 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
     }
-
-    public function name() {
-        return 'node_finite_quant';
-    }
-
     //TODO - ui_nodename()
 }
 
@@ -1349,11 +1322,6 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
     }
-
-    public function name() {
-        return 'node_infinite_quant';
-    }
-
     //TODO - ui_nodename()
 }
 
@@ -1361,12 +1329,9 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
  * Defines concatenation, binary operator.
  */
 class qtype_preg_node_concat extends qtype_preg_operator {
+
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
-    }
-
-    public function name() {
-        return 'node_concat';
     }
 }
 
@@ -1377,10 +1342,6 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ALT;
-    }
-
-    public function name() {
-        return 'node_alt';
     }
 }
 
@@ -1402,9 +1363,6 @@ class qtype_preg_node_assert extends qtype_preg_operator {
         $this->type = qtype_preg_node::TYPE_NODE_ASSERT;
     }
 
-    public function name() {
-        return 'node_assert';
-    }
     public function tohr() {
         return 'node assert';
     }
@@ -1429,10 +1387,6 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
-    }
-
-    public function name() {
-        return 'node_subpatt';
     }
 
     //TODO - ui_nodename()
@@ -1471,9 +1425,6 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
     }
 
-    public function name() {
-        return 'node_cond_subpatt';
-    }
     //TODO - ui_nodename()
 }
 
@@ -1526,10 +1477,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    );
     /** Additional info. */
     public $addinfo;
-
-    public function name() {
-        return 'node_error';
-    }
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
