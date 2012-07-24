@@ -1417,6 +1417,12 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
  */
 class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
 
+    /** Absolute/relative/named references to subpatterns. */
+    const SUBTYPE_SUBPATT = 'subpatt_node_cond_subpatt';
+    /** Recursion condition. */
+    const SUBTYPE_RECURSION = 'recursion_node_cond_subpatt';
+    /** Define subpattern for reference. */
+    const SUBTYPE_DEFINE = 'define_node_cond_subpatt';
     /** Positive lookahead assert. */
     const SUBTYPE_PLA = 'pla_node_cond_subpatt';
     /** Negative lookahead assert. */
@@ -1425,19 +1431,11 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
     const SUBTYPE_PLB = 'plb_node_cond_subpatt';
     /** Negative lookbehind assert. */
     const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
-    /** Backreference. */
-    const SUBTYPE_BACKREF = 'backref_node_cond_subpatt';
-    /** Recursive. */
-    const SUBTYPE_RECURSIVE = 'recursive_node_cond_subpatt';
 
     /** Subpattern number. */
     public $number = 0;
-    /** Subpattern match (if supported). */
-    public $match = null;
     /** Is condition satisfied?. */
     public $condbranch = null;
-    /** Backreference number. */
-    public $backrefnumber = -1;
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
