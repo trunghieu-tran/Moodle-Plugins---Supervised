@@ -119,10 +119,10 @@ function block_formal_langs_hex_to_decimal_char($matches) {
             $num_lines = count($lines);
             
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = strlen($lines[$num_lines -1]);
+            $end_col = strlen($lines[$num_lines -1]) - 1;
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + strlen($this->yytext());
+            $end_col = $begin_col + strlen($this->yytext()) - 1;
         }
         
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
@@ -140,68 +140,68 @@ IS = (u|U|l|L)
 
 %%
 
-/\*[^\*/]+\*/                                               { return $this->create_token("multiline_comment",$this->yytext()); }
-//[^\n\r]\n\r                                               { return $this->create_token("singleline_comment",$this->yytext()); }
-(auto|break|case|const|continue|default|do|else|enum)       { return $this->create_token("keyword",$this->yytext()); }
-(extern|for|goto|if|register|return|sizeof|static|struct)   { return $this->create_token("keyword",$this->yytext()); }
-(switch|typedef|union|volatile|while)                       { return $this->create_token("keyword",$this->yytext()); }
-(char|double|float|int|long|signed|unsigned|void)           { return $this->create_token("typename",$this->yytext()); }
-{L}({L}|{D})*                                               { return $this->create_token("identifier",$this->yytext()); }
-0[xX]{H}+{IS}?                                              { return $this->create_token("numeric",$this->yytext()); }
-0{D}+{IS}?                                                  { return $this->create_token("numeric",$this->yytext()); }
-{D}+{IS}?                                                   { return $this->create_token("numeric",$this->yytext()); }
-"#include"[" "]*"<"[^">"]+">"                               { return $this->create_token("preprocessor",$this->yytext()); }                              
-"#include"[" "]*\"[^">"]+\"                                 { return $this->create_token("preprocessor",$this->yytext()); }
-"#define"                                                   { return $this->create_token("preprocessor",$this->yytext()); }
-"#if"                                                       { return $this->create_token("preprocessor",$this->yytext()); }
-"#ifdef"                                                    { return $this->create_token("preprocessor",$this->yytext()); }
-"#elif"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
-"#else"                                                     { return $this->create_token("preprocessor",$this->yytext()); }
-"#endif"                                                    { return $this->create_token("preprocessor",$this->yytext()); }                              
+/\*[^\*/]+\*/                                               { return $this->create_token('multiline_comment',$this->yytext()); }
+//[^\n\r]\n\r                                               { return $this->create_token('singleline_comment',$this->yytext()); }
+(auto|break|case|const|continue|default|do|else|enum)       { return $this->create_token('keyword',$this->yytext()); }
+(extern|for|goto|if|register|return|sizeof|static|struct)   { return $this->create_token('keyword',$this->yytext()); }
+(switch|typedef|union|volatile|while)                       { return $this->create_token('keyword',$this->yytext()); }
+(char|double|float|int|long|signed|unsigned|void)           { return $this->create_token('typename',$this->yytext()); }
+{L}({L}|{D})*                                               { return $this->create_token('identifier',$this->yytext()); }
+0[xX]{H}+{IS}?                                              { return $this->create_token('numeric',$this->yytext()); }
+0{D}+{IS}?                                                  { return $this->create_token('numeric',$this->yytext()); }
+{D}+{IS}?                                                   { return $this->create_token('numeric',$this->yytext()); }
+"#include"[" "]*"<"[^">"]+">"                               { return $this->create_token('preprocessor',$this->yytext()); }                              
+"#include"[" "]*\"[^">"]+\"                                 { return $this->create_token('preprocessor',$this->yytext()); }
+"#define"                                                   { return $this->create_token('preprocessor',$this->yytext()); }
+"#if"                                                       { return $this->create_token('preprocessor',$this->yytext()); }
+"#ifdef"                                                    { return $this->create_token('preprocessor',$this->yytext()); }
+"#elif"                                                     { return $this->create_token('preprocessor',$this->yytext()); }
+"#else"                                                     { return $this->create_token('preprocessor',$this->yytext()); }
+"#endif"                                                    { return $this->create_token('preprocessor',$this->yytext()); }                              
 L?\'(\\\'|[^\'])+\'                                          { return $this->create_character($this->yytext()); }
 L?\"(\\\"|[^\"])+\"                                         { return $this->create_string($this->yytext()); }
-{D}+{E}{FS}?                                                { return $this->create_token("numeric",$this->yytext()); }
-{D}*"."{D}+({E})?{FS}?                                      { return $this->create_token("numeric",$this->yytext()); }
-{D}+"."{D}*({E})?{FS}?                                      { return $this->create_token("numeric",$this->yytext()); }
-"..."                                                       { return $this->create_token("ellipsis",$this->yytext()); }
-">>="                                                       { return $this->create_token("operators",$this->yytext()); }
-"<<="                                                       { return $this->create_token("operators",$this->yytext()); }
-"="                                                        { return $this->create_token("operators",$this->yytext()); }
-"+="                                                       { return $this->create_token("operators",$this->yytext()); }
-"-="                                                       { return $this->create_token("operators",$this->yytext()); }
-"*="                                                       { return $this->create_token("operators",$this->yytext()); }
-"/="                                                       { return $this->create_token("operators",$this->yytext()); }
-"%="                                                       { return $this->create_token("operators",$this->yytext()); }
-"&="                                                       { return $this->create_token("operators",$this->yytext()); }
-"^="                                                       { return $this->create_token("operators",$this->yytext()); }
-"|="                                                       { return $this->create_token("operators",$this->yytext()); }
-">>"                                                       { return $this->create_token("operators",$this->yytext()); }
-"<<"                                                       { return $this->create_token("operators",$this->yytext()); }
-"++"                                                       { return $this->create_token("operators",$this->yytext()); }
-"--"                                                       { return $this->create_token("operators",$this->yytext()); }
-"->"                                                       { return $this->create_token("operators",$this->yytext()); }
-"&&"                                                       { return $this->create_token("operators",$this->yytext()); }
-"||"                                                       { return $this->create_token("operators",$this->yytext()); }
-"<="                                                       { return $this->create_token("operators",$this->yytext()); }
-">="                                                       { return $this->create_token("operators",$this->yytext()); }
-"=="                                                       { return $this->create_token("operators",$this->yytext()); }
-"!="                                                       { return $this->create_token("operators",$this->yytext()); }
-";"                                                        { return $this->create_token("semicolon",$this->yytext()); }
-("{"|"<%")                                                 { return $this->create_token("brackets","{"); }
-("}"|"%>")                                                 { return $this->create_token("brackets","}"); }
-","                                                        { return $this->create_token("comma",$this->yytext()); }
-":"                                                        { return $this->create_token("colon",$this->yytext()); }
-"("                                                        { return $this->create_token("brackets",$this->yytext()); }
-")"                                                        { return $this->create_token("brackets",$this->yytext()); }
-("["|"<:")                                                 { return $this->create_token("brackets","["); }
-("]"|":>")                                                 { return $this->create_token("brackets","]"); }
-"."                                                        { return $this->create_token("operators",$this->yytext()); }
-"&"                                                        { return $this->create_token("operators",$this->yytext()); }
-"|"                                                        { return $this->create_token("operators",$this->yytext()); }
-"^"                                                        { return $this->create_token("operators",$this->yytext()); }
-"!"                                                        { return $this->create_token("operators",$this->yytext()); }
-"~"                                                        { return $this->create_token("operators",$this->yytext()); }
-"-"|"+"|"*"|"/"|"%"|">"|"<"                                { return $this->create_token("operators",$this->yytext()); }
-"?"                                                        { return $this->create_token("question_mark",$this->yytext()); }
+{D}+{E}{FS}?                                                { return $this->create_token('numeric',$this->yytext()); }
+{D}*"."{D}+({E})?{FS}?                                      { return $this->create_token('numeric',$this->yytext()); }
+{D}+"."{D}*({E})?{FS}?                                      { return $this->create_token('numeric',$this->yytext()); }
+"..."                                                       { return $this->create_token('ellipsis',$this->yytext()); }
+">>="                                                       { return $this->create_token('operators',$this->yytext()); }
+"<<="                                                       { return $this->create_token('operators',$this->yytext()); }
+"="                                                        { return $this->create_token('operators',$this->yytext()); }
+"+="                                                       { return $this->create_token('operators',$this->yytext()); }
+"-="                                                       { return $this->create_token('operators',$this->yytext()); }
+"*="                                                       { return $this->create_token('operators',$this->yytext()); }
+"/="                                                       { return $this->create_token('operators',$this->yytext()); }
+"%="                                                       { return $this->create_token('operators',$this->yytext()); }
+"&="                                                       { return $this->create_token('operators',$this->yytext()); }
+"^="                                                       { return $this->create_token('operators',$this->yytext()); }
+"|="                                                       { return $this->create_token('operators',$this->yytext()); }
+">>"                                                       { return $this->create_token('operators',$this->yytext()); }
+"<<"                                                       { return $this->create_token('operators',$this->yytext()); }
+"++"                                                       { return $this->create_token('operators',$this->yytext()); }
+"--"                                                       { return $this->create_token('operators',$this->yytext()); }
+"->"                                                       { return $this->create_token('operators',$this->yytext()); }
+"&&"                                                       { return $this->create_token('operators',$this->yytext()); }
+"||"                                                       { return $this->create_token('operators',$this->yytext()); }
+"<="                                                       { return $this->create_token('operators',$this->yytext()); }
+">="                                                       { return $this->create_token('operators',$this->yytext()); }
+"=="                                                       { return $this->create_token('operators',$this->yytext()); }
+"!="                                                       { return $this->create_token('operators',$this->yytext()); }
+";"                                                        { return $this->create_token('semicolon',$this->yytext()); }
+("{"|"<%")                                                 { return $this->create_token('bracket','{'); }
+("}"|"%>")                                                 { return $this->create_token('bracket','}'); }
+","                                                        { return $this->create_token('comma',$this->yytext()); }
+":"                                                        { return $this->create_token('colon',$this->yytext()); }
+"("                                                        { return $this->create_token('bracket',$this->yytext()); }
+")"                                                        { return $this->create_token('bracket',$this->yytext()); }
+("["|"<:")                                                 { return $this->create_token('bracket','['); }
+("]"|":>")                                                 { return $this->create_token('bracket',']'); }
+"."                                                        { return $this->create_token('operators',$this->yytext()); }
+"&"                                                        { return $this->create_token('operators',$this->yytext()); }
+"|"                                                        { return $this->create_token('operators',$this->yytext()); }
+"^"                                                        { return $this->create_token('operators',$this->yytext()); }
+"!"                                                        { return $this->create_token('operators',$this->yytext()); }
+"~"                                                        { return $this->create_token('operators',$this->yytext()); }
+"-"|"+"|"*"|"/"|"%"|">"|"<"                                { return $this->create_token('operators',$this->yytext()); }
+"?"                                                        { return $this->create_token('question_mark',$this->yytext()); }
 [ \t\v\n\f]                                                {  } 
-.                                                          { $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
+.                                                          { $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext());}

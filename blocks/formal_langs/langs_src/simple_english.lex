@@ -65,10 +65,10 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
             $num_lines = count($lines);
             
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = strlen($lines[$num_lines -1]);
+            $end_col = strlen($lines[$num_lines - 1]) - 1;
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + strlen($this->yytext());
+            $end_col = $begin_col + strlen($this->yytext()) - 1;
         }
         
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
@@ -78,9 +78,9 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %}
 
 %%
-[a-zA-Z]+('s|'re|'t|s')?                                        { return $this->create_token("word",$this->yytext()); }
-[0-9]+                                                          { return $this->create_token("numeric",$this->yytext()); } 
+(([a-zA-Z]+('s|'re|'t|s')?)|'tis)                               { return $this->create_token('word',$this->yytext()); }
+[0-9]+                                                          { return $this->create_token('numeric',$this->yytext()); } 
 [ \t]                                                           {  }
-("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")  { return $this->create_token("punctuation",$this->yytext()); } 
-("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*")                   { return $this->create_token("typographic_mark",$this->yytext()); } 
-.                                                               { return $this->create_token("other",$this->yytext());}  
+("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")  { return $this->create_token('punctuation',$this->yytext()); } 
+("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*")                   { return $this->create_token('typographic_mark',$this->yytext()); } 
+.                                                               { return $this->create_token('other',$this->yytext());}  

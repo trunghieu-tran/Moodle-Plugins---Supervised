@@ -112,7 +112,7 @@ class block_formal_langs_c_language_comma extends block_formal_langs_token_base
 
 /** Describes a brackets
  */ 
-class block_formal_langs_c_language_brackets extends block_formal_langs_token_base
+class block_formal_langs_c_language_bracket extends block_formal_langs_token_base
 {
 
 }

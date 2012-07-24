@@ -103,10 +103,10 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
             $lines = explode("\n", $this->yytext());
             $num_lines = count($lines);
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = strlen($lines[$num_lines -1]);
+            $end_col = strlen($lines[$num_lines -1]) - 1;
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + strlen($this->yytext());
+            $end_col = $begin_col + strlen($this->yytext()) - 1;
         }
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
         return $res;
@@ -1439,7 +1439,7 @@ array(
 						case -2:
 							break;
 						case 2:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -3:
 							break;
 						case 3:
@@ -1447,203 +1447,203 @@ array(
 						case -4:
 							break;
 						case 4:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -5:
 							break;
 						case 5:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -6:
 							break;
 						case 6:
-							{ $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
+							{ $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext());}
 						case -7:
 							break;
 						case 7:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -8:
 							break;
 						case 8:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -9:
 							break;
 						case 9:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -10:
 							break;
 						case 10:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -11:
 							break;
 						case 11:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -12:
 							break;
 						case 12:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -13:
 							break;
 						case 13:
-							{ return $this->create_token("semicolon",$this->yytext()); }
+							{ return $this->create_token('semicolon',$this->yytext()); }
 						case -14:
 							break;
 						case 14:
-							{ return $this->create_token("brackets","{"); }
+							{ return $this->create_token('bracket','{'); }
 						case -15:
 							break;
 						case 15:
-							{ return $this->create_token("brackets","}"); }
+							{ return $this->create_token('bracket','}'); }
 						case -16:
 							break;
 						case 16:
-							{ return $this->create_token("comma",$this->yytext()); }
+							{ return $this->create_token('comma',$this->yytext()); }
 						case -17:
 							break;
 						case 17:
-							{ return $this->create_token("colon",$this->yytext()); }
+							{ return $this->create_token('colon',$this->yytext()); }
 						case -18:
 							break;
 						case 18:
-							{ return $this->create_token("brackets",$this->yytext()); }
+							{ return $this->create_token('bracket',$this->yytext()); }
 						case -19:
 							break;
 						case 19:
-							{ return $this->create_token("brackets",$this->yytext()); }
+							{ return $this->create_token('bracket',$this->yytext()); }
 						case -20:
 							break;
 						case 20:
-							{ return $this->create_token("brackets","["); }
+							{ return $this->create_token('bracket','['); }
 						case -21:
 							break;
 						case 21:
-							{ return $this->create_token("brackets","]"); }
+							{ return $this->create_token('bracket',']'); }
 						case -22:
 							break;
 						case 22:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -23:
 							break;
 						case 23:
-							{ return $this->create_token("question_mark",$this->yytext()); }
+							{ return $this->create_token('question_mark',$this->yytext()); }
 						case -24:
 							break;
 						case 24:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -25:
 							break;
 						case 25:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -26:
 							break;
 						case 26:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -27:
 							break;
 						case 27:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -28:
 							break;
 						case 28:
-							{ return $this->create_token("keyword",$this->yytext()); }
+							{ return $this->create_token('keyword',$this->yytext()); }
 						case -29:
 							break;
 						case 29:
-							{ return $this->create_token("keyword",$this->yytext()); }
+							{ return $this->create_token('keyword',$this->yytext()); }
 						case -30:
 							break;
 						case 30:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -31:
 							break;
 						case 31:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -32:
 							break;
 						case 32:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -33:
 							break;
 						case 33:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -34:
 							break;
 						case 34:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -35:
 							break;
 						case 35:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -36:
 							break;
 						case 36:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -37:
 							break;
 						case 37:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -38:
 							break;
 						case 38:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -39:
 							break;
 						case 39:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -40:
 							break;
 						case 40:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -41:
 							break;
 						case 41:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -42:
 							break;
 						case 42:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -43:
 							break;
 						case 43:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -44:
 							break;
 						case 44:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -45:
 							break;
 						case 45:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -46:
 							break;
 						case 46:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -47:
 							break;
 						case 47:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -48:
 							break;
 						case 48:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -49:
 							break;
 						case 49:
-							{ return $this->create_token("typename",$this->yytext()); }
+							{ return $this->create_token('typename',$this->yytext()); }
 						case -50:
 							break;
 						case 50:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -51:
 							break;
 						case 51:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -52:
 							break;
 						case 52:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -53:
 							break;
 						case 53:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -54:
 							break;
 						case 54:
@@ -1655,83 +1655,83 @@ array(
 						case -56:
 							break;
 						case 56:
-							{ return $this->create_token("ellipsis",$this->yytext()); }
+							{ return $this->create_token('ellipsis',$this->yytext()); }
 						case -57:
 							break;
 						case 57:
-							{ return $this->create_token("singleline_comment",$this->yytext()); }
+							{ return $this->create_token('singleline_comment',$this->yytext()); }
 						case -58:
 							break;
 						case 58:
-							{ return $this->create_token("multiline_comment",$this->yytext()); }
+							{ return $this->create_token('multiline_comment',$this->yytext()); }
 						case -59:
 							break;
 						case 59:
-							{ return $this->create_token("keyword",$this->yytext()); }
+							{ return $this->create_token('keyword',$this->yytext()); }
 						case -60:
 							break;
 						case 60:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -61:
 							break;
 						case 61:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -62:
 							break;
 						case 62:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -63:
 							break;
 						case 63:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -64:
 							break;
 						case 64:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -65:
 							break;
 						case 65:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -66:
 							break;
 						case 66:
-							{ return $this->create_token("preprocessor",$this->yytext()); }
+							{ return $this->create_token('preprocessor',$this->yytext()); }
 						case -67:
 							break;
 						case 68:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -68:
 							break;
 						case 69:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -69:
 							break;
 						case 70:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -70:
 							break;
 						case 71:
-							{ $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
+							{ $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext());}
 						case -71:
 							break;
 						case 72:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -72:
 							break;
 						case 73:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -73:
 							break;
 						case 74:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -74:
 							break;
 						case 75:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -75:
 							break;
 						case 76:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -76:
 							break;
 						case 77:
@@ -1743,423 +1743,423 @@ array(
 						case -78:
 							break;
 						case 80:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -79:
 							break;
 						case 81:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -80:
 							break;
 						case 82:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -81:
 							break;
 						case 83:
-							{ $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
+							{ $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext());}
 						case -82:
 							break;
 						case 84:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -83:
 							break;
 						case 85:
-							{ return $this->create_token("numeric",$this->yytext()); }
+							{ return $this->create_token('numeric',$this->yytext()); }
 						case -84:
 							break;
 						case 87:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -85:
 							break;
 						case 88:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -86:
 							break;
 						case 89:
-							{ $this->create_error($this->yytext()); return $this->create_token("unknown",$this->yytext());}
+							{ $this->create_error($this->yytext()); return $this->create_token('unknown',$this->yytext());}
 						case -87:
 							break;
 						case 91:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -88:
 							break;
 						case 92:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -89:
 							break;
 						case 94:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -90:
 							break;
 						case 95:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -91:
 							break;
 						case 97:
-							{ return $this->create_token("operators",$this->yytext()); }
+							{ return $this->create_token('operators',$this->yytext()); }
 						case -92:
 							break;
 						case 98:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -93:
 							break;
 						case 100:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -94:
 							break;
 						case 102:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -95:
 							break;
 						case 104:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -96:
 							break;
 						case 106:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -97:
 							break;
 						case 108:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -98:
 							break;
 						case 110:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -99:
 							break;
 						case 112:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -100:
 							break;
 						case 114:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -101:
 							break;
 						case 116:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -102:
 							break;
 						case 118:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -103:
 							break;
 						case 120:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -104:
 							break;
 						case 122:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -105:
 							break;
 						case 124:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -106:
 							break;
 						case 126:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -107:
 							break;
 						case 128:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -108:
 							break;
 						case 130:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -109:
 							break;
 						case 152:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -110:
 							break;
 						case 153:
-							{ return $this->create_token("keyword",$this->yytext()); }
+							{ return $this->create_token('keyword',$this->yytext()); }
 						case -111:
 							break;
 						case 154:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -112:
 							break;
 						case 157:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -113:
 							break;
 						case 158:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -114:
 							break;
 						case 159:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -115:
 							break;
 						case 160:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -116:
 							break;
 						case 161:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -117:
 							break;
 						case 162:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -118:
 							break;
 						case 163:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -119:
 							break;
 						case 164:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -120:
 							break;
 						case 165:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -121:
 							break;
 						case 166:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -122:
 							break;
 						case 167:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -123:
 							break;
 						case 168:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -124:
 							break;
 						case 169:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -125:
 							break;
 						case 170:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -126:
 							break;
 						case 171:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -127:
 							break;
 						case 172:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -128:
 							break;
 						case 173:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -129:
 							break;
 						case 174:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -130:
 							break;
 						case 175:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -131:
 							break;
 						case 176:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -132:
 							break;
 						case 177:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -133:
 							break;
 						case 178:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -134:
 							break;
 						case 179:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -135:
 							break;
 						case 180:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -136:
 							break;
 						case 181:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -137:
 							break;
 						case 182:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -138:
 							break;
 						case 183:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -139:
 							break;
 						case 184:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -140:
 							break;
 						case 185:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -141:
 							break;
 						case 186:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -142:
 							break;
 						case 187:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -143:
 							break;
 						case 188:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -144:
 							break;
 						case 189:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -145:
 							break;
 						case 190:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -146:
 							break;
 						case 191:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -147:
 							break;
 						case 192:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -148:
 							break;
 						case 193:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -149:
 							break;
 						case 194:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -150:
 							break;
 						case 195:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -151:
 							break;
 						case 196:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -152:
 							break;
 						case 197:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -153:
 							break;
 						case 198:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -154:
 							break;
 						case 199:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -155:
 							break;
 						case 200:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -156:
 							break;
 						case 201:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -157:
 							break;
 						case 202:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -158:
 							break;
 						case 203:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -159:
 							break;
 						case 204:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -160:
 							break;
 						case 205:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -161:
 							break;
 						case 206:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -162:
 							break;
 						case 207:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -163:
 							break;
 						case 208:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -164:
 							break;
 						case 209:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -165:
 							break;
 						case 210:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -166:
 							break;
 						case 211:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -167:
 							break;
 						case 212:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -168:
 							break;
 						case 213:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -169:
 							break;
 						case 214:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -170:
 							break;
 						case 215:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -171:
 							break;
 						case 216:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -172:
 							break;
 						case 217:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -173:
 							break;
 						case 218:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -174:
 							break;
 						case 219:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -175:
 							break;
 						case 220:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -176:
 							break;
 						case 221:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -177:
 							break;
 						case 222:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -178:
 							break;
 						case 223:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -179:
 							break;
 						case 224:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -180:
 							break;
 						case 225:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -181:
 							break;
 						case 226:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -182:
 							break;
 						case 227:
-							{ return $this->create_token("identifier",$this->yytext()); }
+							{ return $this->create_token('identifier',$this->yytext()); }
 						case -183:
 							break;
 						default:
