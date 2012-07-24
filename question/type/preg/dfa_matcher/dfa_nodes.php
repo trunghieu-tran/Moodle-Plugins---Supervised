@@ -531,13 +531,13 @@ class qtype_preg_dfa_node_assert extends qtype_preg_dfa_operator {
         if ($this->pregnode->subtype!=qtype_preg_node_assert::SUBTYPE_PLA) {
             switch ($this->pregnode->subtype) {
                 case qtype_preg_node_assert::SUBTYPE_NLA:
-                    $res = 'assertff';
+                    $res = 'nla_node_assert';
                     break;
                 case qtype_preg_node_assert::SUBTYPE_PLB:
-                    $res = 'asserttb';
+                    $res = 'plb_node_assert';
                     break;
                 case qtype_preg_node_assert::SUBTYPE_NLB:
-                    $res = 'assertfb';
+                    $res = 'nlb_node_assert';
                     break;
             }
             return get_string($res, 'qtype_preg');
