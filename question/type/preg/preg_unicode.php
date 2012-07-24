@@ -7594,6 +7594,16 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2028, 1=>0x2029));
     }
 
+    protected static function compare_trivial_ranges($a, $b) {
+        if ($a[0] < $b[0]) {
+            return -1;
+        } else if ($a[0] > $b[0]) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     /**
      * Searches the index of the range in an array of ranges containing the given number.
      * @param code the number to search for.
@@ -7666,52 +7676,37 @@ class qtype_preg_unicode extends textlib {
     }
 
     /**
-     * A trivial range is an array('negative'=>bool, 0=>int, 1=>int).
+     * A trivial range is an array(0=>int, 1=>int).
      * A range is an array of trivial ranges - they united by OR.
-     * This function intersects a set of ranges united by AND, thus $tointersect is a 3-dimensional array.
+     * This function intersects two ranges.
      * @param tointersect an array of ranges united by "AND".
      * @return an array of ranges where ranges represented as array (0=>int, 1=>int).
      */
-    public static function intersect_ranges($tointersect) {
-        $result = array(array(0 => 0, 1 => 0x10FFFD));
-        for ($i = 0; count($result) > 0 && $i < count($tointersect); $i++) {
-            $toresult = array();    // This will replace $result by the end of this loop.
-            foreach ($tointersect[$i] as $tmp) {
-                // $tmp is something like array('negative' => false, 0 => 0, 1 => 0x10FFFD) - a trivial range.
-                // We convert it to a range: a negative trivial range turns into two positive trivial ranges.
-                if (!$tmp['negative']) {
-                    $currange = array(array(0 => $tmp[0], 1 => $tmp[1]));
+    public static function intersect_ranges($ranges1, $ranges2) {
+        $result = array();
+        foreach ($ranges1 as $ranges1part) {
+            foreach ($ranges2 as $ranges2part) {
+                if ($ranges1part[0] < $ranges2part[0]) {
+                    $left = $ranges1part;
+                    $right = $ranges2part;
                 } else {
-                    $currange = array();
-                    if ($tmp[0] > 0) {
-                        $currange[] = array(0 => 0, 1 => $tmp[0]);
-                    }
-                    if ($tmp[1] < 0x10FFFD) {
-                        $currange[] = array(0 => $tmp[1], 1 => 0x10FFFD);
-                    }
+                    $left = $ranges2part;
+                    $right = $ranges1part;
                 }
-                // Now we've got somethign like array($trivialrange1[, $trivialrange2])
-                // Each trivial range of $currange is going to be intersected with each trivial range of $result.
-                $tmp1 = array();    // This will store that trivial intersections.
-
-                foreach ($result as $resultpart) {
-                    foreach ($currange as $currangepart) {
-                        if ($resultpart[0] < $currangepart[0]) {
-                            $left = $resultpart;
-                            $right = $currangepart;
-                        } else {
-                            $left = $currangepart;
-                            $right = $resultpart;
-                        }
-                        if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
-                            $tmp1[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
-                        }
-                    }
+                if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
+                    $result[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
                 }
-                $toresult = array_merge($toresult, $tmp1);
             }
-            $result = $toresult;
         }
+        usort($result, array('self', 'compare_trivial_ranges'));
+        for ($i = 1; $i < count($result); $i++) {
+            if ($result[$i][0] === $result[$i - 1][1]) {
+                $result[$i][0] = $result[$i - 1][0];
+                unset($result[$i - 1]);
+            }
+        }
+        $result = array_values($result);
+        //var_dump($result);
         return $result;
     }
 
