@@ -217,12 +217,12 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// \b
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue(!$token->value->negative);
         $token = $lexer->nextToken();// \B
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue($token->value->negative);
         $token = $lexer->nextToken();// \>
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);

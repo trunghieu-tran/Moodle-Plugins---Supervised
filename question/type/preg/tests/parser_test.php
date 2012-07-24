@@ -338,14 +338,14 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('a\b', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue(!$root->operands[1]->negative);
     }
     function test_parser_word_not_break() {
         $parser = $this->run_parser('a\B', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue($root->operands[1]->negative);
     }
     function test_parser_subpatterns() {

@@ -87,7 +87,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     return 'Begining of line';
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
                     return 'End of line';
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK)
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
                     return ($this->pregnode->negative ? 'Not a word border' : 'A word border');
                 else
                     return 'Unknow assert';
