@@ -236,7 +236,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         foreach ($gr->subgraphs as $iter) {
             $result = find_link($src, $dst, $iter);
-            if (qtype_preg_author_tool_explain_graph::$linkowner === null)
+            if (qtype_preg_author_tool_explain_graph::$linkowner !== null)
                 return $result;
         }
 
