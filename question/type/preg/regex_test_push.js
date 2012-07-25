@@ -11,25 +11,16 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
     var testfoo = function( e ) {
         
        e.preventDefault();
-       
-       /*function adjustHeight(frameId)
-        {
-            var height =
-                document.getElementById(frameId).contentWindow.
-                document.body.scrollHeight;
-                document.getElementById(frameId).height=
-                the_height;
-        }*/
-       
+              
         var page_regex_auth_helper_height = 1000;
         var page_regex_auth_helper_width = 1000;
-        var page_regex_auth_helper_adr = 'http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'));
+        var page_regex_auth_helper_adr = 'http://localhost:41835/question/type/preg/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'));
         var dialog = new Y.Panel({
             contentBox : Y.Node.create('<div id="dialog" />'),
             //bodyContent: '<div style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" height="100%" align="left" id="author_frame_id" >Your browzer is not supporting iframe!</iframe></div>',
-            bodyContent: '<div id="page_regex_auth_helper_iframe_holder" style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" align="left">Your browzer is not supporting iframe!</iframe></div>',
+            bodyContent: '<div id="page_regex_auth_helper_iframe_holder" style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" height="100%" align="left">Your browzer is not supporting iframe!</iframe></div>',
             width      : page_regex_auth_helper_width,
-            //height     : page_regex_auth_helper_height,
+            height     : page_regex_auth_helper_height,
             zIndex     : 120,
             centered   : true,
             modal      : true, // modal behavior
