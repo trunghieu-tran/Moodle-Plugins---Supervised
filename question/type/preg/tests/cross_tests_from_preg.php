@@ -3028,25 +3028,83 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>NOMATCH),
                         'length'=>array(0=>NOMATCH),
-                        'left'=>array(80),
+                        'left'=>array(10),
                         'next'=>'[\p{C}[:alpha:]\h]');
 
-        return array('regex'=>'^[\p{C}[:alpha:]\h]{80,}',
+        return array('regex'=>'^[\p{C}[:alpha:]\h]{10,}',
                      'tests'=>array($test1, $test2));
     }
 
     function data_for_test_uprops_and_posix_negative() {
-
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(0=>NOMATCH),
                         'length'=>array(0=>NOMATCH),
-                        'left'=>array(80),
-                        'next'=>'[^[:alpha:]]');
+                        'left'=>array(10),
+                        'next'=>'[^\p{C}[:alpha:]\h]');
 
-        return array('regex'=>'^[^[:alpha:]]{80,}',
-                     'tests'=>array($test1));
+        $test2 = array( 'str'=>'??????????',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>10),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'^[^\p{C}[:alpha:]\h]{10,}',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_uprops_and_posix_negative_negative() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
+                        'left'=>array(1),
+                        'next'=>'[^\P{C}[:^alpha:]\H]');
+
+        $test2 = array( 'str'=>'!',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
+                        'left'=>array(1),
+                        'next'=>'[^\P{C}[:^alpha:]\H]');
+
+        $test3 = array( 'str'=>'alnum characters here',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>21),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        return array('regex'=>'[^\P{C}[:^alpha:]\H]+',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_esc_inside_charset() {
+
+        $test1 = array( 'str'=>'This string contains 4 digits 43 characters and 9 spaces',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>56),
+                        'left'=>array(0),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+
+        $test2 = array( 'str'=>'...',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>NOMATCH),
+                        'length'=>array(0=>NOMATCH),
+                        'left'=>array(1),
+                        'next'=>'[\w\d\s]');
+
+        return array('regex'=>'[\w\d\s]+',
+                     'tests'=>array($test1, $test2));
     }
 
     /*function data_for_test_leaf_assert_G() {
