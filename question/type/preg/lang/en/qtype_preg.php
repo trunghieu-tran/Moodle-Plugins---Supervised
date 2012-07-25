@@ -253,8 +253,8 @@ $string['description_charset_one_neg'] = 'not %characters';
 //$string['description_charset_one'] = '%characters';
 //CHARSET FLAGS
 // TODO correct charset flags
-$string['description_charset_range'] = 'form <span style="color:red">%start</span> to <span style="color:red">%end</span>';
-$string['description_char'] = '<span style="color:red">%char</span>';
+$string['description_charset_range'] = 'form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
+$string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_space'] = 'space';
 $string['description_char_16value'] = 'character with hex code %code';
 //$string['description_char_neg'] = 'not <span style="color:red">%char</span>';
