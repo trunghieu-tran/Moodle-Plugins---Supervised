@@ -217,12 +217,12 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();// \b
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue(!$token->value->negative);
         $token = $lexer->nextToken();// \B
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_ASSERT);
-        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_WORDBREAK);
+        $this->assertTrue($token->value->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue($token->value->negative);
         $token = $lexer->nextToken();// \>
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
@@ -353,7 +353,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
             $token = $lexer->nextToken();
             $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
             $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_BACKREF);
-            $this->assertTrue($token->value->number == 'name_'.($i + 1));
+            $this->assertTrue($token->value->number == 'name_' . ($i + 1));
         }
     }
     function test_lexer_tricky_backref() {
@@ -621,6 +621,44 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
         $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB);
+        $lexer = $this->create_lexer('((?(123)(?(+1)(?(-1)(?(<name_1>)(?(\'name_2\')(?(name_3)(?(R)(?(R4)(?(R&name_4)(?(DEFINE)');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 123);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 2);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 1);
+        for ($i = 0; $i < 3; $i++) {
+            $token = $lexer->nextToken();
+            $this->assertTrue($token[0]->type === preg_parser_yyParser::CONDSUBPATT);
+            $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+            $this->assertTrue($token[0]->value->number == 'name_' . ($i + 1));
+        }
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 0);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 4);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 'name_4');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE);
+
     }
     function test_lexer_subpatterns_nested() {
         $lexer = $this->create_lexer('((?:(?>()(');
@@ -1142,7 +1180,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('[a-0]');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE);
         $this->assertTrue($token->value->error[0]->indfirst === 1);
         $this->assertTrue($token->value->error[0]->indlast === 3);
         $lexer = $this->create_lexer('{2,2}');
@@ -1151,7 +1189,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('{127,11}');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::QUANT);
-        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($token->value->error->indfirst === 1);
         $this->assertTrue($token->value->error->indlast === 6);
         $lexer = $this->create_lexer('\p{b}[\pB][[:c:]]{4,3}+[^az-yb]\pO[\p{4}]');
@@ -1194,7 +1232,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indfirst === 17);
         $this->assertTrue($token->value->indlast === 22);
         $this->assertTrue($token->value->userinscription === '{4,3}+');
-        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($token->value->error->indfirst === 18);
         $this->assertTrue($token->value->error->indlast === 21);
         $this->assertTrue($token->value->error->userinscription === '4,3');
@@ -1205,7 +1243,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indlast === 30);
         $this->assertTrue($token->value->userinscription === array('az-yb'));
         $this->assertTrue($token->value->flags[0][0]->data == 'ab');
-        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE);
+        $this->assertTrue($token->value->error[0]->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE);
         $this->assertTrue($token->value->error[0]->indfirst === 26);
         $this->assertTrue($token->value->error[0]->indlast === 28);
         $this->assertTrue($token->value->error[0]->userinscription === 'z-y');

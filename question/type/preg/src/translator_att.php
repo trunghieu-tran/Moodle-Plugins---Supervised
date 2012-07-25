@@ -1,14 +1,15 @@
 <?php
 
     /**
-     * Переводчик тестов из формата AT & T в формат кросс-тестов.
-     * Имена входных и выходных файлов задаются пере
+     * Test converter from AT&T format to the Preg cross-test format.
+     * To use .dat.txt files, first remove any comments and empty lines,
+     * then set the $INPUT_SET in this file correspondingly and run this file.
      * @author Valeriy Streltsov
      */
 
-    $INPUT_FILENAME = 'basic.dat.txt';
-    $OUTPUT_FILENAME = 'result.txt';
-    $COMMENT_COUNT = 2;
+    $INPUT_SET = 'repetition';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
+    $INPUT_FILENAME = $INPUT_SET . '.dat.txt';
+    $OUTPUT_FILENAME = 'cross_tests_from_att_' . $INPUT_SET . '.php';
     $TAB = '	';
     $SPACE = ' ';
     $EOL = chr(10);
@@ -16,14 +17,14 @@
     $TAB2 = '        ';
     $TAB3 = '                        ';
     $TAB4 = '                      ';
-    $FUNCTION_PREFIX = 'function data_for_test_att_basic_';
+    $FUNCTION_PREFIX = 'function data_for_test_att_' . $INPUT_SET . '_';
 
     $in = fopen($INPUT_FILENAME, 'r');
     $out = fopen($OUTPUT_FILENAME, 'w');
 
-    for ($i = 0; $i < $COMMENT_COUNT; $i++) {
-        fgets($in);
-    }
+    fwrite($out, '<?php' . $EOL . $EOL);
+    fwrite($out, 'defined(\'NOMATCH\') || define(\'NOMATCH\', qtype_preg_matching_results::NO_MATCH_FOUND);' . $EOL . $EOL);
+    fwrite($out, 'class qtype_preg_cross_tests_from_att_' . $INPUT_SET . ' {' . $EOL . $EOL);
 
     $counter = 0;
     while (!feof($in)) {
@@ -174,6 +175,7 @@
         fwrite($out, $TAB4 . '\'tests\'=>array($test1));' . $EOL);
         fwrite($out, $TAB1 . '}' . $EOL . $EOL);
     }
+    fwrite($out, '}' . $EOL);
 
     fclose($in);
     fclose($out);

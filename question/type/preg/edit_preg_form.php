@@ -29,7 +29,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
             
             $mform->registerNoSubmitButton('regextest');
-            $repeated[] = & $mform->createElement('submit', 'regextest', 'Test regex');
+            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');            
+            array_splice($repeated, 2, 0, array( '0' => $tmp));
             
             //$repeated[] = $mform->createElement('html', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For test regex push this button<input type="submit" formaction="http://localhost/moodle/question/type/preg/ast_preg_form.php" formtarget="_blank" value="Test regex">');
             return $repeated;
@@ -41,11 +42,15 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      */
     function definition_inner($mform) {
         global $CFG;
+        global $PAGE;
 
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
         $qtype = new $qtypeclass;
 
+        //$PAGE->requires->js('/question/type/preg/regex_test_push.js');
+        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost/moodle/question/type/preg/regex_test_push.js"></script></div>');
+        
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine',$CFG->qtype_preg_defaultengine);
@@ -115,7 +120,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $answersinstruct = $mform->getElement('answersinstruct');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_preg'));
 
-        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost:62774/question/type/preg/regex_test_push.js"></script></div>');
     }
 
     function validation($data, $files) {

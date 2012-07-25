@@ -331,7 +331,7 @@ MODIFIER = [iJmsUx]
             $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
             // Form the error node.
             $error = new qtype_preg_node_error();
-            $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
+            $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE;
             $error->indfirst = $this->yychar - 2;
             $error->indlast = $this->yychar + $this->yylength() - 1;
             $error->userinscription = $startchar . '-' . $endchar;
@@ -401,7 +401,7 @@ MODIFIER = [iJmsUx]
     public function map_subpattern($name) {
         if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
-            $this->subpatternmap[$name] = $num;
+            $this->subpatternmap[$name] = (int)$num;
         } else {                                                // Subpatterns with same names should have same numbers.
             $num = $this->subpatternmap[$name];
             // TODO check if we are inside a (?|...) group.
@@ -534,7 +534,7 @@ MODIFIER = [iJmsUx]
     $node = $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive);
     if ($leftborder > $rightborder) {
         $error = new qtype_preg_node_error();
-        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_RANGE;
+        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE;
         $error->indfirst = $this->yychar + 1;
         $error->indlast = $this->yychar + $this->yylength() - 2;
         $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
@@ -595,7 +595,7 @@ MODIFIER = [iJmsUx]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), (int)$this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> ")" {
@@ -718,28 +718,28 @@ MODIFIER = [iJmsUx]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $this->lastsubpatt));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$this->lastsubpatt));
     return $res;
 }
 <YYINITIAL> "(?<"{NOTSPECIAL}+">" {    // Named subpattern (?<name>...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$num));
     return $res;
 }
 <YYINITIAL> "(?'"{NOTSPECIAL}+"'" {    // Named subpattern (?'name'...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$num));
     return $res;
 }
 <YYINITIAL> "(?P<"{NOTSPECIAL}+">" {   // Named subpattern (?P<name>...).
     $this->push_opt_lvl();
     $num = $this->map_subpattern(qtype_poasquestion_string::substr($this->yytext(), 4, $this->yylength() - 5));
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $num));
+    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$num));
     return $res;
 }
 <YYINITIAL> "(?:" {
@@ -774,6 +774,75 @@ MODIFIER = [iJmsUx]
     $this->push_opt_lvl();
     $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
+}
+<YYINITIAL> "(?(R"[0-9]*")" {
+    $text = $this->yytext();
+    $num = (int)qtype_poasquestion_string::substr($text, 4, $this->yylength() - 5);
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?(R&"{NOTSPECIAL}+")" {
+    $text = $this->yytext();
+    $name = qtype_poasquestion_string::substr($text, 5, $this->yylength() - 6);
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?(DEFINE)" {
+    $text = $this->yytext();
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext())),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?("("+"|"-")?[0-9]+")" {
+    $text = $this->yytext();
+    $sign = 0;
+    if (qtype_poasquestion_string::strpos($text, '+') !== false) {
+        $sign = 1;
+    }
+    if (qtype_poasquestion_string::strpos($text, '-') !== false) {
+        $sign = -1;
+    }
+    if ($sign !== 0) {
+        $num = $sign * (int)qtype_poasquestion_string::substr($text, 4, $this->yylength() - 5) + $this->lastsubpatt;
+        if ($sign < 0) {
+            $num++;
+        }
+    } else {
+        $num = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    }
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?(<"{NOTSPECIAL}+">)" {
+    $text = $this->yytext();
+    $name = qtype_poasquestion_string::substr($text, 4, $this->yylength() - 6);
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?('"{NOTSPECIAL}+"')" {
+    $text = $this->yytext();
+    $name = qtype_poasquestion_string::substr($text, 4, $this->yylength() - 6);
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+}
+<YYINITIAL> "(?("{NOTSPECIAL}+")" {
+    $text = $this->yytext();
+    $name = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $this->push_opt_lvl();
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
 <YYINITIAL> "(?=" {
     $this->push_opt_lvl();
@@ -1040,23 +1109,21 @@ MODIFIER = [iJmsUx]
     throw new Exception('\R is not implemented yet');
 }
 <YYINITIAL> "\b"|"\B" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_WORDBREAK));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_B));
     $res->value->negative = ($this->yytext() === '\B');
     return $res;
 }
 <YYINITIAL> "\A" {
-    // TODO: matches at the start of the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_A));
     return $res;
 }
 <YYINITIAL> "\z"|"\Z" {
-    // TODO: matches only at the end of the subject | matches at the end of the subject also matches before a newline at the end of the subject. For now the same as $.
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_DOLLAR));
+    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_Z));
+    $res->value->negative = ($this->yytext() === '\Z');
     return $res;
 }
 <YYINITIAL> "\G" {
-    // TODO: matches at the first matching position in the subject. For now the same as ^.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_G));
     return $res;
 }
 <YYINITIAL> "^" {
