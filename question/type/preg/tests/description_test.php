@@ -28,9 +28,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function charset_provider()
     {
         return array(
-          array('[^[:^word:]abc\pL]','any symbol except the following: not word character, letter, <span style="color:red">a</span>, <span style="color:red">b</span>, <span style="color:red">c</span>;'),
-          array('a','<span style="color:red">a</span>'),
-          array('[^a]','not <span style="color:red">a</span>'),
+          array('[^[:^word:]abc\pL]','any symbol except the following: not word character, letter, <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>;'),
+          array('a','<span style="color:blue">a</span>'),
+          array('[^a]','not <span style="color:blue">a</span>'),
           array('\w','word character'),
           array('\W','not word character')
         );
@@ -89,11 +89,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function concat_provider()
     {
         return array(
-          array('ab','<span style="color:red">a</span><span style="color:red">b</span>'),
-          array('[a|b]c','one of the following characters: <span style="color:red">a</span>, <span style="color:red">|</span>, <span style="color:red">b</span>; then <span style="color:red">c</span>'),
-          array('abc','<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>'),
+          array('ab','<span style="color:blue">a</span><span style="color:blue">b</span>'),
+          array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>; then <span style="color:blue">c</span>'),
+          array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
             array('ab\w','sad'),
-          array('\0113','character with hex code 9 then <span style="color:red">3</span>'),
+          array('\0113','character with hex code 9 then <span style="color:blue">3</span>'),
          );
     }
     
@@ -111,9 +111,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function alt_provider()
     {
         return array(
-          array('a|b','<span style="color:red">a</span> or <span style="color:red">b</span>'),
-          array('a|b|','<span style="color:red">a</span> or <span style="color:red">b</span> or nothing'),
-          array('a|b|c','<span style="color:red">a</span> or <span style="color:red">b</span> or <span style="color:red">c</span>'),
+          array('a|b','<span style="color:blue">a</span> or <span style="color:blue">b</span>'),
+          array('a|b|','<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing'),
+          array('a|b|c','<span style="color:blue">a</span> or <span style="color:blue">b</span> or <span style="color:blue">c</span>'),
         );
     }
     
@@ -131,14 +131,14 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function nassert_provider()
     {
         return array(
-          array('(?=abc)g','further text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
-          array('(?!abc)g','further text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
-          array('(?<=abc)g','preceding text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
-          array('(?<!abc)g','preceding text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
-          array('a(?=abc)g','<span style="color:red">a</span> then further text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
-          array('a(?!abc)g','<span style="color:red">a</span> then further text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
-          array('a(?<=abc)g','<span style="color:red">a</span> and preceding text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
-          array('a(?<!abc)g','<span style="color:red">a</span> and preceding text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
+          array('(?=abc)g','further text should match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] and <span style="color:blue">g</span>'),
+          array('(?!abc)g','further text should not match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] and <span style="color:blue">g</span>'),
+          array('(?<=abc)g','preceding text should match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] then <span style="color:blue">g</span>'),
+          array('(?<!abc)g','preceding text should not match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] then <span style="color:blue">g</span>'),
+          array('a(?=abc)g','<span style="color:blue">a</span> then further text should match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] and <span style="color:blue">g</span>'),
+          array('a(?!abc)g','<span style="color:blue">a</span> then further text should not match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] and <span style="color:blue">g</span>'),
+          array('a(?<=abc)g','<span style="color:blue">a</span> and preceding text should match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] then <span style="color:blue">g</span>'),
+          array('a(?<!abc)g','<span style="color:blue">a</span> and preceding text should not match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] then <span style="color:blue">g</span>'),
         );
     }
     
@@ -174,7 +174,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description('(a(?i)b)c',null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
-        $expected = 'subpattern #1: [<span style="color:red">a</span>caseless: <span style="color:red">b</span>] then case sensitive: <span style="color:red">c</span>'; 
+        $expected = 'subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'; 
         $this->assertEquals($result, $expected);
     }
     
