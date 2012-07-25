@@ -7,7 +7,7 @@
      * @author Valeriy Streltsov
      */
 
-    $INPUT_SET = 'repetition';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
+    $INPUT_SET = 'categorize';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
     $INPUT_FILENAME = $INPUT_SET . '.dat.txt';
     $OUTPUT_FILENAME = 'cross_tests_from_att_' . $INPUT_SET . '.php';
     $TAB = '	';
@@ -90,13 +90,13 @@
         }
 
         // get indexes.
-        while ($i < strlen($line)) {
+        while ($i < strlen($line) && $line[$i] !== $TAB) {
             $indexes .= $line[$i];
             $i++;
         }
 
         // do not include errors.
-        if ($indexes[0] !== '(') {
+        if ($indexes === '' || $indexes[0] !== '(') {
             continue;
         }
 
