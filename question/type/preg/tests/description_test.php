@@ -1,7 +1,7 @@
-<?
+<?php
 
 /**
- * Unit tests for (some of) question/type/preg/question.php.
+ * tests for /question/type/preg/author_tool_description/preg_description.php'
  *
  * @copyright &copy; 2012 Pahomov Dmitry
  * @author Pahomov Dmitry
@@ -89,9 +89,10 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function concat_provider()
     {
         return array(
-          array('ab','<span style="color:red">a</span> then <span style="color:red">b</span>'),
+          array('ab','<span style="color:red">a</span><span style="color:red">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:red">a</span>, <span style="color:red">|</span>, <span style="color:red">b</span>; then <span style="color:red">c</span>'),
-          array('abc','<span style="color:red">a</span> then <span style="color:red">b</span> then <span style="color:red">c</span>'),
+          array('abc','<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>'),
+            array('ab\w','sad'),
           array('\0113','character with hex code 9 then <span style="color:red">3</span>'),
          );
     }
@@ -119,7 +120,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider nassert_provider
      */
-    /*public function test_nassert($regex,$expected)
+    public function test_nassert($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
@@ -130,23 +131,27 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function nassert_provider()
     {
         return array(
-          array('(?=abc)g','jh'),
-          array('(?!abc)g','dg'),
-          array('(?<=abc)g','jh'),
-          array('(?<!abc)g','dg'),
+          array('(?=abc)g','further text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
+          array('(?!abc)g','further text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
+          array('(?<=abc)g','preceding text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
+          array('(?<!abc)g','preceding text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
+          array('a(?=abc)g','<span style="color:red">a</span> then further text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
+          array('a(?!abc)g','<span style="color:red">a</span> then further text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] and <span style="color:red">g</span>'),
+          array('a(?<=abc)g','<span style="color:red">a</span> and preceding text should match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
+          array('a(?<!abc)g','<span style="color:red">a</span> and preceding text should not match: [<span style="color:red">a</span><span style="color:red">b</span><span style="color:red">c</span>] then <span style="color:red">g</span>'),
         );
-    }*/
+    }
     
     /**
      * @dataProvider quant_provider
      */
-    public function test_quant($regex,$expected)
+    /*public function test_quant($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }
+    }*/
     
     public function quant_provider()
     {
@@ -160,5 +165,25 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('g{1,}','jh'),
           array('g{2,5}','dg'),
         );
+    }
+    
+    
+    
+    public function test_option()
+    {
+        $handler = new qtype_preg_author_tool_description('(a(?i)b)c',null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $expected = 'subpattern #1: [<span style="color:red">a</span>caseless: <span style="color:red">b</span>] then case sensitive: <span style="color:red">c</span>'; 
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function test_numbering()
+    {
+        $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
+        //var_dump($handler);
+        $result = $handler->default_description();
+        $expected = 'asd'; 
+        $this->assertEquals($result, $expected);
     }
 }
