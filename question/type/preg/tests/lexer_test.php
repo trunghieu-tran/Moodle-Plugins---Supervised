@@ -626,38 +626,38 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token->value->number === 123);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 123);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token->value->number === 2);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 2);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token->value->number === 1);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->value->number === 1);
         for ($i = 0; $i < 3; $i++) {
             $token = $lexer->nextToken();
-            $this->assertTrue($token->type === preg_parser_yyParser::CONDSUBPATT);
-            $this->assertTrue($token->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-            $this->assertTrue($token->value->number == 'name_' . ($i + 1));
+            $this->assertTrue($token[0]->type === preg_parser_yyParser::CONDSUBPATT);
+            $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+            $this->assertTrue($token[0]->value->number == 'name_' . ($i + 1));
         }
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
-        $this->assertTrue($token->value->number === 0);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 0);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
-        $this->assertTrue($token->value->number === 4);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 4);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
-        $this->assertTrue($token->value->number === 'name_4');
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->value->number === 'name_4');
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE);
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE);
 
     }
     function test_lexer_subpatterns_nested() {

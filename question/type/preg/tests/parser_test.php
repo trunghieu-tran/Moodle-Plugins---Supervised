@@ -161,7 +161,17 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[2]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[2]->operands[0]->userinscription === array('a'));
         $this->assertTrue($root->operands[2]->operands[0]->id === 0);
-
+        $parser = $this->run_parser('(?(DEFINE)a|b)', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBPATT);
+        $this->assertTrue($root->userinscription === '(?(DEFINE) ... | .... )');
+        $this->assertTrue($root->id == 4);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->userinscription == array('a'));
+        $this->assertTrue($root->operands[0]->id == 1);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->userinscription == array('b'));
+        $this->assertTrue($root->operands[1]->id == 2);
     }
 
     function test_parser_easy_regex() {//a|b

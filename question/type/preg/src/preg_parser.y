@@ -56,6 +56,9 @@
      * @param node the node to be checked.
      */
     protected function create_error_node_from_lexer($node) {
+        if (!isset($node->error)) {
+            return;
+        }
         if (is_array($node->error)) {
             foreach ($node->error as $error) {
                 $this->create_error_node($error->subtype, $error->indfirst, $error->indlast, $error->addinfo);

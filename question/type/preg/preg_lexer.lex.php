@@ -7537,7 +7537,9 @@ array(
         $num = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     }
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -65:
                             break;
@@ -7546,7 +7548,9 @@ array(
     $text = $this->yytext();
     $name = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -66:
                             break;
@@ -7555,7 +7559,9 @@ array(
     $text = $this->yytext();
     $num = (int)qtype_poasquestion_string::substr($text, 4, $this->yylength() - 5);
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), (int)$num)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -67:
                             break;
@@ -7721,7 +7727,9 @@ array(
     $text = $this->yytext();
     $name = qtype_poasquestion_string::substr($text, 5, $this->yylength() - 6);
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -85:
                             break;
@@ -7730,7 +7738,9 @@ array(
     $text = $this->yytext();
     $name = qtype_poasquestion_string::substr($text, 4, $this->yylength() - 6);
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -86:
                             break;
@@ -7739,7 +7749,9 @@ array(
     $text = $this->yytext();
     $name = qtype_poasquestion_string::substr($text, 4, $this->yylength() - 6);
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext(), $name)),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -87:
                             break;
@@ -7823,7 +7835,9 @@ array(
                             {
     $text = $this->yytext();
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext()));
+    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, $this->yychar, $this->yychar+ $this->yylength() - 1, $this->yytext())),
+                 $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
+                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
 }
                         case -98:
                             break;
