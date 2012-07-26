@@ -36,12 +36,7 @@ MODIFIER = [iJmsUx]
 %init}
 %eof{
     if ($this->charset !== null) { // End of the expression inside a character class.
-        $error = new qtype_preg_node_error();
-        $error->subtype = qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET;
-        $error->indfirst = $this->charset->indfirst;
-        $error->indlast = $this->yychar - 1;
-        $error->userinscription = $this->charsetuserinscription;
-        $this->errors[] = $error;
+        $this->errors[] = $this->form_error($this->charsetuserinscription, qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, $this->charset->indfirst, $this->yychar - 1);
     }
 %eof}
 %{
@@ -209,6 +204,16 @@ MODIFIER = [iJmsUx]
         return $this->backrefsexist;
     }
 
+    protected function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
+        $error = new qtype_preg_node_error();
+        $error->subtype = $subtype;
+        $error->indfirst = $indfirst;
+        $error->indlast = $indlast;
+        $error->userinscription = $userinscription;
+        $error->addinfo = $addinfo;
+        return $error;
+    }
+
     /**
      * Forms a qtype_preg_node with the given oprions.
      * @param userinscription a string typed by user and consumed by lexer.
@@ -223,7 +228,7 @@ MODIFIER = [iJmsUx]
      * @param negative is this node negative.
      * @return an object of qtype_preg_node child class.
      */
-    protected function form_node($userinscription = '', $name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
+    protected function form_node($userinscription, $name, $subtype = null, $data = null, $leftborder = null, $rightborder = null, $lazy = false, $greed = true, $possessive = false, $negative = false) {
         $result = new $name;
         $result->userinscription = $userinscription;
         if ($subtype !== null) {
@@ -329,13 +334,8 @@ MODIFIER = [iJmsUx]
             // Delete last 3 characters.
             $cclength -= 3;
             $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
-            // Form the error node.
-            $error = new qtype_preg_node_error();
-            $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE;
-            $error->indfirst = $this->yychar - 2;
-            $error->indlast = $this->yychar + $this->yylength() - 1;
-            $error->userinscription = $startchar . '-' . $endchar;
-            return $error;
+            // Return the error node.
+            return $this->form_error($startchar . '-' . $endchar, qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $this->yychar - 2, $this->yychar + $this->yylength() - 1);
         }
     }
 
@@ -371,12 +371,7 @@ MODIFIER = [iJmsUx]
         $errorfound = false;
         for ($i = 0; $i < $set->length(); $i++) {
             if ($unset->contains($set[$i]) !== false) { // Setting and unsetting modifier at the same time is error.
-                $error = new qtype_preg_node_error();
-                $error->subtype = qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER;
-                $error->indfirst = $this->yychar;
-                $error->indlast = $this->yychar + $this->yylength() - 1;
-                $error->userinscription = $set[$i];
-                $this->errors[] = $error;
+                $this->errors[] = $this->form_error($set[$i], qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1);
                 $errorfound = true;
             }
         }
@@ -484,12 +479,7 @@ MODIFIER = [iJmsUx]
             $error = null;
             return self::$upropflags[$str];
         } else {
-            $error = new qtype_preg_node_error();
-            $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY;
-            $error->indfirst = $this->yychar;
-            $error->indlast = $this->yychar + $this->yylength() - 1;
-            $error->userinscription = $this->yytext();
-            $error->addinfo = $str;
+            $error = $this->form_error($this->yytext(), qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $this->yychar, $this->yychar + $this->yylength() - 1, $str);
             return null;
         }
     }
@@ -533,12 +523,7 @@ MODIFIER = [iJmsUx]
     $rightborder = (int)qtype_poasquestion_string::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
     $node = $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive);
     if ($leftborder > $rightborder) {
-        $error = new qtype_preg_node_error();
-        $error->subtype = qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE;
-        $error->indfirst = $this->yychar + 1;
-        $error->indlast = $this->yychar + $this->yylength() - 2;
-        $error->userinscription = qtype_poasquestion_string::substr($text, 1, $textlen - 2);
-        $node->error = $error;
+        $node->error = $this->form_error(qtype_poasquestion_string::substr($text, 1, $textlen - 2), qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $this->yychar + 1, $this->yychar + $this->yylength() - 2);
     }
     return $this->form_res(preg_parser_yyParser::QUANT, $node);
 }
@@ -705,13 +690,7 @@ MODIFIER = [iJmsUx]
 <YYINITIAL> "(*"{NOTSPECIAL}+")" {
     $text = $this->yytext();
     $node = $this->form_node($text, 'qtype_preg_leaf_control');
-    $error = new qtype_preg_node_error();
-    $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE;
-    $error->indfirst = $this->yychar;
-    $error->indlast = $this->yychar + $this->yylength() - 1;
-    $error->userinscription = $text;
-    $error->addinfo = $text;
-    $node->error = $error;
+    $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
 }
 <YYINITIAL> "(?>" {
@@ -1238,14 +1217,8 @@ MODIFIER = [iJmsUx]
 }
 <CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
-    $error = new qtype_preg_node_error();
-    $error->subtype = qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS;
-    $error->indfirst = $this->yychar;
-    $error->indlast = $this->yychar + $this->yylength() - 1;
-    $error->userinscription = $text;
-    $error->addinfo = $text;
     $this->charset->userinscription[] = $text;
-    $this->charset->error[] = $error;
+    $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
     $this->charsetuserinscription .= $text;
 }
 <CHARSET> ("\p"|"\P"). {
