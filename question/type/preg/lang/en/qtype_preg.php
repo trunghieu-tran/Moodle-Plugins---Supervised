@@ -165,11 +165,12 @@ $string['error_calloutmissingending']      = 'Missing ) after {$a->addinfo}.';
 $string['error_unknowncharafterp']         = 'Unknown character after {$a->addinfo}. Did you mean "(?P=..."?';
 $string['error_subpattnamemissingending']  = 'Missing subpattern name ending in the named subpattern {$a->addinfo}.';
 $string['error_duplicatesubpattnames']     = '';
-$string['error_backrefmissingnumber']      = '';
 $string['error_backreftozero']             = 'Backreference to the whole expression is not allowed.';
 $string['error_condsubpattwrongnumber']    = '';
 $string['error_differentsubpattnames']     = '';
 $string['error_subpattnameexpected']       = 'Subpattern name expected.';
+$string['error_cxshouldbeascii']           = '\c should be followed by an ascii character.';
+
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';

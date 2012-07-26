@@ -1481,11 +1481,11 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_UNKNOWN_CHAR_AFTER_P         = 'unknown_char_after_p_node_error';             // Unknown character after (?P, should be (?P=.
     const SUBTYPE_SUBPATT_NAME_MISSING_ENDING  = 'subpatt_name_missing_ending_node_error';      // Missing subpattern name ending.
     const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          //
-    const SUBTYPE_BACKREF_MISSING_NUMBER       = 'backref_missing_number_node_error';           //
     const SUBTYPE_BACKREF_TO_ZERO              = 'backref_to_zero_error';                       // Backreference to the whole expression.
     const SUBTYPE_CONDSUBPATT_WRONG_NUMBER     = 'condsubpatt_wrong_number_node_error';         //
     const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          //
     const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
+    const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
@@ -1518,11 +1518,11 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_UNKNOWN_CHAR_AFTER_P         => 'error_unknowncharafterp',
                                    self::SUBTYPE_SUBPATT_NAME_MISSING_ENDING  => 'error_subpattnamemissingending',
                                    self::SUBTYPE_DUPLICATE_SUBPATT_NAMES      => 'error_duplicatesubpattnames',
-                                   self::SUBTYPE_BACKREF_MISSING_NUMBER       => 'error_backrefmissingnumber',
                                    self::SUBTYPE_BACKREF_TO_ZERO              => 'error_backreftozero',
                                    self::SUBTYPE_CONDSUBPATT_WRONG_NUMBER     => 'error_condsubpattwrongnumber',
                                    self::SUBTYPE_DIFFERENT_SUBPATT_NAMES      => 'error_differentsubpattnames',
-                                   self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected'
+                                   self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected',
+                                   self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii'
                                    );
     /** Additional info. */
     public $addinfo;
