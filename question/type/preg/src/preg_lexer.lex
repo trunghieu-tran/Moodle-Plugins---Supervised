@@ -412,13 +412,16 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 
     /**
      * Calculates the character for a \cx sequence.
-     * @param x substring of a \cx sequence.
+     * @param cx the sequence itself.
      * @return character corresponding to the given sequence.
      */
-    public function calculate_cx($x) {
+    public function calculate_cx($cx, &$error) {
+        $x = qtype_poasquestion_string::substr($cx, 2);
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
-            throw new Exception('The code of \'' . $x . '\' is ' . $code . ', but should be <= 127.');
+            $error = $this->form_error($cx, qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $this->yychar, $this->yychar + $this->yylength() - 1, $cx);
+        } else {
+            $error = null;
         }
         $code ^= 0x40;
         return qtype_poasquestion_string::code2utf8($code);
@@ -1060,8 +1063,13 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     return $res;
 }
 <YYINITIAL> "\c". {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->calculate_cx(qtype_poasquestion_string::substr($this->yytext(), 2))));
-    return $res;
+    $error = null;
+    $char = $this->calculate_cx($this->yytext(), $error);
+    if ($error !== null) {
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+    } else {
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $char));
+    }
 }
 <YYINITIAL> "\e" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B)));
@@ -1386,7 +1394,13 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
 }
 <CHARSET> "\c". {
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, $this->calculate_cx(qtype_poasquestion_string::substr($this->yytext(), 2)));
+    $error = null;
+    $char = $this->calculate_cx($this->yytext(), $error);
+    if ($error !== null) {
+        $this->charset->error[] = $error;
+    } else {
+        $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, $char);
+    }
 }
 <CHARSET> "\e" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B));

@@ -1325,7 +1325,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
         $this->assertTrue($token->value->indfirst === 28);
         $this->assertTrue($token->value->indlast === 59);
-        $lexer = $this->create_lexer('(?(0)(?C255(?Pn(?<name1(?\'name2(?P<name3\g0(?<>(?\'\'(?P<>\g{}\k<>\k\'\'\k{}(?P=)');
+        $lexer = $this->create_lexer('(?(0)(?C255(?Pn(?<name1(?\'name2(?P<name3\g0(?<>(?\'\'(?P<>\g{}\k<>\k\'\'\k{}(?P=)\cй');
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === preg_parser_yyParser::CONDSUBPATT);
         $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
@@ -1419,5 +1419,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 72);
         $this->assertTrue($token->value->indlast === 76);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII);
+        $this->assertTrue($token->value->indfirst === 77);
+        $this->assertTrue($token->value->indlast === 79);
     }
 }
