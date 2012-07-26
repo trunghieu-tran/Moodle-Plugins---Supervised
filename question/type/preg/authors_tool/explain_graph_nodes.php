@@ -164,7 +164,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         {
             $graph->style .= '; color=gold';
 
-            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid', -0.5 * $this->pregnode->id);
             $marking->subgraphs[] = $graph;
 
             $marking->entries[] = end($graph->nodes);
@@ -261,7 +261,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
                 $label = 'from ' . $this->pregnode->leftborder . ' to infinity times';
             }
 
-            $quant = new qtype_preg_author_tool_explain_graph_subgraph($label, 'dotted', $this->pregnode->id);
+            $quant = new qtype_preg_author_tool_explain_graph_subgraph($label, 'dotted; color=black', $this->pregnode->id);
             qtype_preg_author_tool_explain_graph::assume_subgraph($quant, $operand);
 
             $graph->subgraphs[] = $quant;
@@ -273,7 +273,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
             $label = get_string('explain_subpattern', 'qtype_preg') . $this->pregnode->number;
 
-            $subpatt = new qtype_preg_author_tool_explain_graph_subgraph($label, 'solid', $this->pregnode->id);
+            $subpatt = new qtype_preg_author_tool_explain_graph_subgraph($label, 'solid; color=black', $this->pregnode->id);
             qtype_preg_author_tool_explain_graph::assume_subgraph($subpatt, $operand);
 
             $graph->subgraphs[] = $subpatt;
@@ -283,7 +283,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
         if ($id == $this->pregnode->id)
         {
-            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid; color=gold', -1 * $this->pregnode->id);
+            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid; color=gold', -0.5 * $this->pregnode->id);
             qtype_preg_author_tool_explain_graph::assume_subgraph($marking, $graph);
             $graph->nodes = array();
             $graph->links = array();
