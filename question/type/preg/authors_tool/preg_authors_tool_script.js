@@ -9,7 +9,6 @@
 YUI().use('node', function (Y) {
 
     function highlight_description(id){
-        alert(id);
         const highlighted_class = 'description_highlighted';
         var old_highlighted = Y.one('.'+highlighted_class);
         if(old_highlighted!=null){

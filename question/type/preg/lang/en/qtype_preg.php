@@ -424,3 +424,29 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
+
+//This is string for authors tool
+$string['regex_edit_header'] = 'Input regex';
+$string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_tree_header'] = 'Interactive tree';
+$string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_header'] = 'Explaining graph';
+$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_description_header'] = 'Description';
+$string['regex_description_header_help'] = 'Here you can see description of regular expression.';
+$string['regex_match_header'] = 'Input string for check';
+$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+
+// Strings for explaining graph
+
+$string['explain_subpattern'] = 'subpattern #';
+$string['explain_backref'] = 'the result of subpattern #';
+$string['explain_recursion'] = 'recursion';
+$string['explain_unknow_node'] = 'unknow node';
+$string['explain_unknow_meta'] = 'unknow meta';
+$string['explain_unknow_assert'] = 'unknow assert';
+$string['explain_unknow_charset_flag'] = 'unknow charset flag';
+$string['explain_tab'] = 'tabulation';
+$string['explain_not'] = 'not ';
+$string['explain_quote'] = 'quote';
+$string['explain_slash'] = 'slash';

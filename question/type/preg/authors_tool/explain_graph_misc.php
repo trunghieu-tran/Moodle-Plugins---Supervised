@@ -17,7 +17,8 @@ class qtype_preg_author_tool_explain_graph_node {
     public $color   = 'black';    // color of node on image
     public $owner   = null;       // owner of node
     public $label   = '';         // data of node on image
-    public $id      = 0;          // id of node
+    public $id      = -1;          // id of node
+    public $fill    = '';         // filling of node on image
     
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
@@ -54,11 +55,13 @@ class qtype_preg_author_tool_explain_graph_node {
         return $result;
     }
     
-    public function __construct($lbl, $shp, $clr, &$ownr) {
+    public function __construct($lbl, $shp, $clr, &$ownr, $id, $fll = '') {
         $this->label = $lbl;
         $this->shape = $shp;
         $this->color = $clr;
+        $this->fill = $fll;
         $this->owner = $ownr;
+        $this->id = $id;
     }
     
 }
@@ -92,13 +95,14 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public $subgraphs   = array();      // array of subgraphs in subgraph
     public $entries     = array();      // array if nodes "entries"
     public $exits       = array();      // array of nodes "exits"
+    public $id          = -1;
     
-    public function __construct($lbl, $stl) {
+    public function __construct($lbl, $stl, $id = -1) {
         $this->label   = $lbl;
         $this->style   = $stl;
     }
     
-    private static $counter = 0; // counter for generating id for nodes in graph
+    //private static $counter = 0; // counter for generating id for nodes in graph
     
     /**
      * Creates text file with dot instructions.
@@ -107,14 +111,16 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
+            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
             {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . '];';
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . $iter->fill . '];';
             }
             else
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"];';
+            {
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"' . $iter->fill . '];';
+            }
         }
 
         foreach ($this->subgraphs as $iter) {
@@ -140,53 +146,47 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $elements = array();
         $result = '';
         if (count($lbl)) {
-            if (strlen($lbl) == 1 && $lbl[0] != '^') {
-                return $lbl;
+            if (count($lbl) == 1)
+            {
+                $elements[] = $lbl;
+                $invert = FALSE;
             }
-
-            $tmpstring = 'a';
-            $invert = false;
-            
-            if ($lbl[0] == '^') {
-                $invert = true;
-                $copy = substr($lbl, 1);
-            }
-            else $copy = $lbl;
-
-            for ($i = 0; $i < strlen($copy); ++$i) {
-                $tmpstring[0] = $copy[$i];
-                if ($copy[$i] == '-')
-                {
-                    if ($copy[$i] == $copy[0]) {
-                        $elements[] = $tmpstring;
-                    }
+            else {
+                for ($i = 0; $i < count($lbl); ++$i) {
+                    if ($i == 0 && $lbl[$i] == '^')
+                        $invert = TRUE;
                     else {
-                        $elements[count($elements) - 1] .= '..';
-                        ++$i;
-                        $tmpstring[0] = $copy[$i];
-                        $elements[count($elements) - 1] .= $tmpstring;
+                        $elements[] = $lbl[$i];
+                        $invert = FALSE;
                     }
                 }
-                else $elements[] = $tmpstring;
             }
 
             $result .= '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD COLSPAN="';
-            $result .= (count($elements)*2 - 1);
+            $result .= count($elements);
             if ($invert)
-                $result .= '"><font face="Arial">Any character except of</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">Any character except from</font></TD></TR><TR>';
             else
-                $result .= '"><font face="Arial">Any character of</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">Any character from</font></TD></TR><TR>';
 
             for ($i = 0; $i != count($elements); ++$i) {
-                $result .= '<TD>' . $elements[$i] . '</TD>';
-                ++$i;
-                if ($i != count($elements))
-                    $result .= '<TD><font color="red">OR</font></TD>';
-                --$i;
+                if ($elements[$i][0] == chr(10))
+                    $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
+                else
+                    $result .= '<TD>' . str_replace('"', '&#34', $elements[$i]) . '</TD>';
+                //++$i;
+                //if ($i != count($elements))
+                //    $result .= '<TD><font color="red">OR</font></TD>';
+                //--$i;
             }
             
             $result .= '</TR></TABLE>>';
         }
+
+        $result = str_replace(']', '&#93;', $result);
+        $result = str_replace('[', '&#91;', $result);
+        $result = str_replace('\\', '&#92;', $result);
+
         return $result;
     }
     
@@ -196,17 +196,19 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * @param instr - array of dot instructions
      */
     private static function process_subgraph(&$gr, &$instr) {
-        $instr .= 'subgraph "cluster_' . (++qtype_preg_author_tool_explain_graph_subgraph::$counter) . '" {';
+        $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'label="' . $gr->label . '";';
 
         foreach ($gr->nodes as $iter) {
-            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
+            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . $iter->fill . '];';
             else
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"];';
+            {
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label. '"' . $iter->fill .'];';
+            }
         }
 
         foreach ($gr->subgraphs as $iter) {
