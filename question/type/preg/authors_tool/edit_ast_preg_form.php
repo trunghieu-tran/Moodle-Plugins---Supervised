@@ -15,7 +15,7 @@ require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.
 require_once($CFG->dirroot.'/question/type/preg/question.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
-require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_dotstyleprovider.php');
+require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
 
 class qtype_preg_authors_tool_form extends moodleform {

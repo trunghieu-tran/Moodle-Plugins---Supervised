@@ -28,7 +28,7 @@ abstract class qtype_preg_author_tool_node {
     /**
      * Creates and returns subgraph which explaining part of regular expression.
      */
-    abstract public function &create_graph();
+    abstract public function &create_graph($id = -1);
 
     public function accept() {
         return true;
@@ -42,59 +42,69 @@ abstract class qtype_preg_author_tool_node {
 class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
 {
     /**
+     * Returns filling settings of node which will be in graph. 
+     */
+    public function get_filled()
+    {
+        if ($this->pregnode->caseinsensitive)
+        {
+            return ', style=filled, fillcolor=grey';
+        }
+        else
+            return '';
+    }
+
+    /**
      * Returns value of node which will be in graph. 
      */
     public function get_value() {
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
-                if (count($this->pregnode->userinscription) > 1) {
-                    $tmp = '';
-                    if ($this->pregnode->negative)
-                        $tmp = '^';
-
-                    foreach ($this->pregnode->userinscription as $element)
-                        $tmp .= $element;
-
-                    return $tmp;
-                }
-                else {
-                    if ($this->pregnode->userinscription[0] == '\d')
-                        return 'Any digit';
-                    elseif ($this->pregnode->userinscription[0] == '\D')
-                        return 'Any character except of digit';
-                    elseif ($this->pregnode->userinscription[0] == '\s')
-                        return 'Any separator';
-                    elseif ($this->pregnode->userinscription[0] == '\S')
-                        return 'Any character except of separator';
-                    elseif ($this->pregnode->userinscription[0] == '\\')
-                        return '\\';
-                    elseif ($this->pregnode->userinscription[0] == '\w')
-                        return 'A word character';
-                    elseif ($this->pregnode->userinscription[0] == '\W')
-                        return 'Not a word character';
-                    elseif ($this->pregnode->userinscription[0] == '\.')
-                        return 'Any character';
+                if (count($this->pregnode->flags) == 1)
+                {
+                    $result = qtype_preg_author_tool_leaf::process_flag_value($this->pregnode->flags[0]);
+                    if ($result == ' ')
+                        return get_string('description_char_space', 'qtype_preg');
+                    elseif ($result == '	')
+                        return get_string('explain_tab', 'qtype_preg');
+                    elseif ($result == '"')
+                        return get_string('explain_quote', 'qtype_preg');
+                    elseif ($result == '\\')
+                        return get_string('explain_slash', 'qtype_preg');
                     else
-                        return $this->pregnode->userinscription[0];
+                        return $result;
+                }
+                else
+                {
+                    $result = array();
+                    if ($this->pregnode->negative) $result[] = '^';
+                    foreach ($this->pregnode->flags as $flag)
+                    {
+                        $result[] = qtype_preg_author_tool_leaf::process_flag_value($flag, TRUE);
+                    }
+
+                    return $result;
                 }
             case qtype_preg_node::TYPE_LEAF_META:
                 if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
                     return 'Void';
                 else
-                    return 'Unknow meta';
+                    return get_string('explain_unknow_meta', 'qtype_preg');
             case qtype_preg_node::TYPE_LEAF_ASSERT:
-                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
-                    return 'Begining of line';
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
-                    return 'End of line';
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
-                    return ($this->pregnode->negative ? 'Not a word border' : 'A word border');
+                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+                    return get_string('description_circumflex', 'qtype_preg');
+                elseif ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
+                    return get_string('description_dollar', 'qtype_preg');
+                elseif ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
+                    return ($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg'));
                 else
-                    return 'Unknow assert';
+                    return get_string('explain_unknow_assert', 'qtype_preg');
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-                return 'The result of submask #' . $this->pregnode->number;
+                return get_string('explain_backref', 'qtype_preg') . $this->pregnode->number;
+            case qtype_preg_node::TYPE_LEAF_RECURSION:
+                return get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : '');
             default:
-                return 'Unknow node';
+                return get_string('explain_unknow_node', 'qtype_preg');
         }
     }
     
@@ -105,8 +115,8 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
                 if (count($this->pregnode->userinscription) == 1) {
-                    if ($this->pregnode->userinscription[0] == '\d' || $this->pregnode->userinscription[0] == '\.' || $this->pregnode->userinscription[0] == '\W' ||
-                        $this->pregnode->userinscription[0] == '\D' || $this->pregnode->userinscription[0] == '\s' || $this->pregnode->userinscription[0] == '\S' || $this->pregnode->userinscription[0] == '\w')
+                    if ($this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::FLAG || $this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::UPROP || 
+                    $this->pregnode->userinscription[0] == ' ' || $this->pregnode->userinscription[0] == '	' || $this->pregnode->userinscription[0] == '\\' || $this->pregnode->userinscription[0] == '"')
                         return 'green';
                     else
                         return 'black';
@@ -118,6 +128,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
             case qtype_preg_node::TYPE_LEAF_ASSERT:
                 return 'red';
             case qtype_preg_node::TYPE_LEAF_BACKREF:
+            case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return 'blue';
             default:
                 return 'pink';
@@ -131,7 +142,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         if (count($this->pregnode->userinscription) > 1)
             return 'record';
         else {
-            if ($this->pregnode->userinscription[0] == '\d' || $this->pregnode->userinscription[0] == '\.' || $this->pregnode->userinscription[0] == '\W' ||
+            if ($this->pregnode->userinscription[0] == '\d' || $this->pregnode->userinscription[0] == '.' || $this->pregnode->userinscription[0] == '\W' ||
                     $this->pregnode->userinscription[0] == '\D' || $this->pregnode->userinscription[0] == '\s' || $this->pregnode->userinscription[0] == '\S' || $this->pregnode->userinscription[0] == '\w')
                 return 'ellipse';
             elseif (strlen($this->pregnode->userinscription[0]) > 1)
@@ -144,16 +155,48 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     /**
      * Implementation of abstract create_graph for leaf.
      */
-    public function &create_graph() {
+    public function &create_graph($id = -1) {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
 
-        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph);
-        $graph->entries[] = end($graph->nodes);
-        $graph->exits[] = end($graph->nodes);
+        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->get_filled());
+        
+        if ($id == $this->pregnode->id)
+        {
+            $graph->style .= '; color=gold';
+
+            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+            $marking->subgraphs[] = $graph;
+
+            $marking->entries[] = end($graph->nodes);
+            $marking->exits[] = end($graph->nodes);
+
+            return $marking;
+        }
+        else
+        {
+            $graph->entries[] = end($graph->nodes);
+            $graph->exits[] = end($graph->nodes);
+        }
         
         return $graph;
     }
     
+    private static function process_flag_value($flag, $charclass = FALSE)
+    {
+        switch ($flag[0]->type)
+        {
+            case qtype_preg_charset_flag::SET:
+                return $flag[0]->data->string();  //TODO: ololo !!!
+            case qtype_preg_charset_flag::FLAG:
+                $tmp = ($flag[0]->negative ? get_string('explain_not', 'qtype_preg') . get_string('description_charflag_' . $flag[0]->data, 'qtype_preg') : get_string('description_charflag_' . $flag[0]->data, 'qtype_preg'));
+                return ($charclass ? chr(10) . $tmp : $tmp) ;
+            case qtype_preg_charset_flag::UPROP:
+                $tmp = ($flag[0]->negative ? get_string('explain_not', 'qtype_preg') . get_string('description_charflag_' . $flag[0]->data, 'qtype_preg') : get_string('description_charflag_' . $flag[0]->data, 'qtype_preg'));
+                return ($charclass ? chr(10) . 'Unicode: ' . $tmp : 'Unicode: ' . $tmp) ;
+            default:
+                return get_string('explain_unknow_charset_flag', 'qtype_preg');
+        }
+    }
 }
 
 /**
@@ -172,12 +215,12 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
     /**
      * Implementation of abstract create_graph for concatenation.
      */
-    public function &create_graph() {
+    public function &create_graph($id = -1) {
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
         
         if ($this->pregnode->type == 'node_concat') {
-            $left = $this->operands[0]->create_graph();
-            $right = $this->operands[1]->create_graph();
+            $left = $this->operands[0]->create_graph($id);
+            $right = $this->operands[1]->create_graph($id);
 
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
@@ -188,8 +231,8 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->exits[] = end($right->exits);
         }
         elseif ($this->pregnode->type == 'node_alt') {
-            $left = $this->operands[0]->create_graph();
-            $right = $this->operands[1]->create_graph();
+            $left = $this->operands[0]->create_graph($id);
+            $right = $this->operands[1]->create_graph($id);
 
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
@@ -205,7 +248,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->exits[] = end($graph->nodes);
         }
         elseif ($this->pregnode->type == 'node_finite_quant' || $this->pregnode->type == 'node_infinite_quant') {
-            $operand = $this->operands[0]->create_graph();
+            $operand = $this->operands[0]->create_graph($id);
 
             if ($this->pregnode->type == 'node_finite_quant') {
                 $label = 'from ' . $this->pregnode->leftborder . ' to ';
@@ -226,9 +269,9 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->exits[] = end($operand->exits);
         }
         elseif ($this->pregnode->type == 'node_subpatt') {
-            $operand = $this->operands[0]->create_graph();
+            $operand = $this->operands[0]->create_graph($id);
 
-            $label = 'submask #' . $this->pregnode->number;
+            $label = get_string('explain_subpattern', 'qtype_preg') . $this->pregnode->number;
 
             $subpatt = new qtype_preg_author_tool_explain_graph_subgraph($label, 'solid');
             qtype_preg_author_tool_explain_graph::assume_subgraph($subpatt, $operand);
@@ -236,6 +279,16 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->subgraphs[] = $subpatt;
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
+        }
+
+        if ($id == $this->pregnode->id)
+        {
+            $marking = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid; color=gold');
+            qtype_preg_author_tool_explain_graph::assume_subgraph($marking, $graph);
+            $graph->nodes = array();
+            $graph->links = array();
+            $graph->subgraphs = array();
+            $graph->subgraphs[] = $marking;
         }
         
         return $graph;

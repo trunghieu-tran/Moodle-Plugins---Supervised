@@ -14,7 +14,7 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
        
         var page_regex_auth_helper_height = 1000;
         var page_regex_auth_helper_width = 1000;
-        var page_regex_auth_helper_adr = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'));
+        var page_regex_auth_helper_adr = 'http://localhost:41835/question/type/preg/authors_tool/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'));
         var dialog = new Y.Panel({
             contentBox : Y.Node.create('<div id="dialog" />'),
             bodyContent: '<div id="page_regex_auth_helper_iframe_holder" style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div>',
