@@ -154,11 +154,16 @@ $string['error_posixclassoutsidecharset'] = 'POSIX classes are not allowed outsi
 $string['error_unexistingsubpatt']        = 'The subpattern "{$a->addinfo}" does not exist.';
 
 $string['error_charcodetoobig']           = 'The character code {$a->addinfo} is too big.';
-
+$string['error_condsubpattzerocondition'] = 'Invalid condition (?(0).';
 $string['error_missingcommentending']     = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_unknowncharafterp']        = 'Unknown character after {$a->addinfo}. Did you mean "(?P=..."?';
+$string['error_subpattnamemissingending'] = 'Missing subpattern name ending in the named subpattern {$a->addinfo}.';
+
 
 
 $string['error_calloutbignumber']         = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
+$string['error_calloutmissingending']     = 'Missing ) after {$a->addinfo}.';
+
 
 
 
