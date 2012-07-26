@@ -100,6 +100,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public function __construct($lbl, $stl, $id = -1) {
         $this->label   = $lbl;
         $this->style   = $stl;
+        $this->id = $id;
     }
     
     //private static $counter = 0; // counter for generating id for nodes in graph
