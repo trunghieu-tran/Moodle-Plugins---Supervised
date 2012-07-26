@@ -9,59 +9,61 @@
  * @package questions
  */
 
-/**
- *    The cross-tester searches (not recursively!) for files named "cross_tests_<suffix>.php". A class with test data should be named the same as the corresponding file.
- *    For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".
- *    Next, those classes represent test data as a set of test functions. Those functions should:
- *    -be named "data_for_test_..."
- *    -return an array of input and output data as in the following example:
- *       array(
- *             'regex'=>'^[-.\w]+[a-z]{2,6}$',      // A regular expression.
- *             'modifiers'=>'i',                    // Modifiers. It's not necessary to define this element.
- *             'tests'=>array($test1, ..., $testn), // Array containing tests in the format described below. Count of these tests is unlimited.
- *             'tags'=>array($tag1, ..., $tagn)     // Tags for the regular expression: associativity, longest match/less characters left, source (at&t, pcre, preg) etc.
- *             );
- *
- *    Finally, an array of expected results ($testi) should look like:
- *       array(
- *             'str'=>'sample string',             // A string to match.
- *             'is_match'=>true,                   // Is there a match?
- *             'full'=>true,                       // Is it full?
- *             'index_first'=>array(0=>0),         // Indexes of first correct characters for subpatterns. Subpattern numbers are defined by array keys.
- *             'length'=>array(0=>2),              // Lengths of all subpatterns should be matched.
- *             'left'=>0,                          // Number of characters left to complete match.
- *             'next'=>'',                         // A string of possible next characters in case of not full match.
- *             'tags'=>array());                   // Various tags, constants of the class below.
- *
- *    Remark: different matching engines may give different results, especially when matching quantifiers. This situation appears when a character may
- *    lead to continuing matching both a quantifier and the rest of the regex, for example:
- *    the regex is '[a-z]*bacd' and the string is 'abacd'. The character is underlined.
- *                                                  ^
- *    For this kind of situations it's needed to use TAGS which define engine-specific things.
- *
- *    Here's an example test function:
- *
- *    function data_for_test_example() {
- *       $test1 = array( 'str'=>'match ME',
- *                       'is_match'=>true,
- *                       'full'=>true,
- *                       'index_first'=>array(0=>0),
- *                       'length'=>array(0=>8),
- *                       'left'=>0,
- *                       'next'=>'',
- *                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PREG));
- *
- *       return array('regex'=>'.* ME',
- *                    'modifiers'=>'i',
- *                    'tests'=>array($test1));
- *    }
- *
- */
+/****************************************************************************************************************************************************************************************
+*                                                                                                                                                                                       *
+*     The cross-tester searches (not recursively!) for files named "cross_tests_<suffix>.php". A class with test data should be named the same as the corresponding file.               *
+*     For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".                                                                           *
+*                                                                                                                                                                                       *
+*     Those classes represent test data as a set of test functions. Those functions should:                                                                                             *
+*     -be named "data_for_test_..."                                                                                                                                                     *
+*     -return an array of input and output data as in the following example:                                                                                                            *
+*                                                                                                                                                                                       *
+*        array(                                                                                                                                                                         *
+*              'regex'=>'^[-.\w]+[a-z]{2,6}$',                          // The regular expression to test.                                                                              *
+*              'modifiers'=>'i',                                        // Modifiers. Not necessary element, default value is null.                                                     *
+*              'tests'=>array($test1, ..., $testn),                     // Array containing tests in the format described below.                                                        *
+*              'tags'=>array($tag1, ..., $tagn),                        // Tags for the regex, see the cross-tester class constants. Not necessary element, default value is array().   *
+*              'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE)    // Notation of the regex. Not necessary element, default value is 'native'.                                     *
+*              );                                                                                                                                                                       *
+*                                                                                                                                                                                       *
+*     An array of expected results ($testi) should look like:                                                                                                                           *
+*                                                                                                                                                                                       *
+*        array(                                                                                                                                                                         *
+*              'str'=>'sample string',             // A string to match.                                                                                                                *
+*              'is_match'=>true,                   // Is there a match.                                                                                                                 *
+*              'full'=>true,                       // Is it full.                                                                                                                       *
+*              'index_first'=>array(0=>0),         // Start indexes of all subpatterns should be matched, keys are subpattern numbers. Not necessary to define unmatched subpatterns.   *
+*              'length'=>array(0=>2),              // Lengths of all subpatterns should be matched. Not necessary to define unmatched subpatterns.                                      *
+*              'left'=>0,                          // Number of characters left to complete match. Not necessary if 'full' is true.                                                     *
+*              'next'=>'',                         // A string of possible next characters in case of not full match. Not necessary if 'full' is true.                                  *
+*              'tags'=>array());                   // Tags for the string, see the cross-tester class constants. Not necessary element, default value is array().                       *
+*                                                                                                                                                                                       *
+*     Here's an example test function:                                                                                                                                                  *
+*                                                                                                                                                                                       *
+*     function data_for_test_example() {                                                                                                                                                *
+*        $test1 = array( 'str'=>'match me',                                                                                                                                             *
+*                        'is_match'=>true,                                                                                                                                              *
+*                        'full'=>false,                                                                                                                                                 *
+*                        'index_first'=>array(0=>0,1=>6),                                                                                                                               *
+*                        'length'=>array(0=>8,1=>2),                                                                                                                                    *
+*                        'left'=>1,                                                                                                                                                     *
+*                        'next'=>'!',                                                                                                                                                   *
+*                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PREG));                                                                                                        *
+*                                                                                                                                                                                       *
+*        return array('regex'=>'.* (Me)!',                                                                                                                                              *
+*                     'modifiers'=>'i',                                                                                                                                                 *
+*                     'tests'=>array($test1),                                                                                                                                           *
+*                     'tags'=>array(),                                                                                                                                                  *
+*                     'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE);                                                                                                            *
+*     }                                                                                                                                                                                 *
+*                                                                                                                                                                                       *
+****************************************************************************************************************************************************************************************/
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 /**
  * Represents auxiliary class for extra checks. The extra checks are performed by cross-tester
@@ -78,58 +80,73 @@ abstract class qtype_preg_cross_tests_extra_checker {
 
 }
 
-class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
+abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
-    const TAG_FROM_NFA          = 0;
-    const TAG_FROM_DFA          = 1;
-    const TAG_FROM_BACKTRACKING = 2;
-    const TAG_FROM_PCRE         = 3;
-    const TAG_FROM_AT_AND_T     = 4;
+    // Different sources of test data.
+    const TAG_FROM_NFA                = 0;
+    const TAG_FROM_DFA                = 1;
+    const TAG_FROM_BACKTRACKING       = 2;
+    const TAG_FROM_PCRE               = 3;
+    const TAG_FROM_AT_AND_T           = 4;
 
-    var $testdataobjects;    // Objects with test data.
-    var $extracheckobjects;  // Objects for extra checks.
+    // Different notations.
+    const NOTATION_NATIVE             = 'native';
+    const NOTATION_MDLSHORTANSWER     = 'mdlshortanswer';
+    //const NOTATION_PCRESTRICT       = '';
 
-    protected $eol           = "\n";                                    // End-of-line character.
-    protected $boolstr       = array(false => 'FALSE', true => 'TRUE'); // For printing boolean values.
-    protected $doextrachecks = false;                                   // TODO - control this field from outside.
+    // TODO: tags for different capabilities for matchers.
+
+    protected $testdataobjects;        // Objects with test data.
+    protected $extracheckobjects;      // Objects for extra checks.
+    protected $doextrachecks;          // Is it needed to do extra checks.
+    protected $question;               // Question object for getting matchers.
 
     /**
-     * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be re-implemented in child classes.
+     * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be implemented in child classes.
      */
-    public function engine_name() {
-        return '';
-    }
+    abstract protected function engine_name();
 
     public function __construct() {
-        global $CFG;
         $this->testdataobjects = array();
         $this->extracheckobjects = array();
-        $enginename = $this->engine_name();
-        if ($enginename === '') {
+        $this->doextrachecks = false;       // TODO: control this field from outside.
+        $this->question = new qtype_preg_question();
+
+        $testdir = dirname(__FILE__) . '/';
+        $pregdir = dirname($testdir) . '/';
+
+        // Find all available test files.
+        $dh = opendir($testdir);
+        if (!$dh) {
             return;
         }
+
+        $enginename = $this->engine_name();
+
         // Include file with matcher to test.
-        require_once($CFG->dirroot . '/question/type/preg/' . $enginename . '/' . $enginename . '.php');
-        // Find all available test files.
-        if ($dh = opendir($CFG->dirroot . '/question/type/preg/tests')) {
-            while (($file = readdir($dh)) !== false) {
-                if (strpos($file, 'cross_tests_') === 0 && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                    require_once($CFG->dirroot . '/question/type/preg/tests/' . $file);
-                    $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
-                    if (strpos($file, 'cross_tests_extra_checker') === 0) {
-                        // Extra checker found.
-                        $obj = new $classname;
-                        $enginename = $obj->engine_name();
-                        require_once($CFG->dirroot . '/question/type/preg/' . $enginename . '/' . $enginename . '.php');
-                        $this->extracheckobjects[] = new $obj;
-                    } else {
-                        // Test data object found.
-                        $this->testdataobjects[] = new $classname;
-                    }
-                }
+        require_once($pregdir . $enginename . '/' . $enginename . '.php');
+
+        // Include files with test data.
+        while ($file = readdir($dh)) {
+            if (strpos($file, 'cross_tests_') !== 0 || pathinfo($file, PATHINFO_EXTENSION) !== 'php') {
+                continue;
             }
-            closedir($dh);
+            require_once($testdir . $file);
+            $classname = 'qtype_preg_' . pathinfo($file, PATHINFO_FILENAME);
+            if (strpos($file, 'cross_tests_extra_checker') === 0) {
+                // Extra checker found.
+                if ($this->doextrachecks) {
+                    $obj = new $classname;
+                    $enginename = $obj->engine_name();
+                    require_once($pregdir . $enginename . '/' . $enginename . '.php');
+                    $this->extracheckobjects[] = new $obj;
+                }
+            } else {
+                // Test data object found.
+                $this->testdataobjects[] = new $classname;
+            }
         }
+        closedir($dh);
     }
 
     /**
@@ -137,7 +154,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @param $matcher - a matcher to be checked.
      * @return true if there are errors, false otherwise.
      */
-    function check_for_errors(&$matcher) {
+    function check_for_errors($matcher) {
         if ($matcher->is_error_exists()) {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
@@ -166,15 +183,12 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @param $modifiers - modifiers.
      * @param $obtained - a result to check.
      */
-    function do_extra_check($regex, $modifiers, $obtained) {
-        if ($obtained->extendedmatch === null) {
-            return;
-        }
+    function do_extra_check($regex, $notation, $modifiers, $obtained) {
         $str = $obtained->matched_part() . $obtained->string_extension();
         $thisenginename = $this->engine_name();
         foreach ($this->extracheckobjects as $obj) {
             $enginename = 'qtype_preg_' . $obj->engine_name();
-            $matcher = new $enginename($regex, $modifiers);
+            $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
             if ($obtained->extendedmatch->full || $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
                 $matcher->match($str);
                 $newresults = $matcher->get_match_results();
@@ -190,7 +204,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $full = $this->assertTrue($newresults->full === $obtained->extendedmatch->full, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
                 $sum = $this->assertTrue($sum1 === $sum2, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
                 if (!$full) {
-                    echo "extended match field 'full' has the value of " . $this->boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)<br/>";
+                    echo "extended match field 'full' has the value of " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)<br/>";
                 }
                 if (!$sum) {
                     echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . " and " . $obtained->left . ", the new values are " . $obtained->extendedmatch->length() . " and " . $obtained->extendedmatch->left . " (extra-tested by $enginename)<br/>";
@@ -202,7 +216,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $assertionstrue = false) {
+    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $assertionstrue = false) {
         // Checking match existance.
         $fullpassed = ($expected['full'] === $obtained->full);
         if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
@@ -255,70 +269,71 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
             $leftpassed = in_array($obtained->left, $expected['left']);
         }
-        if ($this->doextrachecks) {
-            $this->do_extra_check($regex, $modifiers, $obtained);
+        if ($this->doextrachecks && $obtained->extendedmatch !== null) {
+            $this->do_extra_check($regex, $notation, $modifiers, $obtained);
         }
 
         // Do assertions
         $enginename = $matcher->name();
+        $boolstr = array(false => 'FALSE', true => 'TRUE');
         // is_match
         $this->assertTrue($assertionstrue || $ismatchpassed);
         if (!$ismatchpassed) {
-            echo "$enginename failed 'IS_MATCH' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected is_match: ' . $this->boolstr[$expected['is_match']] . $this->eol .
-                 'obtained is_match: ' . $this->boolstr[$obtained->is_match()] . $this->eol .
-                 'source class:      ' . $classname                            . $this->eol .
-                 'source method:     ' . $methodname              . $this->eol . $this->eol;
+            echo "$enginename failed 'IS_MATCH' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected is_match: ' . $boolstr[$expected['is_match']] . "\n" .
+                 'obtained is_match: ' . $boolstr[$obtained->is_match()] . "\n" .
+                 'source class:      ' . $classname                      . "\n" .
+                 'source method:     ' . $methodname                     . "\n\n";
         }
 
         // full
         $this->assertTrue($assertionstrue || $fullpassed);
         if (!$fullpassed) {
-            echo "$enginename failed 'FULL' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected full: ' . $this->boolstr[$expected['full']]     . $this->eol .
-                 'obtained full: ' . $this->boolstr[$obtained->full]       . $this->eol .
-                 'source class:      ' . $classname                        . $this->eol .
-                 'source method:     ' . $methodname          . $this->eol . $this->eol;
+            echo "$enginename failed 'FULL' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected full: ' . $boolstr[$expected['full']]     . "\n" .
+                 'obtained full: ' . $boolstr[$obtained->full]       . "\n" .
+                 'source class:      ' . $classname                  . "\n" .
+                 'source method:     ' . $methodname                 . "\n\n";
         }
 
         // index_first
         $this->assertTrue($assertionstrue || $indexfirstpassed);
         if (!$indexfirstpassed) {
-            echo "$enginename failed 'INDEX_FIRST' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected index_first: '; print_r($expected['index_first']); echo $this->eol .
-                 'obtained index_first: '; print_r($obtained->index_first);   echo $this->eol .
-                 'source class:      ' . $classname                              . $this->eol .
-                 'source method:     ' . $methodname                . $this->eol . $this->eol;
+            echo "$enginename failed 'INDEX_FIRST' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected index_first: '; print_r($expected['index_first']); echo "\n" .
+                 'obtained index_first: '; print_r($obtained->index_first);   echo "\n" .
+                 'source class:      ' . $classname                              . "\n" .
+                 'source method:     ' . $methodname                             . "\n\n";
         }
 
         // length
         $this->assertTrue($assertionstrue || $lengthpassed);
         if (!$lengthpassed) {
-            echo "$enginename failed 'LENGTH' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected length: '; print_r($expected['length']); echo $this->eol .
-                 'obtained length: '; print_r($obtained->length);   echo $this->eol .
-                 'source class:      ' . $classname                    . $this->eol .
-                 'source method:     ' . $methodname      . $this->eol . $this->eol;
+            echo "$enginename failed 'LENGTH' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected length: '; print_r($expected['length']); echo "\n" .
+                 'obtained length: '; print_r($obtained->length);   echo "\n" .
+                 'source class:      ' . $classname                    . "\n" .
+                 'source method:     ' . $methodname                   . "\n\n";
         }
 
         // next
         $this->assertTrue($assertionstrue || $nextpassed);
         if (!$nextpassed) {
-            echo "$enginename failed 'NEXT' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected next: ' . $expected['next']               . $this->eol .
-                 'obtained next: ' . $obtained->string_extension()   . $this->eol .
-                 'source class:      ' . $classname                  . $this->eol .
-                 'source method:     ' . $methodname    . $this->eol . $this->eol;
+            echo "$enginename failed 'NEXT' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected next: ' . $expected['next']               . "\n" .
+                 'obtained next: ' . $obtained->string_extension()   . "\n" .
+                 'source class:      ' . $classname                  . "\n" .
+                 'source method:     ' . $methodname                 . "\n\n";
         }
 
         // left
         $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $classname)");
         if (!$leftpassed) {
-            echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . $this->eol .
-                 'expected left: ' . $expected['left'][0]            . $this->eol .
-                 'obtained left: ' . $obtained->left                 . $this->eol .
-                 'source class:      ' . $classname                  . $this->eol .
-                 'source method:     ' . $methodname    . $this->eol . $this->eol;
+            echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . "\n" .
+                 'expected left: ' . $expected['left'][0]            . "\n" .
+                 'obtained left: ' . $obtained->left                 . "\n" .
+                 'source class:      ' . $classname                  . "\n" .
+                 'source method:     ' . $methodname                 . "\n\n";
         }
 
         // Return true if everything is correct, false otherwise.
@@ -329,7 +344,6 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
-        $enginename = 'qtype_preg_' . $this->engine_name();
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $testdataclassname = get_class($testdataobj);
@@ -344,18 +358,22 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $regex = $data['regex'];
                 $modifiers = null;
                 $regextags = array();
+                $notation = self::NOTATION_NATIVE;
                 if (array_key_exists('modifiers', $data)) {
                     $modifiers = $data['modifiers'];
                 }
                 if (array_key_exists('tags', $data)) {
                     $regextags = $data['tags'];
                 }
+                if (array_key_exists('notation', $data)) {
+                    $notation = $data['notation'];
+                }
 
                 // Try to get matcher for the regex.
                 try {
-                    $matcher = new $enginename($regex, $modifiers);
+                    $matcher = $this->question->get_matcher($this->engine_name(), $regex, false, strpos($modifiers, 'i') === false, null, $notation);
                 } catch (Exception $e) {
-                    echo "EXCEPTION CATCHED DURING BUILDING MATCHER, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
+                    echo "EXCEPTION CATCHED DURING BUILDING MATCHER, test name is " . $curtestmethod .  "\n" . $e->getMessage() . "\n";
                     continue;
                 }
 
@@ -380,12 +398,12 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $matcher->match($str);
                         $obtained = $matcher->get_match_results();
                     } catch (Exception $e) {
-                        echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
+                        echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $curtestmethod .  "\n" . $e->getMessage() . "\n";
                         continue;
                     }
 
                     // Results obtained, check them.
-                    $this->compare_results($regex, $str, $modifiers, $matcher, $expected, $obtained, $testdataclassname, $curtestmethod, true);
+                    $this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $testdataclassname, $curtestmethod, true);
                 }
             }
         }
