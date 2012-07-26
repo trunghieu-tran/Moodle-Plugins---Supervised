@@ -12,7 +12,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/author_tool_description/preg_description.php');
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_description.php');
 
 class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     
