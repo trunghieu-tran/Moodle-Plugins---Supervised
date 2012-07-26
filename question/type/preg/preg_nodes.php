@@ -1477,8 +1477,12 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      //
     const SUBTYPE_CONDSUBPATT_MISSING_PAREN    = 'condsubpatt_missing_paren_node_error';        //
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
-    const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       //
+    const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       // Invalid condition (?(0).
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';               // Too big number in (?C...).
+    const SUBTYPE_CALLOUT_MISSING_ENDING       = 'callout_missing_ending_node_error';           // Missing ) after (?C.
+    const SUBTYPE_UNKNOWN_CHAR_AFTER_P         = 'unknown_char_after_p_node_error';             // Unknown character after (?P, should be (?P=.
+    const SUBTYPE_SUBPATT_NAME_MISSING_ENDING  = 'subpatt_name_missing_ending_node_error';      // Missing subpattern name ending.
+
     const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          //
     const SUBTYPE_BACKREF_MISSING_NUMBER       = 'backref_missing_number_node_error';           //
     const SUBTYPE_CONDSUBPATT_WRONG_NUMBER     = 'condsubpatt_wrong_number_node_error';         //
@@ -1504,10 +1508,14 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_UNEXISTING_SUBPATT           => 'error_unexistingsubpatt',
 
                                    self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
-
+                                   self::SUBTYPE_CONSUBPATT_ZERO_CONDITION    => 'error_condsubpattzerocondition',
                                    self::SUBTYPE_MISSING_COMMENT_ENDING       => 'error_missingcommentending',
+                                   self::SUBTYPE_UNKNOWN_CHAR_AFTER_P         => 'error_unknowncharafterp',
+                                   self::SUBTYPE_SUBPATT_NAME_MISSING_ENDING  => 'error_subpattnamemissingending',
 
-                                   self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber'
+
+                                   self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
+                                   self::SUBTYPE_CALLOUT_MISSING_ENDING       => 'error_calloutmissingending'
                                    );
     /** Additional info. */
     public $addinfo;
