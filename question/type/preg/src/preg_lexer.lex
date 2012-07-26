@@ -586,33 +586,32 @@ MODIFIER = [iJmsUx]
 }
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
 }
-<YYINITIAL> "(?#"[^)]*")" {       // Comment.
-    return $this->nextToken();
+<YYINITIAL> "(?#"[^)]*")"? {       // Comment.
+    $text = $this->yytext();
+    if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+    } else {
+        return $this->nextToken();
+    }
 }
 <YYINITIAL> "(*ACCEPT)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ACCEPT));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ACCEPT));
 }
 <YYINITIAL> "(*FAIL)"|"(*F)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_FAIL));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_FAIL));
 }
 <YYINITIAL> ("(*MARK:"|"(*:"){NOTSPECIAL}+")" {
     $delimpos = qtype_poasquestion_string::strpos($this->yytext(), ':');
     $name = qtype_poasquestion_string::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
 }
 <YYINITIAL> "(*COMMIT)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_COMMIT));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_COMMIT));
 }
 <YYINITIAL> "(*PRUNE":?")" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
 }
 <YYINITIAL> "(*PRUNE:"{NOTSPECIAL}+")" {
     $delimpos = qtype_poasquestion_string::strpos($this->yytext(), ':');
@@ -623,14 +622,12 @@ MODIFIER = [iJmsUx]
     return $res;
 }
 <YYINITIAL> "(*SKIP":?")" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP));
 }
 <YYINITIAL> "(*SKIP:"{NOTSPECIAL}+")" {
     $delimpos = qtype_poasquestion_string::strpos($this->yytext(), ':');
     $name = qtype_poasquestion_string::substr($this->yytext(), $delimpos + 1, $this->yylength() - $delimpos - 2);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name));
 }
 <YYINITIAL> "(*THEN)" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
@@ -844,6 +841,14 @@ MODIFIER = [iJmsUx]
     $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
     return $res;
 }
+<YYINITIAL> "(?C"[0-9]*")" {
+    // TODO: callouts. For now this rule will return either error or exception :)
+    throw new Exception('\R is not implemented yet');
+    $number = (int)qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
+    if ($number > 255) {
+        // This is error.
+    }
+}
 <YYINITIAL> "." {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
     return $res;
@@ -1023,9 +1028,14 @@ MODIFIER = [iJmsUx]
     return $res;
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(hexdec($str))));
-    return $res;
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $code = (int)hexdec($str);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str));
+    } else {
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($text), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code)));
+    }
 }
 <YYINITIAL> "\d"|"\D" {
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
@@ -1267,8 +1277,14 @@ MODIFIER = [iJmsUx]
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, $str);
 }
 <CHARSET> "\x{"[0-9a-fA-F]+"}" {
-    $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
-    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(hexdec($str)));
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
+    $code = (int)hexdec($str);
+    if ($code > qtype_preg_unicode::max_possible_code()) {
+        $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str);
+    } else {
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+    }
 }
 <CHARSET> "\a" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));

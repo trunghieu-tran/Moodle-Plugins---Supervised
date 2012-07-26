@@ -153,6 +153,14 @@ $string['error_catendofpattern']          = 'Regex syntax error: \c at end of pa
 $string['error_posixclassoutsidecharset'] = 'POSIX classes are not allowed outside character sets.';
 $string['error_unexistingsubpatt']        = 'The subpattern "{$a->addinfo}" does not exist.';
 
+$string['error_charcodetoobig']           = 'The character code {$a->addinfo} is too big.';
+
+$string['error_missingcommentending']     = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
+
+
+$string['error_calloutbignumber']         = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
+
+
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';

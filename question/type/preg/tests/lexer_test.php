@@ -1289,7 +1289,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[2]->indfirst === 12);
         $this->assertTrue($errors[2]->indlast === 14);
         $this->assertTrue($errors[2]->userinscription === '[bc');
-
         $lexer = $this->create_lexer('a\\');
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();
@@ -1313,5 +1312,19 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN);
         $this->assertTrue($token->value->indfirst === 14);
         $this->assertTrue($token->value->indlast === 15);
+
+        $lexer = $this->create_lexer('(?#comment here)\x{FFFFFFFF}(?#comment without closing paren');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG);
+        $this->assertTrue($token->value->indfirst === 16);
+        $this->assertTrue($token->value->indlast === 27);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING);
+        $this->assertTrue($token->value->indfirst === 28);
+        $this->assertTrue($token->value->indlast === 59);
     }
 }
