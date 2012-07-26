@@ -202,7 +202,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $modifiers, &$matcher, &$expected, &$obtained, &$ismatchpassed, &$fullpassed, &$indexfirstpassed, &$lengthpassed, &$nextpassed, &$leftpassed) {
+    function compare_results($regex, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $assertionstrue = false) {
+        // Checking match existance.
         $fullpassed = ($expected['full'] === $obtained->full);
         if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
             $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
@@ -257,21 +258,17 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         if ($this->doextrachecks) {
             $this->do_extra_check($regex, $modifiers, $obtained);
         }
-        return $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $nextpassed && $leftpassed;
-    }
 
-    /**
-     * Does assertions for every field. if assertionstrue === true then error messages displayed only.
-     */
-    function do_assertions($enginename, $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed, $testdataclassname, $assertionstrue = false) {
-
+        // Do assertions
+        $enginename = $matcher->name();
         // is_match
         $this->assertTrue($assertionstrue || $ismatchpassed);
         if (!$ismatchpassed) {
             echo "$enginename failed 'IS_MATCH' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected is_match: ' . $this->boolstr[$expected['is_match']] . $this->eol .
                  'obtained is_match: ' . $this->boolstr[$obtained->is_match()] . $this->eol .
-                 'source class:      ' . $testdataclassname . $this->eol . $this->eol;
+                 'source class:      ' . $classname                            . $this->eol .
+                 'source method:     ' . $methodname              . $this->eol . $this->eol;
         }
 
         // full
@@ -280,7 +277,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             echo "$enginename failed 'FULL' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected full: ' . $this->boolstr[$expected['full']]     . $this->eol .
                  'obtained full: ' . $this->boolstr[$obtained->full]       . $this->eol .
-                 'source class:  ' . $testdataclassname . $this->eol . $this->eol;
+                 'source class:      ' . $classname                        . $this->eol .
+                 'source method:     ' . $methodname          . $this->eol . $this->eol;
         }
 
         // index_first
@@ -289,7 +287,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             echo "$enginename failed 'INDEX_FIRST' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected index_first: '; print_r($expected['index_first']); echo $this->eol .
                  'obtained index_first: '; print_r($obtained->index_first);   echo $this->eol .
-                 'source class:         ' . $testdataclassname . $this->eol      . $this->eol;
+                 'source class:      ' . $classname                              . $this->eol .
+                 'source method:     ' . $methodname                . $this->eol . $this->eol;
         }
 
         // length
@@ -298,7 +297,8 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             echo "$enginename failed 'LENGTH' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected length: '; print_r($expected['length']); echo $this->eol .
                  'obtained length: '; print_r($obtained->length);   echo $this->eol .
-                 'source class:    ' . $testdataclassname . $this->eol . $this->eol;
+                 'source class:      ' . $classname                    . $this->eol .
+                 'source method:     ' . $methodname      . $this->eol . $this->eol;
         }
 
         // next
@@ -307,66 +307,85 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             echo "$enginename failed 'NEXT' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected next: ' . $expected['next']               . $this->eol .
                  'obtained next: ' . $obtained->string_extension()   . $this->eol .
-                 'source class:  ' . $testdataclassname . $this->eol . $this->eol;
+                 'source class:      ' . $classname                  . $this->eol .
+                 'source method:     ' . $methodname    . $this->eol . $this->eol;
         }
 
         // left
-        $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $testdataclassname)");
+        $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $classname)");
         if (!$leftpassed) {
             echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . $this->eol .
                  'expected left: ' . $expected['left'][0]            . $this->eol .
                  'obtained left: ' . $obtained->left                 . $this->eol .
-                 'source class:  ' . $testdataclassname . $this->eol . $this->eol;
+                 'source class:      ' . $classname                  . $this->eol .
+                 'source method:     ' . $methodname    . $this->eol . $this->eol;
         }
+
+        // Return true if everything is correct, false otherwise.
+        return $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $nextpassed && $leftpassed;
     }
 
     /**
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
-        global $CFG;
         $enginename = 'qtype_preg_' . $this->engine_name();
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $testdataclassname = get_class($testdataobj);
             foreach ($testmethods as $curtestmethod) {
                 // Filtering class methods by names. A test method name should start with 'data_for_test_'.
-                if (strpos($curtestmethod, 'data_for_test_') === 0) {
-                    $data = $testdataobj->$curtestmethod();
-                    $regex = $data['regex'];
-                    $modifiers = null;
-                    if (array_key_exists('modifiers', $data)) {
-                        $modifiers = $data['modifiers'];
+                if (strpos($curtestmethod, 'data_for_test_') !== 0) {
+                    continue;
+                }
+
+                // Get current test data.
+                $data = $testdataobj->$curtestmethod();
+                $regex = $data['regex'];
+                $modifiers = null;
+                $regextags = array();
+                if (array_key_exists('modifiers', $data)) {
+                    $modifiers = $data['modifiers'];
+                }
+                if (array_key_exists('tags', $data)) {
+                    $regextags = $data['tags'];
+                }
+
+                // Try to get matcher for the regex.
+                try {
+                    $matcher = new $enginename($regex, $modifiers);
+                } catch (Exception $e) {
+                    echo "EXCEPTION CATCHED DURING BUILDING MATCHER, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
+                    continue;
+                }
+
+                // Skip to the next regex if there's something wrong.
+                if ($this->check_for_errors($matcher)) {
+                    continue;
+                }
+
+                // Iterate over all tests.
+                foreach ($data['tests'] as $expected) {
+                    $str = $expected['str'];
+                    $strtags = array();
+                    if (array_key_exists('tags', $expected)) {
+                        $strtags = $expected['tags'];
                     }
-                    $exception = false;
+                    $tags = array_merge($regextags, $strtags);
+
+                    // TODO: check for tag support, continue if unsupported.
+
+                    // There can be exceptions during matching.
                     try {
-                        $matcher = new $enginename($regex, $modifiers);
+                        $matcher->match($str);
+                        $obtained = $matcher->get_match_results();
                     } catch (Exception $e) {
-                        $exception = true;
-                        echo "EXCEPTION CATCHED WHILE BUILDING MATCHER, test name is " . $curtestmethod . $this->eol;
+                        echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
+                        continue;
                     }
-                    if (!$exception && !$this->check_for_errors($matcher)) {
-                        try {
-                            // Iterate over all tests.
-                            foreach ($data['tests'] as $expected) {
-                                $str = $expected['str'];
-                                $matcher->match($str);
-                                $obtained = $matcher->get_match_results();
-                                // Now the results are obtained, let us check them!
-                                $ismatchpassed = false;
-                                $fullpassed = false;
-                                $indexfirstpassed = false;
-                                $lengthpassed = false;
-                                $nextpassed = false;
-                                $leftpassed = false;
-                                $this->compare_results($regex, $modifiers, $matcher, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed);
-                                $this->do_assertions($this->engine_name(), $regex, $str, $expected, $obtained, $ismatchpassed, $fullpassed, $indexfirstpassed, $lengthpassed, $nextpassed, $leftpassed, $testdataclassname, true);
-                            }
-                        } catch (Exception $e) {
-                            $exception = true;
-                            echo "EXCEPTION CATCHED WHILE CHECKING RESULTS, test name is " . $curtestmethod .  $this->eol . $e->getMessage() . $this->eol;
-                        }
-                    }
+
+                    // Results obtained, check them.
+                    $this->compare_results($regex, $str, $modifiers, $matcher, $expected, $obtained, $testdataclassname, $curtestmethod, true);
                 }
             }
         }
