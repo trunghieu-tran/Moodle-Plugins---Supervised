@@ -7,7 +7,7 @@
      * @author Valeriy Streltsov
      */
 
-    $INPUT_SET = 'categorize';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
+    $INPUT_SET = 'repetition';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
     $INPUT_FILENAME = $INPUT_SET . '.dat.txt';
     $OUTPUT_FILENAME = 'cross_tests_from_att_' . $INPUT_SET . '.php';
     $TAB = '	';
@@ -23,7 +23,7 @@
     $out = fopen($OUTPUT_FILENAME, 'w');
 
     fwrite($out, '<?php' . $EOL . $EOL);
-    fwrite($out, 'defined(\'NOMATCH\') || define(\'NOMATCH\', qtype_preg_matching_results::NO_MATCH_FOUND);' . $EOL . $EOL);
+    //fwrite($out, 'defined(\'NOMATCH\') || define(\'NOMATCH\', qtype_preg_matching_results::NO_MATCH_FOUND);' . $EOL . $EOL);
     fwrite($out, 'class qtype_preg_cross_tests_from_att_' . $INPUT_SET . ' {' . $EOL . $EOL);
 
     $counter = 0;
@@ -163,16 +163,17 @@
         fwrite($out, $TAB3 . '\'is_match\'=>true,' . $EOL);
         fwrite($out, $TAB3 . '\'full\'=>true,' . $EOL);
         fwrite($out, $TAB3 . '\'index_first\'=>' . $index2write . ',' . $EOL);
-        fwrite($out, $TAB3 . '\'length\'=>' . $length2write . ',' . $EOL);
-        fwrite($out, $TAB3 . '\'left\'=>array(0),' . $EOL);
-        fwrite($out, $TAB3 . '\'next\'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,' . $EOL);
-        fwrite($out, $TAB3 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
+        fwrite($out, $TAB3 . '\'length\'=>' . $length2write . ');' . $EOL);
+        //fwrite($out, $TAB3 . '\'left\'=>array(0),' . $EOL);
+        //fwrite($out, $TAB3 . '\'next\'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,' . $EOL);
+        //fwrite($out, $TAB3 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
         fwrite($out, $EOL);
         fwrite($out, $TAB2 . 'return array( \'regex\'=>"' . $regex . '",' . $EOL);
         if (/*$modifiers !== ''*/strpos($modifiers, 'i') !== false) {
             fwrite($out, $TAB4 . '\'modifiers\'=>\'' . /*$modifiers*/'i' . '\',' . $EOL);
         }
-        fwrite($out, $TAB4 . '\'tests\'=>array($test1));' . $EOL);
+        fwrite($out, $TAB4 . '\'tests\'=>array($test1),' . $EOL);
+        fwrite($out, $TAB4 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
         fwrite($out, $TAB1 . '}' . $EOL . $EOL);
     }
     fwrite($out, '}' . $EOL);

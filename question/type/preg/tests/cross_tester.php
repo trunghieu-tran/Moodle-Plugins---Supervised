@@ -16,9 +16,10 @@
  *    -be named "data_for_test_..."
  *    -return an array of input and output data as in the following example:
  *       array(
- *             'regex'=>'^[-.\w]+[a-z]{2,6}$',     // A regular expression.
- *             'modifiers'=>'i',                   // Modifiers. It's not necessary to define this element.
- *             'tests'=>array($test1, ..., $testn) // Array containing tests in the format described below. Count of these tests is unlimited.
+ *             'regex'=>'^[-.\w]+[a-z]{2,6}$',      // A regular expression.
+ *             'modifiers'=>'i',                    // Modifiers. It's not necessary to define this element.
+ *             'tests'=>array($test1, ..., $testn), // Array containing tests in the format described below. Count of these tests is unlimited.
+ *             'tags'=>array($tag1, ..., $tagn)     // Tags for the regular expression: associativity, longest match/less characters left, source (at&t, pcre, preg) etc.
  *             );
  *
  *    Finally, an array of expected results ($testi) should look like:
@@ -209,21 +210,12 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             $ismatchpassed = $fullpassed;
         }
 
-        // If no match found, generate arrays of qtype_preg_matching_results::NO_MATCH_FOUND; use $expected otherwise.
-        if ($obtained->is_match()) {
-            $index_first_expected = $expected['index_first'];
-            $length_expected = $expected['length'];
-        } else {
-            $index_first_expected = array_fill(0, count($expected['index_first']), qtype_preg_matching_results::NO_MATCH_FOUND);
-            $length_expected = $index_first_expected;
-        }
-
         // Checking indexes.
         if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
             $indexfirstpassed = true;
             foreach ($obtained->index_first as $key => $index) {
-                $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $index_first_expected) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                          (array_key_exists($key, $index_first_expected) && $index_first_expected[$key] === $obtained->index_first[$key]));
+                $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $expected['index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                          (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->index_first[$key]));
                 if (!$indexfirstpassed) {
                     break;
                 }
@@ -231,22 +223,22 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
             $lengthpassed = true;
             foreach ($obtained->length as $key => $index) {
-                $lengthpassed = $lengthpassed && ((!array_key_exists($key, $length_expected) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                  (array_key_exists($key, $length_expected) && $length_expected[$key] === $obtained->length[$key]));
+                $lengthpassed = $lengthpassed && ((!array_key_exists($key, $expected['length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                  (array_key_exists($key, $expected['length']) && $expected['length'][$key] === $obtained->length[$key]));
                 if (!$lengthpassed) {
                     break;
                 }
             }
         } else {
-            $indexfirstpassed = (!array_key_exists(0, $index_first_expected) && $obtained->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                (array_key_exists(0, $index_first_expected) && $index_first_expected[0] === $obtained->index_first[0]);
-            $lengthpassed = (!array_key_exists(0, $length_expected) && $obtained->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                            (array_key_exists(0, $length_expected) && $length_expected[0] === $obtained->length[0]);
+            $indexfirstpassed = (!array_key_exists(0, $expected['index_first']) && $obtained->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                (array_key_exists(0, $expected['index_first']) && $expected['index_first'][0] === $obtained->index_first[0]);
+            $lengthpassed = (!array_key_exists(0, $expected['length']) && $obtained->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                            (array_key_exists(0, $expected['length']) && $expected['length'][0] === $obtained->length[0]);
         }
 
         // Checking next possible character.
         $nextpassed = true;
-        if ($matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+        if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
             $str = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
             if ($obtained->extendedmatch !== null) {
                 $str = $obtained->string_extension();
@@ -259,7 +251,7 @@ class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         // Checking number of characters left.
         $leftpassed = true;
-        if ($matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
+        if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
             $leftpassed = in_array($obtained->left, $expected['left']);
         }
         if ($this->doextrachecks) {
