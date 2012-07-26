@@ -1289,5 +1289,29 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[2]->indfirst === 12);
         $this->assertTrue($errors[2]->indlast === 14);
         $this->assertTrue($errors[2]->userinscription === '[bc');
+
+        $lexer = $this->create_lexer('a\\');
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN);
+        $this->assertTrue($token->value->indfirst === 1);
+        $this->assertTrue($token->value->indlast === 1);
+        $lexer = $this->create_lexer('b\\ca[:^alpha:]\\c');
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET);
+        $this->assertTrue($token->value->indfirst === 4);
+        $this->assertTrue($token->value->indlast === 13);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN);
+        $this->assertTrue($token->value->indfirst === 14);
+        $this->assertTrue($token->value->indlast === 15);
     }
 }

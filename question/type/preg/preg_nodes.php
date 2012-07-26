@@ -1464,12 +1464,12 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_INCORRECT_CHARSET_RANGE      = 'incorrect_charset_range_node_error';          // Incorrect character set range: [z-a].
     const SUBTYPE_INCORRECT_QUANT_RANGE        = 'incorrect_quant_range_node_error';            // Incorrect quantifier ranges: {5,3}.
 
-    const SUBTYPE_SLASH_AT_END_OF_PATTERN      = 'slash_at_end_of_pattern_node_error';          //
-    const SUBTYPE_C_AT_END_OF_PATTERN          = 'c_at_end_of_pattern_node_error';              //
+    const SUBTYPE_SLASH_AT_END_OF_PATTERN      = 'slash_at_end_of_pattern_node_error';          // \ at end of pattern.
+    const SUBTYPE_C_AT_END_OF_PATTERN          = 'c_at_end_of_pattern_node_error';              // \c at end of pattern.
     const SUBTYPE_WRONG_ESCAPE_SEQUENCE        = 'wrong_escape_sequence_node_error';            //
     //const SUBTYPE_WRONG_SUBPATT_NAME_NUM       = 'wrong_subpatt_name_number_node_error';      //
-    const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      //
-    const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               //
+    const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      // POSIX class ouside of a character set.
+    const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               // Reference to unexisting subpattern.
     const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 //
     const SUBTYPE_MISSING_COMMENT_ENDING       = 'missing_comment_ending_node_error';           //
     const SUBTYPE_WRONG_SUBPATT_NAME           = 'wrong_subpatt_name_node_error';               //
@@ -1497,7 +1497,11 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_UNKNOWN_POSIX_CLASS          => 'error_unknownposixclass',
                                    self::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     => 'error_unknowncontrolsequence',
                                    self::SUBTYPE_INCORRECT_CHARSET_RANGE      => 'error_incorrectcharsetrange',
-                                   self::SUBTYPE_INCORRECT_QUANT_RANGE        => 'error_incorrectquantrange'
+                                   self::SUBTYPE_INCORRECT_QUANT_RANGE        => 'error_incorrectquantrange',
+                                   self::SUBTYPE_SLASH_AT_END_OF_PATTERN      => 'error_slashatendofpattern',
+                                   self::SUBTYPE_C_AT_END_OF_PATTERN          => 'error_catendofpattern',
+                                   self::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  => 'error_posixclassoutsidecharset',
+                                   self::SUBTYPE_UNEXISTING_SUBPATT           => 'error_unexistingsubpatt'
                                    );
     /** Additional info. */
     public $addinfo;

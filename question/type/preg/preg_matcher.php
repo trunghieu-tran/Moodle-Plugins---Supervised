@@ -439,7 +439,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         if ($this->lexer !== null) {
-            $this->options->capturesubpatterns = $this->lexer->backrefs_exist();
+            $this->options->capturesubpatterns = (count($this->backrefs) > 0);
         }
 
         //Invalidate match called later to allow parser to count subpatterns
