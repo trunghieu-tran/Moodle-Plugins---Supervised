@@ -240,6 +240,9 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
             $result->caseinsensitive = true;
         }
         switch($name) {
+        case 'qtype_preg_leaf_assert':
+            $result->negative = $negative;
+            break;
         case 'qtype_preg_leaf_charset':
             if ($data !== null) {
                 $flag = new qtype_preg_charset_flag;
@@ -500,22 +503,19 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     $greed = $this->yylength() === 1;
     $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
 }
 <YYINITIAL> "*"("?"|"+")? {
     $greed = $this->yylength() === 1;
     $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
 }
 <YYINITIAL> "+"("?"|"+")? {
     $greed = $this->yylength() === 1;
     $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
 }
 <YYINITIAL> "{"[0-9]+","[0-9]+"}"("?"|"+")? {
     $text = $this->yytext();
@@ -548,8 +548,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         $textlen--;
     }
     $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $textlen - 1);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
 }
 <YYINITIAL> "{,"[0-9]+"}"("?"|"+")? {
     $text = $this->yytext();
@@ -562,13 +561,11 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         $textlen--;
     }
     $rightborder = (int)qtype_poasquestion_string::substr($text, 2, $textlen - 3);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
 }
 <YYINITIAL> "{"[0-9]+"}" {
     $count = (int)qtype_poasquestion_string::substr($this->yytext(), 1, $this->yylength() - 2);
-    $res = $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, false, true, false));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, false, true, false));
 }
 <YYINITIAL> "[^"|"["|"[^]"|"[]" {
     $text = $this->yytext();
@@ -589,8 +586,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), (int)$this->lastsubpatt));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), (int)$this->lastsubpatt));
 }
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
@@ -653,8 +649,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
 }
 <YYINITIAL> "(*THEN)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
 }
 <YYINITIAL> "(*THEN:"{ALNUM}*")" {
     $text = $this->yytext();
@@ -670,48 +665,37 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
 }
 <YYINITIAL> "(*CR)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CR));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CR));
 }
 <YYINITIAL> "(*LF)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_LF));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_LF));
 }
 <YYINITIAL> "(*CRLF)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CRLF));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CRLF));
 }
 <YYINITIAL> "(*ANYCRLF)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANYCRLF));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANYCRLF));
 }
 <YYINITIAL> "(*ANY)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANY));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANY));
 }
 <YYINITIAL> "(*BSR_ANYCRLF)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF));
 }
 <YYINITIAL> "(*BSR_UNICODE)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE));
 }
 <YYINITIAL> "(*NO_START_OPT)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_NO_START_OPT));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_NO_START_OPT));
 }
 <YYINITIAL> "(*UTF8)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF8));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF8));
 }
 <YYINITIAL> "(*UTF16)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF16));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF16));
 }
 <YYINITIAL> "(*UCP)" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UCP));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UCP));
 }
 <YYINITIAL> "(*"{ALNUM}*")" {
     $text = $this->yytext();
@@ -723,8 +707,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$this->lastsubpatt));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$this->lastsubpatt));
 }
 <YYINITIAL> "(?<"{ALNUM}*">"? {    // Named subpattern (?<name>...).
     $text = $this->yytext();
@@ -776,36 +759,30 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 }
 <YYINITIAL> "(?:" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?|" {
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(?=" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(?!" {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(?<=" {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(?<!" {
     $this->push_opt_lvl();
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(R"[0-9]*")" {
     $text = $this->yytext();
@@ -904,23 +881,19 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 }
 <YYINITIAL> "(?=" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?!" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?<=" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?<!" {
     $this->push_opt_lvl();
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?C"[0-9]*")"? {
     // TODO: callouts. For now this rule will return either error or exception :)
@@ -935,24 +908,20 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
 }
 <YYINITIAL> "." {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
 }
 <YYINITIAL> {NOTSPECIAL} {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
 }
 <YYINITIAL> "|" {
     // Reset subpattern numeration inside a (?|...) group.
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
-    $res = $this->form_res(preg_parser_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> \\{SPECIAL} {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $str = qtype_poasquestion_string::substr($this->yytext(), 1);
@@ -1051,16 +1020,13 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_CHAR_AFTER_P, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($this->yytext(), 1)))));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($this->yytext(), 1)))));
 }
 <YYINITIAL> \\\\ {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, '\\'));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, '\\'));
 }
 <YYINITIAL> "\a" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07)));
 }
 <YYINITIAL> "\c". {
     $error = null;
@@ -1072,16 +1038,13 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
 }
 <YYINITIAL> "\e" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B)));
 }
 <YYINITIAL> "\f" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C)));
 }
 <YYINITIAL> "\n" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A)));
 }
 <YYINITIAL> ("\p"|"\P"). {
     $text = $this->yytext();
@@ -1115,12 +1078,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
 }
 <YYINITIAL> "\r" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D)));
 }
 <YYINITIAL> "\t" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09)));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09)));
 }
 <YYINITIAL> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     if ($this->yylength() < 3) {
@@ -1128,8 +1089,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     } else {
         $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $str));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $str));
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
@@ -1142,29 +1102,23 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
 }
 <YYINITIAL> "\d"|"\D" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, null, null, false, false, false, ($this->yytext() === '\D')));
 }
 <YYINITIAL> "\h"|"\H" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, null, null, false, false, false, ($this->yytext() === '\H')));
 }
 <YYINITIAL> "\s"|"\S" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, null, null, false, false, false, ($this->yytext() === '\S')));
 }
 <YYINITIAL> "\v"|"\V" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, null, null, false, false, false, ($this->yytext() === '\V')));
 }
 <YYINITIAL> "\w"|"\W" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, null, null, false, false, false, ($this->yytext() === '\W')));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, null, null, false, false, false, ($this->yytext() === '\W')));
 }
 <YYINITIAL> "\C" {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
 }
 <YYINITIAL> "\u"([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])? {
     if ($this->yylength() === 2) {
@@ -1172,8 +1126,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     } else {
         $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($this->yytext(), 2)));
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $str));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $str));
 }
 <YYINITIAL> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
@@ -1194,30 +1147,24 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     throw new Exception('\R is not implemented yet');
 }
 <YYINITIAL> "\b"|"\B" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_B));
-    $res->value->negative = ($this->yytext() === '\B');
-    return $res;
+    $text = $this->yytext();
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_B, null, null, null, false, true, false, ($text === '\B')));
 }
 <YYINITIAL> "\A" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_A));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_A));
 }
 <YYINITIAL> "\z"|"\Z" {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_Z));
-    $res->value->negative = ($this->yytext() === '\Z');
-    return $res;
+    $text = $this->yytext();
+    return $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_Z, null, null, null, false, true, false, ($text === '\Z')));
 }
 <YYINITIAL> "\G" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_G));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_ESC_G));
 }
 <YYINITIAL> "^" {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX));
 }
 <YYINITIAL> "$" {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_DOLLAR));
-    return $res;
+    return $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_assert', qtype_preg_leaf_assert::SUBTYPE_DOLLAR));
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*")" {
     $delimpos = qtype_poasquestion_string::strpos($this->yytext(), '-');
@@ -1242,12 +1189,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
     $this->push_opt_lvl();
     $this->mod_top_opt(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
-    $res = $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?"("R"|[0-9]+)")" {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_recursion', null, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_recursion', null, $this->yytext()));
 }
 <YYINITIAL> "\Q".*"\E"|"\Q".* {
     $str = $this->recognize_qe_sequence($this->yytext());
