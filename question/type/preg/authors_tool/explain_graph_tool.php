@@ -22,7 +22,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
      * Creates graph which explaining regular expression.
      */
     public function create_graph($id = -1) {
-        $graph = $this->dst_root->create_graph();
+        $graph = $this->dst_root->create_graph($id);
        
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $graph);
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $graph);
@@ -65,6 +65,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         case 'leaf_meta':
         case 'leaf_assert':
         case 'leaf_backref':
+        case 'leaf_recursion:':
             return 'qtype_preg_author_tool_leaf';
             break;
         }
@@ -235,7 +236,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         }
 
         foreach ($gr->subgraphs as $iter) {
-            $result = find_link($src, $dst, $iter);
+            $result = qtype_preg_author_tool_explain_graph::find_link($src, $dst, $iter);
             if (qtype_preg_author_tool_explain_graph::$linkowner !== null)
                 return $result;
         }
@@ -252,9 +253,9 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
             $tmpdnode = $graph->nodes[$i];
 
-            if ($tmpdnode->color == 'black' && $tmpdnode->shape == 'ellipse') {
+            if ($tmpdnode->color == 'black' && $tmpdnode->shape == 'ellipse' && $tmpdnode->fill == '') {
                 $neighbor = qtype_preg_author_tool_explain_graph::find_neighbor_dst($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
-                if ($neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $tmpdnode->owner)
+                if ($neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $tmpdnode->owner && $neighbor->fill == '')
                 {
                     $tmp = new qtype_preg_author_tool_explain_graph_node($tmpdnode->label . $neighbor->label, $neighbor->shape, $neighbor->color, $graph);
                     
@@ -265,15 +266,18 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $tmp, $tmpneighbor);
 
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_src($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
-                    unset($graph->links[array_search(qtype_preg_author_tool_explain_graph::find_link($tmpneighbor, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain), $graph->links)]);
-                    $graph->links = array_values($graph->links);
+                    $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($tmpneighbor, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
+                    unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
+                    qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
     
-                    unset($graph->links[array_search(qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor, qtype_preg_author_tool_explain_graph::$gmain), $graph->links)]);
-                    $graph->links = array_values($graph->links);
+                    $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor, qtype_preg_author_tool_explain_graph::$gmain);
+                    unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
+                    qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
                     
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_dst($neighbor, qtype_preg_author_tool_explain_graph::$gmain);
-                    unset($graph->links[array_search(qtype_preg_author_tool_explain_graph::find_link($neighbor, $tmpneighbor, qtype_preg_author_tool_explain_graph::$gmain), $graph->links)]);
-                    $graph->links = array_values($graph->links);
+                    $tmpneighbor = qtype_preg_author_tool_explain_graph::find_link($neighbor, $tmpneighbor, qtype_preg_author_tool_explain_graph::$gmain);
+                    unset(qtype_preg_author_tool_explain_graph::$linkowner->links[array_search($tmpneighbor, qtype_preg_author_tool_explain_graph::$linkowner->links)]);
+                    qtype_preg_author_tool_explain_graph::$linkowner->links = array_values(qtype_preg_author_tool_explain_graph::$linkowner->links);
 
                     unset($graph->nodes[array_search($neighbor, $graph->nodes)]);
                     $graph->nodes = array_values($graph->nodes);
