@@ -17,7 +17,7 @@ class qtype_preg_author_tool_explain_graph_node {
     public $color   = 'black';    // color of node on image
     public $owner   = null;       // owner of node
     public $label   = '';         // data of node on image
-    public $id      = 0;          // id of node
+    public $id      = -1;          // id of node
     public $fill    = '';         // filling of node on image
     
     /**
@@ -55,12 +55,13 @@ class qtype_preg_author_tool_explain_graph_node {
         return $result;
     }
     
-    public function __construct($lbl, $shp, $clr, &$ownr, $fll = '') {
+    public function __construct($lbl, $shp, $clr, &$ownr, $id, $fll = '') {
         $this->label = $lbl;
         $this->shape = $shp;
         $this->color = $clr;
         $this->fill = $fll;
         $this->owner = $ownr;
+        $this->id = $id;
     }
     
 }
@@ -94,13 +95,14 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public $subgraphs   = array();      // array of subgraphs in subgraph
     public $entries     = array();      // array if nodes "entries"
     public $exits       = array();      // array of nodes "exits"
+    public $id          = -1;
     
-    public function __construct($lbl, $stl) {
+    public function __construct($lbl, $stl, $id = -1) {
         $this->label   = $lbl;
         $this->style   = $stl;
     }
     
-    private static $counter = 0; // counter for generating id for nodes in graph
+    //private static $counter = 0; // counter for generating id for nodes in graph
     
     /**
      * Creates text file with dot instructions.
@@ -109,7 +111,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
+            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
             {
@@ -194,12 +196,12 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * @param instr - array of dot instructions
      */
     private static function process_subgraph(&$gr, &$instr) {
-        $instr .= 'subgraph "cluster_' . (++qtype_preg_author_tool_explain_graph_subgraph::$counter) . '" {';
+        $instr .= 'subgraph "cluster_' . $gr->id . '" {';
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'label="' . $gr->label . '";';
 
         foreach ($gr->nodes as $iter) {
-            $iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
+            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . $iter->fill . '];';
