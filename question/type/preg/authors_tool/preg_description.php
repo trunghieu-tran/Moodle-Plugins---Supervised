@@ -241,6 +241,18 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                 else if ($flag->data[$i]===' ') {
                     $characters[] = self::get_form_string('description_char_space',$form);
                 }
+                else if (qtype_poasquestion_string::ord($flag->data[$i])===8) {
+                    $characters[] = self::get_form_string('description_char_b',$form);
+                }
+                else if (qtype_poasquestion_string::ord($flag->data[$i])===9) {
+                    $characters[] = self::get_form_string('description_char_t',$form);
+                }
+                else if (qtype_poasquestion_string::ord($flag->data[$i])===10) {
+                    $characters[] = self::get_form_string('description_char_n',$form);
+                }
+                else if (qtype_poasquestion_string::ord($flag->data[$i])===13) {
+                    $characters[] = self::get_form_string('description_char_r',$form);
+                }
                 else{
                     $characters[] = str_replace('%code',qtype_poasquestion_string::ord($flag->data[$i]),self::get_form_string('description_char_16value') ,$form);  
                 }
