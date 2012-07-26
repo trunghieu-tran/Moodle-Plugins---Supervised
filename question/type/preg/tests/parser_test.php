@@ -480,7 +480,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(empty($errornodes[3]->operands));
         $this->assertTrue(empty($errornodes[4]->operands));
         // Quantifiers without argument inside parentheses.
-        $parser = $this->run_parser('?a({2,3})c(*)e(+)(*s)f', $errornodes);
+        $parser = $this->run_parser('?a({2,3})c(+)e(+)(*s)f', $errornodes);
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
         $this->assertTrue(count($errornodes) === 5);
