@@ -92,8 +92,8 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('ab','<span style="color:blue">a</span><span style="color:blue">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>; then <span style="color:blue">c</span>'),
           array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
-            array('ab\w','sad'),
-          array('\0113','character with hex code 9 then <span style="color:blue">3</span>'),
+            array(' \t\n\r','sad'),
+          array('\0113','tabulation then <span style="color:blue">3</span>'),
          );
     }
     
