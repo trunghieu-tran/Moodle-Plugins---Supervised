@@ -433,3 +433,17 @@ $string['regex_description_header'] = 'Description';
 $string['regex_description_header_help'] = 'Here you can see description of regular expression.';
 $string['regex_match_header'] = 'Input string for check';
 $string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+
+// Strings for explaining graph
+
+$string['explain_subpattern'] = 'subpattern #';
+$string['explain_backref'] = 'the result of subpattern #';
+$string['explain_recursion'] = 'recursion';
+$string['explain_unknow_node'] = 'unknow node';
+$string['explain_unknow_meta'] = 'unknow meta';
+$string['explain_unknow_assert'] = 'unknow assert';
+$string['explain_unknow_charset_flag'] = 'unknow charset flag';
+$string['explain_tab'] = 'tabulation';
+$string['explain_not'] = 'not ';
+$string['explain_quote'] = 'quote';
+$string['explain_slash'] = 'slash';
