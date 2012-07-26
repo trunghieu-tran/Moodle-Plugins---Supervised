@@ -1463,11 +1463,9 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_UNKNOWN_CONTROL_SEQUENCE     = 'unknown_control_sequence_node_error';         // Unknown control sequence (*...).
     const SUBTYPE_INCORRECT_CHARSET_RANGE      = 'incorrect_charset_range_node_error';          // Incorrect character set range: [z-a].
     const SUBTYPE_INCORRECT_QUANT_RANGE        = 'incorrect_quant_range_node_error';            // Incorrect quantifier ranges: {5,3}.
-
     const SUBTYPE_SLASH_AT_END_OF_PATTERN      = 'slash_at_end_of_pattern_node_error';          // \ at end of pattern.
     const SUBTYPE_C_AT_END_OF_PATTERN          = 'c_at_end_of_pattern_node_error';              // \c at end of pattern.
     const SUBTYPE_WRONG_ESCAPE_SEQUENCE        = 'wrong_escape_sequence_node_error';            //
-    //const SUBTYPE_WRONG_SUBPATT_NAME_NUM       = 'wrong_subpatt_name_number_node_error';      //
     const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      // POSIX class ouside of a character set.
     const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               // Reference to unexisting subpattern.
     const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 //
@@ -1482,11 +1480,12 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_CALLOUT_MISSING_ENDING       = 'callout_missing_ending_node_error';           // Missing ) after (?C.
     const SUBTYPE_UNKNOWN_CHAR_AFTER_P         = 'unknown_char_after_p_node_error';             // Unknown character after (?P, should be (?P=.
     const SUBTYPE_SUBPATT_NAME_MISSING_ENDING  = 'subpatt_name_missing_ending_node_error';      // Missing subpattern name ending.
-
     const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          //
     const SUBTYPE_BACKREF_MISSING_NUMBER       = 'backref_missing_number_node_error';           //
+    const SUBTYPE_BACKREF_TO_ZERO              = 'backref_to_zero_error';                       // Backreference to the whole expression.
     const SUBTYPE_CONDSUBPATT_WRONG_NUMBER     = 'condsubpatt_wrong_number_node_error';         //
     const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          //
+    const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
@@ -1506,16 +1505,24 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_C_AT_END_OF_PATTERN          => 'error_catendofpattern',
                                    self::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  => 'error_posixclassoutsidecharset',
                                    self::SUBTYPE_UNEXISTING_SUBPATT           => 'error_unexistingsubpatt',
-
+                                   self::SUBTYPE_UNKNOWN_MODIFIER             => 'error_unknownmodifier',
+                                   self::SUBTYPE_MISSING_COMMENT_ENDING       => 'error_missingcommentending',
+                                   self::SUBTYPE_WRONG_SUBPATT_NAME           => 'error_wrongsubpattname',
+                                   self::SUBTYPE_WRONG_CONDSUBPATT_NUMBER     => 'error_wrongcondsubpattnumber',
+                                   self::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  => 'error_condsubpattassertexpected',
+                                   self::SUBTYPE_CONDSUBPATT_MISSING_PAREN    => 'error_condsubpattmissingparen',
                                    self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
                                    self::SUBTYPE_CONSUBPATT_ZERO_CONDITION    => 'error_condsubpattzerocondition',
-                                   self::SUBTYPE_MISSING_COMMENT_ENDING       => 'error_missingcommentending',
+                                   self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
+                                   self::SUBTYPE_CALLOUT_MISSING_ENDING       => 'error_calloutmissingending',
                                    self::SUBTYPE_UNKNOWN_CHAR_AFTER_P         => 'error_unknowncharafterp',
                                    self::SUBTYPE_SUBPATT_NAME_MISSING_ENDING  => 'error_subpattnamemissingending',
-
-
-                                   self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
-                                   self::SUBTYPE_CALLOUT_MISSING_ENDING       => 'error_calloutmissingending'
+                                   self::SUBTYPE_DUPLICATE_SUBPATT_NAMES      => 'error_duplicatesubpattnames',
+                                   self::SUBTYPE_BACKREF_MISSING_NUMBER       => 'error_backrefmissingnumber',
+                                   self::SUBTYPE_BACKREF_TO_ZERO              => 'error_backreftozero',
+                                   self::SUBTYPE_CONDSUBPATT_WRONG_NUMBER     => 'error_condsubpattwrongnumber',
+                                   self::SUBTYPE_DIFFERENT_SUBPATT_NAMES      => 'error_differentsubpattnames',
+                                   self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected'
                                    );
     /** Additional info. */
     public $addinfo;
