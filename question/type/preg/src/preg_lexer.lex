@@ -21,7 +21,7 @@ MODIFIER = [iJmsUx]
     $this->lastsubpatt             = 0;
     $this->maxsubpatt              = 0;
     $this->subpatternmap           = array();
-    $this->backrefsexist           = false;
+    $this->backrefs                = array();
     $this->optstack                = array();
     $this->optstack[0]             = new stdClass;
     $this->optstack[0]->i          = false;
@@ -45,7 +45,7 @@ MODIFIER = [iJmsUx]
     protected $lastsubpatt;
     protected $maxsubpatt;
     protected $subpatternmap;
-    protected $backrefsexist;
+    protected $backrefs;
     protected $optstack;
     protected $optcount;
     protected $charset;
@@ -200,11 +200,11 @@ MODIFIER = [iJmsUx]
         return $this->subpatternmap;
     }
 
-    public function backrefs_exist() {
-        return $this->backrefsexist;
+    public function get_backrefs() {
+        return $this->backrefs;
     }
 
-    protected function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
+    public function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
         $error = new qtype_preg_node_error();
         $error->subtype = $subtype;
         $error->indfirst = $indfirst;
@@ -253,6 +253,7 @@ MODIFIER = [iJmsUx]
             break;
         case 'qtype_preg_leaf_backref':
             $result->number = $data;
+            $this->backrefs[] = $result;
             break;
         case 'qtype_preg_leaf_control':
             $result->name = $data;
@@ -867,9 +868,8 @@ MODIFIER = [iJmsUx]
     $str = qtype_poasquestion_string::substr($this->yytext(), 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
         // Return a backreference.
-        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
+        $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, (int)$str));
         $res->value->matcher = $this->matcher;
-        $this->backrefsexist = true;
     } else {
         // Return a character.
         $octal = '';
@@ -902,9 +902,8 @@ MODIFIER = [iJmsUx]
     return $res;
 }
 <YYINITIAL> "\g"[0-9][0-9]? {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, qtype_poasquestion_string::substr($this->yytext(), 2)));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, (int)qtype_poasquestion_string::substr($this->yytext(), 2)));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> ("\g{-"|"\g{")[0-9][0-9]?"}" {
@@ -913,44 +912,38 @@ MODIFIER = [iJmsUx]
     if ($num < 0) {
         $num = $this->lastsubpatt + $num + 1;
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $num));
+    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, (int)$num));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> "\g{"{NOTSPECIAL}+"}" {    // Named backreference.
     $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> "\k{"{NOTSPECIAL}+"}" {    // Named backreference.
     $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> "\k'"{NOTSPECIAL}+"'" {    // Named backreference.
     $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> "\k<"{NOTSPECIAL}+">" {    // Named backreference.
     $str = qtype_poasquestion_string::substr($this->yytext(), 3, $this->yylength() - 4);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> "(?P="{NOTSPECIAL}+")" {    // Named backreference.
     $str = qtype_poasquestion_string::substr($this->yytext(), 4, $this->yylength() - 5);
     $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_backref', null, $str));
     $res->value->matcher = $this->matcher;
-    $this->backrefsexist = true;
     return $res;
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
@@ -1070,8 +1063,7 @@ MODIFIER = [iJmsUx]
 }
 <YYINITIAL> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN));
 }
 <YYINITIAL> "\K" {
     // TODO: reset start of match.
@@ -1151,13 +1143,20 @@ MODIFIER = [iJmsUx]
     }
     return $res;
 }
+<YYINITIAL> "\c" {
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\c', qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\c'));
+}
 <YYINITIAL> \\. {
-    $res = $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
-    return $res;
+    return $this->form_res(preg_parser_yyPARSER::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($this->yytext(), 1, 1)));
+}
+<YYINITIAL> \\ {
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\\', qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\\'));
+}
+<YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($this->yytext(), qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> . {
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
-    return $res;
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node(array($this->yytext()), 'qtype_preg_leaf_charset', qtype_preg_charset_flag::SET, $this->yytext()));
 }
 <CHARSET> "[:alnum:]"|"[:^alnum:]" {
     $negative = ($this->yytext() === '[:^alnum:]');
@@ -1285,6 +1284,10 @@ MODIFIER = [iJmsUx]
 }
 <CHARSET> "\n" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A));
+}
+<CHARSET> "\N" {
+    // TODO: matches any character except new line characters. For now, the same as dot.
+    $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
 <CHARSET> "\r" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));

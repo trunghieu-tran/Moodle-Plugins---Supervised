@@ -29,6 +29,8 @@ class qtype_preg_regex_handler {
     protected $lexer;
     /** Regex parser. */
     protected $parser;
+    /** Backreference numbers/names in the regex. */
+    protected $backrefs;
 
     /** The root of the regex abstract syntax tree, consists of qtype_preg_node childs. */
     protected $ast_root;
@@ -255,6 +257,36 @@ class qtype_preg_regex_handler {
             }
         }
         $this->parser->doParse(0, 0);
+
+        // Check for backreferences to unexisting subpatterns.
+        $this->backrefs = $this->lexer->get_backrefs();
+        if (count($this->backrefs) > 0) {
+            $map = $this->lexer->get_subpattern_map();
+            $maxsubpattnumber = $this->lexer->get_max_subpattern();
+            $maxbackrefnumber = -1;
+            foreach ($this->backrefs as $leaf) {
+                $number = $leaf->number;
+                $error = false;
+                if (is_int($number)) {
+                    $maxbackrefnumber = max($maxbackrefnumber, $number);
+                } else {
+                    $number = $map[$number];
+                    if ($number === null) {
+                        $error = true;
+                    } else {
+                        $maxbackrefnumber = max($maxbackrefnumber, $number);
+                    }
+                }
+                if (!$error && $maxbackrefnumber > $maxsubpattnumber) {
+                    $error = true;
+                }
+                if ($error) {
+                    $node = $this->lexer->form_error($leaf->userinscription, qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->indfirst, $leaf->indlast, $leaf->number);
+                    $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+                }
+            }
+        }
+
         // Lexer returns errors for an unclosed character set or wrong modifiers: they don't create AST nodes.
         $lexerrors = $this->lexer->get_errors();
         foreach ($lexerrors as $node) {
