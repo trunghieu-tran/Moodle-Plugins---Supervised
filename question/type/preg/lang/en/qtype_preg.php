@@ -153,17 +153,20 @@ $string['error_catendofpattern']           = 'Regex syntax error: \c at end of p
 $string['error_posixclassoutsidecharset']  = 'POSIX classes are not allowed outside character sets.';
 $string['error_unexistingsubpatt']         = 'The subpattern "{$a->addinfo}" does not exist.';
 $string['error_unknownmodifier']           = '';
+
 $string['error_missingcommentending']      = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_missingcondsubpattending']  = 'Unclosed conditional subpattern name.';
+$string['error_missingcalloutending']      = 'Unclosed callout.';
+$string['error_missingsubpattending']      = 'Unclosed subpattern name.';
+
+
 $string['error_wrongsubpattname']          = '';
 $string['error_wrongcondsubpattnumber']    = '';
 $string['error_condsubpattassertexpected'] = '';
-$string['error_condsubpattmissingparen']   = '';
 $string['error_charcodetoobig']            = 'The character code {$a->addinfo} is too big.';
 $string['error_condsubpattzerocondition']  = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']          = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
-$string['error_calloutmissingending']      = 'Missing ) after {$a->addinfo}.';
 $string['error_unknowncharafterp']         = 'Unknown character after {$a->addinfo}. Did you mean "(?P=..."?';
-$string['error_subpattnamemissingending']  = 'Missing subpattern name ending in the named subpattern {$a->addinfo}.';
 $string['error_duplicatesubpattnames']     = '';
 $string['error_backreftozero']             = 'Backreference to the whole expression is not allowed.';
 $string['error_condsubpattwrongnumber']    = '';
