@@ -1468,7 +1468,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_INVALID_ESCAPE_SEQUENCE      = 'invalid_escape_sequence_node_error';          // Invalid escape sequence.
     const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      // POSIX class ouside of a character set.
     const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               // Reference to unexisting subpattern.
-    const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 //
+    const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 // Unknown, wrong or unsupported modifier.
     const SUBTYPE_MISSING_COMMENT_ENDING       = 'missing_comment_ending_node_error';           // Missing ) after comment.
     const SUBTYPE_MISSING_CONDSUBPATT_ENDING   = 'missing_condsubpatt_ending_node_error';       // Missing conditional subpattern name ending.
     const SUBTYPE_MISSING_CALLOUT_ENDING       = 'missing_callout_ending_node_error';           // Missing ) after (?C.
@@ -1511,8 +1511,8 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_MISSING_CONDSUBPATT_ENDING   => 'error_missingcondsubpattending',
                                    self::SUBTYPE_MISSING_CALLOUT_ENDING       => 'error_missingcalloutending',
                                    self::SUBTYPE_MISSING_SUBPATT_ENDING       => 'error_missingsubpattending',
-                                   self::SUBTYPE_MISSING_BACKREF_ENDING       => 'missing_backref_name_ending_node_error',
-                                   self::SUBTYPE_MISSING_BACKREF_BEGINNING    => 'missing_backref_name_beginning_node_error',
+                                   self::SUBTYPE_MISSING_BACKREF_ENDING       => 'error_missingbackrefending',
+                                   self::SUBTYPE_MISSING_BACKREF_BEGINNING    => 'error_missingbackrefbeginning',
                                    self::SUBTYPE_WRONG_CONDSUBPATT_NUMBER     => 'error_wrongcondsubpattnumber',
                                    self::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  => 'error_condsubpattassertexpected',
                                    self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
