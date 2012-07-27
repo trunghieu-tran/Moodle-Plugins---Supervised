@@ -9,11 +9,13 @@
  */
  
 global $CFG;
+//global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
 //require_once($CFG->dirroot.'/question/type/preg/ast_tree_nodes.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
+//require_once($CFG->dirroot.'/question/type/preg/renderer.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
@@ -43,11 +45,19 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addHelpButton('regex_edit_header','regex_edit_header', 'qtype_preg');
         
         $mform->addElement('text', 'regex_text', 'Input regex', array('size' => 100));        
-        $mform->addElement('button', 'regex_check', 'Check');
+        $mform->addElement('submit', 'regex_check', 'Check');
         $mform->addElement('button', 'regex_back', 'Back (and save regex in this field)');
         
         $regextext = optional_param('regex', '', PARAM_TEXT);
-        //var_dump($regextext);
+        $id = optional_param('id', '', PARAM_INT);
+        $id_line_edit = optional_param('id_line_edit', '', PARAM_TEXT);
+        
+        //$mform->addElement('hidden', 'hidden_id', $id);
+        $mform->addElement('html', '<imput type="hidden" id="hidden_id" value="' . $id_line_edit . '" />');
+        
+        /*var_dump($id);
+        var_dump($regextext); 
+        var_dump($id_line_edit);*/
         if(!empty($regextext)) {
 
             $mform->setDefault('regex_text', $regextext);//Add regex in line edit
@@ -65,6 +75,8 @@ class qtype_preg_authors_tool_form extends moodleform {
                         
             //Add generated images
             $mform->addElement('html', '<div id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" /></div></br>');
+            //$mform->addElement('html', '<div id="tree_handler"><iframe frameborder="0" src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
+            //$mform->addElement('html', '<div id="tree_handler"><iframe frameborder="0" srcdoc="<img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" />" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
             
             //Add graph
             $mform->addElement('header', 'regex_graph_header', 'Graph');
@@ -72,11 +84,13 @@ class qtype_preg_authors_tool_form extends moodleform {
             
             //Generate graph image
             $tmp_graph = new qtype_preg_author_tool_explain_graph($regextext);
-            $graph = $tmp_graph->create_graph();
+            $graph = $tmp_graph->create_graph($id);
             $dot_instructions_graph = $graph->create_dot();
+            
             qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
              
             $mform->addElement('html', '<div id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" /></div></br>');
+            //$mform->addElement('html', '<div id="graph_handler"><iframe frameborder="0" src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" width="100%" height="overload:auto" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
             
             //Add generated maps   
             $tree_map ='';//tag <map>
@@ -122,14 +136,10 @@ class qtype_preg_authors_tool_form extends moodleform {
             $mform->addElement('html', '<div id="description_handler">This is description</div>');
             
             //$question = qtype_preg_question::question_from_regex('regex', false, true, 'nfa_matcher', 'native');
+            //$hint = new qtype_preg_hintnextchar($question);
+            //$rend = $PAGE->get_renderer('qtype_preg');
+            //$hint->render_hint($rend, array('answer' => 'Do rats eat bat?'));
             
-            //$rend = new qtype_preg_hintnextchar($question);
-            
-            //$preg_hint = new qtype_preg_hintmatchingpart($question);
-            //var_dump($preg_hint);
-            //$rend = new qtype_preg_renderer();
-            //var_dump($rend);
-            //var_dump($preg_hint->render_hint(new qtype_preg_renderer() , array('answer' => 'Do rats eat bat?') ) );
             //$mform->addElement('html',  $preg_hint->render_hint($rend , array('answer' => 'Do rats eat bat?') ) );
         }
         
