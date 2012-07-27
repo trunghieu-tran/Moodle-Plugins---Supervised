@@ -150,6 +150,7 @@ $string['error_incorrectcharsetrange']               = 'Incorrect character rang
 $string['error_incorrectquantrange']                 = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
 $string['error_slashatendofpattern']                 = 'Regex syntax error: \\ at end of pattern.';
 $string['error_catendofpattern']                     = 'Regex syntax error: \c at end of pattern.';
+$string['error_invalidescapesequence']               = 'Invalid escape sequence: {$a->addinfo}.';
 $string['error_posixclassoutsidecharset']            = 'POSIX classes are not allowed outside character sets.';
 $string['error_unexistingsubpatt']                   = 'The subpattern "{$a->addinfo}" does not exist.';
 $string['error_unknownmodifier']                     = '';
@@ -169,7 +170,7 @@ $string['error_backreftozero']                       = 'Backreference to the who
 $string['error_differentsubpattnames']               = '';
 $string['error_subpattnameexpected']                 = 'Subpattern name expected.';
 $string['error_cxshouldbeascii']                     = '\c should be followed by an ascii character.';
-
+$string['error_lnuunsupported']                      = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
