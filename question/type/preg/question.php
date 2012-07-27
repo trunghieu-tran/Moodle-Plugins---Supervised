@@ -578,7 +578,10 @@ class qtype_preg_question extends question_graded_automatically
     public function available_specific_hint_types() {
         $hinttypes = array();
         if ($this->usecharhint) {
-            $hinttypes['hintnextchar'] = get_string('hintnextchar','qtype_preg');
+            $hinttypes['hintnextchar'] = get_string('hintnextchar', 'qtype_preg');
+        }
+        if ($this->uselexemhint) {
+            $hinttypes['hintnextlexem'] = get_string('hintnextlexem', 'qtype_preg', $this->lexemusername);
         }
         return $hinttypes;
     }
