@@ -12,11 +12,10 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 %char
 %unicode
 %state CHARSET
-SPECIAL = [\\^$.\[\]|()?*+{}]
-NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
-MODIFIER = [iJmsUx]
-ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
-ESCAPABLE = [^0-9a-zA-Z]
+NOTSPECIAL = [^\\^$.\[\]|()?*+{}]                       // Characters that should be escaped.
+MODIFIER   = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
+ALNUM      = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]     // Used in subpattern\backreference names.
+ESCAPABLE  = [^0-9a-zA-Z]
 %init{
     $this->matcher                 = null;
     $this->errors                  = array();
@@ -207,24 +206,46 @@ ESCAPABLE = [^0-9a-zA-Z]
     }
 
     public function mod_top_opt($set, $unset) {
+        $allowed = 'i';
+        $wrongfound = '';
         // Some sanity checks.
-        $errorfound = false;
         for ($i = 0; $i < $set->length(); $i++) {
-            if ($unset->contains($set[$i]) !== false) {
-                // Setting and unsetting modifier at the same time is error.
-                $this->errors[] = $this->form_error($set[$i], qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1);
-                $errorfound = true;
+            $modname = $set[$i];
+            if (qtype_poasquestion_string::strpos($allowed, $modname) === false) {
+                $wrongfound .= $modname;
             }
         }
-        if (!$errorfound) {
-            // If errors don't exist, set and unset local modifiers.
+        for ($i = 0; $i < $unset->length(); $i++) {
+            $modname = $unset[$i];
+            if (qtype_poasquestion_string::strpos($allowed, $modname) === false && qtype_poasquestion_string::strpos($wrongfound, $modname) === false) {
+                $wrongfound .= $modname;
+            }
+        }
+        if ($wrongfound !== '') {
+            $this->errors[] = $this->form_error($wrongfound, qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, $wrongfound);
+        }
+        $setunseterror = false;
+        for ($i = 0; $i < $set->length(); $i++) {
+            $modname = $set[$i];
+            if ($unset->contains($modname) !== false && qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+                // Setting and unsetting modifier at the same time is error.
+                $this->errors[] = $this->form_error($modname, qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, $modname);
+                $setunseterror = true;
+            }
+        }
+        // If errors don't exist, set and unset local modifiers.
+        if (!$setunseterror) {
             for ($i = 0; $i < $set->length(); $i++) {
                 $modname = $set[$i];
-                $this->optstack[$this->optcount - 1]->$modname = true;
+                if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+                    $this->optstack[$this->optcount - 1]->$modname = true;
+                }
             }
             for ($i = 0; $i < $unset->length(); $i++) {
                 $modname = $unset[$i];
-                $this->optstack[$this->optcount - 1]->$modname = false;
+                if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+                    $this->optstack[$this->optcount - 1]->$modname = false;
+                }
             }
         }
     }

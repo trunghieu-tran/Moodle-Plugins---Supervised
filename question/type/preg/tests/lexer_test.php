@@ -1263,7 +1263,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->error[0]->indfirst === 35);
         $this->assertTrue($token->value->error[0]->indlast === 39);
         $this->assertTrue($token->value->error[0]->userinscription === '\p{4}');
-        $lexer = $this->create_lexer('(?i-i)(?m-m:[bc');
+        $lexer = $this->create_lexer('(?i-i)(?z-z:[bc');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === 'grouping');
@@ -1275,10 +1275,10 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->indfirst === 0);
         $this->assertTrue($errors[0]->indlast === 5);
         $this->assertTrue($errors[0]->userinscription === 'i');
-        $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER);
+        $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER);
         $this->assertTrue($errors[1]->indfirst === 6);
         $this->assertTrue($errors[1]->indlast === 11);
-        $this->assertTrue($errors[1]->userinscription === 'm');
+        $this->assertTrue($errors[1]->userinscription === 'z');
         $this->assertTrue($errors[2]->subtype === qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
         $this->assertTrue($errors[2]->indfirst === 12);
         $this->assertTrue($errors[2]->indlast === 14);
