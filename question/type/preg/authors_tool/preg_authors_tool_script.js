@@ -12,11 +12,7 @@ YUI().use('node', 'io-base',function (Y) {
     //Y.one('#tree_handler').setStyle('overflow','auto');
     //Y.one('#graph_handler').setStyle('overflow','auto');
 
-    var node = Y.one('#id_regex_check');
-    var context = Y.one('#id_regex_text');
-    if(node!=null){
-       node.on("click", check_regex, context);
-    }
+
     //TODO: test this function
     var back_regex = function( e ) {
         
@@ -33,11 +29,7 @@ YUI().use('node', 'io-base',function (Y) {
 
     }
     
-    var back = Y.one('#id_regex_back');
-    var hidden = Y.one('#hidden_id');
-    if(back!=null){
-       back.on("click", back_regex, hidden);
-    }
+
 
     function highlight_description(id){
        const highlighted_class = 'description_highlighted';
@@ -71,7 +63,17 @@ YUI().use('node', 'io-base',function (Y) {
 
     }
     
-
+    var node = Y.one('#id_regex_check');
+    var context = Y.one('#id_regex_text');
+    if(node!=null){
+       node.on("click", check_regex, context);
+    }
+    
+    var back = Y.one('#id_regex_back');
+    var hidden = Y.one('#hidden_id');
+    if(back!=null){
+       back.on("click", back_regex, hidden);
+    }
     
     Y.all("#_anonymous_0 > area").on('click',function( e ) {
        //document.write('sadsadsa');
