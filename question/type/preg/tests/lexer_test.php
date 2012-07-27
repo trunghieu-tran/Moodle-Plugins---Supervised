@@ -1343,7 +1343,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_CHAR_AFTER_P);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
         $this->assertTrue($token->value->indfirst === 11);
         $this->assertTrue($token->value->indlast === 14);
         $token = $lexer->nextToken();
@@ -1450,7 +1450,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[0]->type === preg_parser_yyParser::CONDSUBPATT);
         $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
         $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
-        $lexer = $this->create_lexer('(?(R&(?(<(?(\'(?(');
+        $lexer = $this->create_lexer('(?(R&(?(<(?(\'(?((?(Rd)');
         $token = $lexer->nextToken();   // (?(R&
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
@@ -1463,5 +1463,50 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();   // (?(
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
         $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
+        $token = $lexer->nextToken();   // (?(Rd)
+        $this->assertTrue($token[1]->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER);
+        $lexer = $this->create_lexer('(?<namebody(?\'namebody(?P<namebody');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $lexer = $this->create_lexer('\gA}\kA}\kA\'\kA>(?PA)');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING);
+        $lexer = $this->create_lexer('\g{A\k{A\k\'A\k<A(?P=A');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING);
     }
 }

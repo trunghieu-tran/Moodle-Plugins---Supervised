@@ -135,44 +135,40 @@ $string['unknown_control_sequence_node_error']                     = 'unknown co
 $string['incorrect_range_node_error']                              = 'incorrect ranges in a quantifier or a character set: {5,3} or [z-a]';
 
 /******* Error messages *******/
-$string['error_PCREincorrectregex']        = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
-$string['error_threealtincondsubpatt']     = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
-$string['error_unopenedparen']             = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
-$string['error_unclosedparen']             = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
-$string['error_emptyparens']               = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_quantifieratstart']         = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
-$string['error_unclosedsqbrackets']        = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
-$string['error_setunsetmod']               = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_unknownunicodeproperty']    = 'Unknown unicode property: {$a->addinfo}.';
-$string['error_unknownposixclass']         = 'Unknown posix class: {$a->addinfo}.';
-$string['error_unknowncontrolsequence']    = 'Unknown control sequence: {$a->addinfo}.';
-$string['error_incorrectcharsetrange']     = 'Incorrect character range in position from  {$a->indfirst} to {$a->indlast}: the left character is "greater" than the right one.';
-$string['error_incorrectquantrange']       = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
-$string['error_slashatendofpattern']       = 'Regex syntax error: \\ at end of pattern.';
-$string['error_catendofpattern']           = 'Regex syntax error: \c at end of pattern.';
-$string['error_posixclassoutsidecharset']  = 'POSIX classes are not allowed outside character sets.';
-$string['error_unexistingsubpatt']         = 'The subpattern "{$a->addinfo}" does not exist.';
-$string['error_unknownmodifier']           = '';
-
-$string['error_missingcommentending']      = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_missingcondsubpattending']  = 'Unclosed conditional subpattern name.';
-$string['error_missingcalloutending']      = 'Unclosed callout.';
-$string['error_missingsubpattending']      = 'Unclosed subpattern name.';
-
-
-$string['error_wrongsubpattname']          = '';
-$string['error_wrongcondsubpattnumber']    = '';
-$string['error_condsubpattassertexpected'] = '';
-$string['error_charcodetoobig']            = 'The character code {$a->addinfo} is too big.';
-$string['error_condsubpattzerocondition']  = 'Invalid condition (?(0).';
-$string['error_calloutbignumber']          = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
-$string['error_unknowncharafterp']         = 'Unknown character after {$a->addinfo}. Did you mean "(?P=..."?';
-$string['error_duplicatesubpattnames']     = '';
-$string['error_backreftozero']             = 'Backreference to the whole expression is not allowed.';
-$string['error_condsubpattwrongnumber']    = '';
-$string['error_differentsubpattnames']     = '';
-$string['error_subpattnameexpected']       = 'Subpattern name expected.';
-$string['error_cxshouldbeascii']           = '\c should be followed by an ascii character.';
+$string['error_PCREincorrectregex']                  = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_threealtincondsubpatt']               = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
+$string['error_unopenedparen']                       = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
+$string['error_unclosedparen']                       = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
+$string['error_emptyparens']                         = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_quantifieratstart']                   = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
+$string['error_unclosedsqbrackets']                  = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
+$string['error_setunsetmod']                         = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_unknownunicodeproperty']              = 'Unknown unicode property: {$a->addinfo}.';
+$string['error_unknownposixclass']                   = 'Unknown posix class: {$a->addinfo}.';
+$string['error_unknowncontrolsequence']              = 'Unknown control sequence: {$a->addinfo}.';
+$string['error_incorrectcharsetrange']               = 'Incorrect character range in position from  {$a->indfirst} to {$a->indlast}: the left character is "greater" than the right one.';
+$string['error_incorrectquantrange']                 = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
+$string['error_slashatendofpattern']                 = 'Regex syntax error: \\ at end of pattern.';
+$string['error_catendofpattern']                     = 'Regex syntax error: \c at end of pattern.';
+$string['error_posixclassoutsidecharset']            = 'POSIX classes are not allowed outside character sets.';
+$string['error_unexistingsubpatt']                   = 'The subpattern "{$a->addinfo}" does not exist.';
+$string['error_unknownmodifier']                     = '';
+$string['error_missingcommentending']                = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_missingcondsubpattending']            = 'Unclosed conditional subpattern name.';
+$string['error_missingcalloutending']                = 'Unclosed callout.';
+$string['error_missingsubpattending']                = 'Unclosed subpattern name.';
+$string['missing_backref_name_ending_node_error']    = 'Missing backreference ending: {$a->addinfo}.';
+$string['missing_backref_name_beginning_node_error'] = 'Missing backreference beginning: {$a->addinfo}.';
+$string['error_wrongcondsubpattnumber']              = 'Wrong subpattern number: digits expected.';
+$string['error_condsubpattassertexpected']           = '';
+$string['error_charcodetoobig']                      = 'The character code {$a->addinfo} is too big.';
+$string['error_condsubpattzerocondition']            = 'Invalid condition (?(0).';
+$string['error_calloutbignumber']                    = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
+$string['error_duplicatesubpattnames']               = '';
+$string['error_backreftozero']                       = 'Backreference to the whole expression is not allowed.';
+$string['error_differentsubpattnames']               = '';
+$string['error_subpattnameexpected']                 = 'Subpattern name expected.';
+$string['error_cxshouldbeascii']                     = '\c should be followed by an ascii character.';
 
 
 /******* DFA and NFA limitations *******/
