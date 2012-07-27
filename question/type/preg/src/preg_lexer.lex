@@ -16,6 +16,7 @@ SPECIAL = [\\^$.\[\]|()?*+{}]
 NOTSPECIAL = [^\\^$.\[\]|()?*+{}]
 MODIFIER = [iJmsUx]
 ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
+ESCAPABLE = [^0-9a-zA-Z]
 %init{
     $this->matcher                 = null;
     $this->errors                  = array();
@@ -205,7 +206,44 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->backrefs;
     }
 
-    public function set_node_source_info(&$node, $userinscription, $indfirst, $indlast) {
+    public function mod_top_opt($set, $unset) {
+        // Some sanity checks.
+        $errorfound = false;
+        for ($i = 0; $i < $set->length(); $i++) {
+            if ($unset->contains($set[$i]) !== false) {
+                // Setting and unsetting modifier at the same time is error.
+                $this->errors[] = $this->form_error($set[$i], qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1);
+                $errorfound = true;
+            }
+        }
+        if (!$errorfound) {
+            // If errors don't exist, set and unset local modifiers.
+            for ($i = 0; $i < $set->length(); $i++) {
+                $modname = $set[$i];
+                $this->optstack[$this->optcount - 1]->$modname = true;
+            }
+            for ($i = 0; $i < $unset->length(); $i++) {
+                $modname = $unset[$i];
+                $this->optstack[$this->optcount - 1]->$modname = false;
+            }
+        }
+    }
+
+    /**
+     * Returns an error node.
+     */
+    public function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
+        $error = new qtype_preg_node_error();
+        $error->subtype = $subtype;
+        $error->addinfo = $addinfo;
+        $this->set_node_source_info($error, $userinscription, $indfirst, $indlast);
+        return $error;
+    }
+
+    /**
+     * Sets user insctiption and indexes for the given node.
+     */
+    protected function set_node_source_info(&$node, $userinscription, $indfirst, $indlast) {
         $node->userinscription = $userinscription;
         $node->indfirst = $indfirst;
         $node->indlast = $indlast;
@@ -215,15 +253,23 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         }
     }
 
-    public function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
-        $error = new qtype_preg_node_error();
-        $error->subtype = $subtype;
-        $error->addinfo = $addinfo;
-        $this->set_node_source_info($error, $userinscription, $indfirst, $indlast);
-        return $error;
+    /**
+     * Forms a result to return from the lexer.
+     * @param type is this a leaf or a node, should be a constant of preg_parser_yyParser.
+     * @param value can be either a qtype_preg_node or a qtype_preg_lexem.
+     * @return an object with fields "type" and "value".
+     */
+    protected function form_res($type, $value) {
+        $result = new stdClass();
+        $result->type = $type;
+        $result->value = $value;
+        return $result;
     }
 
-    public function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greed, $possessive) {
+    /**
+     * Returns a quantifier token.
+     */
+    protected function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greed, $possessive) {
         if ($infinite) {
             $node = new qtype_preg_node_infinite_quant();
         } else {
@@ -243,7 +289,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->form_res(preg_parser_yyParser::QUANT, $node);
     }
 
-    public function form_control($text, $pos, $length) {
+    /**
+     * Returns a control sequence token.
+     */
+    protected function form_control($text, $pos, $length) {
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== ')') {
             // return error - paren ) missing;
         }
@@ -322,7 +371,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
-    public function form_named_subpatt($text, $pos, $length, $namestartpos, $closetype) {
+    /**
+     * Returns a named subpattern token.
+     */
+    protected function form_named_subpatt($text, $pos, $length, $namestartpos, $closetype) {
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
             // Missing ending character.
             return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $pos, $pos + $length - 1, $text));
@@ -340,7 +392,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         }
     }
 
-    public function form_cond_subpatt($text, $pos, $length, $subtype, $ending = '', $numeric = true, $namestartpos = 0) {
+    /**
+     * Returns a conditional subpattern token.
+     */
+    protected function form_cond_subpatt($text, $pos, $length, $subtype, $ending = '', $numeric = true, $namestartpos = 0) {
         $this->push_opt_lvl();
         if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
             $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
@@ -431,7 +486,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         }
     }
 
-    public function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
+    /**
+     * Returns a named backreference token.
+     */
+    protected function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
         if (qtype_poasquestion_string::substr($text, $namestartpos - 1, 1) !== $opentype) {
             return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $pos, $pos + $length - 1, $opentype));
         }
@@ -454,7 +512,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         }
     }
 
-    public function form_backref($text, $pos, $length, $number) {
+    /**
+     * Returns a backreference token.
+     */
+    protected function form_backref($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_backref();
         $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
         $node->number = $number;
@@ -466,7 +527,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
-    public function form_simple_assertion($text, $pos, $length, $subtype, $negative = false) {
+    /**
+     * Returns a simple assertion token.
+     */
+    protected function form_simple_assertion($text, $pos, $length, $subtype, $negative = false) {
         $node = new qtype_preg_leaf_assert();
         $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
         $node->subtype = $subtype;
@@ -474,7 +538,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
-    public function form_charset($text, $pos, $length, $subtype, $data, $negative = false) {
+    /**
+     * Returns a character set token.
+     */
+    protected function form_charset($text, $pos, $length, $subtype, $data, $negative = false) {
         $node = new qtype_preg_leaf_charset();
         $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
         $node->subtype = $subtype;
@@ -491,7 +558,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
-    public function form_recursion($text, $pos, $length, $number) {
+    /**
+     * Returns a recursion token.
+     */
+    protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
         $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
         if ($number[2] === 'R') {
@@ -500,19 +570,6 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
             $node->number = qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
         }
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
-    }
-
-    /**
-     * Forms a result to return from the lexer.
-     * @param type is this a leaf or a node, should be a constant of preg_parser_yyParser.
-     * @param value can be either a qtype_preg_node or a qtype_preg_lexem.
-     * @return an object with fields "type" and "value".
-     */
-    protected function form_res($type, $value) {
-        $result = new stdClass();
-        $result->type = $type;
-        $result->value = $value;
-        return $result;
     }
 
     /**
@@ -580,34 +637,12 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         }
     }
 
-    public function mod_top_opt($set, $unset) {
-        // Some sanity checks.
-        $errorfound = false;
-        for ($i = 0; $i < $set->length(); $i++) {
-            if ($unset->contains($set[$i]) !== false) { // Setting and unsetting modifier at the same time is error.
-                $this->errors[] = $this->form_error($set[$i], qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1);
-                $errorfound = true;
-            }
-        }
-        if (!$errorfound) {
-            // If errors don't exist, set and unset local modifiers.
-            for ($i = 0; $i < $set->length(); $i++) {
-                $modname = $set[$i];
-                $this->optstack[$this->optcount - 1]->$modname = true;
-            }
-            for ($i = 0; $i < $unset->length(); $i++) {
-                $modname = $unset[$i];
-                $this->optstack[$this->optcount - 1]->$modname = false;
-            }
-        }
-    }
-
     /**
      * Adds a named subpattern to the map.
      * @param name subpattern to be mapped.
      * @return number of this named subpattern.
      */
-    public function map_subpattern($name) {
+    protected function map_subpattern($name) {
         if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
             $this->subpatternmap[$name] = (int)$num;
@@ -623,7 +658,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
      * @param cx the sequence itself.
      * @return character corresponding to the given sequence.
      */
-    public function calculate_cx($cx, &$error) {
+    protected function calculate_cx($cx, &$error) {
         $x = qtype_poasquestion_string::substr($cx, 2);
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
@@ -642,7 +677,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
      * @param data can contain either subtype of a flag or characters for a charset.
      * @param negative is this flag negative.
      */
-    public function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
+    protected function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
         $this->charsetuserinscription .= $userinscription;
         switch ($type) {
         case qtype_preg_charset_flag::SET:
@@ -670,10 +705,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
      * @param text the \Q...\E sequence.
      * @return the string between \Q and \E.
      */
-    public function recognize_qe_sequence($text) {
+    protected function recognize_qe_sequence($text) {
         $text = $this->yytext();
         $str = '';
-        $epos = qtype_poasquestion_string::strpos($text, '\\E');
+        $epos = qtype_poasquestion_string::strpos($text, '\E');
         if ($epos === false) {
             $str = qtype_poasquestion_string::substr($text, 2);
         } else {
@@ -691,7 +726,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
      * @param error will be an error object if the property is unknown.
      * @return a constant of qtype_preg_leaf_charset if this property is known, null otherwise.
      */
-    public function get_uprop_flag($str, &$error) {
+    protected function get_uprop_flag($str, &$error) {
         if (array_key_exists($str, self::$upropflags)) {
             $error = null;
             return self::$upropflags[$str];
@@ -907,47 +942,6 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
     return $this->form_res(preg_parser_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
-<YYINITIAL> \\{SPECIAL} {
-    $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
-}
-<YYINITIAL> \\[1-9][0-9]?[0-9]? {
-    $text = $this->yytext();
-    $str = qtype_poasquestion_string::substr($text, 1);
-    if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
-        // Return a backreference.
-        $res = $this->form_backref($text, $this->yychar, $this->yylength(), (int)$str);
-    } else {
-        // Return a character.
-        $octal = '';
-        $failed = false;
-        for ($i = 0; !$failed && $i < qtype_poasquestion_string::strlen($str); $i++) {
-            $tmp = qtype_poasquestion_string::substr($str, $i, 1);
-            if (intval($tmp) < 8) {
-                $octal = $octal . $tmp;
-            } else {
-                $failed = true;
-            }
-        }
-        if (qtype_poasquestion_string::strlen($octal) === 0) {    // If no octal digits found, it should be 0.
-            $octal = '0';
-            $tail = $str;
-        } else {                      // Octal digits found.
-            $tail = qtype_poasquestion_string::substr($str, qtype_poasquestion_string::strlen($octal));
-        }
-        // Return a single lexem if all digits are octal, an array of lexems otherwise.
-        if (qtype_poasquestion_string::strlen($tail) === 0) {
-            $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
-        } else {
-            $res = array();
-            $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
-            for ($i = 0; $i < qtype_poasquestion_string::strlen($tail); $i++) {
-                $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($tail, $i, 1));
-            }
-        }
-    }
-    return $res;
-}
 <YYINITIAL> "\g"[0-9][0-9]? {
     $text = $this->yytext();
     return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_poasquestion_string::substr($text, 2));
@@ -975,13 +969,6 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 }
 <YYINITIAL> "(?P""="?{ALNUM}*")"? {             // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
-}
-<YYINITIAL> \\0[0-7]?[0-7]? {
-    $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
-}
-<YYINITIAL> \\\\ {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, '\\');
 }
 <YYINITIAL> "\a" {
     return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
@@ -1085,15 +1072,6 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     // TODO: matches any one data unit. For now implemented the same way as dot.
     return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-<YYINITIAL> "\u"([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])? {
-    $text = $this->yytext();
-    if ($this->yylength() === 2) {
-        $str = qtype_poasquestion_string::substr($text, 1);
-    } else {
-        $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($text, 2)));
-    }
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
-}
 <YYINITIAL> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
     return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
@@ -1175,18 +1153,67 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 <YYINITIAL> "\c" {
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\c', qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\c'));
 }
-<YYINITIAL> \\. {
+<YYINITIAL> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
+    $text = $this->yytext();
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+}
+<YYINITIAL> \\[1-9][0-9]?[0-9]? {
+    $text = $this->yytext();
+    $str = qtype_poasquestion_string::substr($text, 1);
+    if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
+        // Return a backreference.
+        $res = $this->form_backref($text, $this->yychar, $this->yylength(), (int)$str);
+    } else {
+        // Return a character.
+        $octal = '';
+        $failed = false;
+        for ($i = 0; !$failed && $i < qtype_poasquestion_string::strlen($str); $i++) {
+            $tmp = qtype_poasquestion_string::substr($str, $i, 1);
+            if (intval($tmp) < 8) {
+                $octal = $octal . $tmp;
+            } else {
+                $failed = true;
+            }
+        }
+        if (qtype_poasquestion_string::strlen($octal) === 0) {    // If no octal digits found, it should be 0.
+            $octal = '0';
+            $tail = $str;
+        } else {                      // Octal digits found.
+            $tail = qtype_poasquestion_string::substr($str, qtype_poasquestion_string::strlen($octal));
+        }
+        // Return a single lexem if all digits are octal, an array of lexems otherwise.
+        if (qtype_poasquestion_string::strlen($tail) === 0) {
+            $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
+        } else {
+            $res = array();
+            $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
+            for ($i = 0; $i < qtype_poasquestion_string::strlen($tail); $i++) {
+                $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($tail, $i, 1));
+            }
+        }
+    }
+    return $res;
+}
+<YYINITIAL> \\0[0-7]?[0-7]? {
+    $text = $this->yytext();
+    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
+}
+<YYINITIAL> \\{ESCAPABLE} {
     $text = $this->yytext();
     return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
 }
-<YYINITIAL> \\ {
+<YYINITIAL> \\. {           // ERROR: incorrect escape sequence.
+    $text = $this->yytext();
+    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+}
+<YYINITIAL> \\ {           // ERROR: \ at end of pattern.
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\\', qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\\'));
 }
-<YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
+<YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {      // ERROR: POSIX class outside character set.
     $text = $this->yytext();
     return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
 }
-<YYINITIAL> . {
+<YYINITIAL> . {                 // Just to avoid exceptions.
     $text = $this->yytext();
     return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
@@ -1355,6 +1382,10 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 }
 <CHARSET> "\t" {
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
+}
+<CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
+    $text = $this->yytext();
+    $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
 }
 <CHARSET> "\Q".*"\E" {
     $text = $this->yytext();

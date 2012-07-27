@@ -1465,7 +1465,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_INCORRECT_QUANT_RANGE        = 'incorrect_quant_range_node_error';            // Incorrect quantifier ranges: {5,3}.
     const SUBTYPE_SLASH_AT_END_OF_PATTERN      = 'slash_at_end_of_pattern_node_error';          // \ at end of pattern.
     const SUBTYPE_C_AT_END_OF_PATTERN          = 'c_at_end_of_pattern_node_error';              // \c at end of pattern.
-    const SUBTYPE_WRONG_ESCAPE_SEQUENCE        = 'wrong_escape_sequence_node_error';            //
+    const SUBTYPE_INVALID_ESCAPE_SEQUENCE      = 'invalid_escape_sequence_node_error';          // Invalid escape sequence.
     const SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  = 'posix_class_outside_charset_node_error';      // POSIX class ouside of a character set.
     const SUBTYPE_UNEXISTING_SUBPATT           = 'unexisting_subpatt_node_error';               // Reference to unexisting subpattern.
     const SUBTYPE_UNKNOWN_MODIFIER             = 'unknown_modifier_node_error';                 //
@@ -1485,6 +1485,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          //
     const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
+    const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
@@ -1502,6 +1503,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_INCORRECT_QUANT_RANGE        => 'error_incorrectquantrange',
                                    self::SUBTYPE_SLASH_AT_END_OF_PATTERN      => 'error_slashatendofpattern',
                                    self::SUBTYPE_C_AT_END_OF_PATTERN          => 'error_catendofpattern',
+                                   self::SUBTYPE_INVALID_ESCAPE_SEQUENCE      => 'error_invalidescapesequence',
                                    self::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET  => 'error_posixclassoutsidecharset',
                                    self::SUBTYPE_UNEXISTING_SUBPATT           => 'error_unexistingsubpatt',
                                    self::SUBTYPE_UNKNOWN_MODIFIER             => 'error_unknownmodifier',
@@ -1520,7 +1522,8 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_BACKREF_TO_ZERO              => 'error_backreftozero',
                                    self::SUBTYPE_DIFFERENT_SUBPATT_NAMES      => 'error_differentsubpattnames',
                                    self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected',
-                                   self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii'
+                                   self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii',
+                                   self::SUBTYPE_LNU_UNSUPPORTED              => 'error_lnuunsupported'
                                    );
     /** Additional info. */
     public $addinfo;
