@@ -205,14 +205,115 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->backrefs;
     }
 
+    public function set_node_source_info(&$node, $userinscription, $indfirst, $indlast) {
+        $node->userinscription = $userinscription;
+        $node->indfirst = $indfirst;
+        $node->indlast = $indlast;
+    }
+
     public function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
         $error = new qtype_preg_node_error();
         $error->subtype = $subtype;
-        $error->indfirst = $indfirst;
-        $error->indlast = $indlast;
-        $error->userinscription = $userinscription;
         $error->addinfo = $addinfo;
+        $this->set_node_source_info($error, $userinscription, $indfirst, $indlast);
         return $error;
+    }
+
+    public function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greed, $possessive) {
+        if ($infinite) {
+            $node = new qtype_preg_node_infinite_quant();
+        } else {
+            $node = new qtype_preg_node_finite_quant();
+            $node->rightborder = $rightborder;
+        }
+        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
+        $node->leftborder = $leftborder;
+        $node->lazy = $lazy;
+        $node->greed = $greed;
+        $node->possessive = $possessive;
+        if (!$infinite && $leftborder > $rightborder) {
+            $rightoffset = 0;
+            $greed || $rightoffset++;
+            $node->error = $this->form_error($leftborder . ',' . $rightborder, qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $pos + 1, $pos + $length - 2 - $rightoffset);
+        }
+        return $this->form_res(preg_parser_yyParser::QUANT, $node);
+    }
+
+    public function form_control($text, $pos, $length) {
+        if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== ')') {
+            // return error - paren ) missing;
+        }
+        $node = new qtype_preg_leaf_control();
+        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
+        if ($text === '(*ACCEPT)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ACCEPT;
+        } else if ($text === '(*FAIL)' || $text === '(*F)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_FAIL;
+        } else if ($text === '(*COMMIT)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_COMMIT;
+        } else if ($text === '(*THEN)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_THEN;
+        } else if ($text === '(*SKIP)' || $text === '(*SKIP:)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_SKIP;
+        } else if ($text === '(*PRUNE)' || $text === '(*PRUNE:)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_PRUNE;
+        } else if ($text === '(*CR)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_CR;
+        } else if ($text === '(*LF)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_LF;
+        } else if ($text === '(*CRLF)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_CRLF;
+        } else if ($text === '(*ANYCRLF)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ANYCRLF;
+        } else if ($text === '(*ANY)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ANY;
+        } else if ($text === '(*BSR_ANYCRLF)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF;
+        } else if ($text === '(*BSR_UNICODE)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE;
+        } else if ($text === '(*NO_START_OPT)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_NO_START_OPT;
+        } else if ($text === '(*UTF8)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UTF8;
+        } else if ($text === '(*UTF16)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UTF16;
+        } else if ($text === '(*UCP)') {
+            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UCP;
+        } else {
+            // There is a parameter or error,.
+            $delimpos = qtype_poasquestion_string::strpos($text, ':');
+            if ($delimpos !== false) {
+                $subtype = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
+                $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $length - $delimpos - 2);
+                if ($name === '') {
+                    $node->error = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $delimpos, $pos + $length - 1, $text));
+                } else {
+                    $node->name = $name;
+                    if ($subtype === 'MARK' || $delimpos === 2) {
+                        $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
+                    } else if ($subtype === 'PRUNE') {
+                        $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
+                        $node2 = new qtype_preg_leaf_control();
+                        $this->set_node_source_info($node2, $text, $pos, $pos + $length - 1);
+                        $node2->subtype = qtype_preg_leaf_control::SUBTYPE_PRUNE;
+                        return array($this->form_res(preg_parser_yyParser::PARSLEAF, $node),
+                                     $this->form_res(preg_parser_yyParser::PARSLEAF, $node2));
+                    } else if ($subtype === 'SKIP') {
+                        $node->subtype = qtype_preg_leaf_control::SUBTYPE_SKIP_NAME;
+                    } else if ($subtype === 'THEN') {
+                        $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
+                        $node2 = new qtype_preg_leaf_control();
+                        $this->set_node_source_info($node2, $text, $pos, $pos + $length - 1);
+                        $node2->subtype = qtype_preg_leaf_control::SUBTYPE_THEN;
+                        return array($this->form_res(preg_parser_yyParser::PARSLEAF, $node),
+                                     $this->form_res(preg_parser_yyParser::PARSLEAF, $node2));
+                    }
+                }
+            } else {
+                $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $pos, $pos + $length - 1, $text);
+            }
+        }
+        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
@@ -499,75 +600,69 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
 
 %%
 
-<YYINITIAL> "?"("?"|"+")? {
+<YYINITIAL> "?"("?"|"+")? {                     // Quantifier ?
+    $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
+    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, 1, $lazy, $greed, $possessive));
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greed, $possessive);
 }
-<YYINITIAL> "*"("?"|"+")? {
+<YYINITIAL> "*"("?"|"+")? {                     // Quantifier *
+    $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
+    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 0, null, $lazy, $greed, $possessive));
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
 }
-<YYINITIAL> "+"("?"|"+")? {
+<YYINITIAL> "+"("?"|"+")? {                     // Quantifier +
+    $text = $this->yytext();
     $greed = $this->yylength() === 1;
-    $lazy = !$greed && qtype_poasquestion_string::substr($this->yytext(), 1, 1) === '?';
+    $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, 1, null, $lazy, $greed, $possessive));
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
 }
-<YYINITIAL> "{"[0-9]+","[0-9]+"}"("?"|"+")? {
+<YYINITIAL> "{"[0-9]+","[0-9]+"}"("?"|"+")? {   // Quantifier {m,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
-    $greed = ($lastchar === '}');
-    $lazy = !$greed && $lastchar === '?';
+    $greed = $lastchar === '}';
+    $lazy = $lastchar === '?';
     $possessive = !$greed && !$lazy;
-    if (!$greed) {
-        $textlen--;
-    }
+    $greed || $textlen--;
     $delimpos = qtype_poasquestion_string::strpos($text, ',');
     $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $delimpos - 1);
     $rightborder = (int)qtype_poasquestion_string::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
-    $node = $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $leftborder, $rightborder, $lazy, $greed, $possessive);
-    if ($leftborder > $rightborder) {
-        $node->error = $this->form_error(qtype_poasquestion_string::substr($text, 1, $textlen - 2), qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $this->yychar + 1, $this->yychar + $this->yylength() - 2);
-    }
-    return $this->form_res(preg_parser_yyParser::QUANT, $node);
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
 }
 
-<YYINITIAL> "{"[0-9]+",}"("?"|"+")? {
+<YYINITIAL> "{"[0-9]+",}"("?"|"+")? {           // Quantifier {m,}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
-    $greed = ($lastchar === '}');
-    $lazy = !$greed && $lastchar === '?';
+    $greed = $lastchar === '}';
+    $lazy = $lastchar === '?';
     $possessive = !$greed && !$lazy;
-    if (!$greed) {
-        $textlen--;
-    }
+    $greed || $textlen--;
     $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $textlen - 1);
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_infinite_quant', null, null, $leftborder, null, $lazy, $greed, $possessive));
+    return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greed, $possessive);
 }
-<YYINITIAL> "{,"[0-9]+"}"("?"|"+")? {
+<YYINITIAL> "{,"[0-9]+"}"("?"|"+")? {           // Quantifier {,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
     $greed = ($lastchar === '}');
     $lazy = !$greed && $lastchar === '?';
     $possessive = !$greed && !$lazy;
-    if (!$greed) {
-        $textlen--;
-    }
+    $greed || $textlen--;
     $rightborder = (int)qtype_poasquestion_string::substr($text, 2, $textlen - 3);
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, 0, $rightborder, $lazy, $greed, $possessive));
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greed, $possessive);
 }
-<YYINITIAL> "{"[0-9]+"}" {
-    $count = (int)qtype_poasquestion_string::substr($this->yytext(), 1, $this->yylength() - 2);
-    return $this->form_res(preg_parser_yyParser::QUANT, $this->form_node($this->yytext(), 'qtype_preg_node_finite_quant', null, null, $count, $count, false, true, false));
+<YYINITIAL> "{"[0-9]+"}" {                      // Quantifier {m}
+    $text = $this->yytext();
+    $count = (int)qtype_poasquestion_string::substr($text, 1, $this->yylength() - 2);
+    return $this->form_quant($text, $this->yychar, $this->yylength(), false, $count, $count, false, true, false);
 }
-<YYINITIAL> "[^"|"["|"[^]"|"[]" {
+<YYINITIAL> "[^"|"["|"[^]"|"[]" {               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
@@ -582,7 +677,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     }
     $this->yybegin(self::CHARSET);
 }
-<YYINITIAL> "(" {
+<YYINITIAL> "(" {                               // Beginning of a subpattern
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
@@ -592,7 +687,7 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
     $this->pop_opt_lvl();
     return $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
 }
-<YYINITIAL> "(?#"[^)]*")"? {       // Comment.
+<YYINITIAL> "(?#"[^)]*")"? {                    // Comment
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
@@ -600,108 +695,8 @@ ALNUM = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]
         return $this->nextToken();
     }
 }
-<YYINITIAL> "(*ACCEPT)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ACCEPT));
-}
-<YYINITIAL> "(*FAIL)"|"(*F)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_FAIL));
-}
-<YYINITIAL> ("(*MARK:"|"(*:"){ALNUM}*")" {
-    $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, ':');
-    $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
-    if ($name === '') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
-    } else {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
-    }
-}
-<YYINITIAL> "(*COMMIT)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_COMMIT));
-}
-<YYINITIAL> "(*PRUNE":?")" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
-}
-<YYINITIAL> "(*PRUNE:"{ALNUM}*")" {
-    $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, ':');
-    $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
-    if ($name === '') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
-    } else {
-        $res = array();
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_PRUNE));
-        return $res;
-    }
-}
-<YYINITIAL> "(*SKIP":?")" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP));
-}
-<YYINITIAL> "(*SKIP:"{ALNUM}*")" {
-    $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, ':');
-    $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
-    if ($name === '') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
-    } else {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name));
-    }
-}
-<YYINITIAL> "(*THEN)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
-}
-<YYINITIAL> "(*THEN:"{ALNUM}*")" {
-    $text = $this->yytext();
-    $delimpos = qtype_poasquestion_string::strpos($text, ':');
-    $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $this->yylength() - $delimpos - 2);
-    if ($name === '') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
-    } else {
-        $res = array();
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name));
-        $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($text, 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_THEN));
-        return $res;
-    }
-}
-<YYINITIAL> "(*CR)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CR));
-}
-<YYINITIAL> "(*LF)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_LF));
-}
-<YYINITIAL> "(*CRLF)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_CRLF));
-}
-<YYINITIAL> "(*ANYCRLF)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANYCRLF));
-}
-<YYINITIAL> "(*ANY)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_ANY));
-}
-<YYINITIAL> "(*BSR_ANYCRLF)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF));
-}
-<YYINITIAL> "(*BSR_UNICODE)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE));
-}
-<YYINITIAL> "(*NO_START_OPT)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_NO_START_OPT));
-}
-<YYINITIAL> "(*UTF8)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF8));
-}
-<YYINITIAL> "(*UTF16)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UTF16));
-}
-<YYINITIAL> "(*UCP)" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_node($this->yytext(), 'qtype_preg_leaf_control', qtype_preg_leaf_control::SUBTYPE_UCP));
-}
-<YYINITIAL> "(*"{ALNUM}*")" {
-    $text = $this->yytext();
-    $node = $this->form_node($text, 'qtype_preg_leaf_control');
-    $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+<YYINITIAL> "(*"[^)]*")"? {                     // Control sequence
+    return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
 }
 <YYINITIAL> "(?>" {
     $this->push_opt_lvl();

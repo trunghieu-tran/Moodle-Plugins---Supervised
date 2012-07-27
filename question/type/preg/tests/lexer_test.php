@@ -1234,7 +1234,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->userinscription === '{4,3}+');
         $this->assertTrue($token->value->error->subtype === qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE);
         $this->assertTrue($token->value->error->indfirst === 18);
-        $this->assertTrue($token->value->error->indlast === 21);
+        $this->assertTrue($token->value->error->indlast === 20);
         $this->assertTrue($token->value->error->userinscription === '4,3');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
