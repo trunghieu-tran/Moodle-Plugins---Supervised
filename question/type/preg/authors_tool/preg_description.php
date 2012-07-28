@@ -53,6 +53,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
         $options = array('caseinsensitive' => false);
         if(isset($this->dst_root)){
             $string = $this->dst_root->description($numbering_pattern,$options,null,null);
+            $string = self::postprocessing($string);
         }
         else {
            $string = 'tree was not built'; 
@@ -61,6 +62,13 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
             $string = str_replace('%s',$string,$whole_pattern);
         }
         return $string;
+    }
+    
+    private static function postprocessing($s){
+
+        $result = preg_replace('%;((?:</span>)?)]%','\1]',$s);
+        $result = str_replace('not not ','',$result);
+        return $result;
     }
     
     /**
