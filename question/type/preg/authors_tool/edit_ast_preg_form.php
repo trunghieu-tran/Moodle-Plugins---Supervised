@@ -52,8 +52,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         $id = optional_param('id', '', PARAM_INT);
         $id_line_edit = optional_param('id_line_edit', '', PARAM_TEXT);
         
-        //$mform->addElement('hidden', 'hidden_id', $id);
-        $mform->addElement('html', '<imput type="hidden" id="hidden_id" value="' . $id_line_edit . '" />');
+        $mform->addElement('html', '<imput type="hidden" id="hidden_id" value="' . $id_line_edit . '" />');//Add hidden field to store id line edit with answer
         
         /*var_dump($id);
         var_dump($regextext); 
@@ -62,7 +61,7 @@ class qtype_preg_authors_tool_form extends moodleform {
 
             $mform->setDefault('regex_text', $regextext);//Add regex in line edit
             
-            //Add tree
+            //-----------------------------------------Add tree-----------------------------------------
             $mform->addElement('header', 'regex_tree_header', 'Interactive tree');
             $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
         
@@ -76,7 +75,7 @@ class qtype_preg_authors_tool_form extends moodleform {
             //Add generated images
             $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
 
-            //Add graph
+            //-----------------------------------------Add graph-----------------------------------------
             $mform->addElement('header', 'regex_graph_header', 'Graph');
             $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
             
@@ -89,14 +88,19 @@ class qtype_preg_authors_tool_form extends moodleform {
              
             $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" alt="Build graph..." /></div></br>');
             
-            //Add generated maps   
+            //-----------------------------------------Add maps-----------------------------------------
             $tree_map ='';//tag <map>
             //Open and read tag <map> from file 
-            $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');            
-            while (!feof($tree_handle)) {
-                $tree_map .= fgets($tree_handle);
+            $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');
+            
+            if($tree_handle){//If tree.cmapx is open            
+                while (!feof($tree_handle)) {                    
+                    $tree_map .= fgets($tree_handle);
+                }
+                fclose($tree_handle);
+            } else {                
+                $tree_map = 'Error read map file from disk!';
             }
-            fclose($tree_handle);
             
             $mform->addElement('html', $tree_map.'</br>');
             
@@ -105,7 +109,7 @@ class qtype_preg_authors_tool_form extends moodleform {
                 echo "Can't delete file";
             }*/
             
-            //Create description
+            //-----------------------------------------Add description-----------------------------------------
             $description = new qtype_preg_author_tool_description($regextext);
             
             //Add description on form
@@ -158,7 +162,6 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('textarea', 'must_not_match', 'Must not match', 'wrap="virtual" rows="10" cols="100"');
         $mform->addElement('button', 'regex_check_not_match', 'Check no match');
         
-        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="http://localhost/moodle/question/type/preg/authors_tool/preg_authors_tool_script.js"></script></div>');
     }
     
     /*function definition_inner($mform){
