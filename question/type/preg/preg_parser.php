@@ -903,7 +903,6 @@ static public $yy_action = array(
     function yy_r6(){
     if ($this->yystack[$this->yyidx + -1]->minor->type != qtype_preg_node::TYPE_NODE_ALT) {
         $this->_retvalue = new qtype_preg_node_cond_subpatt;
-        $this->_retvalue->subtype = $this->yystack[$this->yyidx + -4]->minor->subtype;
         $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     } else {
         if ($this->yystack[$this->yyidx + -1]->minor->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || $this->yystack[$this->yyidx + -1]->minor->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
@@ -917,6 +916,7 @@ static public $yy_action = array(
             $this->_retvalue->operands[1] = $this->yystack[$this->yyidx + -1]->minor->operands[1];
         }
     }
+    $this->_retvalue->subtype = $this->yystack[$this->yyidx + -4]->minor->subtype;
     if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
         $this->_retvalue->operands[2] = new qtype_preg_node_assert;
