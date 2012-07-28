@@ -78,6 +78,22 @@ class qtype_preg_authors_tool_form extends moodleform {
             if($pars_error === false && $regexhandler->get_ast_root() !== NULL) {
                 //TODO: implement creating and use $dir
                 //$dir = $regexhandler->get_temp_dir('tmp_img');
+                
+                /*$tmp_arr = array();
+                $tmp_arr = type_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');
+                echo "1";
+                var_dump($tmp_arr[1][0]);
+                var_dump($tmp_arr[1][1]);
+                var_dump($tmp_arr[1][2]);
+                
+                fclose($tmp_arr[1][0]);
+                $err = stream_get_contents($tmp_arr[1][2]);
+                if (!empty($err)) {
+                    //echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
+                }
+                fclose($tmp_arr[1][1]);
+                fclose($tmp_arr[1][2]);
+                proc_close($tmp_arr[0]);*/
 
                 qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
                 qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
@@ -101,7 +117,21 @@ class qtype_preg_authors_tool_form extends moodleform {
                 
             } else {
                 $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_err.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
-                $mform->addElement('html', 'Ooops! I can\' build map!</br>');//Add generated map
+                
+                //-----------------------------------------Add maps-----------------------------------------
+                $tree_map ='';//tag <map>
+                $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree_err.cmapx', 'r');//Open and read tag <map> from file
+                
+                if($tree_handle){//If tree.cmapx is open            
+                    while (!feof($tree_handle)) {                    
+                        $tree_map .= fgets($tree_handle);
+                    }
+                    fclose($tree_handle);
+                } else {
+                    $tree_map = 'Error read map file from disk!';
+                }
+                
+                $mform->addElement('html', $tree_map.'</br>');//Add generated map
             }
 
             //-----------------------------------------Add graph-----------------------------------------
