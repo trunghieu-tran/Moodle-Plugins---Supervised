@@ -6376,7 +6376,7 @@ array(
                             break;
                         case 33:
                             {
-    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
 }
                         case -34:
                             break;
@@ -6439,7 +6439,7 @@ array(
                             break;
                         case 42:
                             {
-    return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
+    return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
 }
                         case -43:
                             break;

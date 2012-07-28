@@ -156,6 +156,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
     if (C->type != qtype_preg_node::TYPE_NODE_ALT) {
         A = new qtype_preg_node_cond_subpatt;
+        A->subtype = D->subtype;
         A->operands[0] = C;
     } else {
         if (C->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || C->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
