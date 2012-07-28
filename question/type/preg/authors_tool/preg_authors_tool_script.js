@@ -57,7 +57,7 @@ YUI().use('node', 'io-base',function (Y) {
         
        //Y.one('html').load('http://localhost/moodle/question/type/preg/authors_loot/ast_preg_form.php?regex='+tmp+'&id=-1');
        
-       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex='+tmp+'&id=-1';
+       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=-1' + '&id_line_edit=' + hidden.getAttribute("value");
        Y.one('#id_tree').setAttribute('src','');
        Y.one('#id_graph').setAttribute('src','');
        window.location.assign(url);
@@ -89,7 +89,7 @@ YUI().use('node', 'io-base',function (Y) {
        var tmp = encodeURIComponent(context.get("value"));
        //alert(id);
        
-       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex='+tmp+'&id='+id;
+       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=' + id + '&id_line_edit=' + hidden.getAttribute("value");
        Y.io(url);
        Y.one('#id_graph').setAttribute('src','');
        setTimeout(function() { 
