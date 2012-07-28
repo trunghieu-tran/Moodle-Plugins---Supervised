@@ -52,27 +52,6 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
             $length1 = $this->length[$key];
             $length2 = $other->length[$key];
 
-            // Subexpressions starting earlier take priority over ones starting later.
-            /*if ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                return true;
-            }
-            if ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === qtype_preg_matching_results::NO_MATCH_FOUND) {
-                return false;
-            }
-
-            $repeating2 = ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 >= $index1 + $length1);
-            $repeating1 = ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 >= $index2 + $length2);
-
-            // Subexpressions also correspond the leftmost-longest rule.
-            if (($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 < $index1 && !$repeating1) ||
-                ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 === $index1 && $length2 > $length1)) {
-                return true;
-            }
-            if (($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 < $index2 && !$repeating2) ||
-                ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === $index2 && $length1 > $length2)) {
-                return false;
-            }*/
-
             // Leftmost-longest rule.
             if (($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                 ($index2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index2 < $index1) ||
@@ -84,17 +63,8 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
                 ($index1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $index1 === $index2 && $length1 > $length2)) {
                 return false;
             }
-
-            // Repeating rule.
-            if ($this->index_first[$key] < $other->index_first[$key]) {
-                return true;
-            }
-            if ($this->index_first[$key] > $other->index_first[$key]) {
-                return false;
-            }
         }
         return false;
-
     }
 
     public function concatenate_char_to_str($char) {
@@ -170,6 +140,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @param length number of characters consumed by transition.
      */
     private function write_tag_values(&$newstate, $prevstate, $transition, $startpos, $length) {
+        if ($this->options !== null && !$this->options->capturesubpatterns) {
+            return;
+        }
         // Get subpattern indexes.
         $subpatt_start = array();
         $subpatt_end = array();
