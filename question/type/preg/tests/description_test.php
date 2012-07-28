@@ -186,4 +186,29 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $expected = 'asd'; 
         $this->assertEquals($result, $expected);
     }
+    
+    /**
+     * @dataProvider condmask_provider
+     */
+    public function test_condmask($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function condmask_provider()
+    {
+        return array(
+          array('(?(DEFINE)a|b)','jh'),
+          array('(?(\1))a|b)','dg'),
+          array('g*','jh'),
+          array('g?','dg'),
+          array('g{0,1}','jh'),
+          array('g{0,}','dg'),
+          array('g{1,}','jh'),
+          array('g{2,5}','dg'),
+        );
+    }
 }
