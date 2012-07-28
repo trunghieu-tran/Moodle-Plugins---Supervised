@@ -848,14 +848,12 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
     
 }
 
-class qtype_preg_description_node_error extends qtype_preg_description_operator {
-    /**
-     * Redifinition of abstruct qtype_preg_description_node::pattern()
-     */
+/*class qtype_preg_description_node_error extends qtype_preg_description_operator {
+
     public function pattern($node_parent=null,$form=null){
         
         $pattern_t = '<span style="color:red">'.$this->pregnode->error_string().'</span>';
 
         return $pattern_t;
     }
-}
+}*/

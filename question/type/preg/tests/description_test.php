@@ -253,4 +253,15 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[^\S]','white space'),
         );
     }
+    
+    //------------------------------------------------------------------
+    
+    /*public function test_err()
+    {
+        $handler = new qtype_preg_author_tool_description('a{9,0}',null,null);
+        $expected = 'ad';
+        var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }*/
 }
