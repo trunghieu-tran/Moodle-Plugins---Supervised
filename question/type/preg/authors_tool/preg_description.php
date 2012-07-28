@@ -730,13 +730,24 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
      */
     public function pattern($node_parent=null,$form=null){
         
-        $pattern_t = '';
-        if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
-            $pattern_t = self::get_form_string('description_subpattern',$form);
-        } else {
-            $pattern_t = self::get_form_string('description_subpattern_once',$form);
+        if(is_string($this->pregnode->number)){
+            if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
+                $pattern_t = self::get_form_string('description_subpattern_name',$form);
+            } else {
+                $pattern_t = self::get_form_string('description_subpattern_once_name',$form);
+            }
+            $pattern_t = str_replace('%name', $this->pregnode->number,$pattern_t);
         }
-        $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+        else
+        {
+        $pattern_t = '';
+            if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
+                $pattern_t = self::get_form_string('description_subpattern',$form);
+            } else {
+                $pattern_t = self::get_form_string('description_subpattern_once',$form);
+            }
+            $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+        }
         return $pattern_t;
     }
     
@@ -749,30 +760,74 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
  */
 class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_operator{
     
+    private function description_of_condition(){
+        $pattern_t = '';
+        switch ($this->pregnode->operands[2]->subtype) {
+            case qtype_preg_node_cond_subpatt::SUBTYPE_PLA:
+                $pattern_t = self::get_form_string('description_pla_node_assert',$form);
+                break;
+
+            case qtype_preg_node_cond_subpatt::SUBTYPE_NLA:
+                $pattern_t = self::get_form_string('description_nla_node_assert',$form);
+                break;
+            
+            case qtype_preg_node_cond_subpatt::SUBTYPE_PLB:
+                $pattern_t = self::get_form_string('description_plb_node_assert',$form);
+                break;
+            
+            case qtype_preg_node_cond_subpatt::SUBTYPE_NLB:
+                $pattern_t = self::get_form_string('description_nlb_node_assert',$form);
+                break;          
+        }
+        return $pattern_t;
+    }
+    
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
         
         $pattern_t = '';
-        if($this->pregnode->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_BACKREF){
-            $pattern_t = self::get_form_string('description_backref_node_cond_subpatt',$form);
-            $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
+        if($this->pregnode->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT){
+            
+            if(is_string($this->pregnode->number)){
+                $pattern_t = self::get_form_string('description_backref_node_cond_subpatt_name',$form);
+                $pattern_t = str_replace('%name', $this->pregnode->number,$pattern_t);
+            }
+            else{
+               $pattern_t = self::get_form_string('description_backref_node_cond_subpatt',$form);
+               $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t); 
+            }
+            
         }
-        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_RECURSIVE){
-            if($this->pregnode->number===0){
+        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION){
+            
+            if(is_string($this->pregnode->number)){
+                $pattern_t = self::get_form_string('description_recursive_node_cond_subpatt_name',$form);
+                $pattern_t = str_replace('%name', $this->pregnode->number,$pattern_t);
+            }
+            else if($this->pregnode->number===0){
                 $pattern_t = self::get_form_string('description_recursive_node_cond_subpatt_all',$form);
             }
             else {
                 $pattern_t = self::get_form_string('description_recursive_node_cond_subpatt',$form);
                 $pattern_t = str_replace('%number', $this->pregnode->number,$pattern_t);
             }
+            
+        }
+        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE || count($this->pregnode->operands)==1) {
+            
+            $pattern_t = self::get_form_string('description_define_node_cond_subpatt',$form);    
+            
         }
         else {
-            $pattern_t = self::get_form_string('description_'.$this->pregnode->subtype,$form);
+            $pattern_t = self::get_form_string('description_node_cond_subpatt',$form);
+            $pattern_t = str_replace('%cond', $this->description_of_condition(),$pattern_t);
         }
         return $pattern_t;
     }
+    
+    
     
 }
 
