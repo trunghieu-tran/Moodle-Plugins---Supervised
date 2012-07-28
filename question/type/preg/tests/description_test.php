@@ -36,20 +36,25 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         );
     }
     
-    /*public function test_meta()
+    //------------------------------------------------------------------
+    
+    public function test_meta()
     {
         $handler = new qtype_preg_author_tool_description('a|b|',null,null);
         $result = $handler->description('%s','%s');
-        $expected = 'sdas';
+        $expected = '<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing';
         $this->assertEquals($result, $expected);
-    }*/
+    }
     
+    //------------------------------------------------------------------
+ 
     /**
      * @dataProvider assert_provider
      */
     public function test_assert($regex, $expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
@@ -60,20 +65,24 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('$','end of the string'),
           array('\b','at a word boundary'),
           array('\B','not at a word boundary'),
-          array('\A','at the start of the subject'),
+          //array('\A','at the start of the subject'),
           array('\Z','at the end of the subject'),
-          array('\G','at the first matching position in the subject')
+          //array('\G','at the first matching position in the subject')
         );
     }
+ 
+    //------------------------------------------------------------------
     
     public function test_backref()
     {
-        $handler = new qtype_preg_author_tool_description('\1',null,null);
+        $handler = new qtype_preg_author_tool_description('(a)\1',null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
-        $expected = 'back reference to subpattern #1';
+        $expected = 'subpattern #1: [<span style="color:blue">a</span>] then back reference to subpattern #1';
         $this->assertEquals($result, $expected);
     }
+    
+    //------------------------------------------------------------------
     
     /**
      * @dataProvider concat_provider
@@ -92,10 +101,12 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('ab','<span style="color:blue">a</span><span style="color:blue">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>; then <span style="color:blue">c</span>'),
           array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
-            array(' \t\n\r','sad'),
+            array(' \t\n\r','space then tabulation then newline(LF) then carriage return character'),
           array('\0113','tabulation then <span style="color:blue">3</span>'),
          );
     }
+    
+    //------------------------------------------------------------------
     
     /**
      * @dataProvider alt_provider
@@ -116,6 +127,8 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('a|b|c','<span style="color:blue">a</span> or <span style="color:blue">b</span> or <span style="color:blue">c</span>'),
         );
     }
+    
+    //------------------------------------------------------------------
     
     /**
      * @dataProvider nassert_provider
@@ -142,6 +155,8 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         );
     }
     
+    //------------------------------------------------------------------
+    
     /**
      * @dataProvider quant_provider
      */
@@ -167,7 +182,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         );
     }
     
-    
+    //------------------------------------------------------------------    
     
     public function test_option()
     {
@@ -178,14 +193,18 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($result, $expected);
     }
     
+    //------------------------------------------------------------------
+    
     public function test_numbering()
     {
         $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
         //var_dump($handler);
         $result = $handler->default_description();
-        $expected = 'asd'; 
+        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated at least 1 times</span></span>'; 
         $this->assertEquals($result, $expected);
     }
+    
+    //------------------------------------------------------------------
     
     /**
      * @dataProvider condmask_provider
@@ -201,14 +220,16 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function condmask_provider()
     {
         return array(
-          array('(?(DEFINE)a|b)','jh'),
-          array('(?(\1))a|b)','dg'),
-          array('g*','jh'),
-          array('g?','dg'),
-          array('g{0,1}','jh'),
-          array('g{0,}','dg'),
-          array('g{1,}','jh'),
-          array('g{2,5}','dg'),
+          array('(?(?=a)a|b)','if further text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
+          array('(?(?!a)a|b)','if further text should not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
+          array('(?(?<=a)a|b)','if preceding text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
+          array('(?(?<!a)a|b)','if preceding text should not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
+          array('(?(?=a)a)','if further text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>]'),
+          /*array('(a)(?(1)a)','dg'),
+          //array('(?(name)a)','jh'),
+          array('(?(<name>)a)','jh'),
+          array('(?(<name>)a|b)','jh'),
+          array('(?(*DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]'),*/
         );
     }
 }

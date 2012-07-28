@@ -51,7 +51,12 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     public function description($numbering_pattern,$whole_pattern=null){
 
         $options = array('caseinsensitive' => false);
-        $string = $this->dst_root->description($numbering_pattern,$options,null,null);
+        if(isset($this->dst_root)){
+            $string = $this->dst_root->description($numbering_pattern,$options,null,null);
+        }
+        else {
+           $string = 'tree was not built'; 
+        }
         if($whole_pattern !== null && $whole_pattern !== ''){
             $string = str_replace('%s',$string,$whole_pattern);
         }
@@ -760,7 +765,7 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
  */
 class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_operator{
     
-    private function description_of_condition(){
+    private function description_of_condition($form){
         $pattern_t = '';
         switch ($this->pregnode->operands[2]->subtype) {
             case qtype_preg_node_cond_subpatt::SUBTYPE_PLA:
@@ -815,15 +820,19 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
             }
             
         }
-        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE || count($this->pregnode->operands)==1) {
+        else if ($this->pregnode->subtype===qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE) {
             
             $pattern_t = self::get_form_string('description_define_node_cond_subpatt',$form);    
             
         }
         else {
             $pattern_t = self::get_form_string('description_node_cond_subpatt',$form);
-            $pattern_t = str_replace('%cond', $this->description_of_condition(),$pattern_t);
+            $pattern_t = str_replace('%cond', $this->description_of_condition($form),$pattern_t);
         }
+        
+        $else_replase = (isset($this->pregnode->operands[1]))?self::get_form_string('description_node_cond_subpatt_else',$form):'';
+        $pattern_t = str_replace('%else', $else_replase,$pattern_t);
+            
         return $pattern_t;
     }
     
