@@ -728,8 +728,20 @@ class qtype_preg_lexer extends JLexBase  {
     private function yy_do_eof () {
         if (false === $this->yy_eof_done) {
 
-    if ($this->charset !== null) { // End of the expression inside a character class.
+    // End of the expression inside a character class.
+    if ($this->charset !== null) {
         $this->errors[] = $this->form_error($this->charsetuserinscription, qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, $this->charset->indfirst, $this->yychar - 1);
+    }
+    // Check for backreferences to unexisting subpatterns.
+    if (count($this->backrefs) > 0) {
+        $maxbackrefnumber = -1;
+        foreach ($this->backrefs as $leaf) {
+            $number = $leaf->number;
+            $error = false;
+            if ((is_int($number) && $number > $this->maxsubpatt) || (is_string($number) && !array_key_exists($number, $this->subpatternmap))) {
+                $this->errors[] = $this->form_error($leaf->userinscription, qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->indfirst, $leaf->indlast, $leaf->number);
+            }
+        }
     }
         }
         $this->yy_eof_done = true;
