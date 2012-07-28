@@ -38,26 +38,26 @@ class qtype_preg_dot_style_provider {
                 } else {
                     $label = '[' . $label . ']';
                 }
-                return "[label = \"$label\", tooltip = \"character class\", id = $id, shape = square]";
+                return "[label = \"$label\", tooltip = \"character class\", id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_META: {
                 //if($pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                return "[label = \"emptiness\", tooltip = emptiness, id = $id, shape = square]";
+                return "[label = \"emptiness\", tooltip = emptiness, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = assertion, id = $id, shape = square]";
+                return "[label = \"assertion $label\", tooltip = assertion, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, id = $id, shape = square]";
+                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                return "[label = \"recursion ' . $pregnode->number . '\", shape = square, tooltip = recursion, id = $id, shape = square]";
+                return "[label = \"recursion ' . $pregnode->number . '\", shape = square, tooltip = recursion, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                return "[label = control sequence \"$label\", tooltip = \"control sequence\", id = $id, shape = square]";
+                return "[label = control sequence \"$label\", tooltip = \"control sequence\", id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                return "[label = \"$label\", tooltip = option, id = $id, shape = square]";
+                return "[label = \"$label\", tooltip = option, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
                 return "[label = \"$label\", tooltip = \"finite quantificator\", id = $id]";
