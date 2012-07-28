@@ -8,12 +8,16 @@
  * @package questions
  */
 
+//defined('MOODLE_INTERNAL') || die();
+
 require_once(dirname(__FILE__) . '/../../../../config.php');
 
 global $CFG;
+global $PAGE;
 
-require_once('edit_ast_preg_form.php');
-        
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/edit_ast_preg_form.php');
+//require_once('preg_authors_tool_load.php');
+
 //Instantiate simplehtml_form 
 $mform = new qtype_preg_authors_tool_form();
 
