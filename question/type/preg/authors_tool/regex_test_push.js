@@ -6,7 +6,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
-YUI().use('node', 'panel', 'node-load', function (Y) {
+YUI().use('node', 'panel', 'node-load', 'get', function (Y) {
     
     var testfoo = function( e ) {
         
@@ -17,9 +17,9 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
         var page_regex_auth_helper_adr = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'))+'&id=-1'+'&id_line_edit='+this.getAttribute('id');
         dialog = new Y.Panel({
             contentBox : Y.Node.create('<div id="dialog" />'),
-            bodyContent: '<div id="page_regex_auth_helper_iframe_holder" style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div>',
+            bodyContent: '<div class="message icon-warn">Loading...</div>',
             width      : page_regex_auth_helper_width,
-            height     : page_regex_auth_helper_height,
+            //height     : page_regex_auth_helper_height,
             zIndex     : 120,
             centered   : true,
             modal      : true, // modal behavior
@@ -67,6 +67,15 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
         //Y.one('#page_regex_auth_helper_iframe_holder').setStyle ( 'height',  iframeheight+'' );
         
         //Y.one('#dialog .message').load('http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
+        
+        Y.one('#dialog .message').load(page_regex_auth_helper_adr,function(){
+            Y.Get.js('http://localhost/moodle/question/type/preg/authors_tool/preg_authors_tool_script.js', function (err) {
+                if (err) {
+                    alert('Error loading JS: ' + err[0].error, 'error');
+                    return;
+                }
+            })
+        })
     }
 
     var i=0;
