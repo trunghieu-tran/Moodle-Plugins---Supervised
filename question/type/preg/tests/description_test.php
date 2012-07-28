@@ -65,9 +65,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('$','end of the string'),
           array('\b','at a word boundary'),
           array('\B','not at a word boundary'),
-          //array('\A','at the start of the subject'),
+          array('\A','at the start of the subject'),
           array('\Z','at the end of the subject'),
-          //array('\G','at the first matching position in the subject')
+          array('\G','at the first matching position in the subject')
         );
     }
  
@@ -225,11 +225,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?(?<=a)a|b)','if preceding text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
           array('(?(?<!a)a|b)','if preceding text should not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
           array('(?(?=a)a)','if further text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>]'),
-          /*array('(a)(?(1)a)','dg'),
-          //array('(?(name)a)','jh'),
-          array('(?(<name>)a)','jh'),
-          array('(?(<name>)a|b)','jh'),
-          array('(?(*DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]'),*/
+          array('(?(1)a)','if the subpattern #1 has been successfully matched then check: [<span style="color:blue">a</span>]'),
+          array('(?(name)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]'),
+          array('(?(<name>)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]'),
+          array('(?(<name>)a|b)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
+          array('(?(DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]'),
         );
     }
     
