@@ -344,6 +344,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $testdataclassname = get_class($testdataobj);
@@ -372,6 +373,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 // Try to get matcher for the regex.
                 try {
                     $matcher = $this->question->get_matcher($this->engine_name(), $regex, false, strpos($modifiers, 'i') === false, null, $notation);
+                    $matcher->set_options($matchoptions);
                 } catch (Exception $e) {
                     echo "EXCEPTION CATCHED DURING BUILDING MATCHER, test name is " . $curtestmethod .  "\n" . $e->getMessage() . "\n";
                     continue;
