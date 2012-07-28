@@ -39,8 +39,11 @@ class qtype_preg_regex_handler {
     /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
     protected $anchor;
 
+    /**
+     * Returns class name without 'qtype_preg_' prefix.
+     */
     public function name() {
-        return 'preg_regex_handler';
+        return 'regex_handler';
     }
 
     /**
@@ -231,11 +234,11 @@ class qtype_preg_regex_handler {
         foreach($parseerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
-        if (count($this->errors) === 0) {
+        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
-        }
+        //}
         fclose($pseudofile);
     }
 
@@ -244,6 +247,7 @@ class qtype_preg_regex_handler {
      *
      * Create handler with no parameters, than call this function to avoid re-parsing if you have
      *   two handlers working on one regex.
+     * @deprecated since 28.07.2012 may not work. TODO - find a way to bypass protection on class members to create another handler from this
      */
     public function get_tree_from_another_handler($handler) {
         $this->errors = $handler->get_error_objects();
