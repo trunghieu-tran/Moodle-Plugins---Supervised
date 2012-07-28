@@ -80,6 +80,15 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     }
     
     /**
+     * for testing
+     */
+    public function form_description($form){
+        $options = array('caseinsensitive' => false);
+        $result = $this->dst_root->description('%s',$options,null,$form);
+        return $result;      
+    }
+    
+    /**
      * Returns the engine-specific node name for the given preg_node name.
      * Overload in case of sophisticated node name schemes.
      */
@@ -249,7 +258,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
                 if (qtype_preg_unicode::is_in_range($flag->data[$i],qtype_preg_unicode::graph_ranges())) { //is ctype_graph correct for utf8 string?
-                    $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char') ,$form);  
+                    $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char' ,$form));  
                 }
                 else{ 
                     $char_num = qtype_poasquestion_string::ord($flag->data[$i]);
@@ -415,7 +424,7 @@ class qtype_preg_description_leaf_option extends qtype_preg_description_leaf{
             if($node->pregnode->caseinsensitive === false && $options['caseinsensitive']===true){
                 $options['caseinsensitive'] = false;
                 $node_pattern = self::get_form_string('description_unsetoption_i',$form).$node_pattern;
-                var_dump(1);
+                //var_dump(1);
                 
             }
         }
@@ -542,7 +551,6 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         
         $description = '';
         $child_description = '';
-        $form = '';
         $matches = array();
         
         $this->pattern = $this->pattern($node_parent,$form);
