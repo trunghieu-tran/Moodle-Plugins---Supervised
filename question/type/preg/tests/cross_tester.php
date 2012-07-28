@@ -88,6 +88,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_FROM_BACKTRACKING       = 2;
     const TAG_FROM_PCRE               = 3;
     const TAG_FROM_AT_AND_T           = 4;
+    const TAG_ASSOC_LEFT              = 5;
+    const TAG_ASSOC_RIGHT             = 6;
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
