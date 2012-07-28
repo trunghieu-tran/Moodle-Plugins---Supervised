@@ -49,6 +49,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $qtype = new $qtypeclass;
 
         //$PAGE->requires->js('/question/type/preg/regex_test_push.js');
+        
+        $mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
         $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
         
         $engines = $qtype->available_engines();
