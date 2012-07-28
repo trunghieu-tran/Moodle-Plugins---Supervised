@@ -160,18 +160,18 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider quant_provider
      */
-    /*public function test_quant($regex,$expected)
+    public function test_quant($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }*/
+    }
     
     public function quant_provider()
     {
         return array(
-          array('g{,1}','jh'),
+          array('g{,1}','<span style="color:blue">g</span> may be missing'),
           array('g+','dg'),
           array('g*','jh'),
           array('g?','dg'),
@@ -230,6 +230,27 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?(<name>)a)','jh'),
           array('(?(<name>)a|b)','jh'),
           array('(?(*DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]'),*/
+        );
+    }
+    
+    //------------------------------------------------------------------
+    
+    /**
+     * @dataProvider postprocessing_provider
+     */
+    public function test_postprocessing($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function postprocessing_provider()
+    {
+        return array(
+          array('([abc])','subpattern #1: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]'),
+          array('[^\S]','white space'),
         );
     }
 }
