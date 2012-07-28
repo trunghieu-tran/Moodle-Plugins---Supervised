@@ -11,7 +11,6 @@
 global $CFG;
 //global $PAGE;
 require_once($CFG->libdir.'/formslib.php');
-//require_once($CFG->dirroot.'/question/type/preg/ast_tree_nodes.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
@@ -64,16 +63,46 @@ class qtype_preg_authors_tool_form extends moodleform {
             //-----------------------------------------Add tree-----------------------------------------
             $mform->addElement('header', 'regex_tree_header', 'Interactive tree');
             $mform->addHelpButton('regex_tree_header','regex_tree_header','qtype_preg');
-        
-            //Generate tree image            
             $regexhandler = new qtype_preg_regex_handler($regextext);
-            //TODO: implement creating and use $dir
-            //$dir = $regexhandler->get_temp_dir('tmp_img');
-            qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
-            qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
-                        
-            //Add generated images
-            $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
+            
+            //Checking parser errors
+            $pars_error = false;
+            foreach($regexhandler->get_errors() as $error) {
+                if (is_a($error, 'qtype_preg_parsing_error')) {
+                    $pars_error = true;
+                    break;
+                }
+            }
+            //var_dump($pars_error);
+
+            if($pars_error === false && $regexhandler->get_ast_root() !== NULL) {
+                //TODO: implement creating and use $dir
+                //$dir = $regexhandler->get_temp_dir('tmp_img');
+
+                qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
+                qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
+                //Add generated images
+                $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
+                
+                //-----------------------------------------Add maps-----------------------------------------
+                $tree_map ='';//tag <map>                 
+                $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');//Open and read tag <map> from file
+                
+                if($tree_handle){//If tree.cmapx is open            
+                    while (!feof($tree_handle)) {                    
+                        $tree_map .= fgets($tree_handle);
+                    }
+                    fclose($tree_handle);
+                } else {
+                    $tree_map = 'Error read map file from disk!';
+                }
+                
+                $mform->addElement('html', $tree_map.'</br>');//Add generated map
+                
+            } else {
+                $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_err.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
+                $mform->addElement('html', 'Ooops! I can\' build map!</br>');//Add generated map
+            }
 
             //-----------------------------------------Add graph-----------------------------------------
             $mform->addElement('header', 'regex_graph_header', 'Graph');
@@ -81,41 +110,54 @@ class qtype_preg_authors_tool_form extends moodleform {
             
             //Generate graph image
             $tmp_graph = new qtype_preg_author_tool_explain_graph($regextext);
-            $graph = $tmp_graph->create_graph($id);
-            $dot_instructions_graph = $graph->create_dot();
             
-            qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
-             
-            $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" alt="Build graph..." /></div></br>');
-            
-            //-----------------------------------------Add maps-----------------------------------------
-            $tree_map ='';//tag <map>
-            //Open and read tag <map> from file 
-            $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');
-            
-            if($tree_handle){//If tree.cmapx is open            
-                while (!feof($tree_handle)) {                    
-                    $tree_map .= fgets($tree_handle);
+            //Checking parser errors
+            $pars_error = false;
+            foreach($tmp_graph->get_errors() as $error) {
+                if (is_a($error, 'qtype_preg_parsing_error')) {
+                    $pars_error = true;
+                    break;
                 }
-                fclose($tree_handle);
-            } else {                
-                $tree_map = 'Error read map file from disk!';
             }
             
-            $mform->addElement('html', $tree_map.'</br>');
-            
+            if($pars_error === false && $tmp_graph->get_ast_root() !== NULL) {
+                
+                $graph = $tmp_graph->create_graph($id);
+                $dot_instructions_graph = $graph->create_dot();
+                
+                qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
+                 
+                $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" alt="Build graph..." /></div></br>');
+                
+            } else {
+                $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph_err.png" id="id_graph" alt="Build graph..." /></div></br>');
+            }
             //TODO: implement the removal of temporary files
             /*if(!unlink('/var/www/moodle/question/type/preg/tmp_img/tree.cmapx')){
                 echo "Can't delete file";
             }*/
             
             //-----------------------------------------Add description-----------------------------------------
-            $description = new qtype_preg_author_tool_description($regextext);
-            
             //Add description on form
             $mform->addElement('header', 'regex_description_header', 'Description here:');
             $mform->addHelpButton('regex_description_header','regex_description_header','qtype_preg');
-            $mform->addElement('html', $description->default_description());
+                
+            $description = new qtype_preg_author_tool_description($regextext);
+            
+            //Checking parser errors
+            $pars_error = false;
+            foreach($tmp_graph->get_errors() as $error) {
+                if (is_a($error, 'qtype_preg_parsing_error')) {
+                    $pars_error = true;
+                    break;
+                }
+            }
+            
+            if($pars_error === false && $description->get_ast_root() !== NULL) {
+                $mform->addElement('html', $description->default_description());
+            } else {
+                $mform->addElement('html', '<div id="description_handler">Ooops! I can\'t build description!</div>');
+            }
             
         } else {
             
@@ -168,7 +210,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         //$mform->addElement('button', 'testbuton1', 'PRESS ME!!!');
         return true;
     }*/
-    
+
     //Custom validation should be added here
     function validation($data, $files) {
         return array();
