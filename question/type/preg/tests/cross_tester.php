@@ -169,6 +169,44 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         return false;
     }
 
+    /**
+     * Prints given matchresults.
+     * @param results array with keys 'is_match', 'full', 'index_first', 'length', 'next' and 'left'.
+     * @param label array of additional lines to be printed before the results.
+     */
+    function dump_results($results, $label = array()) {
+        $boolstr = array(false => 'FALSE', true => 'TRUE');
+        foreach ($label as $line) {
+            echo $line . "\n";
+        }
+        if (array_key_exists('is_match', $results)) {
+            echo 'IS_MATCH:    ' . $boolstr[$results['is_match']] . "\n";
+        }
+        if (array_key_exists('full', $results)) {
+            echo 'FULL:        ' . $boolstr[$results['full']] . "\n";
+        }
+        if (array_key_exists('index_first', $results)) {
+            echo 'INDEX_FIRST: ';
+            foreach ($results['index_first'] as $key => $value) {
+                echo $key . '=>' . $value . ', ';
+            }
+            echo "\n";
+        }
+        if (array_key_exists('length', $results)) {
+            echo 'LENGTH:      ';
+            foreach ($results['length'] as $key => $value) {
+                echo $key . '=>' . $value . ', ';
+            }
+            echo "\n";
+        }
+        if (array_key_exists('next', $results)) {
+            echo 'NEXT:        ' . $results['next'] . "\n";
+        }
+        if (array_key_exists('left', $results)) {
+            echo 'LEFT:        ' . $results['left'] . "\n";
+        }
+    }
+
     function check_next_character($regex, $char) {
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
@@ -255,14 +293,14 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         // Checking next possible character.
         $nextpassed = true;
+        $obtainednext = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
         if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-            $str = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
             if ($obtained->extendedmatch !== null) {
-                $str = $obtained->string_extension();
+                $obtainednext = $obtained->string_extension();
             }
             $pattern = $expected['next'];
-            $char = qtype_poasquestion_string::substr($str, 0, 1);
-            $nextpassed = (($expected['next'] === $str && $str === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+            $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
+            $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
                            ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
         }
 
@@ -281,61 +319,55 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // is_match
         $this->assertTrue($assertionstrue || $ismatchpassed);
         if (!$ismatchpassed) {
-            echo "$enginename failed 'IS_MATCH' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected is_match: ' . $boolstr[$expected['is_match']] . "\n" .
-                 'obtained is_match: ' . $boolstr[$obtained->is_match()] . "\n" .
-                 'source class:      ' . $classname                      . "\n" .
-                 'source method:     ' . $methodname                     . "\n\n";
+            $this->dump_results(array('is_match' => $obtained->is_match()),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('is_match' => $expected['is_match']),
+                                array("expected:"));
         }
 
         // full
         $this->assertTrue($assertionstrue || $fullpassed);
         if (!$fullpassed) {
-            echo "$enginename failed 'FULL' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected full: ' . $boolstr[$expected['full']]     . "\n" .
-                 'obtained full: ' . $boolstr[$obtained->full]       . "\n" .
-                 'source class:      ' . $classname                  . "\n" .
-                 'source method:     ' . $methodname                 . "\n\n";
+            $this->dump_results(array('full' => $obtained->full),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('full' => $expected['full']),
+                                array("expected:"));
         }
 
         // index_first
         $this->assertTrue($assertionstrue || $indexfirstpassed);
         if (!$indexfirstpassed) {
-            echo "$enginename failed 'INDEX_FIRST' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected index_first: '; print_r($expected['index_first']); echo "\n" .
-                 'obtained index_first: '; print_r($obtained->index_first);   echo "\n" .
-                 'source class:      ' . $classname                              . "\n" .
-                 'source method:     ' . $methodname                             . "\n\n";
+            $this->dump_results(array('index_first' => $obtained->index_first),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('index_first' => $expected['index_first']),
+                                array("expected:"));
         }
 
         // length
         $this->assertTrue($assertionstrue || $lengthpassed);
         if (!$lengthpassed) {
-            echo "$enginename failed 'LENGTH' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected length: '; print_r($expected['length']); echo "\n" .
-                 'obtained length: '; print_r($obtained->length);   echo "\n" .
-                 'source class:      ' . $classname                    . "\n" .
-                 'source method:     ' . $methodname                   . "\n\n";
+            $this->dump_results(array('length' => $obtained->length),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('length' => $expected['length']),
+                                array("expected:"));
         }
 
         // next
         $this->assertTrue($assertionstrue || $nextpassed);
         if (!$nextpassed) {
-            echo "$enginename failed 'NEXT' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected next: ' . $expected['next']               . "\n" .
-                 'obtained next: ' . $obtained->string_extension()   . "\n" .
-                 'source class:      ' . $classname                  . "\n" .
-                 'source method:     ' . $methodname                 . "\n\n";
+            $this->dump_results(array('next' => $obtainednext),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('next' => $expected['next']),
+                                array("expected:"));
         }
 
         // left
-        $this->assertTrue($assertionstrue || $leftpassed, "$enginename failed 'left' check on regex '$regex' and string '$str'    (test from $classname)");
+        $this->assertTrue($assertionstrue || $leftpassed);
         if (!$leftpassed) {
-            echo "$enginename failed 'LEFT' check on regex '$regex' and string '$str'" . "\n" .
-                 'expected left: ' . $expected['left'][0]            . "\n" .
-                 'obtained left: ' . $obtained->left                 . "\n" .
-                 'source class:      ' . $classname                  . "\n" .
-                 'source method:     ' . $methodname                 . "\n\n";
+            $this->dump_results(array('left' => $obtained->left),
+                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+            $this->dump_results(array('left' => $expected['left'][0]),
+                                array("expected:"));
         }
 
         // Return true if everything is correct, false otherwise.

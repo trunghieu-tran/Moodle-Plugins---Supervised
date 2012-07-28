@@ -11,7 +11,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a|ab)(c|bcd)(d*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_1() {
@@ -23,7 +23,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a|ab)(bcd|c)(d*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_2() {
@@ -35,7 +35,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(ab|a)(c|bcd)(d*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_3() {
@@ -47,7 +47,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(ab|a)(bcd|c)(d*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_4() {
@@ -59,7 +59,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a*)(b|abc)(c*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_5() {
@@ -71,7 +71,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a*)(abc|b)(c*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_6() {
@@ -83,7 +83,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a*)(b|abc)(c*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_7() {
@@ -95,7 +95,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a*)(abc|b)(c*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_8() {
@@ -107,7 +107,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a|ab)(c|bcd)(d|.*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_9() {
@@ -119,7 +119,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(a|ab)(bcd|c)(d|.*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_10() {
@@ -131,7 +131,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(ab|a)(c|bcd)(d|.*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
     function data_for_test_att_rightassoc_11() {
@@ -143,7 +143,7 @@ class qtype_preg_cross_tests_from_att_rightassoc {
 
         return array( 'regex'=>"(ab|a)(bcd|c)(d|.*)",
                       'tests'=>array($test1),
-                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_TAG_ASSOC_RIGHT));
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T, qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
     }
 
 }
