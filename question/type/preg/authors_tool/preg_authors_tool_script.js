@@ -1,5 +1,5 @@
 /**
- * 
+ * Script for button "Check", "Back" and push in interactive tree
  * 
  * @copyright &copy; 2012  Terechov Grigory
  * @author Terechov Grigory, Volgograd State Technical University
@@ -8,68 +8,64 @@
  */
 YUI().use('node', 'io-base',function (Y) {
 
-    //Y.one('body').setStyle('width','1000px').setStyle('max-width','1000px').setStyle('overflow-x','hidden');
-    //Y.one('#tree_handler').setStyle('overflow','auto');
-    //Y.one('#graph_handler').setStyle('overflow','auto');
-
     var node = Y.one('#id_regex_check');
     var context = Y.one('#id_regex_text');
     
     var back = Y.one('#id_regex_back');
     var hidden = Y.one('#hidden_id');
 
-    //TODO: test this function
     var back_regex = function( e ) {
         
-       e.preventDefault();
+        e.preventDefault();
        
-       /*var tmp = encodeURIComponent(context.get("value"));
-       //alert(tmp);
-       id_edit = Y.one('#hidden_id').get("value");
-       //window.parent.document.getElementsById(id_edit).value = tmp;
-       alert(id_edit);
-       Y.one(window.parent.getElemetById(id_edit).set('value',tmp));*/
-       
-        new_regex = Y.one(context).get('value');
-        alert(hidden.getAttribute("value"));
-        Y.one('#' + hidden.getAttribute("value")).set('value',new_regex);
+        var new_regex = Y.one(context).get('value');
+        current_line_edit.set('value',new_regex);
         dialog.hide();
+        
+        //TODO: call OK button
+        //dialog.onOK();
 
     }
 
     function highlight_description(id){
-       const highlighted_class = 'description_highlighted';
-       var old_highlighted = Y.one('.'+highlighted_class);
-       if(old_highlighted!=null){
+        
+        const highlighted_class = 'description_highlighted';
+        var old_highlighted = Y.one('.'+highlighted_class);
+        
+        if(old_highlighted!=null){
            old_highlighted.removeClass(highlighted_class).setStyle('background-color','transparent');
-       }
-       Y.one('.description_node_'+id).addClass(highlighted_class).setStyle('background-color','yellow');
+        }
+        
+        Y.one('.description_node_'+id).addClass(highlighted_class).setStyle('background-color','yellow');
     }
     
     var check_regex = function( e ) {
         
-       e.preventDefault();
-       
-       //alert(encodeURIComponent(this.get("value")));
-       var tmp = encodeURIComponent(this.get("value"));
-       //alert(tmp);
-       //document.write(this.get("value"));
+        e.preventDefault();
         
-       //Y.one('html').load('http://localhost/moodle/question/type/preg/authors_loot/ast_preg_form.php?regex='+tmp+'&id=-1');
+        load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value'))+'&id=-1');
+    }    
+    
+    check_tree = function( e ) {
+
+       id = e.currentTarget.getAttribute ( 'id' );
+       //alert(id);
+       highlight_description(id);
+        
+       /*var tmp = encodeURIComponent(context.get("value"));
        
-       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=-1' + '&id_line_edit=' + hidden.getAttribute("value");
-       Y.one('#id_tree').setAttribute('src','');
+       var url = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=' + id;
+       Y.io(url);
        Y.one('#id_graph').setAttribute('src','');
-       window.location.assign(url);
-
-       /*var cfg = {
-           method: 'POST',
-       };
-       Y.io(uri, cfg);*/
-
+       setTimeout(function() {
+           Y.one('#id_graph').setAttribute('src', preg_www_root + '/question/type/preg/tmp_img/graph.png');
+           //TODO: implement for tree and map
+           }, 500);*/
+       //Y.one('#id_graph').setAttribute('src','').setAttribute('src','http://localhost/moodle/question/type/preg/tmp_img/graph.png');
+       
+       load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value')) + '&id=' + id);
     }
     
-
     if(node!=null){
        node.on("click", check_regex, context);
     }
@@ -78,23 +74,5 @@ YUI().use('node', 'io-base',function (Y) {
        back.on("click", back_regex, hidden);
     }
     
-    Y.all("#_anonymous_0 > area").on('click',function( e ) {
-       //document.write('sadsadsa');
-       id = e.currentTarget.getAttribute ( 'id' );
-       highlight_description(id);
-       // тут надо вызвать php скрипт чтобы сгенерились новые картинки
-       //Y.one('#id_of_tree').setAttribute('src','').setAttribute('src','new_url');
-       //Y.one('#id_of_graph').setAttribute('src','').setAttribute('src','new_url');
-        
-       var tmp = encodeURIComponent(context.get("value"));
-       //alert(id);
-       
-       var url = 'http://localhost/moodle/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=' + id + '&id_line_edit=' + hidden.getAttribute("value");
-       Y.io(url);
-       Y.one('#id_graph').setAttribute('src','');
-       setTimeout(function() { 
-           Y.one('#id_graph').setAttribute('src','http://localhost/moodle/question/type/preg/tmp_img/graph.png'); 
-           }, 500);
-       //Y.one('#id_graph').setAttribute('src','').setAttribute('src','http://localhost/moodle/question/type/preg/tmp_img/graph.png');
-    });
+    Y.all("#_anonymous_0 > area").on('click', check_tree);
 });
