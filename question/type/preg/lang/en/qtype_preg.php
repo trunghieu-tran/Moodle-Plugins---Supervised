@@ -253,7 +253,7 @@ $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]
 $string['description_subpattern_name'] = 'subpattern "%name": [%1]';
 $string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
 //TYPE_NODE_COND_SUBPATT
-$string['description_node_cond_subpatt'] = 'if [%cond] then check: [%1]%else';
+$string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
 $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
 $string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
 $string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
@@ -298,7 +298,6 @@ $string['description_char_t'] = 'tabulation';
 $string['description_char_n'] = 'newline(LF)';
 $string['description_char_r'] = 'carriage return character';
 $string['description_char_16value'] = 'character with hex code %code';
-//$string['description_char_neg'] = 'not <span style="color:red">%char</span>';
 $string['description_charflag_digit'] = 'decimal digit';
 $string['description_charflag_xdigit'] = 'hexadecimal digit';
 $string['description_charflag_space'] = 'white space';
