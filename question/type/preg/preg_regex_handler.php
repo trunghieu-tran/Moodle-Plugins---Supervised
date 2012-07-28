@@ -74,6 +74,14 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Sets regex options.
+     * @param options an object containing options to handle the regex.
+     */
+    public function set_options($options) {
+        $this->options = $options;
+    }
+
+    /**
      * Parses the regex and does all necessary preprocessing.
      * @param string regex - regular expression to handle.
      * @param string modifiers - modifiers of the regular expression.
@@ -104,7 +112,7 @@ class qtype_preg_regex_handler {
 
         $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
-        $this->options = $options;
+        $this->set_options($options);
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
@@ -265,8 +273,9 @@ class qtype_preg_regex_handler {
         foreach($parseerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
+        // Set the AST root anyway, but the DST root only of there are no errors.
+        $this->ast_root = $this->parser->get_root();
         if (count($this->errors) === 0) {
-            $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
         }
