@@ -111,6 +111,7 @@ class qtype_preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
+            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subpatterns
         } else {
             $this->ast_root = null;
             //In case with no parsing we should stick to accepting whole regex, not nodes
