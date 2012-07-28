@@ -264,4 +264,28 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }*/
+    
 }
+
+class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {    
+    /**
+     * @dataProvider form_provider
+     */
+    public function test_form($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        $result = $handler->form_description('g');
+        $this->assertEquals($result, $expected);
+    }
+    
+    public function form_provider()
+    {
+        return array(
+          array('a','<span style="color:blue">a</span>(form g)'),
+          array('\w','word character(form g)'),
+          array('$','end of the string(form g)'),
+          array('a|bc|','<span style="color:blue">a</span>(form g) or <span style="color:blue">b</span>(form g)<span style="color:blue">c</span>(form g) or nothing(form g)'),
+        );
+    }
+}
+

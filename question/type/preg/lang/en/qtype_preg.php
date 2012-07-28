@@ -446,6 +446,15 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
+//for testing
+$string['description_charflag_word_g'] = 'word character(form g)';//for testing only
+$string['description_char_g'] = '<span style="color:blue">%char</span>(form g)';//for testing only
+$string['description_dollar_g'] = 'end of the string(form g)';//for testing
+$string['description_concat_g'] = '%g1 then %g2';
+$string['description_concat_short_g'] = '%g1%g2';
+$string['description_alt_g'] = '%g1 or %g2';
+$string['description_alt_wcomma_g'] = '%g1 or %g2';
+$string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
 
