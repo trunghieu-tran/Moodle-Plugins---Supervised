@@ -362,14 +362,27 @@ class qtype_preg_lexer extends JLexBase  {
             // Missing ending character.
             return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $pos, $pos + $length - 1, $text));
         } else {
-            $this->push_opt_lvl();
             $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
             if ($name === '') {
                 // Name is empty.
                 return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
             } else {
-                $num = (int)$this->map_subpattern($name);
-                $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
+                $error = null;
+                $num = (int)$this->map_subpattern($name, $error);
+                if ($error !== null) {
+                    return $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+                }
+                // Are we inside a (?| group?
+                if ($this->optstack[$this->optcount - 1]->subpattnum !== -1 && $this->optcount > 0) {
+                    if ($this->optstack[$this->optcount - 1]->subpattname === null) {
+                        // First occurence of a named subpattern inside a (?| group.
+                        $this->optstack[$this->optcount - 1]->subpattname = $name;
+                    } else if ($this->optstack[$this->optcount - 1]->subpattname !== $name) {
+                        // Error: different names for subpatterns of the same number.
+                        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, $pos, $pos + $length - 1, $text));
+                    }
+                }
+                $this->push_opt_lvl();
                 return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, $text, $num));
             }
         }
@@ -589,6 +602,7 @@ class qtype_preg_lexer extends JLexBase  {
                 $this->optstack[$this->optcount]->subpattnum = $subpattnum;
                 $this->optstack[$this->optcount]->parennum = $this->optcount;
             }
+            $this->optstack[$this->optcount]->subpattname = null;   // Reset it anyway.
             $this->optcount++;
         } // Else the error will be found in parser, lexer does nothing for this error (closing unopened bracket).
     }
@@ -596,12 +610,14 @@ class qtype_preg_lexer extends JLexBase  {
         if ($this->optcount > 0) {
             $item = $this->optstack[$this->optcount - 1];
             $this->optcount--;
-            // Is it a pair for (?|
+            // Is it a pair for some opening paren?
             if ($item->parennum === $this->optcount) {
                 // Are we out of a (?|...) block?
                 if ($this->optstack[$this->optcount - 1]->subpattnum !== -1) {
+                    // Inside.
                     $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;    // Reset subpattern numeration.
                 } else {
+                    // Outside.
                     $this->lastsubpatt = $this->maxsubpatt;
                 }
             }
@@ -612,14 +628,18 @@ class qtype_preg_lexer extends JLexBase  {
      * @param name subpattern to be mapped.
      * @return number of this named subpattern.
      */
-    protected function map_subpattern($name) {
+    protected function map_subpattern($name, &$error) {
         if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
             $this->subpatternmap[$name] = (int)$num;
         } else {                                                // Subpatterns with same names should have same numbers.
             $num = $this->subpatternmap[$name];
-            // TODO check if we are inside a (?|...) group.
+            $this->lastsubpatt++;
+            if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum === -1) {
+                $error = $this->form_error($name, qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, $this->yychar, $this->yychar + $this->yylength() - 1, $name);
+            }
         }
+        $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
         return $num;
     }
     /**
@@ -707,22 +727,23 @@ class qtype_preg_lexer extends JLexBase  {
         parent::__construct($stream);
         $this->yy_lexical_state = self::YYINITIAL;
 
-    $this->matcher                 = null;
-    $this->errors                  = array();
-    $this->lastsubpatt             = 0;
-    $this->maxsubpatt              = 0;
-    $this->subpatternmap           = array();
-    $this->backrefs                = array();
-    $this->optstack                = array();
-    $this->optstack[0]             = new stdClass;
-    $this->optstack[0]->i          = false;
-    $this->optstack[0]->subpattnum = -1;
-    $this->optstack[0]->parennum   = -1;
-    $this->optcount                = 1;
-    $this->charset                 = null;
-    $this->charsetcount            = 0;
-    $this->charsetset              = '';
-    $this->charsetuserinscription  = '';
+    $this->matcher                  = null;
+    $this->errors                   = array();
+    $this->lastsubpatt              = 0;
+    $this->maxsubpatt               = 0;
+    $this->subpatternmap            = array();
+    $this->backrefs                 = array();
+    $this->optstack                 = array();
+    $this->optstack[0]              = new stdClass;
+    $this->optstack[0]->i           = false;
+    $this->optstack[0]->subpattnum  = -1;
+    $this->optstack[0]->subpattname = null;
+    $this->optstack[0]->parennum    = -1;
+    $this->optcount                 = 1;
+    $this->charset                  = null;
+    $this->charsetcount             = 0;
+    $this->charsetset               = '';
+    $this->charsetuserinscription   = '';
     }
 
     private function yy_do_eof () {

@@ -1475,14 +1475,14 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_MISSING_SUBPATT_ENDING       = 'missing_subpatt_name_ending_node_error';      // Missing subpattern name ending.
     const SUBTYPE_MISSING_BACKREF_ENDING       = 'missing_backref_name_ending_node_error';      // Missing backreference name ending.
     const SUBTYPE_MISSING_BACKREF_BEGINNING    = 'missing_backref_name_beginning_node_error';   // Missing backreference name beginning.
-    const SUBTYPE_WRONG_CONDSUBPATT_NUMBER     = 'wrong_condsubpatt_number_node_error';         //
+    const SUBTYPE_WRONG_CONDSUBPATT_NUMBER     = 'wrong_condsubpatt_number_node_error';         // Wrong conditional subpattern number, digits expected.
     const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      //
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
     const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       // Invalid condition (?(0).
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';               // Too big number in (?C...).
-    const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          //
+    const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          // Two named subpatterns have the same name.
     const SUBTYPE_BACKREF_TO_ZERO              = 'backref_to_zero_error';                       // Backreference to the whole expression.
-    const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          //
+    const SUBTYPE_DIFFERENT_SUBPATT_NAMES      = 'different_subpatt_names_node_error';          // Different subpattern names for subpatterns of the same number.
     const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
     const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
