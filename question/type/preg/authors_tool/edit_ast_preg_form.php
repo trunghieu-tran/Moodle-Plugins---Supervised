@@ -35,7 +35,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         
         //$PAGE->requires->js('/question/type/preg/authors_tool/author_tool.js');
         $mform->addElement('html', '<div id="script_test"><script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script></div>');
-        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
+        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="'.$CFG->wwwroot.'/question/type/preg/authors_tool/preg_authors_tool_script.js" ></script></div>');
         
         //Add header
         $mform->addElement('html', '<div align="center"><h2>Test regex</h2></div>');
@@ -74,10 +74,8 @@ class qtype_preg_authors_tool_form extends moodleform {
             qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
                         
             //Add generated images
-            $mform->addElement('html', '<div id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" /></div></br>');
-            //$mform->addElement('html', '<div id="tree_handler"><iframe frameborder="0" src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
-            //$mform->addElement('html', '<div id="tree_handler"><iframe frameborder="0" srcdoc="<img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" />" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
-            
+            $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="tree_handler"><img src="' . $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png" id="id_tree" usemap="_anonymous_0" alt="Build tree..." /></div></br>');
+
             //Add graph
             $mform->addElement('header', 'regex_graph_header', 'Graph');
             $mform->addHelpButton('regex_graph_header','regex_graph_header','qtype_preg');
@@ -89,8 +87,7 @@ class qtype_preg_authors_tool_form extends moodleform {
             
             qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
              
-            $mform->addElement('html', '<div id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" /></div></br>');
-            //$mform->addElement('html', '<div id="graph_handler"><iframe frameborder="0" src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" width="100%" height="overload:auto" align="left">Your browzer is not supporting iframe!</iframe></div></br>');
+            $mform->addElement('html', '<div style="width:950px;max-height:350px;overflow:auto;position:relative" id="graph_handler"><img src="' . $CFG->wwwroot . '/question/type/preg/tmp_img/graph.png" id="id_graph" alt="Build graph..." /></div></br>');
             
             //Add generated maps   
             $tree_map ='';//tag <map>
@@ -118,6 +115,7 @@ class qtype_preg_authors_tool_form extends moodleform {
             
         } else {
             
+            //TODO:fix bag and update to new version
             $mform->setDefault('regex_text', 'input regex');//Add regex in line edit
             
             //Add tree
