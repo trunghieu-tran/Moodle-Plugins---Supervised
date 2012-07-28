@@ -226,7 +226,8 @@ class qtype_preg_question extends question_graded_automatically
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $hintgradeborder) {
                     $bestfitanswer = $answer;
-                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
+                    $hintneeded = ($this->usecharhint || $this->uselexemhint);//We already know that $answer->fraction >= $hintgradeborder.
+                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
                     $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
                         $maxfitness = (-1)*$bestmatchresult->left;
@@ -241,7 +242,8 @@ class qtype_preg_question extends question_graded_automatically
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
         $full = false;
         foreach ($this->answers as $answer) {
-            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
+            $hintneeded = ($this->usecharhint || $this->uselexemhint) && $answer->fraction >= $hintgradeborder;
+            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
             $matchresults = $matcher->match($response['answer']);
 
             //Check full match.
@@ -312,10 +314,11 @@ class qtype_preg_question extends question_graded_automatically
     @param $exact bool exact macthing mode
     @param $usecase bool case sensitive mode
     @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
-    @param $notation notation, in which regex is written
+    @param $notation string notation, in which regex is written
+    @param $hintpossible boolean whether hint possible for specified answer
     @return matcher object
     */
-    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native') {
+    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native', $hintpossible = true) {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
@@ -342,15 +345,15 @@ class qtype_preg_question extends question_graded_automatically
             //Modify regex according with question properties
             $for_regexp=$regex;
             if ($exact) {
-                //Grouping is needed in case regexp contains top-level alternatives
-                //use non-capturing grouping to not mess-up with user subpattern capturing
+                //Grouping is needed in case regexp contains top-level alternatives.
+                //Use non-capturing grouping to not mess-up with user subpattern capturing.
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
             //Create and fill options object
             $matchingoptions = new qtype_preg_matching_options;
             //We need extension to hint next character or to generate correct answer if none is supplied
-            $matchingoptions->extensionneeded = $this->usecharhint || trim($this->correctanswer) == '';
+            $matchingoptions->extensionneeded = $this->usecharhint || $this->uselexemhint || trim($this->correctanswer) == '';
             if($answerid !== null && $answerid > 0) {
                 $feedback = $this->answers[$answerid]->feedback;
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
@@ -359,7 +362,19 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
-            if ($answerid !== null) {
+
+            if ($matcher->is_error_exists() && !$hintpossible && $engine != 'php_preg_matcher') {
+                //Custom engine can't handle regex and hints not needed, let's try preg_match instead.
+                $engine = 'php_preg_matcher';
+                require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
+                $engineclass = 'qtype_preg_'.$engine;
+                $newmatcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
+                if (!$newmatcher->is_error_exists()) {//We still prefer to show error messages from custom engine, since they are much more detailed.
+                    $matcher = $newmatcher;
+                }
+            }
+
+            if ($answerid !== null) {//Cache created matcher
                 $this->matchers_cache[$answerid] = $matcher;
             }
         }
