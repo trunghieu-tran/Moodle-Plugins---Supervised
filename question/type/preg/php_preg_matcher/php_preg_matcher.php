@@ -40,8 +40,12 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     * @return bool if parsing needed
     */
     protected function is_parsing_needed() {
-        //no parsing needed
-        return false;
+        //We need parsing if option is set for capture subpatterns.
+        return $this->options->capturesubpatterns;
+    }
+
+    protected function is_preg_node_acceptable($pregnode) {
+        return true;    // We actually need tree only for subpatterns, so accept anything.
     }
 
     /**
@@ -70,7 +74,8 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     protected function match_inner($str) {
         //Prepare results
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->invalidate_match($this->get_max_subpattern());
+        $matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());//Needed to invalidate match correctly.
+        $matchresults->invalidate_match();
 
         //Preparing regexp
         $for_regexp = $this->regex;

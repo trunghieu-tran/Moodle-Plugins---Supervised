@@ -221,7 +221,6 @@ class qtype_preg_question extends question_graded_automatically
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
-        $bestmatchresult = new qtype_preg_matching_results();
         if ($ispartialmatching) {
             foreach ($this->answers as $answer) {
                 if ($answer->fraction >= $hintgradeborder) {
@@ -237,6 +236,9 @@ class qtype_preg_question extends question_graded_automatically
                     break;//Any one that fits border helps
                 }
             }
+        } else {//Just use first answer and not bother with maxfitness. But we still should fill $bestmatchresults from matcher to correctly fill matching results arrays.
+            $matcher = $this->get_matcher($this->engine, $bestfitanswer->answer, $this->exactmatch, $this->usecase, $bestfitanswer->id, $this->notation);
+            $bestmatchresult = $matcher->match($response['answer']);
         }
 
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
@@ -475,25 +477,16 @@ class qtype_preg_question extends question_graded_automatically
 
         $answer = $response['answer'];
 
-        //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
-        // c.f. failed test in simpletest/testquestion.php
-
-        if ($matchresults->is_match()) {
-            foreach ($matchresults->all_subpatterns() as $i) {
-                $search = '{$'.$i.'}';
-                $startindex = $matchresults->index_first($i);
-                $length = $matchresults->length($i);
-                if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
-                } else {
-                    $replace = '';
-                }
-                $subject = str_replace($search, $replace, $subject);
+        foreach ($matchresults->all_subpatterns() as $i) {
+            $search = '{$'.$i.'}';
+            $startindex = $matchresults->index_first($i);
+            $length = $matchresults->length($i);
+            if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
+            } else {
+                $replace = '';
             }
-        } else {
-            //No match, so no feedback should be shown.
-            //It is possible to have best fit answer with no match to hint first character from first answer for which hint is possible.
-            $subject = '';
+            $subject = str_replace($search, $replace, $subject);
         }
 
         return $subject;
@@ -517,6 +510,7 @@ class qtype_preg_question extends question_graded_automatically
 
         return parent::make_behaviour($qa, $preferredbehaviour);
      }
+
     /**
     * Returns an array of available specific hint types
     */
