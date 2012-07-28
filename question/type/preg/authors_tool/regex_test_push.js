@@ -10,12 +10,16 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
     
     var testfoo = function( e ) {
         
-        e.preventDefault();
-        
+       e.preventDefault();
+       
+        var page_regex_auth_helper_height = 1000;
+        var page_regex_auth_helper_width = 1000;
+        var page_regex_auth_helper_adr = 'http://localhost:41835/question/type/preg/authors_tool/ast_preg_form.php?regex='+encodeURIComponent(this.get('value'));
         var dialog = new Y.Panel({
             contentBox : Y.Node.create('<div id="dialog" />'),
-            bodyContent: '<div class="message icon-warn">'+this.get("value")+'</div>',
-            width      : 1000,
+            bodyContent: '<div id="page_regex_auth_helper_iframe_holder" style="position:relative;background-color:white;overflow:hidden"><iframe frameborder="0" src="'+page_regex_auth_helper_adr+'" width="100%" height="95%" align="left">Your browzer is not supporting iframe!</iframe></div>',
+            width      : page_regex_auth_helper_width,
+            height     : page_regex_auth_helper_height,
             zIndex     : 120,
             centered   : true,
             modal      : true, // modal behavior
@@ -44,6 +48,7 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
             // the callback is not executed, and is
             // callback reference removed, so it won't persist
             this.callback = false;
+            //Y.one('#tree_img').setAttribute('src','');
         }
 
         dialog.onOK = function (e) {
@@ -55,9 +60,12 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
             }  
             //  callback reference removed, so it won't persist
             this.callback = false;
+            //Y.one('#tree_img').setAttribute('src','');
         }
         
-        Y.one('#dialog .message').load('http://localhost:62774/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
+        var iframeheight = document.getElementById('page_regex_auth_helper_iframe_holder').contentWindow.document.body.scrollHeight;
+        Y.one('#page_regex_auth_helper_iframe_holder').setStyle ( 'height',  iframeheight+'' );
+        //Y.one('#dialog .message').load('http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
     }
 
     var i=0;
@@ -66,9 +74,10 @@ YUI().use('node', 'panel', 'node-load', function (Y) {
     while(node!=null){
         node = Y.one('#id_regextest_'+i);
         context = Y.one('#id_answer_'+i);
-        node.on("click", testfoo, context);
+        if(node!=null){
+            node.on("click", testfoo, context);
+        }
         ++i;
     }
     
 });
-
