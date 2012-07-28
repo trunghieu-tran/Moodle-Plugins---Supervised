@@ -12,24 +12,30 @@ YUI().use('node', 'io-base',function (Y) {
     //Y.one('#tree_handler').setStyle('overflow','auto');
     //Y.one('#graph_handler').setStyle('overflow','auto');
 
+    var node = Y.one('#id_regex_check');
+    var context = Y.one('#id_regex_text');
+    
+    var back = Y.one('#id_regex_back');
+    var hidden = Y.one('#hidden_id');
 
     //TODO: test this function
     var back_regex = function( e ) {
         
        e.preventDefault();
        
-       var tmp = encodeURIComponent(context.get("value"));
+       /*var tmp = encodeURIComponent(context.get("value"));
        //alert(tmp);
        id_edit = Y.one('#hidden_id').get("value");
        //window.parent.document.getElementsById(id_edit).value = tmp;
        alert(id_edit);
-       Y.one(window.parent.getElemetById(id_edit).set('value',tmp));
+       Y.one(window.parent.getElemetById(id_edit).set('value',tmp));*/
        
-       dialog.onOK();
+        new_regex = Y.one(context).get('value');
+        alert(hidden.getAttribute("value"));
+        Y.one('#' + hidden.getAttribute("value")).set('value',new_regex);
+        dialog.hide();
 
     }
-    
-
 
     function highlight_description(id){
        const highlighted_class = 'description_highlighted';
@@ -63,14 +69,11 @@ YUI().use('node', 'io-base',function (Y) {
 
     }
     
-    var node = Y.one('#id_regex_check');
-    var context = Y.one('#id_regex_text');
+
     if(node!=null){
        node.on("click", check_regex, context);
     }
     
-    var back = Y.one('#id_regex_back');
-    var hidden = Y.one('#hidden_id');
     if(back!=null){
        back.on("click", back_regex, hidden);
     }
