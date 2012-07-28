@@ -178,5 +178,13 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[9]->index_last == 23);
         $this->assertTrue($errors[10]->index_first == 8); // Wrong opening paren.
         $this->assertTrue($errors[10]->index_last == 8);
+        $handler = new qtype_preg_regex_handler('(?z)a(b)\1\2');
+        $errors = $handler->get_error_objects();
+        $this->assertTrue(count($errors) == 2);
+        $this->assertTrue($errors[0]->index_first == 0);  // Wrong modifier.
+        $this->assertTrue($errors[0]->index_last == 3);
+        $this->assertTrue($errors[1]->index_first == 10); // Backreference to unexisting subpattern.
+        $this->assertTrue($errors[1]->index_last == 11);
+
     }
 }

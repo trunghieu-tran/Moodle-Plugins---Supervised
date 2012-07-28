@@ -1,7 +1,5 @@
 <?php
 
-defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-
 class qtype_preg_cross_tests_from_att_forcedassoc {
 
     function data_for_test_att_forcedassoc_0() {
@@ -9,13 +7,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1),
-                        'length'=>array(0=>4,1=>1,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>1,2=>3));
 
         return array( 'regex'=>"(a|ab)(c|bcd)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_1() {
@@ -23,13 +19,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1),
-                        'length'=>array(0=>4,1=>1,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>1,2=>3));
 
         return array( 'regex'=>"(a|ab)(bcd|c)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_2() {
@@ -37,13 +31,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1),
-                        'length'=>array(0=>4,1=>1,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>1,2=>3));
 
         return array( 'regex'=>"(ab|a)(c|bcd)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_3() {
@@ -51,13 +43,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1),
-                        'length'=>array(0=>4,1=>1,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>1,2=>3));
 
         return array( 'regex'=>"(ab|a)(bcd|c)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_4() {
@@ -65,13 +55,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>4),
-                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0));
 
         return array( 'regex'=>"((a|ab)(c|bcd))(d*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_5() {
@@ -79,13 +67,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>4),
-                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0));
 
         return array( 'regex'=>"((a|ab)(bcd|c))(d*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_6() {
@@ -93,13 +79,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>4),
-                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0));
 
         return array( 'regex'=>"((ab|a)(c|bcd))(d*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_7() {
@@ -107,13 +91,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1,4=>4),
-                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>4,2=>1,3=>3,4=>0));
 
         return array( 'regex'=>"((ab|a)(bcd|c))(d*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_8() {
@@ -121,13 +103,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2,3=>2,4=>3),
-                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a|ab)((c|bcd)(d*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_9() {
@@ -135,13 +115,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2,3=>2,4=>3),
-                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a|ab)((bcd|c)(d*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_10() {
@@ -149,13 +127,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2,3=>2,4=>3),
-                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(ab|a)((c|bcd)(d*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_11() {
@@ -163,13 +139,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2,3=>2,4=>3),
-                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>4,1=>2,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(ab|a)((bcd|c)(d*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_12() {
@@ -177,13 +151,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>0,2=>3));
 
         return array( 'regex'=>"(a*)(b|abc)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_13() {
@@ -191,13 +163,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>0,2=>3));
 
         return array( 'regex'=>"(a*)(abc|b)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_14() {
@@ -205,13 +175,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>3),
-                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0));
 
         return array( 'regex'=>"((a*)(b|abc))(c*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_15() {
@@ -219,13 +187,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>3),
-                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0));
 
         return array( 'regex'=>"((a*)(abc|b))(c*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_16() {
@@ -233,13 +199,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a*)((b|abc)(c*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_17() {
@@ -247,13 +211,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a*)((abc|b)(c*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_18() {
@@ -261,13 +223,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>0,2=>3));
 
         return array( 'regex'=>"(a*)(b|abc)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_19() {
@@ -275,13 +235,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
-                        'length'=>array(0=>3,1=>0,2=>3),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>0,2=>3));
 
         return array( 'regex'=>"(a*)(abc|b)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_20() {
@@ -289,13 +247,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>3),
-                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0));
 
         return array( 'regex'=>"((a*)(b|abc))(c*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_21() {
@@ -303,13 +259,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>0,4=>3),
-                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>3,2=>0,3=>3,4=>0));
 
         return array( 'regex'=>"((a*)(abc|b))(c*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_22() {
@@ -317,13 +271,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a*)((b|abc)(c*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_23() {
@@ -331,13 +283,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>1,4=>2),
-                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>3,1=>1,2=>2,3=>1,4=>1));
 
         return array( 'regex'=>"(a*)((abc|b)(c*))",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_24() {
@@ -345,13 +295,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>2,1=>2),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>2,1=>2));
 
         return array( 'regex'=>"(a|ab)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_25() {
@@ -359,13 +307,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>2,1=>2),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>2,1=>2));
 
         return array( 'regex'=>"(ab|a)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_26() {
@@ -373,13 +319,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2),
-                        'length'=>array(0=>2,1=>2,2=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>2,1=>2,2=>0));
 
         return array( 'regex'=>"(a|ab)(b*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
 
     function data_for_test_att_forcedassoc_27() {
@@ -387,12 +331,11 @@ class qtype_preg_cross_tests_from_att_forcedassoc {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>2),
-                        'length'=>array(0=>2,1=>2,2=>0),
-                        'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
-                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                        'length'=>array(0=>2,1=>2,2=>0));
 
         return array( 'regex'=>"(ab|a)(b*)",
-                      'tests'=>array($test1));
+                      'tests'=>array($test1),
+                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
+
 }

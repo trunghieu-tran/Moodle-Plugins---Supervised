@@ -5,8 +5,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
-defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-
 class qtype_preg_cross_tests_future {
 
     // From NFA.
