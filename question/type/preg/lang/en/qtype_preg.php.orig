@@ -228,16 +228,17 @@ $string['description_nlb_node_assert'] = 'preceding text should not match: [%1]'
 //TYPE_NODE_SUBPATT
 $string['description_subpattern'] = 'subpattern #%number: [%1]';
 $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
+$string['description_subpattern_name'] = 'subpattern "%name": [%1]';
+$string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
 //TYPE_NODE_COND_SUBPATT
-$string['description_pla_node_cond_subpatt'] = 'if the further text matches [%1] then check: [%2] else check: [%3]';
-$string['description_nla_node_cond_subpatt'] = 'if the further text does not match [%1] then check: [%2] else check: [%3]';
-$string['description_plb_node_cond_subpatt'] = 'if the preceding text matches [%1] then check: [%2] else check: [%3]';
-$string['description_nlb_node_cond_subpatt'] = 'if the preceding text does not match [%1] then check: [%2] else check: [%3]';
-$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%2] else check: [%3]';
-$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%2] else check: [%3]';
-$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%2] else check: [%3]';
-$string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%2] else check: [%3]';
-$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%2] else check: [%3]';
+$string['description_node_cond_subpatt'] = 'if [%cond] then check: [%1]%else';
+$string['description_node_cond_subpatt_else'] = ' else check: [%2]';
+$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
+$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
+$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%1]%else';
+$string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%1]%else';
+$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
+$string['description_define_node_cond_subpatt'] = 'definition of %1';
 //TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
@@ -424,3 +425,29 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
+
+//This is string for authors tool
+$string['regex_edit_header'] = 'Input regex';
+$string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_tree_header'] = 'Interactive tree';
+$string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_header'] = 'Explaining graph';
+$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_description_header'] = 'Description';
+$string['regex_description_header_help'] = 'Here you can see description of regular expression.';
+$string['regex_match_header'] = 'Input string for check';
+$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
+
+// Strings for explaining graph
+
+$string['explain_subpattern'] = 'subpattern #';
+$string['explain_backref'] = 'the result of subpattern #';
+$string['explain_recursion'] = 'recursion';
+$string['explain_unknow_node'] = 'unknow node';
+$string['explain_unknow_meta'] = 'unknow meta';
+$string['explain_unknow_assert'] = 'unknow assert';
+$string['explain_unknow_charset_flag'] = 'unknow charset flag';
+$string['explain_tab'] = 'tabulation';
+$string['explain_not'] = 'not ';
+$string['explain_quote'] = 'quote';
+$string['explain_slash'] = 'slash';
