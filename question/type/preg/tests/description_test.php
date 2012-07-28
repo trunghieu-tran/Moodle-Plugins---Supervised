@@ -172,13 +172,13 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     {
         return array(
           array('g{,1}','<span style="color:blue">g</span> may be missing'),
-          array('g+','dg'),
-          array('g*','jh'),
-          array('g?','dg'),
-          array('g{0,1}','jh'),
-          array('g{0,}','dg'),
-          array('g{1,}','jh'),
-          array('g{2,5}','dg'),
+          array('g+','<span style="color:blue">g</span> is repeated any number of times'),
+          array('g*','<span style="color:blue">g</span> is repeated any number of times or missing'),
+          array('g?','<span style="color:blue">g</span> may be missing'),
+          array('g{0,1}','<span style="color:blue">g</span> may be missing'),
+          array('g{0,}','<span style="color:blue">g</span> is repeated any number of times or missing'),
+          array('g{1,}','<span style="color:blue">g</span> is repeated any number of times'),
+          array('g{2,5}','<span style="color:blue">g</span> is repeated from 2 to 5 times'),
         );
     }
     
@@ -200,7 +200,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
         //var_dump($handler);
         $result = $handler->default_description();
-        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated at least 1 times</span></span>'; 
+        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
         $this->assertEquals($result, $expected);
     }
     

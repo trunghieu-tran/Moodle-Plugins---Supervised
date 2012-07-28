@@ -627,7 +627,7 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
         if($this->pregnode->leftborder===0){
             $pattern_t = self::get_form_string('description_infinite_quant_0',$form);
         }
-        else if ($this->pregnode->leftborder===0) {
+        else if ($this->pregnode->leftborder===1) {
             $pattern_t = self::get_form_string('description_infinite_quant_1',$form);
         }
         else {
