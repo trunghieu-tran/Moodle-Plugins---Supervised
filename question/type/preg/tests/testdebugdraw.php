@@ -34,7 +34,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_draw_ast() {
-        $parser = $this->run_parser('(ab|cd*$|){3,100}');
+        $parser = $this->run_parser('(ab|[^c][de]*$|){3,100}');
         $root = $parser->get_root();
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nodes');

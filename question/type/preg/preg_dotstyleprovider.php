@@ -36,7 +36,7 @@ class qtype_preg_dot_style_provider {
             case qtype_preg_node::TYPE_LEAF_CHARSET: {
                 if ($pregnode->negative) {
                     $label = '[^' . $label . ']';
-                } else {
+                } else if (qtype_poasquestion_string::strlen($label) > 1) {
                     $label = '[' . $label . ']';
                 }
                 return "[label = \"$label\", tooltip = \"character class\", shape = rectangle, id = $id]";
