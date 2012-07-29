@@ -42,6 +42,11 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
         $dotscript = $root->dot_script($styleprovider);
         $dotscript = $styleprovider->select_subtree($dotscript, 8);
         qtype_preg_regex_handler::execute_dot($dotscript, 'png', $dir . 'ast_test.png');
+
+        $str = '<img src="data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png')) . '"/>';
+        $file = fopen($dir . 'testdrawhtml.html', 'w');
+        fwrite($file, $str);
+        fclose($file);
     }
     /*function test_simple() {//[asdf]
         $this->matcher->input_fa('0->asdf->1;');
