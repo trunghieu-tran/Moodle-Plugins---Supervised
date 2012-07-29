@@ -20,12 +20,11 @@ class qtype_preg_dot_style_provider {
         if (is_array($pregnode->userinscription)) {
             $label = '';
             foreach ($pregnode->userinscription as $tmp) {
-                $label .= $tmp;
+                $label .= addslashes($tmp);
             }
         } else {
             $label = $pregnode->userinscription;
         }
-        $label = $label;
         $id = $pregnode->id;
 
         // Now the label is ready, just return the appropriate style for node type and subtype.
