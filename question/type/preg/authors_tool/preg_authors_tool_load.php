@@ -13,10 +13,7 @@
 require_once(dirname(__FILE__) . '/../../../../config.php');
 
 global $CFG;
-//require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
-//require_once($CFG->dirroot.'/question/type/preg/question.php');
-//require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
@@ -57,24 +54,6 @@ class preg_authors_tool_load {
                 $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
                 $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
                 
-                /*qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
-                qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
-                
-                $tree_map ='';//tag <map>                 
-                $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');//Open and read tag <map> from file
-                
-                if($tree_handle){//If tree.cmapx is open
-                    while (!feof($tree_handle)) {
-                        $tree_map .= fgets($tree_handle);
-                    }
-                    fclose($tree_handle);
-                } else {
-                    $tree_map = 'Error read map file from disk!';
-                }
-
-                $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png';//Add tree
-                $json_array['map'] = $tree_map;//Add map*/
-                
             } else {
                 $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_err.png';
             }
@@ -107,16 +86,12 @@ class preg_authors_tool_load {
                 }
             }
             
-            if($pars_error === false && $tmp_graph->get_ast_root() !== NULL) {
+            if($pars_error === false && $tmp_graph->get_ast_root() !== NULL && $tmp_graph->get_dst_root() !== NULL) {
                 
                 $graph = $tmp_graph->create_graph($id);
                 $dot_instructions_graph = $graph->create_dot();
                 
                 $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
-                
-                /*qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
-
-                $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph.png';//Add graph*/
                 
             } else {                
                 $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_err.png';
