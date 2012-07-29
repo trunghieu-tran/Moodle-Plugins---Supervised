@@ -86,7 +86,6 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 else
                 {
                     $result = array();
-                    if ($this->pregnode->negative) $result[] = '^';
                     foreach ($this->pregnode->flags as $flag)
                     {
                         $result[] = qtype_preg_author_tool_leaf::process_flag_value($flag, TRUE);
@@ -150,8 +149,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     public function get_shape() {
         if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META)
             return 'ellipse';
-        elseif (count($this->pregnode->userinscription) > 1)
+        elseif (count($this->pregnode->userinscription) > 1 || $this->pregnode->negative) {
             return 'record';
+        }
         else {
             if ($this->pregnode->userinscription[0] == '\d' || $this->pregnode->userinscription[0] == '.' || $this->pregnode->userinscription[0] == '\W' ||
                     $this->pregnode->userinscription[0] == '\D' || $this->pregnode->userinscription[0] == '\s' || $this->pregnode->userinscription[0] == '\S' || $this->pregnode->userinscription[0] == '\w')
@@ -170,6 +170,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         $graph = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
         
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->pregnode->id, $this->get_filled());
+        if ($this->pregnode->negative) $graph->nodes[0]->invert = TRUE;
         
         if ($id == $this->pregnode->id)
         {

@@ -19,6 +19,7 @@ class qtype_preg_author_tool_explain_graph_node {
     public $label   = '';         // data of node on image
     public $id      = -1;          // id of node
     public $fill    = '';         // filling of node on image
+    public $invert  = FALSE;
     
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
@@ -116,7 +117,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
 
             if ($iter->shape == 'record')
             {
-                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . $iter->fill . '];';
+                $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             }
             else
             {
@@ -143,23 +144,20 @@ class qtype_preg_author_tool_explain_graph_subgraph {
      * Creates html of character class for dot instructions
      * @param lbl - label of node in graph
      */
-    private static function compute_html($lbl) {
+    private static function compute_html($lbl, $invert) {
         $elements = array();
         $result = '';
         if (count($lbl)) {
             if (count($lbl) == 1)
             {
-                $elements[] = $lbl;
-                $invert = FALSE;
+                if ($invert)
+                    $elements[] = $lbl;
+                else
+                    return '"' . $lbl . '"';
             }
             else {
                 for ($i = 0; $i < count($lbl); ++$i) {
-                    if ($i == 0 && $lbl[$i] == '^')
-                        $invert = TRUE;
-                    else {
                         $elements[] = $lbl[$i];
-                        $invert = FALSE;
-                    }
                 }
             }
 
@@ -205,7 +203,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
 
             if ($iter->shape == 'record')
-                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label) . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else
             {
                 $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label. '"' . $iter->fill .'];';
