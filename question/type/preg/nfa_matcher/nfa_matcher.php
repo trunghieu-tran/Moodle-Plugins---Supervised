@@ -492,8 +492,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    public function __construct($regex = null, $modifiers = null) {
-        parent::__construct($regex, $modifiers);
+    public function __construct($regex = null, $modifiers = null, $options = null) {
+        parent::__construct($regex, $modifiers, $options);
         if (!isset($regex) || !empty($this->errors)) {
             return;
         }

@@ -33,19 +33,20 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $copyroot = clone $altnode;
 
         $this->assertTrue($copyroot == $altnode, 'Root node contents copied wrong');
-        $this->assertTrue($copyroot !== $altnode, 'Root node wasn\'t copyied');
+        $this->assertTrue($copyroot !== $altnode, 'Root node wasn\'t copied');
         $this->assertTrue($copyroot->operands[0] == $altnode->operands[0], 'A character node contents copied wrong');
-        $this->assertTrue($copyroot->operands[0] !== $altnode->operands[0], 'A character node wasn\'t copyied');
+        $this->assertTrue($copyroot->operands[0] !== $altnode->operands[0], 'A character node wasn\'t copied');
         $this->assertTrue($copyroot->operands[1] == $altnode->operands[1], 'Asterisk node contents copied wrong');
-        $this->assertTrue($copyroot->operands[1] !== $altnode->operands[1], 'Asterisk node wasn\'t copyied');
+        $this->assertTrue($copyroot->operands[1] !== $altnode->operands[1], 'Asterisk node wasn\'t copied');
         $this->assertTrue($copyroot->operands[1]->operands[0] == $altnode->operands[1]->operands[0], 'B character node contents copied wrong');
-        $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copyied');
+        $this->assertTrue($copyroot->operands[1]->operands[0] !== $altnode->operands[1]->operands[0], 'B character node wasn\'t copied');
     }
 
     function test_backref_no_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
@@ -68,7 +69,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_partial_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
@@ -91,7 +93,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_full_match() {
         $regex = '(abc)';
         $length = 0;
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('abc');
         $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
@@ -107,7 +110,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_empty_match() {
         $regex = '(^$)';
         $length = 0;
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('');
         $this->assertTrue($matcher->get_match_results()->full);
         $backref = new qtype_preg_leaf_backref();
@@ -124,7 +128,8 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_backref_alt_match() {
         $regex = '(ab|cd|)';
         $length = 0;
-        $matcher = new qtype_preg_nfa_matcher($regex);
+        $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $matcher = new qtype_preg_nfa_matcher($regex, null,  $matchoptions);
         $matcher->match('ab');
         $backref = new qtype_preg_leaf_backref();
         $backref->number = 1;
