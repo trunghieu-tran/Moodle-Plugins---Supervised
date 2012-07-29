@@ -342,21 +342,27 @@ class qtype_preg_regex_handler {
     /**
      * Runs dot of graphviz on the given dot script.
      * @param dotscript a string containing the dot script.
+     * @param type type of the resulting image, should be 'png' or something.
      * @param filename the absolute path to the resulting image file.
+     * @return binary representation of the image if filename is null.
      */
-    public static function execute_dot($dotscript, $filename) {
+    public static function execute_dot($dotscript, $type, $filename = null) {
         global $CFG;
-        $type = pathinfo($filename, PATHINFO_EXTENSION);
         $dir = !empty($CFG->pathtodot) ? dirname($CFG->pathtodot) : null;
-        $cmd = "dot -T$type -o\"$filename\"";
+        $cmd = 'dot -T' . $type;
+        if ($filename !== null) {
+            $cmd .= ' -o' . escapeshellarg($filename);
+        }
         $descriptorspec = array(0 => array('pipe', 'r'), // Stdin is a pipe that the child will read from.
                                 1 => array('pipe', 'w'), // Stdout is a pipe that the child will write to.
                                 2 => array('pipe', 'w')  // Stderr is a pipe that the child will write to.
                                 );
         $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
+        $output = null;
         if (is_resource($process)) {
             fwrite($pipes[0], $dotscript);
             fclose($pipes[0]);
+            $output = stream_get_contents($pipes[1]);
             $err = stream_get_contents($pipes[2]);
             if (!empty($err)) {
                 //echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
@@ -367,5 +373,6 @@ class qtype_preg_regex_handler {
         } else {
             //echo "failed to execute cmd \"$cmd\"";
         }
+        return $output;
     }
 }
