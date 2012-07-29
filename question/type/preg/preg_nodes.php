@@ -1533,6 +1533,19 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $this->addinfo = null;
     }
 
+    public function dot_script($styleprovider, $isroot = true) {
+        // Calculate the node name, style and the result.
+        $nodename = $this->id;
+        $style = $nodename . $styleprovider->get_style($this) . ';';
+        $dotscript = $nodename . ';';
+        if ($isroot) {
+            $dotscript = $styleprovider->get_dot_head() . $style . $dotscript . $styleprovider->get_dot_tail();
+            return $dotscript;
+        } else {
+            return array($dotscript, $style);
+        }
+    }
+
     /**
      * Returns a user interface error string for the error, represented by this node.
      */

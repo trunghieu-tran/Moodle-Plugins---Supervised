@@ -590,7 +590,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}', $errornodes);
         $this->assertTrue($parser->get_error());
         $errornodes = $parser->get_error_nodes();
-        $this->assertTrue(count($errornodes) == 9);
+        $this->assertTrue(count($errornodes) == 10);
         $this->assertTrue($errornodes[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errornodes[0]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE);
         $this->assertTrue($errornodes[0]->indfirst == 0);
@@ -619,27 +619,32 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[5]->indlast == 28);
         $this->assertTrue(empty($errornodes[5]->operands));
         $this->assertTrue($errornodes[6]->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[6]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS);
-        $this->assertTrue($errornodes[6]->indfirst == 38);
-        $this->assertTrue($errornodes[6]->indlast == 48);
+        $this->assertTrue($errornodes[6]->subtype == qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER);
+        $this->assertTrue($errornodes[6]->indfirst == 31);
+        $this->assertTrue($errornodes[6]->indlast == 36);
         $this->assertTrue(empty($errornodes[6]->operands));
-        $this->assertTrue($errornodes[6]->addinfo == '[:hamster:]');
         $this->assertTrue($errornodes[7]->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[7]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY);
-        $this->assertTrue($errornodes[7]->indfirst == 50);
-        $this->assertTrue($errornodes[7]->indlast == 61);
-        $this->assertTrue($errornodes[7]->addinfo == 'Squirrel');
+        $this->assertTrue($errornodes[7]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS);
+        $this->assertTrue($errornodes[7]->indfirst == 38);
+        $this->assertTrue($errornodes[7]->indlast == 48);
         $this->assertTrue(empty($errornodes[7]->operands));
+        $this->assertTrue($errornodes[7]->addinfo == '[:hamster:]');
         $this->assertTrue($errornodes[8]->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[8]->subtype == qtype_preg_node_error::SUBTYPE_EMPTY_PARENS);
-        $this->assertTrue($errornodes[8]->indfirst == 22);
-        $this->assertTrue($errornodes[8]->indlast == 23);
+        $this->assertTrue($errornodes[8]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY);
+        $this->assertTrue($errornodes[8]->indfirst == 50);
+        $this->assertTrue($errornodes[8]->indlast == 61);
+        $this->assertTrue($errornodes[8]->addinfo == 'Squirrel');
         $this->assertTrue(empty($errornodes[8]->operands));
         $this->assertTrue($errornodes[9]->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errornodes[9]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
-        $this->assertTrue($errornodes[9]->indfirst == 8);
-        $this->assertTrue($errornodes[9]->indlast == 8);
-        $this->assertTrue(is_a($errornodes[9]->operands[0], 'qtype_preg_node_concat'));
+        $this->assertTrue($errornodes[9]->subtype == qtype_preg_node_error::SUBTYPE_EMPTY_PARENS);
+        $this->assertTrue($errornodes[9]->indfirst == 22);
+        $this->assertTrue($errornodes[9]->indlast == 23);
+        $this->assertTrue(empty($errornodes[8]->operands));
+        $this->assertTrue($errornodes[10]->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[10]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN);
+        $this->assertTrue($errornodes[10]->indfirst == 8);
+        $this->assertTrue($errornodes[10]->indlast == 8);
+        $this->assertTrue(is_a($errornodes[10]->operands[0], 'qtype_preg_node_concat'));
     }
     /**
      * Service function to run parser on regex.

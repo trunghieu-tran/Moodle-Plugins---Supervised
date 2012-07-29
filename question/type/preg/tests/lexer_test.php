@@ -885,7 +885,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->caseinsensitive);
     }
     function test_lexer_options2() {
-        $lexer = $this->create_lexer('(?im-Js:a(?s-i:b)c)');
+        $lexer = $this->create_lexer('(?i:a(?-i:b)c)');
         $token = $lexer->nextToken();// (?i:
         $token = $lexer->nextToken();// a
         $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
@@ -1265,24 +1265,19 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->error[0]->userinscription === '\p{4}');
         $lexer = $this->create_lexer('(?i-i)(?z-z:[bc');
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === 'grouping');
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token[0]->type == preg_parser_yyParser::PARSLEAF);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER);
         $token = $lexer->nextToken();
         $this->assertTrue($token === null);
         $errors = $lexer->get_errors();
-        $this->assertTrue(count($errors) === 3);
-        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER);
-        $this->assertTrue($errors[0]->indfirst === 0);
-        $this->assertTrue($errors[0]->indlast === 5);
-        $this->assertTrue($errors[0]->userinscription === 'i');
-        $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER);
-        $this->assertTrue($errors[1]->indfirst === 6);
-        $this->assertTrue($errors[1]->indlast === 11);
-        $this->assertTrue($errors[1]->userinscription === 'z');
-        $this->assertTrue($errors[2]->subtype === qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
-        $this->assertTrue($errors[2]->indfirst === 12);
-        $this->assertTrue($errors[2]->indlast === 14);
-        $this->assertTrue($errors[2]->userinscription === '[bc');
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET);
+        $this->assertTrue($errors[0]->indfirst === 12);
+        $this->assertTrue($errors[0]->indlast === 14);
+        $this->assertTrue($errors[0]->userinscription === '[bc');
         $lexer = $this->create_lexer('a\\');
         $token = $lexer->nextToken();
         $token = $lexer->nextToken();

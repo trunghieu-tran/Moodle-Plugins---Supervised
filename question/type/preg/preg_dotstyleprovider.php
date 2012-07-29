@@ -23,7 +23,7 @@ class qtype_preg_dot_style_provider {
                 $label .= addslashes($tmp);
             }
         } else {
-            $label = $pregnode->userinscription;
+            $label = addslashes($pregnode->userinscription);
         }
         $id = $pregnode->id;
 
@@ -82,7 +82,6 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = \"conditional subpattern\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
-
                 return "[label = \"ERROR $label\", tooltip = error, id = $id]";
             }
             default: {
