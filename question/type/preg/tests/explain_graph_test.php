@@ -152,7 +152,7 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_author_tool_explain_graph('x+');
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 1 to infinity times', 'dotted; color=black', 'black', $etalon);
+       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 1 to infinity times', 'dotted; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('x', 'ellipse', 'black', $etalon->subgraphs[0], 0);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon, -3);
@@ -170,7 +170,7 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_author_tool_explain_graph('x*');
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 0 to infinity times', 'dotted; color=black', 'black', $etalon);
+       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 0 to infinity times', 'dotted; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('x', 'ellipse', 'black', $etalon->subgraphs[0], 0);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon, -3);
@@ -188,7 +188,7 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_author_tool_explain_graph('x?');
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 0 to 1 time', 'dotted; color=black', 'black', $etalon);
+       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 0 to 1 time', 'dotted; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('x', 'ellipse', 'black', $etalon->subgraphs[0], 0);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon, -3);
@@ -206,7 +206,7 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_author_tool_explain_graph('x{3,7}');
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 3 to 7 times', 'dotted; color=black', 'black', $etalon);
+       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('from 3 to 7 times', 'dotted; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('x', 'ellipse', 'black', $etalon->subgraphs[0], 0);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $etalon, -2);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $etalon, -3);
