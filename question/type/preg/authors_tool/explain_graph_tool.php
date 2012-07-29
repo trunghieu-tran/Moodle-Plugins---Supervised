@@ -199,7 +199,6 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         }
         
         $result = new qtype_preg_author_tool_explain_graph_node('error','','', qtype_preg_author_tool_explain_graph::$gmain, -1);
-        echo 'error dst' . chr(10);
         
         return $result;
     }
@@ -221,7 +220,6 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         }
         
         $result = new qtype_preg_author_tool_explain_graph_node('error','','', qtype_preg_author_tool_explain_graph::$gmain, -1);
-        echo 'error src' . chr(10);
         
         return $result;
     }
