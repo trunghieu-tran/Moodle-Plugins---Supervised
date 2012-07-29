@@ -248,7 +248,6 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 return $result;
         }
 
-        echo 'error link' . chr(10);
         return $result;
     }
     
@@ -283,12 +282,10 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
                     unset($graph->nodes[array_search($neighbor, $graph->nodes)]);
                     $graph->nodes = array_values($graph->nodes);
-                    unset($graph->nodes[array_search($tmpdnode, $graph->nodes)]);
-                    $graph->nodes = array_values($graph->nodes);
                     
-                    $graph->nodes[] = $tmp;
+                    $graph->nodes[array_search($tmpdnode, $graph->nodes)] = $tmp;
 
-                    $i = 0;
+                    $i = -1;
                 }
             }
         }
