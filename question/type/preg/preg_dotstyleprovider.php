@@ -2,6 +2,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
 /**
@@ -38,32 +39,32 @@ class qtype_preg_dot_style_provider {
                 } else {
                     $label = '[' . $label . ']';
                 }
-                return "[label = \"$label\", tooltip = \"character class\", id = $id, shape = rectangle]";
+                return "[label = \"$label\", tooltip = \"character class\", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_META: {
                 //if($pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                return "[label = \"emptiness\", tooltip = emptiness, id = $id, shape = rectangle]";
+                return "[label = \"emptiness\", tooltip = emptiness, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = assertion, id = $id, shape = rectangle]";
+                return "[label = \"assertion $label\", tooltip = assertion, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, id = $id, shape = rectangle]";
+                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                return "[label = \"recursion ' . $pregnode->number . '\", shape = square, tooltip = recursion, id = $id, shape = rectangle]";
+                return "[label = \"recursion ' . $pregnode->number . '\", tooltip = recursion, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                return "[label = control sequence \"$label\", tooltip = \"control sequence\", id = $id, shape = rectangle]";
+                return "[label = control sequence \"$label\", tooltip = \"control sequence\", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                return "[label = \"$label\", tooltip = option, id = $id, shape = rectangle]";
+                return "[label = \"$label\", tooltip = option, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
-                return "[label = \"$label\", tooltip = \"finite quantificator\", id = $id]";
+                return "[label = \"$label\", tooltip = \"finite quantifier\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
-                return "[label = \"$label\", tooltip = \"infinite quantificator\", id = $id]";
+                return "[label = \"$label\", tooltip = \"infinite quantifier\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_CONCAT: {
                 return "[label = \"concat\", tooltip = concatenation, id = $id]";
@@ -109,5 +110,96 @@ class qtype_preg_dot_style_provider {
      */
     public function get_dot_tail() {
         return '}';
+    }
+
+    /**
+     * Makes the subtree of the given node selected.
+     * @param dotscript script with no selection.
+     * @param id id of the root of the subtree to select.
+     * @return modified dot script.
+     */
+    public function select_subtree($dotscript, $id) {
+        $selectstyle = ', style = dotted';
+        $stylelength = qtype_poasquestion_string::strlen($selectstyle);
+        // Our dot script has the format: "[digraph][node styles][node chains].
+        // First, get the chains and find subtree node id's.
+        $script = new qtype_poasquestion_string($dotscript);
+        $index = $script->length() - 2;
+        $chainlength = 1;
+        while ($script[$index - 1] !== ']') {
+            $index--;
+            $chainlength++;
+        }
+        $index++;
+        $chainlength--;
+        $chains = $script->substring($index, $chainlength);
+        $selected = array((int)$id);
+        $tmp = '';
+        $write = false;
+        // Look through the chains of node id's.
+        for ($i = 0; $i < $chains->length(); $i++) {
+            $cur = $chains[$i];
+            if (ctype_digit($cur)) {
+                $tmp .= $cur;
+            } else if ($cur === '-') {
+                // Number ready.
+                if (in_array((int)$tmp, $selected)) {
+                    $write = true;
+                }
+                if ($write) {
+                    if (!in_array((int)$tmp, $selected)) {
+                        $selected[] = (int)$tmp;
+                    }
+                }
+                $tmp = '';
+            } else if ($cur === ';') {
+                // End of a chain.
+                if ($write) {
+                    if (!in_array((int)$tmp, $selected)) {
+                        $selected[] = (int)$tmp;
+                    }
+                }
+                $write = false;
+                $tmp = '';
+            }
+        }
+        // Children nodes obtained, modify their styles.
+        $index = 0;
+        while ($index < $script->length() - $chains->length() - 1) {
+            $cur = $script[$index];
+            // Skip quotes.
+            if ($cur === '"') {
+                $index++;
+                while ($script[$index] !== '"') {
+                    $index++;
+                }
+                $index++;
+                continue;
+            }
+            // Get the current id.
+            if ($script[$index] === ']') {
+                $tmpindex = $index - 1;
+                $tmpid = '';
+                do {
+                    $cur = $script[$tmpindex];
+                    $isdigit = ctype_digit($cur);
+                    if ($isdigit) {
+                        $tmpid = $cur . $tmpid;
+                    }
+                    $tmpindex--;
+                } while ($isdigit);
+                // If this node should be selected, modify its style.
+                if (in_array((int)$tmpid, $selected)) {
+                    $part1 = $script->substring(0, $index);
+                    $part2 = $script->substring($index);
+                    $script = $part1;
+                    $script->concatenate($selectstyle . $part2->string());
+                    $index += $stylelength;
+                }
+
+            }
+            $index++;
+        }
+        return $script->string();
     }
 }

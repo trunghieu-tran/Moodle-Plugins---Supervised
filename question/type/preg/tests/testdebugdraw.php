@@ -38,7 +38,10 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
         $root = $parser->get_root();
         $regexhandler = new qtype_preg_regex_handler();
         $dir = $regexhandler->get_temp_dir('nodes');
-        qtype_preg_regex_handler::execute_dot($root->dot_script(new qtype_preg_dot_style_provider()), $dir . 'ast_test.png');
+        $styleprovider = new qtype_preg_dot_style_provider();
+        $dotscript = $root->dot_script($styleprovider);
+        $dotscript = $styleprovider->select_subtree($dotscript, 8);
+        qtype_preg_regex_handler::execute_dot($dotscript, $dir . 'ast_test.png');
     }
     /*function test_simple() {//[asdf]
         $this->matcher->input_fa('0->asdf->1;');
