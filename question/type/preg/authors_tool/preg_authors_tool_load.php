@@ -48,9 +48,15 @@ class preg_authors_tool_load {
             }
 
             if($pars_error === false && $regexhandler->get_ast_root() !== NULL) {
-
-                qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
-                qtype_preg_regex_handler::execute_dot($regexhandler->get_ast_root()->dot_script(new qtype_preg_dot_style_provider()), $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
+                
+                $styleprovider = new qtype_preg_dot_style_provider();
+                $dotscript = $regexhandler->get_ast_root()->dot_script($styleprovider);
+                if($id!=-1){
+                    $dotscript = $styleprovider->select_subtree($dotscript, $id);
+                }
+                
+                qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
+                qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
                 
                 $tree_map ='';//tag <map>                 
                 $tree_handle = fopen($CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx', 'r');//Open and read tag <map> from file
