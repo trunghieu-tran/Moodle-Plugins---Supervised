@@ -13,9 +13,11 @@ class qtype_preg_error {
 
     protected function highlight_regex($regex, $indfirst, $indlast) {
         if ($indfirst >= 0 && $indlast >= 0) {
-            return qtype_poasquestion_string::substr($regex, 0, $indfirst) . '<b>' . qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1) . '</b>' . qtype_poasquestion_string::substr($regex, $indlast + 1);
+            return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $indfirst)) . '<b>' .
+                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1)) . '</b>' .
+                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $indlast + 1));
         } else {
-            return $regex;
+            return htmlspecialchars($regex);
         }
     }
 
@@ -23,9 +25,9 @@ class qtype_preg_error {
         $this->index_first = $index_first;
         $this->index_last = $index_last;
         if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
+            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . htmlspecialchars($errormsg);
         } else {
-            $this->errormsg = $errormsg;
+            $this->errormsg = htmlspecialchars($errormsg);
         }
      }
 }
@@ -36,14 +38,14 @@ class qtype_preg_parsing_error extends qtype_preg_error {
     public function __construct($regex, $parsernode) {
         $this->index_first = $parsernode->indfirst;
         $this->index_last = $parsernode->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . htmlspecialchars($parsernode->error_string());
     }
 }
 
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    /*
+    /**
      * Returns a string with first character converted to upper case.
      */
     public function uppercase_first_letter($str) {

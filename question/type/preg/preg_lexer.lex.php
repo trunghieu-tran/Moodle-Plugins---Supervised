@@ -360,17 +360,17 @@ class qtype_preg_lexer extends JLexBase  {
     protected function form_named_subpatt($text, $pos, $length, $namestartpos, $closetype) {
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
             // Missing ending character.
-            return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $pos, $pos + $length - 1, $text));
+            return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $pos, $pos + $length - 1, $text));
         } else {
             $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
             if ($name === '') {
                 // Name is empty.
-                return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
+                return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
             } else {
                 $error = null;
                 $num = (int)$this->map_subpattern($name, $error);
                 if ($error !== null) {
-                    return $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+                    return $this->form_res(preg_parser_yyParser::OPENBRACK, $error);
                 }
                 // Are we inside a (?| group?
                 if ($this->optstack[$this->optcount - 1]->subpattnum !== -1 && $this->optcount > 0) {
@@ -379,7 +379,7 @@ class qtype_preg_lexer extends JLexBase  {
                         $this->optstack[$this->optcount - 1]->subpattname = $name;
                     } else if ($this->optstack[$this->optcount - 1]->subpattname !== $name) {
                         // Error: different names for subpatterns of the same number.
-                        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, $pos, $pos + $length - 1, $text));
+                        return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, $pos, $pos + $length - 1, $text));
                     }
                 }
                 $this->push_opt_lvl();
@@ -400,7 +400,7 @@ class qtype_preg_lexer extends JLexBase  {
             $endlength = strlen($ending);
             if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
                 // Unclosed condition.
-                return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, $pos, $pos + $length - 1));
+                return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, $pos, $pos + $length - 1));
             }
             if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION) {
                 $tmp = qtype_poasquestion_string::substr($text, 4, 1);

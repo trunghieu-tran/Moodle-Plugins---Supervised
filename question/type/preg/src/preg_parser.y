@@ -56,6 +56,9 @@
      * @param node the node to be checked.
      */
     protected function create_error_node_from_lexer($node) {
+        if (isset($node->type) && $node->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            $this->create_error_node($node->subtype, $node->indfirst, $node->indlast, $node->addinfo);
+        }
         if (!isset($node->error)) {
             return;
         }
@@ -92,9 +95,9 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->operands[1] = C;
     A->userinscription = '';
     A->id = $this->idcounter++;
-    $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
+    $this->reducecount++;
 }
 
 expr(A) ::= expr(B) ALT expr(C). {
@@ -104,9 +107,9 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->operands[1] = C;
     A->userinscription = '|';
     A->id = $this->idcounter++;
-    $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
+    $this->reducecount++;
 }
 
 expr(A) ::= expr(B) ALT. {
@@ -117,19 +120,19 @@ expr(A) ::= expr(B) ALT. {
     A->operands[1]->id = $this->idcounter++;
     A->userinscription = '|';
     A->id = $this->idcounter++;
-    $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = B->indlast + 1;
+    $this->reducecount++;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->operands[0] = B;
     A->id = $this->idcounter++;
-    $this->reducecount++;
     A->indfirst = B->indfirst;
     A->indlast = C->indlast;
     $this->create_error_node_from_lexer(C);
+    $this->reducecount++;
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
@@ -150,6 +153,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     }
     A->indfirst = B->indfirst;
     A->indlast = C->indlast + 1;
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
 }
 
@@ -185,17 +189,17 @@ expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
         A->userinscription = D->userinscription . ' ... | .... )';
     }
     A->id = $this->idcounter++;
-    $this->reducecount++;
     A->indfirst = D->indfirst;
     A->indlast = C->indlast + 1;
+    $this->reducecount++;
 }
 
 expr(A) ::= PARSLEAF(B). {
     //ECHO 'LEAF <br/>';
     A = B;
     A->id = $this->idcounter++;
-    $this->reducecount++;
     $this->create_error_node_from_lexer(B);
+    $this->reducecount++;
 }
 
 lastexpr(A) ::= expr(B). {
@@ -228,11 +232,13 @@ expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
     if (!$emptyparens) {//regular unclosed parens
         A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst, B->indlast, B->userinscription, array(C));
     }
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
     A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst,  B->indlast, B->userinscription);
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
 }
 
