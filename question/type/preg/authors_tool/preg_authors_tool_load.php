@@ -54,8 +54,10 @@ class preg_authors_tool_load {
                 if($id!=-1){
                     $dotscript = $styleprovider->select_subtree($dotscript, $id);
                 }
+                $json_array['tree_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
+                $json_array['map'] = qtype_preg_regex_handler::execute_dot($dotscript, 'cmapx');
                 
-                qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
+                /*qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.png');//Generate image
                 qtype_preg_regex_handler::execute_dot($dotscript, $CFG->dirroot . '/question/type/preg/tmp_img/tree.cmapx');//Generate map
                 
                 $tree_map ='';//tag <map>                 
@@ -71,9 +73,9 @@ class preg_authors_tool_load {
                 }
 
                 $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree.png';//Add tree
-                $json_array['map'] = $tree_map;//Add map
+                $json_array['map'] = $tree_map;//Add map*/
                 
-            } else {                
+            } else {
                 $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_err.png';
             }
         } else {
@@ -110,9 +112,11 @@ class preg_authors_tool_load {
                 $graph = $tmp_graph->create_graph($id);
                 $dot_instructions_graph = $graph->create_dot();
                 
-                qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
+                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
+                
+                /*qtype_preg_regex_handler::execute_dot($dot_instructions_graph, $CFG->dirroot . '/question/type/preg/tmp_img/graph.png');//Generate image      
 
-                $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph.png';//Add graph
+                $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph.png';//Add graph*/
                 
             } else {                
                 $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_err.png';
