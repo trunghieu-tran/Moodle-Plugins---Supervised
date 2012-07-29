@@ -58,7 +58,7 @@ class preg_authors_tool_load {
                 $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_err.png';
             }
         } else {
-            $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_dif.png';//Add tree
+            $json_array['tree_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/tree_def.png';//Add tree
         }
     }
     
@@ -97,7 +97,7 @@ class preg_authors_tool_load {
                 $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_err.png';
             }
         } else {
-            $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_dif.png';//Add graph
+            $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_def.png';//Add graph
         }
     }
     
