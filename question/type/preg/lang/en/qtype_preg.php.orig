@@ -135,42 +135,20 @@ $string['unknown_control_sequence_node_error']                     = 'unknown co
 $string['incorrect_range_node_error']                              = 'incorrect ranges in a quantifier or a character set: {5,3} or [z-a]';
 
 /******* Error messages *******/
-$string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
-$string['error_threealtincondsubpatt']          = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
-$string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
-$string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
-$string['error_emptyparens']                    = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
-$string['error_unclosedsqbrackets']             = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
-$string['error_setunsetmod']                    = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_unknownunicodeproperty']         = 'Unknown unicode property: {$a->addinfo}.';
-$string['error_unknownposixclass']              = 'Unknown posix class: {$a->addinfo}.';
-$string['error_unknowncontrolsequence']         = 'Unknown control sequence: {$a->addinfo}.';
-$string['error_incorrectcharsetrange']          = 'Incorrect character range in position from  {$a->indfirst} to {$a->indlast}: the left character is "greater" than the right one.';
-$string['error_incorrectquantrange']            = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
-$string['error_slashatendofpattern']            = 'Regex syntax error: \\ at end of pattern.';
-$string['error_catendofpattern']                = 'Regex syntax error: \c at end of pattern.';
-$string['error_invalidescapesequence']          = 'Invalid escape sequence: {$a->addinfo}.';
-$string['error_posixclassoutsidecharset']       = 'POSIX classes are not allowed outside character sets.';
-$string['error_unexistingsubpatt']              = 'The subpattern "{$a->addinfo}" does not exist.';
-$string['error_unknownmodifier']                = 'Unknown, wrong or unsupported modifier(s): {$a->addinfo}.';
-$string['error_missingcommentending']           = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_missingcondsubpattending']       = 'Unclosed conditional subpattern name.';
-$string['error_missingcalloutending']           = 'Unclosed callout.';
-$string['error_missingsubpattending']           = 'Unclosed subpattern name.';
-$string['error_missingbackrefending']           = 'Missing backreference ending: {$a->addinfo}.';
-$string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
-$string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
-$string['error_condsubpattassertexpected']      = '';
-$string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
-$string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
-$string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
-$string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';
-$string['error_backreftozero']                  = 'Backreference to the whole expression is not allowed.';
-$string['error_differentsubpattnames']          = 'Different subpattern names for subpatterns of the same number.';
-$string['error_subpattnameexpected']            = 'Subpattern name expected.';
-$string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
-$string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['error_PCREincorrectregex']     = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
+$string['error_threealtincondsubpatt']  = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
+$string['error_unopenedparen']          = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
+$string['error_unclosedparen']          = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
+$string['error_emptyparens']            = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_quantifieratstart']      = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
+$string['error_unclosedsqbrackets']     = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
+$string['error_setunsetmod']            = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
+$string['error_unknownunicodeproperty'] = 'Unknown unicode property: {$a->addinfo}.';
+$string['error_unknownposixclass']      = 'Unknown posix class: {$a->addinfo}.';
+$string['error_unknowncontrolsequence'] = 'Unknown control sequence: {$a->addinfo}.';
+$string['error_incorrectcharsetrange']  = 'Incorrect character range in position from  {$a->indfirst} to {$a->indlast}: the left character is "greater" than the right one.';
+$string['error_incorrectquantrange']    = 'Incorrect quantifier range in position from  {$a->indfirst} to {$a->indlast}: the left border is greater than the right one.';
+
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
@@ -253,7 +231,7 @@ $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]
 $string['description_subpattern_name'] = 'subpattern "%name": [%1]';
 $string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
 //TYPE_NODE_COND_SUBPATT
-$string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
+$string['description_node_cond_subpatt'] = 'if [%cond] then check: [%1]%else';
 $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
 $string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
 $string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
@@ -298,6 +276,7 @@ $string['description_char_t'] = 'tabulation';
 $string['description_char_n'] = 'newline(LF)';
 $string['description_char_r'] = 'carriage return character';
 $string['description_char_16value'] = 'character with hex code %code';
+//$string['description_char_neg'] = 'not <span style="color:red">%char</span>';
 $string['description_charflag_digit'] = 'decimal digit';
 $string['description_charflag_xdigit'] = 'hexadecimal digit';
 $string['description_charflag_space'] = 'white space';
@@ -446,15 +425,18 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
-//for testing
-$string['description_charflag_word_g'] = 'word character(form g)';//for testing only
-$string['description_char_g'] = '<span style="color:blue">%char</span>(form g)';//for testing only
-$string['description_dollar_g'] = 'end of the string(form g)';//for testing
-$string['description_concat_g'] = '%g1 then %g2';
-$string['description_concat_short_g'] = '%g1%g2';
-$string['description_alt_g'] = '%g1 or %g2';
-$string['description_alt_wcomma_g'] = '%g1 or %g2';
-$string['description_empty_g'] = 'nothing(form g)';
+
+//This is string for authors tool
+$string['regex_edit_header'] = 'Input regex';
+$string['regex_edit_header_help'] = 'Here you can input regular expression for which will be draw interactive tree, explaining graph and description. In the field "Input regex" you can input/edit regular expression. Pushing "check" button redraws new image with tree, graph and discription.';
+$string['regex_tree_header'] = 'Interactive tree';
+$string['regex_tree_header_help'] = 'Here you can see interactive tree. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_graph_header'] = 'Explaining graph';
+$string['regex_graph_header_help'] = 'Here you can see explaining graph. Pressing the node of tree marks corresponding subtree, subgraph and corresponding part of description.';
+$string['regex_description_header'] = 'Description';
+$string['regex_description_header_help'] = 'Here you can see description of regular expression.';
+$string['regex_match_header'] = 'Input string for check';
+$string['regex_match_header_help'] = 'Here you can input string for matching. In field "Input string" you can input string to varify coincidence whith regular expression (in new string coincidence substring will be marked of greed, don\'t coincidence substring will be marked of reed) or generate one character of continuation. In field "Must match" and "Must not match" you can input strings to varify coincidence/don\'t coincidence whith regular expression (coincidence string will be marked of greed, don\'t coincidence string will be marked of reed).';
 
 // Strings for explaining graph
 
