@@ -419,7 +419,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
             } else {
                 $error = null;
-                $num = (int)$this->map_subpattern($name, $error);
+                $num = $this->map_subpattern($name, $error);
                 if ($error !== null) {
                     return $this->form_res(preg_parser_yyParser::OPENBRACK, $error);
                 }
@@ -693,7 +693,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     protected function map_subpattern($name, &$error) {
         if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
-            $this->subpatternmap[$name] = (int)$num;
+            $this->subpatternmap[$name] = $num;
         } else {                                                // Subpatterns with same names should have same numbers.
             $num = $this->subpatternmap[$name];
             $this->lastsubpatt++;
@@ -702,7 +702,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             }
         }
         $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-        return $num;
+        return (int)$num;
     }
 
     /**
@@ -872,7 +872,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), (int)$this->lastsubpatt));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
 }
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
@@ -893,7 +893,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), (int)$this->lastsubpatt));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $this->lastsubpatt));
 }
 <YYINITIAL> "(?<"{ALNUM}*">"? {                 // Named subpattern (?<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
@@ -1005,7 +1005,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     if ($num < 0) {
         $num = $this->lastsubpatt + $num + 1;
     }
-    return $this->form_backref($text, $this->yychar, $this->yylength(), (int)$num);
+    return $this->form_backref($text, $this->yychar, $this->yylength(), $num);
 }
 <YYINITIAL> "\g""{"?{ALNUM}*"}"? {              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
@@ -1093,7 +1093,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
-    $code = (int)hexdec($str);
+    $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str));
     } else {
@@ -1396,7 +1396,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <CHARSET> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
-    $code = (int)hexdec($str);
+    $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str);
     } else {
