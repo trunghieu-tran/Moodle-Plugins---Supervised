@@ -47,7 +47,7 @@ class qtype_preg_author_tool_explain_graph_node {
     public function links() {
     
         $result = array();
-        foreach ($owner->links as $link) {
+        foreach ($this->owner->links as $link) {
             if ($link->destination == $this || $link->source == $this)
                 $result[] = $link;
         }
@@ -100,7 +100,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     public function __construct($lbl, $stl, $id = -1) {
         $this->label   = $lbl;
         $this->style   = $stl;
-        $this->id = $id;
+        $this->id      = $id;
     }
     
     //private static $counter = 0; // counter for generating id for nodes in graph
