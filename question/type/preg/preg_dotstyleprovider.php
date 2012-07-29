@@ -38,51 +38,51 @@ class qtype_preg_dot_style_provider {
                 } else {
                     $label = '[' . $label . ']';
                 }
-                return "[label = \"$label\", tooltip = $id, id = $id, shape = square]";
+                return "[label = \"$label\", tooltip = \"character class\", id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_META: {
                 //if($pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                return "[label = \"emptiness\", tooltip = $id, id = $id, shape = square]";
+                return "[label = \"emptiness\", tooltip = emptiness, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = $id, id = $id, shape = square]";
+                return "[label = \"assertion $label\", tooltip = assertion, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = $id, id = $id, shape = square]";
+                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                return "[label = \"recursion ' . $pregnode->number . '\", shape = square, tooltip = $id, id = $id, shape = square]";
+                return "[label = \"recursion ' . $pregnode->number . '\", shape = square, tooltip = recursion, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                return "[label = control sequence \"$label\", tooltip = $id, id = $id, shape = square]";
+                return "[label = control sequence \"$label\", tooltip = \"control sequence\", id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                return "[label = \"$label\", tooltip = $id, id = $id, shape = square]";
+                return "[label = \"$label\", tooltip = option, id = $id, shape = rectangle]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
-                return "[label = \"$label\", tooltip = $id, id = $id]";
+                return "[label = \"$label\", tooltip = \"finite quantificator\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
-                return "[label = \"$label\", tooltip = $id, id = $id]";
+                return "[label = \"$label\", tooltip = \"infinite quantificator\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_CONCAT: {
-                return "[label = \"concat\", tooltip = $id, id = $id]";
+                return "[label = \"concat\", tooltip = concatenation, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ALT: {
-                return "[label = \"$label\", tooltip = $id, id = $id]";
+                return "[label = \"$label\", tooltip = alternative, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = $id, id = $id]";
+                return "[label = \"assertion $label\", tooltip = assertion, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_SUBPATT: {
-                return "[label = \"$label\", tooltip = $id, id = $id]";
+                return "[label = \"$label\", tooltip = subpattern, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_COND_SUBPATT: {
-                return "[label = \"$label\", tooltip = $id, id = $id]";
+                return "[label = \"$label\", tooltip = \"conditional subpattern\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
 
-                return "[label = \"ERROR $label\", tooltip = $id, id = $id]";
+                return "[label = \"ERROR $label\", tooltip = error, id = $id]";
             }
             default: {
                 return "[label = \"Unknown node subtype\", style = dotted]";
