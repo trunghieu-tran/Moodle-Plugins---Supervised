@@ -150,7 +150,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         if (count($lbl)) {
             if (count($lbl) == 1)
             {
-                if ($invert)
+                if ($invert || strlen($lbl) != 1)
                     $elements[] = $lbl;
                 else
                     return '"' . $lbl . '"';
@@ -164,13 +164,15 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             $result .= '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD COLSPAN="';
             $result .= count($elements);
             if ($invert)
-                $result .= '"><font face="Arial">Any character except from</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">' . get_string('explain_any_char_except', 'qtype_preg') . '</font></TD></TR><TR>';
             else
-                $result .= '"><font face="Arial">Any character from</font></TD></TR><TR>';
+                $result .= '"><font face="Arial">' . get_string('explain_any_char', 'qtype_preg') . '</font></TD></TR><TR>';
 
             for ($i = 0; $i != count($elements); ++$i) {
                 if ($elements[$i][0] == chr(10))
                     $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
+                elseif (strstr($elements[$i], '\\p') == FALSE)
+                    $result .= '<TD><font color="blue">' . $elements[$i] . '</font></TD>';
                 else
                     $result .= '<TD>' . str_replace('"', '&#34', $elements[$i]) . '</TD>';
                 //++$i;

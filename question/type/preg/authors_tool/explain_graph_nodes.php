@@ -75,11 +75,15 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     if ($result == ' ')
                         return get_string('description_char_space', 'qtype_preg');
                     elseif ($result == '	')
-                        return get_string('explain_tab', 'qtype_preg');
+                        return get_string('description_char_t', 'qtype_preg');
                     elseif ($result == '"')
-                        return get_string('explain_quote', 'qtype_preg');
+                        return '\\"';
                     elseif ($result == '\\')
-                        return get_string('explain_slash', 'qtype_preg');
+                        return '\\\\';
+                    elseif ($result == chr(10))
+                        return get_string('description_char_n', 'qtype_preg');
+                    elseif ($result == chr(13))
+                        return get_string('description_char_r', 'qtype_preg');
                     else
                         return $result;
                 }
@@ -124,7 +128,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
             case qtype_preg_node::TYPE_LEAF_CHARSET:
                 if (count($this->pregnode->userinscription) == 1) {
                     if ($this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::FLAG || $this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::UPROP || 
-                    $this->pregnode->userinscription[0] == ' ' || $this->pregnode->userinscription[0] == '	' || $this->pregnode->userinscription[0] == '\\' || $this->pregnode->userinscription[0] == '"')
+                    $this->pregnode->userinscription[0] == ' ' || $this->pregnode->userinscription[0] == '	' || $this->pregnode->userinscription[0] == chr(10))
                         return 'green';
                     else
                         return 'black';
@@ -149,14 +153,13 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     public function get_shape() {
         if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META)
             return 'ellipse';
-        elseif (count($this->pregnode->userinscription) > 1 || $this->pregnode->negative) {
+        elseif (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
         }
         else {
-            if ($this->pregnode->userinscription[0] == '\d' || $this->pregnode->userinscription[0] == '.' || $this->pregnode->userinscription[0] == '\W' ||
-                    $this->pregnode->userinscription[0] == '\D' || $this->pregnode->userinscription[0] == '\s' || $this->pregnode->userinscription[0] == '\S' || $this->pregnode->userinscription[0] == '\w')
+            if ($this->get_color() == 'green')
                 return 'ellipse';
-            elseif (strlen($this->pregnode->userinscription[0]) > 1)
+            elseif ($this->pregnode->flags[0][0]->data->length() > 1)
                 return 'record';
             else
                 return 'ellipse';
