@@ -226,6 +226,7 @@ $string['description_finite_quant'] = '%1 is repeated from %leftborder to %right
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
 $string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 $string['description_finite_quant_01'] = '%1 may be missing%greed';
+$string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
 //TYPE_NODE_INFINITE_QUANT
 $string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
 $string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
@@ -446,6 +447,9 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
+//description errors
+$string['description_errorbefore'] = '<span style="color:red">';
+$string['description_errorafter'] = '</span>';
 //for testing
 $string['description_charflag_word_g'] = 'word character(form g)';//for testing only
 $string['description_char_g'] = '<span style="color:blue">%char</span>(form g)';//for testing only

@@ -256,14 +256,24 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     
     //------------------------------------------------------------------
     
-    /*public function test_err()
+    /**
+     * @dataProvider err_provider
+     */
+    public function test_err($regex,$expected)
     {
-        $handler = new qtype_preg_author_tool_description('a{9,0}',null,null);
-        $expected = 'ad';
-        var_dump($handler);
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    }*/
+    }
+    
+    public function err_provider()
+    {
+        return array(
+          array('a{9,0}','<span style="color:blue">a</span><span style="color:red"> is repeated from 9 to 0 times (incorrect quantifier borders)</span>'),
+          array('(a','<span style="color:red">Regex syntax error: missing a closing parenthesis ')' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>'),
+        );
+    }
     
 }
 
