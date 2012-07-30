@@ -23,7 +23,7 @@ class qtype_preg_dot_style_provider {
                 $label .= addslashes($tmp);
             }
         } else {
-            $label = addslashes($pregnode->userinscription);
+            $label = $pregnode->userinscription;
         }
         $id = $pregnode->id;
 
@@ -82,7 +82,9 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = \"conditional subpattern\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
-                return "[label = \"ERROR $label\", tooltip = error, id = $id]";
+
+                //return "[label = \"ERROR $label\", tooltip = error, id = $id]";
+                return "[label = \"ERROR\", tooltip = error, id = $id, color = \"red\"]";
             }
             default: {
                 return "[label = \"Unknown node subtype\", style = dotted]";
@@ -118,7 +120,8 @@ class qtype_preg_dot_style_provider {
      * @return modified dot script.
      */
     public function select_subtree($dotscript, $id) {
-        $selectstyle = ', style = dotted';
+        //$selectstyle = ', style = dotted';
+        $selectstyle = ', color = "blue"';
         $stylelength = qtype_poasquestion_string::strlen($selectstyle);
         // Our dot script has the format: "[digraph][node styles][node chains].
         // First, get the chains and find subtree node id's.
