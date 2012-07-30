@@ -171,14 +171,10 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             for ($i = 0; $i != count($elements); ++$i) {
                 if ($elements[$i][0] == chr(10))
                     $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
-                elseif (strstr($elements[$i], '\\p') == FALSE)
+                elseif (strstr($elements[$i], '\\p') != FALSE)
                     $result .= '<TD><font color="blue">' . $elements[$i] . '</font></TD>';
                 else
-                    $result .= '<TD>' . str_replace('"', '&#34', $elements[$i]) . '</TD>';
-                //++$i;
-                //if ($i != count($elements))
-                //    $result .= '<TD><font color="red">OR</font></TD>';
-                //--$i;
+                    $result .= '<TD>' . $elements[$i] . '</TD>';
             }
             
             $result .= '</TR></TABLE>>';

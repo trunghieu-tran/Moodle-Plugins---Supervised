@@ -76,16 +76,16 @@ class preg_authors_tool_load {
         if(!empty($regextext)) {            
             //Generate graph image
             $tmp_graph = new qtype_preg_author_tool_explain_graph($regextext);
-            
+
             //Checking parser errors
             $pars_error = false;
             foreach($tmp_graph->get_errors() as $error) {
-                if (is_a($error, 'qtype_preg_parsing_error')) {
+                if (is_a($error, 'qtype_preg_parsing_error') || is_a($error, 'qtype_preg_accepting_error')) {
                     $pars_error = true;
                     break;
                 }
             }
-            
+
             if($pars_error === false && $tmp_graph->get_ast_root() !== NULL && $tmp_graph->get_dst_root() !== NULL) {
                 
                 $graph = $tmp_graph->create_graph($id);
