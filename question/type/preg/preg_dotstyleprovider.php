@@ -27,6 +27,16 @@ class qtype_preg_dot_style_provider {
         }
         $id = $pregnode->id;
 
+        if($label === chr(10)){
+            $label = get_string('description_char_n', 'qtype_preg');
+        } elseif ($label === chr(13)) {
+            $label = get_string('description_char_r', 'qtype_preg');
+        } elseif ($label === ' ') {
+            $label = get_string('description_char_space', 'qtype_preg');
+        } elseif ($label === '  ') {
+            $label = get_string('description_char_t', 'qtype_preg');
+        }
+
         // Now the label is ready, just return the appropriate style for node type and subtype.
         switch ($pregnode->type) {
             case qtype_preg_node::TYPE_ABSTRACT: {
@@ -61,6 +71,12 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = option, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
+                if($pregnode->leftborder > $pregnode->rightborder){
+                    $a = new stdClass;
+                    $a->indfirst = $pregnode->indfirst;
+                    $a->indlast = $pregnode->indlast;
+                    return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $a) . "\", id = $id, color = red]";
+                }
                 return "[label = \"$label\", tooltip = \"finite quantifier\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
@@ -84,7 +100,7 @@ class qtype_preg_dot_style_provider {
             case qtype_preg_node::TYPE_NODE_ERROR: {
 
                 //return "[label = \"ERROR $label\", tooltip = error, id = $id]";
-                return "[label = \"ERROR\", tooltip = error, id = $id, color = \"red\"]";
+                return "[label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", id = $id, color = \"red\"]";
             }
             default: {
                 return "[label = \"Unknown node subtype\", style = dotted]";
@@ -120,8 +136,8 @@ class qtype_preg_dot_style_provider {
      * @return modified dot script.
      */
     public function select_subtree($dotscript, $id) {
-        //$selectstyle = ', style = dotted';
-        $selectstyle = ', color = "blue"';
+        $selectstyle = ', style = dotted';
+        //$selectstyle = ', color = "blue"';
         $stylelength = qtype_poasquestion_string::strlen($selectstyle);
         // Our dot script has the format: "[digraph][node styles][node chains].
         // First, get the chains and find subtree node id's.
