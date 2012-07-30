@@ -37,6 +37,7 @@ abstract class qtype_preg_author_tool_node {
             case qtype_preg_node::TYPE_LEAF_OPTIONS:
             case qtype_preg_node::TYPE_NODE_COND_SUBPATT:
             case qtype_preg_node::TYPE_NODE_ERROR:
+            case qtype_preg_node::TYPE_NODE_ASSERT:
                 return FALSE;
             default:
                 return TRUE;
@@ -151,7 +152,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
      * Returns shape of node which will be in graph. 
      */
     public function get_shape() {
-        if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META)
+        if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT)
             return 'ellipse';
         elseif (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
@@ -201,7 +202,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         switch ($flag[0]->type)
         {
             case qtype_preg_charset_flag::SET:
-                return $flag[0]->data->string();  //TODO: ranges !!!
+                return ($charclass ? qtype_preg_author_tool_leaf::process_charset($flag[0]->data->string()) : $flag[0]->data->string());
             case qtype_preg_charset_flag::FLAG:
                 $tmp = ($flag[0]->negative ? get_string('explain_not', 'qtype_preg') . get_string('description_charflag_' . $flag[0]->data, 'qtype_preg') : get_string('description_charflag_' . $flag[0]->data, 'qtype_preg'));
                 return ($charclass ? chr(10) . $tmp : $tmp) ;
@@ -211,6 +212,16 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
             default:
                 return get_string('explain_unknow_charset_flag', 'qtype_preg');
         }
+    }
+
+    private static function process_charset($info) {
+        $info = str_replace('"', '&#34', $info);
+        /*$info = '<font color="blue">' . str_replace(' ', get_string('description_char_space', 'qtype_preg'), $info) . '</font>';
+        $info = '<font color="blue">' . str_replace('	', get_string('description_char_t', 'qtype_preg'), $info) . '</font>';
+        $info = '<font color="blue">' . str_replace(chr(10), get_string('description_char_n', 'qtype_preg'), $info) . '</font>';
+        $info = '<font color="blue">' . str_replace(chr(13), get_string('description_char_r', 'qtype_preg'), $info) . '</font>';*/
+
+        return $info;
     }
 }
 

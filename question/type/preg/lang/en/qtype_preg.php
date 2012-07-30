@@ -458,6 +458,8 @@ $string['description_empty_g'] = 'nothing(form g)';
 
 // Strings for explaining graph
 
+$string['author_tool_explain_graph'] = 'explain graph';
+
 $string['explain_subpattern'] = 'subpattern #';
 $string['explain_backref'] = 'the result of subpattern #';
 $string['explain_recursion'] = 'recursion';

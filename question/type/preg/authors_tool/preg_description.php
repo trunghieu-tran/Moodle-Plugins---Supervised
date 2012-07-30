@@ -584,6 +584,8 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         
         $pattern_t ='';
         $greed_pattern='';
+		$wrong_borders =($this->pregnode->leftborder >= $this->pregnode->rightborder)?true:false;
+
         if($this->pregnode->leftborder===0 ){
             if($this->pregnode->rightborder ===1){
                 $pattern_t = self::get_form_string('description_finite_quant_01',$form);
@@ -615,6 +617,10 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
             $greed_pattern = self::get_form_string('description_quant_possessive',$form);
         }
         $pattern_t = str_replace('%greed',$greed_pattern,$pattern_t);
+		if($wrong_borders){
+			$pattern_t = str_replace('%1','%1<span style="color:red">',$pattern_t);
+			$pattern_t = $pattern_t.' (incorrect quantifier borders)</span>';
+		}
         return $pattern_t;
     }
     
@@ -652,6 +658,7 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
         else if ($this->pregnode->possessive==true) {
             $greed_pattern = self::get_form_string('description_quant_possessive',$form);
         }
+		
         $pattern_t = str_replace('%greed',$greed_pattern,$pattern_t);
         return $pattern_t;
     }
@@ -856,12 +863,97 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
     
 }
 
-/*class qtype_preg_description_node_error extends qtype_preg_description_operator {
+class qtype_preg_description_node_error extends qtype_preg_description_operator {
 
     public function pattern($node_parent=null,$form=null){
         
         $pattern_t = '<span style="color:red">'.$this->pregnode->error_string().'</span>';
+		$need_arrow = false;
+		$operands_places = array();
+		foreach($this->pregnode->operands as $i => $operand){
+			if(isset($operand)){
+				$operands_places[] = '%'.($i+1);
+			}
+		}
+		if(count($operands_places)!=0){
+			$pattern_t .= ' Operands: '.implode(', ',$operands_places);
+		}
 
         return $pattern_t;
+		/*$pseudonym='';
+		switch($this->pregnode->subtype){
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_EMPTY_PARENS :
+			break;
+			case qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES :
+			break;
+			case qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO :
+			break;
+			case qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII :
+			break;
+			case qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED :
+			break;
+		}*/
     }
-}*/
+}

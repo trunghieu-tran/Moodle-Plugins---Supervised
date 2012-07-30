@@ -81,6 +81,20 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
         return parent::get_engine_node_name($pregname);
     }
+
+    protected function is_preg_node_acceptable($pregnode) {
+        switch ($pregnode->type) {
+            case qtype_preg_node::TYPE_ABSTRACT:
+            case qtype_preg_node::TYPE_LEAF_CONTROL:
+            case qtype_preg_node::TYPE_LEAF_OPTIONS:
+            case qtype_preg_node::TYPE_NODE_COND_SUBPATT:
+            case qtype_preg_node::TYPE_NODE_ERROR:
+            case qtype_preg_node::TYPE_NODE_ASSERT:
+                return FALSE;
+            default:
+                return TRUE;
+        }
+    }
     
     public function __construct ($regex = null, $modifiers = null) {
         parent::__construct($regex, $modifiers);
@@ -584,6 +598,14 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     
     public function get_html() {
         return null;
+    }
+
+    public function get_errors() {
+        $res = array();
+        foreach($this->errors as $error) {
+            $res[] = $error;
+        }
+        return $res;
     }
 }
 
