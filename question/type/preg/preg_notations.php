@@ -76,6 +76,34 @@ class qtype_preg_notation_native extends qtype_preg_notation {
         return 'native';
     }
 
+     public function convert_regex($targetnotation) {
+        if ($targetnotation == 'pcrestrict') {
+            //Escape all empty parenthesis (subpatterns and assrtions)
+            //$pattern = '/(?<!\\\\)(\(|\(\?(\:|\||\=|\<\=|\!|\<\!))\)/u';
+            $pattern = '/(?<!\\\\)\(\)/u';
+            $replacement = '\(\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\:\)/u';
+            $replacement = '\(\?\:\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\|\)/u';
+            $replacement = '\(\?\|\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\=\)/u';
+            $replacement = '\(\?\=\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\<\=\)/u';
+            $replacement = '\(\?\<\=\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\!\)/u';
+            $replacement = '\(\?\!\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\<\!\)/u';
+            $replacement = '\(\?\<\!\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            return $this->regex;
+        }
+    }
     //TODO - implement converting from native to PCRE strict notation
 }
 

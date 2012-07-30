@@ -28,6 +28,10 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         return 'php_preg_matcher';
     }
 
+    public function used_notation() {
+        return 'pcrestrict';
+    }
+
     /**
     * Returns string of regular expression modifiers supported by this engine
     */
@@ -53,6 +57,11 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     * @return bool is tree accepted
     */
     protected function accept_regex() {
+
+        //Clear away errors from parser - we don't really need them...
+        //TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict
+        $this->errors = array();
+
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes
             $for_regexp = implode('\/',explode('/',$for_regexp));
