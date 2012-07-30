@@ -41,7 +41,8 @@ class qtype_preg extends qtype_shortanswer {
     */
     public function available_notations() {
         return array(   'native' => get_string('notation_native', 'qtype_preg'),
-                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg')
+                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg'),
+                        'pcrestrict' => get_string('notation_pcrestrict', 'qtype_preg')
                     );
     }
 

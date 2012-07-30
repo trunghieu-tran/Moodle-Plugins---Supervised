@@ -32,6 +32,7 @@ MODIFIER = [iJmsUx]
     $this->charsetcount            = 0;
     $this->charsetset              = '';
     $this->charsetuserinscription  = '';
+    $this->handlingoptions         = new qtype_preg_handling_options;
 
 %init}
 %eof{
@@ -46,6 +47,7 @@ MODIFIER = [iJmsUx]
 %eof}
 %{
     public $matcher;
+    public $handlingoptions;
     protected $errors;
     protected $lastsubpatt;
     protected $maxsubpatt;

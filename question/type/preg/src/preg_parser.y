@@ -2,6 +2,7 @@
 %include{
     require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 }
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
@@ -14,6 +15,8 @@
     private $parens;
     // Node id counter.
     private $idcounter;
+    // Handling options
+    public $handlingoptions;
 
     function __construct() {
         $this->errornodes = array();
@@ -30,6 +33,7 @@
                               qtype_preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!',
                               qtype_preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
         $this->idcounter = 0;
+        $this->handlingoptions = new qtype_preg_handling_options;
     }
 
     function get_root() {
@@ -76,6 +80,36 @@
         } else if ($node->error !== null) {
             $this->create_error_node($node->error->subtype, $node->error->indfirst, $node->error->indlast, $node->error->addinfo);
         }
+    }
+
+    /**
+      * Creates and return correct parenthesis node (subpattern, groping or assertion).
+      *
+      * Used to avoid code duplication between empty and non-empty parenthesis.
+      * @param parens parenthesis token from lexer
+      * @param exprnode the node for expression inside parenthesis
+      */
+    protected function create_parens_node($parens, $exprnode) {
+        $result = null;
+        if ($parens->subtype == 'grouping' && !$this->handlingoptions->preserveallnodes) {//TODO - replace 'grouping' with new supbattern subtypes here and in the lexer
+            $result = $exprnode;
+        } else {
+            if ($parens->subtype == 'grouping') {
+                $result = new qtype_preg_node_subpatt;
+            } else if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $parens->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
+                $result = new qtype_preg_node_subpatt;
+                $result->number = $parens->number;
+            } else {
+                $result = new qtype_preg_node_assert;
+            }
+            $result->subtype = $parens->subtype;
+            $result->operands[0] = $exprnode;
+            $result->id = $this->idcounter++;
+            $result->userinscription = $parens->userinscription . ' ... )';
+        }
+        $result->indfirst = $parens->indfirst;
+        $result->indlast = $exprnode->indlast + 1;
+        return $result;
     }
 }
 %parse_failure {
@@ -144,22 +178,7 @@ expr(A) ::= expr(B) QUANT(C). {
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
     //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
-    if (B->subtype == 'grouping') {
-        A = C;
-    } else {
-        if (B->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || B->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
-            A = new qtype_preg_node_subpatt;
-            A->number = B->number;
-        } else {
-            A = new qtype_preg_node_assert;
-        }
-        A->subtype = B->subtype;
-        A->operands[0] = C;
-        A->id = $this->idcounter++;
-        A->userinscription = B->userinscription . ' ... )';
-    }
-    A->indfirst = B->indfirst;
-    A->indlast = C->indlast + 1;
+    A = $this->create_parens_node(B, C);
     $this->reducecount++;
 }
 
@@ -222,7 +241,14 @@ expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
     foreach($this->errornodes as $key=>$node) {
         if ($node->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//empty parens, avoiding two error messages
             unset($this->errornodes[$key]);
-            A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_EMPTY_PARENS, B->indfirst, B->indlast + 1, $this->parens[B->subtype]);
+            if ($this->handlingoptions->pcrestrict) {//In strict regular expression notation empty parenthesis is OK, they just contains emptyness
+                $emptynode = new qtype_preg_leaf_meta;
+                $emptynode->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $emptynode->id = $this->idcounter++;
+                A = $this->create_parens_node(B, $emptynode);
+            } else {//Give error for empty parenthesis - they are sure a very strange thing to do, probably an error
+                A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_EMPTY_PARENS, B->indfirst, B->indlast + 1, $this->parens[B->subtype]);
+            }
             $emptyparens = true;
         }
     }
@@ -243,6 +269,7 @@ expr(A) ::= CONDSUBPATT(B) expr(E) CLOSEBRACK(D) expr(C). [ERROR_PREC] {
     foreach($this->errornodes as $key=>$node) {
         if ($node->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == D->indlast + 1) {//empty parens, avoiding two error messages
             unset($this->errornodes[$key]);
+            //TODO check if such empty parens are allowed in PCRE and upgrade like expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] { if needed
             A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_EMPTY_PARENS, B->indfirst, D->indlast + 1, $this->parens[B->subtype], array (E));
             $emptyparens = true;
         }
@@ -261,6 +288,7 @@ expr(A) ::= CONDSUBPATT(B) expr(C). [ERROR_PREC_SHORT] {
     foreach($this->errornodes as $key=>$node) {
         if ($node->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//unclosed parens + empty parens, avoiding two error messages
             unset($this->errornodes[$key]);
+            //TODO check if such empty parens are allowed in PCRE and upgrade like expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] { if needed
             A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_EMPTY_PARENS, B->indfirst, B->indlast + 1, $this->parens[B->subtype]);
             $emptyparens = true;
         }

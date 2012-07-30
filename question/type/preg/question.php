@@ -268,6 +268,8 @@ class qtype_preg_question extends question_graded_automatically
             $engineclass = 'qtype_preg_'.$engine;
             $queryengine = new $engineclass;
             $usednotation = $queryengine->used_notation();
+            //Initialise $notationobj so it won't disappear after condition and could be used later.
+            $notationobj = null;
             if ($notation !== null && $notation != $usednotation) {//Conversion is necessary
                 $notationclass = 'qtype_preg_notation_'.$notation;
                 $notationobj = new $notationclass($regex, $modifiers);
@@ -292,6 +294,12 @@ class qtype_preg_question extends question_graded_automatically
                 if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
                     $matchingoptions->capturesubpatterns = false;
                 }
+            }
+
+            //Convert options to desired notation.
+            if ($notation !== null && $notation != $usednotation) {
+                $notationobj->options = $matchingoptions;
+                $matchingoptions = $notationobj->convert_options($usednotation);
             }
 
             $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
