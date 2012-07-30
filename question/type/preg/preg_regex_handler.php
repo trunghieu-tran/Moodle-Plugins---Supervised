@@ -17,6 +17,16 @@ require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php'
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
+/**
+ * Options, generic to all handlers - mainly affects scanning and parsing.
+ */
+class qtype_preg_handling_options {
+    /** @var boolean Strict PCRE compatible regex syntax.*/
+    public $pcrestrict = false;
+    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes.*/
+    public $preserveallnodes = false;
+}
+
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
@@ -214,7 +224,9 @@ class qtype_preg_regex_handler {
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
+        $this->lexer->handlingoptions = $this->options;
         $this->parser = new preg_parser_yyParser;
+        $this->parser->handlingoptions = $this->options;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
                 $this->parser->doParse($token->type, $token->value);
