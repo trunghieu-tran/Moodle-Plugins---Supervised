@@ -69,7 +69,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $answer00->id = 104;
         $answer00->answer = 'Do ((dogs)|frogs|mice) eat (dogs|frogs|mice)\?';
         $answer00->fraction = 0;
-        $answer00->feedback = 'Oh my, that\'s another story...';
+        $answer00->feedback = 'Oh my, that\'s another story... {$1}';
 
         $regular->answers = array(100=>$answer100, 101=>$answer90, 102=>$answer50, 103=>$answer0, 104=>$answer00);
         $this->testquestion = $regular;
