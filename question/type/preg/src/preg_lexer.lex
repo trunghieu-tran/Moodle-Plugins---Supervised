@@ -915,11 +915,11 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <YYINITIAL> "(?:" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?|" {                             // Duplicate subpattern numbers gropu
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
 <YYINITIAL> "(?(?=" {                           // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
@@ -936,7 +936,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "(?(R"[^"<>()'"]*")"? {             // Conditional subpattern - recursion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, ')');
 }
-<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subpattern
+<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
 <YYINITIAL> "(?(<"[^"'<>()?!="]*(">)")? {       // Conditional subpattern - named
@@ -1211,7 +1211,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
         }
         return $res;
     } else {
-        return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
     }
 }
 <YYINITIAL> "(?"("R"|[0-9]+)")" {

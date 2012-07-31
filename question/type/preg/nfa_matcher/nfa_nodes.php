@@ -352,6 +352,9 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        if ($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+            return;
+        }
         $body = array_pop($stack);
 
         // Every transition outgoing from the start state we tag with the value of (subpattern number * 2).

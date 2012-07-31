@@ -652,7 +652,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?:a)', $errornodes, $options);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
-        $this->assertTrue($root->subtype == 'grouping');//TODO - change to new constant along with lexer and parser.
+        $this->assertTrue($root->subtype == qtype_preg_node_subpatt::SUBTYPE_GROUPING);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
     }
     function test_pcre_strict() {//Tests for PCRE strict option.

@@ -191,10 +191,10 @@ class preg_parser_yyParser
       */
     protected function create_parens_node($parens, $exprnode) {
         $result = null;
-        if ($parens->subtype == 'grouping' && !$this->handlingoptions->preserveallnodes) {//TODO - replace 'grouping' with new supbattern subtypes here and in the lexer
+        if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
             $result = $exprnode;
         } else {
-            if ($parens->subtype == 'grouping') {
+            if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
                 $result = new qtype_preg_node_subpatt;
             } else if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $parens->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
                 $result = new qtype_preg_node_subpatt;

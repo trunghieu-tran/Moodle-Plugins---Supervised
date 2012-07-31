@@ -6598,14 +6598,14 @@ array(
                         case 54:
                             {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
                         case -55:
                             break;
                         case 55:
                             {                             // Duplicate subpattern numbers gropu
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
 }
                         case -56:
                             break;
@@ -6740,7 +6740,7 @@ array(
         }
         return $res;
     } else {
-        return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
     }
 }
                         case -68:
@@ -6885,7 +6885,7 @@ array(
                         case -84:
                             break;
                         case 84:
-                            {                   // Conditional subpattern
+                            {                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
                         case -85:
@@ -7499,7 +7499,7 @@ array(
                         case -148:
                             break;
                         case 149:
-                            {                   // Conditional subpattern
+                            {                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
                         case -149:
