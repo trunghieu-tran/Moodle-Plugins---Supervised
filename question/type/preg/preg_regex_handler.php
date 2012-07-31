@@ -125,7 +125,7 @@ class qtype_preg_regex_handler {
 
         $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
-        $this->set_options($options);
+        $this->options = $options;
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);

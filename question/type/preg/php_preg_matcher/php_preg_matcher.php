@@ -15,6 +15,15 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
+    public function __construct($regex = null, $modifiers = null, $options = null) {
+        //This matcher sometimes use common lexer/parser to count subpatterns, since preg_match don't always return them all.
+        //We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
+        if (is_object($options)) {
+            $options->pcrestrict = true;
+        }
+        parent::__construct($regex, $modifiers, $options);
+    }
+
     public function is_supporting($capability) {
         switch ($capability) {
         case qtype_preg_matcher::SUBPATTERN_CAPTURING :
@@ -60,7 +69,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
         //Clear away errors from parser - we don't really need them...
         //TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict
-        $this->errors = array();
+        //$this->errors = array();
 
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes

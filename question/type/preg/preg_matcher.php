@@ -427,20 +427,23 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
-        // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
-        if ($this->options === null) {
+        // Options should exist at least as a default object. Be sure to create matching options.
+        if ($options === null) {
             $options = new qtype_preg_matching_options();
-            if ($this->lexer !== null) {
-                $options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
-            }
-            $this->set_options($options);
         }
+
 
         //Do parsing
         parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
         }
+
+        //If there were backreferences in regex, subpattern capturing should be forced.
+        if ($this->lexer !== null) {
+            $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
+        }
+
 
         //Invalidate match called later to allow parser to count subpatterns
         $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
