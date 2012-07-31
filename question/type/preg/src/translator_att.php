@@ -7,7 +7,7 @@
      * @author Valeriy Streltsov
      */
 
-    $INPUT_SET = 'repetition';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
+    $INPUT_SET = 'nullsubexpr';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
     $INPUT_FILENAME = $INPUT_SET . '.dat.txt';
     $OUTPUT_FILENAME = 'cross_tests_from_att_' . $INPUT_SET . '.php';
     $TAB = '	';
@@ -27,6 +27,7 @@
     fwrite($out, 'class qtype_preg_cross_tests_from_att_' . $INPUT_SET . ' {' . $EOL . $EOL);
 
     $counter = 0;
+    $lastregex = '';
     while (!feof($in)) {
         $line = fgets($in);
         if (feof($in)) {
@@ -64,6 +65,11 @@
             }
             $regex .= $ch;
             $i++;
+        }
+        if ($regex === 'SAME') {
+            $regex = $lastregex;
+        } else {
+            $lastregex = $regex;
         }
 
         // skip tabs.
@@ -157,6 +163,7 @@
         echo 'indexes: '; print_r($index_first) . $EOL;
         echo 'lengths: '; print_r($length) . $EOL;
         echo $EOL;*/
+
 
         fwrite($out, $TAB1 . $FUNCTION_PREFIX . $counter++ . '() {' . $EOL);
         fwrite($out, $TAB2 . '$test1 = array( \'str\'=>"' . $string . '",' . $EOL);
