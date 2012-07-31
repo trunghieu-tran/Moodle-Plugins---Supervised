@@ -440,7 +440,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         //If there were backreferences in regex, subpattern capturing should be forced.
-        if ($this->lexer !== null) {
+        if ($this->lexer !== null && !$this->options->capturesubpatterns) {
             $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
         }
 
