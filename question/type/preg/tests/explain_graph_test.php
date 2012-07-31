@@ -256,6 +256,25 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        
        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with assert and subgraph ^(a)$!');
    }
+
+   function test_create_graph_backref()
+   {
+       $tree = new qtype_preg_author_tool_explain_graph('(b)\1');
+
+       $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+       $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('subpattern #1', 'solid; color=black');
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('b'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('the result of subpattern #1'), 'ellipse', 'blue', $etalon, 0);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[0]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->subgraphs[0]->nodes[0]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[2]);
+
+       $result = $tree->create_graph();
+       
+       $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with backreference!');
+   }
 }
 
 ?>
