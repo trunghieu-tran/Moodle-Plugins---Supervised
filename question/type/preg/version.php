@@ -10,7 +10,7 @@ $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
     'qbehaviour_adaptivehints' => 2011111902,
     'qbehaviour_adaptivehintsnopenalties' => 2011111902,
-    'qtype_poasquestion' => 2012060900
-    //TODO - add block formal languages there
+    'qtype_poasquestion' => 2012060900,
+    'block_formal_langs' => 2012021400
 );
 ?>

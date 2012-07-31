@@ -1397,6 +1397,10 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
     const SUBTYPE_SUBPATT = 'subpatt_node_subpatt';
     /** Once-only subpattern. */
     const SUBTYPE_ONCEONLY = 'onceonly_node_subpatt';
+    /** Grouping node. For author's tools only.*/
+    const SUBTYPE_GROUPING = 'grouping_node_supbatt';
+    /** Duplicate subpatterns. For author's tools only.*/
+    const SUBTYPE_DUPLICATE_SUBPATTERNS = 'duplicate_node_subpatt';
 
     /** Subpattern number. */
     public $number = 0;
