@@ -10,6 +10,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 /**
  * Abstract notation class
@@ -20,13 +21,19 @@ abstract class qtype_preg_notation {
     public $regex;
     //Regular expression modifiers in this notation
     public $modifiers;
+    //Regular expression handling options
+    public $options;
 
     /**
     * Constructs notation object, should suit most notations
     */
-    public function __construct($regex, $modifiers = '') {
+    public function __construct($regex, $modifiers = '', $options = null) {
         $this->regex = $regex;
         $this->modifiers = $modifiers;
+        if ($options === null) {
+            $options = new qtype_preg_handling_options;
+        }
+        $this->options = $options;
     }
 
     /**
@@ -40,13 +47,23 @@ abstract class qtype_preg_notation {
     public function convert_regex($targetnotation) {
         throw new qtype_preg_exception('Sorry, no conversion from '.$this->name().' to '.$targetnotation.' implemented yet.');
     }
+
     /**
-    * Returns regular expression modifiers in desired notation, should suit most notation
+    * Returns regular expression modifiers in desired notation, should suit most notations
     * When overloading this, you probably would want to add some modifers based on regular expression
     */
     public function convert_modifiers($targetnotation) {
         return $this->modifiers;
     }
+
+    /**
+    * Returns regular expression options in desired notation, should suit most notations
+    * When overloading this, you probably would want to set some options based on notation
+    */
+    public function convert_options($targetnotation) {
+        return $this->options;
+    }
+
 }
 
 /**
@@ -59,6 +76,34 @@ class qtype_preg_notation_native extends qtype_preg_notation {
         return 'native';
     }
 
+     public function convert_regex($targetnotation) {
+        if ($targetnotation == 'pcrestrict') {
+            //Escape all empty parenthesis (subpatterns and assrtions)
+            //$pattern = '/(?<!\\\\)(\(|\(\?(\:|\||\=|\<\=|\!|\<\!))\)/u';
+            $pattern = '/(?<!\\\\)\(\)/u';
+            $replacement = '\(\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\:\)/u';
+            $replacement = '\(\?\:\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\|\)/u';
+            $replacement = '\(\?\|\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\=\)/u';
+            $replacement = '\(\?\=\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\<\=\)/u';
+            $replacement = '\(\?\<\=\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\!\)/u';
+            $replacement = '\(\?\!\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            $pattern = '/(?<!\\\\)\(\?\<\!\)/u';
+            $replacement = '\(\?\<\!\)';
+            $this->regex = preg_replace($pattern, $replacement, $this->regex);
+            return $this->regex;
+        }
+    }
     //TODO - implement converting from native to PCRE strict notation
 }
 
@@ -74,7 +119,7 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
 
     public function convert_regex($targetnotation) {
 
-        if ($targetnotation == 'native' || $targetnotation == 'PCRE') {
+        if ($targetnotation == 'native' || $targetnotation == 'pcrestrict') {
             //Code from qtype_shortanswer_question::compare_string_with_wildcard with proper respect for Tim Hunt
 
             // Break the string on non-escaped asterisks.
@@ -88,6 +133,27 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
             return implode('.*', $excapedbits);
         }
         parent::convert_regex($targetnotation);
+    }
+}
+
+class qtype_preg_notation_pcrestrict extends qtype_preg_notation {
+
+    public function name() {
+        return 'pcrestrict';
+    }
+
+    public function convert_regex($targetnotation) {
+        if ($targetnotation == 'native') {
+            return $this->regex;
+        }
+        parent::convert_regex($targetnotation);
+    }
+
+    public function convert_options($targetnotation) {
+        if ($targetnotation == 'native') {
+            $this->options->pcrestrict = true;
+        }
+        return $this->options;
     }
 }
  ?>

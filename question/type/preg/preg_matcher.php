@@ -365,15 +365,15 @@ class qtype_preg_matching_results {
 }
 
 /**
- * Options, used to specify matching process
+ * Options, used to specify matching process.
  */
-class qtype_preg_matching_options {
+class qtype_preg_matching_options extends qtype_preg_handling_options {
 
     /** @var boolean Should matcher try to generate extension? */
     public $extensionneeded = true;
-    /** @var string Unicode property name for preferred alphabet for \w when generating extension*/
+    /** @var string Unicode property name for preferred alphabet for \w etc when generating extension.*/
     public $preferredalphabet = null;
-    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension*/
+    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension.*/
     public $preferfordot = null;
 
     /** @var boolean Should matcher look for subpattern captures or the whole match only? */

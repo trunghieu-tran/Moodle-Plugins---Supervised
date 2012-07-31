@@ -41,7 +41,8 @@ class qtype_preg extends qtype_shortanswer {
     */
     public function available_notations() {
         return array(   'native' => get_string('notation_native', 'qtype_preg'),
-                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg')
+                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg'),
+                        'pcrestrict' => get_string('notation_pcrestrict', 'qtype_preg')
                     );
     }
 
@@ -91,12 +92,13 @@ class qtype_preg extends qtype_shortanswer {
         parent::save_question_options($question);
     }
 
-    function test_response(&$question, $state, $answer) {
+/*    function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
-        $matcher = $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $hintneeded = ($question->usecharhint || $question->uselexemhint) && $answer->fraction >= $question->hintgradeborder;
+        $matcher = $question->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id, $question->notation);
         return $matcher->match($state->responses['']);
-    }
+    }*/
 
 }
 //// END OF CLASS ////

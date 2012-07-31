@@ -34,6 +34,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $this->charsetcount             = 0;
     $this->charsetset               = '';
     $this->charsetuserinscription   = '';
+    $this->handlingoptions         = new qtype_preg_handling_options;
 
 %init}
 %eof{
@@ -55,6 +56,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 %eof}
 %{
     public $matcher;
+    public $handlingoptions;
     protected $errors;
     protected $lastsubpatt;
     protected $maxsubpatt;

@@ -28,6 +28,10 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         return 'php_preg_matcher';
     }
 
+    public function used_notation() {
+        return 'pcrestrict';
+    }
+
     /**
     * Returns string of regular expression modifiers supported by this engine
     */
@@ -40,8 +44,12 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     * @return bool if parsing needed
     */
     protected function is_parsing_needed() {
-        //no parsing needed
-        return false;
+        //We need parsing if option is set for capture subpatterns.
+        return $this->options->capturesubpatterns;
+    }
+
+    protected function is_preg_node_acceptable($pregnode) {
+        return true;    // We actually need tree only for subpatterns, so accept anything.
     }
 
     /**
@@ -49,6 +57,11 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     * @return bool is tree accepted
     */
     protected function accept_regex() {
+
+        //Clear away errors from parser - we don't really need them...
+        //TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict
+        $this->errors = array();
+
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes
             $for_regexp = implode('\/',explode('/',$for_regexp));
@@ -70,7 +83,8 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     protected function match_inner($str) {
         //Prepare results
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->invalidate_match($this->get_max_subpattern());
+        $matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());//Needed to invalidate match correctly.
+        $matchresults->invalidate_match();
 
         //Preparing regexp
         $for_regexp = $this->regex;

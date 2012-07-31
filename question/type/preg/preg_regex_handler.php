@@ -17,6 +17,16 @@ require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php'
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
+/**
+ * Options, generic to all handlers - mainly affects scanning and parsing.
+ */
+class qtype_preg_handling_options {
+    /** @var boolean Strict PCRE compatible regex syntax.*/
+    public $pcrestrict = false;
+    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes.*/
+    public $preserveallnodes = false;
+}
+
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
@@ -39,8 +49,11 @@ class qtype_preg_regex_handler {
     /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
     protected $anchor;
 
+    /**
+     * Returns class name without 'qtype_preg_' prefix.
+     */
     public function name() {
-        return 'preg_regex_handler';
+        return 'regex_handler';
     }
 
     /**
@@ -116,6 +129,7 @@ class qtype_preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
+            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subpatterns
         } else {
             $this->ast_root = null;
             //In case with no parsing we should stick to accepting whole regex, not nodes
@@ -252,7 +266,9 @@ class qtype_preg_regex_handler {
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
+        $this->lexer->handlingoptions = $this->options;
         $this->parser = new preg_parser_yyParser;
+        $this->parser->handlingoptions = $this->options;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
                 $this->parser->doParse($token->type, $token->value);
@@ -273,12 +289,11 @@ class qtype_preg_regex_handler {
         foreach($parseerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
-        // Set the AST root anyway, but the DST root only of there are no errors.
-        $this->ast_root = $this->parser->get_root();
-        if (count($this->errors) === 0) {
+        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
+            $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
-        }
+        //}
         fclose($pseudofile);
     }
 
@@ -287,6 +302,7 @@ class qtype_preg_regex_handler {
      *
      * Create handler with no parameters, than call this function to avoid re-parsing if you have
      *   two handlers working on one regex.
+     * @deprecated since 28.07.2012 may not work. TODO - find a way to bypass protection on class members to create another handler from this
      */
     public function get_tree_from_another_handler($handler) {
         $this->errors = $handler->get_error_objects();

@@ -142,14 +142,19 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $data['usecharhint'] = false;
         }
 
+        if (!array_key_exists('uselexemhint', $data)) {
+            $data['uselexemhint'] = false;
+        }
+
         $i = 0;
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                //Not using exactmatch option to not confuse user by things it adds to regex
-                $matcher = $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
+                $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
+                //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
+                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation'], $hintused);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';

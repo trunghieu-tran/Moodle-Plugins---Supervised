@@ -646,16 +646,55 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[10]->indlast == 8);
         $this->assertTrue(is_a($errornodes[10]->operands[0], 'qtype_preg_node_concat'));
     }
+    function test_preserve_all_nodes() {//Tests for preserve all nodes option.
+        $options = new qtype_preg_handling_options;
+        $options->preserveallnodes = true;
+        $parser = $this->run_parser('(?:a)', $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->subtype == 'grouping');//TODO - change to new constant along with lexer and parser.
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+    }
+    function test_pcre_strict() {//Tests for PCRE strict option.
+        $options = new qtype_preg_handling_options;
+        $options->pcrestrict = true;
+        //Empty parenthesis should be empty subpattern.
+        $parser = $this->run_parser('()', $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
+        $this->assertTrue($root->subtype == qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        //Empty parenthesis with concatenation.
+        $parser = $this->run_parser('a()b', $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        //Empty assertion
+        $parser = $this->run_parser('(?=)', $errornodes, $options);
+        $root = $parser->get_root();
+        $this->assertTrue(empty($errornodes));
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ASSERT);
+        $this->assertTrue($root->subtype == qtype_preg_node_assert::SUBTYPE_PLA);
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    }
     /**
      * Service function to run parser on regex.
      * @param regex Regular expression to parse.
+     * @param options qtype_preg_handling_options
      * @return parser object.
      */
-    protected function run_parser($regex, &$errors) {
+    protected function run_parser($regex, &$errors, $options = null) {
         $parser = new preg_parser_yyParser;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
+        if ($options === null) {
+            $options = new qtype_preg_handling_options;
+        }
+        $lexer->handlingoptions = $options;
+        $parser->handlingoptions = $options;
         while ($token = $lexer->nextToken()) {
             if (!is_array($token)) {
                 $parser->doParse($token->type, $token->value);
