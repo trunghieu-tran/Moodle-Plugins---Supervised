@@ -73,9 +73,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 return self::process_charset($this->pregnode->userinscription);
             case qtype_preg_node::TYPE_LEAF_META:
                 if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
-                    return 'Void';
+                    return array('Void');
                 else
-                    return get_string('explain_unknow_meta', 'qtype_preg');
+                    return array(get_string('explain_unknow_meta', 'qtype_preg'));
             case qtype_preg_node::TYPE_LEAF_ASSERT:
                 if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
                     return get_string('description_circumflex', 'qtype_preg');
@@ -86,11 +86,11 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 else
                     return get_string('explain_unknow_assert', 'qtype_preg');
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-                return get_string('explain_backref', 'qtype_preg') . $this->pregnode->number;
+                return array(get_string('explain_backref', 'qtype_preg') . $this->pregnode->number);
             case qtype_preg_node::TYPE_LEAF_RECURSION:
-                return get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : '');
+                return array(get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : ''));
             default:
-                return get_string('explain_unknow_node', 'qtype_preg');
+                return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
     }
     
@@ -125,7 +125,8 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
      * Returns shape of node which will be in graph. 
      */
     public function get_shape() {
-        if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT)
+        if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT ||
+             $this->pregnode->type == qtype_preg_node::TYPE_LEAF_BACKREF || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_RECURSION)
             return 'ellipse';
         elseif (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
