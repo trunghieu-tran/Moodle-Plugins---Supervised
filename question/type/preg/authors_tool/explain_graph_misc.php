@@ -121,7 +121,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             }
             else
             {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label . '"' . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
             }
         }
 
@@ -150,10 +150,10 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         if (count($lbl)) {
             if (count($lbl) == 1)
             {
-                if ($invert || strlen($lbl) != 1)
-                    $elements[] = $lbl;
+                if ($invert || strlen($lbl[0]) != 1)
+                    $elements[] = $lbl[0];
                 else
-                    return '"' . $lbl . '"';
+                    return '"' . $lbl[0] . '"';
             }
             else {
                 for ($i = 0; $i < count($lbl); ++$i) {
@@ -171,10 +171,8 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             for ($i = 0; $i != count($elements); ++$i) {
                 if ($elements[$i][0] == chr(10))
                     $result .= '<TD><font color="blue">' . substr($elements[$i], 1) . '</font></TD>';
-                elseif (strstr($elements[$i], '\\p') != FALSE)
-                    $result .= '<TD><font color="blue">' . $elements[$i] . '</font></TD>';
                 else
-                    $result .= '<TD>' . $elements[$i] . '</TD>';
+                    $result .= '<TD>' . str_replace('"', '&#34;', $elements[$i]) . '</TD>';
             }
             
             $result .= '</TR></TABLE>>';
@@ -204,7 +202,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             else
             {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . $iter->label. '"' . $iter->fill .'];';
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill .'];';
             }
         }
 

@@ -33,8 +33,8 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     public function create_graph($id = -1) {
         $graph = $this->dst_root->create_graph($id);
        
-        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('begin', 'box, style=filled', 'purple', $graph, -2);
-        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('end', 'box, style=filled', 'purple', $graph, -3);
+        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $graph, -2);
+        $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $graph, -3);
         
         if (count($graph->nodes) == 2 && count($graph->subgraphs) == 0) {
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1]);
@@ -286,7 +286,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 if ($neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $graph && $neighbor->fill == '')
                 {
                     //create the new unioned node
-                    $tmp = new qtype_preg_author_tool_explain_graph_node($tmpdnode->label . $neighbor->label, $neighbor->shape, $neighbor->color, $graph, $tmpdnode->id);
+                    $tmp = new qtype_preg_author_tool_explain_graph_node(array($tmpdnode->label[0] . $neighbor->label[0]), $neighbor->shape, $neighbor->color, $graph, $tmpdnode->id);
 
                     //find link between left neighbor and current node, then change destination to new node
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_src($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
@@ -517,6 +517,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         if ($n1->color != $n2->color) {
             print(chr(10));
             print('Colors of nodes failed!');
+            print(chr(10));
             return false;
         }
         if ($n1->label != $n2->label) {

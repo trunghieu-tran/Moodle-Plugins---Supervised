@@ -70,34 +70,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     public function get_value() {
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
-                if (count($this->pregnode->flags) == 1)
-                {
-                    $result = qtype_preg_author_tool_leaf::process_flag_value($this->pregnode->flags[0]);
-                    if ($result == ' ')
-                        return get_string('description_char_space', 'qtype_preg');
-                    elseif ($result == '	')
-                        return get_string('description_char_t', 'qtype_preg');
-                    elseif ($result == '"')
-                        return '\\"';
-                    elseif ($result == '\\')
-                        return '\\\\';
-                    elseif ($result == chr(10))
-                        return get_string('description_char_n', 'qtype_preg');
-                    elseif ($result == chr(13))
-                        return get_string('description_char_r', 'qtype_preg');
-                    else
-                        return $result;
-                }
-                else
-                {
-                    $result = array();
-                    foreach ($this->pregnode->flags as $flag)
-                    {
-                        $result[] = qtype_preg_author_tool_leaf::process_flag_value($flag, TRUE);
-                    }
-
-                    return $result;
-                }
+                return self::process_charset($this->pregnode->userinscription);
             case qtype_preg_node::TYPE_LEAF_META:
                 if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
                     return 'Void';
@@ -127,9 +100,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
     public function get_color() {
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
-                if (count($this->pregnode->userinscription) == 1) {
-                    if ($this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::FLAG || $this->pregnode->flags[0][0]->type == qtype_preg_charset_flag::UPROP || 
-                    $this->pregnode->userinscription[0] == ' ' || $this->pregnode->userinscription[0] == '	' || $this->pregnode->userinscription[0] == chr(10))
+                $tmp = $this->get_value();
+                if (count($tmp) == 1) {
+                    if ($tmp[0][0] == chr(10))
                         return 'green';
                     else
                         return 'black';
@@ -214,14 +187,144 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         }
     }
 
-    private static function process_charset($info) {
-        $info = str_replace('"', '&#34', $info);
-        /*$info = '<font color="blue">' . str_replace(' ', get_string('description_char_space', 'qtype_preg'), $info) . '</font>';
-        $info = '<font color="blue">' . str_replace('	', get_string('description_char_t', 'qtype_preg'), $info) . '</font>';
-        $info = '<font color="blue">' . str_replace(chr(10), get_string('description_char_n', 'qtype_preg'), $info) . '</font>';
-        $info = '<font color="blue">' . str_replace(chr(13), get_string('description_char_r', 'qtype_preg'), $info) . '</font>';*/
+    public static function process_charset($info) {
+        $result = array();
 
-        return $info;
+        $result[] = '';
+        foreach ($info as $iter)
+        {
+            $mpos = strpos($iter, '-');
+            if ($mpos != 0 && $mpos != strlen($iter) - 1 && $iter[$mpos-1] != '\\')
+            {
+                $result[] = chr(10) . 'from ' . substr($iter, 0, $mpos) . ' to ' . substr($iter, $mpos + 1);
+                continue;
+            }
+
+            for ($i = 0; $i < strlen($iter); $i++)
+            {
+                if ($i == 0 && $iter[$i] == '[')
+                {
+                    $i += 2;
+                    $tmp = '';
+                    while ($iter[$i] != ':')
+                    {
+                        $tmp .= $iter[$i];
+                        $i++;
+                    }
+                    $i++;
+
+                    $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
+                }
+                elseif ($iter[$i] == '\\')
+                {
+                    $i++;
+                    if ($iter[$i] == '\\')
+                        $result[count($result) - 1] .= '\\\\';
+                    if ($iter[$i] == 'p')
+                    {
+                        $i++;
+                        if ($iter[$i] == '{')
+                        {
+                            $tmp = '';
+                            $i++;
+                            while ($iter[$i] != '}')
+                            {
+                                $tmp .= $iter[$i];
+                                $i++;
+                            }
+                            $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
+                        }
+                        else
+                        {
+                            $result[] = chr(10) . get_string('description_charflag_' . $iter[$i], 'qtype_preg');
+                        }
+                    }
+                    elseif ($iter[$i] == 'x')
+                    {
+                        $i++;
+                        $tmp = $iter[$i];
+                        $i++;
+                        $tmp .= $iter[$i];
+
+                        $result[] = chr(10) . str_replace('%code', $tmp, get_string('description_char_16value', 'qtype_preg'));
+                    }
+                    elseif ($iter[$i] == 'n')
+                    {
+                        $result[] = chr(10) . get_string('description_char_n', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'r')
+                    {
+                        $result[] = chr(10) . get_string('description_char_r', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'd')
+                    {
+                        $result[] = chr(10) . get_string('description_charflag_digit', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'D')
+                    {
+                        $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_digit', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 's')
+                    {
+                        $result[] = chr(10) . get_string('description_charflag_space', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'S')
+                    {
+                        $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_space', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'w')
+                    {
+                        $result[] = chr(10) . get_string('description_charflag_word', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 'W')
+                    {
+                        $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_word', 'qtype_preg');
+                    }
+                    elseif ($iter[$i] == 't')
+                    {
+                        goto tab;
+                    }
+                    elseif ($iter[$i] == ' ')
+                    {
+                        goto space;
+                    }
+                    elseif ($iter[$i] == '	')
+                    {
+                        goto tab;
+                    }
+                    else
+                    {
+                        $result[0] .= $iter[$i];
+                    }
+                }
+                elseif ($iter[$i] == ' ')
+                {
+                    space:
+                    $result[] = chr(10) . get_string('description_char_space', 'qtype_preg');
+                }
+                elseif ($iter[$i] == '	')
+                {
+                    tab:
+                    $result[] = chr(10) . get_string('description_char_t', 'qtype_preg');
+                }
+                elseif ($iter[$i] == '.')
+                {
+                    $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
+                }
+                else
+                {
+                    $result[0] .= $iter[$i];
+                }
+            }
+        }
+
+        if ($result[0] == '')
+        {
+            unset($result[0]);
+            $result = array_values($result);
+        }
+
+        return $result;
     }
 }
 
