@@ -62,7 +62,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 %eof{
     // End of the expression inside a character class.
     if ($this->charset !== null) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, $this->charsetuserinscription);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, htmlspecialchars($this->charsetuserinscription));
         $error->set_user_info($this->charset->indfirst, $this->yychar - 1, $this->charsetuserinscription);
         $this->errors[] = $error;
     }
@@ -73,7 +73,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $number = $leaf->number;
             $error = false;
             if ((is_int($number) && $number > $this->maxsubpatt) || (is_string($number) && !array_key_exists($number, $this->subpatternmap))) {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->number);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, htmlspecialchars($leaf->number));
                 $error->set_user_info($leaf->indfirst, $leaf->indlast, $leaf->userinscription);
                 $this->errors[] = $error;
             }
@@ -263,7 +263,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             }
         }
         if ($wrongfound !== '') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, $wrongfound);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, htmlspecialchars($wrongfound));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
             $errors[] = $error;
         }
@@ -273,7 +273,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $modname = $set[$i];
             if ($unset->contains($modname) !== false && $allowed->contains($modname) !== false) {
                 // Setting and unsetting modifier at the same time is error.
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $modname);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, htmlspecialchars($modname));
                 $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
                 $errors[] = $error;
                 $setunseterror = true;
@@ -312,7 +312,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
         if (!$infinite && $leftborder > $rightborder) {
             $rightoffset = 0;
             $greed || $rightoffset++;
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $leftborder . ',' . $rightborder);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, htmlspecialchars($leftborder . ',' . $rightborder));
             $error->set_user_info($pos + 1, $pos + $length - 2 - $rightoffset, $leftborder . ',' . $rightborder);
             $node->error = $error;
         }
@@ -325,7 +325,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     protected function form_control($text, $pos, $length) {
         // Error: missing ) at end.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== ')') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
@@ -407,7 +407,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
             // Error: unknown control sequence.
             if ($delimpos === false) {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, htmlspecialchars($text));
                 $error->set_user_info($pos, $pos + $length - 1, $text);
                 return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
             }
@@ -418,7 +418,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
             // Error: empty name.
             if ($name === '') {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $text);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
                 $error->set_user_info($pos, $pos + $length - 1, $text);
                 return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
             }
@@ -446,7 +446,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 return array(new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node),
                              new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node2));
             } else {
-                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $text);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, htmlspecialchars($text));
                 $error->set_user_info($pos, $pos + $length - 1, $text);
                 return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
             }
@@ -461,7 +461,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: missing closing characters.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
@@ -470,7 +470,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: empty name.
         if ($name === '') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
@@ -479,7 +479,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: subpatterns with same names should have different numbers.
         if ($num === null) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, $name);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, htmlspecialchars($name));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $name);
             return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
@@ -494,7 +494,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: different names for subpatterns of the same number.
         if ($insidedup && $this->optstack[$this->optcount - 2]->subpattname !== $name) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
@@ -519,7 +519,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: unclosed condition.
         if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
@@ -533,14 +533,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 $data = qtype_poasquestion_string::substr($text, 5, $length - 6);
                 // Error: empty name.
                 if ($data === '') {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $text);
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
                     $secondnode->set_user_info($pos, $pos + $length - 1, $text);
                 }
             } else {                                                        // (?(Rnumber)
                 $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
                 // Error: digits expected.
                 if ($tmp !== '' && !ctype_digit($tmp)) {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, $tmp);
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($tmp));
                     $secondnode->set_user_info($pos, $pos + $length - 1, $text);
                     $data = 0;
                 }
@@ -560,7 +560,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             }
             if ($str !== '' && !ctype_digit($str)) {
                 // Error: digits expected.
-                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, $str);
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($str));
                 $secondnode->set_user_info($pos, $pos + $length - 1, $text);
             } else {
                 if ($sign !== 0) {
@@ -573,7 +573,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 }
                 // Error: reference to the whole expression.
                 if ($data === 0) {
-                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, $data);
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, htmlspecialchars($data));
                     $secondnode->set_user_info($pos, $pos + $length - 1, $text);
                 }
             }
@@ -583,7 +583,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $data = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - $endlength);
             // Error: empty name.
             if ($data === '') {
-                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $text);
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
                 $secondnode->set_user_info($pos, $pos + $length - 1, $text);
             }
         }
@@ -601,14 +601,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
     protected function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
         // Error: missing opening characters.
         if (qtype_poasquestion_string::substr($text, $namestartpos - 1, 1) !== $opentype) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $opentype);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, htmlspecialchars($opentype));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
 
         // Error: missing closing characters.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, $closetype);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, htmlspecialchars($closetype));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
@@ -617,7 +617,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 
         // Error: empty name.
         if ($name === '') {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
@@ -637,7 +637,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     protected function form_backref($text, $pos, $length, $number) {
         // Error: backreference to the whole expression.
         if ($number === 0) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO, $text);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO, htmlspecialchars($text));
             $error->set_user_info($pos, $pos + $length - 1, $text);
             return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
@@ -736,7 +736,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $cclength -= 3;
             $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
             // Return the error node.
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $startchar . '-' . $endchar);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, htmlspecialchars($startchar . '-' . $endchar));
             $error->set_user_info($this->yychar - 2, $this->yychar + $this->yylength() - 1, $startchar . '-' . $endchar);
             return $error;
         }
@@ -801,7 +801,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
         $x = qtype_poasquestion_string::substr($cx, 2);
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $cx);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, htmlspecialchars($cx));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $cx);
         } else {
             $error = null;
@@ -871,7 +871,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $error = null;
             return self::$upropflags[$str];
         } else {
-            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $str);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext());
             return null;
         }
@@ -970,7 +970,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "(?#"[^)]*")"? {                    // Comment
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, $text);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, htmlspecialchars($text));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
         return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
@@ -1061,14 +1061,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $text);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, htmlspecialchars($text));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
         return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     }
     throw new Exception('Callouts are not implemented yet');
     $number = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $text);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, htmlspecialchars($text));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
         return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
@@ -1190,7 +1190,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
         return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
@@ -1316,13 +1316,13 @@ ESCAPABLE  = [^0-9a-zA-Z]
     return $res;
 }
 <YYINITIAL> "\c" {
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c');
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, htmlspecialchars('\c'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, '\c');
     return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
     return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
@@ -1373,18 +1373,18 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <YYINITIAL> \\. {           // ERROR: incorrect escape sequence.
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
     return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> \\ {           // ERROR: \ at end of pattern.
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, '\\');
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, htmlspecialchars('\\'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, '\\');
     return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {      // ERROR: POSIX class outside character set.
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
     return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
@@ -1465,7 +1465,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
     $this->charset->userinscription[] = $text;
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
     $this->charset->error[] = $error;
     $this->charsetuserinscription .= $text;
@@ -1523,7 +1523,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
-        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, '0x' . $str);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
         $this->charset->error[] = $error;
     } else {
@@ -1564,7 +1564,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, $text);
     $this->charset->error[] = $error;
 }
