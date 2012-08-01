@@ -140,7 +140,7 @@ abstract class qtype_preg_node {
     /**
      * Sets indexes and userinscription for the node.
      */
-    public function set_user_info($indfirst, $indlast, $userinscription) {
+    public function set_user_info($indfirst, $indlast, $userinscription = null) {
         $this->indfirst = $indfirst;
         $this->indlast = $indlast;
         $this->userinscription = $userinscription;
