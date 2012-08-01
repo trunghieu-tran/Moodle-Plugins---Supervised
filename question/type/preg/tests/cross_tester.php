@@ -94,7 +94,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     // Different notations.
     const NOTATION_NATIVE             = 'native';
     const NOTATION_MDLSHORTANSWER     = 'mdlshortanswer';
-    //const NOTATION_PCRESTRICT       = '';
+    const NOTATION_PCRESTRICT         = 'pcrestrict';
 
     // TODO: tags for different capabilities for matchers.
 
