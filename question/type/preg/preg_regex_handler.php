@@ -221,6 +221,10 @@ class qtype_preg_regex_handler {
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
+        // Do not show accepting errors for error nodes.
+        if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            return true;
+        }
         return false;    // Should be overloaded by child classes
     }
 
