@@ -160,7 +160,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_syntax_errors() {
         $handler = new qtype_preg_regex_handler('(*UTF9))((?(?=x)a|b|c)()({5,4})(?i-i)[[:hamster:]]\p{Squirrel}[abc');
         $errors = $handler->get_error_objects();
-        $this->assertTrue(count($errors) == 11);
+        $this->assertTrue(count($errors) == 12);
         /*$this->assertTrue($errors[0]->index_first == 31); // Setting and unsetting modifier.
         $this->assertTrue($errors[0]->index_last == 36);
         $this->assertTrue($errors[1]->index_first == 62); // Unclosed charset.

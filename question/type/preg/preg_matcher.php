@@ -428,7 +428,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->resultcache = array();
 
         // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
-        if ($this->options === null) {
+        if ($options === null) {
             $options = new qtype_preg_matching_options();
             if ($this->lexer !== null) {
                 $options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
