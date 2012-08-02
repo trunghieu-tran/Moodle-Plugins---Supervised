@@ -6985,9 +6985,6 @@ array(
     foreach ($this->charsetuserinscription as $userinscription) {
         $this->charset->userinscription[] = $userinscription;
     }
-    if (count($this->charset->userinscription) === 0) {
-        $this->charset->userinscription = null;
-    }
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
@@ -7102,6 +7099,7 @@ array(
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
     $this->charset->error[] = $error;
+    $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
 }
                         case -101:
                             break;
@@ -7115,6 +7113,7 @@ array(
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -7129,6 +7128,7 @@ array(
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, htmlspecialchars($text));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
@@ -7141,7 +7141,7 @@ array(
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
     $this->charset->error[] = $error;
-   //$this->charsetuserinscription[] = new qtype_preg_userinscription($text, false); // Note, addinfo is false because there are no such constants in the lang file.
+    $this->charsetuserinscription[] = new qtype_preg_userinscription($text, false); // Note, addinfo is false because there are no such constants in the lang file.
 }
                         case -104:
                             break;
@@ -7170,6 +7170,7 @@ array(
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
             $this->charset->error[] = $error;
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -7193,6 +7194,7 @@ array(
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
@@ -7637,6 +7639,7 @@ array(
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }

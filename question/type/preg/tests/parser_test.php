@@ -46,7 +46,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?:ab)', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->userinscription === null);
+        $this->assertTrue($root->userinscription->data === '');
         $this->assertTrue($root->id == 2);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
@@ -63,7 +63,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->userinscription->data === '( ... )');
         $this->assertTrue($root->id == 3);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->userinscription === null);
+        $this->assertTrue($root->operands[0]->userinscription->data === '');
         $this->assertTrue($root->operands[0]->id == 2);
         $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data == 'a');
@@ -81,7 +81,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->id == 3);
         $this->assertTrue($root->lazy);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->userinscription === null);
+        $this->assertTrue($root->operands[0]->userinscription->data === '');
         $this->assertTrue($root->operands[0]->id == 2);
         $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data == 'a');
@@ -99,7 +99,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->id == 3);
         $this->assertTrue($root->greed);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->operands[0]->userinscription === null);
+        $this->assertTrue($root->operands[0]->userinscription->data === '');
         $this->assertTrue($root->operands[0]->id == 2);
         $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[0]->userinscription[0]->data === 'a-z');
@@ -200,7 +200,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('ab+', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        $this->assertTrue($root->userinscription === null);
+        $this->assertTrue($root->userinscription->data === '');
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
         $this->assertTrue($root->operands[0]->userinscription[0]->data === 'a');
