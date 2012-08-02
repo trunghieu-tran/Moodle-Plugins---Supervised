@@ -1187,8 +1187,10 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
     public $posopt;
     public $negopt;
 
-    public function __construct() {
+    public function __construct($posopt = null, $negopt = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
+        $this->posopt = $posopt;
+        $this->negopt = $negopt;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');

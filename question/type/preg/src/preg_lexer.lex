@@ -1280,7 +1280,13 @@ ESCAPABLE  = [^0-9a-zA-Z]
         }
         return $res;
     } else {
-        return $this->nextToken();
+        if ($this->handlingoptions->preserveallnodes) {
+            $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+            $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        } else {
+            return $this->nextToken();
+        }
     }
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {
@@ -1302,7 +1308,16 @@ ESCAPABLE  = [^0-9a-zA-Z]
         }
         return $res;
     } else {
-        return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+        if ($this->handlingoptions->preserveallnodes) {
+            $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+            $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
+            $res = array();
+            $res[] = new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+            $res[] = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+            return $res;
+        } else {
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+        }
     }
 }
 <YYINITIAL> "(?"("R"|[0-9]+)")" {
