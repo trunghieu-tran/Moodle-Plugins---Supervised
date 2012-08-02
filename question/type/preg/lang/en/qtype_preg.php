@@ -166,6 +166,7 @@ $string['error_missingcontrolending']           = 'Missing closing parenthesis a
 $string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
 $string['error_condsubpattassertexpected']      = '';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
+$string['error_charcodedisallowed']             = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
 $string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
 $string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';
