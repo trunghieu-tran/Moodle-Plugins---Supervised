@@ -1183,10 +1183,21 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
+        return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
     } else {
-        $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($text, 2)));
+        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+        } else {
+            return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+        }
     }
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
@@ -1194,6 +1205,10 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
@@ -1532,10 +1547,22 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
     } else {
-        $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($text, 2)));
+        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            $this->charset->error[] = $error;
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            $this->charset->error[] = $error;
+        } else {
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+        }
     }
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
 }
 <CHARSET> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
@@ -1546,6 +1573,10 @@ ESCAPABLE  = [^0-9a-zA-Z]
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
         $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        $this->charset->error[] = $error;
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
