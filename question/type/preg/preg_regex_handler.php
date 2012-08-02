@@ -109,6 +109,11 @@ class qtype_preg_regex_handler {
             return;
         }
 
+        // Options should exist at least as a default object.
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+        }
+
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
             $modifiers = new qtype_poasquestion_string($modifiers);
