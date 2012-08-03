@@ -601,8 +601,8 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errornodes[1]->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN);
         $this->assertTrue($errornodes[1]->indfirst == 7);
         $this->assertTrue($errornodes[1]->indlast == 7);
-        $this->assertTrue(is_a($errornodes[1]->operands[0], 'qtype_preg_leaf_control'));
-        $this->assertTrue($errornodes[2]->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->operands[0]->type == qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errornodes[1]->operands[0]->subtype == qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE);
         $this->assertTrue($errornodes[2]->subtype == qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER);
         $this->assertTrue($errornodes[2]->indfirst == 9);
         $this->assertTrue($errornodes[2]->indlast == 21);

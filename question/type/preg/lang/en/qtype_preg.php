@@ -162,6 +162,7 @@ $string['error_missingcalloutending']           = 'Unclosed callout.';
 $string['error_missingsubpattending']           = 'Unclosed subpattern name.';
 $string['error_missingbackrefending']           = 'Missing backreference ending: {$a->addinfo}.';
 $string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
+$string['error_missingcontrolending']           = 'Missing closing parenthesis after control sequence (*...';
 $string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
 $string['error_condsubpattassertexpected']      = '';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
