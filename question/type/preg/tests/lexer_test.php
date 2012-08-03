@@ -1424,8 +1424,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
         $token = $lexer->nextToken();
         $this->assertTrue($token[0]->type === preg_parser_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token[0]->value->subtype == null);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED);
         $lexer = $this->create_lexer('(?(R&(?(<(?(\'(?((?(Rd)');
         $token = $lexer->nextToken();   // (?(R&
         $this->assertTrue($token->type === preg_parser_yyParser::OPENBRACK);

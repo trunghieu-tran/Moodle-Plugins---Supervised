@@ -1419,8 +1419,9 @@ class qtype_preg_node_assert extends qtype_preg_operator {
     /** Negative lookbehind assert. */
     const SUBTYPE_NLB = 'nlb_node_assert';
 
-    public function __construct() {
+    public function __construct($subtype = null) {
         $this->type = qtype_preg_node::TYPE_NODE_ASSERT;
+        $this->subtype = $subtype;
     }
 
     public function tohr() {
@@ -1482,8 +1483,9 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
     /** Is condition satisfied?. */
     public $condbranch = null;
 
-    public function __construct($number = 0, $condbranch = null) {
+    public function __construct($subtype = null, $number = 0, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
+        $this->subtype = $subtype;
         $this->number = $number;
         $this->condbranch = $condbranch;
     }
@@ -1500,7 +1502,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   = 'consubpatt_too_much_alter_node_error';        // Too much top-level alternatives in a conditional subpattern.
     const SUBTYPE_WRONG_CLOSE_PAREN            = 'wrong_close_paren_node_error';                // Closing paren without opening  xxx).
     const SUBTYPE_WRONG_OPEN_PAREN             = 'wrong_open_paren_node_error';                 // Opening paren without closing  (xxx.
-    const SUBTYPE_EMPTY_PARENS                 = 'empty_parens_node_error';                     // Empty parens.
     const SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER = 'quantifier_without_parameter_node_error';     // Quantifier at the start of the expression  - NOTE - currently incompatible with PCRE which treat it as a character.
     const SUBTYPE_UNCLOSED_CHARSET             = 'unclosed_charset_node_error';                 // Unclosed brackets in a character set.
     const SUBTYPE_SET_UNSET_MODIFIER           = 'set_and_unset_same_modifier_node_error';      // Set and unset same modifier at ther same time.
@@ -1523,7 +1524,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_MISSING_BACKREF_BEGINNING    = 'missing_backref_name_beginning_node_error';   // Missing backreference name beginning.
     const SUBTYPE_MISSING_CONTROL_ENDING       = 'missing_control_ending_node_error';           // Missing ) after control sequence.
     const SUBTYPE_WRONG_CONDSUBPATT_NUMBER     = 'wrong_condsubpatt_number_node_error';         // Wrong conditional subpattern number, digits expected.
-    const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      //
+    const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      // Assertion or condition expected.
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
     const SUBTYPE_CHAR_CODE_DISALLOWED         = 'char_code_disallowed_node_error';             // Character code disallowed.
     const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       // Invalid condition (?(0).
@@ -1540,7 +1541,6 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   => 'error_threealtincondsubpatt',
                                    self::SUBTYPE_WRONG_CLOSE_PAREN            => 'error_unopenedparen',
                                    self::SUBTYPE_WRONG_OPEN_PAREN             => 'error_unclosedparen',
-                                   self::SUBTYPE_EMPTY_PARENS                 => 'error_emptyparens',
                                    self::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER => 'error_quantifieratstart',
                                    self::SUBTYPE_UNCLOSED_CHARSET             => 'error_unclosedsqbrackets',
                                    self::SUBTYPE_SET_UNSET_MODIFIER           => 'error_setunsetmod',
