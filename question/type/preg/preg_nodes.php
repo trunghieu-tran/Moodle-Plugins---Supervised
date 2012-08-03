@@ -13,6 +13,21 @@
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
 /**
+ * Representation of nodes and leafs as they were typed in the regex.
+ */
+class qtype_preg_userinscription {
+    /** String with the leaf itself. */
+    public $data = '';
+    /** Additional info - for example, is it a charset flag (\w, \d) - true or false, etc. */
+    public $addinfo = null;
+
+    public function __construct($data = '', $addinfo = null) {
+        $this->data = $data;
+        $this->addinfo = $addinfo;
+    }
+}
+
+/**
  * Class for plain lexems (not complete nodes), they contain position information too.
  */
 class qtype_preg_lexem {
@@ -21,8 +36,8 @@ class qtype_preg_lexem {
     /** Indexes of first and last characters of the lexem. */
     public $indfirst = -1;
     public $indlast = -1;
-    /** What the user actually typed, the original representation of this lexem in the regex. Can be a string or an array of strings (for character sets). */
-    public $userinscription = '';
+    /** An instance of qtype_preg_userinscription. */
+    public $userinscription = null;
 
     public function __construct($subtype, $indfirst, $indlast, $userinscription) {
         $this->subtype = $subtype;
@@ -113,13 +128,22 @@ abstract class qtype_preg_node {
     /** Indexes of first and last characters of the node in the regex. */
     public $indfirst = -1;
     public $indlast = -1;
-    /** What the user actually typed, the original representation of this node in the regex. Can be a string or an array of strings. */
-    public $userinscription = '';
+    /** An instance of qtype_preg_userinscription. */
+    public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
+    }
+
+    /**
+     * Sets indexes and userinscription for the node.
+     */
+    public function set_user_info($indfirst, $indlast, $userinscription = null) {
+        $this->indfirst = $indfirst;
+        $this->indlast = $indlast;
+        $this->userinscription = $userinscription;
     }
 
     /**
@@ -946,8 +970,9 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     //Service subtype - end of regex, but not end of string
     const SUBTYPE_ENDREG = 'endreg_leaf_meta';
 
-    public function __construct() {
+    public function __construct($subtype = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_META;
+        $this->subtype = $subtype;
     }
 
     //TODO - ui_nodename()
@@ -995,8 +1020,10 @@ class qtype_preg_leaf_assert extends qtype_preg_leaf {
     /** \G */
     const SUBTYPE_ESC_G = 'esc_g_leaf_assert';
 
-    public function __construct() {
+    public function __construct($subtype = null, $negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
+        $this->subtype = $subtype;
+        $this->negative = $negative;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -1093,8 +1120,9 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     /** The number of a subpattern to refer to. */
     public $number;
 
-    public function __construct() {
+    public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_BACKREF;
+        $this->number = $number;
     }
 
     public function consumes($matcherstateobj = null) {
@@ -1159,8 +1187,10 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
     public $posopt;
     public $negopt;
 
-    public function __construct() {
+    public function __construct($posopt = null, $negopt = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_OPTIONS;
+        $this->posopt = $posopt;
+        $this->negopt = $negopt;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for qtype_preg_leaf_option class before use it!');
@@ -1177,8 +1207,9 @@ class qtype_preg_leaf_recursion extends qtype_preg_leaf {
 
     public $number;
 
-    public function __construct() {
+    public function __construct($number = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_RECURSION;
+        $this->number = $number;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implements abstract function match for qtype_preg_leaf_recursion class before use it!');
@@ -1241,8 +1272,10 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
 
     public $name;
 
-    public function __construct() {
+    public function __construct($subtype = null, $name = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_CONTROL;
+        $this->subtype = $subtype;
+        $this->name = $name;
     }
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
@@ -1317,8 +1350,13 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
     /** Biggest possible repetition number. */
     public $rightborder;
 
-    public function __construct() {
+    public function __construct($leftborder = 0, $rightborder = 0, $lazy = false, $greed = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_FINITE_QUANT;
+        $this->leftborder = $leftborder;
+        $this->rightborder = $rightborder;
+        $this->lazy = $lazy;
+        $this->greed = $greed;
+        $this->possessive = $possessive;
     }
     //TODO - ui_nodename()
 }
@@ -1337,8 +1375,12 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
     /** Smallest possible repetition number. */
     public $leftborder;
 
-    public function __construct() {
+    public function __construct($leftborder = 0, $lazy = false, $greed = true, $possessive = false) {
         $this->type = qtype_preg_node::TYPE_NODE_INFINITE_QUANT;
+        $this->leftborder = $leftborder;
+        $this->lazy = $lazy;
+        $this->greed = $greed;
+        $this->possessive = $possessive;
     }
     //TODO - ui_nodename()
 }
@@ -1404,11 +1446,10 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
 
     /** Subpattern number. */
     public $number = 0;
-    /** Subpattern match (if supported). */
-    public $match = null;
 
-    public function __construct() {
+    public function __construct($number = 0) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
+        $this->number = $number;
     }
 
     //TODO - ui_nodename()
@@ -1441,8 +1482,10 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
     /** Is condition satisfied?. */
     public $condbranch = null;
 
-    public function __construct() {
+    public function __construct($number = 0, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
+        $this->number = $number;
+        $this->condbranch = $condbranch;
     }
 
     //TODO - ui_nodename()
@@ -1452,7 +1495,6 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
  * Defines error nodes, used when syntax errors in the regular expression occur.
  */
 class qtype_preg_node_error extends qtype_preg_operator {
-
 
     const SUBTYPE_UNKNOWN_ERROR                = 'unknown_error_node_error';                    // Unknown parse error.
     const SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER   = 'consubpatt_too_much_alter_node_error';        // Too much top-level alternatives in a conditional subpattern.
@@ -1479,9 +1521,11 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_MISSING_SUBPATT_ENDING       = 'missing_subpatt_name_ending_node_error';      // Missing subpattern name ending.
     const SUBTYPE_MISSING_BACKREF_ENDING       = 'missing_backref_name_ending_node_error';      // Missing backreference name ending.
     const SUBTYPE_MISSING_BACKREF_BEGINNING    = 'missing_backref_name_beginning_node_error';   // Missing backreference name beginning.
+    const SUBTYPE_MISSING_CONTROL_ENDING       = 'missing_control_ending_node_error';           // Missing ) after control sequence.
     const SUBTYPE_WRONG_CONDSUBPATT_NUMBER     = 'wrong_condsubpatt_number_node_error';         // Wrong conditional subpattern number, digits expected.
     const SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  = 'condsubpatt_assert_expected_node_error';      //
     const SUBTYPE_CHAR_CODE_TOO_BIG            = 'char_code_too_big_node_error';                // Character code too big.
+    const SUBTYPE_CHAR_CODE_DISALLOWED         = 'char_code_disallowed_node_error';             // Character code disallowed.
     const SUBTYPE_CONSUBPATT_ZERO_CONDITION    = 'condsubpatt_zero_condition_node_error';       // Invalid condition (?(0).
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';               // Too big number in (?C...).
     const SUBTYPE_DUPLICATE_SUBPATT_NAMES      = 'duplicate_subpatt_names_node_error';          // Two named subpatterns have the same name.
@@ -1517,9 +1561,11 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_MISSING_SUBPATT_ENDING       => 'error_missingsubpattending',
                                    self::SUBTYPE_MISSING_BACKREF_ENDING       => 'error_missingbackrefending',
                                    self::SUBTYPE_MISSING_BACKREF_BEGINNING    => 'error_missingbackrefbeginning',
+                                   self::SUBTYPE_MISSING_CONTROL_ENDING       => 'error_missingcontrolending',
                                    self::SUBTYPE_WRONG_CONDSUBPATT_NUMBER     => 'error_wrongcondsubpattnumber',
                                    self::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED  => 'error_condsubpattassertexpected',
                                    self::SUBTYPE_CHAR_CODE_TOO_BIG            => 'error_charcodetoobig',
+                                   self::SUBTYPE_CHAR_CODE_DISALLOWED         => 'error_charcodedisallowed',
                                    self::SUBTYPE_CONSUBPATT_ZERO_CONDITION    => 'error_condsubpattzerocondition',
                                    self::SUBTYPE_CALLOUT_BIG_NUMBER           => 'error_calloutbignumber',
                                    self::SUBTYPE_DUPLICATE_SUBPATT_NAMES      => 'error_duplicatesubpattnames',
@@ -1532,9 +1578,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
     /** Additional info. */
     public $addinfo;
 
-    public function __construct() {
+    public function __construct($subtype = null, $addinfo = null) {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
-        $this->addinfo = null;
+        $this->subtype = $subtype;
+        $this->addinfo = $addinfo;
     }
 
     public function dot_script($styleprovider, $isroot = true) {

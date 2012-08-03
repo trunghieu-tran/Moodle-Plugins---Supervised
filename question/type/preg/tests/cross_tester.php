@@ -88,13 +88,14 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_FROM_BACKTRACKING       = 2;
     const TAG_FROM_PCRE               = 3;
     const TAG_FROM_AT_AND_T           = 4;
-    const TAG_ASSOC_LEFT              = 5;
-    const TAG_ASSOC_RIGHT             = 6;
+    const TAG_CATEGORIZE              = 5;
+    const TAG_ASSOC_LEFT              = 6;
+    const TAG_ASSOC_RIGHT             = 7;
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
     const NOTATION_MDLSHORTANSWER     = 'mdlshortanswer';
-    //const NOTATION_PCRESTRICT       = '';
+    const NOTATION_PCRESTRICT         = 'pcrestrict';
 
     // TODO: tags for different capabilities for matchers.
 
@@ -103,19 +104,59 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     protected $doextrachecks;          // Is it needed to do extra checks.
     protected $question;               // Question object for getting matchers.
 
+    protected $blacklist;              // Blacklist of tags in different modes.
+    protected $whitelist;              // Whitelist of tags in different modes.
+
     /**
      * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be implemented in child classes.
      */
     abstract protected function engine_name();
 
     /**
-     * Returns tags, tests with wich will be skipped.
+     * Returns engine-specific tags, tests with wich will be skipped.
      */
     protected function blacklist_tags() {
         return array();
     }
 
+    function categorize_assoc($enginename) {
+        $test1 = array('str'=>'abc',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0,3=>1),
+                       'length'=>array(0=>2,1=>1,3=>1),
+                       'tags'=>array(qtype_preg_cross_tester::TAG_ASSOC_RIGHT));
+        $test2 = array('str'=>'abc',
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0,2=>0,3=>2),
+                       'length'=>array(0=>2,1=>0,2=>2,3=>0),
+                       'tags'=>array(qtype_preg_cross_tester::TAG_ASSOC_LEFT));
+
+        $regex = '(a*)(ab)*(b*)';
+
+        $matchoptions = new qtype_preg_matching_options();
+        $matcher = $this->question->get_matcher($enginename, $regex, false, false, null, self::NOTATION_NATIVE);
+        $matcher->set_options($matchoptions);
+
+        $matcher->match($test1['str']);
+        $obtained1 = $matcher->get_match_results();
+        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', true, false);
+
+        $matcher->match($test2['str']);
+        $obtained2 = $matcher->get_match_results();
+        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', true, false);
+
+        if ($left && !$right) {
+            return self::TAG_ASSOC_LEFT;
+        } else if (!$left && $right) {
+            return self::TAG_ASSOC_RIGHT;
+        }
+        return false;
+    }
+
     public function __construct() {
+        global $argc, $argv;
         $this->testdataobjects = array();
         $this->extracheckobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
@@ -156,6 +197,35 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             }
         }
         closedir($dh);
+        $this->blacklist = array();
+        $this->whitelist = array();
+        if ($argc === 2) {
+            // Just run simple tests.
+            $this->blacklist = array(self::TAG_ASSOC_LEFT, self::TAG_ASSOC_RIGHT);
+        } else {
+            switch ($argv[2]) {
+            case '-c':
+                // Run categorization tests.
+                $assoc = $this->categorize_assoc($enginename);
+                if ($assoc === self::TAG_ASSOC_LEFT) {
+                    echo "\n$enginename has LEFT ASSOCIATIVITY\n\n";
+                    $this->whitelist = array(self::TAG_ASSOC_LEFT);
+                    break;
+                } else if ($assoc === self::TAG_ASSOC_RIGHT) {
+                    echo "\n$enginename has RIGHT ASSOCIATIVITY\n\n";
+                    $this->whitelist = array(self::TAG_ASSOC_RIGHT);
+                    break;
+                } else {
+                    echo "\n$enginename has UNDEFINED ASSOCIATIVITY\n\n";
+                    die();
+                }
+                break;
+            default:
+                echo 'unknown key: ' . $argv[2] . "\n";
+                echo 'use -c to run categorize tests, do not use keys to run other tests' . "\n\n";
+                die();
+            }
+        }
     }
 
     /**
@@ -263,7 +333,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $doassertions) {
+    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $doassertions, $dumpfails = true) {
         // Checking match existance.
         $fullpassed = ($expected['full'] === $obtained->full);
         if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
@@ -323,59 +393,65 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Do assertions
         $enginename = $matcher->name();
         $boolstr = array(false => 'FALSE', true => 'TRUE');
-        $true = true;   // To continue testing if fails occur.
-        // is_match
-        $doassertions && $this->assertTrue($true || $ismatchpassed);
-        if (!$ismatchpassed) {
-            $this->dump_results(array('is_match' => $obtained->is_match()),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('is_match' => $expected['is_match']),
-                                array("expected:"));
+        if ($doassertions) {
+            $true = true;   // To continue testing if fails occur.
+            $this->assertTrue($true || $ismatchpassed);
+            $this->assertTrue($true || $fullpassed);
+            $this->assertTrue($true || $indexfirstpassed);
+            $this->assertTrue($true || $lengthpassed);
+            $this->assertTrue($true || $nextpassed);
+            $this->assertTrue($true || $leftpassed);
         }
 
-        // full
-        $doassertions && $this->assertTrue($true || $fullpassed);
-        if (!$fullpassed) {
-            $this->dump_results(array('full' => $obtained->full),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('full' => $expected['full']),
-                                array("expected:"));
-        }
+        // Dump fails.
+        if ($dumpfails) {
+            // is_match
+            if (!$ismatchpassed) {
+                $this->dump_results(array('is_match' => $obtained->is_match()),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('is_match' => $expected['is_match']),
+                                    array("expected:"));
+            }
 
-        // index_first
-        $doassertions && $this->assertTrue($true || $indexfirstpassed);
-        if (!$indexfirstpassed) {
-            $this->dump_results(array('index_first' => $obtained->index_first),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('index_first' => $expected['index_first']),
-                                array("expected:"));
-        }
+            // full
+            if (!$fullpassed) {
+                $this->dump_results(array('full' => $obtained->full),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('full' => $expected['full']),
+                                    array("expected:"));
+            }
 
-        // length
-        $doassertions && $this->assertTrue($true || $lengthpassed);
-        if (!$lengthpassed) {
-            $this->dump_results(array('length' => $obtained->length),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('length' => $expected['length']),
-                                array("expected:"));
-        }
+            // index_first
+            if (!$indexfirstpassed) {
+                $this->dump_results(array('index_first' => $obtained->index_first),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('index_first' => $expected['index_first']),
+                                    array("expected:"));
+            }
 
-        // next
-        $doassertions && $this->assertTrue($true || $nextpassed);
-        if (!$nextpassed) {
-            $this->dump_results(array('next' => $obtainednext),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('next' => $expected['next']),
-                                array("expected:"));
-        }
+            // length
+            if (!$lengthpassed) {
+                $this->dump_results(array('length' => $obtained->length),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('length' => $expected['length']),
+                                    array("expected:"));
+            }
 
-        // left
-        $doassertions && $this->assertTrue($true || $leftpassed);
-        if (!$leftpassed) {
-            $this->dump_results(array('left' => $obtained->left),
-                                array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
-            $this->dump_results(array('left' => $expected['left'][0]),
-                                array("expected:"));
+            // next
+            if (!$nextpassed) {
+                $this->dump_results(array('next' => $obtainednext),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('next' => $expected['next']),
+                                    array("expected:"));
+            }
+
+            // left
+            if (!$leftpassed) {
+                $this->dump_results(array('left' => $obtained->left),
+                                    array("\n$enginename failed on regex '$regex' and string '$str' ($classname, $methodname"));
+                $this->dump_results(array('left' => $expected['left'][0]),
+                                    array("expected:"));
+            }
         }
 
         // Return true if everything is correct, false otherwise.
@@ -388,7 +464,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     function test() {
         $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
         $enginename = $this->engine_name();
-        $blacklist = $this->blacklist_tags();
+        $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
+        $whitelist = $this->whitelist;
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $classname = get_class($testdataobj);
@@ -418,6 +495,10 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 if (count(array_intersect($blacklist, $regextags)) > 0) {
                     continue;
                 }
+                // Skip regexes without whitelisted tags.
+                if (count($whitelist) > 0 && count(array_intersect($whitelist, $regextags)) === 0) {
+                    continue;
+                }
 
                 // Try to get matcher for the regex.
                 try {
@@ -441,12 +522,16 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $strtags = $expected['tags'];
                     }
 
-                    // Skip strings with blacklisted tags.
-                    if (count(array_intersect($blacklist, $strtags)) > 0) {
+                    $tags = array_merge($regextags, $strtags);
+
+                    // Skip tests with blacklisted tags.
+                    if (count(array_intersect($blacklist, $tags)) > 0) {
                         continue;
                     }
-
-                    $tags = array_merge($regextags, $strtags);
+                    // Skip tests without whitelisted tags.
+                    if (count($whitelist) > 0 && count(array_intersect($whitelist, $tags)) === 0) {
+                        continue;
+                    }
 
                     // There can be exceptions during matching.
                     try {
