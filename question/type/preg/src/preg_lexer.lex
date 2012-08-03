@@ -537,14 +537,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 // Error: empty name.
                 if ($data === '') {
                     $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
-                    $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
                 }
             } else {                                                        // (?(Rnumber)
                 $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
                 // Error: digits expected.
                 if ($tmp !== '' && !ctype_digit($tmp)) {
                     $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($tmp));
-                    $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
                     $data = 0;
                 }
                 $data = (int)$tmp;
@@ -564,7 +564,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             if ($str !== '' && !ctype_digit($str)) {
                 // Error: digits expected.
                 $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($str));
-                $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $secondnode->set_user_info($pos, $pos + $length - 1);
             } else {
                 if ($sign !== 0) {
                     $data = $sign * (int)$str + $this->lastsubpatt;
@@ -577,7 +577,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 // Error: reference to the whole expression.
                 if ($data === 0) {
                     $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, htmlspecialchars($data));
-                    $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
                 }
             }
         }
@@ -587,7 +587,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             // Error: empty name.
             if ($data === '') {
                 $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
-                $secondnode->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $secondnode->set_user_info($pos, $pos + $length - 1);
             }
         }
 
@@ -999,6 +999,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "(?|" {                             // Duplicate subpattern numbers gropu
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
     return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
+}
+<YYINITIAL> "(?()" {                            // Error - empty condition
+    $text = $this->yytext();
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return array(new qtype_preg_token(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(null, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription(''))),
+                 new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error),
+                 new qtype_preg_token(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
 }
 <YYINITIAL> "(?(?=" {                           // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
