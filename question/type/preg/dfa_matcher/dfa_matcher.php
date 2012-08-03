@@ -76,18 +76,17 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         case qtype_preg_matcher::CORRECT_ENDING :
         case qtype_preg_matcher::CHARACTERS_LEFT :
             return true;
-            break;
         }
         return false;
     }
 
     protected function is_preg_node_acceptable($pregnode) {
-        switch ($pregnode->name()) {
-        case 'leaf_charset':
-        case 'leaf_meta':
-        case 'leaf_assert':
+        switch ($pregnode->type) {
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+        case qtype_preg_node::TYPE_LEAF_META:
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+        case qtype_preg_node::TYPE_NODE_ERROR:
             return true;
-            break;
         }
         return get_string($pregnode->name(), 'qtype_preg');
     }
