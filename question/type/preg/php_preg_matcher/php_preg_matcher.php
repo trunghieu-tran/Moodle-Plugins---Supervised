@@ -1,19 +1,31 @@
-<?php //$Id: dfa_preg_matcher.php, v 0.1 beta 2010/08/08 23:47:35 dvkolesov Exp $
+<?php
 
 /**
- * Defines class preg_php_matcher, matching engine based on php preg extension
- * It support the more complicated regular expression possible with great speed, but doesn't allow partial matching and hinting
+ * Defines preg_php_matcher class, the matching engine based on php preg extension.
+ * It supports more complicated regular expressions possible with great speed, but doesn't allow partial matching and hintings
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
+
+    public function __construct($regex = null, $modifiers = null, $options = null) {
+        //This matcher sometimes use common lexer/parser to count subpatterns, since preg_match don't always return them all.
+        //We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
+        if (is_object($options)) {
+            $options->pcrestrict = true;
+        }
+        parent::__construct($regex, $modifiers, $options);
+    }
 
     public function is_supporting($capability) {
         switch ($capability) {
@@ -28,27 +40,40 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         return 'php_preg_matcher';
     }
 
+    public function used_notation() {
+        return 'pcrestrict';
+    }
+
     /**
-    * Returns string of regular expression modifiers supported by this engine
-    */
+     * Returns string of regular expression modifiers supported by this engine
+     */
     public function get_supported_modifiers() {
         return new qtype_poasquestion_string('imsxeADSUX');
     }
 
     /**
-    * Does this engine need a parsing of regular expression?
-    * @return bool if parsing needed
-    */
+     * Does this engine need a parsing of regular expression?
+     * @return bool if parsing needed
+     */
     protected function is_parsing_needed() {
-        //no parsing needed
-        return false;
+        //We need parsing if option is set for capture subpatterns.
+        return $this->options->capturesubpatterns;
+    }
+
+    protected function is_preg_node_acceptable($pregnode) {
+        return true;    // We actually need tree only for subpatterns, so accept anything.
     }
 
     /**
-    * Check regular expression for errors
-    * @return bool is tree accepted
-    */
+     * Check regular expression for errors
+     * @return bool is tree accepted
+     */
     protected function accept_regex() {
+
+        //Clear away errors from parser - we don't really need them...
+        //TODO improve this ugly hack to save modifier errors or create conversion from native to PCRE Strict
+        //$this->errors = array();
+
         $for_regexp = $this->regex;
         if (strpos($for_regexp,'/') !== false) {//escape any slashes
             $for_regexp = implode('\/',explode('/',$for_regexp));
@@ -64,13 +89,14 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-    * Do real matching
-    * @param str a string to match
-    */
+     * Do real matching
+     * @param str a string to match
+     */
     protected function match_inner($str) {
         //Prepare results
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->invalidate_match($this->get_max_subpattern());
+        $matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());//Needed to invalidate match correctly.
+        $matchresults->invalidate_match();
 
         //Preparing regexp
         $for_regexp = $this->regex;
@@ -97,11 +123,6 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
                 }
             }
         }
-
         return $matchresults;
     }
-
-
-
 }
-?>
