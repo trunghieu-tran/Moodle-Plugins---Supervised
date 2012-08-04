@@ -1,17 +1,19 @@
 ﻿<?php
 
+/**
+ * Tests for poasquestion string class.
+ *
+ * @package    qtype_poasquestion
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
-/**
- * Unit tests for preg string class.
- *
- * @copyright  2012 Valeriy Streltsov
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
 
     function test_string() {
