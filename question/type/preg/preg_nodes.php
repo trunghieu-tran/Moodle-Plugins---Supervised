@@ -305,42 +305,25 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         if ($this->flags === null) {
             return false;
         }
-        $strclone = clone $str;
-        if ($this->caseinsensitive) {
-            $strclone->tolower();
-        }
-        $ord = qtype_poasquestion_string::ord($strclone[$pos]);
+
         foreach ($this->flags as $flags) {
             // Get intersection of all current flags.
-            $ranges = array(array(0, qtype_preg_unicode::max_possible_code()));
+            $result = !empty($flags);
             foreach ($flags as $flag) {
-                if ($flag->type === qtype_preg_charset_flag::SET) {
-                    $dataclone = clone $flag->data;
-                    if ($this->caseinsensitive) {
-                        $dataclone->tolower();
-                    }
-                    $currange = qtype_preg_unicode::get_ranges_from_charset($dataclone);
-                } else {
-                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                $result = $result && $flag->match($str, $pos, !$this->caseinsensitive);
+                if (!$result) {
+                    break;
                 }
-                if ($flag->negative) {
-                    $currange = qtype_preg_unicode::negate_ranges($currange);
-                }
-                $ranges = qtype_preg_unicode::intersect_ranges($ranges, $currange);
             }
-            if ($this->negative) {
-                $ranges = qtype_preg_unicode::negate_ranges($ranges);
-            }
-            foreach ($ranges as $range) {
-                if ($range[0] <= $ord && $ord <= $range[1]) {
-                    $length = 1;
-                    return true;
-                }
+            $result = ($result xor $this->negative);
+            if ($result) {
+                $length = 1;
+                return true;
             }
         }
 
         $length = 0;
-        return $result;
+        return false;
     }
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) { // TODO may be rename to character?
@@ -744,37 +727,37 @@ class qtype_preg_charset_flag {
         return $this->type === self::CIRCUMFLEX || $this->type === self::DOLLAR;
     }
 
-    public function match($str, $pos, $cs = true) {
+    public function match($str, $pos, $cs) {
         if ($pos < 0 || $pos >= $str->length()) {
             return false;    // String index out of borders.
         }
+
+        $char = $str[$pos];
+        if (!$cs) {
+            $charlower = qtype_poasquestion_string::strtolower($char);
+            $charupper = qtype_poasquestion_string::strtoupper($char);
+        }
+
         switch ($this->type) {
             case self::CIRCUMFLEX:
-                $result = ($pos === 0);
-                break;
+                return (($pos === 0) xor $this->negative);
             case self::DOLLAR:
-                $result = ($pos === $str->length() - 1);
-                break;
+                return (($pos === $str->length() - 1) xor $this->negative);
             case self::SET:
-                $charsetcopy = clone $this->data;
-                $strcopy = clone $str;
-                if (!$cs) {
-                    $charsetcopy->tolower();
-                    $strcopy->tolower();
-                }
-                $currange = qtype_preg_unicode::get_ranges_from_charset($charsetcopy);
-                $result = qtype_preg_unicode::is_in_range($strcopy[$pos], $currange);
+                $ranges = qtype_preg_unicode::get_ranges_from_charset($this->data);
                 break;
             case self::FLAG:
             case self::UPROP:
-                $currange = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
-                $result = qtype_preg_unicode::is_in_range($str[$pos], $currange);
+                $ranges = call_user_func('qtype_preg_unicode::' . $this->data . '_ranges');
                 break;
         }
-        if ($this->negative) {
-            $result = !$result;
+
+        if ($cs) {
+            $result = qtype_preg_unicode::is_in_range($char, $ranges);
+        } else {
+            $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
         }
-        return $result;
+        return ($result xor $this->negative);
     }
 
     /**
