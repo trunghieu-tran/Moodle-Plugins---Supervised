@@ -919,6 +919,18 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_case_sensitivity7() {
+        $test1 = array( 'str'=>'lowerUPPERlowerMiXeDMiXeD',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>10,3=>15),
+                        'length'=>array(0=>25,1=>10,2=>5,3=>10));
+
+        return array('regex'=>'(?i)([[:lower:]]{10})(?-i)([[:lower:]]{5})(?i)((?:[[:upper:]][[:lower:]]){5})',
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     // Tests for cases with ambiguity - subpatterns, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',
