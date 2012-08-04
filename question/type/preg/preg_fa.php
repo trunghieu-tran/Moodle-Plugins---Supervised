@@ -1,14 +1,13 @@
 <?php
+
 /**
- * Defines classes of finite automaton for regular expression matching, its states and transitions.
+ * Defines finite automata states and transitions classes for regular expression matching.
+ * The class is used by FA-based matching engines (DFA and NFA), provides standartisation to them and enchances testability.
  *
- * The class is intended for use by FA-based matching engines (DFA and NFA), and maybe other regex handlers.
- * Main purpose of the class is to enchance testability, code reuse and standartisation between FA-based matching engines.
- *
- * @copyright &copy; 2012  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -449,9 +448,10 @@ abstract class qtype_preg_finite_automaton {
 
     /**
      * Generates dot code for drawing FA.
+     * @param type image type.
      * @param filename - name of the resulting image file.
      */
-    public function draw($filename) {
+    public function draw($type, $filename) {
         $result = "digraph {\nrankdir = LR;\n";
         foreach ($this->states as $curstate) {
             $index1 = $curstate->number;
@@ -498,7 +498,7 @@ abstract class qtype_preg_finite_automaton {
             }
         }
         $result .= "};";
-        qtype_preg_regex_handler::execute_dot($result, $filename);
+        qtype_preg_regex_handler::execute_dot($result, $type, $filename);
     }
 
 

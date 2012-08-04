@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Language strings for the Preg question type.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['addmoreanswerblanks'] = 'Adding a regular expression options';
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the choosen engine doesn\'t support subpatterns capturing you should use only {$0}.</p>';
 $string['answerno'] = 'Answer {$a}';
@@ -24,6 +32,7 @@ $string['exactmatch_help'] = '<p>By default regular expression matching returns 
 $string['hintgradeborder'] = 'Hint grade border';
 $string['hintgradeborder_help'] = 'Answers with the grade less than the hint grade border won\'t be used in hinting.';
 $string['hintnextchar'] = 'next correct character';
+$string['hintnextlexem'] = 'next correct {$a}';
 $string['langselect'] = 'Language';
 $string['langselect_help'] = 'For next lexem hint you should choose a language, which is used to break answers down to lexems. Each language has it own rules for lexems. Languages are defined using \'Formal languages block\'';
 $string['largefa'] = 'Too large finite automaton';
@@ -37,9 +46,10 @@ $string['nocorrectanswermatch'] = 'No maximum grade regular expression matches t
 $string['nohintgradeborderpass'] = 'No answer has a grade greater or equal the hint grade border. This disables hinting.';
 $string['nohintsupport'] = '{$a} engine doesn\'t support hinting';
 $string['notation'] = 'Regular expression notation';
-$string['notation_help'] = '<p>You can choose the notation to enter regular expressions. If you just want to write a regular expression, please use the default, <b>Regular expression</b> notation which is very close to PCRE, but has additional error-proof capabilities.</p><p><b>Moodle shortanswer</b> notation allows you to use preg as a usual Moodle shortanswer question with the hinting capability - with no need to understand regular expressions. Just copy you answers from shortanswer question. The \'*\' wildcard is supported.</p>';
+$string['notation_help'] = '<p>You can choose the notation to enter regular expressions. If you just want to write a regular expression, please use the default, <b>Regular expression</b> notation which is very close to PCRE, but has additional error-proof capabilities.</p><p><b>Moodle shortanswer</b> notation allows you to use preg as a usual Moodle shortanswer question with the hinting capability - with no need to understand regular expressions. Just copy you answers from shortanswer question. The \'*\' wildcard is supported.</p><p><b>PCRE Strict</b> notation allows you to bypass additional error checking and enter some strange regexes, that don\'t give errors in PCRE.</p>';
 $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
+$string['notation_pcrestrict'] = 'PCRE Strict';
 $string['noregex'] = 'No regex supplied for matching';
 $string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from the feedback or choose another engine';
 $string['pluginname'] = 'Regular expression';
@@ -49,8 +59,8 @@ $string['pluginname_link'] = 'question/type/preg';
 $string['pluginnameadding'] = 'Adding a regular expression question';
 $string['pluginnameediting'] = 'Editing a regular expression question';
 $string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. Using behaviours with multiple tries can give a hint by telling a next correct character.<br/>You can use it without knowing regular expression to get hinting by using the \'Moodle shortanswer\' notation.';
-$string['preg_regex_handler'] = 'Regex handler';
 $string['questioneditingheading'] = 'Question editing settings';
+$string['regex_handler'] = 'Regex handler';
 $string['subpattern'] = 'Subpattern';
 $string['tobecontinued'] = '...';
 $string['toomanyerrors'] = '.......{$a} more errors';
@@ -139,7 +149,6 @@ $string['error_PCREincorrectregex']             = 'Incorrect regular expression 
 $string['error_threealtincondsubpatt']          = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
 $string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
 $string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
-$string['error_emptyparens']                    = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
 $string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
 $string['error_unclosedsqbrackets']             = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
 $string['error_setunsetmod']                    = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
@@ -160,9 +169,11 @@ $string['error_missingcalloutending']           = 'Unclosed callout.';
 $string['error_missingsubpattending']           = 'Unclosed subpattern name.';
 $string['error_missingbackrefending']           = 'Missing backreference ending: {$a->addinfo}.';
 $string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
+$string['error_missingcontrolending']           = 'Missing closing parenthesis after control sequence (*...';
 $string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
-$string['error_condsubpattassertexpected']      = '';
+$string['error_condsubpattassertexpected']      = 'Assertion or condition expected.';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
+$string['error_charcodedisallowed']             = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
 $string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
 $string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';

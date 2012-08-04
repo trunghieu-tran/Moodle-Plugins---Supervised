@@ -1,4 +1,14 @@
-<?PHP // $Id: version.php,v 1.1.2.3 2009/10/04 19:49:58 oasychev Exp $
+<?php
+
+/**
+ * Version information for the Preg question type.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
 $plugin->version  = 2012072300;
@@ -10,7 +20,6 @@ $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
     'qbehaviour_adaptivehints' => 2011111902,
     'qbehaviour_adaptivehintsnopenalties' => 2011111902,
-    'qtype_poasquestion' => 2012060900
-    //TODO - add block formal languages there
+    'qtype_poasquestion' => 2012060900,
+    'block_formal_langs' => 2012021400
 );
-?>

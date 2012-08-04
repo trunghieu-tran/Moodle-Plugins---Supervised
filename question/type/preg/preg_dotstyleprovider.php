@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * Defines a class which provides dot styles for different AST node types\subtypes for drawing via graphviz.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
@@ -20,36 +30,69 @@ class qtype_preg_dot_style_provider {
         if (is_array($pregnode->userinscription)) {
             $label = '';
             foreach ($pregnode->userinscription as $tmp) {
-                $label .= addslashes($tmp);
+                $label .= $tmp;
             }
         } else {
             $label = $pregnode->userinscription;
         }
         $id = $pregnode->id;
 
-        if($label === chr(10)){
-            $label = get_string('description_char_n', 'qtype_preg');
-        } elseif ($label === chr(13)) {
-            $label = get_string('description_char_r', 'qtype_preg');
-        } elseif ($label === ' ') {
-            $label = get_string('description_char_space', 'qtype_preg');
-        } elseif ($label === '  ') {
-            $label = get_string('description_char_t', 'qtype_preg');
-        }
-
         // Now the label is ready, just return the appropriate style for node type and subtype.
         switch ($pregnode->type) {
             case qtype_preg_node::TYPE_ABSTRACT: {
-                return "[label = \"abstract node\", style = dotted]";  // это пример, замени его потом на пустую строку.
+                return "[label = \"abstract node\", style = dotted, color = \"blue\"]";  // это пример, замени его потом на пустую строку.
             }
             case qtype_preg_node::TYPE_LEAF_CHARSET: {
-                if ($pregnode->negative) {
-                    $label = '[^' . $label . ']';
-                    return "[label = \"$label\", tooltip = \"negative character class\", shape = rectangle, id = $id]";
-                } else if (qtype_poasquestion_string::strlen($label) > 1) {
-                    $label = '[' . $label . ']';
-                }
-                return "[label = \"$label\", tooltip = \"character class\", shape = rectangle, id = $id]";
+                
+                //if($pregnode->flags != NULL){
+                    //$flag = false;
+                    //$quote = true;
+                    $flag =TRUE;
+                    $label = str_replace('"', '&#34;', $label);
+                    $label = str_replace(' ', '<font color="blue">' . get_string('description_char_space', 'qtype_preg') . '</font>', $label);
+                    $label = str_replace('	', '<font color="blue">' . get_string('description_char_t', 'qtype_preg') . '</font>', $label);
+                    $label = str_replace('\\r', '<font color="blue">' . get_string('description_char_r', 'qtype_preg') . '</font>', $label);
+                    $label = str_replace('\\n', '<font color="blue">' . get_string('description_char_n', 'qtype_preg') . '</font>', $label);
+                    $label = str_replace('\\t', '<font color="blue">' . get_string('description_char_t', 'qtype_preg') . '</font>', $label);
+                    $label = str_replace('\\d', '<font color="blue">\\d</font>', $label);
+                    $label = str_replace('\\D', '<font color="blue">\\D</font>', $label);
+                    $label = str_replace('\\s', '<font color="blue">\\s</font>', $label);
+                    $label = str_replace('\\S', '<font color="blue">\\S</font>', $label);
+                    $label = str_replace('\\w', '<font color="blue">\\w</font>', $label);
+                    $label = str_replace('\\W', '<font color="blue">\\W</font>', $label);
+                    $label = str_replace('\\v', '<font color="blue">\\v</font>', $label);
+                    $label = str_replace('\\V', '<font color="blue">\\V</font>', $label);
+                    $label = str_replace('\\h', '<font color="blue">\\h</font>', $label);
+                    $label = str_replace('\\H', '<font color="blue">\\H</font>', $label);
+                    
+                    //TODO: implement prsing $label on error range
+                    for($i=0; $i<strlen($label); $i++){
+                        if($label[$i] == '-' && $i != 0 && $i != strlen($label)){
+                            if(ord($label[$i-1]) > ord($label[$i+1]) ){
+                                return "[label = \"$label\", tooltip = \"Incorrect range: left border is greater then the right one\", id = $id, color = \"red\"]";
+                            }
+                        }
+                    }
+                    
+                    if ($pregnode->negative) {
+                        $label = '[^' . $label . ']';
+                        //if($flag == true){
+                            $label = str_replace(']', '&#93;', $label);
+                            $label = str_replace('[', '&#91;', $label);
+                            $label = str_replace('\\', '&#92;', $label);
+                            //$quote = false;
+                        //}
+                        //return "[label = \"$label\", tooltip = \"negative character class\", shape = rectangle, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = record, id = $id]";
+                    } else if (qtype_poasquestion_string::strlen($label) > 1 && $label != 'd' && $label != '\\D' && $label != '\\s' && $label != '\\S' && $label != '\\h' && $label != '\\H' && $label != '\\v' && $label != '\\V' && $label != '\\w' && $label != '\\W' && $label != 'space') {
+                        $label = '[' . $label . ']';
+                    }
+                    
+                    $label = str_replace(']', '&#93;', $label);
+                    $label = str_replace('[', '&#91;', $label);
+                    $label = str_replace('\\', '&#92;', $label);
+                    //var_dump("[label = <<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = none, id = $id]");
+                    return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = record, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_META: {
                 //if($pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -59,7 +102,7 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"assertion $label\", tooltip = assertion, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to ' . $pregnode->number . ' subpattern\", tooltip = backreference, shape = rectangle, id = $id]";
+                return "[label = \"backreference to subpattern #$pregnode->number\", tooltip = backreference, shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
                 return "[label = \"recursion ' . $pregnode->number . '\", tooltip = recursion, shape = rectangle, id = $id]";
