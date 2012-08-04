@@ -42,10 +42,10 @@ class qtype_preg_token {
 %char
 %unicode
 %state CHARSET
-NOTSPECIAL = [^\\^$.\[\]|()?*+{}]                       // Characters that should be escaped.
-MODIFIER   = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
-ALNUM      = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]     // Used in subpattern\backreference names.
-ESCAPABLE  = [^0-9a-zA-Z]
+NOTSPECIALO = [^"\^$.[|()?*+{"]                          // Special characters outside character sets.
+NOTSPECIALI = [^"\^-[]"]                                 // Special characters inside character sets.
+MODIFIER    = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
+ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\backreference names.
 %init{
     $this->matcher                   = null;
     $this->errors                    = array();
@@ -1091,10 +1091,6 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "." {
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-<YYINITIAL> {NOTSPECIAL} {
-    $text = $this->yytext();
-    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
-}
 <YYINITIAL> "|" {
     // Reset subpattern numeration inside a (?|...) group.
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
@@ -1416,15 +1412,9 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-<YYINITIAL> \\{ESCAPABLE} {
+<YYINITIAL> \\. {
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
-}
-<YYINITIAL> \\. {           // ERROR: incorrect escape sequence.
-    $text = $this->yytext();
-    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, htmlspecialchars($text));
-    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
-    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> \\ {           // ERROR: \ at end of pattern.
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, htmlspecialchars('\\'));
