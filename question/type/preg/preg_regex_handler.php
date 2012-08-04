@@ -1,16 +1,17 @@
 <?php
 /**
- * Defines abstract class of regular expression handler, which is basically anything that want to work with regex
- * Beeing handler you could benefit from automatic regex parsing, error handling etc
+ * Defines abstract class of regular expression handler, which is basically anything that works with regexes.
+ * By inheriting the handler you can benefit automatic regex parsing, error handling etc.
  *
- * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');

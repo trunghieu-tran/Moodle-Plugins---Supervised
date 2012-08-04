@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Defines NFA matcher class
+ * Defines NFA matcher class.
  *
- * @copyright &copy; 2012  Valeriy Streltsov
- * @author Valeriy Streltsov, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

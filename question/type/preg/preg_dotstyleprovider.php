@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * Defines a class which provides dot styles for different AST node types\subtypes for drawing via graphviz.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 

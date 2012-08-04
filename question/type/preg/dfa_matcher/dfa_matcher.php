@@ -1,17 +1,19 @@
-<?php //$Id: dfa_preg_matcher.php, v 0.1 beta 2010/08/08 23:47:35 dvkolesov Exp $
+<?php
 
 /**
- * Defines class dfa_preg_matcher
+ * Defines DFA matcher class.
  *
- * @copyright &copy; 2010  Kolesov Dmitriy
- * @author Kolesov Dmitriy, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Dmitriy Kolesov <xapuyc7@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//fa - finite automate
-//marked state, it's mean that the state is ready, all it's passages point to other states(marked and not marked), not marked state isn't ready, it's passages point to nothing.
+//marked state, it means that the state is ready, all its transitions point to other states(marked and not marked), not marked state isn't ready, its transitions point to nothing.
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/dfa_matcher/dfa_nodes.php');
@@ -1418,4 +1420,3 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return $dotcode;
     }
 }
-?>

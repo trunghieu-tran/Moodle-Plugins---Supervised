@@ -1,16 +1,22 @@
 <?php
+
 /**
  * Defines the editing form for the preg question type.
  *
- * @copyright &copy; 2008  Sychev Oleg
- * @author Sychev Oleg, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once($CFG->dirroot.'/question/type/shortanswer/edit_shortanswer_form.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
+
 /**
- * preg editing form definition.
+ * Preg editing form definition.
  */
 class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
@@ -28,11 +34,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
-            
+
             $mform->registerNoSubmitButton('regextest');
-            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');            
+            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');
             array_splice($repeated, 2, 0, array( '0' => $tmp));
-            
+
             //$repeated[] = $mform->createElement('html', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For test regex push this button<input type="submit" formaction="http://localhost/moodle/question/type/preg/ast_preg_form.php" formtarget="_blank" value="Test regex">');
             return $repeated;
     }*/
@@ -50,10 +56,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $qtype = new $qtypeclass;
 
         //$PAGE->requires->js('/question/type/preg/regex_test_push.js');
-        
+
         //$mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
         //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
-        
+
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
         $mform->setDefault('engine',$CFG->qtype_preg_defaultengine);
@@ -212,4 +218,3 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return 'preg';
     }
 }
-?>

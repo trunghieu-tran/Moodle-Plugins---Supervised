@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Unit tests for (some of) question/type/preg/preg_hints.php.
+ * Unit tests for question/type/preg/preg_hints.php.
  *
- * @copyright &copy; 2012 Oleg Sychev
- * @author Oleg Sychev
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package question
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -38,7 +38,7 @@ class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
         $regular->notation = 'native';
         $regular->uselexemhint = true;
         $regular->lexemhintpenalty = 0.4;
-        $regular->langid = 1;//Simple english - TODO - make a better way to get 
+        $regular->langid = 1;//Simple english - TODO - make a better way to get
         $regular->lexemusername = 'word';
 
         //correct answer
@@ -145,5 +145,4 @@ class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($hint->hinted_string($matchresults) == 'H');
         $this->assertTrue($hint->to_be_continued($matchresults));
     }
-
 }

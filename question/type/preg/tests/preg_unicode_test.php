@@ -6,12 +6,6 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
-/**
- * Unit tests for preg string class.
- *
- * @copyright  2012 Valeriy Streltsov
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
 
     function test_intersect_positive_ranges() {

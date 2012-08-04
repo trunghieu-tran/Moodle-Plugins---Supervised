@@ -1,42 +1,24 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Perl-compatible regular expression question hints classes.
+ * Defines Preg question type hints classes.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Sychev Oleg
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 /**
  * Hint class for showing matching part of a response (along with unmatched head and tail)
- *
  * Also contains some methods common to the all hints, based on $matchresults
- *
- * @copyright  2012 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_hintmatchingpart extends qtype_specific_hint {
 
@@ -138,9 +120,6 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
 
 /**
  * Hint class for next character hint
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
@@ -184,10 +163,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 }
 
 /**
- * Hint class for next lexem hint
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Hint class for next lexem hint.
  */
 class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
 
@@ -264,5 +240,4 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
         return  $this->hinttoken->position()->colend() + 1 < qtype_poasquestion_string::strlen($matchresults->extendedmatch->str())
                 || $matchresults->extendedmatch->full === false;
     }
-
 }
