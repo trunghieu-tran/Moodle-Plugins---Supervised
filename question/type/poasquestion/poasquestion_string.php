@@ -1,19 +1,16 @@
 <?php
 
- /**
-  * Defines string class.
-  *
-  * @package    qtype
-  * @subpackage poasquestion
-  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
-  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-  */
-
 /**
- * Represents a short answer question.
- * @author     Valeriy Streltsov
+ * Defines a unicode string class.
+ *
+ * @package    qtype_poasquestion
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
+
 class qtype_poasquestion_string extends textlib implements ArrayAccess {
     /** @var string the utf-8 string itself. */
     private $fstring;
