@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Defines NFA node classes
+ * Defines NFA node classes.
  *
- * @copyright &copy; 2012  Valeriy Streltsov
- * @author Valeriy Streltsov, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -352,6 +352,9 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        if ($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+            return;
+        }
         $body = array_pop($stack);
 
         // Every transition outgoing from the start state we tag with the value of (subpattern number * 2).

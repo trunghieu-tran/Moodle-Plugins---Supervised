@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Defines Preg errors displayed to users.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
 class qtype_preg_error {
@@ -38,7 +50,7 @@ class qtype_preg_parsing_error extends qtype_preg_error {
     public function __construct($regex, $parsernode) {
         $this->index_first = $parsernode->indfirst;
         $this->index_last = $parsernode->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . htmlspecialchars($parsernode->error_string());
+        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
     }
 }
 

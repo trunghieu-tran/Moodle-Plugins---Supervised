@@ -1,10 +1,40 @@
 <?php
 
+/**
+ * Contains source info for generating lexer.
+ * Lexer can return error tokens as leafs or fill the "casual" node's error field - depends on the node type.
+ * A node's error field is usually filled if the it contains semantic errors but the syntax is correct:
+ * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc. Error leafs returned otherwise.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>, Dmitriy Kolesov <xapuyc7@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
+
+/**
+ * Represents a token returned from the lexer.
+ */
+class qtype_preg_token {
+    /** Is this a leaf or a node, should be a constant of preg_parser_yyParser. */
+    public $type;
+    /** The value can be either a qtype_preg_node or a qtype_preg_lexem. */
+    public $value;
+
+    public function __construct($type, $value) {
+        $this->type = $type;
+        $this->value = $value;
+    }
+}
 
 %%
 %class qtype_preg_lexer
@@ -17,29 +47,33 @@ MODIFIER   = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?
 ALNUM      = [^" !\"#$%&'()*+,-./:;<=>?[\\]^`{|}~"]     // Used in subpattern\backreference names.
 ESCAPABLE  = [^0-9a-zA-Z]
 %init{
-    $this->matcher                  = null;
-    $this->errors                   = array();
-    $this->lastsubpatt              = 0;
-    $this->maxsubpatt               = 0;
-    $this->subpatternmap            = array();
-    $this->backrefs                 = array();
-    $this->optstack                 = array();
-    $this->optstack[0]              = new stdClass;
-    $this->optstack[0]->i           = false;
-    $this->optstack[0]->subpattnum  = -1;
-    $this->optstack[0]->subpattname = null;
-    $this->optstack[0]->parennum    = -1;
-    $this->optcount                 = 1;
-    $this->charset                  = null;
-    $this->charsetcount             = 0;
-    $this->charsetset               = '';
-    $this->charsetuserinscription   = '';
+    $this->matcher                   = null;
+    $this->errors                    = array();
+    $this->lastsubpatt               = 0;
+    $this->maxsubpatt                = 0;
+    $this->subpatternmap             = array();
+    $this->backrefs                  = array();
+    $this->optstack                  = array();
+    $this->optstack[0]               = new stdClass;
+    $this->optstack[0]->i            = false;
+    $this->optstack[0]->subpattnum   = -1;
+    $this->optstack[0]->subpattname  = null;
+    $this->optstack[0]->parennum     = -1;
+    $this->optcount                  = 1;
+    $this->charset                   = null;
+    $this->charsetcount              = 0;
+    $this->charsetset                = '';
+    $this->charsetuserinscription    = null;
+    $this->charsetuserinscriptionraw = null;
+    $this->handlingoptions           = new qtype_preg_handling_options();
 
 %init}
 %eof{
     // End of the expression inside a character class.
     if ($this->charset !== null) {
-        $this->errors[] = $this->form_error($this->charsetuserinscription, qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET, $this->charset->indfirst, $this->yychar - 1, $this->charsetuserinscription);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET/*, $this->charsetuserinscription*/);
+        $error->set_user_info($this->charset->indfirst, $this->yychar - 1);
+        $this->errors[] = $error;
     }
     // Check for backreferences to unexisting subpatterns.
     if (count($this->backrefs) > 0) {
@@ -48,13 +82,16 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $number = $leaf->number;
             $error = false;
             if ((is_int($number) && $number > $this->maxsubpatt) || (is_string($number) && !array_key_exists($number, $this->subpatternmap))) {
-                $this->errors[] = $this->form_error($leaf->userinscription, qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->indfirst, $leaf->indlast, $leaf->number, $leaf->userinscription);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT, $leaf->number);
+                $error->set_user_info($leaf->indfirst, $leaf->indlast);
+                $this->errors[] = $error;
             }
         }
     }
 %eof}
 %{
     public $matcher;
+    public $handlingoptions;
     protected $errors;
     protected $lastsubpatt;
     protected $maxsubpatt;
@@ -62,10 +99,11 @@ ESCAPABLE  = [^0-9a-zA-Z]
     protected $backrefs;
     protected $optstack;
     protected $optcount;
-    protected $charset;
-    protected $charsetcount;
-    protected $charsetset;
-    protected $charsetuserinscription;
+    protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
+    protected $charsetcount;                // Number of characters in the charset excluding flags.
+    protected $charsetset;                  // Characters of the charset.
+    protected $charsetuserinscription;      // User inscriptions for flags and ranges.
+    protected $charsetuserinscriptionraw;   // User inscriptions char by char (can also be \x... or anything representing one character).
     protected static $upropflags = array('C'                      => qtype_preg_charset_flag::UPROPC,
                                          'Cc'                     => qtype_preg_charset_flag::UPROPCC,
                                          'Cf'                     => qtype_preg_charset_flag::UPROPCF,
@@ -222,34 +260,37 @@ ESCAPABLE  = [^0-9a-zA-Z]
      * Returns array of error nodes.
      */
     public function mod_top_opt($set, $unset) {
-        $allowed = 'i';
+        $allowed = new qtype_poasquestion_string('i');
+        $setunset = new qtype_poasquestion_string($set . $unset);
         $wrongfound = '';
         $errors = array();
-        // Some sanity checks.
-        for ($i = 0; $i < $set->length(); $i++) {
-            $modname = $set[$i];
-            if (qtype_poasquestion_string::strpos($allowed, $modname) === false) {
-                $wrongfound .= $modname;
-            }
-        }
-        for ($i = 0; $i < $unset->length(); $i++) {
-            $modname = $unset[$i];
-            if (qtype_poasquestion_string::strpos($allowed, $modname) === false && qtype_poasquestion_string::strpos($wrongfound, $modname) === false) {
+        $text = $this->yytext();
+
+        // Are there unknown/unsupported modifiers?
+        for ($i = 0; $i < $setunset->length(); $i++) {
+            $modname = $setunset[$i];
+            if ($allowed->contains($modname) === false) {
                 $wrongfound .= $modname;
             }
         }
         if ($wrongfound !== '') {
-            $errors[] = $this->form_error($wrongfound, qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, $wrongfound);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER, htmlspecialchars($wrongfound));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            $errors[] = $error;
         }
+
         $setunseterror = false;
         for ($i = 0; $i < $set->length(); $i++) {
             $modname = $set[$i];
-            if ($unset->contains($modname) !== false && qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
+            if ($unset->contains($modname) !== false && $allowed->contains($modname) !== false) {
                 // Setting and unsetting modifier at the same time is error.
-                $errors[] = $this->form_error($modname, qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, $this->yychar, $this->yychar + $this->yylength() - 1, $modname);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER, htmlspecialchars($modname));
+                $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+                $errors[] = $error;
                 $setunseterror = true;
             }
         }
+
         // If errors don't exist, set and unset local modifiers.
         if (!$setunseterror) {
             for ($i = 0; $i < $set->length(); $i++) {
@@ -265,44 +306,8 @@ ESCAPABLE  = [^0-9a-zA-Z]
                 }
             }
         }
+
         return $errors;
-    }
-
-    /**
-     * Returns an error node.
-     */
-    public function form_error($userinscription, $subtype, $indfirst = -1, $indlast = -1, $addinfo = null) {
-        $error = new qtype_preg_node_error();
-        $error->subtype = $subtype;
-        $error->addinfo = $addinfo;
-        $this->set_node_source_info($error, $userinscription, $indfirst, $indlast);
-        return $error;
-    }
-
-    /**
-     * Sets user insctiption and indexes for the given node.
-     */
-    protected function set_node_source_info(&$node, $userinscription, $indfirst, $indlast) {
-        $node->userinscription = $userinscription;
-        $node->indfirst = $indfirst;
-        $node->indlast = $indlast;
-        // Set i modifier for leafs.
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
-            $node->caseinsensitive = true;
-        }
-    }
-
-    /**
-     * Forms a result to return from the lexer.
-     * @param type is this a leaf or a node, should be a constant of preg_parser_yyParser.
-     * @param value can be either a qtype_preg_node or a qtype_preg_lexem.
-     * @return an object with fields "type" and "value".
-     */
-    protected function form_res($type, $value) {
-        $result = new stdClass();
-        $result->type = $type;
-        $result->value = $value;
-        return $result;
     }
 
     /**
@@ -310,138 +315,202 @@ ESCAPABLE  = [^0-9a-zA-Z]
      */
     protected function form_quant($text, $pos, $length, $infinite, $leftborder, $rightborder, $lazy, $greed, $possessive) {
         if ($infinite) {
-            $node = new qtype_preg_node_infinite_quant();
+            $node = new qtype_preg_node_infinite_quant($leftborder, $lazy, $greed, $possessive);
         } else {
-            $node = new qtype_preg_node_finite_quant();
-            $node->rightborder = $rightborder;
+            $node = new qtype_preg_node_finite_quant($leftborder, $rightborder, $lazy, $greed, $possessive);
         }
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
-        $node->leftborder = $leftborder;
-        $node->lazy = $lazy;
-        $node->greed = $greed;
-        $node->possessive = $possessive;
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         if (!$infinite && $leftborder > $rightborder) {
             $rightoffset = 0;
             $greed || $rightoffset++;
-            $node->error = $this->form_error($leftborder . ',' . $rightborder, qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, $pos + 1, $pos + $length - 2 - $rightoffset, $leftborder . ',' . $rightborder);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE, htmlspecialchars($leftborder . ',' . $rightborder));
+            $error->set_user_info($pos + 1, $pos + $length - 2 - $rightoffset);
+            $node->error = $error;
         }
-        return $this->form_res(preg_parser_yyParser::QUANT, $node);
+        return new qtype_preg_token(preg_parser_yyParser::QUANT, $node);
     }
 
     /**
      * Returns a control sequence token.
      */
     protected function form_control($text, $pos, $length) {
+        // Error: missing ) at end.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== ')') {
-            // return error - paren ) missing;
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONTROL_ENDING, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
-        $node = new qtype_preg_leaf_control();
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
-        if ($text === '(*ACCEPT)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ACCEPT;
-        } else if ($text === '(*FAIL)' || $text === '(*F)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_FAIL;
-        } else if ($text === '(*COMMIT)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_COMMIT;
-        } else if ($text === '(*THEN)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_THEN;
-        } else if ($text === '(*SKIP)' || $text === '(*SKIP:)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_SKIP;
-        } else if ($text === '(*PRUNE)' || $text === '(*PRUNE:)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_PRUNE;
-        } else if ($text === '(*CR)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_CR;
-        } else if ($text === '(*LF)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_LF;
-        } else if ($text === '(*CRLF)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_CRLF;
-        } else if ($text === '(*ANYCRLF)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ANYCRLF;
-        } else if ($text === '(*ANY)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_ANY;
-        } else if ($text === '(*BSR_ANYCRLF)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF;
-        } else if ($text === '(*BSR_UNICODE)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE;
-        } else if ($text === '(*NO_START_OPT)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_NO_START_OPT;
-        } else if ($text === '(*UTF8)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UTF8;
-        } else if ($text === '(*UTF16)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UTF16;
-        } else if ($text === '(*UCP)') {
-            $node->subtype = qtype_preg_leaf_control::SUBTYPE_UCP;
-        } else {
-            // There is a parameter or error,.
+
+        switch ($text) {
+        case '(*ACCEPT)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ACCEPT);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*FAIL)':
+        case '(*F)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_FAIL);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*COMMIT)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_COMMIT);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*THEN)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_THEN);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*SKIP)':
+        case '(*SKIP:)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_SKIP);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*PRUNE)':
+        case '(*PRUNE:)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_PRUNE);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*CR)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_CR);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*LF)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_LF);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*CRLF)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_CRLF);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*ANYCRLF)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ANYCRLF);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*ANY)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_ANY);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*BSR_ANYCRLF)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_BSR_ANYCRLF);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*BSR_UNICODE)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_BSR_UNICODE);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*NO_START_OPT)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_NO_START_OPT);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*UTF8)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UTF8);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*UTF16)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UTF16);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        case '(*UCP)':
+            $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_UCP);
+            $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        default:
             $delimpos = qtype_poasquestion_string::strpos($text, ':');
-            if ($delimpos !== false) {
-                $subtype = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
-                $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $length - $delimpos - 2);
-                if ($name === '') {
-                    $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $delimpos, $pos + $length - 1, $text);
-                } else {
-                    $node->name = $name;
-                }
 
-                if ($subtype === 'MARK' || $delimpos === 2) {
-                    $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
-                } else if ($subtype === 'PRUNE') {
-                    $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
-                    $node2 = new qtype_preg_leaf_control();
-                    $this->set_node_source_info($node2, $text, $pos, $pos + $length - 1);
-                    $node2->subtype = qtype_preg_leaf_control::SUBTYPE_PRUNE;
-                    return array($this->form_res(preg_parser_yyParser::PARSLEAF, $node),
-                                 $this->form_res(preg_parser_yyParser::PARSLEAF, $node2));
-                } else if ($subtype === 'SKIP') {
-                    $node->subtype = qtype_preg_leaf_control::SUBTYPE_SKIP_NAME;
-                } else if ($subtype === 'THEN') {
-                    $node->subtype = qtype_preg_leaf_control::SUBTYPE_MARK_NAME;
-                    $node2 = new qtype_preg_leaf_control();
-                    $this->set_node_source_info($node2, $text, $pos, $pos + $length - 1);
-                    $node2->subtype = qtype_preg_leaf_control::SUBTYPE_THEN;
-                    return array($this->form_res(preg_parser_yyParser::PARSLEAF, $node),
-                                 $this->form_res(preg_parser_yyParser::PARSLEAF, $node2));
-                }
+            // Error: unknown control sequence.
+            if ($delimpos === false) {
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, htmlspecialchars($text));
+                $error->set_user_info($pos, $pos + $length - 1);
+                return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+            }
 
+            // There is a parameter separated by ":"
+            $subtype = qtype_poasquestion_string::substr($text, 2, $delimpos - 2);
+            $name = qtype_poasquestion_string::substr($text, $delimpos + 1, $length - $delimpos - 2);
+
+            // Error: empty name.
+            if ($name === '') {
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                $error->set_user_info($pos, $pos + $length - 1);
+                return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+            }
+
+            if ($subtype === 'MARK' || $delimpos === 2) {
+                $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
+                $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+            } else if ($subtype === 'PRUNE') {
+                $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
+                $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $node2 = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_PRUNE);
+                $node2->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                return array(new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node),
+                             new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node2));
+            } else if ($subtype === 'SKIP') {
+                $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_SKIP_NAME, $name);
+                $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+            } else if ($subtype === 'THEN') {
+                $node = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_MARK_NAME, $name);
+                $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                $node2 = new qtype_preg_leaf_control(qtype_preg_leaf_control::SUBTYPE_THEN);
+                $node2->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+                return array(new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node),
+                             new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node2));
             } else {
-                $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, $pos, $pos + $length - 1, $text);
+                $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE, htmlspecialchars($text));
+                $error->set_user_info($pos, $pos + $length - 1);
+                return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
             }
         }
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
      * Returns a named subpattern token.
      */
     protected function form_named_subpatt($text, $pos, $length, $namestartpos, $closetype) {
+        $this->push_opt_lvl();
+
+        // Error: missing closing characters.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
-            // Missing ending character.
-            return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, $pos, $pos + $length - 1, $text));
-        } else {
-            $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
-            if ($name === '') {
-                // Name is empty.
-                return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
-            } else {
-                $error = null;
-                $num = $this->map_subpattern($name, $error);
-                if ($error !== null) {
-                    return $this->form_res(preg_parser_yyParser::OPENBRACK, $error);
-                }
-                // Are we inside a (?| group?
-                if ($this->optstack[$this->optcount - 1]->subpattnum !== -1 && $this->optcount > 0) {
-                    if ($this->optstack[$this->optcount - 1]->subpattname === null) {
-                        // First occurence of a named subpattern inside a (?| group.
-                        $this->optstack[$this->optcount - 1]->subpattname = $name;
-                    } else if ($this->optstack[$this->optcount - 1]->subpattname !== $name) {
-                        // Error: different names for subpatterns of the same number.
-                        return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, $pos, $pos + $length - 1, $text));
-                    }
-                }
-                $this->push_opt_lvl();
-                return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, $text, $num));
-            }
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
         }
+
+        $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
+
+        // Error: empty name.
+        if ($name === '') {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
+        }
+
+        $num = $this->map_subpattern($name);
+
+        // Error: subpatterns with same names should have different numbers.
+        if ($num === null) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, htmlspecialchars($name));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
+        }
+
+        // Are we inside a (?| group?
+        $insidedup = ($this->optcount > 1 && $this->optstack[$this->optcount - 2]->subpattnum !== -1);
+
+        // First occurence of a named subpattern inside a (?| group.
+        if ($insidedup && $this->optstack[$this->optcount - 2]->subpattname === null) {
+            $this->optstack[$this->optcount - 2]->subpattname = $name;
+        }
+
+        // Error: different names for subpatterns of the same number.
+        if ($insidedup && $this->optstack[$this->optcount - 2]->subpattname !== $name) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
+        }
+
+        return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $num));
     }
 
     /**
@@ -449,134 +518,148 @@ ESCAPABLE  = [^0-9a-zA-Z]
      */
     protected function form_cond_subpatt($text, $pos, $length, $subtype, $ending = '', $numeric = true, $namestartpos = 0) {
         $this->push_opt_lvl();
+
+        // Conditional subpatterns with assertions is a separate story.
         if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
             $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
             $this->push_opt_lvl();
-            return $this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, $text));
-        } else {
-            $endlength = strlen($ending);
-            if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
-                // Unclosed condition.
-                return $this->form_res(preg_parser_yyParser::OPENBRACK, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, $pos, $pos + $length - 1, $text));
-            }
+            return new qtype_preg_token(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text)));
+        }
 
-            if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION) {
-                $tmp = qtype_poasquestion_string::substr($text, 4, 1);
-                $secondnode = new qtype_preg_lexem(null, -1, -1, '');
-                if ($tmp === '&') {
-                    // (?(R&
-                    $name = qtype_poasquestion_string::substr($text, 5, $length - 6);
-                    if ($name === '') {
-                        // Empty name.
-                        $secondnode = $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text);
-                    }
-                    $data = $name;
-                } else {
-                    // (?(Rnumber)
-                    $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
-                    if ($tmp !== '' && !ctype_digit($tmp)) {
-                        // Error: digits expected.
-                        $secondnode = $this->form_error($text, qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, $pos, $pos + $length - 1, $tmp);
-                        $data = 0;
-                    } else {
-                        $data = (int)$tmp;
-                    }
+        $endlength = strlen($ending);
+
+        // Error: unclosed condition.
+        if (qtype_poasquestion_string::substr($text, $length - $endlength) !== $ending) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
+        }
+
+        $data = null;
+        $secondnode = new qtype_preg_lexem(null, -1, -1, null);
+
+        // Recursion.
+        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION) {
+            if (qtype_poasquestion_string::substr($text, 4, 1) === '&') {   // (?(R&
+                $data = qtype_poasquestion_string::substr($text, 5, $length - 6);
+                // Error: empty name.
+                if ($data === '') {
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
                 }
-                return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, $pos, $pos + $length - 1, $text, $data)),
-                             $this->form_res(preg_parser_yyParser::PARSLEAF, $secondnode),
-                             $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
-            } else if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE) {
-                return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, $pos, $pos + $length - 1, $text)),
-                             $this->form_res(preg_parser_yyParser::PARSLEAF, new qtype_preg_lexem(null, -1, -1, '')),
-                             $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
-            } else if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT) {
-                if ($numeric) {
-                    //(?("("+"
-                    $str = qtype_poasquestion_string::substr($text, 3, $length - 4);
-                    $tmp = qtype_poasquestion_string::substr($str, 0, 1);
-                    $sign = 0;
-                    $tmp === '+' && $sign++;
-                    $tmp === '-' && $sign--;
-                    if ($sign !== 0) {
-                        $str = qtype_poasquestion_string::substr($str, 1);
+            } else {                                                        // (?(Rnumber)
+                $tmp = qtype_poasquestion_string::substr($text, 4, $length - 5);
+                // Error: digits expected.
+                if ($tmp !== '' && !ctype_digit($tmp)) {
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($tmp));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
+                    $data = 0;
+                }
+                $data = (int)$tmp;
+            }
+        }
+
+        // Subpattern.
+        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT && $numeric) {
+            $str = qtype_poasquestion_string::substr($text, 3, $length - 4);
+            $tmp = qtype_poasquestion_string::substr($str, 0, 1);
+            $sign = 0;
+            $tmp === '+' && $sign++;
+            $tmp === '-' && $sign--;
+            if ($sign !== 0) {
+                $str = qtype_poasquestion_string::substr($str, 1);
+            }
+            if ($str !== '' && !ctype_digit($str)) {
+                // Error: digits expected.
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, htmlspecialchars($str));
+                $secondnode->set_user_info($pos, $pos + $length - 1);
+            } else {
+                if ($sign !== 0) {
+                    $data = $sign * (int)$str + $this->lastsubpatt;
+                    if ($sign < 0) {
+                        $data++;
                     }
-                    $secondnode = new qtype_preg_lexem(null, -1, -1, '');
-                    if ($str !== '' && !ctype_digit($str)) {
-                        // Error: digits expected.
-                        $secondnode = $this->form_error($text, qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER, $pos, $pos + $length - 1, $str);
-                        $num = 0;
-                    } else {
-                        if ($sign !== 0) {
-                            $num = $sign * (int)$str + $this->lastsubpatt;
-                            if ($sign < 0) {
-                                $num++;
-                            }
-                        } else {
-                            $num = (int)$str;
-                        }
-                        if ($num === 0) {
-                            $secondnode = $this->form_error($text, qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, $pos, $pos + $length - 1, $num);
-                        }
-                    }
-                    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, $text, $num)),
-                                 $this->form_res(preg_parser_yyParser::PARSLEAF, $secondnode),
-                                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
                 } else {
-                    $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - $endlength);
-                    if ($name === '') {
-                        // Empty name.
-                        $secondnode = $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text);
-                    } else {
-                        $secondnode = new qtype_preg_lexem(null, -1, -1, '');
-                    }
-                    $this->push_opt_lvl();
-                    return array($this->form_res(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt(qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, $pos, $pos + $length - 1, $text, $name)),
-                                 $this->form_res(preg_parser_yyParser::PARSLEAF, $secondnode),
-                                 $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, '')));
+                    $data = (int)$str;
+                }
+                // Error: reference to the whole expression.
+                if ($data === 0) {
+                    $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION, htmlspecialchars($data));
+                    $secondnode->set_user_info($pos, $pos + $length - 1);
                 }
             }
         }
+
+        if ($subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT && !$numeric) {
+            $data = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - $endlength);
+            // Error: empty name.
+            if ($data === '') {
+                $secondnode = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+                $secondnode->set_user_info($pos, $pos + $length - 1);
+            }
+        }
+
+        // Subtype "DEFINE" has no need to be processed.
+
+        return array(new qtype_preg_token(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem_subpatt($subtype, $pos, $pos + $length - 1, new qtype_preg_userinscription($text), $data)),
+                     new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $secondnode),
+                     new qtype_preg_token(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
     }
 
     /**
      * Returns a named backreference token.
      */
     protected function form_named_backref($text, $pos, $length, $namestartpos, $opentype, $closetype) {
+        // Error: missing opening characters.
         if (qtype_poasquestion_string::substr($text, $namestartpos - 1, 1) !== $opentype) {
-            return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, $pos, $pos + $length - 1, $opentype));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING, htmlspecialchars($opentype));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
+
+        // Error: missing closing characters.
         if (qtype_poasquestion_string::substr($text, $length - 1, 1) !== $closetype) {
-            return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, $pos, $pos + $length - 1, $closetype));
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING, htmlspecialchars($closetype));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
+
         $name = qtype_poasquestion_string::substr($text, $namestartpos, $length - $namestartpos - 1);
+
+        // Error: empty name.
         if ($name === '') {
-            return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, $pos, $pos + $length - 1, $text));
-        } else {
-            $node = new qtype_preg_leaf_backref();
-            $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
-            $node->number = $name;
-            $node->matcher = $this->matcher;
-            $this->backrefs[] = $node;
-            if ($name === 0) {
-                $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO, $pos, $pos + $length - 1, $name);
-            }
-            return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
+
+        $node = new qtype_preg_leaf_backref($name);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+            $node->caseinsensitive = true;
+        }
+        $this->backrefs[] = $node;
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
      * Returns a backreference token.
      */
     protected function form_backref($text, $pos, $length, $number) {
-        $node = new qtype_preg_leaf_backref();
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
-        $node->number = $number;
-        $node->matcher = $this->matcher;
-        $this->backrefs[] = $node;
+        // Error: backreference to the whole expression.
         if ($number === 0) {
-            $node->error = $this->form_error($text, qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO, $pos, $pos + $length - 1, $number);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO, htmlspecialchars($text));
+            $error->set_user_info($pos, $pos + $length - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+
+        $node = new qtype_preg_leaf_backref($number);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+            $node->caseinsensitive = true;
+        }
+        $this->backrefs[] = $node;
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
@@ -584,10 +667,10 @@ ESCAPABLE  = [^0-9a-zA-Z]
      */
     protected function form_simple_assertion($text, $pos, $length, $subtype, $negative = false) {
         $node = new qtype_preg_leaf_assert();
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
         $node->subtype = $subtype;
         $node->negative = $negative;
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
@@ -595,7 +678,10 @@ ESCAPABLE  = [^0-9a-zA-Z]
      */
     protected function form_charset($text, $pos, $length, $subtype, $data, $negative = false) {
         $node = new qtype_preg_leaf_charset();
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
+        $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $subtype !== qtype_preg_charset_flag::SET)));
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+            $node->caseinsensitive = true;
+        }
         $node->subtype = $subtype;
         $node->israngecalculated = false;
         if ($data !== null) {
@@ -607,7 +693,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
             $flag->set_data($subtype, $data);
             $node->flags = array(array($flag));
         }
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
@@ -615,50 +701,56 @@ ESCAPABLE  = [^0-9a-zA-Z]
      */
     protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
-        $this->set_node_source_info($node, $text, $pos, $pos + $length - 1);
+        $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+            $node->caseinsensitive = true;
+        }
         if ($number[2] === 'R') {
             $node->number = 0;
         } else {
             $node->number = qtype_poasquestion_string::substr($number, 2, qtype_poasquestion_string::strlen($number) - 3);
         }
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $node);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
     }
 
     /**
      * Forms an interval from sequences like a-z, 0-9, etc. If a string contains
      * something like "x-z" in the end, it will be converted to "xyz".
-     * @param cc a string containing characters and possible "x-y" sequence in the end.
-     * @param cclength length of the cc - this may be a utf-8 string.
      * @return mixed null if everything is correct, an error object otherwise.
      */
-    protected function form_num_interval(&$cc, &$cclength) {
+    protected function form_num_interval() {
         // Check if there are enough characters in before.
-        if ($cclength < 3 || qtype_poasquestion_string::substr($cc, $cclength - 2, 1) !== '-') {
-            return;
+        if ($this->charsetcount < 3 || qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 2, 1) !== '-') {
+            return null;
         }
-        $startchar = qtype_poasquestion_string::substr($cc, $cclength - 3, 1);
-        $endchar = qtype_poasquestion_string::substr($cc, $cclength - 1, 1);
+        $startchar = qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 3, 1);
+        $endchar = qtype_poasquestion_string::substr($this->charsetset, $this->charsetcount - 1, 1);
+
+        // Modify userinscription;
+        $userinscriptionend = array_pop($this->charsetuserinscriptionraw);
+        array_pop($this->charsetuserinscriptionraw);
+        $userinscriptionstart = array_pop($this->charsetuserinscriptionraw);
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($userinscriptionstart->data . '-' . $userinscriptionend->data);
+
         if (qtype_poasquestion_string::ord($startchar) <= qtype_poasquestion_string::ord($endchar)) {
-            // Modify userinscription;
-            $userinscriptionlength = qtype_poasquestion_string::strlen($this->charset->userinscription[0]);
-            $this->charset->userinscription[0] = qtype_poasquestion_string::substr($this->charset->userinscription[0], 0, $userinscriptionlength - 3);
-            $this->charset->userinscription[] = $startchar . '-' . $endchar;
             // Replace last 3 characters by all the characters between them.
-            $cc = qtype_poasquestion_string::substr($cc, 0, $cclength - 3);
-            $cclength -= 3;
+            $this->charsetset = qtype_poasquestion_string::substr($this->charsetset, 0, $this->charsetcount - 3);
+            $this->charsetcount -= 3;
             $curord = qtype_poasquestion_string::ord($startchar);
             $endord = qtype_poasquestion_string::ord($endchar);
             while ($curord <= $endord) {
-                $cc .= qtype_poasquestion_string::code2utf8($curord++);
-                $cclength++;
+                $this->charsetset .= qtype_poasquestion_string::code2utf8($curord++);
+                $this->charsetcount++;
             }
             return null;
         } else {
             // Delete last 3 characters.
-            $cclength -= 3;
-            $cc = qtype_poasquestion_string::substr($cc, 0, $cclength);
+            $this->charsetcount -= 3;
+            $this->charsetset = qtype_poasquestion_string::substr($this->charsetset, 0, $this->charsetcount);
             // Return the error node.
-            return $this->form_error($startchar . '-' . $endchar, qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, $this->yychar - 2, $this->yychar + $this->yylength() - 1, $startchar . '-' . $endchar);
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE, htmlspecialchars($startchar . '-' . $endchar));
+            $error->set_user_info($this->yychar - 2, $this->yychar + $this->yylength() - 1);
+            return $error;
         }
     }
 
@@ -695,18 +787,18 @@ ESCAPABLE  = [^0-9a-zA-Z]
     /**
      * Adds a named subpattern to the map.
      * @param name subpattern to be mapped.
-     * @return number of this named subpattern.
      */
-    protected function map_subpattern($name, &$error) {
+    protected function map_subpattern($name) {
         if (!array_key_exists($name, $this->subpatternmap)) {   // This subpattern does not exists.
             $num = ++$this->lastsubpatt;
             $this->subpatternmap[$name] = $num;
         } else {                                                // Subpatterns with same names should have same numbers.
+            if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum === -1) {
+                return null;
+            }
             $num = $this->subpatternmap[$name];
             $this->lastsubpatt++;
-            if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum === -1) {
-                $error = $this->form_error($name, qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES, $this->yychar, $this->yychar + $this->yylength() - 1, $name);
-            }
+
         }
         $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
         return (int)$num;
@@ -717,13 +809,11 @@ ESCAPABLE  = [^0-9a-zA-Z]
      * @param cx the sequence itself.
      * @return character corresponding to the given sequence.
      */
-    protected function calculate_cx($cx, &$error) {
+    protected function calculate_cx($cx) {
         $x = qtype_poasquestion_string::substr($cx, 2);
         $code = qtype_poasquestion_string::ord($x);
         if ($code > 127) {
-            $error = $this->form_error($cx, qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, $this->yychar, $this->yychar + $this->yylength() - 1, $cx);
-        } else {
-            $error = null;
+            return null;
         }
         $code ^= 0x40;
         return qtype_poasquestion_string::code2utf8($code);
@@ -736,25 +826,24 @@ ESCAPABLE  = [^0-9a-zA-Z]
      * @param data can contain either subtype of a flag or characters for a charset.
      * @param negative is this flag negative.
      */
-    protected function add_flag_to_charset($userinscription = '', $type, $data, $negative = false) {
-        $this->charsetuserinscription .= $userinscription;
+    protected function add_flag_to_charset($text, $type, $data, $negative = false) {
         switch ($type) {
         case qtype_preg_charset_flag::SET:
-            $this->charsetcount += qtype_poasquestion_string::strlen($data);
+            $this->charsetuserinscriptionraw[] = new qtype_preg_userinscription($text);
+            $this->charsetcount++;
             $this->charsetset .= $data;
-            $this->charset->userinscription[0] .= $userinscription;
-            $error = $this->form_num_interval($this->charsetset, $this->charsetcount);
+            $error = $this->form_num_interval();
             if ($error !== null) {
                 $this->charset->error[] = $error;
             }
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
             $this->charset->flags[] = array($flag);
-            $this->charset->userinscription[] = $userinscription;
             break;
         }
     }
@@ -782,17 +871,14 @@ ESCAPABLE  = [^0-9a-zA-Z]
     /**
      * Returns a unicode property flag type corresponding to the consumed string.
      * @param str string consumed by the lexer, defines the property itself.
-     * @param error will be an error object if the property is unknown.
      * @return a constant of qtype_preg_leaf_charset if this property is known, null otherwise.
      */
-    protected function get_uprop_flag($str, &$error) {
+    protected function get_uprop_flag($str) {
         if (array_key_exists($str, self::$upropflags)) {
             $error = null;
             return self::$upropflags[$str];
-        } else {
-            $error = $this->form_error($this->yytext(), qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, $this->yychar, $this->yychar + $this->yylength() - 1, $str);
-            return null;
         }
+        return null;
     }
 %}
 
@@ -864,12 +950,13 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
-    $this->charset->userinscription = array('');
     $this->charset->negative = ($text === '[^' || $text === '[^]');
     $this->charset->error = array();
+    $this->charset->userinscription = array();
     $this->charsetcount = 0;
     $this->charsetset = '';
-    $this->charsetuserinscription = $text;
+    $this->charsetuserinscription = array();
+    $this->charsetuserinscriptionraw = array();
     if ($text === '[^]' || $text === '[]') {
         $this->add_flag_to_charset(']', qtype_preg_charset_flag::SET, ']');
     }
@@ -879,16 +966,18 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, $this->yytext(), $this->lastsubpatt));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, new qtype_preg_userinscription('('), $this->lastsubpatt));
 }
 <YYINITIAL> ")" {
     $this->pop_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
 }
 <YYINITIAL> "(?#"[^)]*")"? {                    // Comment
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, htmlspecialchars($text));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
         return $this->nextToken();
     }
@@ -900,7 +989,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext(), $this->lastsubpatt));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), $this->lastsubpatt));
 }
 <YYINITIAL> "(?<"{ALNUM}*">"? {                 // Named subpattern (?<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
@@ -913,11 +1002,19 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <YYINITIAL> "(?:" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
 }
 <YYINITIAL> "(?|" {                             // Duplicate subpattern numbers gropu
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
+}
+<YYINITIAL> "(?()" {                            // Error - empty condition
+    $text = $this->yytext();
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return array(new qtype_preg_token(preg_parser_yyParser::CONDSUBPATT, new qtype_preg_lexem(null, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription(''))),
+                 new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error),
+                 new qtype_preg_token(preg_parser_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
 }
 <YYINITIAL> "(?(?=" {                           // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
@@ -934,7 +1031,7 @@ ESCAPABLE  = [^0-9a-zA-Z]
 <YYINITIAL> "(?(R"[^"<>()'"]*")"? {             // Conditional subpattern - recursion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, ')');
 }
-<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subpattern
+<YYINITIAL> "(?(DEFINE"")"? {                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
 <YYINITIAL> "(?(<"[^"'<>()?!="]*(">)")? {       // Conditional subpattern - named
@@ -959,47 +1056,51 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <YYINITIAL> "(?=" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?=')));
 }
 <YYINITIAL> "(?!" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?!')));
 }
 <YYINITIAL> "(?<=" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<=')));
 }
 <YYINITIAL> "(?<!" {
     $this->push_opt_lvl();
-    return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<!')));
 }
 <YYINITIAL> "(?C"[0-9]*")"? {
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING, htmlspecialchars($text));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     }
     throw new Exception('Callouts are not implemented yet');
     $number = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     if ($number > 255) {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER, htmlspecialchars($text));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
 
     }
 }
 <YYINITIAL> "." {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
 <YYINITIAL> {NOTSPECIAL} {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
 <YYINITIAL> "|" {
     // Reset subpattern numeration inside a (?|...) group.
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
-    return $this->form_res(preg_parser_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, $this->yytext()));
+    return new qtype_preg_token(preg_parser_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
 <YYINITIAL> "\g"[0-9][0-9]? {
     $text = $this->yytext();
@@ -1030,37 +1131,40 @@ ESCAPABLE  = [^0-9a-zA-Z]
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
 }
 <YYINITIAL> "\a" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
 }
 <YYINITIAL> "\c". {
     $text = $this->yytext();
-    $error = null;
-    $char = $this->calculate_cx($text, $error);
-    if ($error !== null) {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+    $char = $this->calculate_cx($text);
+    if ($char === null) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, htmlspecialchars($text));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
-        return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $char);
+        return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $char);
     }
 }
 <YYINITIAL> "\e" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B));
 }
 <YYINITIAL> "\f" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C));
 }
 <YYINITIAL> "\n" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A));
 }
 <YYINITIAL> ("\p"|"\P"). {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
-    $subtype = $this->get_uprop_flag($str, $error);
-    $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
-    if ($error !== null) {
-        $res->value->error = array($error);
+    $subtype = $this->get_uprop_flag($str);
+    if ($subtype === null) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+    } else {
+        return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
-    return $res;
 }
 <YYINITIAL> ("\p"|"\P")("{^"|"{")[^}]*"}" {
     $text = $this->yytext();
@@ -1072,68 +1176,88 @@ ESCAPABLE  = [^0-9a-zA-Z]
         $str = qtype_poasquestion_string::substr($str, 1);
     }
     if ($str === 'Any') {
-        $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
+        $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
     } else {
-        $subtype = $this->get_uprop_flag($str, $error);
-        $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
-        if ($error !== null) {
-            $res->value->error = array($error);
+        $subtype = $this->get_uprop_flag($str);
+        if ($subtype === null) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+        } else {
+            return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
     }
     return $res;
 }
 <YYINITIAL> "\r" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));
 }
 <YYINITIAL> "\t" {
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
 }
 <YYINITIAL> "\x"[0-9a-fA-F]?[0-9a-fA-F]? {
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
+        return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
     } else {
-        $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($text, 2)));
+        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+        } else {
+            return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+        }
     }
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $str);
 }
 <YYINITIAL> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
-        return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str));
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
     } else {
-        return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+        return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
 }
 <YYINITIAL> "\d"|"\D" {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $text === '\D');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $text === '\D');
 }
 <YYINITIAL> "\h"|"\H" {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $text === '\H');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $text === '\H');
 }
 <YYINITIAL> "\s"|"\S" {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $text === '\S');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $text === '\S');
 }
 <YYINITIAL> "\v"|"\V" {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, $text === '\V');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, $text === '\V');
 }
 <YYINITIAL> "\w"|"\W" {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $text === '\W');
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $text === '\W');
 }
 <YYINITIAL> "\C" {
     // TODO: matches any one data unit. For now implemented the same way as dot.
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
 <YYINITIAL> "\N" {
     // TODO: matches any character except new line characters. For now, the same as dot.
-    return $this->form_charset(array($this->yytext()), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
+    return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
 <YYINITIAL> "\K" {
     // TODO: reset start of match.
@@ -1183,11 +1307,17 @@ ESCAPABLE  = [^0-9a-zA-Z]
     if (count($errors) > 0) {
         $res = array();
         foreach ($errors as $error) {
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+            $res[] = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
         return $res;
     } else {
-        return $this->nextToken();
+        if ($this->handlingoptions->preserveallnodes) {
+            $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+            $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
+            return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+        } else {
+            return $this->nextToken();
+        }
     }
 }
 <YYINITIAL> "(?"{MODIFIER}*-?{MODIFIER}*":" {
@@ -1205,11 +1335,20 @@ ESCAPABLE  = [^0-9a-zA-Z]
     if (count($errors) > 0) {
         $res = array();
         foreach ($errors as $error) {
-            $res[] = $this->form_res(preg_parser_yyParser::PARSLEAF, $error);
+            $res[] = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
         }
         return $res;
     } else {
-        return $this->form_res(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem('grouping', $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+        if ($this->handlingoptions->preserveallnodes) {
+            $node = new qtype_preg_leaf_option(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+            $node->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text));
+            $res = array();
+            $res[] = new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+            $res[] = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $node);
+            return $res;
+        } else {
+            return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription($text)));
+        }
     }
 }
 <YYINITIAL> "(?"("R"|[0-9]+)")" {
@@ -1221,16 +1360,20 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $str = $this->recognize_qe_sequence($text);
     $res = array();
     for ($i = 0; $i < qtype_poasquestion_string::strlen($str); $i++) {
-        $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($str, $i, 1));
+        $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($str, $i, 1));
     }
     return $res;
 }
 <YYINITIAL> "\c" {
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\c', qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\c'));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, htmlspecialchars('\c'));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> \\[1-9][0-9]?[0-9]? {
     $text = $this->yytext();
@@ -1258,12 +1401,12 @@ ESCAPABLE  = [^0-9a-zA-Z]
         }
         // Return a single lexem if all digits are octal, an array of lexems otherwise.
         if (qtype_poasquestion_string::strlen($tail) === 0) {
-            $res = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
+            $res = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
         } else {
             $res = array();
-            $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
+            $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec($octal)));
             for ($i = 0; $i < qtype_poasquestion_string::strlen($tail); $i++) {
-                $res[] = $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($tail, $i, 1));
+                $res[] = $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($tail, $i, 1));
             }
         }
     }
@@ -1271,26 +1414,32 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <YYINITIAL> \\0[0-7]?[0-7]? {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
 <YYINITIAL> \\{ESCAPABLE} {
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
 }
 <YYINITIAL> \\. {           // ERROR: incorrect escape sequence.
     $text = $this->yytext();
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> \\ {           // ERROR: \ at end of pattern.
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error('\\', qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, $this->yychar, $this->yychar + $this->yylength() - 1, '\\'));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, htmlspecialchars('\\'));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {      // ERROR: POSIX class outside character set.
     $text = $this->yytext();
-    return $this->form_res(preg_parser_yyParser::PARSLEAF, $this->form_error($text, qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, $this->yychar, $this->yychar + $this->yylength() - 1, $text));
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $error);
 }
 <YYINITIAL> . {                 // Just to avoid exceptions.
     $text = $this->yytext();
-    return $this->form_charset(array($text), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
+    return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
 <CHARSET> "[:alnum:]"|"[:^alnum:]" {
     $text = $this->yytext();
@@ -1364,19 +1513,21 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <CHARSET> "[:"[^\]]*":]"|"[:^"[^\]]*":]"|"[."[^\]]*".]"|"[="[^\]]*"=]" {
     $text = $this->yytext();
-    $this->charset->userinscription[] = $text;
-    $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
-    $this->charsetuserinscription .= $text;
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    $this->charset->error[] = $error;
+    $this->charsetuserinscription[] = new qtype_preg_userinscription($text, false); // Note, addinfo is false because there are no such constants in the lang file.
 }
 <CHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
-    $subtype = $this->get_uprop_flag($str, $error);
-    if ($error !== null) {
-        $this->charset->userinscription[] = $text;
+    $subtype = $this->get_uprop_flag($str);
+    if ($subtype === null) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
-        $this->charsetuserinscription .= $text;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -1393,11 +1544,12 @@ ESCAPABLE  = [^0-9a-zA-Z]
     if ($str === 'Any') {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
     } else {
-        $subtype = $this->get_uprop_flag($str, $error);
-        if ($error !== null) {
-            $this->charset->userinscription[] = $text;
+        $subtype = $this->get_uprop_flag($str);
+        if ($subtype === null) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
             $this->charset->error[] = $error;
-            $this->charsetuserinscription .= $text;
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
@@ -1411,17 +1563,36 @@ ESCAPABLE  = [^0-9a-zA-Z]
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
+        $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
     } else {
-        $str = qtype_poasquestion_string::code2utf8(hexdec(qtype_poasquestion_string::substr($text, 2)));
+        $code = hexdec(qtype_poasquestion_string::substr($text, 2));
+        if ($code > qtype_preg_unicode::max_possible_code()) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            $this->charset->error[] = $error;
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+        } else if (0xd800 <= $code && $code <= 0xdfff) {
+            $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+            $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+            $this->charset->error[] = $error;
+        } else {
+            $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
+        }
     }
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $str);
 }
 <CHARSET> "\x{"[0-9a-fA-F]+"}" {
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
     if ($code > qtype_preg_unicode::max_possible_code()) {
-        $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, $this->yychar, $this->yychar + $this->yylength() - 1, '0x' . $str);
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
+    } else if (0xd800 <= $code && $code <= 0xdfff) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CHAR_CODE_DISALLOWED, htmlspecialchars('0x' . $str));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+        $this->charset->error[] = $error;
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
@@ -1431,10 +1602,12 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <CHARSET> "\c". {
     $text = $this->yytext();
-    $error = null;
-    $char = $this->calculate_cx($text, $error);
-    if ($error !== null) {
+    $char = $this->calculate_cx($text);
+    if ($char === null) {
+        $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII, htmlspecialchars($text));
+        $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
@@ -1460,7 +1633,10 @@ ESCAPABLE  = [^0-9a-zA-Z]
 }
 <CHARSET> "\u"|"\U"|"\l"|"\L"|"\N{"{ALNUM}*"}" {
     $text = $this->yytext();
-    $this->charset->error[] = $this->form_error($text, qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, $this->yychar, $this->yychar + $this->yylength() - 1, $text);
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    $this->charset->error[] = $error;
+    $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> "\Q".*"\E" {
     $text = $this->yytext();
@@ -1482,17 +1658,28 @@ ESCAPABLE  = [^0-9a-zA-Z]
         $flag->set_data(qtype_preg_charset_flag::SET, new qtype_poasquestion_string($this->charsetset));
         $this->charset->flags[] = array($flag);
     }
-    if ($this->charset->userinscription[0] === '') {
-        array_shift($this->charset->userinscription);
+    $tmp = '';
+    foreach ($this->charsetuserinscriptionraw as $userinscription) {
+        $tmp .= $userinscription->data;
+    }
+    if ($tmp !== '') {
+        $this->charset->userinscription[] = new qtype_preg_userinscription($tmp);
+    }
+    foreach ($this->charsetuserinscription as $userinscription) {
+        $this->charset->userinscription[] = $userinscription;
     }
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
-    $res = $this->form_res(preg_parser_yyParser::PARSLEAF, $this->charset);
+    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        $this->charset->caseinsensitive = true;
+    }
+    $res = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $this->charset);
     $this->charset = null;
     $this->charsetcount = 0;
     $this->charsetset = '';
-    $this->charsetuserinscription = '';
+    $this->charsetuserinscription = array();
+    $this->charsetuserinscriptionraw = array();
     $this->yybegin(self::YYINITIAL);
     return $res;
 }
