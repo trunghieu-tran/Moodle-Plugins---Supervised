@@ -7037,6 +7037,9 @@ array(
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
+    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        $this->charset->caseinsensitive = true;
+    }
     $res = new qtype_preg_token(preg_parser_yyParser::PARSLEAF, $this->charset);
     $this->charset = null;
     $this->charsetcount = 0;
