@@ -1,12 +1,12 @@
 <?php
 
 /**
- * tests for /question/type/preg/author_tool_description/preg_description.php'
+ * Tests for /question/type/preg/author_tool_description/preg_description.php.
  *
- * @copyright &copy; 2012 Pahomov Dmitry
- * @author Pahomov Dmitry
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package question
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Pahomov Dmitry
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -15,7 +15,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_description.php');
 
 class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
-    
+
     /**
      * @dataProvider charset_provider
      */
@@ -24,7 +24,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
-    } 
+    }
     public function charset_provider()
     {
         return array(
@@ -35,9 +35,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('\W','not word character')
         );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     public function test_meta()
     {
         $handler = new qtype_preg_author_tool_description('a|b|',null,null);
@@ -45,9 +45,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $expected = '<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing';
         $this->assertEquals($result, $expected);
     }
-    
+
     //------------------------------------------------------------------
- 
+
     /**
      * @dataProvider assert_provider
      */
@@ -70,9 +70,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('\G','at the first matching position in the subject')
         );
     }
- 
+
     //------------------------------------------------------------------
-    
+
     public function test_backref()
     {
         $handler = new qtype_preg_author_tool_description('(a)\1',null,null);
@@ -81,9 +81,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $expected = 'subpattern #1: [<span style="color:blue">a</span>] then back reference to subpattern #1';
         $this->assertEquals($result, $expected);
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider concat_provider
      */
@@ -94,7 +94,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function concat_provider()
     {
         return array(
@@ -105,9 +105,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('\0113','tabulation then <span style="color:blue">3</span>'),
          );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider alt_provider
      */
@@ -118,7 +118,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function alt_provider()
     {
         return array(
@@ -127,9 +127,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('a|b|c','<span style="color:blue">a</span> or <span style="color:blue">b</span> or <span style="color:blue">c</span>'),
         );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider nassert_provider
      */
@@ -140,7 +140,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function nassert_provider()
     {
         return array(
@@ -154,9 +154,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('a(?<!abc)g','<span style="color:blue">a</span> and preceding text should not match: [<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>] then <span style="color:blue">g</span>'),
         );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider quant_provider
      */
@@ -167,7 +167,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function quant_provider()
     {
         return array(
@@ -181,20 +181,20 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('g{2,5}','<span style="color:blue">g</span> is repeated from 2 to 5 times'),
         );
     }
-    
-    //------------------------------------------------------------------    
-    
+
+    //------------------------------------------------------------------
+
     public function test_option()
     {
         $handler = new qtype_preg_author_tool_description('(a(?i)b)c',null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
-        $expected = 'subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'; 
+        $expected = 'subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>';
         $this->assertEquals($result, $expected);
     }
-    
+
     //------------------------------------------------------------------
-    
+
     public function test_numbering()
     {
         $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
@@ -203,9 +203,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
         $this->assertEquals($result, $expected);
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider condmask_provider
      */
@@ -216,7 +216,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function condmask_provider()
     {
         return array(
@@ -232,9 +232,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?(DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]'),
         );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider postprocessing_provider
      */
@@ -245,7 +245,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function postprocessing_provider()
     {
         return array(
@@ -253,9 +253,9 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[^\S]','white space'),
         );
     }
-    
+
     //------------------------------------------------------------------
-    
+
     /**
      * @dataProvider err_provider
      */
@@ -266,7 +266,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function err_provider()
     {
         return array(
@@ -274,10 +274,10 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(a','<span style="color:red">Regex syntax error: missing a closing parenthesis ')' for the opening parenthesis in position 0.</span> Operands: <span style="color:blue">a</span>'),
         );
     }
-    
+
 }
 
-class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {    
+class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider form_provider
      */
@@ -287,7 +287,7 @@ class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
         $result = $handler->form_description('g');
         $this->assertEquals($result, $expected);
     }
-    
+
     public function form_provider()
     {
         return array(

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Unit tests for (some of) question/type/preg/preg_notations.php.
+ * Unit tests for question/type/preg/preg_notations.php.
  *
- * @copyright &copy; 2012 Oleg Sychev
- * @author Oleg Sychev
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package question
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

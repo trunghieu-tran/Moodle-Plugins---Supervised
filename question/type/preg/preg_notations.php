@@ -1,14 +1,17 @@
 <?php
+
 /**
- * Defines classes of notations, used to write regexes
+ * Defines classes of notations, used to write regexes.
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 

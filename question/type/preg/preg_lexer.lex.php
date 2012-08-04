@@ -1,10 +1,17 @@
 <?php
 /**
- * This file contains source info for generating lexer.
- * Lexer can return error tokens as leafs or fill "casual" token's error field - depends on the node type.
- * The error field is usually filled if the node contains semantic errors but the syntax is correct: for
- * example, wrong quantifier borders {4,3}, wrong charset range z-a etc. Error leafs returned otherwise.
+ * Contains source info for generating lexer.
+ * Lexer can return error tokens as leafs or fill the "casual" node's error field - depends on the node type.
+ * A node's error field is usually filled if the it contains semantic errors but the syntax is correct:
+ * for example, wrong quantifier borders {4,3}, wrong charset range z-a etc. Error leafs returned otherwise.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>, Dmitriy Kolesov <xapuyc7@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
