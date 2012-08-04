@@ -285,6 +285,14 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     {
                         goto tab;
                     }
+                    elseif ($iter[$i] == 'h')
+                    {
+                        goto horiz;
+                    }
+                    elseif ($iter[$i] == 'v')
+                    {
+                        goto vert;
+                    }
                     elseif ($iter[$i] == ' ')
                     {
                         goto space;
@@ -297,6 +305,16 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     {
                         $result[0] .= $iter[$i];
                     }
+                }
+                elseif ($iter[$i] == 'h')
+                {
+                    horiz:
+                    $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
+                }
+                elseif ($iter[$i] == 'v')
+                {
+                    vert:
+                    $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
                 }
                 elseif ($iter[$i] == ' ')
                 {

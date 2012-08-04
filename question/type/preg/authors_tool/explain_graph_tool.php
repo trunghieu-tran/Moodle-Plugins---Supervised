@@ -555,8 +555,9 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 if (!qtype_preg_author_tool_explain_graph::cmp_nodes($g1->nodes[$i], $g2->nodes[$i]))
                     return false;
             }
-        }
-        else return false;
+        } else {		
+			return false;
+		}
 
         if (count($g1->entries) == count($g2->entries)) {
             for ($i = 0; $i < count($g1->entries); ++$i) {
