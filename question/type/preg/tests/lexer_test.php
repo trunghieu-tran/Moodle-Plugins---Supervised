@@ -1509,8 +1509,8 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->error[3]->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED);
         $this->assertTrue($token->value->error[4]->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === preg_parser_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->flags[0][0]->data == 'm');
         $lexer = $this->create_lexer("(?|(?<qwe>)|(?'qwe'(?'rty'(?'abc')))|(?'uio')");      // (?P<rty>)\k<qwe>\k'qwe'\g{qwe}\k{rty}(?P=rty)
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == preg_parser_yyParser::OPENBRACK);
