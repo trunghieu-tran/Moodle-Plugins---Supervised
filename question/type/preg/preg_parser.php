@@ -8,19 +8,19 @@
  *
  * meta-data should be stored as an array
  */
-class preg_parser_yyToken implements ArrayAccess
+class qtype_preg_yyToken implements ArrayAccess
 {
     public $string = '';
     public $metadata = array();
 
     function __construct($s, $m = array())
     {
-        if ($s instanceof preg_parser_yyToken) {
+        if ($s instanceof qtype_preg_yyToken) {
             $this->string = $s->string;
             $this->metadata = $s->metadata;
         } else {
             $this->string = (string) $s;
-            if ($m instanceof preg_parser_yyToken) {
+            if ($m instanceof qtype_preg_yyToken) {
                 $this->metadata = $m->metadata;
             } elseif (is_array($m)) {
                 $this->metadata = $m;
@@ -47,7 +47,7 @@ class preg_parser_yyToken implements ArrayAccess
     {
         if ($offset === null) {
             if (isset($value[0])) {
-                $x = ($value instanceof preg_parser_yyToken) ?
+                $x = ($value instanceof qtype_preg_yyToken) ?
                     $value->metadata : $value;
                 $this->metadata = array_merge($this->metadata, $x);
                 return;
@@ -57,7 +57,7 @@ class preg_parser_yyToken implements ArrayAccess
         if ($value === null) {
             return;
         }
-        if ($value instanceof preg_parser_yyToken) {
+        if ($value instanceof qtype_preg_yyToken) {
             $this->string .= $value->string;
             $this->metadata[$offset] = $value->metadata;
         } else {
@@ -92,7 +92,7 @@ class preg_parser_yyToken implements ArrayAccess
  *      the information used by the action routines in the grammar.
  *      It is sometimes called the "minor" token.
  */
-class preg_parser_yyStackEntry
+class qtype_preg_yyStackEntry
 {
     public $stateno;       /* The state-number */
     public $major;         /* The major token value.  This is the code
@@ -106,7 +106,7 @@ class preg_parser_yyStackEntry
  * The state of the parser is completely contained in an instance of
  * the following structure
  */
-class preg_parser_yyParser
+class qtype_preg_yyParser
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
@@ -441,14 +441,14 @@ static public $yy_action = array(
 **                       and nonterminal numbers.  "unsigned char" is
 **                       used if there are fewer than 250 rules and
 **                       states combined.  "int" is used otherwise.
-**    preg_parser_TOKENTYPE     is the data type used for minor tokens given
+**    qtype_preg_TOKENTYPE     is the data type used for minor tokens given
 **                       directly to the parser from the tokenizer.
 **    YYMINORTYPE        is the data type used for all minor tokens.
 **                       This is typically a union of many types, one of
-**                       which is preg_parser_TOKENTYPE.  The entry in the union
+**                       which is qtype_preg_TOKENTYPE.  The entry in the union
 **                       for base tokens is called "yy0".
 **    YYSTACKDEPTH       is the maximum depth of the parser's stack.
-**    preg_parser_ARG_DECL      A global declaration for the %extra_argument
+**    qtype_preg_ARG_DECL      A global declaration for the %extra_argument
 **    YYNSTATE           the combined number of states.
 **    YYNRULE            the number of rules in the grammar
 **    YYERRORSYMBOL      is the code number of the error symbol.  If not
@@ -456,7 +456,7 @@ static public $yy_action = array(
 */
     const YYNOCODE = 16;
     const YYSTACKDEPTH = 100;
-    const preg_parser_ARG_DECL = '0';
+    const qtype_preg_ARG_DECL = '0';
     const YYNSTATE = 25;
     const YYNRULE = 21;
     const YYERRORSYMBOL = 11;
@@ -610,7 +610,7 @@ static public $yy_action = array(
      * is popped from the stack, then call it.
      *
      * Return the major token number for the symbol popped.
-     * @param preg_parser_yyParser
+     * @param qtype_preg_yyParser
      * @return int
      */
     function yy_pop_parser_stack()
@@ -683,7 +683,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new preg_parser_yyStackEntry;
+                        $x = new qtype_preg_yyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -745,7 +745,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new preg_parser_yyStackEntry;
+                        $x = new qtype_preg_yyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -873,7 +873,7 @@ static public $yy_action = array(
             ** stack ever overflows */
             return;
         }
-        $yytos = new preg_parser_yyStackEntry;
+        $yytos = new qtype_preg_yyStackEntry;
         $yytos->stateno = $yyNewState;
         $yytos->major = $yyMajor;
         $yytos->minor = $yypMinor;
@@ -1166,7 +1166,7 @@ static public $yy_action = array(
         //int $yygoto;                     /* The next state */
         //int $yyact;                      /* The next action */
         //mixed $yygotominor;        /* The LHS of the rule reduced */
-        //preg_parser_yyStackEntry $yymsp;            /* The top of the parser's stack */
+        //qtype_preg_yyStackEntry $yymsp;            /* The top of the parser's stack */
         //int $yysize;                     /* Amount to pop the stack */
         $yymsp = $this->yystack[$this->yyidx];
         if (self::$yyTraceFILE && $yyruleno >= 0
@@ -1198,7 +1198,7 @@ static public $yy_action = array(
             ** That gives a significant speed improvement. */
             if (!self::$yyTraceFILE && $yysize) {
                 $this->yyidx++;
-                $x = new preg_parser_yyStackEntry;
+                $x = new qtype_preg_yyStackEntry;
                 $x->stateno = $yyact;
                 $x->major = $yygoto;
                 $x->minor = $yy_lefthand_side;
@@ -1259,7 +1259,7 @@ static public $yy_action = array(
     /**
      *  The main parser program.
      * The first argument is a pointer to a structure obtained from
-     * "preg_parser_Alloc" which describes the current state of the parser.
+     * "qtype_preg_Alloc" which describes the current state of the parser.
      * The second argument is the major token number.  The third is
      * the minor token.  The fourth optional argument is whatever the
      * user wants (and specified in the grammar) and is available for
@@ -1280,8 +1280,8 @@ static public $yy_action = array(
      */
     function doParse($yymajor, $yytokenvalue, $extraargument = null)
     {
-        if (self::preg_parser_ARG_DECL && $extraargument !== null) {
-            $this->{self::preg_parser_ARG_DECL} = $extraargument;
+        if (self::qtype_preg_ARG_DECL && $extraargument !== null) {
+            $this->{self::qtype_preg_ARG_DECL} = $extraargument;
         }
 //        YYMINORTYPE yyminorunion;
 //        int yyact;            /* The parser action. */
@@ -1293,7 +1293,7 @@ static public $yy_action = array(
             /* if ($yymajor == 0) return; // not sure why this was here... */
             $this->yyidx = 0;
             $this->yyerrcnt = -1;
-            $x = new preg_parser_yyStackEntry;
+            $x = new qtype_preg_yyStackEntry;
             $x->stateno = 0;
             $x->major = 0;
             $this->yystack = array();

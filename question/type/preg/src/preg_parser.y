@@ -1,4 +1,4 @@
-%name preg_parser_
+%name qtype_preg_
 %include{
     global $CFG;
     require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
