@@ -182,6 +182,7 @@ $string['error_differentsubpattnames']          = 'Different subpattern names fo
 $string['error_subpattnameexpected']            = 'Subpattern name expected.';
 $string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
 $string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
