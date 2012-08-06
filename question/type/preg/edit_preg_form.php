@@ -24,6 +24,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *      field holding an array of answers
      * @return array of form fields.
      */
+     /*
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
@@ -34,7 +35,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             
             //$repeated[] = $mform->createElement('html', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For test regex push this button<input type="submit" formaction="http://localhost/moodle/question/type/preg/ast_preg_form.php" formtarget="_blank" value="Test regex">');
             return $repeated;
-    }
+    }*/
     /**
      * Add question-type specific form fields.
      *
@@ -50,8 +51,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
         //$PAGE->requires->js('/question/type/preg/regex_test_push.js');
         
-        $mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
-        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
+        //$mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
+        //$mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
         
         $engines = $qtype->available_engines();
         $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
@@ -142,14 +143,19 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $data['usecharhint'] = false;
         }
 
+        if (!array_key_exists('uselexemhint', $data)) {
+            $data['uselexemhint'] = false;
+        }
+
         $i = 0;
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
-                //Not using exactmatch option to not confuse user by things it adds to regex
-                $matcher = $questionobj->get_matcher($data['engine'],$trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation']);
+                $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
+                //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
+                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation'], $hintused);
                 if($matcher->is_error_exists()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';

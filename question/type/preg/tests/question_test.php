@@ -110,7 +110,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         //Answer with named subpattern
         $answer4 = new stdClass;
         $answer4->id = 203;
-        $answer4->answer = '(?P<name>value)nonvalue';
+        $answer4->answer = '(?P<name>value)nonvalue|(?P<noname>wrongvalue)';
         $answer4->fraction = 100;
         $answer4->feedback = '{$name}';
 
@@ -339,13 +339,13 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
         $replaced = $customengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
-        $this->assertTrue($replaced === '');
-        //Named subpattern test
+        $this->assertTrue($replaced === '||');
+        //Named subpattern test (matched and not matched one)
         $response = array('answer' => 'valuenonvalue');
         $bestfit = $customengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        $replaced = $customengine->insert_subpatterns('{$name}', $response, $matchresults);
-        $this->assertTrue($replaced === 'value');
+        $replaced = $customengine->insert_subpatterns('{$name}|{$noname}', $response, $matchresults);
+        $this->assertTrue($replaced === 'value|');
 
         ////Engine using PHP preg_match function
         $phpengine = clone $this->subpattquestion;
@@ -355,7 +355,6 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
         $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
-        ECHO $replaced.'</br>';
         $this->assertTrue($replaced == 'abgh|ab|');
         //First subpattern isn't captured
         $response = array('answer' => '3456gh');
@@ -374,9 +373,16 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $bestfit = $phpengine->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
         $replaced = $phpengine->insert_subpatterns('{$0}|{$1}|{$2}', $response, $matchresults);
-        $this->assertTrue($replaced == '');
+        $this->assertTrue($replaced == '||');
+        //Named subpattern test (matched and not matched one)
+        $response = array('answer' => 'valuenonvalue');
+        $bestfit = $phpengine->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        $replaced = $phpengine->insert_subpatterns('{$name}|{$noname}', $response, $matchresults);
+        $this->assertTrue($replaced === 'value|');
         //'(ab|cd(ef))gh'
         //'(12)|34(56)gh'
         //'(z|y(x))(w)'
+        //'(?P<name>value)nonvalue|(?P<noname>wrongvalue)'
     }
 }

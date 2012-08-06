@@ -365,15 +365,15 @@ class qtype_preg_matching_results {
 }
 
 /**
- * Options, used to specify matching process
+ * Options, used to specify matching process.
  */
-class qtype_preg_matching_options {
+class qtype_preg_matching_options extends qtype_preg_handling_options {
 
     /** @var boolean Should matcher try to generate extension? */
     public $extensionneeded = true;
-    /** @var string Unicode property name for preferred alphabet for \w when generating extension*/
+    /** @var string Unicode property name for preferred alphabet for \w etc when generating extension.*/
     public $preferredalphabet = null;
-    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension*/
+    /** @var string Unicode property name for preferred characters for dot meta-character when generating extension.*/
     public $preferfordot = null;
 
     /** @var boolean Should matcher look for subpattern captures or the whole match only? */
@@ -427,18 +427,19 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
+        // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
+        if ($this->options === null) {
+            $options = new qtype_preg_matching_options();
+            if ($this->lexer !== null) {
+                $options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
+            }
+            $this->set_options($options);
+        }
+
         //Do parsing
         parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
-        }
-
-        // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
-        if ($this->options === null) {
-            $this->options = new qtype_preg_matching_options();
-            if ($this->lexer !== null) {
-                $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
-            }
         }
 
         //Invalidate match called later to allow parser to count subpatterns
