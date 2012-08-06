@@ -1416,6 +1416,11 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
 }
+<YYINITIAL> "(?<". {       // ERROR: Unrecognized character after (?<
+    $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, htmlspecialchars('(?<'));
+    $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
+    return new qtype_preg_token(preg_parser_yyParser::OPENBRACK, $error);
+}
 <YYINITIAL> \\ {           // ERROR: \ at end of pattern.
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, htmlspecialchars('\\'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
