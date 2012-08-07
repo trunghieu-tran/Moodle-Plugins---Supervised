@@ -550,7 +550,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
     public function description($numbering_pattern,&$options,$node_parent=null,$form=null){
         
         $description = '';
-        $childdescription = '';
+        $child_description = '';
         $matches = array();
         
         $this->pattern = $this->pattern($node_parent,$form);
@@ -560,9 +560,9 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $find = '/%(\w+)?'.$i.'/';
         while((count($this->operands) >= $i) && preg_match($find,$description,$matches)){
             $form = (count($matches)>=2) ? $matches[1] : null;
-            $childdescription = $this->operands[$i-1]->description($numbering_pattern,$options,$this,$form);
+            $child_description = $this->operands[$i-1]->description($numbering_pattern,$options,$this,$form);
             //var_dump($matches[0]);
-            $description = str_replace($matches[0],$childdescription,$description);
+            $description = str_replace($matches[0],$child_description,$description);
             $i++;
             $find = '/%(\w+)?'.$i.'(\w+)?/';
         }
@@ -584,7 +584,7 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         
         $resultpattern ='';
         $greedpattern='';
-        $wrongborders =$this->pregnode->leftborder >= $this->pregnode->rightborder;
+        $wrong_borders =$this->pregnode->leftborder >= $this->pregnode->rightborder;
 
         if($this->pregnode->leftborder===0 ){
             if($this->pregnode->rightborder ===1){
@@ -618,7 +618,7 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
         }
         $resultpattern = str_replace('%greed',$greedpattern,$resultpattern);
         
-        if($wrongborders){
+        if($wrong_borders){
             $resultpattern = preg_replace('/%(\w+)?1/',('%${1}1'.self::get_form_string('description_errorbefore',$form)),$resultpattern);
             $resultpattern = $resultpattern
                 .self::get_form_string('description_finite_quant_borders_err',$form)
