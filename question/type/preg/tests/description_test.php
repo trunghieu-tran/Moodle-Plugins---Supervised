@@ -101,7 +101,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('ab','<span style="color:blue">a</span><span style="color:blue">b</span>'),
           array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>; then <span style="color:blue">c</span>'),
           array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
-            array(' \t\n\r','space then tabulation then newline(LF) then carriage return character'),
+          array(' \t\n\r','space then tabulation then newline(LF) then carriage return character'),
           array('\0113','tabulation then <span style="color:blue">3</span>'),
          );
     }
