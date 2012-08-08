@@ -1,14 +1,15 @@
 <?php
 
     /**
-     * Переводчик тестов из формата AT & T в формат кросс-тестов.
-     * Имена входных и выходных файлов задаются пере
+     * Test converter from AT&T format to the Preg cross-test format.
+     * To use .dat.txt files, first remove any comments and empty lines,
+     * then set the $INPUT_SET in this file correspondingly and run this file.
      * @author Valeriy Streltsov
      */
 
-    $INPUT_FILENAME = 'basic.dat.txt';
-    $OUTPUT_FILENAME = 'result.txt'
-    $COMMENT_COUNT = 2;
+    $INPUT_SET = 'nullsubexpr';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
+    $INPUT_FILENAME = $INPUT_SET . '.dat.txt';
+    $OUTPUT_FILENAME = 'cross_tests_from_att_' . $INPUT_SET . '.php';
     $TAB = '	';
     $SPACE = ' ';
     $EOL = chr(10);
@@ -16,16 +17,17 @@
     $TAB2 = '        ';
     $TAB3 = '                        ';
     $TAB4 = '                      ';
-    $FUNCTION_PREFIX = 'function data_for_test_att_basic_';
+    $FUNCTION_PREFIX = 'function data_for_test_att_' . $INPUT_SET . '_';
 
     $in = fopen($INPUT_FILENAME, 'r');
     $out = fopen($OUTPUT_FILENAME, 'w');
 
-    for ($i = 0; $i < $COMMENT_COUNT; $i++) {
-        fgets($in);
-    }
+    fwrite($out, '<?php' . $EOL . $EOL);
+    //fwrite($out, 'defined(\'NOMATCH\') || define(\'NOMATCH\', qtype_preg_matching_results::NO_MATCH_FOUND);' . $EOL . $EOL);
+    fwrite($out, 'class qtype_preg_cross_tests_from_att_' . $INPUT_SET . ' {' . $EOL . $EOL);
 
     $counter = 0;
+    $lastregex = '';
     while (!feof($in)) {
         $line = fgets($in);
         if (feof($in)) {
@@ -64,6 +66,11 @@
             $regex .= $ch;
             $i++;
         }
+        if ($regex === 'SAME') {
+            $regex = $lastregex;
+        } else {
+            $lastregex = $regex;
+        }
 
         // skip tabs.
         while ($i < strlen($line) && $line[$i] === $TAB) {
@@ -89,13 +96,13 @@
         }
 
         // get indexes.
-        while ($i < strlen($line)) {
+        while ($i < strlen($line) && $line[$i] !== $TAB) {
             $indexes .= $line[$i];
             $i++;
         }
 
         // do not include errors.
-        if ($indexes[0] !== '(') {
+        if ($indexes === '' || $indexes[0] !== '(') {
             continue;
         }
 
@@ -157,23 +164,26 @@
         echo 'lengths: '; print_r($length) . $EOL;
         echo $EOL;*/
 
+
         fwrite($out, $TAB1 . $FUNCTION_PREFIX . $counter++ . '() {' . $EOL);
         fwrite($out, $TAB2 . '$test1 = array( \'str\'=>"' . $string . '",' . $EOL);
         fwrite($out, $TAB3 . '\'is_match\'=>true,' . $EOL);
         fwrite($out, $TAB3 . '\'full\'=>true,' . $EOL);
         fwrite($out, $TAB3 . '\'index_first\'=>' . $index2write . ',' . $EOL);
-        fwrite($out, $TAB3 . '\'length\'=>' . $length2write . ',' . $EOL);
-        fwrite($out, $TAB3 . '\'left\'=>array(0),' . $EOL);
-        fwrite($out, $TAB3 . '\'next\'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,' . $EOL);
-        fwrite($out, $TAB3 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
+        fwrite($out, $TAB3 . '\'length\'=>' . $length2write . ');' . $EOL);
+        //fwrite($out, $TAB3 . '\'left\'=>array(0),' . $EOL);
+        //fwrite($out, $TAB3 . '\'next\'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,' . $EOL);
+        //fwrite($out, $TAB3 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
         fwrite($out, $EOL);
         fwrite($out, $TAB2 . 'return array( \'regex\'=>"' . $regex . '",' . $EOL);
         if (/*$modifiers !== ''*/strpos($modifiers, 'i') !== false) {
             fwrite($out, $TAB4 . '\'modifiers\'=>\'' . /*$modifiers*/'i' . '\',' . $EOL);
         }
-        fwrite($out, $TAB4 . '\'tests\'=>array($test1));' . $EOL);
+        fwrite($out, $TAB4 . '\'tests\'=>array($test1),' . $EOL);
+        fwrite($out, $TAB4 . '\'tags\'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));' . $EOL );
         fwrite($out, $TAB1 . '}' . $EOL . $EOL);
     }
+    fwrite($out, '}' . $EOL);
 
     fclose($in);
     fclose($out);

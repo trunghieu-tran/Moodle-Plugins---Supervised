@@ -41,7 +41,8 @@ class qtype_preg extends qtype_shortanswer {
     */
     public function available_notations() {
         return array(   'native' => get_string('notation_native', 'qtype_preg'),
-                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg')
+                        'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg'),
+                        'pcrestrict' => get_string('notation_pcrestrict', 'qtype_preg')
                     );
     }
 
@@ -52,17 +53,29 @@ class qtype_preg extends qtype_shortanswer {
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'qtype_preg');
-        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder', 'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
     }
 
     function save_question_options($question) {
         //Fill in some data that could be absent due to disabling form controls
-        if (!isset($question->usehint)) {
-            $question->usehint = false;
+        if (!isset($question->usecharhint)) {
+            $question->usecharhint = false;
         }
-        if (!isset($question->hintpenalty)) {
-            $question->hintpenalty = 0;
+        if (!isset($question->charhintpenalty)) {
+            $question->charhintpenalty = 0;
+        }
+        if (!isset($question->uselexemhint)) {
+            $question->uselexemhint = false;
+        }
+        if (!isset($question->lexemhintpenalty)) {
+            $question->lexemhintpenalty = 0;
+        }
+        if (!isset($question->lexemusername)) {
+            $question->lexemusername = '';
+        }
+        if (!isset($question->langid)) {
+            $question->langid = 0;
         }
         if (!isset($question->hintgradeborder)) {
             $question->hintgradeborder = 1;
@@ -72,18 +85,20 @@ class qtype_preg extends qtype_shortanswer {
         $questionobj = new qtype_preg_question;
         $querymatcher = $questionobj->get_query_matcher($question->engine);
         if (!$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-            $question->usehint = false;
+            $question->usecharhint = false;
+            $question->uselexemhint = false;
         }
 
         parent::save_question_options($question);
     }
 
-    function test_response(&$question, $state, $answer) {
+/*    function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
-        $matcher = $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $hintneeded = ($question->usecharhint || $question->uselexemhint) && $answer->fraction >= $question->hintgradeborder;
+        $matcher = $question->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id, $question->notation);
         return $matcher->match($state->responses['']);
-    }
+    }*/
 
 }
 //// END OF CLASS ////

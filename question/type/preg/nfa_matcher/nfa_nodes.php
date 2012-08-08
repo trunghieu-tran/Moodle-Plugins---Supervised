@@ -11,6 +11,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
@@ -41,11 +42,11 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
         global $CFG;
         $this->statelimit = 250;
         $this->transitionlimit = 250;
-        if (isset($CFG->qtype_preg_nfastatelimit)) {
-            $this->statelimit = $CFG->qtype_preg_nfastatelimit;
+        if (isset($CFG->qtype_preg_nfa_transition_limit)) {
+            $this->statelimit = $CFG->qtype_preg_nfa_transition_limit;
         }
-        if (isset($CFG->qtype_preg_nfatransitionlimit)) {
-            $this->transitionlimit = $CFG->qtype_preg_nfatransitionlimit;
+        if (isset($CFG->qtype_preg_nfa_state_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_nfa_state_limit;
         }
     }
 
@@ -100,14 +101,6 @@ abstract class qtype_preg_nfa_node {
  * Class for leafs. They contruct trivial NFAs with two states and one transition between them.
  */
 class qtype_preg_nfa_leaf extends qtype_preg_nfa_node {
-
-    public function accept() {
-        if ($this->pregnode->type === qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregnode->subtype === qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
-            $leafdesc = get_string($this->pregnode->name(), 'qtype_preg');
-            return $leafdesc . ' \G';
-        }
-        return true;
-    }
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Create start and end states of the resulting automaton.
@@ -212,13 +205,6 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
  * Class for infinite quantifiers (*, +, {m,}).
  */
 class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
-
-    public function accept() {
-        if (!$this->pregnode->greed) {
-            return get_string('ungreedyquant', 'qtype_preg');
-        }
-        return true;
-    }
 
     /**
      * Creates an automaton for * or {0,} quantifier.
@@ -366,6 +352,9 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
     public function create_automaton(&$matcher, &$automaton, &$stack) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        if ($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+            return;
+        }
         $body = array_pop($stack);
 
         // Every transition outgoing from the start state we tag with the value of (subpattern number * 2).

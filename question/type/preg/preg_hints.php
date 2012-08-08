@@ -26,7 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 /**
  * Hint class for showing matching part of a response (along with unmatched head and tail)
@@ -71,25 +73,25 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
      *
      * Supposed to be called from render_hint() function of subclasses implementing hinted_string() and to_be_continued()
      */
-    public function render_stringextension_hint($response) {
+    public function render_stringextension_hint($renderer, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {//hint could be computed
             if (!$matchresults->full) {//there is a hint to show
-                $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
-                $correctpart = qtype_preg_renderer::render_matched($matchresults->correct_before_hint());
-                $hint = qtype_preg_renderer::render_hinted($this->hinted_string($matchresults));
+                $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+                $correctpart = $renderer->render_matched($matchresults->correct_before_hint());
+                $hint = $renderer->render_hinted($this->hinted_string($matchresults));
                 if ($this->to_be_continued($matchresults)) {
-                    $hint .= qtype_preg_renderer::render_tobecontinued();
+                    $hint .= $renderer->render_tobecontinued();
                 }
                 $wrongtail = '';
                 if (qtype_poasquestion_string::strlen($hint) == 0) {
-                    $wrongtail = qtype_preg_renderer::render_deleted($matchresults->tail_to_delete());
+                    $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
             } else {//No hint, due to full match
-                return qtype_preg_hintmatchingpart::render_hint($response);
+                return qtype_preg_hintmatchingpart::render_hint($renderer, $response);
             }
         }
         return '';
@@ -112,14 +114,14 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response
      */
-    public function render_hint($response) {
+    public function render_hint($renderer, $response) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
         if ($this->could_show_hint($matchresults)) {
-            $wronghead = qtype_preg_renderer::render_unmatched($matchresults->match_heading());
-            $correctpart = qtype_preg_renderer::render_matched($matchresults->matched_part());
-            $wrongtail = qtype_preg_renderer::render_unmatched($matchresults->match_tail());
+            $wronghead = $renderer->render_unmatched($matchresults->match_heading());
+            $correctpart = $renderer->render_matched($matchresults->matched_part());
+            $wrongtail = $renderer->render_unmatched($matchresults->match_tail());
             return $wronghead.$correctpart.$wrongtail;
         }
         return '';
@@ -150,19 +152,19 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function hint_available($response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
-        return parent::hint_available($response) && $this->question->usehint && !$matchresults->full;
+        return parent::hint_available($response) && $this->question->usecharhint && !$matchresults->full;
     }
 
     /**
      * Returns penalty for using specific hint of given hint type (possibly for given response)
      */
     public function penalty_for_specific_hint($response = null) {
-            return $this->question->hintpenalty;
+            return $this->question->charhintpenalty;
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($response) {
-        return $this->render_stringextension_hint($response);
+    public function render_hint($renderer, $response) {
+        return $this->render_stringextension_hint($renderer, $response);
     }
 
     public function hinted_string($matchresults) {
@@ -177,6 +179,90 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function to_be_continued($matchresults) {
         $hintedstring = $matchresults->string_extension();
         return qtype_poasquestion_string::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
+    }
+
+}
+
+/**
+ * Hint class for next lexem hint
+ *
+ * @copyright  2011 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
+
+    //Cache values, filled by hinted_string function
+    protected $hinttoken;
+    protected $endmatchindx;
+    protected $inside;
+
+
+    ////Abstract hint class functions implementation
+
+    /**
+     * Returns whether response allows for the hint to be done
+     */
+    public function hint_available($response = null) {
+        $bestfit = $this->question->get_best_fit_answer($response);
+        $matchresults = $bestfit['match'];
+        return parent::hint_available($response) && $this->question->uselexemhint && !$matchresults->full && is_object($matchresults->extendedmatch);//TODO check that there is lexem after current situation
+    }
+
+    /**
+     * Returns penalty for using specific hint of given hint type (possibly for given response)
+     */
+    public function penalty_for_specific_hint($response = null) {
+            return $this->question->lexemhintpenalty;
+    }
+
+    ////qtype_preg_matching_hint functions implementation
+    public function render_hint($renderer, $response) {
+        return $this->render_stringextension_hint($renderer, $response);
+    }
+
+    public function hinted_string($matchresults) {
+        //////Lexem hint
+        $langobj = block_formal_langs::lang_object($this->question->langid);
+        $extendedmatch = $matchresults->extendedmatch;
+        $endmatchindx = $extendedmatch->index_first() + $matchresults->length();//Index of first non-matched character after match in extended match.
+        $procstr = $langobj->create_from_string($extendedmatch->str());
+        $stream = $procstr->stream;
+        $tokens = $stream->tokens;
+
+        if ($endmatchindx < 0) {//No match at all, but we still could give hint from the start of the string
+            $endmatchindx = 0;
+        }
+
+        //Look for hint token.
+        $hinttoken = null;
+        $inside = false;//Whether match ended inside lexem.
+        foreach ($tokens as $token) {
+            if  ($token->position()->colstart() >= $endmatchindx) {//Token starts after match ends.
+                //Match ended between tokens, or we would have loop breaked already.
+                $hinttoken = $token; //Next token hint, $inside == false.
+                break;
+            } else if ($token->position()->colend() >= $endmatchindx) {//Match ends inside this token.
+                $hinttoken = $token;
+                $inside = true;//Token completion hint.
+                break;
+            }
+        }
+
+        //Cache values
+        $this->hinttoken = $hinttoken;
+        $this->inside = $inside;
+        $this->endmatchindx = $endmatchindx;
+
+        if ($hinttoken !== null) {//Found hint token.
+            return qtype_poasquestion_string::substr($extendedmatch->str(), $endmatchindx, $hinttoken->position()->colend() - $endmatchindx + 1);
+        } else {//There are some non-matched separators after end of last token. Just hint the end of generated string.
+            return qtype_poasquestion_string::substr($extendedmatch->str(), $endmatchindx,  qtype_poasquestion_string::strlen($extendedmatch->str()) - $endmatchindx);
+        }
+    }
+
+    public function to_be_continued($matchresults) {
+        return  $this->hinttoken->position()->colend() + 1 < qtype_poasquestion_string::strlen($matchresults->extendedmatch->str())
+                || $matchresults->extendedmatch->full === false;
     }
 
 }

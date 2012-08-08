@@ -7594,99 +7594,119 @@ class qtype_preg_unicode extends textlib {
                      array(0=>0x2028, 1=>0x2029));
     }
 
+    protected static function compare_trivial_ranges($a, $b) {
+        if ($a[0] < $b[0]) {
+            return -1;
+        } else if ($a[0] > $b[0]) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     /**
-     * Returns unicode ranges which $utf8str characters belongs to.
-     * @param utf8str UTF-8 string.
-     * @return array of arrays['left'=>int, 'right'=>int] containing ranges.
+     * Searches the index of the range in an array of ranges containing the given number.
+     * @param code the number to search for.
+     * @return the index of the range containing this code, false if not found.
      */
-    public static function get_ranges($utf8str) {
-        $result = array();
-        for ($i = 0; $i < qtype_poasquestion_string::strlen($utf8str); $i++) {
-            $code = qtype_poasquestion_string::ord(qtype_poasquestion_string::substr($utf8str, $i, 1));
-            foreach (self::$ranges as $name => $range) {
-                if ($code >= $range[0] && $code < $range[1]) {
-                    if (!array_key_exists($name, $result)) {
-                        $result[$name] = $range;
-                    }
-                    break;
-                }
+    public static function search_number_binary($code, $ranges) {
+        $start = 0;
+        $end = count($ranges) - 1;
+        while ($end >= $start) {
+            $middle = $start + (int)(($end - $start) / 2);
+            if ($ranges[$middle][1] < $code) {
+                $start = $middle + 1;
+            } else if ($ranges[$middle][0] > $code) {
+                $end = $middle - 1;
+            } else if ($ranges[$middle][0] <= $code && $ranges[$middle][1] >= $code) {
+                return $middle;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Makes a set of ranges negative.
+     * @param ranges array of ranges to negate.
+     * @return array of ranges which are negation of the given.
+     */
+    public static function negate_ranges($ranges) {
+        $size = count($ranges);
+        $maxcode = self::max_possible_code();
+        if ($size === 0) {
+            return array(array(0, $maxcode));
+        }
+        $result = array();
+        if ($ranges[0][0] > 0) {
+            $result[] = array(0, $ranges[0][0] - 1);
+        }
+        for ($i = 0; $i < $size - 1; $i++) {
+            $result[] = array($ranges[$i][1] + 1, $ranges[$i + 1][0] - 1);
+        }
+        if ($ranges[$size - 1][1] < $maxcode) {
+            $result[] = array($ranges[$size - 1][1] + 1, $maxcode);
         }
         return $result;
     }
 
     /**
      * @param $charset object of qtype_poasquestion_string.
+     * @return a sorted array of trivial ranges corresponding to the given charset.
      */
     public static function get_ranges_from_charset($charset) {
-        $result = array();
-        $previous = -1;
+        $ords = array();
         for ($i = 0; $i < $charset->length(); $i++) {
-            $str = $charset[$i];
-            $newnum = qtype_poasquestion_string::ord($str);
-            if ($previous === -1) {
-                $toadd = array(0 => $newnum);
-            } else {
-                if ($newnum !== $previous + 1) {
-                    $toadd[1] = $previous;
-                    $result[] = $toadd;
-                    $toadd = array(0 => $newnum);
-                }
-            }
-            $previous = $newnum;
+            $ords[] = qtype_poasquestion_string::ord($charset[$i]);
         }
-        $toadd[1] = $previous;
-        $result[] = $toadd;
+        sort($ords, SORT_NUMERIC);
+        $prevord = $ords[0];
+        $result = array(array($prevord, $prevord));
+        $index = 0;
+        for ($i = 1; $i < count($ords); $i++) {
+            $neword = $ords[$i];
+            if ((int)$neword == (int)$prevord + 1) {
+                $result[$index][1]++;
+            } else {
+                $result[] = array($neword, $neword);
+                $index++;
+            }
+            $prevord = $neword;
+        }
         return $result;
     }
 
     /**
-     * A trivial range is an array('negative'=>bool, 0=>int, 1=>int).
+     * A trivial range is an array(0=>int, 1=>int).
      * A range is an array of trivial ranges - they united by OR.
-     * This function intersects a set of ranges united by AND, thus $tointersect is a 3-dimensional array.
+     * This function intersects two ranges.
      * @param tointersect an array of ranges united by "AND".
      * @return an array of ranges where ranges represented as array (0=>int, 1=>int).
      */
-    public static function intersect_ranges($tointersect) {
-        $result = array(array(0 => 0, 1 => 0x10FFFD));
-        for ($i = 0; count($result) > 0 && $i < count($tointersect); $i++) {
-            $toresult = array();    // This will replace $result by the end of this loop.
-            foreach ($tointersect[$i] as $tmp) {
-                // $tmp is something like array('negative' => false, 0 => 0, 1 => 0x10FFFD) - a trivial range.
-                // We convert it to a range: a negative trivial range turns into two positive trivial ranges.
-                if (!$tmp['negative']) {
-                    $currange = array(array(0 => $tmp[0], 1 => $tmp[1]));
+    public static function intersect_ranges($ranges1, $ranges2) {
+        $result = array();
+        foreach ($ranges1 as $ranges1part) {
+            foreach ($ranges2 as $ranges2part) {
+                if ($ranges1part[0] < $ranges2part[0]) {
+                    $left = $ranges1part;
+                    $right = $ranges2part;
                 } else {
-                    $currange = array();
-                    if ($tmp[0] > 0) {
-                        $currange[] = array(0 => 0, 1 => $tmp[0]);
-                    }
-                    if ($tmp[1] < 0x10FFFD) {
-                        $currange[] = array(0 => $tmp[1], 1 => 0x10FFFD);
-                    }
+                    $left = $ranges2part;
+                    $right = $ranges1part;
                 }
-                // Now we've got somethign like array($trivialrange1[, $trivialrange2])
-                // Each trivial range of $currange is going to be intersected with each trivial range of $result.
-                $tmp1 = array();    // This will store that trivial intersections.
-
-                foreach ($result as $resultpart) {
-                    foreach ($currange as $currangepart) {
-                        if ($resultpart[0] < $currangepart[0]) {
-                            $left = $resultpart;
-                            $right = $currangepart;
-                        } else {
-                            $left = $currangepart;
-                            $right = $resultpart;
-                        }
-                        if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
-                            $tmp1[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
-                        }
-                    }
+                if ($right[0] <= $left[1] && $left[1] >= $right[0]) {
+                    $result[] = array(0 => $right[0], 1 => min($left[1], $right[1]));
                 }
-                $toresult = array_merge($toresult, $tmp1);
             }
-            $result = $toresult;
         }
+        usort($result, array('self', 'compare_trivial_ranges'));
+        for ($i = 1; $i < count($result); $i++) {
+            if ($result[$i][0] === $result[$i - 1][1]) {
+                $result[$i][0] = $result[$i - 1][0];
+                unset($result[$i - 1]);
+            }
+        }
+        $result = array_values($result);
+        //var_dump($result);
         return $result;
     }
 
@@ -7695,11 +7715,6 @@ class qtype_preg_unicode extends textlib {
             return false;
         }
         $ord = qtype_poasquestion_string::ord($utf8chr);
-        foreach ($ranges as $range) {
-            if ($range[0] <= $ord && $ord <= $range[1]) {
-                return true;
-            }
-        }
-        return false;
+        return (self::search_number_binary($ord, $ranges) !== false);
     }
 }

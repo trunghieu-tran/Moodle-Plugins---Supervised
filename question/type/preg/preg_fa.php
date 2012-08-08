@@ -449,9 +449,10 @@ abstract class qtype_preg_finite_automaton {
 
     /**
      * Generates dot code for drawing FA.
+     * @param type image type.
      * @param filename - name of the resulting image file.
      */
-    public function draw($filename) {
+    public function draw($type, $filename) {
         $result = "digraph {\nrankdir = LR;\n";
         foreach ($this->states as $curstate) {
             $index1 = $curstate->number;
@@ -498,7 +499,7 @@ abstract class qtype_preg_finite_automaton {
             }
         }
         $result .= "};";
-        qtype_preg_regex_handler::execute_dot($result, $filename);
+        qtype_preg_regex_handler::execute_dot($result, $type, $filename);
     }
 
 

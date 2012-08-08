@@ -17,6 +17,16 @@ require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php'
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
+/**
+ * Options, generic to all handlers - mainly affects scanning and parsing.
+ */
+class qtype_preg_handling_options {
+    /** @var boolean Strict PCRE compatible regex syntax.*/
+    public $pcrestrict = false;
+    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes.*/
+    public $preserveallnodes = false;
+}
+
 class qtype_preg_regex_handler {
 
     /** Regular expression as an object of qtype_poasquestion_string. */
@@ -39,8 +49,11 @@ class qtype_preg_regex_handler {
     /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
     protected $anchor;
 
+    /**
+     * Returns class name without 'qtype_preg_' prefix.
+     */
     public function name() {
-        return 'preg_regex_handler';
+        return 'regex_handler';
     }
 
     /**
@@ -74,6 +87,14 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Sets regex options.
+     * @param options an object containing options to handle the regex.
+     */
+    public function set_options($options) {
+        $this->options = $options;
+    }
+
+    /**
      * Parses the regex and does all necessary preprocessing.
      * @param string regex - regular expression to handle.
      * @param string modifiers - modifiers of the regular expression.
@@ -104,10 +125,11 @@ class qtype_preg_regex_handler {
 
         $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
-        $this->options = $options;
+        $this->set_options($options);
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
+            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subpatterns
         } else {
             $this->ast_root = null;
             //In case with no parsing we should stick to accepting whole regex, not nodes
@@ -146,8 +168,7 @@ class qtype_preg_regex_handler {
      * @return bool if parsing needed
      */
     protected function is_parsing_needed() {
-        //most engines will need parsing
-        return true;
+        return true;    // Most engines will need parsing.
     }
 
     /**
@@ -179,12 +200,47 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Access function to AST root.
+     * Used mainly for unit-testing and avoiding re-parsing
+     */
+    public function get_ast_root() {
+        return $this->ast_root;
+    }
+
+    public function is_regex_anchored($start = true) {
+        if ($start) {
+            return $this->anchor->start;
+        } else {
+            return $this->anchor->end;
+        }
+    }
+
+    /**
      * Is a preg_node_... or a preg_leaf_... supported by the engine?
      * Returns true if node is supported or user interface string describing
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
         return false;    // Should be overloaded by child classes
+    }
+
+    protected function look_for_circumflex($root) {
+        if (is_a($root, 'qtype_preg_leaf')) {
+            return ($root->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        } else if (is_a($root, 'qtype_preg_node_infinite_quant')) {
+            $operand = $root->operands[0];
+            return ($root->leftborder === 0 && is_a($operand, 'qtype_preg_leaf_charset') &&
+                    count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
+        } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
+            return $this->look_for_circumflex($root->operands[0]);
+        } else if (is_a($root, 'qtype_preg_node_alt')) {
+            $result = true;
+            foreach ($root->operands as $operand) {
+                $result = $result && $this->look_for_circumflex($operand);
+            }
+            return $result;
+        }
+        return false;
     }
 
     /**
@@ -196,7 +252,7 @@ class qtype_preg_regex_handler {
     public function look_for_anchors() {
         //TODO(performance) - write real code, for now think no anchoring is in expressions
         $this->anchor = new stdClass;
-        $this->anchor->start = false;
+        $this->anchor->start = $this->look_for_circumflex($this->ast_root);
         $this->anchor->end = false;
     }
 
@@ -210,7 +266,9 @@ class qtype_preg_regex_handler {
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
+        $this->lexer->handlingoptions = $this->options;
         $this->parser = new preg_parser_yyParser;
+        $this->parser->handlingoptions = $this->options;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
                 $this->parser->doParse($token->type, $token->value);
@@ -231,11 +289,11 @@ class qtype_preg_regex_handler {
         foreach($parseerrors as $node) {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
-        if (count($this->errors) === 0) {
+        //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
-        }
+        //}
         fclose($pseudofile);
     }
 
@@ -244,6 +302,7 @@ class qtype_preg_regex_handler {
      *
      * Create handler with no parameters, than call this function to avoid re-parsing if you have
      *   two handlers working on one regex.
+     * @deprecated since 28.07.2012 may not work. TODO - find a way to bypass protection on class members to create another handler from this
      */
     public function get_tree_from_another_handler($handler) {
         $this->errors = $handler->get_error_objects();
@@ -253,14 +312,6 @@ class qtype_preg_regex_handler {
             $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
         }
-    }
-
-    /**
-     * Access function to AST root.
-     * Used mainly for unit-testing and avoiding re-parsing
-     */
-    public function get_ast_root() {
-        return $this->ast_root;
     }
 
     /**
@@ -305,31 +356,39 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Runs dot of graphviz on the given .dot file.
+     * Runs dot of graphviz on the given dot script.
      * @param dotscript a string containing the dot script.
+     * @param type type of the resulting image, should be 'png' or something.
      * @param filename the absolute path to the resulting image file.
+     * @return binary representation of the image if filename is null.
      */
-    public static function execute_dot($dotscript, $filename) {
+    public static function execute_dot($dotscript, $type, $filename = null) {
         global $CFG;
-        $descriptorspec = array(0 => array('pipe', 'r'), // stdin is a pipe that the child will read from
-                                1 => array('pipe', 'w'), // stdout is a pipe that the child will write to
-                                2 => array('pipe', 'w')  // stderr is a pipe that the child will write to
+        $dir = !empty($CFG->pathtodot) ? dirname($CFG->pathtodot) : null;
+        $cmd = 'dot -T' . $type;
+        if ($filename !== null) {
+            $cmd .= ' -o' . escapeshellarg($filename);
+        }
+        $descriptorspec = array(0 => array('pipe', 'r'), // Stdin is a pipe that the child will read from.
+                                1 => array('pipe', 'w'), // Stdout is a pipe that the child will write to.
+                                2 => array('pipe', 'w')  // Stderr is a pipe that the child will write to.
                                 );
-        $type = pathinfo($filename, PATHINFO_EXTENSION);
-        $cmd = (!empty($CFG->pathtodot) ? $CFG->pathtodot : 'dot') . " -T$type -o\"$filename\"";
-        $process = proc_open($cmd, $descriptorspec, $pipes, "/tmp", array());
+        $process = proc_open($cmd, $descriptorspec, $pipes, $dir);
+        $output = null;
         if (is_resource($process)) {
             fwrite($pipes[0], $dotscript);
             fclose($pipes[0]);
+            $output = stream_get_contents($pipes[1]);
             $err = stream_get_contents($pipes[2]);
             if (!empty($err)) {
-                echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
+                //echo "failed to execute cmd: \"$cmd\". stderr: `$err'\n";
             }
             fclose($pipes[1]);
             fclose($pipes[2]);
             proc_close($process);
         } else {
-            echo "failed to execute cmd \"$cmd\"";
+            //echo "failed to execute cmd \"$cmd\"";
         }
+        return $output;
     }
 }
