@@ -640,7 +640,7 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
     public function followpos(&$fpmap) {
         parent::followpos($fpmap);
         foreach ($this->pregnode->operands[0]->lastpos as $lpkey) {
-            dfa_preg_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
+            qtype_preg_dfa_node::push_unique($fpmap[$lpkey], $this->pregnode->operands[0]->firstpos);
         }
     }
     public function print_self($indent) {
