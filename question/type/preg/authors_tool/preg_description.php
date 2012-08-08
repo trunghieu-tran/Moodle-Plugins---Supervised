@@ -275,6 +275,12 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                 case 32:
                     $result = self::get_form_string('description_char_space',$form);
                     break;
+                case 160:
+                    $result = self::get_form_string('description_char_nobreakspace',$form);
+                    break;
+                case 173:
+                    $result = self::get_form_string('description_char_softhyphen',$form);
+                    break;
                 default:
                     $result = str_replace('%code',strtoupper(dechex($ord)),
                         self::get_form_string('description_char_16value' ,$form)); 
