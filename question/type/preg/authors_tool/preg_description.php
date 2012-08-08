@@ -219,12 +219,68 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     
+    /**
+     * Checks if charset contains only one printing character
+     */
     public function is_one_char(){
         $flag = $this->pregnode->flags[0][0];
         return count($this->pregnode->flags)===1 && 
             $flag->type===qtype_preg_charset_flag::SET &&
             $flag->data->length()===1 && 
-            qtype_preg_unicode::is_in_range($flag->data[0],qtype_preg_unicode::graph_ranges());
+            self::is_chr_printable($flag->data[0]);
+    }
+    
+    /**
+     * Checks if a character is printable
+     * 
+     * @param $utf8chr character (from qtype_poasquestion_string) for check
+     */
+    public static function is_chr_printable($utf8chr){
+        return !qtype_preg_unicode::is_in_range($utf8chr,qtype_preg_unicode::C_ranges()) &&
+               !qtype_preg_unicode::is_in_range($utf8chr,qtype_preg_unicode::Z_ranges());
+    }
+    
+    /**
+     * Describes character
+     * 
+     * @param $utf8chr character from qtype_poasquestion_string for describe
+     * @param bool $isprintable flag indicating if a character printable
+     * @return string|bool description of character (if character is non printable) or character itself. Returns false if $utf8chr is empty.
+     * */ 
+    public static function description_of_chr($utf8chr,&$isprintable,$form=null){
+        // is $utf8chr empty?
+        if ($utf8chr === null || $utf8chr === '') {
+            return false;
+        }
+        // get code of $utf8chr
+        $ord = qtype_poasquestion_string::ord($utf8chr);
+        // check if a character is printable
+        $isprintable = self::is_chr_printable($utf8chr);
+        // if character is printable we dont need to describe one
+        if($isprintable) {
+            $result = $utf8chr;
+        } else {
+            // ok, character is non printable, lets find description of one in lang files
+            $result = '';
+            switch($ord){
+                case 9:
+                    $result = self::get_form_string('description_char_t',$form);
+                    break;
+                case 10:
+                    $result = self::get_form_string('description_char_n',$form);
+                    break;
+                case 13:
+                    $result = self::get_form_string('description_char_r',$form);
+                    break;
+                case 32:
+                    $result = self::get_form_string('description_char_space',$form);
+                    break;
+                default:
+                    $result = str_replace('%code',strtoupper(dechex($ord)),
+                        self::get_form_string('description_char_16value' ,$form)); 
+            }
+        }
+        return $result;
     }
     
     
@@ -254,33 +310,12 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             }
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
-            
+            $iscurrentprintable = true;
+            $currentchar = '';
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
-                if (qtype_preg_unicode::is_in_range($flag->data[$i],qtype_preg_unicode::graph_ranges())) { //is ctype_graph correct for utf8 string?
-                    $characters[] = str_replace('%char',$flag->data[$i],self::get_form_string('description_char' ,$form));  
-                }
-                else{ 
-                    $char_num = qtype_poasquestion_string::ord($flag->data[$i]);
-                    if ($flag->data[$i]===' ') {
-                        $characters[] = self::get_form_string('description_char_space',$form);
-                    }
-                    else if ($char_num===8) {
-                        $characters[] = self::get_form_string('description_char_b',$form);
-                    }
-                    else if ($char_num===9) {
-                        $characters[] = self::get_form_string('description_char_t',$form);
-                    }
-                    else if ($char_num===10) {
-                        $characters[] = self::get_form_string('description_char_n',$form);
-                    }
-                    else if ($char_num===13) {
-                        $characters[] = self::get_form_string('description_char_r',$form);
-                    }
-                    else{
-                        $characters[] = str_replace('%code',$char_num,self::get_form_string('description_char_16value') ,$form);  
-                    }               
-                }
+                $currentchar = self::description_of_chr($flag->data[$i],$iscurrentprintable,$form);
+                $characters[] = $iscurrentprintable?str_replace('%char',$currentchar,self::get_form_string('description_char' ,$form)):$currentchar;
             }
             
         }
@@ -661,7 +696,7 @@ class qtype_preg_description_node_infinite_quant extends qtype_preg_description_
         else if ($this->pregnode->possessive==true) {
             $greedpattern = self::get_form_string('description_quant_possessive',$form);
         }
-		
+
         $resultpattern = str_replace('%greed',$greedpattern,$resultpattern);
         return $resultpattern;
     }
