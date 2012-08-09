@@ -240,53 +240,56 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                !qtype_preg_unicode::is_in_range($utf8chr,qtype_preg_unicode::Z_ranges());
     }
     
+    /*
+     * Returns description of $utf8chr if it is non-printing character, otherwise returns null
+     * 
+     * @param $utf8chr character from qtype_poasquestion_string for describe
+     * @return string|null description of character (if character is non printable) or null.
+     */
+    public static function describe_nonprinting($utf8chr,$form=null){
+        // null returns if description is not needed
+        if ($utf8chr === null || $utf8chr === '' || self::is_chr_printable($utf8chr)) {
+            return null;
+        }
+        // ok, character is non-printing, lets find its description in the language file
+        $result = '';
+        $ord = qtype_poasquestion_string::ord($utf8chr);
+        switch($ord){
+            case 0x9:
+                $result = self::get_form_string('description_char_t',$form);
+                break;
+            case 0xA:
+                $result = self::get_form_string('description_char_n',$form);
+                break;
+            case 0xD:
+                $result = self::get_form_string('description_char_r',$form);
+                break;
+            case 0x20:
+                $result = self::get_form_string('description_char_space',$form);
+                break;
+            case 0xA0:
+                $result = self::get_form_string('description_char_nobreakspace',$form);
+                break;
+            case 0xAD:
+                $result = self::get_form_string('description_char_softhyphen',$form);
+                break;
+            default:
+                $result = str_replace('%code',strtoupper(dechex($ord)),
+                    self::get_form_string('description_char_16value' ,$form)); 
+        }
+        return $result;
+    }
+    
     /**
      * Describes character
      * 
      * @param $utf8chr character from qtype_poasquestion_string for describe
      * @param bool $isprintable flag indicating if a character printable
-     * @return string|bool description of character (if character is non printable) or character itself. Returns false if $utf8chr is empty.
+     * @return string description of character (if character is non printable) or character itself.
      * */ 
-    public static function description_of_chr($utf8chr,&$isprintable,$form=null){
-        // is $utf8chr empty?
-        if ($utf8chr === null || $utf8chr === '') {
-            return false;
-        }
-        // get code of $utf8chr
-        $ord = qtype_poasquestion_string::ord($utf8chr);
-        // check if a character is printable
-        $isprintable = self::is_chr_printable($utf8chr);
-        // if character is printable we dont need to describe one
-        if($isprintable) {
-            $result = $utf8chr;
-        } else {
-            // ok, character is non printable, lets find description of one in lang files
-            $result = '';
-            switch($ord){
-                case 9:
-                    $result = self::get_form_string('description_char_t',$form);
-                    break;
-                case 10:
-                    $result = self::get_form_string('description_char_n',$form);
-                    break;
-                case 13:
-                    $result = self::get_form_string('description_char_r',$form);
-                    break;
-                case 32:
-                    $result = self::get_form_string('description_char_space',$form);
-                    break;
-                case 160:
-                    $result = self::get_form_string('description_char_nobreakspace',$form);
-                    break;
-                case 173:
-                    $result = self::get_form_string('description_char_softhyphen',$form);
-                    break;
-                default:
-                    $result = str_replace('%code',strtoupper(dechex($ord)),
-                        self::get_form_string('description_char_16value' ,$form)); 
-            }
-        }
-        return $result;
+    public static function describe_chr($utf8chr,&$isprintable,$form=null){
+        $result = self::describe_nonprinting($utf8chr);
+        return $result===null ? $utf8chr : $result;
     }
     
     
@@ -316,12 +319,11 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             }
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
-            $iscurrentprintable = true;
             $currentchar = '';
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
-                $currentchar = self::description_of_chr($flag->data[$i],$iscurrentprintable,$form);
-                $characters[] = $iscurrentprintable?str_replace('%char',$currentchar,self::get_form_string('description_char' ,$form)):$currentchar;
+                $currentchar = self::describe_nonprinting($flag->data[$i],$form);
+                $characters[] = $currentchar?$currentchar:str_replace('%char',$flag->data[$i],self::get_form_string('description_char' ,$form));
             }
             
         }
