@@ -1,0 +1,15 @@
+#/bin/sh
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+TARGETDIR="$( dirname "$DIR" )"
+echo "Generating lexer..."
+cd $DIR"/JLexPhp"
+java JLexPHP.Main ../preg_lexer.lex
+echo "Generating parser..."
+cd $DIR"/Lemon php"
+php Main.php
+echo "Copying files..."
+cd $DIR
+mv preg_lexer.lex.php $TARGETDIR
+mv preg_parser.php $TARGETDIR
+echo "Done!"
