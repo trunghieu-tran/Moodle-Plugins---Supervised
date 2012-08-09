@@ -275,7 +275,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                 break;
             default:
                 $result = str_replace('%code',strtoupper(dechex($ord)),
-                    self::get_form_string('description_char_16value' ,$form)); 
+                            self::get_form_string('description_char_16value' ,$form)); 
         }
         return $result;
     }
@@ -289,6 +289,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * */ 
     public static function describe_chr($utf8chr,&$isprintable,$form=null){
         $result = self::describe_nonprinting($utf8chr);
+        $isprintable = $result===null;
         return $result===null ? $utf8chr : $result;
     }
     
