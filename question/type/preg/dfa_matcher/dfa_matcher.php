@@ -611,7 +611,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     @param regex - regular expirience for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    function __construct($regex = null, $modifiers = null) {
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
         if (isset($CFG->qtype_preg_dfa_state_limit)) {
@@ -627,7 +627,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
-        parent::__construct($regex, $modifiers);      
+        parent::__construct($regex, $modifiers, $options);     
         $this->roots[0] = $this->dst_root;//place dst root in engine specific place
         //building finite automates
         if ($this->is_error_exists()) {
