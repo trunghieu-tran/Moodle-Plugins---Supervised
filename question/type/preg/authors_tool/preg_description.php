@@ -254,28 +254,11 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
         $ord = qtype_poasquestion_string::ord($utf8chr);
-        switch($ord){
-            case 0x9:
-                $result = self::get_form_string('description_char_t',$form);
-                break;
-            case 0xA:
-                $result = self::get_form_string('description_char_n',$form);
-                break;
-            case 0xD:
-                $result = self::get_form_string('description_char_r',$form);
-                break;
-            case 0x20:
-                $result = self::get_form_string('description_char_space',$form);
-                break;
-            case 0xA0:
-                $result = self::get_form_string('description_char_nobreakspace',$form);
-                break;
-            case 0xAD:
-                $result = self::get_form_string('description_char_softhyphen',$form);
-                break;
-            default:
-                $result = str_replace('%code',strtoupper(dechex($ord)),
-                            self::get_form_string('description_char_16value' ,$form)); 
+        if($ord <=32 || $ord==127 || $ord==160 || $ord==173){
+            $result = self::get_form_string('description_char'.$ord,$form);
+        } else {
+            $result = str_replace('%code',strtoupper(dechex($ord)),
+                        self::get_form_string('description_char_16value' ,$form)); 
         }
         return $result;
     }
