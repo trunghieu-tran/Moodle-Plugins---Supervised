@@ -254,10 +254,11 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
         $ord = qtype_poasquestion_string::ord($utf8chr);
+        $hexord = strtoupper(dechex($ord));
         if($ord <=32 || $ord==127 || $ord==160 || $ord==173){
-            $result = self::get_form_string('description_char'.$ord,$form);
+            $result = self::get_form_string('description_char'.$hexord,$form);
         } else {
-            $result = str_replace('%code',strtoupper(dechex($ord)),
+            $result = str_replace('%code',$hexord,
                         self::get_form_string('description_char_16value' ,$form)); 
         }
         return $result;
