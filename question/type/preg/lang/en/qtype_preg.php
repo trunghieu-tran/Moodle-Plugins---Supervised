@@ -292,7 +292,7 @@ $string['description_ucp_leaf_control'] = 'PCRE_UCP';
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
 $string['description_charset_one_neg'] = 'not %characters';
-$string['description_charset_range'] = 'form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
+$string['description_charset_range'] = 'any character form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
 $string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_16value'] = 'character with code 0x%code';
 //$string['description_charset_one'] = '%characters';
@@ -308,7 +308,7 @@ $string['description_char7'] = 'bell character(BEL)';
 $string['description_char8'] = 'backspace character(BS)';
 $string['description_char9'] = 'tabulation(HT)';
 $string['description_charA'] = 'line feed(LF)';
-$string['description_charB'] = 'vertical tabulation(VT)'; // \v already has a string
+$string['description_charB'] = 'vertical tabulation(VT)'; // TODO - \v already has a string but this string is used when user type \xb ?
 $string['description_charC'] = 'form feed(FF)';
 $string['description_charD'] = 'carriage return character(CR)';
 $string['description_charE'] = 'shift out character (SO)';

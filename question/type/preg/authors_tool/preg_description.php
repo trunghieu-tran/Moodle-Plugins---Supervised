@@ -114,7 +114,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
  */
 abstract class qtype_preg_description_node{
     /** @var string pattern for description of current node */    
-    public $resultpattern;
+    public $pattern;
     
     /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
     public $pregnode;
