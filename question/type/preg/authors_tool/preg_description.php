@@ -67,7 +67,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     private static function postprocessing($s){
 
         $result = preg_replace('%;((?:</span>)?)]%','\1]',$s);
-        $result = str_replace('not not ','',$result);
+        $result = str_replace('not not ','',$result); // TODO - analyze this into charset
         return $result;
     }
     
@@ -227,7 +227,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         return count($this->pregnode->flags)===1 && 
             $flag->type===qtype_preg_charset_flag::SET &&
             $flag->data->length()===1 && 
-            self::is_chr_printable($flag->data[0]);
+            self::is_chr_printable(qtype_poasquestion_string::ord($flag->data[0]));
     }
     
     /**
@@ -235,31 +235,31 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * 
      * @param $utf8chr character (from qtype_poasquestion_string) for check
      */
-    public static function is_chr_printable($utf8chr){
-        return !qtype_preg_unicode::is_in_range($utf8chr,qtype_preg_unicode::C_ranges()) &&
-               !qtype_preg_unicode::is_in_range($utf8chr,qtype_preg_unicode::Z_ranges());
+    public static function is_chr_printable($code){
+        //var_dump($code);
+        return qtype_preg_unicode::search_number_binary($code,qtype_preg_unicode::C_ranges())===false &&
+               qtype_preg_unicode::search_number_binary($code,qtype_preg_unicode::Z_ranges())===false;
     }
     
     /*
      * Returns description of $utf8chr if it is non-printing character, otherwise returns null
      * 
-     * @param $utf8chr character from qtype_poasquestion_string for describe
+     * @param int $code character code
      * @return string|null description of character (if character is non printable) or null.
      */
-    public static function describe_nonprinting($utf8chr,$form=null){
+    public static function describe_nonprinting($code,$form=null){
         // null returns if description is not needed
-        if ($utf8chr === null || $utf8chr === '' || self::is_chr_printable($utf8chr)) {
+        if ($code === null || self::is_chr_printable($code)) {
             return null;
         }
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
-        $ord = qtype_poasquestion_string::ord($utf8chr);
-        $hexord = strtoupper(dechex($ord));
-        if($ord <=32 || $ord==127 || $ord==160 || $ord==173){
-            $result = self::get_form_string('description_char'.$hexord,$form);
+        $hexcode = strtoupper(dechex($code));
+        if($code <=32 || $code==127 || $code==160 || $code==173){
+            $result = self::get_form_string('description_char'.$hexcode,$form);
         } else {
-            $result = str_replace('%code',$hexord,
-                        self::get_form_string('description_char_16value' ,$form)); 
+            $result = str_replace('%code',$hexcode,
+                                  self::get_form_string('description_char_16value' ,$form)); 
         }
         return $result;
     }
@@ -272,7 +272,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * @return string description of character (if character is non printable) or character itself.
      * */ 
     public static function describe_chr($utf8chr,&$isprintable,$form=null){
-        $result = self::describe_nonprinting($utf8chr);
+        $result = self::describe_nonprinting(qtype_poasquestion_string::ord($utf8chr));
         $isprintable = $result===null;
         return $result===null ? $utf8chr : $result;
     }
@@ -305,9 +305,11 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             
         } else if ($flag->type === qtype_preg_charset_flag::SET) {
             $currentchar = '';
+            $currentcode = 0;
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
-                $currentchar = self::describe_nonprinting($flag->data[$i],$form);
+                $currentcode = qtype_poasquestion_string::ord($flag->data[$i]);
+                $currentchar = self::describe_nonprinting($currentcode,$form);
                 $characters[] = $currentchar?$currentchar:str_replace('%char',$flag->data[$i],self::get_form_string('description_char' ,$form));
             }
             
@@ -324,7 +326,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         $characters = array();
         
         foreach ($this->pregnode->flags as $outer) {
-
             self::flag_to_array($outer[0],$characters,$form);
         }
 
