@@ -111,7 +111,8 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = \"infinite quantifier\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_CONCAT: {
-                return "[label = \"CONCAT\", tooltip = concatenation, id = $id]";
+                return "[label = \"&#8226;\", tooltip = concatenation, id = $id]";
+                //return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD><font>&#8226;</font></TD></TR></TABLE>>, tooltip = concatenation, shape = record, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ALT: {
                 return "[label = \"$label\", tooltip = alternative, id = $id]";
