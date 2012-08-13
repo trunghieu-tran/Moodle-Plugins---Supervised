@@ -1037,19 +1037,19 @@ class qtype_preg_dot_style_provider {
             }
             
             if (strpos(chr(32), $tmp->data) >= 0) {
-                $tmp->data = str_replace(chr(32), '<font color="blue">' . get_string('description_char_space', 'qtype_preg') . '</font>', $tmp->data);
+                $tmp->data = str_replace(chr(32), '<font color="blue">' . get_string('description_char20', 'qtype_preg') . '</font>', $tmp->data);
             } 
             if (strpos(chr(9), $tmp->data) >= 0) {
-                $tmp->data = str_replace(chr(9), '<font color="blue">' . get_string('description_char_t', 'qtype_preg') . '</font>', $tmp->data);
+                $tmp->data = str_replace(chr(9), '<font color="blue">' . get_string('description_char9', 'qtype_preg') . '</font>', $tmp->data);
             } 
             if (strpos('\\r', $tmp->data) >= 0) {
-                $tmp->data = str_replace('\\r', '<font color="blue">' . get_string('description_char_r', 'qtype_preg') . '</font>', $tmp->data);
+                $tmp->data = str_replace('\\r', '<font color="blue">' . get_string('description_charD', 'qtype_preg') . '</font>', $tmp->data);
             } 
             if (strpos('\\n', $tmp->data) >= 0) {
-                $tmp->data = str_replace('\\n', '<font color="blue">' . get_string('description_char_n', 'qtype_preg') . '</font>', $tmp->data);
+                $tmp->data = str_replace('\\n', '<font color="blue">' . get_string('description_charA', 'qtype_preg') . '</font>', $tmp->data);
             } 
             if (strpos('\\t', $tmp->data) >= 0) {
-                $tmp->data = str_replace('\\t', '<font color="blue">' . get_string('description_char_t', 'qtype_preg') . '</font>', $tmp->data);
+                $tmp->data = str_replace('\\t', '<font color="blue">' . get_string('description_char9', 'qtype_preg') . '</font>', $tmp->data);
             }
         }
         return $tmp->data;
