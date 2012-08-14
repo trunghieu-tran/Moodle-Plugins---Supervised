@@ -245,6 +245,31 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     }
 
     /**
+     * Gets unicode char from code $dec
+     * 
+     * @param int $dec decimal code of character
+     * @return string utf8 character or html code;
+     */
+    function uhtmlchr($dec) { 
+        //// replacing:
+        //   &        >       <       "
+        // &#38;    &#62;   &#60;   &#34;
+        if ($dec==34||$dec==38||$dec==39||$dec==60||$dec==62){
+            $utf = '&#'.$dec.';';
+        } else if ($dec < 128) { 
+            $utf = chr($dec); 
+        } else if ($dec < 2048) { 
+            $utf = chr(192 + (($dec - ($dec % 64)) / 64)); 
+            $utf .= chr(128 + ($dec % 64)); 
+        } else { 
+            $utf = chr(224 + (($dec - ($dec % 4096)) / 4096)); 
+            $utf .= chr(128 + ((($dec % 4096) - ($dec % 64)) / 64)); 
+            $utf .= chr(128 + ($dec % 64)); 
+        } 
+        return $utf;
+    }
+
+    /**
      * Checks if a character is printable
      * 
      * @param $utf8chr character (from qtype_poasquestion_string) for check
@@ -286,7 +311,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
      * @return string description of character (if character is non printable) or character itself.
      */ 
     public static function describe_chr($utf8chr,&$isprintable,$form=null){
-        $result = self::describe_nonprinting(qtype_poasquestion_string::ord($utf8chr));
+        $code = qtype_poasquestion_string::ord($utf8chr);
+        $result = self::describe_nonprinting($code);
         $isprintable = $result===null;
         return $result===null ? $utf8chr : $result;
     }
@@ -321,10 +347,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             $curchar = '';
             $curcode = 0;
             // TODO -
-            // &#38;    & 
-            // &#62;    >
-            // &#60;    <
-            // &#34;    "
+
             // current flag is simple enumeration of characters
             for ($i=0; $i < $flag->data->length(); $i++) {
                 $curcode = qtype_poasquestion_string::ord($flag->data[$i]);
