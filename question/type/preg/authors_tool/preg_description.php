@@ -245,18 +245,13 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     }
 
     /**
-     * Gets unicode char from code $dec
+     * Gets unicode char from code $code
      * 
      * @param int $code decimal code of character
-     * @return string utf8 character or html escape sequence;
+     * @return string utf8 character;
      */
     public static function uchr($code) { 
-        //// replacing:
-        //   &        >       <       "
-        // &#38;    &#62;   &#60;   &#34;
-        /*if ($code==34||$code==38||$code==39||$code==60||$code==62){//escape: & > < " '
-            $utf = '&#'.$code.';';
-        } else*/ if ($code < 128) { 
+        if ($code < 128) { 
             $utf = chr($code); 
         } else if ($code < 2048) { 
             $utf = chr(192 + (($code - ($code % 64)) / 64)); 
@@ -294,7 +289,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
         $hexcode = strtoupper(dechex($code));
-        if($code <=32||$code==127||$code==160||$code==173){
+        if($code<=32||$code==127||$code==160||$code==173){
             $result = self::get_form_string('description_char'.$hexcode,$form);
         } else {
             $result = str_replace('%code',$hexcode,
