@@ -292,7 +292,7 @@ $string['description_ucp_leaf_control'] = 'PCRE_UCP';
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
 $string['description_charset_one_neg'] = 'not %characters';
-$string['description_charset_range'] = 'any character form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
+$string['description_charset_range'] = 'any character form %start to %end';
 $string['description_char'] = '<span style="color:blue">%char</span>';
 $string['description_char_16value'] = 'character with code 0x%code';
 //$string['description_charset_one'] = '%characters';
