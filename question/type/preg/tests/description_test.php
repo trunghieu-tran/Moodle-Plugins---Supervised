@@ -319,26 +319,18 @@ class qtype_preg_description_form_test extends PHPUnit_Framework_TestCase {
 }
 
 
-/*class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
-    /**
-     * @dataProvider vardump_provider
-     */
-    /*public function test_vardump($regex,$expected)
+class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
+    public function test_vardump()
     {
         $options = new qtype_preg_handling_options();
         $options->preserveallnodes = true;
+        $regex = '(?i)[Z-A]';
+        $expected = '000';
         //var_dump($options);
         $handler = new qtype_preg_author_tool_description($regex,null,$options);
         var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected, $result);
     }
-    
-    public function vardump_provider()
-    {
-        return array(
-          array('(?i)[a]','')
-        );
-    }
-}*/
+}
 
