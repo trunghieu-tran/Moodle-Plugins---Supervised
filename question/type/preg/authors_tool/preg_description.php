@@ -74,7 +74,7 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     private static function postprocessing($s){
 
         $result = preg_replace('%;((?:</span>)?)]%','\1]',$s);
-        $result = str_replace('not not ','',$result); // TODO - analyze this into charset
+        //$result = str_replace('not not ','',$result); // TODO - analyze this into charset
         return $result;
     }
     
@@ -380,6 +380,15 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
 
         $result_pattern = '';
         $characters = array();
+        
+        // 'not not' fix
+        if( count($this->pregnode->flags)==1 
+            && $this->pregnode->negative == true
+            && $this->pregnode->flags[0][0]->negative === true) {
+
+            $this->pregnode->negative = false;
+            $this->pregnode->flags[0][0]->negative = false;
+        }
 
         foreach ($this->pregnode->flags as $outer) {
             $this->flag_to_array($outer[0],$characters,$form);
