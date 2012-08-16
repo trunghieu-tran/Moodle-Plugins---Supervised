@@ -392,6 +392,10 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
 
         $result_pattern = '';
         $characters = array();
+        // check errors
+        if($this->pregnode->error !== NULL){
+            return $this->pregnode->error[0]->error_string();
+        }
         
         // 'not not' fix
         if( count($this->pregnode->flags)==1 
