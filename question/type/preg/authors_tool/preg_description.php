@@ -24,8 +24,9 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     /** @var array with options: array(option name => value) */
     public $descriptionoptions;// TODO - hide $descriptionoptions
     // keys are constants below:
-    const OPT_CASELESS      = 0;    // flag for (?i) !>>must be false by default<<! 
-    const OPT_RANGELIMIT    = 1;    // limit for charset in which it is displayed as a enum of characters
+    const OPT_CASELESS                  = 0;    // flag for (?i) !>>must be false by default<<! 
+    const OPT_RANGELIMIT                = 1;    // limit for charset in which it is displayed as a enum of characters
+    const OPT_CHARSET_USERINSCRIPTION   = 2;    // use userinscription for charset description instead of flags (true/false)
 
     /*
      * Construct of parent class parses the regex and does all necessary preprocessing.
@@ -36,7 +37,10 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      */
     public function __construct($regex = null, $modifiers = null, $options = null){
         parent::__construct($regex, $modifiers, $options);
-        $this->descriptionoptions = array(self::OPT_CASELESS => false,self::OPT_RANGELIMIT => 5);
+        $this->descriptionoptions = array(  self::OPT_CASELESS => false,
+                                            self::OPT_RANGELIMIT => 5,
+                                            self::OPT_CHARSET_USERINSCRIPTION =>false
+                                         );
     }
 
 
@@ -53,11 +57,17 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      * @param string $wholepattern Pattern for whole decription. Must contain %s - description.
      * @param string $numbering_pattern Pattern to track numbering. 
      * Must contain: %s - description of node;
-     * May contain:  %n - id node.
+     * May contain:  %n - node id.
+     * @param bool $charsetuserinscr use userinscription for charset description instead of flags
      * @return string description.
      */
-    public function description($numbering_pattern,$wholepattern=null){
-
+    public function description($numbering_pattern,$wholepattern=null,$charsetuserinscr=false,$rangelengthmax=5){
+        
+        $defoptions = $this->descriptionoptions;// save default options
+        // set up options
+        $this->descriptionoptions[self::OPT_CHARSET_USERINSCRIPTION]    = (bool)$charsetuserinscr;
+        $this->descriptionoptions[self::OPT_RANGELIMIT]                 = (int)$rangelengthmax;
+        // make description
         if(isset($this->dst_root)){
             $string = $this->dst_root->description($numbering_pattern,null,null);
             $string = self::postprocessing($string);
@@ -65,9 +75,11 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
         else {
            $string = 'tree was not built'; 
         }
+        // put string into $wholepattern
         if($wholepattern !== null && $wholepattern !== ''){
             $string = str_replace('%s',$string,$wholepattern);
         }
+        $this->descriptionoptions = $defoptions;// restore default options
         return $string;
     }
     
@@ -390,10 +402,12 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             $this->pregnode->flags[0][0]->negative = false;
         }
 
+        // filling $characters[]
         foreach ($this->pregnode->flags as $outer) {
             $this->flag_to_array($outer[0],$characters,$form);
         }
 
+        // adding resulting patterns
         if(count($characters)==1 && $this->pregnode->negative == false){
             // Simulation of: 
             // $string['description_charset_one'] = '%characters'; 
