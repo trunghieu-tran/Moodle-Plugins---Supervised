@@ -39,7 +39,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[\x{FF}-\x{1FF}]','any character form <span style="color:blue">ÿ</span> to <span style="color:blue">ǿ</span>'),
           array('[a-z]','any character form <span style="color:blue">a</span> to <span style="color:blue">z</span>'),
           array('[a-c]','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>;'),
-          array('[\x00\r\x22-\x3C\t]','one of the following characters: null character(NUL), tabulation(HT), carriage return character(CR), any character form <span style="color:blue">&#34;</span> to <span style="color:blue">&#60;</span>;'),
+          array('[\x00\r\x22-\x3C\t]','one of the following characters: null character(NUL), carriage return character(CR), any character form <span style="color:blue">&#34;</span> to <span style="color:blue">&#60;</span>, tabulation(HT);'),
           array('[ÿ-ƎƏ-ǿ]','any character form <span style="color:blue">ÿ</span> to <span style="color:blue">ǿ</span>'),
         );
     }
@@ -107,7 +107,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     {
         return array(
           array('ab','<span style="color:blue">a</span><span style="color:blue">b</span>'),
-          array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">|</span>; then <span style="color:blue">c</span>'),
+          array('[a|b]c','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>; then <span style="color:blue">c</span>'),
           array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
           array(' \t\n\r','space then tabulation(HT) then line feed(LF) then carriage return character(CR)'),
           array('\0113','tabulation(HT) then <span style="color:blue">3</span>'),
@@ -219,7 +219,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         //var_dump($handler);
         $result = $handler->default_description();
         //$expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
-        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">|</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
+        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
         $this->assertEquals($expected, $result);
     }
     
@@ -324,7 +324,7 @@ class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
     {
         $options = new qtype_preg_handling_options();
         $options->preserveallnodes = true;
-        $regex = '(?i)[Z-A]';
+        $regex = '(?i)[\xff\x00-\x1fA-B\t\n]';
         $expected = '000';
         //var_dump($options);
         $handler = new qtype_preg_author_tool_description($regex,null,$options);
@@ -333,4 +333,18 @@ class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $result);
     }
 }
+
+/*
+[\xff\x00-\x1fA-B\t\n]
+
+  ["userinscription"]=>
+  array(3) {
+    [0]=>
+    string(14) "\xff\x00-\\t\n"
+    [1]=>
+    string(3) "-"
+    [2]=>
+    string(3) "A-B"
+  }
+*/
 

@@ -245,6 +245,10 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
 
+        const FIRST_CHAR    = 0;
+        const INTO_RANGE    = 1;
+        const OUT_OF_RANGE  = 2;
+
     /**
      * Checks if charset contains only one printing character
      */
@@ -336,10 +340,61 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
     }
     
     /**
+     * Analyzes the enumeration of characters and finds the range.
+     * Input string will transform to:
+     * array(
+     *     0 => array(10,20),    // range
+     *     1 => 30,              // simple char
+     *     2 => 40,              // simple char
+     *     3 => array(100,200),  // range
+     *     ...
+     * );
+     * 
+     * @param $str object of qtype_poasquestion_string.
+     * @return mixed[] array with ranges and simple characters (see description of the function).
+     */
+    public static function find_ranges($str){
+        $lenth = $str->length();
+        if(!($str instanceof qtype_poasquestion_string) && $lenth < 1)
+            return false;
+        $result = array();
+        $rangestart = 0;
+        $prevcode = -1;
+        $state = self::FIRST_CHAR;
+        $curcode = -1;
+        for($i=0;$i<$lenth;$i++){
+            // if-else magic 8-)
+            $curcode = qtype_poasquestion_string::ord($str[$i]);
+            if ($state==self::FIRST_CHAR) {
+                $state = self::OUT_OF_RANGE;
+            } else if ($state == self::INTO_RANGE) {
+                if($curcode-1 != $prevcode){
+                    $state = self::OUT_OF_RANGE;
+                    $result[] = array($rangestart,$prevcode);
+                } 
+            } else if ($state == self::OUT_OF_RANGE) {
+                if($curcode-1 == $prevcode){
+                    $state = self::INTO_RANGE;
+                    $rangestart = $prevcode;
+                } else {
+                    $result[] = $prevcode;
+                }
+            }
+            $prevcode = $curcode;
+        }
+        if($state == self::INTO_RANGE){
+            $result[] = array($rangestart,$prevcode);
+        } else { // hence $state == OUT_OF_RANGE
+            $result[] = $prevcode;
+        }
+        return $result;
+    }
+    
+    /**
      * Convertes charset flag to array of descriptions(strings)
      * 
      * @param qtype_preg_charset_flag $flag flag gor description
-     * @param string[] $characters enumeration of descriptions in charset
+     * @param string[] $characters enumeration of descriptions in charset (updated parameter)
      * @param string $form required form
      */
     private function flag_to_array($flag,&$characters,$form=null) {
@@ -366,19 +421,24 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             if($flag->data->length()==1){
                 $characters[] = self::describe_chr($flag->data[0],true,$form);
             } else {
-                $ranges = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                $ranges = self::find_ranges($flag->data);
+                //var_dump($ranges);
                 $rangelengthmax = $this->options[qtype_preg_author_tool_description::OPT_RANGELIMIT];
                 foreach($ranges as $range){
-                    $rangelength = $range[1]-$range[0];
-                    if ($rangelength<$rangelengthmax) {
-                        for($i=$range[0];$i<=$range[1];$i++){
-                            $characters[] = self::describe_chr($i,true,$form);
+                    if(is_int($range)){ // $range is a code of character
+                        $characters[] = self::describe_chr($range,true,$form);
+                    } else { // $range is a range (from A to Z)
+                        $rangelength = $range[1]-$range[0];
+                        if ($rangelength<$rangelengthmax) { // if length of range less than $rangelengthmax it will be displayed as enumeration
+                            for($i=$range[0];$i<=$range[1];$i++){
+                                $characters[] = self::describe_chr($i,true,$form);
+                            }
+                        } else { // otherwise it will be displayed
+                            $temp_str = self::get_form_string('description_charset_range' ,$form);
+                            $temp_str = str_replace('%start',self::describe_chr($range[0],true,$form),$temp_str);
+                            $temp_str = str_replace('%end',self::describe_chr($range[1],true,$form),$temp_str);
+                            $characters[] = $temp_str;
                         }
-                    } else {
-                        $temp_str = self::get_form_string('description_charset_range' ,$form);
-                        $temp_str = str_replace('%start',self::describe_chr($range[0],true,$form),$temp_str);
-                        $temp_str = str_replace('%end',self::describe_chr($range[1],true,$form),$temp_str);
-                        $characters[] = $temp_str;
                     }
                 }
             }
@@ -986,7 +1046,7 @@ class qtype_preg_description_node_error extends qtype_preg_description_operator 
         
         $resultpattern = self::get_form_string('description_errorbefore',null)
                 .$this->pregnode->error_string()
-                . self::get_form_string('description_errorafter',null);
+                .self::get_form_string('description_errorafter',null);
         
         $operandplaces = array();
         foreach($this->pregnode->operands as $i => $operand){
