@@ -41,6 +41,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[a-c]','one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>;'),
           array('[\x00\r\x22-\x3C\t]','one of the following characters: null character(NUL), carriage return character(CR), any character form <span style="color:blue">&#34;</span> to <span style="color:blue">&#60;</span>, tabulation(HT);'),
           array('[ÿ-ƎƏ-ǿ]','any character form <span style="color:blue">ÿ</span> to <span style="color:blue">ǿ</span>'),
+          array('[dcab]','one of the following characters: <span style="color:blue">d</span>, <span style="color:blue">c</span>, <span style="color:blue">a</span>, <span style="color:blue">b</span>;'),
         );
     }
     
@@ -111,6 +112,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('abc','<span style="color:blue">a</span><span style="color:blue">b</span><span style="color:blue">c</span>'),
           array(' \t\n\r','space then tabulation(HT) then line feed(LF) then carriage return character(CR)'),
           array('\0113','tabulation(HT) then <span style="color:blue">3</span>'),
+          array('bcab','<span style="color:blue">b</span><span style="color:blue">c</span><span style="color:blue">a</span><span style="color:blue">b</span>'),
         );
     }
     

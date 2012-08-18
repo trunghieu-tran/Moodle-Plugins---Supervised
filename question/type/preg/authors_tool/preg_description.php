@@ -305,7 +305,8 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         // ok, character is non-printing, lets find its description in the language file
         $result = '';
         $hexcode = strtoupper(dechex($code));
-        if($code<=32||$code==127||$code==160||$code==173){
+        if($code<=32||$code==127||$code==160||$code==173
+            ||$code==8194||$code==8195||$code==8201||$code==8204||$code==8205){
             $result = self::get_form_string('description_char'.$hexcode,$form);
         } else {
             $result = str_replace('%code',$hexcode,
@@ -389,7 +390,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         }
         return $result;
     }
-    
+
     /**
      * Convertes charset flag to array of descriptions(strings)
      * 
