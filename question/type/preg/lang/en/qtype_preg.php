@@ -333,6 +333,11 @@ $string['description_char20'] = 'space';
 $string['description_char7F'] = 'delete character (DEL)';
 $string['description_charA0'] = 'non-breaking space';
 $string['description_charAD'] = 'soft hyphen character';
+$string['description_char2002'] = 'en space';
+$string['description_char2003'] = 'em space';
+$string['description_char2009'] = 'thin space';
+$string['description_char200C'] = 'zero width non-joiner';
+$string['description_char200D'] = 'zero width joiner';
 //CHARSET FLAGS
 $string['description_charflag_digit'] = 'decimal digit';
 $string['description_charflag_xdigit'] = 'hexadecimal digit';
