@@ -2,7 +2,7 @@
 
 /**
  * Preg question type backup code.
- * 
+ *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
  * @author     Valeriy Streltsov <vostreltsov@gmail.com>

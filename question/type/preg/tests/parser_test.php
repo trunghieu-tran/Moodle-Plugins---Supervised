@@ -25,7 +25,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
      * @return parser object.
      */
     protected function run_parser($regex, &$errors, $options = null) {
-        $parser = new preg_parser_yyParser;
+        $parser = new qtype_preg_yyParser;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);

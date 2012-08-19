@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * POAS abstract question type backup code.
+ *
+ * @package    qtype_poasquestion
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/engine/bank.php');
 
 class backup_qtype_poasquestion_plugin extends backup_qtype_plugin {

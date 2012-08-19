@@ -396,11 +396,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         }
                         $newresult->set_source_info($newresult->str()->substring(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
 
-                        $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
-                        if ($path !== null) {
-                            $newresult->left = $path->length[0] - $newresult->length[0];
-                            $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
-                            $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                        $path = null;
+                        if ($this->options === null || $this->options->extensionneeded) {
+                            $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
+                            if ($path !== null) {
+                                $newresult->left = $path->length[0] - $newresult->length[0];
+                                $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
+                                $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                            }
                         }
                         // Finally, save the possible partial match.
                         $partialmatches[] = $newresult;
