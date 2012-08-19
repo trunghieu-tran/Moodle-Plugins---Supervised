@@ -1,39 +1,18 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains hint definitions, that is used by different poas questions.
+ * Defines hint classes for the POAS abstract question type.
  *
- * Note: interfaces and classes there are intentionally left without qtype_poasquestion prefix as
- *  they are intended for more general Moodle use after hinting behaviours would be complete.
- *
- * @package    qtype
- * @subpackage hints
- * @copyright  2012 Sychev Oleg
+ * @package    qtype_poasquestion
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface question_with_qtype_specific_hints {
 
@@ -55,9 +34,6 @@ interface question_with_qtype_specific_hints {
 
 /**
  * Base class for question-type specific hints
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_specific_hint {
 

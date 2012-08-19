@@ -1,18 +1,19 @@
 <?php
+
 /**
- * Defines abstract class of regular expression matcher, extend it to create a new matching engine.
- *
+ * Defines an abstract regular expression matcher, extend it to create a new matching engine.
  * A matcher is a particulary important type of regex handlers, that allows the question to work at all.
- * The file also define a class to store matching results.
+ * The file also defines a class to store matching results.
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
@@ -427,20 +428,23 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
-        // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
-        if ($this->options === null) {
+        // Options should exist at least as a default object. Be sure to create matching options.
+        if ($options === null) {
             $options = new qtype_preg_matching_options();
-            if ($this->lexer !== null) {
-                $options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
-            }
-            $this->set_options($options);
         }
+
 
         //Do parsing
         parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
         }
+
+        //If there were backreferences in regex, subpattern capturing should be forced.
+        if ($this->lexer !== null && !$this->options->capturesubpatterns) {
+            $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
+        }
+
 
         //Invalidate match called later to allow parser to count subpatterns
         $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
@@ -555,4 +559,3 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
 }
-?>
