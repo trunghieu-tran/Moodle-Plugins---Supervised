@@ -523,3 +523,20 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
+
+// Strings for tooltipe
+$string['tooltipe_charset'] = 'character class';
+$string['tooltipe_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['tooltipe_emptiness'] = 'emptiness';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_backreference'] = 'backreference';
+$string['tooltipe_recursion'] = 'recursion';
+$string['tooltipe_control_sequence'] = 'control sequence';
+$string['tooltipe_option'] = 'option';
+$string['tooltipe_finite_quantifier'] = 'finite quantifier';
+$string['tooltipe_infinite_quantifier'] = 'infinite quantifier';
+$string['tooltipe_concatenation'] = 'concatenation';
+$string['tooltipe_alternative'] = 'alternative';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_subpattern'] = 'subpattern';
+$string['tooltipe_conditional_subpattern'] = 'conditional subpattern';
