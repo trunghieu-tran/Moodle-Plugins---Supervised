@@ -931,6 +931,30 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_case_sensitivity8() {
+        $test1 = array( 'str'=>'lowerUPPER',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5));
+
+        return array('regex'=>'\p{Ll}+',
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_case_sensitivity9() {
+        $test1 = array( 'str'=>'lowerUPPER',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>10));
+
+        return array('regex'=>'(?i)\p{Ll}+',
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     // Tests for cases with ambiguity - subpatterns, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',

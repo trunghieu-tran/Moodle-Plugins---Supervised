@@ -1521,6 +1521,7 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_SUBPATT_NAME_EXPECTED        = 'subpatt_name_expected_node_error';            // Subpattern name expected.
     const SUBTYPE_CX_SHOULD_BE_ASCII           = 'cx_should_be_ascii_node_error';               // \c should be followed by an ascii character.
     const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                  // \L, \l, \N{name}, \U, and \u are unsupported.
+    const SUBTYPE_UNRECOGNIZED_LBA             = 'unrecognized_lab_node_error';                 // Unrecognized character after (?<.
 
     /** Error strings names in qtype_preg.php lang file. */
     public static $errstrs = array(self::SUBTYPE_UNKNOWN_ERROR                => 'error_PCREincorrectregex',
@@ -1559,7 +1560,8 @@ class qtype_preg_node_error extends qtype_preg_operator {
                                    self::SUBTYPE_DIFFERENT_SUBPATT_NAMES      => 'error_differentsubpattnames',
                                    self::SUBTYPE_SUBPATT_NAME_EXPECTED        => 'error_subpattnameexpected',
                                    self::SUBTYPE_CX_SHOULD_BE_ASCII           => 'error_cxshouldbeascii',
-                                   self::SUBTYPE_LNU_UNSUPPORTED              => 'error_lnuunsupported'
+                                   self::SUBTYPE_LNU_UNSUPPORTED              => 'error_lnuunsupported',
+                                   self::SUBTYPE_UNRECOGNIZED_LBA             => 'error_unrecognizedlba'
                                    );
     /** Additional info. */
     public $addinfo;
