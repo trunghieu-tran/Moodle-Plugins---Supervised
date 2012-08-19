@@ -245,9 +245,9 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
  */
 class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
 
-        const FIRST_CHAR    = 0;
-        const INTO_RANGE    = 1;
-        const OUT_OF_RANGE  = 2;
+    const FIRST_CHAR    = 0;
+    const INTO_RANGE    = 1;
+    const OUT_OF_RANGE  = 2;
 
     /**
      * Checks if charset contains only one printing character
@@ -428,7 +428,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
                 foreach($ranges as $range){
                     if(is_int($range)){ // $range is a code of character
                         $characters[] = self::describe_chr($range,true,$form);
-                    } else { // $range is a range (from A to Z)
+                    } else { // $range is a range (from A to Z <=> array(65,90) )
                         $rangelength = $range[1]-$range[0];
                         if ($rangelength<$rangelengthmax) { // if length of range less than $rangelengthmax it will be displayed as enumeration
                             for($i=$range[0];$i<=$range[1];$i++){

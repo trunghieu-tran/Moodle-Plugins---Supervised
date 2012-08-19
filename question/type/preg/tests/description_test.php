@@ -113,6 +113,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array(' \t\n\r','space then tabulation(HT) then line feed(LF) then carriage return character(CR)'),
           array('\0113','tabulation(HT) then <span style="color:blue">3</span>'),
           array('bcab','<span style="color:blue">b</span><span style="color:blue">c</span><span style="color:blue">a</span><span style="color:blue">b</span>'),
+          array('\x{2002}\x{2003}\x{2009}\x{200C}\x{200D}','en space then em space then thin space then zero width non-joiner then zero width joiner'),
         );
     }
     
