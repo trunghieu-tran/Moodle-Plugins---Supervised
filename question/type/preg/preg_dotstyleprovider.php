@@ -64,7 +64,7 @@ class qtype_preg_dot_style_provider {
                         $label = str_replace(']', '&#93;', $label);
                         $label = str_replace('[', '&#91;', $label);
                         //$label = str_replace('\\', '&#92;', $label);
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = record, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltipe_charset', 'qtype_preg') . "\", shape = record, id = $id]";
                     } else if (qtype_poasquestion_string::strlen($label) > 1) {
                         $label = '[' . $label . ']';
                     }
@@ -74,29 +74,29 @@ class qtype_preg_dot_style_provider {
                     //$label = str_replace('\\', '&#92;', $label);
                     //var_dump("[label = <<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = none, id = $id]");
                     if($pregnode->error === NULL){
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"character class\", shape = record, id = $id]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltipe_charset', 'qtype_preg') . "\", shape = record, id = $id]";
                     } else {
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"Incorrect range: left border is greater then the right one\", shape = record, id = $id, color = \"red\"]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltipe_charset_error', 'qtype_preg') . "\", shape = record, id = $id, color = \"red\"]";
                     }
             }
             case qtype_preg_node::TYPE_LEAF_META: {
                 //if($pregnode->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                return "[label = \"emptiness\", tooltip = emptiness, shape = rectangle, id = $id]";
+                return "[label = \"emptiness\", tooltip = " . get_string('tooltipe_emptiness', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = assertion, shape = rectangle, id = $id]";
+                return "[label = \"assertion $label\", tooltip = " . get_string('tooltipe_assertion', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to subpattern #$pregnode->number\", tooltip = backreference, shape = rectangle, id = $id]";
+                return "[label = \"backreference to subpattern #$pregnode->number\", tooltip = " . get_string('tooltipe_backreference', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
-                return "[label = \"recursion ' . $pregnode->number . '\", tooltip = recursion, shape = rectangle, id = $id]";
+                return "[label = \"recursion ' . $pregnode->number . '\", tooltip = " . get_string('tooltipe_recursion', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_CONTROL: {
-                return "[label = control sequence \"$label\", tooltip = \"control sequence\", shape = rectangle, id = $id]";
+                return "[label = control sequence \"$label\", tooltip = \"" . get_string('tooltipe_control_sequence', 'qtype_preg') . "\", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_OPTIONS: {
-                return "[label = \"$label\", tooltip = option, shape = rectangle, id = $id]";
+                return "[label = \"$label\", tooltip = " . get_string('tooltipe_option', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
                 if($pregnode->leftborder > $pregnode->rightborder){
@@ -105,26 +105,27 @@ class qtype_preg_dot_style_provider {
                     $a->indlast = $pregnode->indlast;
                     return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $a) . "\", id = $id, color = red]";
                 }
-                return "[label = \"$label\", tooltip = \"finite quantifier\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('tooltipe_finite_quantifier', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT: {
-                return "[label = \"$label\", tooltip = \"infinite quantifier\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('tooltipe_infinite_quantifier', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_CONCAT: {
-                return "[label = \"&#8226;\", tooltip = concatenation, id = $id]";
+                return "[label = \"&#8226;\", tooltip = " . get_string('tooltipe_concatenation', 'qtype_preg') . ", id = $id]";
                 //return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD><font>&#8226;</font></TD></TR></TABLE>>, tooltip = concatenation, shape = record, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ALT: {
-                return "[label = \"$label\", tooltip = alternative, id = $id]";
+                return "[label = \"$label\", tooltip = " . get_string('tooltipe_alternative', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ASSERT: {
-                return "[label = \"assertion $label\", tooltip = assertion, id = $id]";
+                return "[label = \"assertion $label\", tooltip = " . get_string('tooltipe_assertion', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_SUBPATT: {
-                return "[label = \"$label\", tooltip = subpattern, id = $id]";
+                //return "[label = \"$label\", tooltip = " . get_string('tooltipe_subpattern', 'qtype_preg') . ", id = $id]";
+                return "[label = \"( ... )\", tooltip = " . get_string('tooltipe_subpattern', 'qtype_preg') . ", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_COND_SUBPATT: {
-                return "[label = \"$label\", tooltip = \"conditional subpattern\", id = $id]";
+                return "[label = \"$label\", tooltip = \"" . get_string('tooltipe_conditional_subpattern', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
 
