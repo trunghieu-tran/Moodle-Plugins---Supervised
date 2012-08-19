@@ -3,24 +3,22 @@
 /**
  * Preg question renderer class.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Oleg Sychev
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
  * Generates the output for preg questions.
- *
- * @copyright  2011 Oleg Sychev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
@@ -143,5 +141,4 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //////Teacher-defined feedback text for that answer
         return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
-
 }

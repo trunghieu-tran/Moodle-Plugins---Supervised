@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Language strings for the Preg question type.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['addmoreanswerblanks'] = 'Adding a regular expression options';
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the choosen engine doesn\'t support subpatterns capturing you should use only {$0}.</p>';
 $string['answerno'] = 'Answer {$a}';
@@ -51,8 +59,8 @@ $string['pluginname_link'] = 'question/type/preg';
 $string['pluginnameadding'] = 'Adding a regular expression question';
 $string['pluginnameediting'] = 'Editing a regular expression question';
 $string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. Using behaviours with multiple tries can give a hint by telling a next correct character.<br/>You can use it without knowing regular expression to get hinting by using the \'Moodle shortanswer\' notation.';
-$string['preg_regex_handler'] = 'Regex handler';
 $string['questioneditingheading'] = 'Question editing settings';
+$string['regex_handler'] = 'Regex handler';
 $string['subpattern'] = 'Subpattern';
 $string['tobecontinued'] = '...';
 $string['toomanyerrors'] = '.......{$a} more errors';
@@ -141,7 +149,6 @@ $string['error_PCREincorrectregex']             = 'Incorrect regular expression 
 $string['error_threealtincondsubpatt']          = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
 $string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
 $string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
-$string['error_emptyparens']                    = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
 $string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
 $string['error_unclosedsqbrackets']             = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
 $string['error_setunsetmod']                    = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
@@ -164,8 +171,9 @@ $string['error_missingbackrefending']           = 'Missing backreference ending:
 $string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
 $string['error_missingcontrolending']           = 'Missing closing parenthesis after control sequence (*...';
 $string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
-$string['error_condsubpattassertexpected']      = '';
+$string['error_condsubpattassertexpected']      = 'Assertion or condition expected.';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
+$string['error_charcodedisallowed']             = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
 $string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
 $string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';
@@ -174,6 +182,7 @@ $string['error_differentsubpattnames']          = 'Different subpattern names fo
 $string['error_subpattnameexpected']            = 'Subpattern name expected.';
 $string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
 $string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';

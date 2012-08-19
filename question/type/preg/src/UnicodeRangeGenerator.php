@@ -1,14 +1,17 @@
 <?php
 
-    /**
-     * Генератор отрезков для юникод-свойств.
-     * Переменная $prop принимает нужное значение,
-     * выходной файл out.txt в папке $PATH содержит массив
-     * отрезков юникода, подходящих под данное свойство.
-     * @author Valeriy Streltsov
-     */
+/**
+ * Generator of ranges for unicode properties.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
     $PATH = '/home/valeriy/';
+    $IN = 'in.txt';
+    $OUT = 'out.txt';
     $prefix = 'public static function ';
     $suffix = '_ranges() {';
     $tab1 = '    ';
@@ -189,11 +192,11 @@
         return '';
     }
 
-    $out = fopen($PATH . 'out.txt', 'w');
+    $out = fopen($PATH . $OUT, 'w');
     foreach ($props as $funcname => $regex) {
         $pattern = '/(*UTF8)' . $regex . '/';
         $exists = false;
-        $tmp = fopen($PATH . 'in.txt', 'w');
+        $tmp = fopen($PATH . $IN, 'w');
         for ($i = 0; $i <= 0x10FFFD; $i++) {
             $res = preg_match($pattern, code2utf8($i));
             if ($res) {
@@ -209,7 +212,7 @@
             }
         }
         fclose($tmp);
-        $in = fopen($PATH . 'in.txt', 'r');
+        $in = fopen($PATH . $IN, 'r');
         $previous = -1;
         $prevhex = -1;
         fwrite($out, $tab1 . $prefix . $funcname . $suffix . $eol);

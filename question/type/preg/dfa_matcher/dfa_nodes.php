@@ -1,13 +1,17 @@
 <?php
+
 /**
- * Defines DFA matcher node classes with code needed to do DFA stuff
+ * Defines NFA node classes.
  *
- * @copyright &copy; 2010 Sychev Oleg, Kolesov Dmitriy
- * @author Sychev Oleg, Kolesov Dmitriy, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Dmitriy Kolesov <xapuyc7@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
 /**

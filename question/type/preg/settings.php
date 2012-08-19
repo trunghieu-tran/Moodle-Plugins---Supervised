@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Settings for the Preg question type.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
 require_once($CFG->dirroot.'/question/type/preg/questiontype.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 

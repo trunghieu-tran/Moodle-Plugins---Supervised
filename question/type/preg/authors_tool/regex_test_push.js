@@ -11,6 +11,7 @@ YUI().use('node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-par
     load_content = function(url) {
 
         var upd_dialog_Success = function(id, o, a) {
+            //alert(o.responseText);
             var json_array = Y.JSON.parse(o.responseText);
 
             //TODO: add errors message

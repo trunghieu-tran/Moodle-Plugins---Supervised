@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Defines NFA node classes
+ * Defines NFA node classes.
  *
- * @copyright &copy; 2012  Valeriy Streltsov
- * @author Valeriy Streltsov, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -206,6 +206,13 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
  */
 class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
+    public function accept() {
+        if (!$this->pregnode->greed) {
+            return get_string('ungreedyquant', 'qtype_preg');
+        }
+        return true;
+    }
+
     /**
      * Creates an automaton for * or {0,} quantifier.
      */
@@ -276,6 +283,13 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
  * Class for finite quantifiers {m, n}.
  */
 class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
+
+    public function accept() {
+        if (!$this->pregnode->greed) {
+            return get_string('ungreedyquant', 'qtype_preg');
+        }
+        return true;
+    }
 
     /**
      * Creates an automaton for ? quantifier.

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Defines NFA matcher class
+ * Defines NFA matcher class.
  *
- * @copyright &copy; 2012  Valeriy Streltsov
- * @author Valeriy Streltsov, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -114,19 +114,18 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         case qtype_preg_matcher::SUBPATTERN_CAPTURING:
         case qtype_preg_matcher::CORRECT_ENDING_ALWAYS_FULL:
             return true;
-            break;
         }
         return false;
     }
 
     protected function is_preg_node_acceptable($pregnode) {
-        switch ($pregnode->name()) {
-        case 'leaf_charset':
-        case 'leaf_meta':
-        case 'leaf_assert':
-        case 'leaf_backref':
+        switch ($pregnode->type) {
+        case qtype_preg_node::TYPE_LEAF_CHARSET:
+        case qtype_preg_node::TYPE_LEAF_META:
+        case qtype_preg_node::TYPE_LEAF_ASSERT:
+        case qtype_preg_node::TYPE_LEAF_BACKREF:
+        case qtype_preg_node::TYPE_NODE_ERROR:
             return true;
-            break;
         }
         return get_string($pregnode->name(), 'qtype_preg');
     }
@@ -397,11 +396,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         }
                         $newresult->set_source_info($newresult->str()->substring(0, $startpos + $newresult->length[0]), $this->get_max_subpattern(), $this->get_subpattern_map());
 
-                        $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
-                        if ($path !== null) {
-                            $newresult->left = $path->length[0] - $newresult->length[0];
-                            $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
-                            $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                        $path = null;
+                        if ($this->options === null || $this->options->extensionneeded) {
+                            $path = $this->determine_characters_left($str, $startpos, $newresult, $fulllastmatch);
+                            if ($path !== null) {
+                                $newresult->left = $path->length[0] - $newresult->length[0];
+                                $newresult->extendedmatch = new qtype_preg_matching_results($path->full, $path->index_first, $path->length, $path->left);
+                                $newresult->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                            }
                         }
                         // Finally, save the possible partial match.
                         $partialmatches[] = $newresult;

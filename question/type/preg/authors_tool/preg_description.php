@@ -473,7 +473,6 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
         }
 
         // adding resulting patterns
-        if(count($characters)==1 && $this->pregnode->negative == false){
             // Simulation of: 
             // $string['description_charset_one'] = '%characters'; 
             // w/o calling functions
@@ -753,12 +752,12 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
  * Possible errors: left border is greater than right one.
  */
 class qtype_preg_description_node_finite_quant extends qtype_preg_description_operator{
-    
+
     /**
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-        
+
         $resultpattern ='';
         $greedpattern='';
         $wrong_borders =$this->pregnode->leftborder >= $this->pregnode->rightborder;
@@ -879,7 +878,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             $resultpattern = self::get_form_string('description_concat_short',$form);
         } else if($firstaheadassert || $secondbehindassert || $aheadassertinprevconcat){
             $resultpattern = self::get_form_string('description_concat_and',$form);
-        } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT){
+        } else if($type1 === qtype_preg_node::TYPE_NODE_CONCAT) {
             $resultpattern = self::get_form_string('description_concat_wcomma',$form);
         } else {
             $resultpattern = self::get_form_string('description_concat',$form);
@@ -1049,16 +1048,91 @@ class qtype_preg_description_node_error extends qtype_preg_description_operator 
                 .$this->pregnode->error_string()
                 .self::get_form_string('description_errorafter',null);
         
-        $operandplaces = array();
-        foreach($this->pregnode->operands as $i => $operand){
-            if(isset($operand)){
+                $operandplaces = array();
+		foreach($this->pregnode->operands as $i => $operand){
+			if(isset($operand)){
                 $operandplaces[] = '%'.($i+1);
-            }
-        }
+			}
+		}
         if(count($operandplaces)!=0){
             $resultpattern .= ' Operands: '.implode(', ',$operandplaces);
-        }
+		}
 
         return $resultpattern;
+		/*$pseudonym='';
+		switch($this->pregnode->subtype){
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_EMPTY_PARENS :
+			break;
+			case qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SET_UNSET_MODIFIER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_CONTROL_SEQUENCE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INCORRECT_CHARSET_RANGE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INCORRECT_QUANT_RANGE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN :
+			break;
+			case qtype_preg_node_error::SUBTYPE_INVALID_ESCAPE_SEQUENCE :
+			break;
+			case qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBPATT :
+			break;
+			case qtype_preg_node_error::SUBTYPE_UNKNOWN_MODIFIER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_CALLOUT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_ENDING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_MISSING_BACKREF_BEGINNING :
+			break;
+			case qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CHAR_CODE_TOO_BIG :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CALLOUT_BIG_NUMBER :
+			break;
+			case qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES :
+			break;
+			case qtype_preg_node_error::SUBTYPE_BACKREF_TO_ZERO :
+			break;
+			case qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES :
+			break;
+			case qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED :
+			break;
+			case qtype_preg_node_error::SUBTYPE_CX_SHOULD_BE_ASCII :
+			break;
+			case qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED :
+			break;
+		}*/
     }
 }
