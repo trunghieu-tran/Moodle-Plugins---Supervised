@@ -734,19 +734,17 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $description = '';
         $child_description = '';
         $matches = array();
+        $i = 0;
         
         $this->pattern = $this->pattern($node_parent,$form);
         $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
         
-        $i=1;
-        $find = '/%(\w+)?'.$i.'/';
-        while((count($this->operands) >= $i) && preg_match($find,$description,$matches)){
-            $form = (count($matches)>=2) ? $matches[1] : null;
+        $find = '/%(\w+)?(\d)/';
+        while(preg_match($find,$description,$matches) !== 0){
+            $form = $matches[1];
+            $i = (int)$matches[2];
             $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
-            //var_dump($matches[0]);
             $description = str_replace($matches[0],$child_description,$description);
-            $i++;
-            $find = '/%(\w+)?'.$i.'(\w+)?/';
         }
         qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
@@ -928,7 +926,8 @@ class qtype_preg_description_node_assert extends qtype_preg_description_operator
      */
     public function pattern($node_parent=null,$form=null){
 
-        return self::get_form_string('description_'.$this->pregnode->subtype,$form);
+        $suff = ($node_parent !== null && $node_parent->pregnode->type === qtype_preg_node::TYPE_NODE_COND_SUBPATT) ? '_cond' : '';
+        return self::get_form_string('description_' . $this->pregnode->subtype . $suff,$form);
     }
     
 }
@@ -1028,12 +1027,13 @@ class qtype_preg_description_node_cond_subpatt extends qtype_preg_description_op
             
         } else {
             $resultpattern = self::get_form_string('description_node_cond_subpatt',$form);
-            $resultpattern = str_replace('%cond', $this->description_of_condition($form),$resultpattern);
+            // replacing %cond with %2 or %3 whichever how many alternatives has this node
+            $resultpattern = str_replace('%cond', '%'.count($this->pregnode->operands),$resultpattern);
         }
         
-        $elsereplase = (isset($this->pregnode->operands[1]))?self::get_form_string('description_node_cond_subpatt_else',$form):'';
+        $elsereplase = isset($this->pregnode->operands[1])?self::get_form_string('description_node_cond_subpatt_else',$form):'';
         $resultpattern = str_replace('%else', $elsereplase,$resultpattern);
-            
+        //var_dump($resultpattern);
         return $resultpattern;
     }
     
