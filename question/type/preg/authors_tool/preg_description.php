@@ -942,14 +942,26 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
      */
     public function pattern($node_parent=null,$form=null){
         
-        if(is_string($this->pregnode->number)){
+        $resultpattern = '';
+        if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+            
+            $resultpattern = self::get_form_string('description_grouping',$form);
+            
+        } else if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_DUPLICATE_SUBPATTERNS) {
+            
+            $resultpattern = self::get_form_string('description_grouping_duplicate',$form);
+            
+        } else if(is_string($this->pregnode->number)) {
+            
             if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
                 $resultpattern = self::get_form_string('description_subpattern_name',$form);
             } else {
                 $resultpattern = self::get_form_string('description_subpattern_once_name',$form);
             }
             $resultpattern = str_replace('%name', $this->pregnode->number,$resultpattern);
+            
         } else {
+            
             $resultpattern = '';
             if($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT){
                 $resultpattern = self::get_form_string('description_subpattern',$form);
@@ -957,6 +969,7 @@ class qtype_preg_description_node_subpatt extends qtype_preg_description_operato
                 $resultpattern = self::get_form_string('description_subpattern_once',$form);
             }
             $resultpattern = str_replace('%number', $this->pregnode->number,$resultpattern);
+            
         }
         return $resultpattern;
     }
