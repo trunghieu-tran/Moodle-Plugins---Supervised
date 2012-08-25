@@ -276,6 +276,27 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('[^\S]','white space'),
         );
     }
+    
+    //------------------------------------------------------------------
+
+    /**
+     * @dataProvider subpattern_provider
+     */
+    public function test_subpattern($regex,$expected)
+    {
+        $handler = new qtype_preg_author_tool_description($regex,null,null);
+        var_dump($handler);
+        $result = $handler->description('%s','%s');
+        $this->assertEquals($expected, $result);
+    }
+
+    public function subpattern_provider()
+    {
+        return array(
+          array('(?:[abc])','grouping: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]'),
+          //array('(?|(a)|(b))','1'),
+        );
+    }
 
     //------------------------------------------------------------------
 

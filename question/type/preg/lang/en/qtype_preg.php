@@ -269,6 +269,8 @@ $string['description_subpattern'] = 'subpattern #%number: [%1]';
 $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
 $string['description_subpattern_name'] = 'subpattern "%name": [%1]';
 $string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
+$string['description_grouping'] = 'grouping: [%1]';
+$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternative): [%1]';
 // TYPE_NODE_COND_SUBPATT (%1 - first option; %2 - second option; %cond - condition )
 $string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
 $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
