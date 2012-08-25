@@ -201,7 +201,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_option($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        var_dump($handler);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected, $result);
     }
@@ -235,7 +235,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_condmask($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        //if($regex == '(?(?=a)a)' )var_dump($handler);
+        //if($regex == '(?(?=a)b)' )var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected, $result);
     }
@@ -243,11 +243,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function condmask_provider()
     {
         return array(
-          array('(?(?=a)a|b)','if further text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
-          array('(?(?!a)a|b)','if further text should not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
-          array('(?(?<=a)a|b)','if preceding text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
-          array('(?(?<!a)a|b)','if preceding text should not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]'),
-          array('(?(?=a)a)','if further text should match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">a</span>]'),
+          array('(?(?=a)b|c)','if further text matches: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]'),
+          array('(?(?!a)b|c)','if further text does not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]'),
+          array('(?(?<=a)b|c)','if preceding text matches: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]'),
+          array('(?(?<!a)b|c)','if preceding text does not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]'),
+          array('(?(?=a)b)','if further text matches: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>]'),
           array('(?(1)a)','if the subpattern #1 has been successfully matched then check: [<span style="color:blue">a</span>]'),
           array('(?(name)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]'),
           array('(?(<name>)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]'),
@@ -332,7 +332,7 @@ class qtype_preg_description_dumping_test extends PHPUnit_Framework_TestCase {
         $expected = '000';
         //var_dump($options);
         $handler = new qtype_preg_author_tool_description($regex,null,$options);
-        var_dump($handler);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected, $result);
     }
