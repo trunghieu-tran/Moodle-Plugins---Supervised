@@ -17,36 +17,139 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
+ * State of description generating
+ */
+class qtype_preg_description_state {
+
+    /** @var bool is (?i) set */
+    private $mcaseless = false;
+
+    /** @var bool is (?s) set */
+    private $msingleline = false;
+
+    /** @var bool is (?m) set */
+    private $mmultilineline = false;
+
+    /** @var bool is (?x) set */
+    private $mextended = false;
+
+    /** @var bool is (?U) set */
+    private $mungreedy = false;
+
+    /** @var bool is (?J) set */
+    private $mduplicate = false;
+
+    /**
+     * set default values to all state variables
+     */
+    public function reset() {
+        $this->mcaseless        = false;
+        $this->msingleline      = false;
+        $this->mmultilineline   = false;
+        $this->mextended        = false;
+        $this->mungreedy        = false;
+        $this->mduplicate       = false;
+    }
+
+    /**
+     * set flag that means modifier $modifier is set
+     * 
+     * @param string $modifier modifier to set
+     */
+    public function set_modifier($modifier) {
+        switch ($modifier){
+            case 'i':
+                $this->mcaseless = true;
+                break;
+            case 's':
+                $this->msingleline = true;
+                break;
+            case 'm':
+                $this->mmultilineline = true;
+                break;
+            case 'x':
+                $this->mextended = true;
+                break;
+            case 'U':
+                $this->mungreedy = true;
+                break;
+            case 'J':
+                $this->mduplicate = true;
+                break;
+        }
+    }
+    
+    /**
+     * set flag that means modifier $modifier is unset
+     * 
+     * @param string $modifier modifier to unset
+     */
+    public function unset_modifier($modifier) {
+        switch ($modifier){
+            case 'i':
+                $this->mcaseless = false;
+                break;
+            case 's':
+                $this->msingleline = false;
+                break;
+            case 'm':
+                $this->mmultilineline = false;
+                break;
+            case 'x':
+                $this->mextended = false;
+                break;
+            case 'U':
+                $this->mungreedy = false;
+                break;
+            case 'J':
+                $this->mduplicate = false;
+                break;
+        }
+    }
+}
+
+/**
+ * Options, for generating description - affects scanning, parsing, description genetating.
+ */
+class qtype_preg_description_options extends qtype_preg_handling_options {
+
+    /** @var bool use userinscription for charset description instead of flags */
+    public $charsetuserinscription = false;
+
+    /** @var int limit for charset in which it is displayed as a enum of characters */
+    public $rangelengthmax = 5;
+
+    public function __construct() {
+        $this->preserveallnodes = true;
+    }
+}
+
+/**
  * Handler, generating information for regular expression
  */
 class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     
-    /** @var array with options: array(option name => value) */
-    public $descriptionoptions;// TODO - hide $descriptionoptions
-    // keys are constants below:
-    const OPT_CASELESS                  = 0x0;    // flag for (?i) !>>must be false by default<<! 
-    const OPT_RANGELIMIT                = 0x1;    // limit for charset in which it is displayed as a enum of characters
-    const OPT_CHARSET_USERINSCRIPTION   = 0x2;    // use userinscription for charset description instead of flags (true/false)
+    /** @var qtype_preg_description_options options for description and state of description */
+    public $options;
+    
+    /** @var qtype_preg_description_state state of description generating */
+    public $state;
 
     /*
      * Construct of parent class parses the regex and does all necessary preprocessing.
      *
-     * @param string regex - regular expression to handle.
-     * @param string modifiers - modifiers of the regular expression.
-     * @param object options - options to handle regex, i.e. any necessary additional parameters.
+     * @param string $regex - regular expression to handle.
+     * @param string $modifiers - modifiers of the regular expression.
+     * @param object $options - options to handle regex, i.e. any necessary additional parameters.
      */
     public function __construct($regex = null, $modifiers = null, $options = null){
         if($options === null) {
-            $options = new qtype_preg_handling_options;
-            $options->preserveallnodes = true;
+            $options = new qtype_preg_description_options();
         }
         parent::__construct($regex, $modifiers, $options);
-        $this->descriptionoptions = array(  self::OPT_CASELESS => false,
-                                            self::OPT_RANGELIMIT => 5,
-                                            self::OPT_CHARSET_USERINSCRIPTION =>false
-                                         );
+        $this->options = $options;
+        $this->state = new qtype_preg_description_state();
     }
-
 
     /**
      * Genegates description of regexp
@@ -63,14 +166,16 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      * Must contain: %s - description of node;
      * May contain:  %n - node id.
      * @param bool $charsetuserinscr use userinscription for charset description instead of flags
+     * @param int $rangelengthmax limit for charset ranges in which it is displayed as a enum of characters
      * @return string description.
      */
     public function description($numbering_pattern,$wholepattern=null,$charsetuserinscr=false,$rangelengthmax=5){
         
-        $defoptions = $this->descriptionoptions;// save default options
         // set up options
-        $this->descriptionoptions[self::OPT_CHARSET_USERINSCRIPTION]    = (bool)$charsetuserinscr;
-        $this->descriptionoptions[self::OPT_RANGELIMIT]                 = (int)$rangelengthmax;
+        $this->state->reset();// restore default state
+        $backupoptions = $this->options;// save original options
+        $this->options->charsetuserinscription  = (bool)$charsetuserinscr;
+        $this->options->rangelengthmax          = (int)$rangelengthmax;
         // make description
         if(isset($this->dst_root)){
             $string = $this->dst_root->description($numbering_pattern,null,null);
@@ -83,14 +188,13 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
         if($wholepattern !== null && $wholepattern !== ''){
             $string = str_replace('%s',$string,$wholepattern);
         }
-        $this->descriptionoptions = $defoptions;// restore default options
+        $this->options = $backupoptions; // restore original options
         return $string;
     }
     
     private static function postprocessing($s){
 
         $result = preg_replace('%;((?:</span>)?)]%','\1]',$s);
-        //$result = str_replace('not not ','',$result); // TODO - analyze this into charset
         return $result;
     }
     
@@ -128,7 +232,6 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
-       
         return true;
     }
     
@@ -145,8 +248,8 @@ abstract class qtype_preg_description_node{
     /** @var qtype_preg_node Aggregates a pointer to the automatically generated abstract node */
     public $pregnode;
     
-    /** @var Reference to array with options */
-    public $options;
+    /** @var Reference to handler (for reading global option) */
+    public $handler;
     
     /**
      * Constructs node.
@@ -154,8 +257,8 @@ abstract class qtype_preg_description_node{
      * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.                                    
      * @param type $matcher Reference to handler, which generates nodes.
      */
-    public function __construct($node, $matcher) {
-        $this->options = &$matcher->descriptionoptions;
+    public function __construct($node, &$matcher) {
+        $this->handler =& $matcher;
         $this->pregnode = $node;
     }
     
@@ -191,12 +294,6 @@ abstract class qtype_preg_description_node{
         if(isset($form) && $form !== ''){
             $s.='_'.$form;
         }
-        /* exeption throws automaticly?
-        $return = get_string($s);
-        if($return == null){
-            throw new coding_exception($s.' is missing in current lang file of preg description', 'ask localizator of preg description module');
-        }
-        return $return;*/
         return get_string($s,'qtype_preg');
     }
     
@@ -212,7 +309,7 @@ abstract class qtype_preg_description_node{
      * 
      * @param type $s this string will be placed instead of %s
      */
-    protected function numbering_pattern($numbering_pattern,$s){       
+    protected function numbering_pattern($numbering_pattern,$s) {       
         return str_replace('%s',$s,str_replace('%n',$this->pregnode->id,$numbering_pattern));
     }
 }
@@ -227,7 +324,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
      */
     public function pattern($node_parent=null,$form=null){
         
-        return 'seems like this pattern() for this node didnt redefined';
+        return 'seems like pattern() for '.get_class($this).' node didnt redefined';
     }
     
     /**
@@ -239,7 +336,6 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
         $this->pattern = $this->pattern($node_parent,$form);
         //var_dump($this->pattern);
         $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
-        qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
     }
 }
@@ -428,7 +524,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf{
             } else {
                 $ranges = self::find_ranges($flag->data);
                 //var_dump($ranges);
-                $rangelengthmax = $this->options[qtype_preg_author_tool_description::OPT_RANGELIMIT];
+                $rangelengthmax =& $this->handler->options->rangelengthmax;
                 foreach($ranges as $range){
                     if(is_int($range)){ // $range is a code of character
                         $characters[] = self::describe_chr($range,true,$form);
@@ -590,11 +686,11 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
      * @param string $node_pattern description of current node
      * @param array $options array of options
      */
-    public static function check_options($node,&$node_pattern,$form=null){
+    /*public static function check_options($node,&$node_pattern,$form=null){
         $caselesskey = qtype_preg_author_tool_description::OPT_CASELESS;
         /*if(isset($node->options[$caselesskey])){ //set def value
             $node->options[$caselesskey] = false;
-        }*/
+        }*
         
         if(isset($node->pregnode->caseinsensitive)){
 
@@ -610,17 +706,7 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
 
             }
         }
-        /*else{
-            $need_pattern = $node->pregnode->type===qtype_preg_node::TYPE_NODE_SUBPATT || 
-                    $node->pregnode->type===qtype_preg_node::TYPE_NODE_COND_SUBPATT ||
-                    (count($node->pregnode->operands)>=2 && isset($node->operand[1]->pregnode->caseinsensitive) && 
-                     $node->operand[1]->pregnode->caseinsensitive===false);
-            if($need_pattern){    
-                $node_pattern = self::caseinsensitive($node_pattern);
-                var_dump($node_pattern);
-            }
-        }*/
-    }
+    }*/
    
 }
 
@@ -723,7 +809,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
      */
     public function pattern($node_parent=null,$form=null){
         
-        return 'seems like this pattern() for this node didnt redefined';
+        return 'seems like pattern() for '.get_class($this).' node didnt redefined';
     }
     
     /**
@@ -746,7 +832,6 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
             $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
             $description = str_replace($matches[0],$child_description,$description);
         }
-        qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
     }
 }
@@ -863,6 +948,7 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
         $subtype1 = $this->operands[0]->pregnode->subtype;
         $subtype2 = $this->operands[1]->pregnode->subtype;
         
+        // TODO - calculate flags inside if-esle block for optimization
         $needshortpattern = $type1===qtype_preg_node::TYPE_LEAF_CHARSET &&
                 $this->operands[0]->is_one_char() &&
                 $type2===qtype_preg_node::TYPE_LEAF_CHARSET &&
