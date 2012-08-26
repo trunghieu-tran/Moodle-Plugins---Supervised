@@ -5,7 +5,7 @@ require_once(dirname(dirname(__FILE__)).'/answer.php');
 class answer_file extends poasassignment_answer {
     var $checked;
     var $fieldnames = array ( 'fileamount','maxfilesize','fileextensions');
-    function answer_file() {
+    function __construct() {
         global $DB;
         $plugin = $DB->get_record('poasassignment_answers',
                                   array('name' => 'answer_file'));
@@ -189,7 +189,7 @@ class answer_file extends poasassignment_answer {
                 'answerid'=>$this->answerid);
         return $DB->delete_records('poasassignment_ans_stngs',$conditions);
     }
-    function show_answer_form($mform,$poasassignmentid) {
+    function show_answer_form($mform, $poasassignmentid) {
         global $DB;
         $mform->addElement('header', 
                            'answerfileheader', 
