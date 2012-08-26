@@ -2,6 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'POAS assignment';
+$string['modulename_help'] = "The POAS assignment module allows teachers to develop single task or variations of task, collect work from students, review it and provide feedback including multi-criterion grades. Module can distribute multiple task’s variants between students in different ways, using one of distribution strategies.";
 $string['submissionoptions'] = 'Submission options';
 $string['modulenameplural'] = 'POAS assignments';
 $string['poasassignmentfieldset'] = 'Individual tasks';
@@ -226,6 +227,7 @@ $string['graderresults'] = 'Grader\'s results';
 $string['graderresults_help'] = 'Help';
 $string['assignee'] = 'Student';
 $string['attempt'] = 'Attempt';
+$string['poasassignment:addinstance'] = 'Ability to create new instances';
 $string['poasassignment:finalgrades'] = 'Ability to finalize grades';
 $string['poasassignment:grade'] = 'Ability to grade student\'s work';
 $string['poasassignment:manageanything'] = 'Ability to do anything';

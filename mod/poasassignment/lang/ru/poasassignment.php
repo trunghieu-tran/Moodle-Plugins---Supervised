@@ -2,6 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'POAS assignment';
+$string['modulename_help'] = "Модуль POAS assignment позволяет преподавателям создавать задния (одно для всех студентов или набор заданий), собирать ответы студентов, осуществлять проверку и оценивание работ по нескольким критериям. Модуль может распределять задания между студентами различными способами.";
 $string['modulenameplural'] = 'POAS assignments';
 $string['poasassignmentfieldset'] = 'Индивидуальные задания';
 $string['poasassignmentname'] = 'Название задания';
@@ -143,6 +144,7 @@ $string['attemptnumber'] = 'Номер попытки';
 $string['lastattempt'] = 'Последняя попытка';
 $string['penalty'] = 'Штрафные баллы';
 $string['totalratingis'] = 'Итоговый балл';
+$string['poasassignment:addinstance'] = 'Право создавать новые POAS assignment\'ы';
 $string['poasassignment:view'] = 'Право видеть общедоступную информацию';
 $string['poasassignment:havetask'] = 'Право получать и выполнять задание';
 $string['poasassignment:grade'] = 'Право оценивать работу';
