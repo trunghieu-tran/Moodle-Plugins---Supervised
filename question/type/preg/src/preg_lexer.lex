@@ -678,7 +678,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
      */
     protected function form_charset($text, $pos, $length, $subtype, $data, $negative = false) {
         $node = new qtype_preg_leaf_charset();
-        $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $subtype !== qtype_preg_charset_flag::SET)));
+        $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
+        $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
         if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
             $node->caseinsensitive = true;
         }
@@ -839,7 +840,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             break;
         case qtype_preg_charset_flag::FLAG:
         case qtype_preg_charset_flag::UPROP:
-            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
             $flag = new qtype_preg_charset_flag;
             $flag->set_data($type, $data);
             $flag->negative = $negative;
@@ -1511,7 +1512,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
     $this->charset->error[] = $error;
-    $this->charsetuserinscription[] = new qtype_preg_userinscription($text, false); // Note, addinfo is false because there are no such constants in the lang file.
+    $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
 }
 <CHARSET> ("\p"|"\P"). {
     $text = $this->yytext();
@@ -1522,7 +1523,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
         $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
         $this->charset->error[] = $error;
-        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
+        $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
     } else {
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
@@ -1544,7 +1545,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_UNICODE_PROPERTY, htmlspecialchars($str));
             $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1);
             $this->charset->error[] = $error;
-            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, true);
+            $this->charsetuserinscription[] = new qtype_preg_userinscription($text, qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         } else {
             $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
         }
