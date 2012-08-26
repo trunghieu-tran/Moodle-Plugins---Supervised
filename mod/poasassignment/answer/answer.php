@@ -4,23 +4,33 @@ class poasassignment_answer {
 
     var $answerid;
     
-    function poasassignment_answer() {
+    function __construct() {
     }
-    
-    // Displays subplugin's settings in mod_form.php
-    function show_settings($mform) {
+
+    /**
+     * Displays subplugin's settings in mod_form.php
+     *
+     * @param $mform - POAS assignment mod_form.php moodle form
+     * @param $poasassignmentid - POAS assignment instance id
+     */
+    function show_settings($mform, $poasassignmentid) {
     }
     
     // Vaildates subplugin's settigns in mod_form.php
     static function validation($data, &$errors) {
     }
-    
-    // Displays form to input an answer
-    function show_answer_form() {
+
+    /**
+     * Displays form to input an answer
+     *
+     * @param $mform - POAS assignment mod_form.php moodle form
+     * @param $poasassignmentid - POAS assignment instance id
+     */
+    function show_answer_form($mform, $poasassignmentid) {
     }
     
     // Saves subplugin settings in DB
-    function save_settings($poasassignmentanswer) {
+    function save_settings($poasassignment, $id) {
     }
     // Delete all subplugin settings from DB
     function delete_settings($poasassignmentid) {

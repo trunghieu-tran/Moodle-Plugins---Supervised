@@ -4,7 +4,7 @@ require_once(dirname(dirname(__FILE__)).'/answer.php');
 // require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class answer_text extends poasassignment_answer {
     var $checked;
-    function answer_text() {
+    function __construct() {
         global $DB;
         $plugin = $DB->get_record('poasassignment_answers', 
                                   array('name' => 'answer_text'));
@@ -33,7 +33,7 @@ class answer_text extends poasassignment_answer {
                               'answertext', 
                               'poasassignmentanswertypes_answer_text');
     }
-    function show_answer_form($mform) {
+    function show_answer_form($mform, $poasassignmentid = false) {
         $mform->addElement('header',
                            'answertextheader',
                            get_string('answertext','poasassignmentanswertypes_answer_text'));
