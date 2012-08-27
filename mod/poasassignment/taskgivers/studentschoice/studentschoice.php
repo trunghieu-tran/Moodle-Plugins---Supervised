@@ -3,26 +3,30 @@ global $CFG;
 require_once dirname(dirname(__FILE__)).'/taskgiver.php';
 require_once($CFG->libdir.'/formslib.php');
 class studentschoice extends taskgiver {
-//    function print_before_tasks() {
-//        echo "students choice";
-//    }
     public static function has_settings() {
         return false;
     }
     public static function show_tasks() {
         return true;
     }
-    
-    function get_task_extra_string($taskid,$cmid) {
-        global $USER,$OUTPUT;
 
-        $takeurl = new moodle_url('warning.php?id='.$cmid.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id);
-        $takeicon= '<a href="'.$takeurl.'">'.'<img src="'.$OUTPUT->pix_url('taketask','poasassignment').
-                    '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('taketask','poasassignment').'" /></a>';
+    /**
+     * Get html to add after task name in table cell
+     *
+     * @param $taskid poas assignment task id
+     * @param $cmid course module id
+     * @return mixed html code to add after task name
+     */
+    function get_task_extra_string($taskid, $cmid) {
+        global $USER,$OUTPUT;
+        $takeicon = '';
+        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+            // Require mod/poasassignment:havetask to show 'take task' link
+            $takeurl = new moodle_url('warning.php?id='.$cmid.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id);
+            $takeicon = '<a href="'.$takeurl.'">'.'<img src="'.$OUTPUT->pix_url('taketask','poasassignment').
+                '" class="iconsmall" alt="'.get_string('view').'" title="'.get_string('taketask','poasassignment').'" /></a>';
+        }
         return $takeicon;
     }
-//    function print_after_tasks() {
-//        echo 'Good bye!';
-//    }
 }
 ?>
