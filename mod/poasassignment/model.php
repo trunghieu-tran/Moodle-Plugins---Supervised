@@ -97,8 +97,11 @@ class poasassignment_model {
         else {
             //echo 'Constructing model without id';
         }
-        if (!$this->assignee)
-            $this->assignee->id=0;
+        if (!$this->assignee) {
+            $this->assignee = new stdClass();
+            $this->assignee->id = 0;
+        }
+
         $this->initArrays();
     }
     /**
