@@ -52,31 +52,32 @@ class criterions_page extends abstract_page {
      * @return array criterions
      */
     private function get_criterions_from_post() {
-    	$count = required_param('option_repeats', PARAM_INT);
-    	
-    	$names = required_param('name', PARAM_RAW);
-    	$descriptions = required_param('description', PARAM_RAW);
-    	$weights = required_param('weight', PARAM_RAW);
-    	$sources = required_param('source', PARAM_RAW);
-    	$criterionids = required_param('criterionid', PARAM_RAW);
-    	$delete = optional_param('delete', array(), PARAM_RAW);
-    	
-    	$criterions = array();
-    	for ($i = 0; $i < $count; $i++) {
-    		if ($names[$i] != '') {
-    			$criterion = new stdClass();
-    			$criterion->id = $criterionids[$i];
-    			$criterion->name = $names[$i];
-    			$criterion->description = $descriptions[$i];
-    			$criterion->weight = $weights[$i];
-    			$criterion->graderid = $sources[$i];
-    			$criterion->delete = isset($delete[$i]) && $delete[$i] == 1;
-    			$criterion->poasassignmentid = $this->poasassignment->id;
-    			
-    			$criterions[] = $criterion;
-    		}
-    	}
-    	return $criterions;
+        $count = required_param('option_repeats', PARAM_INT);
+
+        $names = required_param_array('name', PARAM_CLEANHTML);
+        $descriptions = required_param_array('description', PARAM_RAW);
+        $weights = required_param_array('weight', PARAM_RAW);
+        $sources = required_param_array('source', PARAM_INT);
+        $criterionids = required_param_array('criterionid', PARAM_INT);
+        if (isset($_REQUEST['delete']))
+            $delete = required_param_array('delete', array(), PARAM_CLEANHTML);
+
+        $criterions = array();
+        for ($i = 0; $i < $count; $i++) {
+            if ($names[$i] != '') {
+                $criterion = new stdClass();
+                $criterion->id = $criterionids[$i];
+                $criterion->name = $names[$i];
+                $criterion->description = $descriptions[$i];
+                $criterion->weight = $weights[$i];
+                $criterion->graderid = $sources[$i];
+                $criterion->delete = isset($delete[$i]) && $delete[$i] == 1;
+                $criterion->poasassignmentid = $this->poasassignment->id;
+
+                $criterions[] = $criterion;
+            }
+        }
+        return $criterions;
     }
     
     /**
@@ -318,10 +319,10 @@ class criterionsedit_form extends moodleform {
         $instance = $this->_customdata;
 
         $repeatarray = array();
-        $repeatarray[] = &MoodleQuickForm::createElement('header', 'criterionheader');
-        $repeatarray[] = &MoodleQuickForm::createElement('text', 'name', get_string('criterionname','poasassignment'),array('size'=>45));
+        $repeatarray[] = $mform->createElement('header', 'criterionheader');
+        $repeatarray[] = $mform->createElement('text', 'name', get_string('criterionname','poasassignment'),array('size'=>45));
         $repeatarray[] = $mform->createElement('textarea', 'description', get_string('criteriondescription','poasassignment'));
-        $repeatarray[] = &MoodleQuickForm::createElement('text', 'weight', get_string('criterionweight','poasassignment'));
+        $repeatarray[] = $mform->createElement('text', 'weight', get_string('criterionweight','poasassignment'));
         $sources[0] = 'manually';
         //TODO cash used graders in model class
         $usedgraders = $DB->get_records('poasassignment_used_graders',array('poasassignmentid' => $instance['poasassignmentid']));
@@ -336,9 +337,9 @@ class criterionsedit_form extends moodleform {
             $mform->addElement('hidden', 'grader' . (count($sources) - 1), $usedgraderrecord->graderid);
             $mform->setType('grader' . (count($sources) - 1), PARAM_INT);
         }
-        $repeatarray[] = &MoodleQuickForm::createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);
+        $repeatarray[] = $mform->createElement('select', 'source', get_string('criterionsource','poasassignment'),$sources);
         $repeatarray[] = $mform->createElement('checkbox', 'delete', get_string('deletecriterion', 'poasassignment'));
-        $repeatarray[] = &MoodleQuickForm::createElement('hidden', 'criterionid', -1);
+        $repeatarray[] = $mform->createElement('hidden', 'criterionid', -1);
 
         if ($instance){
             $repeatno = $DB->count_records('poasassignment_criterions', array('poasassignmentid'=>$instance['poasassignmentid']));
