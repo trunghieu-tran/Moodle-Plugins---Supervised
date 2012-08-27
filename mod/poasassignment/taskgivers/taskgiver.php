@@ -7,7 +7,7 @@
  */
 abstract class taskgiver {
     public function process_before_tasks() {}
-    public function get_task_extra_string(){}
+    public function get_task_extra_string($taskid, $cmid){}
     public function process_after_tasks() {}
     public function get_settings_form($id, $poasassignmentid) {}
     public function get_settings($poasassignmentid) {}
