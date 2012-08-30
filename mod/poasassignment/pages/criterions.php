@@ -8,47 +8,47 @@ class criterions_page extends abstract_page {
     private $mform;
 
     function __construct($cm, $poasassignment) {
-    	$this->cm = $cm;
-    	$this->poasassignment = $poasassignment;
+        $this->cm = $cm;
+        $this->poasassignment = $poasassignment;
     }
 
     public function pre_view() {
         if (optional_param('mode', '', PARAM_ACTION) == 'updateconfirmed') {
-        	$this->update_confirmed();
+            $this->update_confirmed();
         }
     }
     function view() {
         global $DB, $OUTPUT;
         $poasmodel = poasassignment_model::get_instance();
         $id = $poasmodel->get_cm()->id;
-		$context = $poasmodel->get_context();
-		
-		if (has_capability('mod/poasassignment:managecriterions', $context)) {
-			$this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
-			if($this->mform->get_data()) {
-				$data = $this->mform->get_data();
-				$this->confirm_update($data);
-				/*
-				 $result = $poasmodel->save_criterion($data);
-				if ($result == POASASSIGNMENT_CRITERION_OK) {
-				redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
-				}*/
-			}
-			else {			
-				$this->mform->set_data($poasmodel->get_criterions_data());
-				$this->mform->display();
-			}
-		}
-		else {
-			$this->show_read_only_criterions();
-		}
+        $context = $poasmodel->get_context();
+
+        if (has_capability('mod/poasassignment:managecriterions', $context)) {
+            $this->mform = new criterionsedit_form(null, array('id' => $id, 'poasassignmentid' => $poasmodel->get_poasassignment()->id));
+            if($this->mform->get_data()) {
+                $data = $this->mform->get_data();
+                $this->confirm_update($data);
+                /*
+                     $result = $poasmodel->save_criterion($data);
+                    if ($result == POASASSIGNMENT_CRITERION_OK) {
+                    redirect(new moodle_url('view.php', array('id' => $id, 'page' => 'criterions')), null, 0);
+                    }*/
+            }
+            else {
+                $this->mform->set_data($poasmodel->get_criterions_data());
+                $this->mform->display();
+            }
+        }
+        else {
+            $this->show_read_only_criterions();
+        }
 
     }
-    
-    /** 
+
+    /**
      * Extract criterion objects from POST
-     * 
-     * @access private 
+     *
+     * @access private
      * @return array criterions
      */
     private function get_criterions_from_post() {
@@ -60,7 +60,7 @@ class criterions_page extends abstract_page {
         $sources = required_param_array('source', PARAM_INT);
         $criterionids = required_param_array('criterionid', PARAM_INT);
         if (isset($_REQUEST['delete']))
-            $delete = required_param_array('delete', array(), PARAM_CLEANHTML);
+            $delete = required_param_array('delete', PARAM_CLEANHTML);
 
         $criterions = array();
         for ($i = 0; $i < $count; $i++) {
@@ -79,210 +79,210 @@ class criterions_page extends abstract_page {
         }
         return $criterions;
     }
-    
+
     /**
      * Returns true, if $data param contains info about new criterion(s) data
-     * 
+     *
      * @access private
      * @param object $data criterions data
      * @return boolean true if there is at least 1 new criterion
      */
     private function has_new_criterions($data) {
-    	foreach ($data->name as $index => $name) {
-    		if ($name != '' && isset($data->criterionid[$index]) && $data->criterionid[$index] == -1) {
-    			return true;
-    		}
-    	}
-    	return false;
+        foreach ($data->name as $index => $name) {
+            if ($name != '' && isset($data->criterionid[$index]) && $data->criterionid[$index] == -1) {
+                return true;
+            }
+        }
+        return false;
     }
-    
-    private function update_confirmed() {
-    	if (required_param('confirm', PARAM_TEXT) == get_string('no')) {
-    		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions')));
-    	}
-    	if (required_param('confirm', PARAM_TEXT) == get_string('yes')) {
-    		$model = poasassignment_model::get_instance();
-    		$gradedcount = required_param('gradedcount', PARAM_INT);
-    		$insertedcriterions = $model->update_criterions($this->get_criterions_from_post());
-    		if ($gradedcount > 0) {
-    			$assigneeids = required_param('assigneeids', PARAM_RAW);
-    			
-    			foreach($assigneeids as $assigneeid) {
-    				if (count($insertedcriterions) > 0) {
-    					$action = required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT);
-	    				switch($action) {
-	    					case 'put0':
-	    						$model->new_criterion_rating($assigneeid, $insertedcriterions, 0, get_string('newcriterionwithgrade', 'poasassignment').' 0');
-	    						break;
-    						case 'put100':
-    							$model->new_criterion_rating($assigneeid, $insertedcriterions, 100, get_string('newcriterionwithgrade', 'poasassignment').' 100');
-    							break;
-    						case 'puttotal':
-    							$model->new_criterion_rating($assigneeid, $insertedcriterions, 'total', get_string('newcriterionwithgradetotal', 'poasassignment'));
-    							break;
-    						case 'putspecified':   
-    							$grade = required_param('specified_'.$assigneeid, PARAM_INT); 							
-    							$model->new_criterion_rating(
-    								$assigneeid, 
-    								$insertedcriterions, 
-    								$grade, 
-    								get_string('newcriterionwithgradespecified', 'poasassignment').' '.$grade);
-    							break;
-    						case 'putnull':
-    							$model->new_criterion_rating($assigneeid, $insertedcriterions, null, get_string('newcriterionwithgrade', 'poasassignment').' null');
-    							break;
-	    				}
-    				}
-    				$model->recalculate_rating($assigneeid);
-    			}
 
-    		}
-    		redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions'), 'redirecting...'));
-    	}
+    private function update_confirmed() {
+        if (required_param('confirm', PARAM_TEXT) == get_string('no')) {
+            redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions')));
+        }
+        if (required_param('confirm', PARAM_TEXT) == get_string('yes')) {
+            $model = poasassignment_model::get_instance();
+            $gradedcount = required_param('gradedcount', PARAM_INT);
+            $insertedcriterions = $model->update_criterions($this->get_criterions_from_post());
+            if ($gradedcount > 0) {
+                $assigneeids = required_param('assigneeids', PARAM_RAW);
+
+                foreach($assigneeids as $assigneeid) {
+                    if (count($insertedcriterions) > 0) {
+                        $action = required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT);
+                        switch($action) {
+                            case 'put0':
+                                $model->new_criterion_rating($assigneeid, $insertedcriterions, 0, get_string('newcriterionwithgrade', 'poasassignment').' 0');
+                                break;
+                            case 'put100':
+                                $model->new_criterion_rating($assigneeid, $insertedcriterions, 100, get_string('newcriterionwithgrade', 'poasassignment').' 100');
+                                break;
+                            case 'puttotal':
+                                $model->new_criterion_rating($assigneeid, $insertedcriterions, 'total', get_string('newcriterionwithgradetotal', 'poasassignment'));
+                                break;
+                            case 'putspecified':
+                                $grade = required_param('specified_'.$assigneeid, PARAM_INT);
+                                $model->new_criterion_rating(
+                                    $assigneeid,
+                                    $insertedcriterions,
+                                    $grade,
+                                    get_string('newcriterionwithgradespecified', 'poasassignment').' '.$grade);
+                                break;
+                            case 'putnull':
+                                $model->new_criterion_rating($assigneeid, $insertedcriterions, null, get_string('newcriterionwithgrade', 'poasassignment').' null');
+                                break;
+                        }
+                    }
+                    $model->recalculate_rating($assigneeid);
+                }
+
+            }
+            redirect(new moodle_url('view.php?', array('id' => $this->cm->id, 'page' => 'criterions'), 'redirecting...'));
+        }
     }
     /**
      * Show confirm update criterions page
-     * 
+     *
      * @access private
      * @param object $data data from criterions moodleform
      */
     private function confirm_update($data) {
-    	global $OUTPUT;
-    	$model = poasassignment_model::get_instance();
-    	// Open form
-    	echo '<form action="view.php?page=criterions&id='.$this->cm->id.'" method="post">';
-    	
-    	$has_rated_attempts = $model->instance_has_rated_attempts();
-    	if ($has_rated_attempts) {
-    		$graded = $model->get_graded_assignees();
-    		echo '<input type="hidden" name="gradedcount" value="' . count($graded) . '"/>';
-    		// Show table of graded students
-    		$usersinfo = $model->get_users_info($graded);
-    		print_string('gradedassignees', 'poasassignment');
-    		require_once ('poasassignment_view.php');
-    		
-    		$extcolumns = array(
-    				'task',
-    				'put0',
-    				'put100',
-    				'puttotal',
-    				'putspecified',
-    				'putnull'
-    		);
-    		$extheaders = array(
-    				get_string('task', 'poasassignment'),
-    		
-    				get_string('put0', 'poasassignment').' '.
-    				$OUTPUT->help_icon('put0', 'poasassignment'),
-    				
-    				get_string('put100', 'poasassignment').' '.
-					$OUTPUT->help_icon('put100', 'poasassignment'),
-    				
-    				get_string('puttotal', 'poasassignment').' '.
-    				$OUTPUT->help_icon('puttotal', 'poasassignment'),
-    				
-    				get_string('putspecified', 'poasassignment').' '.
-    				$OUTPUT->help_icon('putspecified', 'poasassignment'),
-    		
-    				get_string('putnull', 'poasassignment').' '.
-    				$OUTPUT->help_icon('putnull', 'poasassignment')
-    		);
-    		
-    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
-    		foreach ($usersinfo as $userinfo) {
-    			$table->add_data($this->get_graded($userinfo));
-    			echo '<input type="hidden" name="assigneeids[]" value="'.$userinfo->id.'"/>';
-    		}
-    		$table->print_html();
-    	}
-    	else {
-    		echo '<input type="hidden" name="gradedcount" value="0"/>';
-    		print_string('nobodyhasgrade', 'poasassignment');
-    	}
-    	
-    	// Ask user to confirm update
-    	echo '<br/>';
-    	print_string('updatecriterionsconfirmation', 'poasassignment');
-    	if ($has_rated_attempts) {
-    		echo ' <span class="poasassignment-critical">(';
-    		print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
-    		echo ')</span>';
-    	}
-    	// Add updated criterions in hidden elements
-    	echo '<input type="hidden" name="option_repeats" value="'.$data->option_repeats.'"/>';
-    	foreach($data->name as $name) {
-    		echo '<input type="hidden" name="name[]" value="'.$name.'"/>';
-    	}
-    	foreach($data->description as $description) {
-    		echo '<input type="hidden" name="description[]" value="'.$description.'"/>';
-    	}    	
-    	foreach($data->weight as $weight) {
-    		echo '<input type="hidden" name="weight[]" value="'.$weight.'"/>';
-    	}
-    	foreach($data->source as $source) {
-    		echo '<input type="hidden" name="source[]" value="'.$source.'"/>';
-    	}
-    	foreach($data->criterionid as $criterionid) {
-    		echo '<input type="hidden" name="criterionid[]" value="'.$criterionid.'"/>';
-    	}
-    	if (isset($data->delete)) {
-	    	foreach($data->delete as $key => $delete) {
-	    		echo '<input type="hidden" name="delete['.$key.']" value="'.$delete.'"/>';
-	    	}
-    	}
-    	
-    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
-    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
-    	echo '<input type="hidden" name="mode" value="updateconfirmed"/>';
-    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
-    	echo '</form>';
+        global $OUTPUT;
+        $model = poasassignment_model::get_instance();
+        // Open form
+        echo '<form action="view.php?page=criterions&id='.$this->cm->id.'" method="post">';
+
+        $has_rated_attempts = $model->instance_has_rated_attempts();
+        if ($has_rated_attempts) {
+            $graded = $model->get_graded_assignees();
+            echo '<input type="hidden" name="gradedcount" value="' . count($graded) . '"/>';
+            // Show table of graded students
+            $usersinfo = $model->get_users_info($graded);
+            print_string('gradedassignees', 'poasassignment');
+            require_once ('poasassignment_view.php');
+
+            $extcolumns = array(
+                'task',
+                'put0',
+                'put100',
+                'puttotal',
+                'putspecified',
+                'putnull'
+            );
+            $extheaders = array(
+                get_string('task', 'poasassignment'),
+
+                get_string('put0', 'poasassignment').' '.
+                    $OUTPUT->help_icon('put0', 'poasassignment'),
+
+                get_string('put100', 'poasassignment').' '.
+                    $OUTPUT->help_icon('put100', 'poasassignment'),
+
+                get_string('puttotal', 'poasassignment').' '.
+                    $OUTPUT->help_icon('puttotal', 'poasassignment'),
+
+                get_string('putspecified', 'poasassignment').' '.
+                    $OUTPUT->help_icon('putspecified', 'poasassignment'),
+
+                get_string('putnull', 'poasassignment').' '.
+                    $OUTPUT->help_icon('putnull', 'poasassignment')
+            );
+
+            $table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
+            foreach ($usersinfo as $userinfo) {
+                $table->add_data($this->get_graded($userinfo));
+                echo '<input type="hidden" name="assigneeids[]" value="'.$userinfo->id.'"/>';
+            }
+            $table->print_html();
+        }
+        else {
+            echo '<input type="hidden" name="gradedcount" value="0"/>';
+            print_string('nobodyhasgrade', 'poasassignment');
+        }
+
+        // Ask user to confirm update
+        echo '<br/>';
+        print_string('updatecriterionsconfirmation', 'poasassignment');
+        if ($has_rated_attempts) {
+            echo ' <span class="poasassignment-critical">(';
+            print_string('changingcriterionswillchangestudentsdata', 'poasassignment');
+            echo ')</span>';
+        }
+        // Add updated criterions in hidden elements
+        echo '<input type="hidden" name="option_repeats" value="'.$data->option_repeats.'"/>';
+        foreach($data->name as $name) {
+            echo '<input type="hidden" name="name[]" value="'.$name.'"/>';
+        }
+        foreach($data->description as $description) {
+            echo '<input type="hidden" name="description[]" value="'.$description.'"/>';
+        }
+        foreach($data->weight as $weight) {
+            echo '<input type="hidden" name="weight[]" value="'.$weight.'"/>';
+        }
+        foreach($data->source as $source) {
+            echo '<input type="hidden" name="source[]" value="'.$source.'"/>';
+        }
+        foreach($data->criterionid as $criterionid) {
+            echo '<input type="hidden" name="criterionid[]" value="'.$criterionid.'"/>';
+        }
+        if (isset($data->delete)) {
+            foreach($data->delete as $key => $delete) {
+                echo '<input type="hidden" name="delete['.$key.']" value="'.$delete.'"/>';
+            }
+        }
+
+        $nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+        $yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+        echo '<input type="hidden" name="mode" value="updateconfirmed"/>';
+        echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+        echo '</form>';
     }
-    
+
     /**
      * Get row for graded assignees flexible table
-     * 
+     *
      * @access public
      * @param object $userinfo graded assignee
      * @return array row
      */
     private function get_graded($userinfo) {
-    	$model = poasassignment_model::get_instance();
-    	$row = $model->get_flexible_table_assignees_row($userinfo);
-    	// Get link to student's task
-    	$taskurl = new moodle_url(
-    			'view.php',
-    			array(
-    					'page' => 'taskview',
-    					'taskid' => $userinfo->taskid,
-    					'id' => $model->get_cm()->id
-    			)
-    	);
-    	
-    	$task = $model->get_task_info($userinfo->taskid);
-    	$row[] = html_writer::link($taskurl, $task->name . $model->help_icon($task->description));
-    	
-    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put0"></input>';
-    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put100"></input>';
-    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="puttotal" checked="checked"></input>';
-    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putspecified"></input>'
-    				.'<input type="text" name="specified_'.$userinfo->id.'" value="77" style="width:30px"/>';
-    	$row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putnull"></input>';
-    	return $row;
+        $model = poasassignment_model::get_instance();
+        $row = $model->get_flexible_table_assignees_row($userinfo);
+        // Get link to student's task
+        $taskurl = new moodle_url(
+            'view.php',
+            array(
+                'page' => 'taskview',
+                'taskid' => $userinfo->taskid,
+                'id' => $model->get_cm()->id
+            )
+        );
+
+        $task = $model->get_task_info($userinfo->taskid);
+        $row[] = html_writer::link($taskurl, $task->name . $model->help_icon($task->description));
+
+        $row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put0"></input>';
+        $row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="put100"></input>';
+        $row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="puttotal" checked="checked"></input>';
+        $row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putspecified"></input>'
+            .'<input type="text" name="specified_'.$userinfo->id.'" value="77" style="width:30px"/>';
+        $row[] = '<input type="radio" name="action_'.$userinfo->id.'" value="putnull"></input>';
+        return $row;
     }
-	private function show_read_only_criterions() {
-		global $OUTPUT, $DB;
-		$poasmodel = poasassignment_model::get_instance();
-		$criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $poasmodel->poasassignment->id));
+    private function show_read_only_criterions() {
+        global $OUTPUT, $DB;
+        $poasmodel = poasassignment_model::get_instance();
+        $criterions = $DB->get_records('poasassignment_criterions', array('poasassignmentid' => $poasmodel->poasassignment->id));
         if (count($criterions) == 0) {
             echo '<p class=no-info-message>'.get_string('nocriterions','poasassignment').'</p>';
             return;
         }
-		$weightsum = 0;
-		foreach($criterions as $criterion) {
+        $weightsum = 0;
+        foreach($criterions as $criterion) {
             $weightsum += $criterion->weight;
-		}
-		$canseedescription = has_capability('mod/poasassignment:seecriteriondescription',
-											$poasmodel->get_context());
+        }
+        $canseedescription = has_capability('mod/poasassignment:seecriteriondescription',
+            $poasmodel->get_context());
         echo '<table class="poasassignment-table">';
         echo '<tr>';
         echo '<td class = "header">' . get_string('criterionname', 'poasassignment') . '</td>';
@@ -291,26 +291,26 @@ class criterions_page extends abstract_page {
         }
         echo '<td class = "header">' . get_string('criterionweight', 'poasassignment') . '</td>';
         echo '</tr>';
-		foreach ($criterions as $criterion) {
+        foreach ($criterions as $criterion) {
             echo '<tr>';
 
-			echo '<td>' . $criterion->name . '</td>';
+            echo '<td>' . $criterion->name . '</td>';
 
             echo '<td>';
-			if ($canseedescription) {
-				echo $criterion->description;
-			}
+            if ($canseedescription) {
+                echo $criterion->description;
+            }
             else {
                 echo '-';
             }
             echo '</td>';
 
-			echo '<td>' . round($criterion->weight / $weightsum, 2) . '</td>';
+            echo '<td>' . round($criterion->weight / $weightsum, 2) . '</td>';
 
             echo '</tr>';
-		}
+        }
         echo '</table>';
-	}
+    }
 }
 class criterionsedit_form extends moodleform {
     function definition(){
@@ -354,14 +354,14 @@ class criterionsedit_form extends moodleform {
         $repeateloptions['description']['helpbutton'] = array('criteriondescription', 'poasassignment');
         $repeateloptions['weight']['helpbutton'] = array('criterionweight', 'poasassignment');
         $repeateloptions['source']['helpbutton'] = array('criterionsource', 'poasassignment');
-        
+
         $repeateloptions['delete']['default'] = 0;
         $repeateloptions['delete']['disabledif'] = array('criterionid', 'eq', -1);
 
         $mform->setType('criterionid', PARAM_INT);
 
         $this->repeat_elements($repeatarray, $repeatno,
-                    $repeateloptions, 'option_repeats', 'option_add_fields', 2);
+            $repeateloptions, 'option_repeats', 'option_add_fields', 2);
 
         $mform->addElement('hidden', 'id', $instance['id']);
         $mform->setType('id', PARAM_INT);
