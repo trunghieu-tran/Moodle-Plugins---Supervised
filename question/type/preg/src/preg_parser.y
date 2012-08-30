@@ -96,7 +96,7 @@
             $result->subtype = $parens->subtype;
             $result->operands[0] = $exprnode;
             $result->id = $this->idcounter++;
-            $result->userinscription = new qtype_preg_userinscription($parens->userinscription->data . ' ... )');
+            $result->userinscription = new qtype_preg_userinscription($parens->userinscription->data . '...)');
         }
         $result->set_user_info($parens->indfirst, $exprnode->indlast + 1, $result->userinscription);
         return $result;
@@ -139,9 +139,9 @@
         }
         $result->operands[2] = new qtype_preg_node_assert($subtype);
         $result->operands[2]->operands[0] = $assertnode;
-        $result->operands[2]->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($paren->userinscription->data, 2) . ' ... )');
+        $result->operands[2]->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($paren->userinscription->data, 2) . '...)');
         $result->operands[2]->id = $this->idcounter++;
-        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . ' ... ) ... | .... )'));
+        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...)...|...)'));
         $result->id = $this->idcounter++;
         $this->reducecount++;
         return $result;
@@ -171,7 +171,7 @@
         if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT) {
             $result->number = $paren->number;
         }
-        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . ' ... | .... )'));
+        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...|...)'));
         $result->id = $this->idcounter++;
         $this->reducecount++;
         return $result;
