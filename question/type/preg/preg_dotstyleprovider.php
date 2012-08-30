@@ -5,7 +5,7 @@
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
- * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>, Terechov Grigiry <grvlter@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,12 +38,12 @@ class qtype_preg_dot_style_provider {
                 $tooltip .= $tmptooltip . ' ';
             }
         } else {
-            $label .= qtype_preg_dot_style_provider::get_spec_symbol($pregnode->userinscription, $tmptooltip, 10);
-            $tooltip .= $tmptooltip . ' ';
+            $label = qtype_preg_dot_style_provider::get_spec_symbol($pregnode->userinscription, $tmptooltip, 10);
+            $tooltip = $tmptooltip . ' ';
         }
-        
+
         $id = $pregnode->id;
-        
+
         // Now the label is ready, just return the appropriate style for node type and subtype.
         switch ($pregnode->type) {
             case qtype_preg_node::TYPE_ABSTRACT: {
@@ -63,11 +63,11 @@ class qtype_preg_dot_style_provider {
 
                     $label = str_replace(']', '&#93;', $label);
                     $label = str_replace('[', '&#91;', $label);
-                    
+
                     if($pregnode->error === NULL){
                         return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltip_charset', 'qtype_preg') . ": " . $tooltip . "\", shape = record, id = $id]";
                     } else {
-                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . "\", shape = record, id = $id, color = \"red\"]";
+                        return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltip_charset_error', 'qtype_preg') . ": " . $tooltip . "\", shape = record, color = red, id = $id]";
                     }
             }
             case qtype_preg_node::TYPE_LEAF_META: {
@@ -90,11 +90,8 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = " . get_string('tooltip_option', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_FINITE_QUANT: {
-                if($pregnode->leftborder > $pregnode->rightborder){
-                    $a = new stdClass;
-                    $a->indfirst = $pregnode->indfirst;
-                    $a->indlast = $pregnode->indlast;
-                    return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $a) . "\", id = $id, color = red]";
+                if ($pregnode->error !== null){
+                    return "[label = \"$label\", tooltip = \"" . get_string('error_incorrectquantrange', 'qtype_preg', $pregnode->error) . "\", color = red, id = $id]";
                 }
                 return "[label = \"$label\", tooltip = \"" . get_string('tooltip_finite_quantifier', 'qtype_preg') . "\", id = $id]";
             }
@@ -119,9 +116,7 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"$label\", tooltip = \"" . get_string('tooltip_conditional_subpattern', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
-
-                //return "[label = \"ERROR $label\", tooltip = error, id = $id]";
-                return "[label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", id = $id, color = \"red\"]";
+                return "[label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", color = red, id = $id]";
             }
             default: {
                 return "[label = \"Unknown node subtype\", style = dotted]";
@@ -240,9 +235,9 @@ class qtype_preg_dot_style_provider {
         }
         return $script->string();
     }
-    
+
     /**
-     * Replace non-printable and service character and shorten their description
+     * Replaces non-printable and service characters and shortens their description
      * and additional info (for example, is it a charset flag (\ w, \ d) - true or false, etc)
      * to the appropriate equivalents for the dot.
      * @param object $tmp string for label.
@@ -250,77 +245,47 @@ class qtype_preg_dot_style_provider {
      * @param int $length string length.
      * @return modified label.
      */
-    protected static function get_spec_symbol($tmp, &$tooltip, $length = 30) {
-        if ($tmp->addinfo === true) {
-            $tooltip = $tmp->data;
-            $tmp->data = '<font color="blue">' . $tooltip . '</font>';
+    protected static function get_spec_symbol($userinscription, &$tooltip, $length = 30) {
+        if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
+            $result = '<font color="blue">' . $userinscription->data . '</font>';
         } else {
-            //Replacement of service characters
-            if (strpos($tmp->data, '"') >= 0) {
-                $tmp->data = str_replace('"', '&#34;', $tmp->data);
-            }
-            /*if (strpos($tmp->data, '\\') >= 0) {
-                $tmp->data = str_replace('\\', '&#92;', $tmp->data);
-            }*/
-            if (strpos($tmp->data, '&') >= 0) {
-                $tmp->data = str_replace('&', '&#38;', $tmp->data);
-            }
-            if (strpos($tmp->data, '{') >= 0) {
-                $tmp->data = str_replace('{', '\\{', $tmp->data);
-            }
-            if (strpos($tmp->data, '}') >= 0) {
-                $tmp->data = str_replace('}', '\\}', $tmp->data);
-            }
-            if (strpos($tmp->data, '>') >= 0) {
-                $tmp->data = str_replace('>', '&#62;', $tmp->data);
-            }
-            if (strpos($tmp->data, '<') >= 0) {
-                $tmp->data = str_replace('<', '&#60;', $tmp->data);
-            }
-            
-            $tooltip = $tmp->data;            
-            //Replacement of nonprinting characters
-            for($i = 1; $i < 33; ++$i){
-                if (strpos($tmp->data, chr($i)) !== FALSE) {
+            // Replacement of service and non-printable characters.
+            $service = array('"' => '&#34;',
+                             //'\\' '&#92;',
+                             '&' => '&#38;',
+                             '{' => '\\{',
+                             '}' => '\\}',
+                             '>' => '&#62;',
+                             '<' => '&#60;'
+                             );
+            $nonprintable = array(qtype_poasquestion_string::code2utf8(127) => 'description_char7F',
+                                  qtype_poasquestion_string::code2utf8(160) => 'description_charA0',
+                                  qtype_poasquestion_string::code2utf8(173) => 'description_charAD',
+                                  qtype_poasquestion_string::code2utf8(8194) => 'description_char2002',
+                                  qtype_poasquestion_string::code2utf8(8195) => 'description_char2003',
+                                  qtype_poasquestion_string::code2utf8(8201) => 'description_char2009',
+                                  qtype_poasquestion_string::code2utf8(8204) => 'description_char200C',
+                                  qtype_poasquestion_string::code2utf8(8205) => 'description_char200D'
+                                  );
+            $result = $userinscription->data;
+            for ($i = 1; $i < 33; $i++) {
+                if (qtype_poasquestion_string::strpos($result, chr($i)) !== false) {
                     $tooltip = get_string('description_char' . dechex($i), 'qtype_preg');
-                    $tmp->data = str_replace(chr($i), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
+                    $result = str_replace(chr($i), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $result);
                 }
             }
-            
-            if (strpos($tmp->data, chr(127)) !== FALSE) {
-                $tooltip = get_string('description_char7F', 'qtype_preg');
-                $tmp->data = str_replace(chr(127), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
+            foreach ($service as $key => $value) {
+                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                    $result = str_replace($key, $value, $result);
+                }
             }
-            if (strpos($tmp->data, chr(160)) !== FALSE) {
-                $tooltip = get_string('description_charA0', 'qtype_preg');
-                $tmp->data = str_replace(chr(160), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
+            foreach ($nonprintable as $key => $value) {
+                if (qtype_poasquestion_string::strpos($result, $key) !== false) {
+                    $tooltip = get_string($value, 'qtype_preg');
+                    $result = str_replace($key, '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $result);
+                }
             }
-            if (strpos($tmp->data, chr(173)) !== FALSE) {
-                $tooltip = get_string('description_charAD', 'qtype_preg');
-                $tmp->data = str_replace(chr(173), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            if (strpos($tmp->data, chr(8194)) !== FALSE) {
-                $tooltip = get_string('description_char2002', 'qtype_preg');
-                $tmp->data = str_replace(chr(8194), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            if (strpos($tmp->data, chr(8195)) !== FALSE) {
-                $tooltip = get_string('description_char2003', 'qtype_preg');
-                $tmp->data = str_replace(chr(8195), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            if (strpos($tmp->data, chr(8201)) !== FALSE) {
-                $tooltip = get_string('description_char2009', 'qtype_preg');
-                $tmp->data = str_replace(chr(8201), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            if (strpos($tmp->data, chr(8204)) !== FALSE) {
-                $tooltip = get_string('description_char200C', 'qtype_preg');
-                $tmp->data = str_replace(chr(8204), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            if (strpos($tmp->data, chr(8205)) !== FALSE) {
-                $tooltip = get_string('description_char200D', 'qtype_preg');
-                $tmp->data = str_replace(chr(8205), '<font color="blue">' . shorten_text($tooltip, $length) . '</font>', $tmp->data);
-            }
-            
         }
-        return $tmp->data;
+        return $result;
     }
 }
