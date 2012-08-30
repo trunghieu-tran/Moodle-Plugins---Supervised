@@ -201,7 +201,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function test_option($regex,$expected)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
-        var_dump($handler);
+        //var_dump($handler);
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected, $result);
     }
@@ -209,10 +209,10 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function option_provider()
     {
         return array(
-          array('(?i)b','1'),
-          //array('(?i:b)','1'),
-          //array('(a(?i)b)c','subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'),
-          //array('(?i)a|b[a]c','subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'),
+          array('(?i)b','caseless: <span style="color:blue">b</span>'),
+          array('(?i:b)','grouping: [caseless: <span style="color:blue">b</span>]'),
+          array('(a(?i)b)c','subpattern #1: [<span style="color:blue">a</span> then caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'),
+          //array('(?i)a(?u)b(?-i)c(?-u)d','subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>'),
         );
     }
 
