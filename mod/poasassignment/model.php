@@ -585,8 +585,8 @@ class poasassignment_model {
         $criterions = $DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$this->poasassignment->id));
         if ($criterions) {
             $i = 0;
+            $data = new stdClass();
             foreach ($criterions as $criterion) {
-                $data = new stdClass();
                 $data->name[$i] = $criterion->name;
                 $data->description[$i] = $criterion->description;
                 $data->weight[$i] = $criterion->weight;
