@@ -91,6 +91,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_CATEGORIZE              = 5;
     const TAG_ASSOC_LEFT              = 6;
     const TAG_ASSOC_RIGHT             = 7;
+    const TAG_DEBUG_MODE              = 8;
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
