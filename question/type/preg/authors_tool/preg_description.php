@@ -22,33 +22,36 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 class qtype_preg_description_state {
 
     /** @var bool is (?i) set */
-    private $mcaseless = false;
+    public $caseless = false;
 
     /** @var bool is (?s) set */
-    private $msingleline = false;
+    public $singleline = false;
 
     /** @var bool is (?m) set */
-    private $mmultilineline = false;
+    public $multilineline = false;
 
     /** @var bool is (?x) set */
-    private $mextended = false;
+    public $extended = false;
 
     /** @var bool is (?U) set */
-    private $mungreedy = false;
+    public $ungreedy = false;
 
     /** @var bool is (?J) set */
-    private $mduplicate = false;
+    public $duplicate = false;
+    
+    public $forceunsetmodifiers = false;
 
     /**
      * set default values to all state variables
      */
     public function reset() {
-        $this->mcaseless        = false;
-        $this->msingleline      = false;
-        $this->mmultilineline   = false;
-        $this->mextended        = false;
-        $this->mungreedy        = false;
-        $this->mduplicate       = false;
+        $this->caseless        = false;
+        $this->singleline      = false;
+        $this->multilineline   = false;
+        $this->extended        = false;
+        $this->ungreedy        = false;
+        $this->duplicate       = false;
+        $this->forceunsetmodifiers = false;
     }
 
     /**
@@ -59,22 +62,22 @@ class qtype_preg_description_state {
     public function set_modifier($modifier) {
         switch ($modifier){
             case 'i':
-                $this->mcaseless = true;
+                $this->caseless = true;
                 break;
             case 's':
-                $this->msingleline = true;
+                $this->singleline = true;
                 break;
             case 'm':
-                $this->mmultilineline = true;
+                $this->multilineline = true;
                 break;
             case 'x':
-                $this->mextended = true;
+                $this->extended = true;
                 break;
             case 'U':
-                $this->mungreedy = true;
+                $this->ungreedy = true;
                 break;
             case 'J':
-                $this->mduplicate = true;
+                $this->duplicate = true;
                 break;
         }
     }
@@ -87,22 +90,22 @@ class qtype_preg_description_state {
     public function unset_modifier($modifier) {
         switch ($modifier){
             case 'i':
-                $this->mcaseless = false;
+                $this->caseless = false;
                 break;
             case 's':
-                $this->msingleline = false;
+                $this->singleline = false;
                 break;
             case 'm':
-                $this->mmultilineline = false;
+                $this->multilineline = false;
                 break;
             case 'x':
-                $this->mextended = false;
+                $this->extended = false;
                 break;
             case 'U':
-                $this->mungreedy = false;
+                $this->ungreedy = false;
                 break;
             case 'J':
-                $this->mduplicate = false;
+                $this->duplicate = false;
                 break;
         }
     }
@@ -336,6 +339,7 @@ abstract class qtype_preg_description_leaf extends qtype_preg_description_node{
         $this->pattern = $this->pattern($node_parent,$form);
         //var_dump($this->pattern);
         $description = $this->numbering_pattern($numbering_pattern,$this->pattern);
+        qtype_preg_description_leaf_options::check_options($this,$description,$form);
         return $description;
     }
 }
@@ -673,9 +677,17 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
      * Redifinition of abstruct qtype_preg_description_node::pattern()
      */
     public function pattern($node_parent=null,$form=null){
-
-        // TODO - pattern
-        return('<TODO options>');
+        $resultpattern = '';
+        $posopt =& $this->pregnode->posopt;
+        $negopt =& $this->pregnode->negopt;
+        if($posopt->length() > 0) {
+            $this->handler->state->set_modifier($posopt[0]);
+            $resultpattern = self::get_form_string('description_option_'.$posopt[0],$form);
+        } else if($negopt->length() > 0) { 
+            $this->handler->state->unset_modifier($negopt[0]);
+            $resultpattern = self::get_form_string('description_unsetoption_'.$negopt[0],$form);
+        }
+        return $resultpattern;
     }
 
     /**
@@ -686,27 +698,51 @@ class qtype_preg_description_leaf_options extends qtype_preg_description_leaf{
      * @param string $node_pattern description of current node
      * @param array $options array of options
      */
-    /*public static function check_options($node,&$node_pattern,$form=null){
-        $caselesskey = qtype_preg_author_tool_description::OPT_CASELESS;
-        /*if(isset($node->options[$caselesskey])){ //set def value
-            $node->options[$caselesskey] = false;
-        }*
+    public static function check_options($node,&$node_pattern,$form=null){
         
-        if(isset($node->pregnode->caseinsensitive)){
+        $resultpattern = '';
+        $mcaseless =& $node->handler->state->caseless;
+        $msingleline =& $node->handler->state->singleline;
+        $mmultilineline =& $node->handler->state->multilineline;
+        $mextended =& $node->handler->state->extended;
+        $mungreedy =& $node->handler->state->ungreedy;
+        $mduplicate =& $node->handler->state->duplicate;
+        
+        if($node->pregnode->type === qtype_preg_node::TYPE_NODE_SUBPATT) {
+			
+			$node->handler->state->forceunsetmodifiers = true;	
+					
+		} else if($node->handler->state->forceunsetmodifiers === true) { // any other leaf
 
-            //$options['caseinsensitive'] = ($node->pregnode->caseinsensitive === true )?true:false;
-            if($node->pregnode->caseinsensitive === true && $node->options[$caselesskey]===false){
-                $node->options[$caselesskey] = true;
-                $node_pattern = self::get_form_string('description_option_i',$form).$node_pattern;
-            }
-            if($node->pregnode->caseinsensitive === false && $node->options[$caselesskey]===true){
-                $node->options[$caselesskey] = false;
-                $node_pattern = self::get_form_string('description_unsetoption_i',$form).$node_pattern;
-                //var_dump(1);
-
-            }
-        }
-    }*/
+			// TODO - generate 'caseless, singleline:' instead of 'caseless: singleline:'
+			if($mcaseless === true) {			
+				$resultpattern .= self::get_form_string('description_unsetoption_i',$form) . ' ';
+				$mcaseless = false;
+			}
+			if($msingleline === true) {				
+				$resultpattern .= self::get_form_string('description_unsetoption_s',$form) . ' ';
+				$msingleline = false;
+			} 
+			if($mmultilineline === true) {
+				$resultpattern .= self::get_form_string('description_unsetoption_m',$form) . ' ';
+				$mmultilineline = false;
+			}
+			if($mextended === true) {
+				$resultpattern .= self::get_form_string('description_unsetoption_x',$form) . ' ';
+				$mextended = false;
+			}
+			if($mungreedy === true) {
+				$resultpattern .= self::get_form_string('description_unsetoption_U',$form) . ' ';
+				$mungreedy = false;
+			}
+			if($mduplicate === true) {
+				$resultpattern .= self::get_form_string('description_unsetoption_J',$form) . ' ';
+				$mduplicate = false;
+			}
+			$node->handler->state->forceunsetmodifiers = false;
+			$node_pattern = $resultpattern . $node_pattern;
+		}
+    }
    
 }
 
@@ -832,6 +868,7 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
             $child_description = $this->operands[$i-1]->description($numbering_pattern,$this,$form);
             $description = str_replace($matches[0],$child_description,$description);
         }
+        qtype_preg_description_leaf_options::check_options($this,$resultpattern,$form);
         return $description;
     }
 }
@@ -963,8 +1000,12 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
         $aheadassertinprevconcat = $type1===qtype_preg_node::TYPE_NODE_CONCAT && 
                 ($this->operands[0]->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_PLA ||
                 $this->operands[0]->operands[1]->pregnode->subtype===qtype_preg_node_assert::SUBTYPE_NLA);
-        
-        if($needshortpattern || $needcontiuneshortpattern) {       
+        $neddspacepattern = $type1===qtype_preg_node::TYPE_LEAF_OPTIONS ||
+                ($type1===qtype_preg_node::TYPE_NODE_CONCAT && 
+                $this->operands[0]->operands[1]->pregnode->type===qtype_preg_node::TYPE_LEAF_OPTIONS);
+        if($neddspacepattern) {
+            $resultpattern = self::get_form_string('description_concat_space',$form);
+        } else if($needshortpattern || $needcontiuneshortpattern) {       
             $resultpattern = self::get_form_string('description_concat_short',$form);
         } else if($firstaheadassert || $secondbehindassert || $aheadassertinprevconcat){
             $resultpattern = self::get_form_string('description_concat_and',$form);
