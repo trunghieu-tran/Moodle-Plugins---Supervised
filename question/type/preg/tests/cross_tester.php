@@ -99,13 +99,14 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     // TODO: tags for different capabilities for matchers.
 
+    protected $passcount;              // Number of passes.
+    protected $failcount;              // Number of fails.
     protected $testdataobjects;        // Objects with test data.
     protected $extracheckobjects;      // Objects for extra checks.
     protected $doextrachecks;          // Is it needed to do extra checks.
     protected $question;               // Question object for getting matchers.
 
     protected $blacklist;              // Blacklist of tags in different modes.
-    protected $whitelist;              // Whitelist of tags in different modes.
 
     /**
      * Returns name of the engine to be tested (without qtype_preg_ prefix!). Should be implemented in child classes.
@@ -141,11 +142,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         $matcher->match($test1['str']);
         $obtained1 = $matcher->get_match_results();
-        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', true, false);
+        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', false);
 
         $matcher->match($test2['str']);
         $obtained2 = $matcher->get_match_results();
-        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', true, false);
+        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', false);
 
         if ($left && !$right) {
             return self::TAG_ASSOC_LEFT;
@@ -156,7 +157,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     }
 
     public function __construct() {
-        global $argc, $argv;
+        $this->passcount = 0;
+        $this->failcount = 0;
         $this->testdataobjects = array();
         $this->extracheckobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
@@ -197,34 +199,18 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             }
         }
         closedir($dh);
-        $this->blacklist = array();
-        $this->whitelist = array();
-        if ($argc === 2) {
-            // Just run simple tests.
-            $this->blacklist = array(self::TAG_ASSOC_LEFT, self::TAG_ASSOC_RIGHT);
+
+
+        $assoc = $this->categorize_assoc($enginename);
+        if ($assoc === self::TAG_ASSOC_LEFT) {
+            echo "\n$enginename has LEFT ASSOCIATIVITY\n\n";
+            $this->blacklist = array(self::TAG_ASSOC_RIGHT);
+        } else if ($assoc === self::TAG_ASSOC_RIGHT) {
+            echo "\n$enginename has RIGHT ASSOCIATIVITY\n\n";
+            $this->blacklist = array(self::TAG_ASSOC_LEFT);
         } else {
-            switch ($argv[2]) {
-            case '-c':
-                // Run categorization tests.
-                $assoc = $this->categorize_assoc($enginename);
-                if ($assoc === self::TAG_ASSOC_LEFT) {
-                    echo "\n$enginename has LEFT ASSOCIATIVITY\n\n";
-                    $this->whitelist = array(self::TAG_ASSOC_LEFT);
-                    break;
-                } else if ($assoc === self::TAG_ASSOC_RIGHT) {
-                    echo "\n$enginename has RIGHT ASSOCIATIVITY\n\n";
-                    $this->whitelist = array(self::TAG_ASSOC_RIGHT);
-                    break;
-                } else {
-                    echo "\n$enginename has UNDEFINED ASSOCIATIVITY\n\n";
-                    die();
-                }
-                break;
-            default:
-                echo 'unknown key: ' . $argv[2] . "\n";
-                echo 'use -c to run categorize tests, do not use keys to run other tests' . "\n\n";
-                die();
-            }
+            echo "\n$enginename has UNDEFINED ASSOCIATIVITY\n\n";
+            $this->blacklist = array(self::TAG_ASSOC_LEFT, self::TAG_ASSOC_RIGHT);
         }
     }
 
@@ -299,10 +285,13 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @param $regex - regular expression.
      * @param $modifiers - modifiers.
      * @param $obtained - a result to check.
+     * @return true if everything is correct, false otherwise.
      */
     function do_extra_check($regex, $notation, $modifiers, $obtained) {
         $str = $obtained->matched_part() . $obtained->string_extension();
         $thisenginename = $this->engine_name();
+        $boolstr = array(false => 'FALSE', true => 'TRUE');
+        $result = true;
         foreach ($this->extracheckobjects as $obj) {
             $enginename = 'qtype_preg_' . $obj->engine_name();
             $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
@@ -317,23 +306,25 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     $sum1++;
                 }
 
-                // Do assertions.
-                $full = $this->assertTrue($newresults->full === $obtained->extendedmatch->full, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
-                $sum = $this->assertTrue($sum1 === $sum2, "$thisenginename failed 'full' EXTRA check on regex '$regex' and string '$str'");
+                $full = $newresults->full === $obtained->extendedmatch->full;
+                $sum = $sum1 === $sum2;
                 if (!$full) {
+                    $result = false;
                     echo "extended match field 'full' has the value of " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)<br/>";
                 }
                 if (!$sum) {
+                    $result = false;
                     echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . " and " . $obtained->left . ", the new values are " . $obtained->extendedmatch->length() . " and " . $obtained->extendedmatch->left . " (extra-tested by $enginename)<br/>";
                 }
             }
         }
+        return $result;
     }
 
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $doassertions, $dumpfails = true) {
+    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $dumpfails = true) {
         // Checking match existance.
         $fullpassed = ($expected['full'] === $obtained->full);
         if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
@@ -390,18 +381,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             $this->do_extra_check($regex, $notation, $modifiers, $obtained);
         }
 
-        // Do assertions
         $enginename = $matcher->name();
         $boolstr = array(false => 'FALSE', true => 'TRUE');
-        if ($doassertions) {
-            $true = true;   // To continue testing if fails occur.
-            $this->assertTrue($true || $ismatchpassed);
-            $this->assertTrue($true || $fullpassed);
-            $this->assertTrue($true || $indexfirstpassed);
-            $this->assertTrue($true || $lengthpassed);
-            $this->assertTrue($true || $nextpassed);
-            $this->assertTrue($true || $leftpassed);
-        }
 
         // Dump fails.
         if ($dumpfails) {
@@ -465,7 +446,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $matchoptions = new qtype_preg_matching_options();  // Forced subpattern catupring.
         $enginename = $this->engine_name();
         $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
-        $whitelist = $this->whitelist;
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $classname = get_class($testdataobj);
@@ -493,10 +473,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                 // Skip regexes with blacklisted tags.
                 if (count(array_intersect($blacklist, $regextags)) > 0) {
-                    continue;
-                }
-                // Skip regexes without whitelisted tags.
-                if (count($whitelist) > 0 && count(array_intersect($whitelist, $regextags)) === 0) {
                     continue;
                 }
 
@@ -528,10 +504,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     if (count(array_intersect($blacklist, $tags)) > 0) {
                         continue;
                     }
-                    // Skip tests without whitelisted tags.
-                    if (count($whitelist) > 0 && count(array_intersect($whitelist, $tags)) === 0) {
-                        continue;
-                    }
 
                     // There can be exceptions during matching.
                     try {
@@ -543,9 +515,15 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     }
 
                     // Results obtained, check them.
-                    $this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, true);
+                    if ($this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, true)) {
+                        $this->passcount++;
+                    } else {
+                        $this->failcount++;
+                    }
                 }
             }
         }
+        echo "\nNUMBER OF PASSED REGEX-STRING PAIRS: " . $this->passcount . "\n";
+        echo 'NUMBER OF FAILED REGEX-STRING PAIRS: ' . $this->failcount . "\n";
     }
 }
