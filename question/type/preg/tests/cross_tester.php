@@ -479,6 +479,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                 // Try to get matcher for the regex.
                 try {
+                    $matchoptions->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
                     $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
                     $matcher->set_options($matchoptions);
                 } catch (Exception $e) {
