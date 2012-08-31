@@ -826,13 +826,18 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
      * @param type type of the flag, should be a constant of qtype_preg_leaf_charset.
      * @param data can contain either subtype of a flag or characters for a charset.
      * @param negative is this flag negative.
+     * @param appendtoend if true, new characters are concatenated from right, from left otherwise.
      */
-    protected function add_flag_to_charset($text, $type, $data, $negative = false) {
+    protected function add_flag_to_charset($text, $type, $data, $negative = false, $appendtoend = true) {
         switch ($type) {
         case qtype_preg_charset_flag::SET:
             $this->charsetuserinscriptionraw[] = new qtype_preg_userinscription($text);
             $this->charsetcount++;
-            $this->charsetset .= $data;
+            if ($appendtoend) {
+                $this->charsetset .= $data;
+            } else {
+                $this->charsetset = $data . $this->charsetset;
+            }
             $error = $this->form_num_interval();
             if ($error !== null) {
                 $this->charset->error[] = $error;
@@ -1640,7 +1645,8 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 }
 <CHARSET> \\. {
     $text = $this->yytext();
-    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
+    $char = qtype_poasquestion_string::substr($text, 1, 1);
+    $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
 <CHARSET> [^\]] {
     $text = $this->yytext();
