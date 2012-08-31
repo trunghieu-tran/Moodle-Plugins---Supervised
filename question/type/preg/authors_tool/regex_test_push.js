@@ -22,8 +22,14 @@ M.qtype_preg_authors_tool.init = function(Y) {
     var load_content = function(url) {
 
         var upd_dialog_Success = function(id, o, a) {
-            var debug_output = o.responseText
-            //alert(o.responseText);
+            // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+            var index_of_bracket = o.responseText.indexOf("{");
+            if (index_of_bracket != 0) {
+                alert(o.responseText.substr(0,index_of_bracket));
+            }
+            // allerting json array:
+            // alert(o.responseText.substr(index_of_bracket));
+            // end of debug output !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             var json_array = Y.JSON.parse(o.responseText);
 
             //TODO: add errors message
