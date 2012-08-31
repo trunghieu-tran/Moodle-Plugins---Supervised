@@ -99,7 +99,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(ab)', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_SUBPATT);
-        $this->assertTrue($root->userinscription->data === '( ... )');
+        $this->assertTrue($root->userinscription->data === '(...)');
         $this->assertTrue($root->id == 3);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->userinscription->data === '');
@@ -187,7 +187,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?(?=a)b|cd)', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBPATT);
-        $this->assertTrue($root->userinscription->data === '(?(?= ... ) ... | .... )');
+        $this->assertTrue($root->userinscription->data === '(?(?=...)...|...)');
         $this->assertTrue($root->id == 7);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->userinscription[0]->data === 'b');
@@ -201,7 +201,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->operands[1]->flags[0][0]->data == 'd');
         $this->assertTrue($root->operands[1]->operands[1]->id == 3);
         $this->assertTrue($root->operands[2]->type == qtype_preg_node::TYPE_NODE_ASSERT);
-        $this->assertTrue($root->operands[2]->userinscription->data === '(?= ... )');
+        $this->assertTrue($root->operands[2]->userinscription->data === '(?=...)');
         // id 5 consumed by alternation node.
         $this->assertTrue($root->operands[2]->id === 6);
         $this->assertTrue($root->operands[2]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -210,7 +210,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $parser = $this->run_parser('(?(DEFINE)a|b)', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBPATT);
-        $this->assertTrue($root->userinscription->data === '(?(DEFINE) ... | .... )');
+        $this->assertTrue($root->userinscription->data === '(?(DEFINE)...|...)');
         $this->assertTrue($root->id == 4);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->userinscription[0]->data === 'a');
@@ -384,16 +384,16 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $ff = $root->operands[1]->operands[1]->operands[1];
         $this->assertTrue($tf->type == qtype_preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($tf->subtype == qtype_preg_node_assert::SUBTYPE_PLA);
-        $this->assertTrue($tf->userinscription->data === '(?= ... )');
+        $this->assertTrue($tf->userinscription->data === '(?=...)');
         $this->assertTrue($ff->type == qtype_preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($ff->subtype == qtype_preg_node_assert::SUBTYPE_NLA);
-        $this->assertTrue($ff->userinscription->data === '(?! ... )');
+        $this->assertTrue($ff->userinscription->data === '(?!...)');
         $this->assertTrue($fb->type == qtype_preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($fb->subtype == qtype_preg_node_assert::SUBTYPE_NLB);
-        $this->assertTrue($fb->userinscription->data === '(?<! ... )');
+        $this->assertTrue($fb->userinscription->data === '(?<!...)');
         $this->assertTrue($tb->type == qtype_preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($tb->subtype == qtype_preg_node_assert::SUBTYPE_PLB);
-        $this->assertTrue($tb->userinscription->data === '(?<= ... )');
+        $this->assertTrue($tb->userinscription->data === '(?<=...)');
     }
     function test_parser_metasymbol_dot() {
         $parser = $this->run_parser('.', $errornodes);
