@@ -22,10 +22,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
  * Options, generic to all handlers - mainly affects scanning and parsing.
  */
 class qtype_preg_handling_options {
-    /** @var boolean Strict PCRE compatible regex syntax.*/
+    /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
-    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes.*/
+    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
+    /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
+    public $debugmode = false;
 }
 
 class qtype_preg_regex_handler {

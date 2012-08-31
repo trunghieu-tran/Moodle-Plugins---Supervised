@@ -1571,20 +1571,23 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->userinscription[0]->data === '\p{L}');
+        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->userinscription[0]->data === '\x{ab}');
+        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_GENERAL);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->userinscription[0]->data === 'ae');
+        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_GENERAL);
         $this->assertTrue($token->value->userinscription[1]->data === '\pC');
-        $this->assertTrue($token->value->userinscription[1]->addinfo === true);
+        $this->assertTrue($token->value->userinscription[1]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         $this->assertTrue($token->value->userinscription[2]->data === 'b-d');
         $this->assertTrue($token->value->userinscription[3]->data === '\x00-\xff');
         $this->assertTrue($token->value->userinscription[4]->data === '[:alpha:]');
-        $this->assertTrue($token->value->userinscription[4]->addinfo === true);
+        $this->assertTrue($token->value->userinscription[4]->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
@@ -1592,5 +1595,16 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->userinscription[0]->data === '\p{Squirrel}');
+
+        $lexer = $this->create_lexer('[\xff\x00-\x1fA-B\t\n]');
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($token->value->userinscription[0]->data === '\xff\t\n');
+        $this->assertTrue($token->value->userinscription[0]->type === qtype_preg_userinscription::TYPE_GENERAL);
+        $this->assertTrue($token->value->userinscription[1]->data === '\x00-\x1f');
+        $this->assertTrue($token->value->userinscription[1]->type === qtype_preg_userinscription::TYPE_GENERAL);
+        $this->assertTrue($token->value->userinscription[2]->data === 'A-B');
+        $this->assertTrue($token->value->userinscription[2]->type === qtype_preg_userinscription::TYPE_GENERAL);
     }
 }
