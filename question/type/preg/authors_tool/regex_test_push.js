@@ -7,6 +7,8 @@
  * @package questions
  */
  
+// TODO - code documentation
+ 
 M.qtype_preg_authors_tool = {};
  
 M.qtype_preg_authors_tool.init = function(Y) {
@@ -213,6 +215,7 @@ M.qtype_preg_authors_tool.init = function(Y) {
     }
 
     // code:
+    // installation click handler:
     var i = 0;
     var testregexbtn = Y.one('#id_regextest_' + i);
     var testregexlineedit = Y.one('#id_answer_' + i);
