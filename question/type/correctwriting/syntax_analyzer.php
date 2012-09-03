@@ -38,7 +38,10 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
     public function __construct($answer, $language, $correctedresponse=null, $lcs=null) {
-
+        
+        $this->errors = array();
+        $this->mistakes  = array();
+        
         //TODO:
         // 0. Throw exception if language doesn't support parsing or syntax analyzer isnt' written yet
         //1. Create Abstract Syntax Tree for answer - Pashaev
@@ -62,6 +65,7 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
     * Fitness doesn't necessary equivalent to the number of mistakes as each mistake could have different weight
     */
     public function fitness() {
+        return 0;
     }
 
     public function mistakes() {

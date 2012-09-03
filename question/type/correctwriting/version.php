@@ -16,6 +16,5 @@ $plugin->release = 'Correct Writing 2.2';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
-    'block_formal_langs' => 2012021400,
-    'qtype_poasquestion' => 2012060900
+    'block_formal_langs' => 2012021400
 );
