@@ -1,18 +1,40 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines hint classes for the POAS abstract question type.
+ * This file contains hint definitions, that is used by different poas questions.
+ *
+ * Note: interfaces and classes there are intentionally left without qtype_poasquestion prefix as
+ *  they are intended for more general Moodle use after hinting behaviours would be complete.
  *
  * @package    qtype_poasquestion
+ * @subpackage hints
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
  * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
+ *
+ * @copyright  2011 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface question_with_qtype_specific_hints {
 
@@ -34,6 +56,9 @@ interface question_with_qtype_specific_hints {
 
 /**
  * Base class for question-type specific hints
+ *
+ * @copyright  2011 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_specific_hint {
 
@@ -72,6 +97,16 @@ abstract class qtype_specific_hint {
      * Even if response is used to calculate penalty, hint object should still return an approximation to show to the student if $response is null
      */
     abstract public function penalty_for_specific_hint($response = null);
+
+    /**
+     * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
+     *
+     * Questions should render hint buttons when _nonresp_hintbuttons and/or _resp_hintbuttons behaviour variable is set, depending on whether hint is response based.
+     */
+    public function button_rendered_by_question() {
+        //By default, hint button should be rendered by behaviour.
+        return false;
+    }
 
     /**
      * Returns true if there should be only one hint button for the given situation

@@ -28,44 +28,48 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         }
         $output .= html_writer::empty_tag('br');
 
-        //hinting buttons
+        //Render buttons that should be rendered by behaviour.
          foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
-            $attributes = array(
-                'type' => 'submit',
-                'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
-                'class' => 'submit btn',
-            );
-            if ($options->readonly) {
-                $attributes['disabled'] = 'disabled';
-            }
-            $output .= html_writer::empty_tag('input', $attributes);
 
-            //Cost message
             $hintobj = $question->hint_object($hintkey);
-            if ($hintobj->penalty_response_based()) {//if penalty is response-based
-                //try to get last response
-                $response = $qa->get_last_qt_data();
-                if (empty($response)) {
-                    $response = null;
+
+            if (!$hintobj->button_rendered_by_question()) {//Button(s) isn't rendered by the question, so behaviour must render it.
+                $attributes = array(
+                    'type' => 'submit',
+                    'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
+                    'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
+                    'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
+                    'class' => 'submit btn',
+                );
+                if ($options->readonly) {
+                    $attributes['disabled'] = 'disabled';
                 }
-                $penalty = $hintobj->penalty_for_specific_hint($response);
-                if ($penalty != 0) {
-                    $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//note that reported penalty is approximation since user could change response in adaptive
+                $output .= html_writer::empty_tag('input', $attributes);
+
+                //Cost message
+                if ($hintobj->penalty_response_based()) {//if penalty is response-based
+                    //try to get last response
+                    $response = $qa->get_last_qt_data();
+                    if (empty($response)) {
+                        $response = null;
+                    }
+                    $penalty = $hintobj->penalty_for_specific_hint($response);
+                    if ($penalty != 0) {
+                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//note that reported penalty is approximation since user could change response in adaptive
+                    }
+                } else {
+                    $penalty = $hintobj->penalty_for_specific_hint(null);
+                    if ($penalty != 0) {
+                        $output .= $this->button_cost('withpenalty', $penalty, $options);
+                    }
                 }
-            } else {
-                $penalty = $hintobj->penalty_for_specific_hint(null);
-                if ($penalty != 0) {
-                    $output .= $this->button_cost('withpenalty', $penalty, $options);
-                }
+                $output .= html_writer::empty_tag('br');
+
+                /*if (!$options->readonly) {
+                $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
+                        array($attributes['id'], $qa->get_slot()));
+                }*/
             }
-            $output .= html_writer::empty_tag('br');
-            
-            /*if (!$options->readonly) {
-            $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
-                    array($attributes['id'], $qa->get_slot()));
-            }*/
         }
 
         return $output;

@@ -11,6 +11,7 @@ defined('MOODLE_INTERNAL') || die();
  * _try - number of submissions (inherited from adaptive)
  * _rawfraction - fraction for the step without penalties (inherited from adaptive)
  * _hashint - there was hint requested in the step
+ * _hintbuttons - render hint buttons, could be 'active' or 'readonly'
  * _render_<hintname> - true if hint with hintname should be rendered when rendering question next time
  * _penalty - penalty added in this state (used for rendering and summarising mainly)
  * _totalpenalties - sum of all penalties already done
@@ -74,13 +75,26 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     ////Process functions
     public function process_action(question_attempt_pending_step $pendingstep) {
+        // Process hint button press.
         foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
                 return $this->process_hint($pendingstep, $hintkey);
             }
         }
 
-        return parent::process_action($pendingstep);
+        //Proces all actions.
+        $result = parent::process_action($pendingstep);
+
+        // Compute variables to show question it should render it's hint buttons.
+        if (!$this->qa->get_state()->is_finished()) {
+            $pendingstep->set_behaviour_var('_nonresp_hintbuttons', true);
+            $response = $pendingstep->get_qt_data();
+            if ($this->question->is_complete_response($response)) {
+                $pendingstep->set_behaviour_var('_resp_hintbuttons', true);
+            }
+        }
+
+        return $result;
     }
 
     public function process_hint(question_attempt_pending_step $pendingstep, $hintkey) {
