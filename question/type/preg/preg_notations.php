@@ -79,35 +79,6 @@ class qtype_preg_notation_native extends qtype_preg_notation {
         return 'native';
     }
 
-     public function convert_regex($targetnotation) {
-        if ($targetnotation == 'pcrestrict') {
-            //Escape all empty parenthesis (subpatterns and assrtions)
-            //$pattern = '/(?<!\\\\)(\(|\(\?(\:|\||\=|\<\=|\!|\<\!))\)/u';
-            $pattern = '/(?<!\\\\)\(\)/u';
-            $replacement = '\(\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\:\)/u';
-            $replacement = '\(\?\:\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\|\)/u';
-            $replacement = '\(\?\|\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\=\)/u';
-            $replacement = '\(\?\=\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\<\=\)/u';
-            $replacement = '\(\?\<\=\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\!\)/u';
-            $replacement = '\(\?\!\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\<\!\)/u';
-            $replacement = '\(\?\<\!\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            return $this->regex;
-        }
-    }
-    //TODO - implement converting from native to PCRE strict notation
 }
 
 /**
@@ -122,7 +93,7 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
 
     public function convert_regex($targetnotation) {
 
-        if ($targetnotation == 'native' || $targetnotation == 'pcrestrict') {
+        if ($targetnotation == 'native') {
             //Code from qtype_shortanswer_question::compare_string_with_wildcard with proper respect for Tim Hunt
 
             // Break the string on non-escaped asterisks.
@@ -139,24 +110,4 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
     }
 }
 
-class qtype_preg_notation_pcrestrict extends qtype_preg_notation {
-
-    public function name() {
-        return 'pcrestrict';
-    }
-
-    public function convert_regex($targetnotation) {
-        if ($targetnotation == 'native') {
-            return $this->regex;
-        }
-        parent::convert_regex($targetnotation);
-    }
-
-    public function convert_options($targetnotation) {
-        if ($targetnotation == 'native') {
-            $this->options->pcrestrict = true;
-        }
-        return $this->options;
-    }
-}
  ?>
