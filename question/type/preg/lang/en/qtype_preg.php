@@ -208,9 +208,9 @@ $string['regexmatchheader_help'] = 'Here you can input string for matching. In f
 
 // Strings for node description
 
-//TYPE_LEAF_META
+// TYPE_LEAF_META
 $string['description_empty'] = 'nothing';
-//TYPE_LEAF_ASSERT
+// TYPE_LEAF_ASSERT
 $string['description_circumflex'] = 'beginning of the string';
 $string['description_dollar'] = 'end of the string';
 $string['description_wordbreak'] = 'at a word boundary';
@@ -218,14 +218,14 @@ $string['description_wordbreak_neg'] = 'not at a word boundary';
 $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
 $string['description_esc_g'] = 'at the first matching position in the subject';
-//TYPE_LEAF_BACKREF
+// TYPE_LEAF_BACKREF
 $string['description_backref'] = 'back reference to subpattern #%number';
 $string['description_backref_name'] = 'back reference to subpattern "%name"';
-//TYPE_LEAF_RECURSION
+// TYPE_LEAF_RECURSION
 $string['description_recursion_all'] = 'recursive match with whole regular expression                                 ';
 $string['description_recursion'] = 'recursive match with subpattern #%number';
 $string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
-//TYPE_LEAF_OPTIONS
+// TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'caseless: ';
 $string['description_unsetoption_i'] = 'case sensitive: ';
 /*$string['description_option_s'] = 'dot metacharacter matches \n in following:[%text]';
@@ -233,39 +233,39 @@ $string['description_option_m'] = 'multiline matching:[%text]';
 $string['description_option_x'] = 'ignore white space:[%text]';
 $string['description_option_U'] = 'quantifiers ungreedy by default:[%text]';
 $string['description_option_J'] = 'allow duplicate names:[%text]';*/
-//TYPE_NODE_FINITE_QUANT
+// TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
 $string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 $string['description_finite_quant_01'] = '%1 may be missing%greed';
 $string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
-//TYPE_NODE_INFINITE_QUANT
+// TYPE_NODE_INFINITE_QUANT
 $string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
 $string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
 $string['description_infinite_quant_1'] = '%1 is repeated any number of times%greed';
-//%greed
+// %greed
 $string['description_quant_lazy'] = ' (lazy quantifier)';
 $string['description_quant_greed'] = '';
 $string['description_quant_possessive'] = ' (possessive quantifier)';
-//TYPE_NODE_CONCAT
+// TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';
 $string['description_concat_wcomma'] = '%1 then %2';
 $string['description_concat_and'] = '%1 and %2';
 $string['description_concat_short'] = '%1%2';
-//TYPE_NODE_ALT
+// TYPE_NODE_ALT
 $string['description_alt'] = '%1 or %2';
 $string['description_alt_wcomma'] = '%1 or %2';
-//TYPE_NODE_ASSERT
+// TYPE_NODE_ASSERT
 $string['description_pla_node_assert'] = 'further text should match: [%1]';
 $string['description_nla_node_assert'] = 'further text should not match: [%1]';
 $string['description_plb_node_assert'] = 'preceding text should match: [%1]';
 $string['description_nlb_node_assert'] = 'preceding text should not match: [%1]';
-//TYPE_NODE_SUBPATT
+// TYPE_NODE_SUBPATT
 $string['description_subpattern'] = 'subpattern #%number: [%1]';
 $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
 $string['description_subpattern_name'] = 'subpattern "%name": [%1]';
 $string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
-//TYPE_NODE_COND_SUBPATT
+// TYPE_NODE_COND_SUBPATT
 $string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
 $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
 $string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
@@ -274,7 +274,7 @@ $string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern h
 $string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%1]%else';
 $string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
 $string['description_define_node_cond_subpatt'] = 'definition of %1';
-//TYPE_LEAF_CONTROL
+// TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
 $string['description_mark_name_leaf_control'] = 'set name to %name to be passed back';
@@ -297,20 +297,57 @@ $string['description_no_start_opt_leaf_control'] = 'no start-match optimization'
 $string['description_utf8_leaf_control'] = 'UTF-8 mode';
 $string['description_utf16_leaf_control'] = 'UTF-16 mode';
 $string['description_ucp_leaf_control'] = 'PCRE_UCP';
-//TYPE_LEAF_CHARSET
+// TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
 $string['description_charset_one_neg'] = 'not %characters';
-//$string['description_charset_one'] = '%characters';
-//CHARSET FLAGS
-// TODO correct charset flags
-$string['description_charset_range'] = 'form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
+$string['description_charset_range'] = 'any character form %start to %end';
 $string['description_char'] = '<span style="color:blue">%char</span>';
-$string['description_char_space'] = 'space';
-$string['description_char_t'] = 'tabulation';
-$string['description_char_n'] = 'newline(LF)';
-$string['description_char_r'] = 'carriage return character';
-$string['description_char_16value'] = 'character with hex code %code';
+$string['description_char_16value'] = 'character with code 0x%code';
+//$string['description_charset_one'] = '%characters';
+// non-printing characters
+$string['description_char0'] = 'null character(NUL)';
+$string['description_char1'] = 'start of header character (SOH)';
+$string['description_char2'] = 'start of text character(STX)';
+$string['description_char3'] = 'end of text character(ETX)';
+$string['description_char4'] = 'end of transmission character(EOT)';
+$string['description_char5'] = 'enquiry character(ENQ)';
+$string['description_char6'] = 'acknowledgment character(ACK)';
+$string['description_char7'] = 'bell character(BEL)';
+$string['description_char8'] = 'backspace character(BS)';
+$string['description_char9'] = 'tabulation(HT)';
+$string['description_charA'] = 'line feed(LF)';
+$string['description_charB'] = 'vertical tabulation(VT)'; // TODO - \v already has a string but this string is used when user type \xb ?
+$string['description_charC'] = 'form feed(FF)';
+$string['description_charD'] = 'carriage return character(CR)';
+$string['description_charE'] = 'shift out character (SO)';
+$string['description_charF'] = 'shift in character (SI)';
+$string['description_char10'] = 'data link escape character (DLE)';
+$string['description_char11'] = 'device control 1 (oft. XON) character (DC1)';
+$string['description_char12'] = 'device control 2 character (DC2)';
+$string['description_char13'] = 'device control 3 (oft. XOFF) character (DC3)';
+$string['description_char14'] = 'device control 4 character (DC4)';
+$string['description_char15'] = 'negative acknowledgement character (NAK)';
+$string['description_char16'] = 'synchronous idle character (SYN)';
+$string['description_char17'] = 'end of transmission block character (ETB)';
+$string['description_char18'] = 'cancel character (CAN)';
+$string['description_char19'] = 'end of medium character (EM)';
+$string['description_char1A'] = 'substitute character (SUB)';
+$string['description_char1B'] = 'escape(ESC)';
+$string['description_char1C'] = 'file separator character (FS)';
+$string['description_char1D'] = 'group separator character (GS)';
+$string['description_char1E'] = 'record separator character (RS)';
+$string['description_char1F'] = 'unit separator character (US)';
+$string['description_char20'] = 'space';
+$string['description_char7F'] = 'delete character (DEL)';
+$string['description_charA0'] = 'non-breaking space';
+$string['description_charAD'] = 'soft hyphen character';
+$string['description_char2002'] = 'en space';
+$string['description_char2003'] = 'em space';
+$string['description_char2009'] = 'thin space';
+$string['description_char200C'] = 'zero width non-joiner';
+$string['description_char200D'] = 'zero width joiner';
+//CHARSET FLAGS
 $string['description_charflag_digit'] = 'decimal digit';
 $string['description_charflag_xdigit'] = 'hexadecimal digit';
 $string['description_charflag_space'] = 'white space';
@@ -459,10 +496,10 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
-//description errors
+// description errors
 $string['description_errorbefore'] = '<span style="color:red">';
 $string['description_errorafter'] = '</span>';
-//for testing
+// for testing
 $string['description_charflag_word_g'] = 'word character(form g)';//for testing only
 $string['description_char_g'] = '<span style="color:blue">%char</span>(form g)';//for testing only
 $string['description_dollar_g'] = 'end of the string(form g)';//for testing
@@ -486,3 +523,20 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
+
+// Strings for tooltipe
+$string['tooltipe_charset'] = 'character class';
+$string['tooltipe_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['tooltipe_emptiness'] = 'emptiness';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_backreference'] = 'backreference';
+$string['tooltipe_recursion'] = 'recursion';
+$string['tooltipe_control_sequence'] = 'control sequence';
+$string['tooltipe_option'] = 'option';
+$string['tooltipe_finite_quantifier'] = 'finite quantifier';
+$string['tooltipe_infinite_quantifier'] = 'infinite quantifier';
+$string['tooltipe_concatenation'] = 'concatenation';
+$string['tooltipe_alternative'] = 'alternative';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_subpattern'] = 'subpattern';
+$string['tooltipe_conditional_subpattern'] = 'conditional subpattern';

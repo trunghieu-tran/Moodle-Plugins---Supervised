@@ -19,14 +19,19 @@ require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.ph
  * Representation of nodes and leafs as they were typed in the regex.
  */
 class qtype_preg_userinscription {
+    /** General case, contains the same string as typed by user. */
+    const TYPE_GENERAL = 'userinscription_general';
+    /** Flag that needs an additional description that must be stored in the lang file (unicode properties names etc). */
+    const TYPE_CHARSET_FLAG = 'userinscription_charset_flag';
+
     /** String with the leaf itself. */
     public $data = '';
-    /** Additional info - for example, is it a charset flag (\w, \d) - true or false, etc. */
-    public $addinfo = null;
+    /** Type of the user inscription. */
+    public $type = null;
 
-    public function __construct($data = '', $addinfo = null) {
+    public function __construct($data = '', $type = self::TYPE_GENERAL) {
         $this->data = $data;
-        $this->addinfo = $addinfo;
+        $this->type = $type;
     }
 }
 
