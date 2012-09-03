@@ -20,9 +20,10 @@
  * Note: interfaces and classes there are intentionally left without qtype_poasquestion prefix as
  *  they are intended for more general Moodle use after hinting behaviours would be complete.
  *
- * @package    qtype
+ * @package    qtype_poasquestion
  * @subpackage hints
- * @copyright  2012 Sychev Oleg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -96,6 +97,16 @@ abstract class qtype_specific_hint {
      * Even if response is used to calculate penalty, hint object should still return an approximation to show to the student if $response is null
      */
     abstract public function penalty_for_specific_hint($response = null);
+
+    /**
+     * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
+     *
+     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour variable is set, depending on whether hint is response based.
+     */
+    public function button_rendered_by_question() {
+        //By default, hint button should be rendered by behaviour.
+        return false;
+    }
 
     /**
      * Returns true if there should be only one hint button for the given situation

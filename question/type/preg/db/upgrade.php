@@ -1,21 +1,12 @@
-<?php  //$Id: upgrade.php,v 1.2.2.2 2009/08/31 16:37:52 arborrow Exp $
+<?php
 
-// This file keeps track of upgrades to
-// the preg qtype plugin
-//
-// Sometimes, changes between versions involve
-// alterations to database structures and other
-// major things that may break installations.
-//
-// The upgrade function in this file will attempt
-// to perform all the necessary actions to upgrade
-// your older installtion to the current version.
-//
-// If there's something it cannot do itself, it
-// will tell you what you need to do.
-//
-// The commands in here will all be database-neutral,
-// using the functions defined in lib/ddllib.php
+/**
+ * Preg question type upgrade code.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 function xmldb_qtype_preg_upgrade($oldversion=0) {
 
@@ -130,7 +121,7 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
-         // Define field lexemhintpenalty to be added to qtype_preg
+        // Define field lexemhintpenalty to be added to qtype_preg
         $field = new xmldb_field('lexemhintpenalty', XMLDB_TYPE_FLOAT, '4, 2', null, XMLDB_NOTNULL, null, '0', 'uselexemhint');
 
         // Conditionally launch add field lexemhintpenalty
@@ -139,7 +130,7 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         }
 
         // Define field langid to be added to qtype_preg
-         $field = new xmldb_field('langid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'lexemhintpenalty');
+        $field = new xmldb_field('langid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'lexemhintpenalty');
 
         // Conditionally launch add field langid
         if (!$dbman->field_exists($table, $field)) {
@@ -154,13 +145,12 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
-         // Rename field usehint on table qtype_preg to usecharhint
+        // Rename field usehint on table qtype_preg to usecharhint
         $field = new xmldb_field('usehint', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'exactmatch');
         // Launch rename field usehint
         $dbman->rename_field($table, $field, 'usecharhint');
 
         // Rename field hintpenalty on table qtype_preg to charhintpenalty
-
         $field = new xmldb_field('hintpenalty', XMLDB_TYPE_FLOAT, '4, 2', null, XMLDB_NOTNULL, null, '0', 'usecharhint');
 
         // Launch rename field hintpenalty
@@ -170,9 +160,13 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2012072300, 'qtype', 'preg');
     }
 
+    if ($oldversion < 2012090300) {
+        //Remove temporarily added pcrestrict notation as redundant.
+        $query = "UPDATE {qtype_preg} SET notation='native' WHERE notation='pcrestrict'";
+        $DB->execute($query);
 
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2012090300, 'qtype', 'preg');
+    }
     return true;
-
 }
-
-?>

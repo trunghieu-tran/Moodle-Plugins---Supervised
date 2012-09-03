@@ -1,15 +1,18 @@
-<?php //$Id: dfa_preg_matcher.php, v 0.1 beta 2010/08/08 23:47:35 dvkolesov Exp $
+<?php
 
 /**
- * Defines class preg_php_matcher, matching engine based on php preg extension
- * It support the more complicated regular expression possible with great speed, but doesn't allow partial matching and hinting
+ * Defines preg_php_matcher class, the matching engine based on php preg extension.
+ * It supports more complicated regular expressions possible with great speed, but doesn't allow partial matching and hintings
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
@@ -37,21 +40,17 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         return 'php_preg_matcher';
     }
 
-    public function used_notation() {
-        return 'pcrestrict';
-    }
-
     /**
-    * Returns string of regular expression modifiers supported by this engine
-    */
+     * Returns string of regular expression modifiers supported by this engine
+     */
     public function get_supported_modifiers() {
         return new qtype_poasquestion_string('imsxeADSUX');
     }
 
     /**
-    * Does this engine need a parsing of regular expression?
-    * @return bool if parsing needed
-    */
+     * Does this engine need a parsing of regular expression?
+     * @return bool if parsing needed
+     */
     protected function is_parsing_needed() {
         //We need parsing if option is set for capture subpatterns.
         return $this->options->capturesubpatterns;
@@ -62,9 +61,9 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-    * Check regular expression for errors
-    * @return bool is tree accepted
-    */
+     * Check regular expression for errors
+     * @return bool is tree accepted
+     */
     protected function accept_regex() {
 
         //Clear away errors from parser - we don't really need them...
@@ -86,9 +85,9 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     }
 
     /**
-    * Do real matching
-    * @param str a string to match
-    */
+     * Do real matching
+     * @param str a string to match
+     */
     protected function match_inner($str) {
         //Prepare results
         $matchresults = new qtype_preg_matching_results();
@@ -120,11 +119,6 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
                 }
             }
         }
-
         return $matchresults;
     }
-
-
-
 }
-?>
