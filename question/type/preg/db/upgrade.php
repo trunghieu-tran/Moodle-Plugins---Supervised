@@ -159,5 +159,14 @@ function xmldb_qtype_preg_upgrade($oldversion=0) {
         // preg savepoint reached
         upgrade_plugin_savepoint(true, 2012072300, 'qtype', 'preg');
     }
+
+    if ($oldversion < 2012090300) {
+        //Remove temporarily added pcrestrict notation as redundant.
+        $query = "UPDATE {qtype_preg} SET notation='native' WHERE notation='pcrestrict'";
+        $DB->execute($query);
+
+        // preg savepoint reached
+        upgrade_plugin_savepoint(true, 2012090300, 'qtype', 'preg');
+    }
     return true;
 }
