@@ -42,7 +42,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                 } else {
                     $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
                 }
-                if (!$showhintbtn) {
+                if (!$showhintbtn || !$hintobj->hint_available()) {
                     continue;
                 }
 
