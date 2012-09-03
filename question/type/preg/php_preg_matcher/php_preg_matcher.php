@@ -40,10 +40,6 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         return 'php_preg_matcher';
     }
 
-    public function used_notation() {
-        return 'pcrestrict';
-    }
-
     /**
      * Returns string of regular expression modifiers supported by this engine
      */
