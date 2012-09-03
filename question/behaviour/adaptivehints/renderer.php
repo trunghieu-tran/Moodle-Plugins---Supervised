@@ -34,6 +34,19 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
             $hintobj = $question->hint_object($hintkey);
 
             if (!$hintobj->button_rendered_by_question()) {//Button(s) isn't rendered by the question, so behaviour must render it.
+
+                //Check whether button should be rendered at all.
+                $laststep = $qa->get_last_step();
+                if ($hintobj->hint_response_based()) {
+                    $showhintbtn = $laststep->has_behaviour_var('_resp_hintbtns');
+                } else {
+                    $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
+                }
+                if (!$showhintbtn) {
+                    continue;
+                }
+
+                //Render button.
                 $attributes = array(
                     'type' => 'submit',
                     'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
@@ -41,9 +54,6 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
                     'class' => 'submit btn',
                 );
-                if ($options->readonly) {
-                    $attributes['disabled'] = 'disabled';
-                }
                 $output .= html_writer::empty_tag('input', $attributes);
 
                 //Cost message
