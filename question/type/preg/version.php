@@ -14,7 +14,7 @@ $plugin->component = 'qtype_preg';
 $plugin->version  = 2012072300;
 $plugin->requires = 2012062501;
 $plugin->release = 'Preg 2.3';
-$plugin->maturity = MATURITY_STABLE;
+$plugin->maturity = MATURITY_BETA;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
