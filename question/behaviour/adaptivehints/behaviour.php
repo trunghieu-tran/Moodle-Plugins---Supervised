@@ -129,6 +129,16 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $newtotal = $prevtotal + $penalty;
         $pendingstep->set_behaviour_var('_totalpenalties', $newtotal);
         $pendingstep->set_behaviour_var('_render_'.$hintkey, true);
+        //Copy previous _render_hintxxx variables if previous state is hint state and response is same.
+        $prevhintstep = $this->qa->get_last_step();
+        if ($prevhintstep->has_behaviour_var('_hashint') && $this->is_same_response($pendingstep)) {
+            $prevhints = $this->question->available_specific_hint_types();
+            foreach ($prevhints as $prevhintkey => $value) {
+                if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey)) {
+                    $pendingstep->set_behaviour_var('_render_'.$prevhintkey, true);
+                }
+            }
+        }
 
 
         $prevbest = $pendingstep->get_fraction();
