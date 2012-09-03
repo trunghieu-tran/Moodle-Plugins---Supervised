@@ -52,7 +52,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
         if(!$currentanswer) {
-            return parent::feedback($qa, $options);;
+            $currentanswer = '';
         }
 
         //Determine requested hint(s)
@@ -65,7 +65,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             }
         }
 
-        var_dump($hintkeys);
         //Render hints
         if (!empty($hintkeys)) {//Hint requested.
             foreach ($hintkeys as $hintkey) {

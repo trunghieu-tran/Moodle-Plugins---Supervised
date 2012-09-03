@@ -48,7 +48,6 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     public function adjust_display_options(question_display_options $options) {
         parent::adjust_display_options($options);//there seems to nothing to be done until question_display_options will be passed to specific_feedback function of question renderer
-        //maybe add correctness if there were a response there
     }
 
     ////Summarise functions
@@ -73,24 +72,34 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         return get_string('hintused', 'qbehaviour_adaptivehints', $a);
     }
 
+    //We should init first step to show non-response based hint buttons
+    public function init_first_step(question_attempt_step $step, $variant) {
+        parent::init_first_step($step, $variant);
+        $step->set_behaviour_var('_nonresp_hintbtns', true);
+    }
+
     ////Process functions
     public function process_action(question_attempt_pending_step $pendingstep) {
+
+        $result = null;
         // Process hint button press.
         foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
-                return $this->process_hint($pendingstep, $hintkey);
+                $result = $this->process_hint($pendingstep, $hintkey);
             }
         }
 
         //Proces all actions.
-        $result = parent::process_action($pendingstep);
+        if ($result === null) {
+            $result = parent::process_action($pendingstep);
+        }
 
         // Compute variables to show question it should render it's hint buttons.
         if (!$this->qa->get_state()->is_finished()) {
-            $pendingstep->set_behaviour_var('_nonresp_hintbuttons', true);
+            $pendingstep->set_behaviour_var('_nonresp_hintbtns', true);
             $response = $pendingstep->get_qt_data();
             if ($this->question->is_complete_response($response)) {
-                $pendingstep->set_behaviour_var('_resp_hintbuttons', true);
+                $pendingstep->set_behaviour_var('_resp_hintbtns', true);
             }
         }
 

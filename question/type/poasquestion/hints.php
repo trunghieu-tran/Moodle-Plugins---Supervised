@@ -101,7 +101,7 @@ abstract class qtype_specific_hint {
     /**
      * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
      *
-     * Questions should render hint buttons when _nonresp_hintbuttons and/or _resp_hintbuttons behaviour variable is set, depending on whether hint is response based.
+     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour variable is set, depending on whether hint is response based.
      */
     public function button_rendered_by_question() {
         //By default, hint button should be rendered by behaviour.

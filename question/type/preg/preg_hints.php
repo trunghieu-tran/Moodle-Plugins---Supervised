@@ -125,6 +125,10 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
 
     ////Abstract hint class functions implementation
 
+    public function hint_response_based() {
+        return false;//Could do without response to hint first character.
+    }
+
     /**
      * Returns whether response allows for the hint to be done
      */
@@ -174,6 +178,10 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
 
 
     ////Abstract hint class functions implementation
+
+    public function hint_response_based() {
+        return false;//Could do without response to hint first character.
+    }
 
     /**
      * Returns whether response allows for the hint to be done
