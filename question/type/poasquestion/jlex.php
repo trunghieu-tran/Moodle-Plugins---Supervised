@@ -25,7 +25,8 @@
   **************************************************************
 */
 
-require_once(dirname(__FILE__) . '/poasquestion_string.php');
+global $CFG;
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
 class JLexToken {
     public $line;

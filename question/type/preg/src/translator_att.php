@@ -1,11 +1,15 @@
 <?php
 
-    /**
-     * Test converter from AT&T format to the Preg cross-test format.
-     * To use .dat.txt files, first remove any comments and empty lines,
-     * then set the $INPUT_SET in this file correspondingly and run this file.
-     * @author Valeriy Streltsov
-     */
+/**
+ * Test converter from AT&T format to the Preg cross-test format.
+ * To use .dat.txt files, first remove any comments and empty lines,
+ * then set the $INPUT_SET in this file correspondingly and run this file.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Valeriy Streltsov <vostreltsov@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
     $INPUT_SET = 'nullsubexpr';      // CHANGE THIS VARIABLE TO CONVERT DIFFERENT FILES.
     $INPUT_FILENAME = $INPUT_SET . '.dat.txt';

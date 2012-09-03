@@ -3,24 +3,22 @@
 /**
  * Preg question renderer class.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Oleg Sychev
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
  * Generates the output for preg questions.
- *
- * @copyright  2011 Oleg Sychev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
@@ -54,28 +52,28 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
         if(!$currentanswer) {
-            return parent::feedback($qa, $options);;
+            $currentanswer = '';
         }
 
         //Determine requested hint(s)
         $hintmessage = '';
-        $hintkey = '';
+        $hintkeys = array();
         $hints = $question->available_specific_hint_types();
         foreach ($hints as $key => $value) {
             if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
-                $hintkey = $key;
-                break;//One hint per time for now - TODO - decide what to do with several hints per time
+                $hintkeys[] = $key;
             }
         }
 
         //Render hints
-        //TODO - decide exact conditions to show colored string. $options->correctness may be not best variant, because it associated with moodle 'hints' for questions like multichoice
-        //if ($options->correctness == question_display_options::VISIBLE) {
-        if ($hintkey !== '') {//hint requested
-            $hintobj = $question->hint_object($hintkey);
-            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
-            $hintmessage .= html_writer::empty_tag('br');
-        } elseif ($options->feedback == question_display_options::VISIBLE) {//specific feedback is possible, render correctness - TODO - decide when to render correctness
+        if (!empty($hintkeys)) {//Hint requested.
+            foreach ($hintkeys as $hintkey) {
+                $hintobj = $question->hint_object($hintkey);
+                $hintmessage .= $hintobj->render_hint($this, array('answer' => $currentanswer));
+                $hintmessage .= html_writer::empty_tag('br');
+            }
+        } elseif ($options->feedback == question_display_options::VISIBLE) {
+            //Specific feedback is possible, render colored string - TODO - decide when to render colored string.
             $hintobj =  $question->hint_object('hintmatchingpart');
             $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
             if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
@@ -143,5 +141,4 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //////Teacher-defined feedback text for that answer
         return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
-
 }
