@@ -63,12 +63,12 @@ class qtype_correctwriting_lexical_analyzer {
         // We assume that, lexical analyzer must fix all the lexical mistakes and find them at all
         // Because, why not? He must fix a lexical mistakes, but if can't fix stuff, he can put some mistakes.
         // If question starts working with lexical errors, what should it do? Which mistakes should it take - 
-        // lexical_analyzer's or own? How he maanages to split lexical_analyzer's mistakes from sequence_analyzer's
+        // lexical_analyzer's or own? How he manages to split lexical_analyzer's mistakes from sequence_analyzer's
         // Do we need another loop with is_a?
         $mistakes = array();
         if (count($responsestring->stream->tokens) != 0) {
             foreach($responsestring->stream->tokens as $index => $token) {
-                if (is_a($token, "block_formal_langs_c_language_character")) {
+                if (is_a($token, "block_formal_langs_c_token_character")) {
                     $value = $token->value();
                     $len = strlen($token->value());
                     if ($value[0] == 'L') {
@@ -78,7 +78,7 @@ class qtype_correctwriting_lexical_analyzer {
                        $mistakes[] = new qtype_correctwriting_c_language_multicharacter_literal($question, $responsestring, $token);
                     }
                 }
-                if (is_a($token,"block_formal_langs_c_language_unknown")) {
+                if (is_a($token,"block_formal_langs_c_token_unknown")) {
                     $value = $token->value();
                     if ($value == '"') {
                         $mistakes[] = new qtype_correctwriting_c_language_unmatched_quote_mistake($question, $responsestring, $token);
