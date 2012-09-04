@@ -242,7 +242,7 @@ abstract class qtype_preg_finite_automaton {
         if ($this->state_exists($state)) {
             $this->startstate = $state;
         } else {
-            throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
+            throw new qtype_preg_exception('set_start_state error: No state ' . $state->number . ' in automaton');
         }
     }
 
@@ -253,7 +253,7 @@ abstract class qtype_preg_finite_automaton {
         if ($this->state_exists($state)) {
             $this->endstate = $state;
         } else {
-            throw new qtype_preg_exception('set_end_state error: No state '.$stateindex.' in automaton');
+            throw new qtype_preg_exception('set_end_state error: No state ' . $state->number . ' in automaton');
         }
     }
 
