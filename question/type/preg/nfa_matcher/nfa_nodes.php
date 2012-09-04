@@ -309,7 +309,43 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
-        if ($rightborder === 0) {
+
+        for ($i = 0; $i < $rightborder; $i++) {
+            $this->operands[0]->create_automaton($matcher, $automaton, $stack);
+        }
+        $res = null;                // The resulting automaton.
+        $borderstates = array();    // States to which separating eps-transitions will be added.
+
+        // Linking automatons to the resulting one.
+        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        for ($i = 0; $i < $rightborder; $i++) {
+            $cur = array_pop($stack);
+            if ($i >= $leftborder) {
+                $borderstates[] = $cur['start'];
+            }
+            if ($res === null) {
+                // On the first iteration we just remember current automaton as the result.
+                $res = $cur;
+            } else {
+                // On subsequent iterations we concatenate current automaton to the result.
+                $automaton->update_state_references($res['end'], $cur['start']);
+                $cur['start']->merge_transition_set($res['end']);
+                $automaton->remove_state($res['end']);
+                $res['end'] = $cur['end'];
+            }
+        }
+
+        // Adding eps-transitions after first m bodies.
+        foreach ($borderstates as $state) {
+            $state->add_transition(new qtype_preg_nfa_transition($state, $epsleaf, $res['end']));
+        }
+        $automaton->set_start_state($res['start']);
+        $automaton->set_end_state($res['end']);
+        $stack[] = $res;
+    }
+
+    public function create_automaton(&$matcher, &$automaton, &$stack) {
+        if ($this->pregnode->rightborder === 0) {
             // Repeating 0 times means epsilon-transition.
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $start = new qtype_preg_fa_state($automaton);
@@ -320,44 +356,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
             $automaton->set_start_state($start);
             $automaton->set_end_state($end);
             $stack[] = array('start' => $start, 'end' => $end);
-        } else {
-            for ($i = 0; $i < $rightborder; $i++) {
-                $this->operands[0]->create_automaton($matcher, $automaton, $stack);
-            }
-            $res = null;                // The resulting automaton.
-            $borderstates = array();    // States to which separating eps-transitions will be added.
-
-            // Linking automatons to the resulting one.
-            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            for ($i = 0; $i < $rightborder; $i++) {
-                $cur = array_pop($stack);
-                if ($i >= $leftborder) {
-                    $borderstates[] = $cur['start'];
-                }
-                if ($res === null) {
-                    // On the first iteration we just remember current automaton as the result.
-                    $res = $cur;
-                } else {
-                    // On subsequent iterations we concatenate current automaton to the result.
-                    $automaton->update_state_references($res['end'], $cur['start']);
-                    $cur['start']->merge_transition_set($res['end']);
-                    $automaton->remove_state($res['end']);
-                    $res['end'] = $cur['end'];
-                }
-            }
-
-            // Adding eps-transitions after first m bodies.
-            foreach ($borderstates as $state) {
-                $state->add_transition(new qtype_preg_nfa_transition($state, $epsleaf, $res['end']));
-            }
-            $automaton->set_start_state($res['start']);
-            $automaton->set_end_state($res['end']);
-            $stack[] = $res;
-        }
-    }
-
-    public function create_automaton(&$matcher, &$automaton, &$stack) {
-        if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
+        } else if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
             return $this->create_qu($matcher, $automaton, $stack);
         } else {
             return $this->create_brace($matcher, $automaton, $stack);
