@@ -2742,7 +2742,6 @@ class qtype_preg_cross_tests_from_preg {
     }
 
     function data_for_test_esc_inside_charset() {
-
         $test1 = array( 'str'=>'This string contains 4 digits 43 characters and 9 spaces',
                         'is_match'=>true,
                         'full'=>true,
@@ -2758,6 +2757,25 @@ class qtype_preg_cross_tests_from_preg {
                         'next'=>'[\w\d\s]');
 
         return array('regex'=>'[\w\d\s]+',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_big_quantifier() {
+        $test1 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0),
+                        'length'=>array(100));
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(1),
+                        'next'=>'a');
+
+        return array('regex'=>'a{1,124}',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
