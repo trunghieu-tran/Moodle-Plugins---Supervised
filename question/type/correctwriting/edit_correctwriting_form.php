@@ -123,6 +123,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     $newtext = implode('<br />', $textdata);
                     $element=$mform->getElement('lexemedescriptions[' . $key . ']');
                     $element->setLabel($newtext);
+                    $element->setRows(count($textdata));
                 }
          
             }
