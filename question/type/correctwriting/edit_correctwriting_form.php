@@ -92,7 +92,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('maxmistakepercentage', PARAM_FLOAT);
         $mform->setDefault('maxmistakepercentage', 0.7);
         $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
-        
+
+        $mform->setAdvanced("lexicalerrorthreshold");
+        $mform->setAdvanced("lexicalerrorweight");
+        $mform->setAdvanced("absentmistakeweight");
+        $mform->setAdvanced("addedmistakeweight");
+        $mform->setAdvanced("movedmistakeweight");
+        $mform->setAdvanced("hintgradeborder");
+        $mform->setAdvanced("maxmistakepercentage");
+
         $languages = block_formal_langs::available_langs();
         
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
