@@ -105,8 +105,24 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->addRule('langid', null, 'required', null, 'client');
-        
-        parent::definition_inner($mform);
+
+        // Actually, this part is copied from shortanswer. When shortanswer
+        // gives a change to change his inner definition to correct, than it must
+        // be reverted to parent call and answerinstruct changed to origin
+        $menu = array(
+            get_string('caseno', 'qtype_shortanswer'),
+            get_string('caseyes', 'qtype_shortanswer')
+        );
+        $mform->addElement('select', 'usecase',
+            get_string('casesensitive', 'qtype_shortanswer'), $menu);
+
+        $mform->addElement('static', 'answersinstruct', '', '');
+        $mform->closeHeaderBefore('answersinstruct');
+
+        $this->add_per_answer_fields($mform, get_string('answerno', 'qtype_shortanswer', '{no}'),
+            question_bank::fraction_options());
+
+        $this->add_interactive_settings();
     }
     
     function definition_after_data() {
