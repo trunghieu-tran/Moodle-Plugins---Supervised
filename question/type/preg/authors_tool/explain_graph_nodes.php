@@ -224,11 +224,11 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     }
                     elseif ($iter->data[$i] == 'n')
                     {
-                        $result[] = chr(10) . get_string('description_char_n', 'qtype_preg');
+                        $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
                     }
                     elseif ($iter->data[$i] == 'r')
                     {
-                        $result[] = chr(10) . get_string('description_char_r', 'qtype_preg');
+                        $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
                     }
                     elseif ($iter->data[$i] == 'd')
                     {
@@ -260,11 +260,11 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     }
                     elseif ($iter->data[$i] == 'h')
                     {
-                        goto horiz;
+                        $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
                     }
                     elseif ($iter->data[$i] == 'v')
                     {
-                        goto vert;
+                        $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
                     }
                     elseif ($iter->data[$i] == ' ')
                     {
@@ -279,25 +279,15 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                         $result[0] .= $iter->data[$i];
                     }
                 }
-                elseif ($iter->data[$i] == 'h')
-                {
-                    horiz:
-                    $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
-                }
-                elseif ($iter->data[$i] == 'v')
-                {
-                    vert:
-                    $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
-                }
                 elseif ($iter->data[$i] == ' ')
                 {
                     space:
-                    $result[] = chr(10) . get_string('description_char_space', 'qtype_preg');
+                    $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
                 }
                 elseif ($iter->data[$i] == '	')
                 {
                     tab:
-                    $result[] = chr(10) . get_string('description_char_t', 'qtype_preg');
+                    $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                 }
                 elseif ($iter->data[$i] == '.')
                 {
