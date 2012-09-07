@@ -174,16 +174,14 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
         if (count($first['end']->outgoing_transitions()) > 0) {
             $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new qtype_preg_leaf_meta;
-            $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $first['end']->add_transition(new qtype_preg_nfa_transition($first['end'], $epsleaf, $end));
             $first['end'] = $end;
         }
         if (count($second['end']->outgoing_transitions()) > 0) {
             $end = new qtype_preg_fa_state;
             $automaton->add_state($end);
-            $epsleaf = new qtype_preg_leaf_meta;
-            $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $second['end']->add_transition(new qtype_preg_nfa_transition($second['end'], $epsleaf, $end));
             $second['end'] = $end;
         }
@@ -227,8 +225,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         }
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf = new qtype_preg_leaf_meta;
-        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
     }
@@ -300,8 +297,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         $body = array_pop($stack);
 
         // The body automaton can be skipped by an eps-transition.
-        $epsleaf = new qtype_preg_leaf_meta;
-        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
         $stack[] = $body;
     }
@@ -313,16 +309,15 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         // Operand creates its automaton n times.
         $leftborder = $this->pregnode->leftborder;
         $rightborder = $this->pregnode->rightborder;
+
         for ($i = 0; $i < $rightborder; $i++) {
             $this->operands[0]->create_automaton($matcher, $automaton, $stack);
         }
-
         $res = null;                // The resulting automaton.
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
-        $epsleaf = new qtype_preg_leaf_meta;
-        $epsleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
@@ -350,7 +345,18 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
     }
 
     public function create_automaton(&$matcher, &$automaton, &$stack) {
-        if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
+        if ($this->pregnode->rightborder === 0) {
+            // Repeating 0 times means epsilon-transition.
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $start = new qtype_preg_fa_state($automaton);
+            $end = new qtype_preg_fa_state($automaton);
+            $start->add_transition(new qtype_preg_nfa_transition($start, $epsleaf, $end));
+            $automaton->add_state($start);
+            $automaton->add_state($end);
+            $automaton->set_start_state($start);
+            $automaton->set_end_state($end);
+            $stack[] = array('start' => $start, 'end' => $end);
+        } else if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
             return $this->create_qu($matcher, $automaton, $stack);
         } else {
             return $this->create_brace($matcher, $automaton, $stack);
