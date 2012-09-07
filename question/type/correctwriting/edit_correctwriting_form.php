@@ -217,7 +217,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $this->first_time = false;
             // We place it here, because it will look nicer and won't shift any of strings 
             // in lexeme descriptions field
-            $errors['category'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+            $errors['answer[0]'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
         } else {
             $lang = block_formal_langs::lang_object($data['langid']);
             foreach($data['answer'] as $key => $value) {
@@ -234,10 +234,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
                     if (count($tokens) > count($descriptions)) {
-                        $errors["lexemedescriptions[$key]"] = get_string('writemoredescriptions', 'qtype_correctwriting');
+                        $errors["answer[$key]"] = get_string('writemoredescriptions', 'qtype_correctwriting');
                     }
                     if (count($tokens) < count($descriptions)) {
-                        $errors["lexemedescriptions[$key]"] = get_string('writelessdescriptions', 'qtype_correctwriting');
+                        $errors["answer[$key]"] = get_string('writelessdescriptions', 'qtype_correctwriting');
                     }
                 }
             }
