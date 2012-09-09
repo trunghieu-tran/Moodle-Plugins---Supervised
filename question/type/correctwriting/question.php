@@ -219,8 +219,9 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         return $this->answers[$this->matchedanswerid];
     }
     /** Computes a fraction of student response, based on alayzer
-        @param float  $fraction maximum fraction of student response
-        @param object $analyzer lexical analyzer
+     *  @param float  $fraction maximum fraction of student response
+     *  @param object $analyzer lexical analyzer
+     *  @return float fraction
      */
     public function compute_fraction($fraction, $analyzer) {
         $result = $fraction;
@@ -244,58 +245,56 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         return array('exact' => $exact, 'nonexact' => $nonexact);
     }
-    /** Checks, whether student answer matches exact match answer and if matches, grades it
-      @param string $response student response
-      @param array  $answers  array of exact match answers
-      @return bool  whether it was matched
-      */
-    public function check_exact_match_answers($response, $answers) {
-        // Don't scan if no need for this
-        if (count($answers) == 0) {
-            return false;
-        }
-        // Scan answers
-        $matched = false;
-        $matchedid = null;
-        $matchedanalyzer = null;
-        $fraction = -1;
-        // Scan answers for match
-        foreach($answers as $id => $answer) {
-            $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
-            $mistakes = $analyzer->mistakes();
-            if (count($mistakes) == 0) {
-                if (($fraction <= $answer->fraction) || ($matched == false)) {
-                    $fraction = $answer->fraction;
-                    $matchedanalyzer = $analyzer;
-                    $matchedid = $id;
-                }
-                $matched = true;
-            }
-        }
-        // Normalize fraction
-        if (($fraction < 0) && ($matched == true)) {
-            $fraction = 0;
-        }
-        if (($fraction > 1) && ($matched == true)) {
-            $fraction = 1;
-        }
-        
-        if ($matched) {
-            // Copy matched data
-            $this->matchedanswerid = $matchedid;
-            $this->matchedanalyzer = $matchedanalyzer;
-            $state = question_state::graded_state_for_fraction($fraction);
-            $this->matchedgradestate = array($fraction, $state);
-        }
-        
-        return $matched;
+
+    /**
+     * Performs exact matching  for answer
+     * @param stdClass $answer answer object
+     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @param block_formal_langs $stream stream data
+     * @return bool whether it matches
+     */
+    public function matches_exact($answer, $analyzer,  $stream) {
+        return count($analyzer->mistakes()) == 0;
+    }
+    /**
+     * Performs exact matching  for answer
+     * @param stdClass $answer answer object
+     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @param block_formal_langs $stream stream data
+     * @return bool whether it matches
+     */
+    public function matches_non_exact($answer, $analyzer, $stream) {
+        $answertokencount = count($stream->tokens);
+        $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
+        return $partiallycorrect;
+    }
+
+    /**
+     * Computes fraction for exact match. Used as callback in check match
+     * @param stdClass $answer answer type
+     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @return float resulting fraction
+     */
+    public function compute_exact_match_fraction($answer, $analyzer) {
+        return $answer->fraction;
+    }
+    /**
+     * Computes fraction for non-exact match. Used as callback in check match
+     * @param stdClass $answer answer type
+     * @param qtype_correctwriting_lexical_analyzer $analyzer analyzer data
+     * @return float resulting fraction
+     */
+    public function compute_nonexact_match_fraction($answer, $analyzer) {
+        return $this->compute_fraction($answer->fraction, $analyzer);
     }
     /** Checks, whether student answer matches non-exact match answer and if matches, grades it
-      @param string $response student response
-      @param array  $answers  array of exact match answers
-      @return bool  whether it was matched
+      *  @param string $response student response
+      *  @param array  $answers  array of exact match answers
+      *  @param string $checkmethod  method used to check, whether answer is suitable to match. @see matches_non_exact, matches_exact
+      *  @param string $fractionmethod method used to compute fraction on match. @see  compute_nonexact_match_fraction, compute_exact_match_fraction
+      *  @return bool  whether it was matched
       */
-    public function check_nonexact_match_answers($response, $answers) {
+    public function check_match_answers($response, $answers, $checkmethod, $fractionmethod) {
         // Don't scan if no need for this
         if (count($answers) == 0) {
             return false;
@@ -312,11 +311,11 @@ class qtype_correctwriting_question extends question_graded_automatically  {
             $analyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
             //Get lexeme count from answer
             $answerstring = $language->create_from_string($answer->answer);
-            $answertokencount = count($answerstring->stream->tokens);
+            $answerstream= $answerstring->stream;
             // Check, whether answer is partially correct
-            $partiallycorrect = (count($analyzer->mistakes())  <= ($this->maxmistakepercentage * $answertokencount));
-            if ($partiallycorrect == true) {
-                $answerfraction = $this->compute_fraction($answer->fraction, $analyzer);
+            $currentmatched = $this->$checkmethod($answer, $analyzer, $answerstream);
+            if ($currentmatched == true) {
+                $answerfraction = $this->$fractionmethod($answer, $analyzer);
                 if (($fraction <= $answerfraction) || ($matched == false)) {
                     $fraction = $answerfraction;
                     $matchedanalyzer = $analyzer;
@@ -325,7 +324,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                 $matched = true;
             }
         }
-        
+
         // Normalize fraction
         if (($fraction < 0) && ($matched == true)) {
             $fraction = 0;
@@ -333,7 +332,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         if (($fraction > 1) && ($matched == true)) {
             $fraction = 1;
         }
-        
+
         if ($matched) {
             // Copy matched data
             $this->matchedanswerid = $matchedid;
@@ -341,8 +340,28 @@ class qtype_correctwriting_question extends question_graded_automatically  {
             $state = question_state::graded_state_for_fraction($fraction);
             $this->matchedgradestate = array($fraction, $state);
         }
-        
+
         return $matched;
+    }
+    /** Checks, whether student answer matches exact match answer and if matches, grades it
+     * @param string $response student response
+     * @param array  $answers  array of exact match answers
+     * @return bool  whether it was matched
+     */
+    public function check_exact_match_answers($response, $answers) {
+        return $this->check_match_answers($response, $answers,
+                                          'matches_exact',
+                                          'compute_exact_match_fraction');
+    }
+    /** Checks, whether student answer matches non-exact match answer and if matches, grades it
+      @param string $response student response
+      @param array  $answers  array of exact match answers
+      @return bool  whether it was matched
+      */
+    public function check_nonexact_match_answers($response, $answers) {
+        return $this->check_match_answers($response, $answers,
+                                          'matches_non_exact',
+                                          'compute_nonexact_match_fraction');
     }
     /** Grades  as wrong answer to an answer of max fraction
         @param string $response student response    
