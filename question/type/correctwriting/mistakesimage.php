@@ -54,7 +54,18 @@ class qtype_correctwriting_abstract_label
      @var array  array(x, y) connection point where connection to point can be put to.
      */
    protected $connection = array(0,0);
-  
+   /**
+    * @var stdClass|null bounding rectangle
+    */
+   protected $rectangle = null;
+
+    /**
+     * Returns a rectangle for data
+     * @return null|stdClass
+     */
+    public function rect() {
+       return $this->rectangle;
+   }
    /** Returns a connection point for drawing arrows
      @return array  of two coordinates x and y as array(x,y)
      */
@@ -80,6 +91,7 @@ class qtype_correctwriting_abstract_label
        } else {
            $this->connection[] = $currentrect->y - TINY_SPACE; 
        }
+       $this->rectangle = $currentrect;
    }
    /** Paints a label at specific position, specified by rectangle, also setting a connection point
        for drawing arrows
@@ -199,7 +211,19 @@ class qtype_correctwriting_table_cell
        // Return result
        return array($width, $height);
    }
-   /** Returns a connection point for answer part of cell
+    /** Returns an answer rect
+     *  @return stdClass rect
+     */
+    public function get_answer_rect() {
+        return $this->answer->rect();
+    }
+    /** Returns an response rect
+     *  @return stdClass rect
+     */
+    public function get_response_rect() {
+        return $this->response->rect();
+    }
+    /** Returns a connection point for answer part of cell
        @return array coordinates of point as array(x, y)
     */
    public function get_answer_connection_point() {
@@ -488,6 +512,14 @@ class qtype_correctwriting_table
        $cell = $this->table[$this->answertable[$answerindex]];
        return $this->get_connections_from_cell($cell);
    }
+    /** Returns a connection point for lexeme in student answer
+        @param int $answerindex index of lexeme in answer
+        @return stdClass bounding rectangle
+     */
+   public function get_rect_by_answer_index($answerindex) {
+       $cell = $this->table[$this->answertable[$answerindex]];
+       return $cell->get_answer_rect();
+   }
    /** Returns a connection point for lexeme in student response
        @param int $responseindex index of lexeme in responses
        @return stdClass( answer => coordinate of answer connection point as array(x,y), response => coordinate of response)
@@ -496,6 +528,14 @@ class qtype_correctwriting_table
         //Get current cell
         $cell = $this->table[$this->responsetable[$responseindex]];
         return $this->get_connections_from_cell($cell);
+   }
+   /** Returns a connection point for lexeme in student answer
+     @param int $answerindex index of lexeme in answer
+     @return stdClass bounding rectangle
+    */
+   public function get_rect_by_response_index($responseindex) {
+       $cell = $this->table[$this->responsetable[$responseindex]];
+       return $cell->get_response_rect();
    }
    /** Returns a connection for arrow for cell $cell
        @param qtype_correctwriting_table_cell $cell cell, which connection point is extracted
@@ -572,11 +612,11 @@ class qtype_correctwriting_table
   */
 class qtype_correctwriting_arrow_builder {
    /**
-     @var qtype_correctwriting_table built table of lexemes
+    * @var qtype_correctwriting_table built table of lexemes
     */
    private $table;
    /** Creates a new builder with associated data
-     @param qtype_correctwriting_table $table built table of lexemes
+    * @param qtype_correctwriting_table $table built table of lexemes
     */
    public function __construct($table) {
        $this->table = $table;
@@ -592,17 +632,15 @@ class qtype_correctwriting_arrow_builder {
        // Draw absent lexemes arrows
        if (count($this->table->mistakes()->get_absent_lexeme_indexes()) != 0) {
            foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
-               $p1 = $this->table->get_connections_by_answer_index($index)->answer;
-               $p2 = $this->table->get_connections_by_answer_index($index)->response;
-               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+               $rect = $this->table->get_rect_by_answer_index($index);
+               $this->draw_rectangle($im, $palette['red'], $rect);
            }
        }
        // Draw added lexemes arrows
        if (count($this->table->mistakes()->get_added_lexeme_indexes()) != 0 ) {
            foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
-               $p1 = $this->table->get_connections_by_response_index($index)->answer;
-               $p2 = $this->table->get_connections_by_response_index($index)->response;
-               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+               $rect = $this->table->get_rect_by_response_index($index);
+               $this->draw_strikethrough($im, $palette['black'], $rect);
            }
        }
        // Draw moved lexemes arrows
@@ -622,10 +660,47 @@ class qtype_correctwriting_arrow_builder {
            }
        }
    }
-
+   /**
+    * Draws a strikethrough line in specified rect
+    * @param resource $im image
+    * @param int      $color  color
+    * @param stdClass $rect   rectangle
+    */
+   protected function draw_strikethrough(&$im, $color, $rect) {
+       $p1x = $rect->x;
+       $py = $rect->y + $rect->height * 0.65;
+       $p2x = $rect->x + $rect->width;
+       imageline($im, $p1x, $py, $p2x, $py, $color);
+   }
+   /**
+    * Draws a rectangle with specified color
+    * @param resource $im image
+    * @param int      $color  color
+    * @param stdClass $rect   rectangle
+    */
+   protected function draw_rectangle(&$im, $color, $rect) {
+       $points = array(  array(0, 0),
+                         array(0, $rect->height),
+                         array($rect->width, $rect->height),
+                         array($rect->width, 0)
+                      );
+       $lines = array( array($points[0], $points[1]),
+                       array($points[1], $points[2]),
+                       array($points[2], $points[3]),
+                       array($points[3], $points[0])
+                     );
+       for($i = 0;$i < count($lines); $i++) {
+           $line = $lines[$i];
+           $p1x = $rect->x + $line[0][0];
+           $p1y = $rect->y + $line[0][1];
+           $p2x = $rect->x + $line[1][0];
+           $p2y = $rect->y + $line[1][1];
+           imageline($im, $p1x, $p1y, $p2x, $p2y, $color);
+       }
+   }
    /** Draws a directed arrow 
        @param resource $im image 
-       @param color    $color color, which it should be painted by
+       @param int      $color color, which it should be painted by
        @param array    $p1   first point as array(x, y)
        @param array    $p2   second point as array(x, y)
        @param bool     $markbegin whether arrow tail should be at p1, otherwise at p2
