@@ -61,6 +61,26 @@ function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues)
     return qtype_correctwriting_sequence_analyzer::lcs($answer, $response);
 }
 
+/**
+ *  A class of test utils to test some stuff d
+ */
+class qtype_correctwriting_sa_test_utils {
+    /**
+     * Tests, whether LCS is in list
+     * @static
+     * @param PHPUnit_Framework_TestCase $test test case
+     * @param array $lcss    all of lcss
+     * @param array $testlcs current testing lcs
+     */
+    public static function has_lcs($test, $lcss, $testlcs) {
+        $haslcs = false;
+        for($i = 0;$i < count($lcss);$i++) {
+            $haslcs = $haslcs || ($lcss[$i] == $testlcs);
+        }
+        $test->assertTrue($haslcs, var_export($testlcs,true) . " was not found in " . var_export($lcss, true));
+    }
+}
+
  /**
   * This class contains the test cases for the sequence analyzer.
   * Currently lcs() function is being tested
@@ -122,18 +142,20 @@ function get_test_lcs($answertypes,$answervalues,$responsetypes,$responsevalues)
        // Check LCS props
        $this->assertTrue($lcs != null, 'LCS does not exists!');
        $this->assertTrue(count($lcs) == 2, 'Incorrect amount of LCS found!');
-       // Check first LCS   
-       $this->assertTrue(count($lcs[0]) == 4, 'Incorrect amount of lexemes in first LCS!');
-       $this->assertTrue($lcs[0][0] == 0, 'First LCS must contain 0->0  index pair!');
-       $this->assertTrue($lcs[0][1] == 1, 'First LCS must contain 1->1  index pair!');
-       $this->assertTrue($lcs[0][2] == 2, 'First LCS must contain 2->2  index pair!');
-       $this->assertTrue($lcs[0][3] == 3, 'First LCS must contain 3->3  index pair!');
-       // Check second LCS   
-       $this->assertTrue(count($lcs[1]) == 4, 'Incorrect amount of lexemes in second LCS!');
-       $this->assertTrue($lcs[1][3] == 4, 'Second LCS must contain 3->4  index pair!');
-       $this->assertTrue($lcs[1][2] == 2, 'Second LCS must contain 2->2  index pair!');
-       $this->assertTrue($lcs[1][1] == 1, 'Second LCS must contain 1->1  index pair!');
-       $this->assertTrue($lcs[1][0] == 0, 'Second LCS must contain 0->0  index pair!');
+       // Check first LCS
+       qtype_correctwriting_sa_test_utils::has_lcs($this, $lcs, array(
+                                                   0 => 0,
+                                                   1 => 1,
+                                                   2 => 2,
+                                                   3 => 3
+                                                   ));
+       // Check second LCS
+       qtype_correctwriting_sa_test_utils::has_lcs($this, $lcs, array(
+                                                   0 => 0,
+                                                   1 => 1,
+                                                   2 => 2,
+                                                   3 => 4
+                                                   ));
     }
     
     // Tests lcs() function with case, when no LCS can be found
