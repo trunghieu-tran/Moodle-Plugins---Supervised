@@ -367,17 +367,17 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         @param string $response student response    
       */    
     public function grade_as_wrong_response_to_max_fraction($response) {
-        $fraction = -1;
-        $maxid = null;
-         foreach($this->answers as $id => $answer) {
-            if (($answer->fraction >= $fraction) || ($maxid == null)) {
-                $maxid = $id;
-                $fraction = $answer->fraction;
+        $fid = null;
+        $prec = 0.0001;
+        foreach($this->answers as $id => $answer) {
+            if (abs($answer->fraction - 1) < $prec ) {
+                $fid = $id;
+                break;
             } 
         }
         
-        $this->matchedanswerid = $maxid;
-        $answer = $this->answers[$maxid];
+        $this->matchedanswerid = $fid;
+        $answer = $this->answers[$fid];
         $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
         $this->matchedgradestate = array(0, question_state::$gradedwrong);
     }
