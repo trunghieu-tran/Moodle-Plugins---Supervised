@@ -72,7 +72,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         return get_string('hintused', 'qbehaviour_adaptivehints', $a);
     }
 
-    //We should init first step to show non-response based hint buttons
+    //We should init first step to show non-response based hint buttons.
     public function init_first_step(question_attempt_step $step, $variant) {
         parent::init_first_step($step, $variant);
         $step->set_behaviour_var('_nonresp_hintbtns', true);
@@ -115,7 +115,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
             return question_attempt::DISCARD;
         }
 
-        //process data from last graded state (e.g. submit)
+        //Process data from last graded state (e.g. submit).
         $prevstep = $this->get_graded_step();
         if (!is_null($prevstep)) {//TODO - deal with situation where hint requested for response that is correct already
             if ($prevstep->get_state() == question_state::$complete) {
@@ -124,7 +124,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
                 $pendingstep->set_state(question_state::$todo);
             }
             $pendingstep->set_behaviour_var('_rawfraction', $prevstep->get_behaviour_var('_rawfraction'));
-        } else {//hint requested before submitting anything
+        } else {//Hint requested before submitting anything.
             $pendingstep->set_fraction(0);
             $pendingstep->set_behaviour_var('_rawfraction', 0);
             $pendingstep->set_state(question_state::$todo);

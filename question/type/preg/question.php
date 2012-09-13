@@ -440,7 +440,7 @@ class qtype_preg_question extends question_graded_automatically
     /**
     * Returns an array of available specific hint types
     */
-    public function available_specific_hint_types() {
+    public function available_specific_hint_types($response = null) {
         $hinttypes = array();
         if ($this->usecharhint) {
             $hinttypes['hintnextchar'] = get_string('hintnextchar', 'qtype_preg');
@@ -456,7 +456,7 @@ class qtype_preg_question extends question_graded_automatically
      *
      * Returns a hint object for given type
      */
-    public function hint_object($hintkey) {
+    public function hint_object($hintkey, $response = null) {
         $hintclass = 'qtype_preg_'.$hintkey;
         return new $hintclass($this);
     }
