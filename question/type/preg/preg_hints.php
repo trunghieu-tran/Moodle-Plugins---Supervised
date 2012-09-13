@@ -22,6 +22,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_preg_hintmatchingpart extends qtype_specific_hint {
 
+    public function hint_type() {
+        return qtype_specific_hint::SINGLE_INSTANCE_HINT;
+    }
+
     /**
      * Is hint based on response or not?
      *

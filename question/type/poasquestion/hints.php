@@ -41,17 +41,18 @@ interface question_with_qtype_specific_hints {
     /**
      * Returns an array of available specific hint types depending on question settings
      *
-     * The keys are hint type indentifiers, unique for the qtype
+     * The keys are hint type indentifiers, unique for the qtype.
      * The values are interface strings with the hint description (without "hint" word!)
+     * If a question allows for multiple instance choosen hints, it should return a separate key for each instance. That may depend on $response.
      */
-    public function available_specific_hint_types();
+    public function available_specific_hint_types($response = null);
 
     /**
      * Hint object factory
      *
-     * Returns a hint object for given type
+     * Returns a hint object for given type, for multiple instance choosen hints response may be needed to generate correct object.
      */
-    public function hint_object($hintkey);
+    public function hint_object($hintkey, $response = null);
 }
 
 /**
@@ -62,8 +63,29 @@ interface question_with_qtype_specific_hints {
  */
 abstract class qtype_specific_hint {
 
+    /** 
+     *  Single instance hint allows exactly one hint for each question state. 
+     *  Example is next character or next lexem hint in preg question type.
+     */
+    const SINGLE_INSTANCE_HINT = 1;
+    /** 
+     *  Choosen multiple instance hint allows several hint buttons, from which the user (either teacher or student, depending on behaviour) could choose one they want. 
+     *  Example is hint, that would show how you should place misplaced lexem in correct writing question type.
+     */
+    const CHOOSEN_MULTIPLE_INSTANCE_HINT = 2;
+    /** 
+     *  Sequential multuple instance hint allows several hints, that could be used only in sequence. 
+     *  Current moodle text hints are example of this ones since there are no way to allow students to choose between them.
+     */
+    const SEQENTIAL_MULTIPLE_INSTANCE_HINT = 3;
+
     /** @var object Question object, created this hint*/
     protected $question;
+
+    /**
+     * Returns one of hint type constants (single instance etc).
+     */
+    abstract public function hint_type();
 
     /**
      * Constructs hint object, remember question to use
@@ -106,15 +128,5 @@ abstract class qtype_specific_hint {
     public function button_rendered_by_question() {
         //By default, hint button should be rendered by behaviour.
         return false;
-    }
-
-    /**
-     * Returns true if there should be only one hint button for the given situation
-     *
-     * TODO - define what to do with multiple instance hints and how function should really behave there, implement in hinting behaviours
-     * Example of multiple instance hints is teacher-defined text hints or correctwriting question hints, where could be several misplaced (deleted, extraneous) lexems
-     */
-    public function is_single_instance_hint() {
-        return true;
     }
 }
