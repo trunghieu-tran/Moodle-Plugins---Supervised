@@ -45,7 +45,7 @@ interface question_with_qtype_specific_hints {
      * The values are interface strings with the hint description (without "hint" word!)
      * If a question allows for multiple instance choosen hints, it should return a separate key for each instance. That may depend on $response.
      */
-    public function available_specific_hint_types($response = null);
+    public function available_specific_hints($response = null);
 
     /**
      * Hint object factory
