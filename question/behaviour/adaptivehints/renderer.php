@@ -29,7 +29,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         $output .= html_writer::empty_tag('br');
 
         //Render buttons that should be rendered by behaviour.
-         foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
+         foreach ($question->available_specific_hints() as $hintkey => $hintdescription) {
 
             $hintobj = $question->hint_object($hintkey);
 
