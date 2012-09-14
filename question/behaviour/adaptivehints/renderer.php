@@ -29,7 +29,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         $output .= html_writer::empty_tag('br');
 
         //Render buttons that should be rendered by behaviour.
-         foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
+         foreach ($question->available_specific_hints() as $hintkey => $hintdescription) {
 
             $hintobj = $question->hint_object($hintkey);
 
@@ -42,7 +42,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                 } else {
                     $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
                 }
-                if (!$showhintbtn || !$hintobj->hint_available()) {
+                if (!$showhintbtn || !$hintobj->hint_available()) {//Should not pass $response to hint_available, since response could be changed in adaptive.
                     continue;
                 }
 
@@ -65,7 +65,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     }
                     $penalty = $hintobj->penalty_for_specific_hint($response);
                     if ($penalty != 0) {
-                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//note that reported penalty is approximation since user could change response in adaptive
+                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Òote that reported penalty is approximation since user could change response in adaptive
                     }
                 } else {
                     $penalty = $hintobj->penalty_for_specific_hint(null);

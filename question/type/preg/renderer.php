@@ -72,7 +72,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //Determine requested hint(s)
         $hintmessage = '';
         $hintkeys = array();
-        $hints = $question->available_specific_hint_types();
+        $hints = $question->available_specific_hints();
         foreach ($hints as $key => $value) {
             if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
                 $hintkeys[] = $key;
