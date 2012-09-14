@@ -128,7 +128,6 @@ abstract class qtype_specific_hint {
     public function button_rendered_by_question() {
         //By default, hint button should be rendered by behaviour.
         return false;
-     * Example of multiple instance hints is teacher-defined text hints or correctwriting question hints,
-     * where could be several misplaced (deleted, extraneous) lexems.
     }
 }
+
