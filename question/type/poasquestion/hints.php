@@ -15,26 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains hint definitions, that is used by different poas questions.
- *
- * Note: interfaces and classes there are intentionally left without qtype_poasquestion prefix as
- *  they are intended for more general Moodle use after hinting behaviours would be complete.
+ * Defines hint classes for the POAS abstract question type.
  *
  * @package    qtype_poasquestion
- * @subpackage hints
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
  * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface question_with_qtype_specific_hints {
 
@@ -56,9 +48,6 @@ interface question_with_qtype_specific_hints {
 
 /**
  * Base class for question-type specific hints
- *
- * @copyright  2011 Sychev Oleg
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_specific_hint {
 
@@ -85,34 +74,26 @@ abstract class qtype_specific_hint {
     abstract public function hint_available($response = null);
 
     /**
-     * Returns whether response is used to calculate penalty (cost) for the hint
+     * Returns whether response is used to calculate penalty (cost) for the hint.
      */
     public function penalty_response_based() {
-        return false;//Most hint have fixed penalty (cost)
+        return false; // Most hint have fixed penalty (cost).
     }
 
     /**
      * Returns penalty (cost) for using specific hint of given hint type (possibly for given response)
-     *
-     * Even if response is used to calculate penalty, hint object should still return an approximation to show to the student if $response is null
+     * Even if response is used to calculate penalty, hint object should still return an approximation
+     * to show to the student if $response is null.
      */
     abstract public function penalty_for_specific_hint($response = null);
 
     /**
-     * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
-     *
-     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour variable is set, depending on whether hint is response based.
-     */
-    public function button_rendered_by_question() {
-        //By default, hint button should be rendered by behaviour.
-        return false;
-    }
-
-    /**
      * Returns true if there should be only one hint button for the given situation
      *
-     * TODO - define what to do with multiple instance hints and how function should really behave there, implement in hinting behaviours
-     * Example of multiple instance hints is teacher-defined text hints or correctwriting question hints, where could be several misplaced (deleted, extraneous) lexems
+     * TODO - define what to do with multiple instance hints and how function should really behave there,
+     * implement in hinting behaviours.
+     * Example of multiple instance hints is teacher-defined text hints or correctwriting question hints,
+     * where could be several misplaced (deleted, extraneous) lexems.
      */
     public function is_single_instance_hint() {
         return true;
