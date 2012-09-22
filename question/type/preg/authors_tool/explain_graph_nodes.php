@@ -38,9 +38,10 @@ abstract class qtype_preg_author_tool_node {
             case qtype_preg_node::TYPE_NODE_COND_SUBPATT:
             case qtype_preg_node::TYPE_NODE_ERROR:
             case qtype_preg_node::TYPE_NODE_ASSERT:
-                return FALSE;
+                return false;
+
             default:
-                return TRUE;
+                return true;
         }
     }
     
@@ -69,24 +70,29 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
                 return self::process_charset($this->pregnode->userinscription);
+
             case qtype_preg_node::TYPE_LEAF_META:
                 if ($this->pregnode->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)
                     return array('Void');
                 else
                     return array(get_string('explain_unknow_meta', 'qtype_preg'));
+
             case qtype_preg_node::TYPE_LEAF_ASSERT:
                 if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
                     return get_string('description_circumflex', 'qtype_preg');
-                elseif ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
                     return get_string('description_dollar', 'qtype_preg');
-                elseif ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
                     return ($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg'));
                 else
                     return get_string('explain_unknow_assert', 'qtype_preg');
+
             case qtype_preg_node::TYPE_LEAF_BACKREF:
                 return array(get_string('explain_backref', 'qtype_preg') . $this->pregnode->number);
+
             case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return array(get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : ''));
+
             default:
                 return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
@@ -107,13 +113,17 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 } else {
                     return 'black';
                 }
+
             case qtype_preg_node::TYPE_LEAF_META:
                 return 'orange';
+
             case qtype_preg_node::TYPE_LEAF_ASSERT:
                 return 'red';
+
             case qtype_preg_node::TYPE_LEAF_BACKREF:
             case qtype_preg_node::TYPE_LEAF_RECURSION:
                 return 'blue';
+
             default:
                 return 'pink';
         }
@@ -126,12 +136,12 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         if ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_META || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT ||
              $this->pregnode->type == qtype_preg_node::TYPE_LEAF_BACKREF || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_RECURSION)
             return 'ellipse';
-        elseif (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
+        else if (count($this->pregnode->flags) > 1 || $this->pregnode->negative) {
             return 'record';
         } else {
             if ($this->get_color() == 'green')
                 return 'ellipse';
-            elseif ($this->pregnode->flags[0][0]->data->length() > 1)
+            else if ($this->pregnode->flags[0][0]->data->length() > 1)
                 return 'record';
             else
                 return 'ellipse';
@@ -146,7 +156,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         
         $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node($this->get_value(), $this->get_shape(), $this->get_color(), $graph, $this->pregnode->id, $this->get_filled());
         if ($this->pregnode->negative) 
-            $graph->nodes[0]->invert = TRUE;
+            $graph->nodes[0]->invert = true;
         
         if ($id == $this->pregnode->id) {
             $graph->style .= '; color=darkgreen';
@@ -192,7 +202,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     $i++;
 
                     $result[] = chr(10) . get_string('description_charflag_' . $tmp, 'qtype_preg');
-                } elseif ($iter->data[$i] == '\\') {
+                } else if ($iter->data[$i] == '\\') {
                     $i++;
                     if ($iter->data[$i] == '\\')
                         $result[count($result) - 1] .= '\\\\';
@@ -209,52 +219,49 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                         } else {
                             $result[] = chr(10) . get_string('description_charflag_' . $iter->data[$i], 'qtype_preg');
                         }
-                    } elseif ($iter->data[$i] == 'x') {
+                    } else if ($iter->data[$i] == 'x') {
                         $i++;
                         $tmp = $iter->data[$i];
                         $i++;
                         $tmp .= $iter->data[$i];
 
                         $result[] = chr(10) . str_replace('%code', $tmp, get_string('description_char_16value', 'qtype_preg'));
-                    } elseif ($iter->data[$i] == 'n') {
+                    } else if ($iter->data[$i] == 'n') {
                         $result[] = chr(10) . get_string('description_charA', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'r') {
+                    } else if ($iter->data[$i] == 'r') {
                         $result[] = chr(10) . get_string('description_charD', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'd') {
+                    } else if ($iter->data[$i] == 'd') {
                         $result[] = chr(10) . get_string('description_charflag_digit', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'D') {
+                    } else if ($iter->data[$i] == 'D') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_digit', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 's') {
+                    } else if ($iter->data[$i] == 's') {
                         $result[] = chr(10) . get_string('description_charflag_space', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'S') {
+                    } else if ($iter->data[$i] == 'S') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_space', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'w') {
+                    } else if ($iter->data[$i] == 'w') {
                         $result[] = chr(10) . get_string('description_charflag_word', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'W') {
+                    } else if ($iter->data[$i] == 'W') {
                         $result[] = chr(10) . get_string('explain_not', 'qtype_preg') . get_string('description_charflag_word', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 't') {
-                        goto tab;
-                    } elseif ($iter->data[$i] == 'h') {
+                    } else if ($iter->data[$i] == 't') {
+                        $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
+                    } else if ($iter->data[$i] == 'h') {
                         $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
-                    } elseif ($iter->data[$i] == 'v') {
+                    } else if ($iter->data[$i] == 'v') {
                         $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
-                    } elseif ($iter->data[$i] == ' ') {
-                        goto space;
-                    } elseif ($iter->data[$i] == '	') {
-                        goto tab;
+                    } else if ($iter->data[$i] == ' ') {
+                        $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
+                    } else if ($iter->data[$i] == '	') {
+                        $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                     } else {
-                        goto other;
+                        $result[0] .= $iter->data[$i];
                     }
-                } elseif ($iter->data[$i] == ' ') {
-                    space:
+                } else if ($iter->data[$i] == ' ') {
                     $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
-                } elseif ($iter->data[$i] == '	') {
-                    tab:
+                } else if ($iter->data[$i] == '	') {
                     $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
-                } elseif ($iter->data[$i] == '.') {
+                } else if ($iter->data[$i] == '.') {
                     $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
                 } else {
-                    other:
                     $result[0] .= $iter->data[$i];
                 }
             }
@@ -299,7 +306,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
 
             $graph->entries[] = end($left->entries);
             $graph->exits[] = end($right->exits);
-        } elseif ($this->pregnode->type == 'node_alt') {
+        } else if ($this->pregnode->type == 'node_alt') {
             $left = $this->operands[0]->create_graph($id);
             $right = $this->operands[1]->create_graph($id);
 
@@ -315,7 +322,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->exits[] = end($graph->nodes);
-        } elseif ($this->pregnode->type == 'node_finite_quant' || $this->pregnode->type == 'node_infinite_quant') {
+        } else if ($this->pregnode->type == 'node_finite_quant' || $this->pregnode->type == 'node_infinite_quant') {
             $operand = $this->operands[0]->create_graph($id);
 
             if ($this->pregnode->type == 'node_finite_quant') {
@@ -334,7 +341,7 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             $graph->subgraphs[] = $quant;
             $graph->entries[] = end($operand->entries);
             $graph->exits[] = end($operand->exits);
-        } elseif ($this->pregnode->type == 'node_subpatt') {
+        } else if ($this->pregnode->type == 'node_subpatt') {
             $operand = $this->operands[0]->create_graph($id);
 
             $label = get_string('explain_subpattern', 'qtype_preg') . $this->pregnode->number;

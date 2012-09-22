@@ -68,14 +68,13 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         case 'node_alt':
         case 'node_subpatt':
             return 'qtype_preg_author_tool_operator';
-            break;
+
         case 'leaf_charset':
         case 'leaf_meta':
         case 'leaf_assert':
         case 'leaf_backref':
         case 'leaf_recursion:':
             return 'qtype_preg_author_tool_leaf';
-            break;
         }
 
         return parent::get_engine_node_name($pregname);
@@ -89,9 +88,10 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
             case qtype_preg_node::TYPE_NODE_COND_SUBPATT:
             case qtype_preg_node::TYPE_NODE_ERROR:
             case qtype_preg_node::TYPE_NODE_ASSERT:
-                return FALSE;
+                return false;
+
             default:
-                return TRUE;
+                return true;
         }
     }
     
@@ -143,7 +143,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     private static function process_alters(&$graph) {
         begin:
         foreach ($graph->nodes as $iter) {
-            $neighbor = NULL;
+            $neighbor = null;
 
             if ($iter->shape == 'point') {
                 $tmplinks = array();
@@ -168,7 +168,8 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                         unset($graph->nodes[array_search($iter, $graph->nodes)]);
                         $graph->nodes = array_values($graph->nodes);
                         
-                        goto begin;
+                        reset($graph->nodes);
+                        continue;
                     }
                 }
         
@@ -194,7 +195,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                         unset($graph->nodes[array_search($iter, $graph->nodes)]);
                         $graph->nodes = array_values($graph->nodes);
 
-                        goto begin;
+                        reset($graph->nodes);
                     }
                 }
             }
@@ -273,7 +274,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
      */
     private static function process_simple(&$graph) {
         for ($i = 0; $i < count($graph->nodes); $i++) {
-            $neighbor = NULL;
+            $neighbor = null;
 
             $tmpdnode = $graph->nodes[$i];
 
@@ -313,7 +314,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     private static function process_asserts(&$graph) {
         nodes_cycle:
         foreach ($graph->nodes as $iter) {
-            $neighbor = NULL;
+            $neighbor = null;
 
             $tmpdnode = $iter;
 
@@ -329,7 +330,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                     $tmplabel2 = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain)->label;
                     
                     $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label), $tmplabel2), $neighbor_l, $neighbor_r);
-                } elseif ($neighbor_r->owner != $neighbor_l->owner && $neighbor_l->owner != $graph && $neighbor_r->owner == $graph) {
+                } else if ($neighbor_r->owner != $neighbor_l->owner && $neighbor_l->owner != $graph && $neighbor_r->owner == $graph) {
                     $tmplabel2 = qtype_preg_author_tool_explain_graph::find_link($tmpdnode, $neighbor_r, qtype_preg_author_tool_explain_graph::$gmain)->label;
 
                     if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_l->owner)) {
@@ -349,7 +350,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                         
                         $graph->links[] = new qtype_preg_author_tool_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmpdnode->label, $tmplabel2), $graph->nodes[count($graph->nodes) - 1], $neighbor_r);
                     }
-                } elseif ($neighbor_r->owner != $neighbor_l->owner && $neighbor_l->owner == $graph && $neighbor_r->owner != $graph) {
+                } else if ($neighbor_r->owner != $neighbor_l->owner && $neighbor_l->owner == $graph && $neighbor_r->owner != $graph) {
                     $tmplabel1 = qtype_preg_author_tool_explain_graph::find_link($neighbor_l, $tmpdnode, qtype_preg_author_tool_explain_graph::$gmain)->label; 
 
                     if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
@@ -403,7 +404,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', end($graph->nodes), $neighbor_r);
                             
                             $graph->links[] = new qtype_preg_author_tool_explain_graph_link(qtype_preg_author_tool_explain_graph::compute_label($tmplabel1, $tmpdnode->label), $leftborder, end($graph->nodes));
-                        } elseif (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
+                        } else if (qtype_preg_author_tool_explain_graph::is_child($graph, $neighbor_r->owner)) {
                             $neighbor_r->owner->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $neighbor_r->owner, $neighbor_l->id + 0.05);
                             
                             $neighbor_r->owner->links[] = new qtype_preg_author_tool_explain_graph_link('', end($neighbor_r->owner->nodes), $neighbor_r);
@@ -437,7 +438,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 unset($graph->nodes[array_search($tmpdnode, $graph->nodes)]);
                 $graph->nodes = array_values($graph->nodes);
 
-                goto nodes_cycle;
+                reset($graph->nodes);
             }
         }
     }
