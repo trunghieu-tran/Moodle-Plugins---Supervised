@@ -19,7 +19,7 @@ class qtype_preg_author_tool_explain_graph_node {
     public $label   = '';         // data of node on image
     public $id      = -1;          // id of node
     public $fill    = '';         // filling of node on image
-    public $invert  = FALSE;
+    public $invert  = false;
     
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
