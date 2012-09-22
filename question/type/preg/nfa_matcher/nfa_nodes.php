@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Defines NFA node classes.
@@ -88,7 +102,8 @@ abstract class qtype_preg_nfa_node {
      * Creates an automaton corresponding to this node.
      * @param matcher - a reference to the matcher.
      * @param automaton - a reference to the automaton being built.
-     * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2) - start and end states of parts of the resulting automaton.
+     * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2),
+     *                start and end states of parts of the resulting automaton.
      */
     abstract public function create_automaton(&$matcher, &$automaton, &$stack);
 
