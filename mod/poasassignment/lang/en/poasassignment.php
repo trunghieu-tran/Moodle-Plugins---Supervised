@@ -384,3 +384,4 @@ $string['preventlate_help'] = 'Prevent late submissions';
 $string['taskhidden_help'] = 'Task cannot be taken.';
 $string['cyclicrandom'] = 'Cyclic random';
 $string['cyclicrandom_help'] = 'If you have choose group, grouping or course - unique but you have not enough tasks, this option will allow students to take the task, that somebody else took. This option allows to have least popular task in group/grouping/course.';
+$string['newfield'] = 'New field';
