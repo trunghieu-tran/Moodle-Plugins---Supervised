@@ -1,13 +1,6 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of parameterchoice
- *
- * @author Arkanif
+ * Enables students to select tasks using search form.
  */
 global $CFG;
 require_once dirname(dirname(__FILE__)).'/taskgiver.php';
@@ -23,11 +16,10 @@ class parameterchoice extends taskgiver{
 
     function parameter_search($cmid, $poasassignment) {
         global $DB,$USER;
-        //$poasmodel = poasassignment_model::get_instance($poasassignment);
         $poasmodel = poasassignment_model::get_instance();
         $poasmodel->cash_instance($poasassignment->id);
         $poasmodel->cash_assignee_by_user_id($USER->id);
-        $mform = new parametersearch_form(null,array('poasassignmentid'=>$poasassignment->id,'id'=>$cmid));
+        $mform = new parametersearch_form(null, array('poasassignmentid' => $poasassignment->id, 'id' => $cmid));
         if($data = $mform->get_data()) {
             $tasks = $poasmodel->get_available_tasks($USER->id);
             if(count($tasks) == 0) {
@@ -37,27 +29,31 @@ class parameterchoice extends taskgiver{
             $fields = parameterchoice::get_parameters_fields($poasassignment->id);
             if($fields) {
                 $satisfyingtasks = array();
+                // Tasks that match not all search fields
+                $taskswithmismatch = array();
                 foreach($fields as $field) {
                     $fieldelementname = 'field' . $field->id;
-                    $fieldvalues = $DB->get_records('poasassignment_task_values',
-                                                    array('fieldid' => $field->id));
+                    $fieldvalues = $DB->get_records('poasassignment_task_values', array('fieldid' => $field->id));
                     if($fieldvalues) {
-                        if($field->ftype==LISTOFELEMENTS || $field->ftype==MULTILIST || $field->ftype==STR || $field->ftype==TEXT) {
+                        if($field->ftype == LISTOFELEMENTS || $field->ftype == MULTILIST || $field->ftype == STR || $field->ftype == TEXT) {
                             foreach($fieldvalues as $fieldvalue) {
                                 if(!isset($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
                                     continue;
                                 }
-                                if($tasks[$fieldvalue->taskid]->hidden==0) {
-                                    $contains=strpos($fieldvalue->value,$data->$fieldelementname);
-                                    if($contains!==false) {
-                                        for($i=0;$i<5;$i++) {
-                                            $satisfyingtasks[]=$fieldvalue->taskid;
+                                if($tasks[$fieldvalue->taskid]->hidden == 0) {
+                                    $contains = strpos($fieldvalue->value, $data->$fieldelementname);
+                                    if($contains !== false) {
+                                        for($i = 0; $i < 5; $i++) {
+                                            $satisfyingtasks[] = $fieldvalue->taskid;
                                         }
+                                    }
+                                    else {
+                                        $taskswithmismatch[] = $fieldvalue->taskid;
                                     }
                                 }
                             }
                         }
-                        if ($field->ftype==NUMBER || $field->ftype==FLOATING || $field->ftype==DATE) {
+                        if ($field->ftype == NUMBER || $field->ftype == FLOATING || $field->ftype == DATE) {
                             foreach ($fieldvalues as $fieldvalue) {
                                 if(empty($fieldvalue->value) || !isset($tasks[$fieldvalue->taskid])) {
                                     continue;
@@ -69,7 +65,7 @@ class parameterchoice extends taskgiver{
                                         }
                                     }
                                     else {
-                                        if ($data->$fieldelementname==0) {
+                                        if ($data->$fieldelementname == 0) {
                                             continue;
                                         }
                                         else {
@@ -89,6 +85,11 @@ class parameterchoice extends taskgiver{
                 }
 
                 //echo implode(',',$satisfyingtasks).'<br>';
+                $taskswithmismatch = array_unique($taskswithmismatch);
+                if (count ($fields) > 1 && count($taskswithmismatch) > 0) {
+                    // If there are tasks that matched not all search fields, don't use them
+                    $satisfyingtasks = array_diff($satisfyingtasks, $taskswithmismatch);
+                }
                 if (count($satisfyingtasks) > 0) {
                     shuffle($satisfyingtasks);
                     $taskid = $satisfyingtasks[rand(0, count($satisfyingtasks) - 1)];
