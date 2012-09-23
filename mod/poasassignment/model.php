@@ -929,6 +929,7 @@ class poasassignment_model {
     	$variants = explode("\n", $variants);
     	$i = 0;
     	foreach ($variants as $variant) {
+            $rec = new stdClass();
     		$rec->fieldid = $fieldid;
     		$rec->sortorder = $i;
     		$rec->value = $variant;
