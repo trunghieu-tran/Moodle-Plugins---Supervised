@@ -205,7 +205,7 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 } else if ($iter->data[$i] == '\\') {
                     $i++;
                     if ($iter->data[$i] == '\\')
-                        $result[count($result) - 1] .= '\\\\';
+                        $result[count($result) - 1] .= '\\';
                     if ($iter->data[$i] == 'p') {
                         $i++;
                         if ($iter->data[$i] == '{') {
@@ -248,6 +248,10 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                         $result[] = chr(10) . get_string('description_charflag_hspace', 'qtype_preg');
                     } else if ($iter->data[$i] == 'v') {
                         $result[] = chr(10) . get_string('description_charflag_vspace', 'qtype_preg');
+                    } else if ($iter->data[$i] == 'H') {
+                        $result[] = chr(10) . get_string('explain_not', 'qtype_preg')  . get_string('description_charflag_hspace', 'qtype_preg');
+                    } else if ($iter->data[$i] == 'V') {
+                        $result[] = chr(10) . get_string('explain_not', 'qtype_preg')  . get_string('description_charflag_vspace', 'qtype_preg');
                     } else if ($iter->data[$i] == ' ') {
                         $result[] = chr(10) . get_string('description_char20', 'qtype_preg');
                     } else if ($iter->data[$i] == '	') {
