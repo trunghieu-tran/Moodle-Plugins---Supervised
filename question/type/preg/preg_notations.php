@@ -1,14 +1,31 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Defines classes of notations, used to write regexes
+ * Defines classes of notations, used to write regexes.
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
@@ -76,35 +93,6 @@ class qtype_preg_notation_native extends qtype_preg_notation {
         return 'native';
     }
 
-     public function convert_regex($targetnotation) {
-        if ($targetnotation == 'pcrestrict') {
-            //Escape all empty parenthesis (subpatterns and assrtions)
-            //$pattern = '/(?<!\\\\)(\(|\(\?(\:|\||\=|\<\=|\!|\<\!))\)/u';
-            $pattern = '/(?<!\\\\)\(\)/u';
-            $replacement = '\(\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\:\)/u';
-            $replacement = '\(\?\:\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\|\)/u';
-            $replacement = '\(\?\|\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\=\)/u';
-            $replacement = '\(\?\=\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\<\=\)/u';
-            $replacement = '\(\?\<\=\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\!\)/u';
-            $replacement = '\(\?\!\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            $pattern = '/(?<!\\\\)\(\?\<\!\)/u';
-            $replacement = '\(\?\<\!\)';
-            $this->regex = preg_replace($pattern, $replacement, $this->regex);
-            return $this->regex;
-        }
-    }
-    //TODO - implement converting from native to PCRE strict notation
 }
 
 /**
@@ -119,7 +107,7 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
 
     public function convert_regex($targetnotation) {
 
-        if ($targetnotation == 'native' || $targetnotation == 'pcrestrict') {
+        if ($targetnotation == 'native') {
             //Code from qtype_shortanswer_question::compare_string_with_wildcard with proper respect for Tim Hunt
 
             // Break the string on non-escaped asterisks.
@@ -136,24 +124,4 @@ class qtype_preg_notation_mdlshortanswer extends qtype_preg_notation {
     }
 }
 
-class qtype_preg_notation_pcrestrict extends qtype_preg_notation {
-
-    public function name() {
-        return 'pcrestrict';
-    }
-
-    public function convert_regex($targetnotation) {
-        if ($targetnotation == 'native') {
-            return $this->regex;
-        }
-        parent::convert_regex($targetnotation);
-    }
-
-    public function convert_options($targetnotation) {
-        if ($targetnotation == 'native') {
-            $this->options->pcrestrict = true;
-        }
-        return $this->options;
-    }
-}
  ?>

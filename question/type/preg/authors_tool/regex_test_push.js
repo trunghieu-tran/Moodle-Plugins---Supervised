@@ -1,32 +1,60 @@
 /**
  * Script for button "Test regex" from edit_ast_preg_form.php
  * 
- * @copyright &copy; 2012  Terechov Grigory
- * @author Terechov Grigory, Volgograd State Technical University
+ * @copyright &copy; 2012  Terechov Grigory, Pahomov Dmitry
+ * @author Terechov Grigory, Pahomov Dmitry, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
-YUI().use('node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-parse", function(Y) {
+ 
+// TODO - code documentation
+ 
+M.qtype_preg_authors_tool = {};
+ 
+M.qtype_preg_authors_tool.init = function(Y) {
 
-    load_content = function(url) {
+    // variables:
+    var node;
+    var context;
+    var back;
+    var hidden;
+    var currentlineedit;
+
+    // functions:
+    var load_content = function(url) {
 
         var upd_dialog_Success = function(id, o, a) {
-            var json_array = Y.JSON.parse(o.responseText);
+            // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+            var indexofbracket = o.responseText.indexOf("{");
+            if (indexofbracket != 0) {
+                alert(o.responseText.substr(0,indexofbracket));
+            }
+            // allerting json array:
+            // alert(o.responseText.substr(indexofbracket));
+            // end of debug output !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            var jsonarray = Y.JSON.parse(o.responseText);
 
             //TODO: add errors message
-            if(typeof json_array['tree_src'] != 'undefined') {
-                Y.one('#id_tree').setAttribute("src", '').setAttribute("src", json_array['tree_src']);
+            if(typeof jsonarray['tree_src'] != 'undefined') {
+                Y.one('#id_tree').setAttribute("src", '').setAttribute("src", jsonarray['tree_src']);
             }
-            if(typeof json_array['map'] != 'undefined') {
-                Y.one('#tree_map').setHTML(json_array['map']);
+            if(typeof jsonarray['map'] != 'undefined') {
+                Y.one('#tree_map').setHTML(jsonarray['map']);
                 Y.all("#_anonymous_0 > area").on('click', check_tree);
             }
-            if(typeof json_array['graph_src'] != 'undefined') {
-                Y.one('#id_graph').setAttribute("src", '').setAttribute("src", json_array['graph_src']);
+            if(typeof jsonarray['graph_src'] != 'undefined') {
+                Y.one('#id_graph').setAttribute("src", '').setAttribute("src", jsonarray['graph_src']);
             }
-            if(typeof json_array['description'] != 'undefined') {
-                Y.one('#description_handler').setHTML(json_array['description']);
+            if(typeof jsonarray['description'] != 'undefined') {
+                Y.one('#description_handler').setHTML(jsonarray['description']);
             }
+
+            node = Y.one('#id_regex_check');
+            context = Y.one('#id_regex_text');
+            back = Y.one('#id_regex_back');
+            hidden = Y.one('#hidden_id');
+            back.on("click", back_regex, hidden);
+            node.on("click", check_regex, context);
         }
 
         var upd_dialog_failure = function(id, o, a) {
@@ -47,20 +75,21 @@ YUI().use('node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-par
         var response = Y.io(url, cfg);
     }
 
-    var testfoo = function(e) {
+    var testregexbtn_pressed = function(e) {
 
         e.preventDefault();
 
-        var page_regex_auth_helper_height = 1000;
-        var page_regex_auth_helper_width = 1000;
-        current_line_edit = this;
+        //var page_regex_auth_helper_height = 1000;
+        var pageregexauthhelperwidth = 1000;
+        currentlineedit = this;
         //regex = encodeURIComponent(this.get('value'));
-        var page_regex_auth_helper_adr = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(this.get('value')) + '&id=-1' + '&id_line_edit=' + this.getAttribute('id');
-        if(typeof dialog == 'undefined') {
+        // TODO - replace preg_www_root with moodle variable
+        var pageregexauthhelperadr = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(this.get('value')) + '&id=-1' + '&id_line_edit=' + this.getAttribute('id');
+        if (typeof dialog == 'undefined') {
             dialog = new Y.Panel({
                 contentBox: Y.Node.create('<div id="dialog" />'),
                 bodyContent: '<div class="message icon-warn">Loading...</div>',
-                width: page_regex_auth_helper_width,
+                width: pageregexauthhelperwidth,
                 //height     : page_regex_auth_helper_height,
                 zIndex: 120,
                 centered: true,
@@ -109,40 +138,96 @@ YUI().use('node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-par
 
             //Y.one('#dialog .message').load('http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
 
-            Y.one('#dialog .message').load(preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(current_line_edit.get('value')) + '&id=-1', function() {
-                Y.Get.js(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_script.js', function(err) {
+            Y.one('#dialog .message').load(preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1', function() {
+                /*Y.Get.js(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_script.js', function(err) {
                     if(err) {
                         alert('Error loading JS: ' + err[0].error, 'error');
                         return;
                     }
-                })
+                })*/
                 //TODO: set empty src in all field
-                Y.one('#id_regex_text').set('value', current_line_edit.get('value'));
+                Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
                 Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
                 Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
-                load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(current_line_edit.get('value')) + '&id=-1');
+                load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1');
             })
 
         } else {
             //TODO: set empty src in all field
-            Y.one('#id_regex_text').set('value', current_line_edit.get('value'));
+            Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
             Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
             Y.one('#id_graph').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
-            load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(current_line_edit.get('value')) + '&id=-1');
+            load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1');
             dialog.show();
         }
     }
 
-    var i = 0;
-    var node = Y.one('#id_regextest_' + i);
-    var context = Y.one('#id_answer_' + i);
-    while(node != null) {
-        node = Y.one('#id_regextest_' + i);
-        context = Y.one('#id_answer_' + i);
-        if(node != null) {
-            node.on("click", testfoo, context);
-        }
-        ++i;
+    var back_regex = function( e ) {
+        
+        e.preventDefault();
+       
+        var new_regex = Y.one(context).get('value');
+        currentlineedit.set('value',new_regex);
+        dialog.hide();
+        
+        //TODO: call OK button
+        //dialog.onOK();
+
     }
 
+    var highlight_description = function(id){
+        
+        const highlightedclass = 'description_highlighted';
+        var oldhighlighted = Y.one('.'+highlightedclass);
+        
+        if(oldhighlighted!=null){
+           oldhighlighted.removeClass(highlightedclass).setStyle('background-color','transparent');
+        }
+        
+        Y.one('.description_node_'+id).addClass(highlightedclass).setStyle('background-color','yellow');
+    }
+    
+    var check_regex = function( e ) {
+        
+        e.preventDefault();
+        
+        load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value'))+'&id=-1');
+    }    
+    
+    var check_tree = function( e ) {
+
+       id = e.currentTarget.getAttribute ( 'id' );
+       //alert(id);
+       highlight_description(id);
+        
+       /*var tmp = encodeURIComponent(context.get("value"));
+       
+       var url = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=' + id;
+       Y.io(url);
+       Y.one('#id_graph').setAttribute('src','');
+       setTimeout(function() {
+           Y.one('#id_graph').setAttribute('src', preg_www_root + '/question/type/preg/tmp_img/graph.png');
+           //TODO: implement for tree and map
+           }, 500);*/
+       //Y.one('#id_graph').setAttribute('src','').setAttribute('src','http://localhost/moodle/question/type/preg/tmp_img/graph.png');
+       
+       load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value')) + '&id=' + id);
+    }
+
+    // code:
+    // installation click handler:
+    var i = 0;
+    var testregexbtn = Y.one('#id_regextest_' + i);
+    var testregexlineedit = Y.one('#id_answer_' + i);
+    while(testregexbtn != null) {
+        testregexbtn.on("click", testregexbtn_pressed, testregexlineedit);
+        ++i;
+        testregexbtn = Y.one('#id_regextest_' + i);
+        testregexlineedit = Y.one('#id_answer_' + i);
+    }
+}
+
+
+YUI().use('node', 'panel', 'node-load', 'get', "io-xdr", "substitute", "json-parse", function(Y) {
+    M.qtype_preg_authors_tool.init(Y);
 });
