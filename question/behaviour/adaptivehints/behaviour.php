@@ -11,6 +11,7 @@ defined('MOODLE_INTERNAL') || die();
  * _try - number of submissions (inherited from adaptive)
  * _rawfraction - fraction for the step without penalties (inherited from adaptive)
  * _hashint - there was hint requested in the step
+ * _hintbuttons - render hint buttons, could be 'active' or 'readonly'
  * _render_<hintname> - true if hint with hintname should be rendered when rendering question next time
  * _penalty - penalty added in this state (used for rendering and summarising mainly)
  * _totalpenalties - sum of all penalties already done
@@ -38,7 +39,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $expected = parent::get_expected_data();
 
         if ($this->qa->get_state()->is_active()) {//returning an array of hint buttons
-            foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
+            foreach ($this->question->available_specific_hints() as $hintkey => $hintdescription) {
                 $expected[$hintkey.'btn'] = PARAM_BOOL;
             }
         }
@@ -47,13 +48,12 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     public function adjust_display_options(question_display_options $options) {
         parent::adjust_display_options($options);//there seems to nothing to be done until question_display_options will be passed to specific_feedback function of question renderer
-        //maybe add correctness if there were a response there
     }
 
     ////Summarise functions
     public function summarise_action(question_attempt_step $step) {
         //Summarise hint action
-        foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
+        foreach ($this->question->available_specific_hints() as $hintkey => $hintdescription) {
             if ($step->has_behaviour_var($hintkey.'btn')) {
                 return $this->summarise_hint($step, $hintkey, $hintdescription);
             }
@@ -72,15 +72,38 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         return get_string('hintused', 'qbehaviour_adaptivehints', $a);
     }
 
+    //We should init first step to show non-response based hint buttons.
+    public function init_first_step(question_attempt_step $step, $variant) {
+        parent::init_first_step($step, $variant);
+        $step->set_behaviour_var('_nonresp_hintbtns', true);
+    }
+
     ////Process functions
     public function process_action(question_attempt_pending_step $pendingstep) {
-        foreach ($this->question->available_specific_hint_types() as $hintkey => $hintdescription) {
+
+        $result = null;
+        // Process hint button press.
+        foreach ($this->question->available_specific_hints() as $hintkey => $hintdescription) {
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
-                return $this->process_hint($pendingstep, $hintkey);
+                $result = $this->process_hint($pendingstep, $hintkey);
             }
         }
 
-        return parent::process_action($pendingstep);
+        //Proces all actions.
+        if ($result === null) {
+            $result = parent::process_action($pendingstep);
+        }
+
+        // Compute variables to show question it should render it's hint buttons.
+        if (!$this->qa->get_state()->is_finished()) {
+            $pendingstep->set_behaviour_var('_nonresp_hintbtns', true);
+            $response = $pendingstep->get_qt_data();
+            if ($this->question->is_complete_response($response)) {
+                $pendingstep->set_behaviour_var('_resp_hintbtns', true);
+            }
+        }
+
+        return $result;
     }
 
     public function process_hint(question_attempt_pending_step $pendingstep, $hintkey) {
@@ -92,7 +115,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
             return question_attempt::DISCARD;
         }
 
-        //process data from last graded state (e.g. submit)
+        //Process data from last graded state (e.g. submit).
         $prevstep = $this->get_graded_step();
         if (!is_null($prevstep)) {//TODO - deal with situation where hint requested for response that is correct already
             if ($prevstep->get_state() == question_state::$complete) {
@@ -101,7 +124,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
                 $pendingstep->set_state(question_state::$todo);
             }
             $pendingstep->set_behaviour_var('_rawfraction', $prevstep->get_behaviour_var('_rawfraction'));
-        } else {//hint requested before submitting anything
+        } else {//Hint requested before submitting anything.
             $pendingstep->set_fraction(0);
             $pendingstep->set_behaviour_var('_rawfraction', 0);
             $pendingstep->set_state(question_state::$todo);
@@ -115,6 +138,16 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $newtotal = $prevtotal + $penalty;
         $pendingstep->set_behaviour_var('_totalpenalties', $newtotal);
         $pendingstep->set_behaviour_var('_render_'.$hintkey, true);
+        //Copy previous _render_hintxxx variables if previous state is hint state and response is same.
+        $prevhintstep = $this->qa->get_last_step();
+        if ($prevhintstep->has_behaviour_var('_hashint') && $this->is_same_response($pendingstep)) {
+            $prevhints = $this->question->available_specific_hints();
+            foreach ($prevhints as $prevhintkey => $value) {
+                if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey)) {
+                    $pendingstep->set_behaviour_var('_render_'.$prevhintkey, true);
+                }
+            }
+        }
 
 
         $prevbest = $pendingstep->get_fraction();

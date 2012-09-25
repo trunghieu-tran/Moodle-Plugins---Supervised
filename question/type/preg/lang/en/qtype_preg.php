@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Language strings for the Preg question type.
+ *
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $string['addmoreanswerblanks'] = 'Adding a regular expression options';
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the choosen engine doesn\'t support subpatterns capturing you should use only {$0}.</p>';
 $string['answerno'] = 'Answer {$a}';
@@ -51,8 +59,8 @@ $string['pluginname_link'] = 'question/type/preg';
 $string['pluginnameadding'] = 'Adding a regular expression question';
 $string['pluginnameediting'] = 'Editing a regular expression question';
 $string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. Using behaviours with multiple tries can give a hint by telling a next correct character.<br/>You can use it without knowing regular expression to get hinting by using the \'Moodle shortanswer\' notation.';
-$string['preg_regex_handler'] = 'Regex handler';
 $string['questioneditingheading'] = 'Question editing settings';
+$string['regex_handler'] = 'Regex handler';
 $string['subpattern'] = 'Subpattern';
 $string['tobecontinued'] = '...';
 $string['toomanyerrors'] = '.......{$a} more errors';
@@ -141,7 +149,6 @@ $string['error_PCREincorrectregex']             = 'Incorrect regular expression 
 $string['error_threealtincondsubpatt']          = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
 $string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
 $string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
-$string['error_emptyparens']                    = 'Regex syntax error: empty parentheses in position from {$a->indfirst} to {$a->indlast}.';
 $string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
 $string['error_unclosedsqbrackets']             = 'Regex syntax error: missing a closing bracket \']\' for the character set starting in position {$a->indfirst}.';
 $string['error_setunsetmod']                    = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->indfirst} to {$a->indlast}.';
@@ -164,8 +171,9 @@ $string['error_missingbackrefending']           = 'Missing backreference ending:
 $string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
 $string['error_missingcontrolending']           = 'Missing closing parenthesis after control sequence (*...';
 $string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
-$string['error_condsubpattassertexpected']      = '';
+$string['error_condsubpattassertexpected']      = 'Assertion or condition expected.';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
+$string['error_charcodedisallowed']             = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
 $string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
 $string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';
@@ -174,6 +182,7 @@ $string['error_differentsubpattnames']          = 'Different subpattern names fo
 $string['error_subpattnameexpected']            = 'Subpattern name expected.';
 $string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
 $string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
 
 /******* DFA and NFA limitations *******/
 $string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
@@ -199,9 +208,9 @@ $string['regexmatchheader_help'] = 'Here you can input string for matching. In f
 
 // Strings for node description
 
-//TYPE_LEAF_META
+// TYPE_LEAF_META
 $string['description_empty'] = 'nothing';
-//TYPE_LEAF_ASSERT
+// TYPE_LEAF_ASSERT
 $string['description_circumflex'] = 'beginning of the string';
 $string['description_dollar'] = 'end of the string';
 $string['description_wordbreak'] = 'at a word boundary';
@@ -209,54 +218,66 @@ $string['description_wordbreak_neg'] = 'not at a word boundary';
 $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
 $string['description_esc_g'] = 'at the first matching position in the subject';
-//TYPE_LEAF_BACKREF
+// TYPE_LEAF_BACKREF
 $string['description_backref'] = 'back reference to subpattern #%number';
 $string['description_backref_name'] = 'back reference to subpattern "%name"';
-//TYPE_LEAF_RECURSION
+// TYPE_LEAF_RECURSION
 $string['description_recursion_all'] = 'recursive match with whole regular expression                                 ';
 $string['description_recursion'] = 'recursive match with subpattern #%number';
 $string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
-//TYPE_LEAF_OPTIONS
-$string['description_option_i'] = 'caseless: ';
-$string['description_unsetoption_i'] = 'case sensitive: ';
-/*$string['description_option_s'] = 'dot metacharacter matches \n in following:[%text]';
-$string['description_option_m'] = 'multiline matching:[%text]';
-$string['description_option_x'] = 'ignore white space:[%text]';
-$string['description_option_U'] = 'quantifiers ungreedy by default:[%text]';
-$string['description_option_J'] = 'allow duplicate names:[%text]';*/
-//TYPE_NODE_FINITE_QUANT
+// TYPE_LEAF_OPTIONS
+$string['description_option_i'] = 'caseless:';
+$string['description_unsetoption_i'] = 'case sensitive:';
+$string['description_option_s'] = 'dot metacharacter matches \n:';
+$string['description_unsetoption_s'] = 'dot metacharacter does not match \n:';
+$string['description_option_m'] = 'multiline matching:';
+$string['description_unsetoption_m'] = 'not multiline matching:';
+$string['description_option_x'] = 'white spaces in expression was ignored:';
+$string['description_unsetoption_x'] = 'white spaces in expression was not ignored:';
+$string['description_option_U'] = 'quantifiers ungreedy by default:';
+$string['description_unsetoption_U'] = 'quantifiers greedy by default:';
+$string['description_option_J'] = 'allow duplicate names:';
+$string['description_unsetoption_J'] = 'disallow duplicate names:';
+// TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
 $string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 $string['description_finite_quant_01'] = '%1 may be missing%greed';
 $string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
-//TYPE_NODE_INFINITE_QUANT
+// TYPE_NODE_INFINITE_QUANT
 $string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
 $string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
 $string['description_infinite_quant_1'] = '%1 is repeated any number of times%greed';
-//%greed
+// %greed
 $string['description_quant_lazy'] = ' (lazy quantifier)';
 $string['description_quant_greed'] = '';
 $string['description_quant_possessive'] = ' (possessive quantifier)';
-//TYPE_NODE_CONCAT
+// TYPE_NODE_CONCAT
 $string['description_concat'] = '%1 then %2';
 $string['description_concat_wcomma'] = '%1 then %2';
+$string['description_concat_space'] = '%1 %2';
 $string['description_concat_and'] = '%1 and %2';
 $string['description_concat_short'] = '%1%2';
-//TYPE_NODE_ALT
+// TYPE_NODE_ALT
 $string['description_alt'] = '%1 or %2';
 $string['description_alt_wcomma'] = '%1 or %2';
-//TYPE_NODE_ASSERT
+// TYPE_NODE_ASSERT
 $string['description_pla_node_assert'] = 'further text should match: [%1]';
 $string['description_nla_node_assert'] = 'further text should not match: [%1]';
 $string['description_plb_node_assert'] = 'preceding text should match: [%1]';
 $string['description_nlb_node_assert'] = 'preceding text should not match: [%1]';
-//TYPE_NODE_SUBPATT
+$string['description_pla_node_assert_cond'] = 'further text matches: [%1]';
+$string['description_nla_node_assert_cond'] = 'further text does not match: [%1]';
+$string['description_plb_node_assert_cond'] = 'preceding text matches: [%1]';
+$string['description_nlb_node_assert_cond'] = 'preceding text does not match: [%1]';
+// TYPE_NODE_SUBPATT
 $string['description_subpattern'] = 'subpattern #%number: [%1]';
 $string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
 $string['description_subpattern_name'] = 'subpattern "%name": [%1]';
 $string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
-//TYPE_NODE_COND_SUBPATT
+$string['description_grouping'] = 'grouping: [%1]';
+$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternative): [%1]';
+// TYPE_NODE_COND_SUBPATT (%1 - first option; %2 - second option; %cond - condition )
 $string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
 $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
 $string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
@@ -265,7 +286,7 @@ $string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern h
 $string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%1]%else';
 $string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
 $string['description_define_node_cond_subpatt'] = 'definition of %1';
-//TYPE_LEAF_CONTROL
+// TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
 $string['description_mark_name_leaf_control'] = 'set name to %name to be passed back';
@@ -288,20 +309,57 @@ $string['description_no_start_opt_leaf_control'] = 'no start-match optimization'
 $string['description_utf8_leaf_control'] = 'UTF-8 mode';
 $string['description_utf16_leaf_control'] = 'UTF-16 mode';
 $string['description_ucp_leaf_control'] = 'PCRE_UCP';
-//TYPE_LEAF_CHARSET
+// TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: %characters;';
 $string['description_charset_negative'] = 'any symbol except the following: %characters;';
 $string['description_charset_one_neg'] = 'not %characters';
-//$string['description_charset_one'] = '%characters';
-//CHARSET FLAGS
-// TODO correct charset flags
-$string['description_charset_range'] = 'form <span style="color:blue">%start</span> to <span style="color:blue">%end</span>';
+$string['description_charset_range'] = 'any character form %start to %end';
 $string['description_char'] = '<span style="color:blue">%char</span>';
-$string['description_char_space'] = 'space';
-$string['description_char_t'] = 'tabulation';
-$string['description_char_n'] = 'newline(LF)';
-$string['description_char_r'] = 'carriage return character';
-$string['description_char_16value'] = 'character with hex code %code';
+$string['description_char_16value'] = 'character with code 0x%code';
+//$string['description_charset_one'] = '%characters';
+// non-printing characters
+$string['description_char0'] = 'null character(NUL)';
+$string['description_char1'] = 'start of header character (SOH)';
+$string['description_char2'] = 'start of text character(STX)';
+$string['description_char3'] = 'end of text character(ETX)';
+$string['description_char4'] = 'end of transmission character(EOT)';
+$string['description_char5'] = 'enquiry character(ENQ)';
+$string['description_char6'] = 'acknowledgment character(ACK)';
+$string['description_char7'] = 'bell character(BEL)';
+$string['description_char8'] = 'backspace character(BS)';
+$string['description_char9'] = 'tabulation(HT)';
+$string['description_charA'] = 'line feed(LF)';
+$string['description_charB'] = 'vertical tabulation(VT)'; // TODO - \v already has a string but this string is used when user type \xb ?
+$string['description_charC'] = 'form feed(FF)';
+$string['description_charD'] = 'carriage return character(CR)';
+$string['description_charE'] = 'shift out character (SO)';
+$string['description_charF'] = 'shift in character (SI)';
+$string['description_char10'] = 'data link escape character (DLE)';
+$string['description_char11'] = 'device control 1 (oft. XON) character (DC1)';
+$string['description_char12'] = 'device control 2 character (DC2)';
+$string['description_char13'] = 'device control 3 (oft. XOFF) character (DC3)';
+$string['description_char14'] = 'device control 4 character (DC4)';
+$string['description_char15'] = 'negative acknowledgement character (NAK)';
+$string['description_char16'] = 'synchronous idle character (SYN)';
+$string['description_char17'] = 'end of transmission block character (ETB)';
+$string['description_char18'] = 'cancel character (CAN)';
+$string['description_char19'] = 'end of medium character (EM)';
+$string['description_char1A'] = 'substitute character (SUB)';
+$string['description_char1B'] = 'escape(ESC)';
+$string['description_char1C'] = 'file separator character (FS)';
+$string['description_char1D'] = 'group separator character (GS)';
+$string['description_char1E'] = 'record separator character (RS)';
+$string['description_char1F'] = 'unit separator character (US)';
+$string['description_char20'] = 'space';
+$string['description_char7F'] = 'delete character (DEL)';
+$string['description_charA0'] = 'non-breaking space';
+$string['description_charAD'] = 'soft hyphen character';
+$string['description_char2002'] = 'en space';
+$string['description_char2003'] = 'em space';
+$string['description_char2009'] = 'thin space';
+$string['description_char200C'] = 'zero width non-joiner';
+$string['description_char200D'] = 'zero width joiner';
+//CHARSET FLAGS
 $string['description_charflag_digit'] = 'decimal digit';
 $string['description_charflag_xdigit'] = 'hexadecimal digit';
 $string['description_charflag_space'] = 'white space';
@@ -450,10 +508,10 @@ $string['description_charflag_Tifinagh'] = 'Tifinagh character';
 $string['description_charflag_Ugaritic'] = 'Ugaritic character';
 $string['description_charflag_Vai'] = 'Vai character';
 $string['description_charflag_Yi'] = 'Yi character';
-//description errors
+// description errors
 $string['description_errorbefore'] = '<span style="color:red">';
 $string['description_errorafter'] = '</span>';
-//for testing
+// for testing
 $string['description_charflag_word_g'] = 'word character(form g)';//for testing only
 $string['description_char_g'] = '<span style="color:blue">%char</span>(form g)';//for testing only
 $string['description_dollar_g'] = 'end of the string(form g)';//for testing
@@ -477,3 +535,20 @@ $string['explain_unknow_charset_flag'] = 'unknow charset flag';
 $string['explain_not'] = 'not ';
 $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
+
+// Strings for tooltipe
+$string['tooltipe_charset'] = 'character class';
+$string['tooltipe_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['tooltipe_emptiness'] = 'emptiness';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_backreference'] = 'backreference';
+$string['tooltipe_recursion'] = 'recursion';
+$string['tooltipe_control_sequence'] = 'control sequence';
+$string['tooltipe_option'] = 'option';
+$string['tooltipe_finite_quantifier'] = 'finite quantifier';
+$string['tooltipe_infinite_quantifier'] = 'infinite quantifier';
+$string['tooltipe_concatenation'] = 'concatenation';
+$string['tooltipe_alternative'] = 'alternative';
+$string['tooltipe_assertion'] = 'assertion';
+$string['tooltipe_subpattern'] = 'subpattern';
+$string['tooltipe_conditional_subpattern'] = 'conditional subpattern';

@@ -17,16 +17,13 @@
 /**
  * Serve question type files
  *
- * @since      2.0
- * @package    qtype
- * @subpackage shortanswer
- * @copyright  Sychev Oleg 
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Checks file access for preg questions.

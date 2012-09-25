@@ -1,18 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Defines abstract class of regular expression matcher, extend it to create a new matching engine.
- *
+ * Defines an abstract regular expression matcher, extend it to create a new matching engine.
  * A matcher is a particulary important type of regex handlers, that allows the question to work at all.
- * The file also define a class to store matching results.
+ * The file also defines a class to store matching results.
  *
- * @copyright &copy; 2010  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
@@ -427,20 +442,23 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         $this->matchresults = new qtype_preg_matching_results();
         $this->resultcache = array();
 
-        // Options should exist at least as a default object. If some options were passed to the constructor, do not overwrite them.
-        if ($this->options === null) {
+        // Options should exist at least as a default object. Be sure to create matching options.
+        if ($options === null) {
             $options = new qtype_preg_matching_options();
-            if ($this->lexer !== null) {
-                $options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
-            }
-            $this->set_options($options);
         }
+
 
         //Do parsing
         parent::__construct($regex, $modifiers, $options);
         if ($regex === null) {
             return;
         }
+
+        //If there were backreferences in regex, subpattern capturing should be forced.
+        if ($this->lexer !== null && !$this->options->capturesubpatterns) {
+            $this->options->capturesubpatterns = (count($this->lexer->get_backrefs()) > 0);
+        }
+
 
         //Invalidate match called later to allow parser to count subpatterns
         $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
@@ -555,4 +573,3 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
     }
 
 }
-?>

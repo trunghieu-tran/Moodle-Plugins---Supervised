@@ -1,16 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Defines abstract class of regular expression handler, which is basically anything that want to work with regex
- * Beeing handler you could benefit from automatic regex parsing, error handling etc
+ * Defines abstract class of regular expression handler, which is basically anything that works with regexes.
+ * By inheriting the handler you can benefit automatic regex parsing, error handling etc.
  *
- * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
@@ -21,10 +37,12 @@ require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
  * Options, generic to all handlers - mainly affects scanning and parsing.
  */
 class qtype_preg_handling_options {
-    /** @var boolean Strict PCRE compatible regex syntax.*/
+    /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
-    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes.*/
+    /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
+    /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
+    public $debugmode = false;
 }
 
 class qtype_preg_regex_handler {
@@ -109,6 +127,11 @@ class qtype_preg_regex_handler {
             return;
         }
 
+        // Options should exist at least as a default object.
+        if ($options === null) {
+            $options = new qtype_preg_handling_options();
+        }
+
         //Are passed modifiers supported?
         if (is_string($modifiers)) {
             $modifiers = new qtype_poasquestion_string($modifiers);
@@ -125,7 +148,7 @@ class qtype_preg_regex_handler {
 
         $this->regex = new qtype_poasquestion_string($regex);
         $this->modifiers = $modifiers;
-        $this->set_options($options);
+        $this->options = $options;
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
@@ -221,6 +244,10 @@ class qtype_preg_regex_handler {
      *   what properties of node isn't supported.
      */
     protected function is_preg_node_acceptable($pregnode) {
+        // Do not show accepting errors for error nodes.
+        if ($pregnode->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            return true;
+        }
         return false;    // Should be overloaded by child classes
     }
 
@@ -234,11 +261,13 @@ class qtype_preg_regex_handler {
         } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
             return $this->look_for_circumflex($root->operands[0]);
         } else if (is_a($root, 'qtype_preg_node_alt')) {
-            $result = true;
+            $cf = true;
+            $empty = false;
             foreach ($root->operands as $operand) {
-                $result = $result && $this->look_for_circumflex($operand);
+                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $cf = $cf && $this->look_for_circumflex($operand);
             }
-            return $result;
+            return $cf || $empty;
         }
         return false;
     }
@@ -267,7 +296,7 @@ class qtype_preg_regex_handler {
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
         $this->lexer->handlingoptions = $this->options;
-        $this->parser = new preg_parser_yyParser;
+        $this->parser = new qtype_preg_yyParser;
         $this->parser->handlingoptions = $this->options;
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {

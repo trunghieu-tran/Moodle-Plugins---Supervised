@@ -1,14 +1,27 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Defines classes of finite automaton for regular expression matching, its states and transitions.
+ * Defines finite automata states and transitions classes for regular expression matching.
+ * The class is used by FA-based matching engines (DFA and NFA), provides standartisation to them and enchances testability.
  *
- * The class is intended for use by FA-based matching engines (DFA and NFA), and maybe other regex handlers.
- * Main purpose of the class is to enchance testability, code reuse and standartisation between FA-based matching engines.
- *
- * @copyright &copy; 2012  Oleg Sychev
- * @author Oleg Sychev, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -243,7 +256,7 @@ abstract class qtype_preg_finite_automaton {
         if ($this->state_exists($state)) {
             $this->startstate = $state;
         } else {
-            throw new qtype_preg_exception('set_start_state error: No state '.$stateindex.' in automaton');
+            throw new qtype_preg_exception('set_start_state error: No state ' . $state->number . ' in automaton');
         }
     }
 
@@ -254,7 +267,7 @@ abstract class qtype_preg_finite_automaton {
         if ($this->state_exists($state)) {
             $this->endstate = $state;
         } else {
-            throw new qtype_preg_exception('set_end_state error: No state '.$stateindex.' in automaton');
+            throw new qtype_preg_exception('set_end_state error: No state ' . $state->number . ' in automaton');
         }
     }
 

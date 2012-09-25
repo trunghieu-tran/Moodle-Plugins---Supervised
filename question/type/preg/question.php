@@ -17,15 +17,16 @@
 /**
  * Perl-compatible regular expression question definition class.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Sychev Oleg
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
@@ -453,7 +454,7 @@ class qtype_preg_question extends question_graded_automatically
     /**
     * Returns an array of available specific hint types
     */
-    public function available_specific_hint_types() {
+    public function available_specific_hints($response = null) {
         $hinttypes = array();
         if ($this->usecharhint) {
             $hinttypes['hintnextchar'] = get_string('hintnextchar', 'qtype_preg');
@@ -469,7 +470,7 @@ class qtype_preg_question extends question_graded_automatically
      *
      * Returns a hint object for given type
      */
-    public function hint_object($hintkey) {
+    public function hint_object($hintkey, $response = null) {
         $hintclass = 'qtype_preg_'.$hintkey;
         return new $hintclass($this);
     }
