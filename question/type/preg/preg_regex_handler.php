@@ -261,11 +261,13 @@ class qtype_preg_regex_handler {
         } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
             return $this->look_for_circumflex($root->operands[0]);
         } else if (is_a($root, 'qtype_preg_node_alt')) {
-            $result = true;
+            $cf = true;
+            $empty = false;
             foreach ($root->operands as $operand) {
-                $result = $result && $this->look_for_circumflex($operand);
+                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $cf = $cf && $this->look_for_circumflex($operand);
             }
-            return $result;
+            return $cf || $empty;
         }
         return false;
     }
