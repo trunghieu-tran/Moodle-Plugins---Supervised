@@ -1457,9 +1457,9 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     $negative = ($text === '[:^ascii:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ASCII, $negative);
 }
-<CHARSET> "\h"|"\H"|"[:blank:]"|"[:^blank:]" {
+<CHARSET> "\h"|"\H"|"\v"|"\V"|"[:blank:]"|"[:^blank:]" {
     $text = $this->yytext();
-    $negative = ($text === '\H' || $text === '[:^blank:]');
+    $negative = ($text === '\H' || $text === '\V' || $text === '[:^blank:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $negative);
 }
 <CHARSET> "[:cntrl:]"|"[:^cntrl:]" {
