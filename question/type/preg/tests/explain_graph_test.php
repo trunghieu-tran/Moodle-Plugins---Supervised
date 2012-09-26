@@ -276,6 +276,45 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        
        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with backreference!');
    }
+
+   function test_create_graph_multialter()
+   {
+       $tree = new qtype_preg_author_tool_explain_graph('abc|acb|bac|bca|cab|cba');
+
+       $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('abc'), 'ellipse', 'black', $etalon, 0);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('acb'), 'ellipse', 'black', $etalon, 1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bac'), 'ellipse', 'black', $etalon, 2);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bca'), 'ellipse', 'black', $etalon, 3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cab'), 'ellipse', 'black', $etalon, 4);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cba'), 'ellipse', 'black', $etalon, 5);
+
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
+
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[5]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[5], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[8], $etalon->nodes[6]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[7], $etalon->nodes[9]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[4]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[3]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[2]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[1]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[0]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[4], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[7]);
+       $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[7]);
+       
+       $result = $tree->create_graph();
+       
+       $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with multialter!');
+   }
 }
 
 ?>
