@@ -10,19 +10,38 @@
 // TODO - code documentation
  
 M.qtype_preg_authors_tool = {};
- 
+  
 M.qtype_preg_authors_tool.init = function(Y) {
 
     // variables:
+    
+    /** @var a reference to 'Check' button */
     var node;
+
+    /** @var a reference to line edit with new regex */
     var context;
+
+    /** @var a reference to 'Back' button */
     var back;
-    var hidden;
+
+    /** @var a hidden field */
+    //var hidden; // unused ?
+
+    /** @var a reference to line edit on a base page from which we are getting a regex */
     var currentlineedit;
 
     // functions:
+    
+    /**
+     * Loads data about new regex
+     *
+     * @param url URL address to which a request is made, with the new regular expression
+     */
     var load_content = function(url) {
 
+        /**
+         * Calls if request for information about new regex is successful
+         */
         var upd_dialog_Success = function(id, o, a) {
             // this is debug output (should be deleted is release): !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
             var indexofbracket = o.responseText.indexOf("{");
@@ -52,45 +71,59 @@ M.qtype_preg_authors_tool.init = function(Y) {
             node = Y.one('#id_regex_check');
             context = Y.one('#id_regex_text');
             back = Y.one('#id_regex_back');
-            hidden = Y.one('#hidden_id');
-            back.on("click", back_regex, hidden);
+            //hidden = Y.one('#hidden_id');
+            back.on("click", back_regex/*, hidden*/);
             node.on("click", check_regex, context);
         }
 
+        /**
+         * Calls if request for information about new regex fails
+         */
         var upd_dialog_failure = function(id, o, a) {
             alert("ERROR " + id + " " + a);
         }
 
+        /** @var configuration of request */
         var cfg = {
             method: "GET",
             xdr: {
                 use: 'native'
             },
             on: {
-                success: upd_dialog_Success,
-                failure: upd_dialog_failure
+                success: upd_dialog_Success,    // upd_dialog_Succes(...) will call if request is successful
+                failure: upd_dialog_failure     // upd_dialog_failure(...) will call if request fails
             }
         };
 
         var response = Y.io(url, cfg);
     }
 
+    /**
+     * Handler of pressing on 'Test regex' button
+     */
     var testregexbtn_pressed = function(e) {
 
         e.preventDefault();
 
-        //var page_regex_auth_helper_height = 1000;
+        /** @var width of dialog */
         var pageregexauthhelperwidth = 1000;
+
+        /** @var a reference to line edit from which we got a regex (this reference is passed as 'this' when we install this handler) */
         currentlineedit = this;
-        //regex = encodeURIComponent(this.get('value'));
-        // TODO - replace preg_www_root with moodle variable
-        var pageregexauthhelperadr = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(this.get('value')) + '&id=-1' + '&id_line_edit=' + this.getAttribute('id');
+
+        /** @var regex, which we should analyse */
+        var currentregex = encodeURIComponent(this.get('value'));
+
+        // TODO - replace preg_www_root with moodle variable ???
+        /** @var full address of request */
+        var pageregexauthhelperadr = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + currentregex + '&id=-1' /*+ '&id_line_edit=' + this.getAttribute('id')*/;
+
         if (typeof dialog == 'undefined') {
+            // if the 'Test regex' button is first pressed, we should generate a dialog window
             dialog = new Y.Panel({
                 contentBox: Y.Node.create('<div id="dialog" />'),
                 bodyContent: '<div class="message icon-warn">Loading...</div>',
                 width: pageregexauthhelperwidth,
-                //height     : page_regex_auth_helper_height,
                 zIndex: 120,
                 centered: true,
                 modal: true, // modal behavior
@@ -113,6 +146,9 @@ M.qtype_preg_authors_tool.init = function(Y) {
                 }
             });
 
+            /**
+             * Handler of pressing on 'Cancel' button of dialog
+             */
             dialog.onCancel = function(e) {
                 e.preventDefault();
                 this.hide();
@@ -122,29 +158,24 @@ M.qtype_preg_authors_tool.init = function(Y) {
                 //Y.one('#tree_img').setAttribute('src','');
             }
 
+            /**
+             * Handler of pressing on 'Ok' button of dialog
+             */
             dialog.onOK = function(e) {
                 e.preventDefault();
                 //TODO: implement save text widgets "string test" in database
-                //alert('123');
                 this.hide();
                 // code that executes the user confirmed action goes here
-                if(this.callback) {
-                    this.callback();
-                }
+                //if(this.callback) {
+                //    this.callback();
+                //}
                 //  callback reference removed, so it won't persist
-                this.callback = false;
+                //this.callback = false;
                 //Y.one('#tree_img').setAttribute('src','');
             }
 
-            //Y.one('#dialog .message').load('http://localhost/moodle/question/type/preg/ast_preg_form.php?regex='+this.get("value"));
 
             Y.one('#dialog .message').load(preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + encodeURIComponent(currentlineedit.get('value')) + '&id=-1', function() {
-                /*Y.Get.js(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_script.js', function(err) {
-                    if(err) {
-                        alert('Error loading JS: ' + err[0].error, 'error');
-                        return;
-                    }
-                })*/
                 //TODO: set empty src in all field
                 Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
                 Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
@@ -153,6 +184,7 @@ M.qtype_preg_authors_tool.init = function(Y) {
             })
 
         } else {
+            // if a dialog window is already generated we should fill it with new data
             //TODO: set empty src in all field
             Y.one('#id_regex_text').set('value', currentlineedit.get('value'));
             Y.one('#id_tree').setAttribute("src", preg_www_root + '/question/type/preg/tmp_img/spacer.gif');
@@ -162,6 +194,9 @@ M.qtype_preg_authors_tool.init = function(Y) {
         }
     }
 
+    /**
+     * Handler of pressing on 'Back' button of dialog
+     */
     var back_regex = function( e ) {
         
         e.preventDefault();
@@ -169,12 +204,13 @@ M.qtype_preg_authors_tool.init = function(Y) {
         var new_regex = Y.one(context).get('value');
         currentlineedit.set('value',new_regex);
         dialog.hide();
-        
-        //TODO: call OK button
-        //dialog.onOK();
-
     }
 
+    /**
+     * Highlights part of text description of regex corresponding to giving id
+     *
+     * @param id id of node for which we should highlight part of description
+     */
     var highlight_description = function(id){
         
         const highlightedclass = 'description_highlighted';
@@ -186,31 +222,24 @@ M.qtype_preg_authors_tool.init = function(Y) {
         
         Y.one('.description_node_'+id).addClass(highlightedclass).setStyle('background-color','yellow');
     }
-    
+
+    /**
+     * Handler of pressing on 'Check' button of dialog
+     */
     var check_regex = function( e ) {
         
         e.preventDefault();
         
         load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value'))+'&id=-1');
     }    
-    
+
+    /**
+     * Handler of pressing on area of a map on regex tree image
+     */
     var check_tree = function( e ) {
 
        id = e.currentTarget.getAttribute ( 'id' );
-       //alert(id);
        highlight_description(id);
-        
-       /*var tmp = encodeURIComponent(context.get("value"));
-       
-       var url = preg_www_root + '/question/type/preg/authors_tool/ast_preg_form.php?regex=' + tmp + '&id=' + id;
-       Y.io(url);
-       Y.one('#id_graph').setAttribute('src','');
-       setTimeout(function() {
-           Y.one('#id_graph').setAttribute('src', preg_www_root + '/question/type/preg/tmp_img/graph.png');
-           //TODO: implement for tree and map
-           }, 500);*/
-       //Y.one('#id_graph').setAttribute('src','').setAttribute('src','http://localhost/moodle/question/type/preg/tmp_img/graph.png');
-       
        load_content(preg_www_root + '/question/type/preg/authors_tool/preg_authors_tool_load.php?regex='+encodeURIComponent(Y.one('#id_regex_text').get('value')) + '&id=' + id);
     }
 
