@@ -176,6 +176,9 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         return $graph;
     }
 
+    /**
+     * Processes userinscription of charset to make an array of information which one will be in result graph.
+     */
     public static function process_charset($info) {
         $result = array();
 
@@ -219,11 +222,25 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                         } else {
                             $result[] = chr(10) . get_string('description_charflag_' . $iter->data[$i], 'qtype_preg');
                         }
-                    } else if ($iter->data[$i] == 'x') {
+                    } else if ($iter->data[$i] == 'x' || $iter->data[$i] == 'X') {
                         $i++;
-                        $tmp = $iter->data[$i];
-                        $i++;
-                        $tmp .= $iter->data[$i];
+                        if (self::is_hex($iter->data[$i]))
+                        {
+                            $tmp = $iter->data[$i];
+
+                            $i++;
+                            if (self::is_hex($iter->data[$i]))
+                                $tmp .= $iter->data[$i];
+                        } else if ($iter->data[$i] == '{') {
+                            $i++;
+                            while ($iter->data[$i] != '}'){
+                                $tmp .= $iter->data[$i];
+                                $i++;
+                            }
+                        } else {
+                            $tmp = 0;
+                            $i--;
+                        }
 
                         $result[] = chr(10) . str_replace('%code', $tmp, get_string('description_char_16value', 'qtype_preg'));
                     } else if ($iter->data[$i] == 'n') {
@@ -264,7 +281,10 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                 } else if ($iter->data[$i] == '	') {
                     $result[] = chr(10) . get_string('description_char9', 'qtype_preg');
                 } else if ($iter->data[$i] == '.') {
-                    $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
+                    if ($iter->type == qtype_preg_userinscription::TYPE_GENERAL)
+                        $result[] = $iter->data[$i];
+                    else
+                        $result[] = chr(10) . get_string('description_charflag_print', 'qtype_preg');
                 } else {
                     $result[0] .= $iter->data[$i];
                 }
@@ -277,6 +297,37 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
         }
 
         return $result;
+    }
+
+    private static function is_hex($letter) {
+        switch ($letter) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+                return true;
+
+            default:
+                return false;
+        }
     }
 }
 

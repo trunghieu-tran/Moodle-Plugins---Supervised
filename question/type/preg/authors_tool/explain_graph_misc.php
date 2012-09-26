@@ -117,7 +117,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill . '];';
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill . '];';
             }
         }
 
@@ -176,6 +176,8 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $result = str_replace(']', '&#93;', $result);
         $result = str_replace('[', '&#91;', $result);
         $result = str_replace('\\', '&#92;', $result);
+        $result = str_replace('{', '&#123;', $result);
+        $result = str_replace('}', '&#125;', $result);
 
         return $result;
     }
