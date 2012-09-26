@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
  * Representation of nodes and leafs as they were typed in the regex.
@@ -382,22 +383,155 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      * @return true if included, false otherwise
      */
     public function is_include(qtype_preg_leaf_charset $other) {
-        $result = true;
+        /*$result = true;
         for ($i = 32; $result && $i < 126; $i++) {
-            $c = chr($i);
+            $c = new qtype_poasquestion_string(chr($i));
             $result = $result && (!$this->match($c, 0, $l) && $other->match($c, 0, $l));
         }
-        return $result;
+        return $result || $other===$this;*/
+        //getting ranges of this charset
+        foreach ($this->flags as $flags) {
+            foreach ($flags as $flag) {
+                // Get intersection of all current flags.
+                $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
+                if ($flag->type === qtype_preg_charset_flag::SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                }
+                foreach ($currange as &$tmp) {
+                    $tmp['negative'] = $flag->negative;
+                }
+                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                if ($this->negative) {
+                    foreach ($ranges as &$tmp)
+                        $tmp['negative'] = true;
+                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                }
+            }
+        }
+        //getting ranges of other charset
+        foreach ($other->flags as $flags) {
+            foreach ($flags as $flag) {
+                // Get intersection of all current flags.
+                $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
+                if ($flag->type === qtype_preg_charset_flag::SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                }
+                foreach ($currange as &$tmp) {
+                    $tmp['negative'] = $flag->negative;
+                }
+                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                if ($other->negative) {
+                    foreach ($otherranges as &$tmp)
+                        $tmp['negative'] = true;
+                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                }
+            }
+        }
+        //comparing ranges of this and other charsets
+        if (is_array($ranges)) {
+		      $included = true;        
+        } else {
+            return false;
+        }
+        /*foreach($ranges as $i=>$ran) {
+        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+        }
+        foreach($otherranges as $i=>$ran) {
+        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+        }
+        $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
+        for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
+			   if (current($ranges)!=current($otherranges)) {
+				    $included = false;
+				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+					     next($ranges);				    
+				    }
+				    if (current($ranges)!==false) {
+                    $included = true;				    
+				    }*/
+			   }        
+        }
+        return $included;
     }
     public function is_part_ident(qtype_preg_leaf_charset $other) {
-        $flag1 = false;
+        /*$flag1 = false;
         $flag2 = false;
         for ($i = 32; !($flag1 && $flag2) && $i < 126; $i++) {
             $c=chr($i);
             $flag1 = $flag1 || ($this->match($c, 0, $l) && $other->match($c, 0, $l));
             $flag2 = $flag2 || (!$this->match($c, 0, $l) && $other->match($c, 0, $l) || $this->match($c, 0, $l) && !$other->match($c, 0, $l));
         }
-        return $flag1 && $flag2;
+        return $flag1 && $flag2;*/
+        foreach ($this->flags as $flags) {
+            foreach ($flags as $flag) {
+                // Get intersection of all current flags.
+                $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
+                if ($flag->type === qtype_preg_charset_flag::SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                }
+                foreach ($currange as &$tmp) {
+                    $tmp['negative'] = $flag->negative;
+                }
+                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                if ($this->negative) {
+                    foreach ($ranges as &$tmp)
+                        $tmp['negative'] = true;
+                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                }
+            }
+        }
+        //getting ranges of other charset
+        foreach ($other->flags as $flags) {
+            foreach ($flags as $flag) {
+                // Get intersection of all current flags.
+                $range = array(array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
+                if ($flag->type === qtype_preg_charset_flag::SET) {
+                    $currange = qtype_preg_unicode::get_ranges_from_charset($flag->data);
+                } else {
+                    $currange = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                }
+                foreach ($currange as &$tmp) {
+                    $tmp['negative'] = $flag->negative;
+                }
+                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                if ($other->negative) {
+                    foreach ($otherranges as &$tmp)
+                        $tmp['negative'] = true;
+                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                }
+            }
+        }
+        //comparing ranges of this and other charsets
+        if (is_array($ranges)) {
+		      $included = false;        
+        } else {
+            return false;
+        }
+        /*foreach($ranges as $i=>$ran) {
+        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+        }
+        foreach($otherranges as $i=>$ran) {
+        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+        }
+        $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
+        for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
+			   if (current($ranges)==current($otherranges)) {
+				    $included = true;
+				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+					     next($ranges);				    
+				    }
+				    if (current($ranges)!==false) {
+                    $included = true;				    
+				    }*/
+			   }        
+        }
+        return $included;
     }
 
     public function tohr() {
