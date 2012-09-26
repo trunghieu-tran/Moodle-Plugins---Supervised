@@ -108,24 +108,16 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-    *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex (it match with end of string)
+    *function form node with concatenation, first operand old root of tree, second operant leaf with sign of end regex
     *@param index - number of tree for adding end's leaf.
     */
     function append_end($index) {
-        /*
-        if ($index==0) {
-            $root = $this->roots[0];
-        } else {
-            $root = $this->roots[$index]->pregnode->operands[0];
-        }
-        */
-        $root = $this->roots[$index];
-        $oldroot = $root;
         $root = new qtype_preg_node_concat;
         $root->operands[1] = new qtype_preg_leaf_meta;
         $root->operands[1]->subtype = qtype_preg_leaf_meta::SUBTYPE_ENDREG;
         $root = $this->from_preg_node($root);
-        $root->pregnode->operands[0] = $oldroot;
+        $root->pregnode->operands[0] = $this->roots[0];
+        $this->roots[0] = $root;
     }
 
     /**
@@ -156,7 +148,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new finite_automate_state;
                 $statecount++;
-                $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);
+                $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);        
                 foreach ($fpU as $follow) {
                     if ($follow < qtype_preg_dfa_node_assert::ASSERT_MIN_NUM) {
                         //if number less then dfa_preg_node_assert::ASSERT_MIN_NUM constant than this is character class, to passages it.
@@ -177,7 +169,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                         end($this->finiteautomates[$index]);
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
                     } else {
-                        //else do passage point to state, which has in fa already
+                        //else do passage point to state, which has in fa already                        
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 }
@@ -200,7 +192,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $result = $this->compare($str, 0, $offset, false);
         if ($result===false) {
             $errres = new qtype_preg_matching_results(false, array(0), array(0), qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null);
-            $errres->set_source_info('', $this->get_max_subpattern(), $this->get_subpattern_map());
+            $errres->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
             return $errres;
         }
         $extstr = substr($str, 0, $result->offset + $result->index+1);
@@ -208,10 +200,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         } else {
             $extstr .= $result->next;
         }
+        if (!is_object($extstr)) {
+        	   $extstr = new qtype_poasquestion_string($extstr);
+        }
         if ($result->full) {
             $extmatch = null;
         } else {
-        $ext=$result;
+            $ext=$result;
             $extmatch = new qtype_preg_matching_results($ext->full, array($ext->offset), array($ext->index+1), $ext->left-1, null);
             $extmatch->set_source_info($extstr, $this->get_max_subpattern(), $this->get_subpattern_map());
         }
@@ -233,7 +228,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
  *   If matching is impossible, return bool(false)
     */
-    function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
+    function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0        
         $index = 0;//char index in string, comparing begin of first char in string
         $length = 0;//count of character matched with current leaf
         $end = false;//current state is end state, not yet
@@ -271,7 +266,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             while (!$found && current($this->finiteautomates[$assertnumber][$currentstate]->passages) !== false) { //while not found and all passages not checked yet
                 //current character is contain in character class
                 $key = key($this->finiteautomates[$assertnumber][$currentstate]->passages);
-                if ($key != dfa_preg_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
+                if ($key != qtype_preg_dfa_leaf_meta::ENDREG && $offset + $index <= strlen($string)) {
                     $found = $this->connection[$assertnumber][$key]->pregnode->match($string, $offset + $index, $length, $casesens);
                 }
                 if ($found && $this->connection[$assertnumber][$key]->pregnode->type == qtype_preg_node::TYPE_LEAF_META) {
@@ -302,11 +297,11 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $foundkey = $key;
                 $ismatch = true;
             }
-            if (array_key_exists(dfa_preg_leaf_meta::ENDREG, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
+            if (array_key_exists(qtype_preg_dfa_leaf_meta::ENDREG, $this->finiteautomates[$assertnumber][$currentstate]->passages)) {
             //if current character is end of string and fa can go to end state.
                 if ($offset + $index == strlen($string)) { //must be end
                     $found = true;
-                    $foundkey = dfa_preg_leaf_meta::ENDREG;
+                    $foundkey = qtype_preg_dfa_leaf_meta::ENDREG;
                     $length = 0;
                 } elseif(count($this->finiteautomates[$assertnumber][$currentstate]->passages) == 1) {//must be end
                     //$foundkey = dfa_preg_leaf_meta::ENDREG;
@@ -317,13 +312,13 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $substringmatch->index = $index;
             }
             $index += $length;
-            if ($found && $foundkey != dfa_preg_leaf_meta::ENDREG) {
+            if ($found && $foundkey != qtype_preg_dfa_leaf_meta::ENDREG) {
                 $acceptedcharcount += $length;
             }
             //form results of check this character
             if ($found) { //if finite automate did accept this character
                 $correct = true;
-                if ($foundkey != dfa_preg_leaf_meta::ENDREG) {// if finite automate go to not end state
+                if ($foundkey != qtype_preg_dfa_leaf_meta::ENDREG) {// if finite automate go to not end state
                     if ($length == 0) {
                         foreach ($laststates as $state) {
                             if ($state == $currentstate) {
@@ -417,7 +412,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 if ($counter > 10000) {
                 //TODO set wave error flag!
                     $res = new stdClass;
-                    $res->nextkey = 1;
+                    $res->nextkey = '1';
                     $res->left = 0;
                     return $res;
                     return new stdClass;
@@ -426,6 +421,16 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 }
                 foreach ($curr->currentstep as $step) {//for all state if current subfront
                     foreach ($this->finiteautomates[$assertnum][$step]->passages as $passkey => $passage) {//for all passage in this state
+                        if ($counter > 1000000) {
+                        //TODO set wave error flag!
+                            $res = new stdClass;
+                            $res->nextkey = '1';
+                            $res->left = 0;
+                            return $res;
+                            return new stdClass;
+                        } else {
+                            $counter++;
+                        }
                         if ($passage != $step) {//if passage not to self
                             $endafterassert = false;
                             if ($this->connection[$assertnum][$passkey]->pregnode->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
@@ -450,6 +455,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                             }
                         }
                     }
+                }
+                if (!isset($front[$i]->nextstep)) {
+					     throw new Exception("wave error on regex: $this->regex\n");      
                 }
                 $front[$i]->currentstep = $front[$i]->nextstep;
                 $front[$i]->nextstep = array();
@@ -551,7 +559,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
             foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                    $cc->pregnode->push_negative();
+                    
                     $this->connection[$index][$number]->pregnode->push_negative();
                     if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
                         array_push($equnum, $num);
@@ -574,7 +582,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 }
             }
         }
-        $equnum = array_unique($equnum, SORT_NUMERIC);
+       /* $equnum = array_unique($equnum, SORT_NUMERIC);*/
         $followU = array();
         foreach ($equnum as $num) {//forming map of following numbers
             qtype_preg_dfa_matcher::push_unique($followU, $fpmap[$num]);
@@ -618,8 +626,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     @param regex - regular expirience for which will be build finite automate
     @param modifiers - modifiers of regular expression
     */
-    function __construct($regex = null, $modifiers = null) {
-        set_time_limit(100);
+    public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
         if (isset($CFG->qtype_preg_dfa_state_limit)) {
@@ -635,7 +642,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
-        parent::__construct($regex, $modifiers);
+        parent::__construct($regex, $modifiers, $options);     
         $this->roots[0] = $this->dst_root;//place dst root in engine specific place
         //building finite automates
         if ($this->is_error_exists()) {
@@ -649,7 +656,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $this->roots[0]->lastpos();
         $this->roots[0]->followpos($this->map[0]);
         //$this->split_leafs(0);
-        //$this->prepare_map(0);
+        $this->prepare_map(0);
         $this->roots[0]->find_asserts($this->roots);
         foreach ($this->roots as $key => $value) {
             if ($key!=0) {
@@ -672,7 +679,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     protected function prepare_map($index) {
         foreach ($this->connection[$index] as $i=>$leaf1) {
             foreach ($this->connection[$index] as $j=>$leaf2) {
-                if (is_a($leaf1, 'dfa_preg_leaf_charset') && is_a($leaf2, 'dfa_preg_leaf_charset') && $leaf1->pregnode->is_part_ident($leaf2->pregnode)) {
+                if (is_a($leaf1, 'qtype_preg_dfa_leaf_charset') && is_a($leaf2, 'qtype_preg_dfa_leaf_charset') && $leaf1->pregnode->is_part_ident($leaf2->pregnode)) {
                     $leaf1and2 = $leaf1->pregnode->intersect($leaf2->pregnode);
                     $leaf1not2 = $leaf1->pregnode->substract($leaf2->pregnode);
                     $leaf2not1 = $leaf2->pregnode->substract($leaf1->pregnode);

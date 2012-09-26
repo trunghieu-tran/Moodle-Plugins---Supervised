@@ -224,6 +224,17 @@ expr(A) ::= expr(B) ALT. {
     $this->reducecount++;
 }
 
+expr(A) ::= ALT expr(B). {
+    A = new qtype_preg_node_alt();
+    A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
+    A->operands[0] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->operands[0]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
+    A->operands[0]->id = $this->idcounter++;
+    A->operands[1] = B;
+    A->id = $this->idcounter++;
+    $this->reducecount++;
+}
+
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->set_user_info(B->indfirst, C->indlast, C->userinscription);

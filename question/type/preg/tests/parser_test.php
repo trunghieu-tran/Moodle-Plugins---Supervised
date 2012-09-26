@@ -415,6 +415,29 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B);
         $this->assertTrue($root->operands[1]->negative);
     }
+    function test_parser_alt_all_forms() {
+        $parser = $this->run_parser('a|b', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
+        $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->flags[0][0]->data == 'b');
+        $parser = $this->run_parser('a|', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
+        $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[1]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $parser = $this->run_parser('|b', $errornodes);
+        $root = $parser->get_root();
+        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_META);
+        $this->assertTrue($root->operands[0]->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->flags[0][0]->data == 'b');
+    }
     function test_parser_subpatterns() {
         $parser = $this->run_parser('((?:(?(?=a)(?>b)|a)))', $errornodes);
         $root = $parser->get_root();
