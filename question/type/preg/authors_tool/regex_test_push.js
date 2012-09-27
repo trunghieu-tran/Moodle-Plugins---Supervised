@@ -246,12 +246,12 @@ M.qtype_preg_authors_tool.init = function(Y) {
     // code:
     // installation click handler:
     var i = 0;
-    var testregexbtn = Y.one('#id_regextest_' + i);
+    var testregexbtn = Y.one('#id_answer_' + i + '_test');
     var testregexlineedit = Y.one('#id_answer_' + i);
     while(testregexbtn != null) {
         testregexbtn.on("click", testregexbtn_pressed, testregexlineedit);
         ++i;
-        testregexbtn = Y.one('#id_regextest_' + i);
+        testregexbtn = Y.one('#id_answer_' + i + '_test');
         testregexlineedit = Y.one('#id_answer_' + i);
     }
 }
