@@ -86,19 +86,27 @@ class qtype_preg_dot_style_provider {
             case qtype_preg_node::TYPE_LEAF_CHARSET: {
             
                     $tooltip = substr($tooltip, 0, strlen($tooltip)-5);
+                    
+                    if (strrpos($label, ',') === (strlen($label)-1) && strlen($label) > 0) {
+                            $label[strlen($label)-1] = '\0';
+                    }
+                    
                     if ($pregnode->negative) {
                         $label = '&#91;^' . $label . '&#93;';
                         return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
                     } else if (qtype_poasquestion_string::strlen($label) > 1 && $bracketflag) {
                         $label = '&#91;' . $label;
                         //delete last comma
-                        if (strrpos($label, ',') === (strlen($label)-1) && strlen($label) > 0) {
+                        /*if (strrpos($label, ',') === (strlen($label)-1) && strlen($label) > 0) {
                             $label[strlen($label)-1] = '&';
                             $label .= '#93;';
-                        } else {
+                        } else {*/
                             $label .= '&#93;';
-                        }
+                        //}
                     }
+                    
+                    
+                        
                     //var_dump($label);
                     if($pregnode->error === NULL){
                         return "[label = <<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"4\"><TR><TD>$label</TD></TR></TABLE>>, tooltip = \"" . get_string('tooltip_charset', 'qtype_preg') . ": " . $tooltip . " \", shape = record, id = $id]";
