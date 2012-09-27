@@ -3,8 +3,8 @@
 #page-mod-poasassignment-view #dates .c0 {text-align:right; font-weight:bold; background: #f6f6f6;}
 #page-mod-poasassignment-view #dates .c1 {}
 #page-mod-poasassignment-view #dates {
-	margin: 1em auto;
-	border: none;
+    margin: 1em auto;
+    border: none;
 }
 /*.poasassignment-table {width:100%}*/
 .poasassignment-table {
@@ -33,31 +33,31 @@ p.no-info-message {text-align: center;}
 #page-mod-poasassignment-view th {font-weight: normal;}*/
 
 .poasassignment-confirmation-buttons {
-	margin-top: 10px;
-	text-align: center;
+    margin-top: 10px;
+    text-align: center;
 }
 .poasassignment-confirmation-buttons .singlebutton {
-	display: inline-block;
+    display: inline-block;
 }
 .poasassignment-confirmation-buttons input[type=submit] {
-	width:100px;
-	margin:0 10px;
-	padding:5px 0;
+    width:100px;
+    margin:0 10px;
+    padding:5px 0;
 }
 .poasassignment-critical {
-	color:red;
-	font-weight:bold;
+    color:red;
+    font-weight:bold;
 }
 table.task-owners th,
 .tasks-table th ,
 .taskfields-table th{
-	white-space: normal !important;
+    white-space: normal !important;
 }
 table.task-owners,
 .tasks-table td,
 .taskfields-table td{
-	text-align: center !important;
-	vertical-align: middle !important;
+    text-align: center !important;
+    vertical-align: middle !important;
 }
 
 a:link.hiddentask, a:visited.hiddentask {

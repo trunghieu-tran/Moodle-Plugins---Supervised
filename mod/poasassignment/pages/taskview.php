@@ -13,7 +13,7 @@ class taskview_page extends abstract_page {
     }
     
     function has_satisfying_parameters() {
-    	//TODO приватность
+        //TODO приватность
         global $DB, $USER;
         if(!$this->task = $DB->get_record('poasassignment_tasks', array('id' => $this->taskid))) {        
             $this->lasterror = 'errornonexistenttask';
@@ -130,11 +130,11 @@ class taskview_page extends abstract_page {
                         $str = $model->view_files($model->get_context()->id,'poasassignmenttaskfiles', $taskvalue->id);
                     }
                     if ($field->ftype == LISTOFELEMENTS ) {
-                    	$variants = $model->get_variants($field->id);
-                    	if (isset($variants[$taskvalue->value]))
-                        	$variant = $variants[$taskvalue->value];
-                    	else 
-                    		$variant = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
+                        $variants = $model->get_variants($field->id);
+                        if (isset($variants[$taskvalue->value]))
+                            $variant = $variants[$taskvalue->value];
+                        else
+                            $variant = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
                         $str = $variant;
                     }
                     if ($field->ftype == MULTILIST ) {

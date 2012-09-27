@@ -25,43 +25,43 @@ class tasksfields_page extends abstract_page {
 
     function view() {
         $id = $this->cm->id;
-		$this->view_controls($id);
+        $this->view_controls($id);
 
-		echo '<div id="poasassignment-taskfields">';
+        echo '<div id="poasassignment-taskfields">';
         $count = $this->view_table();
-		echo '</div>';
-		if ($count > 4) {
-			$this->view_controls($id);
-		}
+        echo '</div>';
+        if ($count > 4) {
+            $this->view_controls($id);
+        }
 
     }
     private function view_controls($id) {
         global $OUTPUT;
-		echo '<div align="center">';
+        echo '<div align="center">';
         echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskfieldedit')),
                                     get_string('addtaskfield','poasassignment'));
         /*echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'categoryedit')),
                                     get_string('addcategoryfield','poasassignment'));*/
         echo '</div>';
-	}
+    }
     private function view_table() {
         global $DB, $OUTPUT, $PAGE;
         $poasmodel = poasassignment_model::get_instance();
         $table = new flexible_table('mod-poasassignment-tasksfields');
         $table->baseurl = $PAGE->url;
         $columns = array(
-        		'name',
-        		'ftype',
-        		'range',
-        		'random',
-        		'secretfield',
-        		'showintable');
+                'name',
+                'ftype',
+                'range',
+                'random',
+                'secretfield',
+                'showintable');
         $headers = array(
-        		get_string('taskfieldname','poasassignment') . $OUTPUT->help_icon('taskfieldname', 'poasassignment'),
+                get_string('taskfieldname','poasassignment') . $OUTPUT->help_icon('taskfieldname', 'poasassignment'),
                 get_string('ftype','poasassignment') . $OUTPUT->help_icon('ftype', 'poasassignment'),
-        		get_string('range','poasassignment') . $OUTPUT->help_icon('range', 'poasassignment'),
-        		get_string('random','poasassignment') . $OUTPUT->help_icon('random', 'poasassignment'),
-        		get_string('secretfield','poasassignment') . $OUTPUT->help_icon('secretfield', 'poasassignment'),
+                get_string('range','poasassignment') . $OUTPUT->help_icon('range', 'poasassignment'),
+                get_string('random','poasassignment') . $OUTPUT->help_icon('random', 'poasassignment'),
+                get_string('secretfield','poasassignment') . $OUTPUT->help_icon('secretfield', 'poasassignment'),
                 get_string('showintable','poasassignment') . $OUTPUT->help_icon('showintable', 'poasassignment'));
         
         $table->define_columns($columns);
@@ -73,18 +73,18 @@ class tasksfields_page extends abstract_page {
         //$table->set_attribute('border', '1');
         //$table->set_attribute('width', '100%');
 
-		$table->sortable(true, 'lastname');
-		$table->no_sorting('range');
+        $table->sortable(true, 'lastname');
+        $table->no_sorting('range');
         $table->setup();
 
         if ($table->get_sql_sort()) {
-			$sort = $table->get_sql_sort();
+            $sort = $table->get_sql_sort();
         }
-		else {
-			$sort = '';
-		}
-		$yes_icon = $OUTPUT->pix_icon('yes', get_string('yes'), 'mod_poasassignment');
-		$no_icon = $OUTPUT->pix_icon('no', get_string('no'), 'mod_poasassignment');
+        else {
+            $sort = '';
+        }
+        $yes_icon = $OUTPUT->pix_icon('yes', get_string('yes'), 'mod_poasassignment');
+        $no_icon = $OUTPUT->pix_icon('no', get_string('no'), 'mod_poasassignment');
         $fields = $DB->get_records('poasassignment_fields', array('poasassignmentid'=>$this->poasassignment->id), $sort);
         foreach($fields as $field) {
 
@@ -124,13 +124,13 @@ class tasksfields_page extends abstract_page {
             
             $row = array($name,
                     $poasmodel->ftypes[$field->ftype],
-            		$range,
-            		$field->random == 1 ? $yes_icon : $no_icon,
-		            $field->secretfield == 1 ? $yes_icon : $no_icon,
-		            $field->showintable == 1 ? $yes_icon : $no_icon);
+                    $range,
+                    $field->random == 1 ? $yes_icon : $no_icon,
+                    $field->secretfield == 1 ? $yes_icon : $no_icon,
+                    $field->showintable == 1 ? $yes_icon : $no_icon);
             $table->add_data($row);
         }
         $table->print_html();
-		return count($fields);
+        return count($fields);
     }
 }

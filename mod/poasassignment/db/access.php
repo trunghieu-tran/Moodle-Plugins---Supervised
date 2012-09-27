@@ -73,7 +73,7 @@ $capabilities = array(
         )
     ),
     'mod/poasassignment:finalgrades'=> array(
-		'riskbitmask' => RISK_XSS,
+        'riskbitmask' => RISK_XSS,
         'captype'=>'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array (

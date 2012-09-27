@@ -35,13 +35,13 @@ class attempts_page extends abstract_page {
             // Page content is available if assignee wants to see his own attempts
             // or teacher wants to see them
             if($this->assignee->userid == $USER->id) {
-				//if (has_capability('mod/poasassignment:viewownsubmission', $context)) {
-					return true;
-				//}
-				//else {
-				//	$this->lasterror = 'errorviewownsubmissioncap';
-				//	return false;
-				//}
+                //if (has_capability('mod/poasassignment:viewownsubmission', $context)) {
+                    return true;
+                //}
+                //else {
+                //    $this->lasterror = 'errorviewownsubmissioncap';
+                //    return false;
+                //}
             }
             else {
                 $this->lasterror = 'erroranothersattempts';
@@ -77,9 +77,9 @@ class attempts_page extends abstract_page {
             $latestattempt = $poasmodel->get_last_attempt($this->assignee->id);
             $attemptscount = count($attempts);  
             foreach($attempts as $attempt) {
-				echo $OUTPUT->box_start();
-				$hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
-				echo attempts_page::show_attempt($attempt, $hascap);
+                echo $OUTPUT->box_start();
+                $hascap = has_capability('mod/poasassignment:viewownsubmission', $poasmodel->get_context());
+                echo attempts_page::show_attempt($attempt, $hascap);
                 // show disablepenalty/enablepenalty button
                 if(has_capability('mod/poasassignment:grade',$poasmodel->get_context())) {
                     $cmid = $poasmodel->get_cm()->id;
@@ -92,10 +92,10 @@ class attempts_page extends abstract_page {
                                                                 get_string('disablepenalty','poasassignment'));
                     }
                 }
-				$canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
-				attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
+                $canseecriteriondescr = has_capability('mod/poasassignment:seecriteriondescription', $poasmodel->get_context());
+                attempts_page::show_feedback($attempt, $latestattempt, $canseecriteriondescr);
                 echo $OUTPUT->box_end();
-				echo '<br>';
+                echo '<br>';
             }
         }
     }
@@ -148,91 +148,91 @@ class attempts_page extends abstract_page {
         $html .= '</table>';
         return $html;
     }
-	public static function show_feedback($attempt, $latestattempt, $showdescription) {
+    public static function show_feedback($attempt, $latestattempt, $showdescription) {
         global $DB,$OUTPUT;
-		$poasmodel = poasassignment_model::get_instance();
-		$context = $poasmodel->get_context();
-		$criterions = $DB->get_records('poasassignment_criterions',
-						   		       array('poasassignmentid' => $poasmodel->get_poasassignment()->id));
+        $poasmodel = poasassignment_model::get_instance();
+        $context = $poasmodel->get_context();
+        $criterions = $DB->get_records('poasassignment_criterions',
+                                          array('poasassignmentid' => $poasmodel->get_poasassignment()->id));
         if (/*isset($attempt->rating) && */
                             $DB->record_exists('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
-			$heading = get_string('feedback','poasassignment');
+            $heading = get_string('feedback','poasassignment');
             
             if ($attempt->ratingdate < $latestattempt->attemptdate) {
                 $heading .= ' (' . get_string('oldfeedback','poasassignment') . ')';
             }
-			$heading .= ' - ' . userdate($attempt->ratingdate);
-			echo $OUTPUT->heading($heading);
+            $heading .= ' - ' . userdate($attempt->ratingdate);
+            echo $OUTPUT->heading($heading);
             //echo $OUTPUT->box_start();
-			
-			
-			$options = new stdClass();
-			$options->area    = 'poasassignment_comment';
-			$options->component    = 'mod_poasassignment';
-			$options->pluginname = 'poasassignment';
-			$options->context = $context;
-			$options->showcount = true;
+
+
+            $options = new stdClass();
+            $options->area    = 'poasassignment_comment';
+            $options->component    = 'mod_poasassignment';
+            $options->pluginname = 'poasassignment';
+            $options->context = $context;
+            $options->showcount = true;
             foreach ($criterions as $criterion) {
-				
+
                 $ratingvalue=$DB->get_record('poasassignment_rating_values',
-											 array('criterionid'=>$criterion->id,
-												   'attemptid'=>$attempt->id));
-												   
-				echo '<table class="poasassignment-table" align="center" width = "90%">';
-				echo '<tr>';
-				
-				echo '<td class="header">';
-				echo $criterion->name.' ';
-				if ($showdescription) {
-						echo $poasmodel->help_icon($criterion->description);
-				}
-				echo '</td>';
-				
-				echo '<td width="20%" style="text-align:center">';
-				if ($attempt->draft==0) {                        
-					echo $ratingvalue->value . ' / 100';
-				}
-				else {
-					echo get_string('draft', 'poasassignment');
-				}
-				echo '</td>';
-				
-				echo '</tr>';
-				
-				echo '<td colspan="2">';
-				$options->itemid  = $ratingvalue->id;
-				$comment = new comment($options);
-				echo $comment->output(true);
-				echo '</td>';
-				echo '</tr>';
-				echo '</table>';
+                                             array('criterionid'=>$criterion->id,
+                                                   'attemptid'=>$attempt->id));
+
+                echo '<table class="poasassignment-table" align="center" width = "90%">';
+                echo '<tr>';
+
+                echo '<td class="header">';
+                echo $criterion->name.' ';
+                if ($showdescription) {
+                        echo $poasmodel->help_icon($criterion->description);
+                }
+                echo '</td>';
+
+                echo '<td width="20%" style="text-align:center">';
+                if ($attempt->draft==0) {
+                    echo $ratingvalue->value . ' / 100';
+                }
+                else {
+                    echo get_string('draft', 'poasassignment');
+                }
+                echo '</td>';
+
+                echo '</tr>';
+
+                echo '<td colspan="2">';
+                $options->itemid  = $ratingvalue->id;
+                $comment = new comment($options);
+                echo $comment->output(true);
+                echo '</td>';
+                echo '</tr>';
+                echo '</table>';
             }
             echo $poasmodel->view_files($context->id, 'commentfiles', $attempt->id);
             
-			echo '<table class="poasassignment-table" align="center" width = "90%">';
-			echo '<tr>';
-			
-			echo '<td class="header critical">';
-			echo get_string('penalty','poasassignment');
-			echo '</td>';
-			
-			echo '<td class="critical" width="20%" style="text-align:center">';
-			echo $poasmodel->get_penalty($attempt->id);
-			echo '</td>';
-			
-			echo '</tr>';
-			echo '</table>';
+            echo '<table class="poasassignment-table" align="center" width = "90%">';
+            echo '<tr>';
+
+            echo '<td class="header critical">';
+            echo get_string('penalty','poasassignment');
+            echo '</td>';
+
+            echo '<td class="critical" width="20%" style="text-align:center">';
+            echo $poasmodel->get_penalty($attempt->id);
+            echo '</td>';
+
+            echo '</tr>';
+            echo '</table>';
             if ($attempt->draft==0) {    
-				$ratingwithpenalty = $attempt->rating - $poasmodel->get_penalty($attempt->id);
-				echo '<table class="poasassignment-table" align="center" width = "90%">';
-				
-				echo '<tr><td class="header">';				
+                $ratingwithpenalty = $attempt->rating - $poasmodel->get_penalty($attempt->id);
+                echo '<table class="poasassignment-table" align="center" width = "90%">';
+
+                echo '<tr><td class="header">';
                 echo $OUTPUT->heading(get_string('totalratingis','poasassignment'));
-				echo '</td>';
-				
-				echo '<td width="20%">';
-				echo $OUTPUT->heading($ratingwithpenalty);
-				echo '</td></tr></table>';
+                echo '</td>';
+
+                echo '<td width="20%">';
+                echo $OUTPUT->heading($ratingwithpenalty);
+                echo '</td></tr></table>';
             }
             //echo $OUTPUT->box_end();
         }

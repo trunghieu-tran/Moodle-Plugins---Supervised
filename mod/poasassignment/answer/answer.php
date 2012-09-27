@@ -85,8 +85,8 @@ class poasassignment_answer {
         }
         return $attemptid;
     }
-	public function show_attempt_submission($attemptid) {
-	}
+    public function show_attempt_submission($attemptid) {
+    }
 
     /**
      * Validate user's submission.
