@@ -36,19 +36,19 @@ class taskfieldedit_page extends abstract_page {
         return true;
     }
     public function pre_view() {
-		
-		global $PAGE;
-		$id = poasassignment_model::get_instance()->get_cm()->id;
-		// add navigation nodes
-		$tasksfields = new moodle_url('view.php', array('id' => $id,
-														'page' => 'tasksfields'));
-		$PAGE->navbar->add(get_string('tasksfields','poasassignment'), $tasksfields);
-		
-		$taskfieldedit = new moodle_url('view.php', array('id' => $id,
-														  'page' => 'taskfieldedit',
-														  'fieldid' => $this->fieldid));
-		$PAGE->navbar->add(get_string('taskfieldedit','poasassignment'), $taskfieldedit);
-		
+
+        global $PAGE;
+        $id = poasassignment_model::get_instance()->get_cm()->id;
+        // add navigation nodes
+        $tasksfields = new moodle_url('view.php', array('id' => $id,
+                                                        'page' => 'tasksfields'));
+        $PAGE->navbar->add(get_string('tasksfields','poasassignment'), $tasksfields);
+
+        $taskfieldedit = new moodle_url('view.php', array('id' => $id,
+                                                          'page' => 'taskfieldedit',
+                                                          'fieldid' => $this->fieldid));
+        $PAGE->navbar->add(get_string('taskfieldedit','poasassignment'), $taskfieldedit);
+
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
         $this->mform = new taskfieldedit_form(null, array('id' => $model->get_cm()->id,
@@ -62,35 +62,35 @@ class taskfieldedit_page extends abstract_page {
                      null, 
                      0);
         }
-    	if ($this->mode == 'changeconfirmed') {
-        	$this->update_confirmed();        	
+        if ($this->mode == 'changeconfirmed') {
+            $this->update_confirmed();
         }
         if ($this->mode == 'addconfirmed') {
-        	$this->add_confirmed();
+            $this->add_confirmed();
         }
     }
     function view() {
         global $DB, $OUTPUT, $USER;
-		
+
         $model = poasassignment_model::get_instance();
         
         if ($data = $this->mform->get_data()) {
-	        if ($this->mode == 'confirmedit') {
-	        	$this->confirm_update($data);
-	        }
-	        if ($this->mode == 'confirmadd') {
-	        	$this->confirm_add($data);
-	        }
+            if ($this->mode == 'confirmedit') {
+                $this->confirm_update($data);
+            }
+            if ($this->mode == 'confirmadd') {
+                $this->confirm_add($data);
+            }
         }
         else {        
-	        if ($this->fieldid > 0) {
-	            $this->mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
-	            $data = new stdClass();
-	            $data->variants = $model->get_field_variants($this->fieldid, 0);
-	            $data->id = $model->get_cm()->id;
-	            $this->mform->set_data($data);
-	        }
-	        $this->mform->display();
+            if ($this->fieldid > 0) {
+                $this->mform->set_data($DB->get_record('poasassignment_fields', array('id' => $this->fieldid)));
+                $data = new stdClass();
+                $data->variants = $model->get_field_variants($this->fieldid, 0);
+                $data->id = $model->get_cm()->id;
+                $this->mform->set_data($data);
+            }
+            $this->mform->display();
         }
     }
     public static function display_in_navbar() {
@@ -104,63 +104,63 @@ class taskfieldedit_page extends abstract_page {
      * @param unknown_type $owners
      */
     public function show_owners($owners) {
-    	global $CFG, $OUTPUT;
-    	$model = poasassignment_model::get_instance();
-    	echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
-    	if (count($owners) > 0) {
-    		// Show owners table
-    		$usersinfo = $model->get_users_info($owners);
-    		print_string('instanceowners', 'poasassignment');
-    		require_once ('poasassignment_view.php');
-    		$extcolumns = array(
-    				'task',
-    				'saveprogress',
-    				'dropprogress'
-    		);
-    		$extheaders = array(
-    				get_string('task', 'poasassignment'),
-    	
-    				get_string('saveprogress', 'poasassignment').' '.
-    				$OUTPUT->help_icon('saveprogress', 'poasassignment'),
-    	
-    				get_string('dropprogress', 'poasassignment').' '.
-    				$OUTPUT->help_icon('dropprogress', 'poasassignment')
-    		);
-    	
-    		$table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
-    		foreach ($usersinfo as $userinfo) {
-    			$table->add_data($this->get_owner($userinfo));
-    			echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
-    		}
-    		// Add field's parameters
-    	
-    		echo '<input type="hidden" name="name" value="'.required_param('name', PARAM_TEXT).'"/>';
-    		echo '<input type="hidden" name="description" value="'.required_param('description', PARAM_TEXT).'"/>';
-    		echo '<input type="hidden" name="ftype" value="'.required_param('ftype', PARAM_INT).'"/>';
-    	
-    		// Checkboxes
-    		if (optional_param('showintable', false, PARAM_INT)) {
-    			echo '<input type="hidden" name="showintable" value="1"/>';
-    		}
-    		if (optional_param('secretfield', false, PARAM_INT)) {
-    			echo '<input type="hidden" name="secretfield" value="1"/>';
-    		}
-    		if (optional_param('random', false, PARAM_INT)) {
-    			echo '<input type="hidden" name="random" value="1"/>';
-    		}
-    	
-    		echo '<input type="hidden" name="valuemin" value="' . optional_param('valuemin', 0, PARAM_FLOAT) . '"/>';
-    		echo '<input type="hidden" name="valuemax" value="' . optional_param('valuemax', 0, PARAM_FLOAT) . '"/>';
-    	
-    		if ($variants = optional_param('variants', false, PARAM_RAW)) {
-    			echo '<input type="hidden" name="variants" value="' . $variants . '"/>';
-    		}
-    	
-    		$table->print_html();
-    	}
-    	else {
-    		print_string('nobodytooktask', 'poasassignment');
-    	}
+        global $CFG, $OUTPUT;
+        $model = poasassignment_model::get_instance();
+        echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
+        if (count($owners) > 0) {
+            // Show owners table
+            $usersinfo = $model->get_users_info($owners);
+            print_string('instanceowners', 'poasassignment');
+            require_once ('poasassignment_view.php');
+            $extcolumns = array(
+                    'task',
+                    'saveprogress',
+                    'dropprogress'
+            );
+            $extheaders = array(
+                    get_string('task', 'poasassignment'),
+
+                    get_string('saveprogress', 'poasassignment').' '.
+                    $OUTPUT->help_icon('saveprogress', 'poasassignment'),
+
+                    get_string('dropprogress', 'poasassignment').' '.
+                    $OUTPUT->help_icon('dropprogress', 'poasassignment')
+            );
+
+            $table = poasassignment_view::get_instance()->prepare_flexible_table_owners($extcolumns, $extheaders);
+            foreach ($usersinfo as $userinfo) {
+                $table->add_data($this->get_owner($userinfo));
+                echo '<input type="hidden" name="assigneids[]" value="'.$userinfo->id.'"/>';
+            }
+            // Add field's parameters
+
+            echo '<input type="hidden" name="name" value="'.required_param('name', PARAM_TEXT).'"/>';
+            echo '<input type="hidden" name="description" value="'.required_param('description', PARAM_TEXT).'"/>';
+            echo '<input type="hidden" name="ftype" value="'.required_param('ftype', PARAM_INT).'"/>';
+
+            // Checkboxes
+            if (optional_param('showintable', false, PARAM_INT)) {
+                echo '<input type="hidden" name="showintable" value="1"/>';
+            }
+            if (optional_param('secretfield', false, PARAM_INT)) {
+                echo '<input type="hidden" name="secretfield" value="1"/>';
+            }
+            if (optional_param('random', false, PARAM_INT)) {
+                echo '<input type="hidden" name="random" value="1"/>';
+            }
+
+            echo '<input type="hidden" name="valuemin" value="' . optional_param('valuemin', 0, PARAM_FLOAT) . '"/>';
+            echo '<input type="hidden" name="valuemax" value="' . optional_param('valuemax', 0, PARAM_FLOAT) . '"/>';
+
+            if ($variants = optional_param('variants', false, PARAM_RAW)) {
+                echo '<input type="hidden" name="variants" value="' . $variants . '"/>';
+            }
+
+            $table->print_html();
+        }
+        else {
+            print_string('nobodytooktask', 'poasassignment');
+        }
     }
     
     /**
@@ -172,29 +172,29 @@ class taskfieldedit_page extends abstract_page {
      * @return string html-code
      */
     private function data_to_hidden($data) {
-    	$html = '';    	
-    	$html .= '<input type="hidden" name="name" value="'.$data->name.'"/>';
-    	$html .= '<input type="hidden" name="description" value="'.$data->description.'"/>';
-    	$html .= '<input type="hidden" name="ftype" value="'.$data->ftype.'"/>';
-    	if (isset($data->showintable)) {
-    		$html .= '<input type="hidden" name="showintable" value="1"/>';
-    	}
-    	if (isset($data->secretfield)) {
-    		$html .= '<input type="hidden" name="secretfield" value="1"/>';
-    	}
-    	if (isset($data->random)) {
-    		$html .= '<input type="hidden" name="random" value="1"/>';
-    	}
-    	if (isset($data->variants)) {
-    		$html .= '<input type="hidden" name="variants" value="'.$data->variants.'"/>';
-    	}
-    	if (isset($data->valuemax)) {
-    		$html .= '<input type="hidden" name="valuemax" value="'.$data->valuemax.'"/>';
-    	}
-    	if (isset($data->valuemin)) {
-    		$html .= '<input type="hidden" name="valuemin" value="'.$data->valuemin.'"/>';
-    	}
-    	return $html;
+        $html = '';
+        $html .= '<input type="hidden" name="name" value="'.$data->name.'"/>';
+        $html .= '<input type="hidden" name="description" value="'.$data->description.'"/>';
+        $html .= '<input type="hidden" name="ftype" value="'.$data->ftype.'"/>';
+        if (isset($data->showintable)) {
+            $html .= '<input type="hidden" name="showintable" value="1"/>';
+        }
+        if (isset($data->secretfield)) {
+            $html .= '<input type="hidden" name="secretfield" value="1"/>';
+        }
+        if (isset($data->random)) {
+            $html .= '<input type="hidden" name="random" value="1"/>';
+        }
+        if (isset($data->variants)) {
+            $html .= '<input type="hidden" name="variants" value="'.$data->variants.'"/>';
+        }
+        if (isset($data->valuemax)) {
+            $html .= '<input type="hidden" name="valuemax" value="'.$data->valuemax.'"/>';
+        }
+        if (isset($data->valuemin)) {
+            $html .= '<input type="hidden" name="valuemin" value="'.$data->valuemin.'"/>';
+        }
+        return $html;
     }
     /**
      * Show confirm edit screen with task owners list
@@ -203,32 +203,32 @@ class taskfieldedit_page extends abstract_page {
      * @param object $data data from moodleform
      */
     private function confirm_update($data) {
-    	$model = poasassignment_model::get_instance();
-    	$owners = $model->get_instance_task_owners();
-    	// Open form
-    	echo '<form action="view.php?page=taskfieldedit&id='.$this->cm->id.'" method="post">';
-    	
-    	// Show owners table
-    	$this->show_owners($owners);
-    	
-    	// Ask user to confirm delete
-    	echo '<br/>';
-    	print_string('changefieldconfirmation', 'poasassignment');
-    	if (count($owners) > 0) {
-    		echo ' <span class="poasassignment-critical">(';
-    		print_string('changingfieldwillchangestudentsdata', 'poasassignment');
-    		echo ')</span>';
-    	}
-    	
-    	// Add field params as hidden elements
-    	echo $this->data_to_hidden($data);
-    	
-    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
-    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
-    	echo '<input type="hidden" name="mode" value="changeconfirmed"/>';    	
-    	echo '<input type="hidden" name="fieldid" value="'.$this->fieldid.'"/>';
-    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
-    	echo '</form>';
+        $model = poasassignment_model::get_instance();
+        $owners = $model->get_instance_task_owners();
+        // Open form
+        echo '<form action="view.php?page=taskfieldedit&id='.$this->cm->id.'" method="post">';
+
+        // Show owners table
+        $this->show_owners($owners);
+
+        // Ask user to confirm delete
+        echo '<br/>';
+        print_string('changefieldconfirmation', 'poasassignment');
+        if (count($owners) > 0) {
+            echo ' <span class="poasassignment-critical">(';
+            print_string('changingfieldwillchangestudentsdata', 'poasassignment');
+            echo ')</span>';
+        }
+
+        // Add field params as hidden elements
+        echo $this->data_to_hidden($data);
+
+        $nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+        $yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+        echo '<input type="hidden" name="mode" value="changeconfirmed"/>';
+        echo '<input type="hidden" name="fieldid" value="'.$this->fieldid.'"/>';
+        echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+        echo '</form>';
     }
     
     /**
@@ -238,31 +238,31 @@ class taskfieldedit_page extends abstract_page {
      * @param object $data data from moodleform
      */
     private function confirm_add($data) {
-    	$model = poasassignment_model::get_instance();
-    	$owners = $model->get_instance_task_owners();
-    	// Open form
-    	echo '<form action="view.php?page=taskfieldedit&id='.$this->cm->id.'" method="post">';
-    	
-    	// Show owners table
-    	$this->show_owners($owners);
-    	
-    	// Ask user to confirm delete
-    	echo '<br/>';
-    	print_string('addfieldconfirmation', 'poasassignment');
-    	if (count($owners) > 0) {
-    		echo ' <span class="poasassignment-critical">(';
-    		print_string('addingfieldwillchangestudentsdata', 'poasassignment');
-    		echo ')</span>';
-    	}
-    	
-    	// Add field params as hidden elements
-    	echo $this->data_to_hidden($data);
-    	
-    	$nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
-    	$yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
-    	echo '<input type="hidden" name="mode" value="addconfirmed"/>';
-    	echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
-    	echo '</form>';
+        $model = poasassignment_model::get_instance();
+        $owners = $model->get_instance_task_owners();
+        // Open form
+        echo '<form action="view.php?page=taskfieldedit&id='.$this->cm->id.'" method="post">';
+
+        // Show owners table
+        $this->show_owners($owners);
+
+        // Ask user to confirm delete
+        echo '<br/>';
+        print_string('addfieldconfirmation', 'poasassignment');
+        if (count($owners) > 0) {
+            echo ' <span class="poasassignment-critical">(';
+            print_string('addingfieldwillchangestudentsdata', 'poasassignment');
+            echo ')</span>';
+        }
+
+        // Add field params as hidden elements
+        echo $this->data_to_hidden($data);
+
+        $nobutton = '<input type="submit" name="confirm" value="'.get_string('no').'"/>';
+        $yesbutton = '<input type="submit" name="confirm" value="'.get_string('yes').'"/>';
+        echo '<input type="hidden" name="mode" value="addconfirmed"/>';
+        echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
+        echo '</form>';
     }
     
     /**
@@ -271,40 +271,40 @@ class taskfieldedit_page extends abstract_page {
      * @access private
      */
     private function update_confirmed() {
-    	$confirm = required_param('confirm', PARAM_TEXT);
-    	
-    	if ($confirm == get_string('no')) {
-    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
-    	}
-    	else {
-    		$model = poasassignment_model::get_instance();
+        $confirm = required_param('confirm', PARAM_TEXT);
+
+        if ($confirm == get_string('no')) {
+            redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+        }
+        else {
+            $model = poasassignment_model::get_instance();
 
 
             $save_fieldvalues = $model->changing_field_without_deleting_task_values($this->fieldid, (object)$_POST);
             // Delete old task values
             if (!$save_fieldvalues)
                 $model->delete_fieldvalues($this->fieldid);
-    		
-    		// Update task field, insert new task field variants
-    		$model->update_task_field($this->fieldid, (object)$_POST);
-    		
-    		// Generate random values for field
-    		$model->generate_randoms($model->get_task_field($this->fieldid));
-    		
-    		if (required_param('ownerscount', PARAM_INT) > 0) {
-    			// $_POST['assigneids'] contains array of owners ids
-    			$assigneeids = $_POST['assigneids'];
-    			foreach ($assigneeids as $assigneeid) {
-    				if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
-    					// Drop progress - attempts and grades
-    					$model->drop_assignee_progress($assigneeid);
-    				}
-    			}
-    		}
-    		
+
+            // Update task field, insert new task field variants
+            $model->update_task_field($this->fieldid, (object)$_POST);
+
+            // Generate random values for field
+            $model->generate_randoms($model->get_task_field($this->fieldid));
+
+            if (required_param('ownerscount', PARAM_INT) > 0) {
+                // $_POST['assigneids'] contains array of owners ids
+                $assigneeids = $_POST['assigneids'];
+                foreach ($assigneeids as $assigneeid) {
+                    if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
+                        // Drop progress - attempts and grades
+                        $model->drop_assignee_progress($assigneeid);
+                    }
+                }
+            }
+
             // Redirect to fields page
-    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
-    	}
+            redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+        }
     } 
     
     /**
@@ -313,97 +313,97 @@ class taskfieldedit_page extends abstract_page {
      * @access private
      */
     private function add_confirmed() {
-    	$confirm = required_param('confirm', PARAM_TEXT);
-    	
-    	if ($confirm == get_string('no')) {
-    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
-    	}
-    	else {
-    		$model = poasassignment_model::get_instance();
-    	
-    		// Insert field
+        $confirm = required_param('confirm', PARAM_TEXT);
+
+        if ($confirm == get_string('no')) {
+            redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+        }
+        else {
+            $model = poasassignment_model::get_instance();
+
+            // Insert field
             $data = $model->add_task_field((object)$_POST);
             
             // Generate random values for students, who already took the task
             $model->generate_randoms($data);
             
-    	
-    		if (required_param('ownerscount', PARAM_INT) > 0) {
-    			// $_POST['assigneids'] contains array of owners ids
-    			$assigneeids = $_POST['assigneids'];
-    			foreach ($assigneeids as $assigneeid) {
-    				if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
-    					// Drop progress - attempts and grades
-    					$model->drop_assignee_progress($assigneeid);
-    				}
-    			}
-    		}
-    		
+
+            if (required_param('ownerscount', PARAM_INT) > 0) {
+                // $_POST['assigneids'] contains array of owners ids
+                $assigneeids = $_POST['assigneids'];
+                foreach ($assigneeids as $assigneeid) {
+                    if (required_param('action_'.$assigneeid, PARAM_ALPHANUMEXT) == 'dropprogress') {
+                        // Drop progress - attempts and grades
+                        $model->drop_assignee_progress($assigneeid);
+                    }
+                }
+            }
+
             // Redirect to fields page
-    		redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
-    	}
+            redirect(new moodle_url('view.php', array('page' => 'tasksfields', 'id' => $this->cm->id)));
+        }
     } 
     private function get_owner($userinfo) {
-    	$model = poasassignment_model::get_instance();
-    	$owner = array();
-    	
-    	// Get student username and profile link
-    	$userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
-    	$owner[] = html_writer::link($userurl, fullname($userinfo->userinfo, true));
-    	
-    	// TODO Get student's groups
-    	$owner[] = '?';
-    	
-    	// Get information about assignee's attempts and grades
-    	if ($attempt = $model->get_last_attempt($userinfo->id)) {
-    		$owner[] = get_string('hasattempts', 'poasassignment');
-    	
-    		// If assignee has an attempt(s), show information about his grade
-    		if ($attempt->rating != null) {
-    			// Show actual grade with penalty
-    			$owner[] =
-    			get_string('hasgrade', 'poasassignment').
-    			' ('.
-    			$model->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
-    			')';
-    		}
-    		else {
-    			// Looks like assignee has no grade or outdated grade
-    			if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
-    				$owner[] =
-    				get_string('hasoutdatedgrade', 'poasassignment').
-    				' ('.
-    				$model->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
-    				')';
-    			}
-    			else {
-    				// There is no graded attempts, so show 'No grade'
-    				$owner[] = get_string('nograde', 'poasassignment');
-    			}
-    		}
-    	}
-    	else {
-    		// No attepts => no grade
-    		$owner[] = get_string('hasnoattempts', 'poasassignment');
-    		$owner[] = get_string('nograde', 'poasassignment');
-    	}
-    	
-    	// Get link to student's task
-    	$taskurl = new moodle_url(
-	    			'view.php', 
-	    			array(
-	    					'page' => 'taskview', 
-	    					'taskid' => $userinfo->taskid, 
-	    					'id' => $model->get_cm()->id
-	    					)
-	    			);
-    	$task = $model->get_task_info($userinfo->taskid);
-    	$owner[] = html_writer::link($taskurl, $task->name.$model->help_icon($task->description));
-    	
-    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="saveprogress" checked="checked"></input>';
-    	$owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="dropprogress"></input>';
-    	
-    	return $owner;
+        $model = poasassignment_model::get_instance();
+        $owner = array();
+
+        // Get student username and profile link
+        $userurl = new moodle_url('/user/profile.php', array('id' => $userinfo->userid));
+        $owner[] = html_writer::link($userurl, fullname($userinfo->userinfo, true));
+
+        // TODO Get student's groups
+        $owner[] = '?';
+
+        // Get information about assignee's attempts and grades
+        if ($attempt = $model->get_last_attempt($userinfo->id)) {
+            $owner[] = get_string('hasattempts', 'poasassignment');
+
+            // If assignee has an attempt(s), show information about his grade
+            if ($attempt->rating != null) {
+                // Show actual grade with penalty
+                $owner[] =
+                get_string('hasgrade', 'poasassignment').
+                ' ('.
+                $model->show_rating_methematics($attempt->rating, $model->get_penalty($attempt->id)).
+                ')';
+            }
+            else {
+                // Looks like assignee has no grade or outdated grade
+                if ($lastgraded = $model->get_last_graded_attempt($userinfo->id)) {
+                    $owner[] =
+                    get_string('hasoutdatedgrade', 'poasassignment').
+                    ' ('.
+                    $model->show_rating_methematics($lastgraded->rating, $model->get_penalty($lastgraded->id)).
+                    ')';
+                }
+                else {
+                    // There is no graded attempts, so show 'No grade'
+                    $owner[] = get_string('nograde', 'poasassignment');
+                }
+            }
+        }
+        else {
+            // No attepts => no grade
+            $owner[] = get_string('hasnoattempts', 'poasassignment');
+            $owner[] = get_string('nograde', 'poasassignment');
+        }
+
+        // Get link to student's task
+        $taskurl = new moodle_url(
+                    'view.php',
+                    array(
+                            'page' => 'taskview',
+                            'taskid' => $userinfo->taskid,
+                            'id' => $model->get_cm()->id
+                            )
+                    );
+        $task = $model->get_task_info($userinfo->taskid);
+        $owner[] = html_writer::link($taskurl, $task->name.$model->help_icon($task->description));
+
+        $owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="saveprogress" checked="checked"></input>';
+        $owner[] = '<input type="radio" name="action_'.$userinfo->id.'" value="dropprogress"></input>';
+
+        return $owner;
     }
 }
 class taskfieldedit_form extends moodleform {

@@ -22,16 +22,16 @@ class submission_page extends abstract_page {
                                            'userid' => $USER->id,
                                            'id' => $model->get_cm()->id));
         $plugins = $model->get_plugins();
-		if (has_capability('mod/poasassignment:viewownsubmission', $model->get_context())) {
-			foreach($plugins as $plugin) {
-				if (poasassignment_answer::used_in_poasassignment($plugin->id, $poasassignmentid)) {
-					require_once($plugin->path);
-					$poasassignmentplugin = new $plugin->name();
-					$preloadeddata = $poasassignmentplugin->get_answer_values($poasassignmentid);
-					$this->mform->set_data($preloadeddata);
-				}
-			}
-		}
+        if (has_capability('mod/poasassignment:viewownsubmission', $model->get_context())) {
+            foreach($plugins as $plugin) {
+                if (poasassignment_answer::used_in_poasassignment($plugin->id, $poasassignmentid)) {
+                    require_once($plugin->path);
+                    $poasassignmentplugin = new $plugin->name();
+                    $preloadeddata = $poasassignmentplugin->get_answer_values($poasassignmentid);
+                    $this->mform->set_data($preloadeddata);
+                }
+            }
+        }
         if ($this->mform->is_cancelled()) {
             redirect(new moodle_url('view.php', array('id' => $model->get_cm()->id,'page' => 'view')), null, 0);
         }

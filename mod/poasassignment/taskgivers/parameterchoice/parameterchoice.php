@@ -122,10 +122,10 @@ class parameterchoice extends taskgiver{
     }
     
     function process_before_tasks($cmid, $poasassignment) {
-    	if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
-	        $mform = $this->parameter_search($cmid, $poasassignment);
-	        $mform->display();
-    	}
+        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+            $mform = $this->parameter_search($cmid, $poasassignment);
+            $mform->display();
+        }
     }
     //put your code here
     public function get_settings_form($id, $poasassignmentid) {

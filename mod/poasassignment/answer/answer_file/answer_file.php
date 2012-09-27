@@ -48,21 +48,21 @@ class answer_file extends poasassignment_answer {
                            get_string('submissionfilesamount', 
                                       'poasassignmentanswertypes_answer_file'), 
                            array(
-                           		-1=>get_string('any', 'poasassignmentanswertypes_answer_file'),
-                           		1=>1,
-                           		2=>2,
-                           		3=>3,
-                           		4=>4,
-                           		5=>5,
-                           		6=>6,
-                           		7=>7,
-                           		8=>8,
-                           		9=>9,
-                           		10=>10,
-                           		15=>15,
-                           		20=>20,
-                           		30=>30,
-                           		50=>50));
+                                   -1=>get_string('any', 'poasassignmentanswertypes_answer_file'),
+                                   1=>1,
+                                   2=>2,
+                                   3=>3,
+                                   4=>4,
+                                   5=>5,
+                                   6=>6,
+                                   7=>7,
+                                   8=>8,
+                                   9=>9,
+                                   10=>10,
+                                   15=>15,
+                                   20=>20,
+                                   30=>30,
+                                   50=>50));
         $conditions = array('poasassignmentid' => $poasassignmentid,
                             'answerid' => $this->answerid,
                             'name' => 'fileamount');
@@ -117,18 +117,18 @@ class answer_file extends poasassignment_answer {
     }
     
     static function validation($data, &$errors) {
-    	if ( isset($data['answerfile']) && $data['fileextensions'] !== '') {
-	    	// Must look like *.txt, *.ogg, *.doc	    	
-	    	if (preg_match('/^([a-zA-Z]+|(\*\.[a-zA-Z0-9]+))(,(\s)?([a-zA-Z]+|(\*\.[a-zA-Z0-9]+)))*$/', $data['fileextensions']) == 0)
-	    		$errors['fileextensions'] = get_string('incorrectextensions','poasassignmentanswertypes_answer_file');
-    		return $errors;
-    	}
+        if ( isset($data['answerfile']) && $data['fileextensions'] !== '') {
+            // Must look like *.txt, *.ogg, *.doc
+            if (preg_match('/^([a-zA-Z]+|(\*\.[a-zA-Z0-9]+))(,(\s)?([a-zA-Z]+|(\*\.[a-zA-Z0-9]+)))*$/', $data['fileextensions']) == 0)
+                $errors['fileextensions'] = get_string('incorrectextensions','poasassignmentanswertypes_answer_file');
+            return $errors;
+        }
     }
     function save_settings($poasassignment, $id) {
         global $DB;
         if ($this->checked) {
-        	$settingsrecord = new stdClass();
-        	
+            $settingsrecord = new stdClass();
+
             $settingsrecord->poasassignmentid = $id;
             $settingsrecord->answerid = $this->answerid;
             $settingsrecord->name = 'fileamount';
@@ -153,11 +153,11 @@ class answer_file extends poasassignment_answer {
         if ($recordexists && !$this->checked)
             $this->delete_settings($poasassignment->id);
         if ($recordexists && $this->checked) {
-        	$settingsrecord = new stdClass();
+            $settingsrecord = new stdClass();
             $settingsrecord->poasassignmentid = $poasassignment->id;
             $settingsrecord->answerid = $this->answerid;            
             $conditions = array('poasassignmentid' => $poasassignment->id,
-                    			'name' => 'fileamount');
+                                'name' => 'fileamount');
             $currentsetting = $DB->get_record('poasassignment_ans_stngs',$conditions);
             $settingsrecord->id = $currentsetting->id;
             $settingsrecord->name ='fileamount';
@@ -165,7 +165,7 @@ class answer_file extends poasassignment_answer {
             $DB->update_record('poasassignment_ans_stngs',$settingsrecord);
             
             $conditions = array('poasassignmentid'=>$poasassignment->id,
-                    			'name'=>'maxfilesize');
+                                'name'=>'maxfilesize');
             $currentsetting = $DB->get_record('poasassignment_ans_stngs',$conditions);
             $settingsrecord->id = $currentsetting->id;
             $settingsrecord->name = 'maxfilesize';
@@ -173,7 +173,7 @@ class answer_file extends poasassignment_answer {
             $DB->update_record('poasassignment_ans_stngs', $settingsrecord);
             
             $conditions = array('poasassignmentid' => $poasassignment->id,
-                    			'name'=>'fileextensions');
+                                'name'=>'fileextensions');
             $currentsetting = $DB->get_record('poasassignment_ans_stngs', $conditions);
             $settingsrecord->id = $currentsetting->id;
             $settingsrecord->name = 'fileextensions';
@@ -219,19 +219,19 @@ class answer_file extends poasassignment_answer {
             $options['accepted_types'] = explode(',', $plugin_settings_types->value);
         }
         if ($plugin_settings_amount->value == -1) {
-            $mform->addElement(	'static',
+            $mform->addElement(    'static',
                                 'filescount',
                                 get_string('filescount', 'poasassignmentanswertypes_answer_file'),
                                 get_string('any', 'poasassignmentanswertypes_answer_file'));
         }
         else {
-        	$mform->addElement('static', 'filetypes', get_string('filestypes', 'poasassignmentanswertypes_answer_file'), $plugin_settings_types->value);
+            $mform->addElement('static', 'filetypes', get_string('filestypes', 'poasassignmentanswertypes_answer_file'), $plugin_settings_types->value);
         }
         $mform->addElement( 'filemanager', 
                             'answerfiles_filemanager', 
                             get_string('loadfiles','poasassignmentanswertypes_answer_file'),
-			        		null,
-			        		$options);
+                            null,
+                            $options);
 
         $mform->closeHeaderBefore('answerfileheader');
     }

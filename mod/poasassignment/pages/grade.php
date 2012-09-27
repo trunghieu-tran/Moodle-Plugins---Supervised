@@ -28,23 +28,23 @@ class grade_page extends abstract_page{
     }
     
     public function pre_view() {
-    	$poasmodel = poasassignment_model::get_instance();
-    	$cmid = $poasmodel->get_cm()->id;
-    	$poasassignmentid = $poasmodel->get_poasassignment()->id;
-    	$this->mform = new grade_form(null,array('id' => $cmid, 'assigneeid' => $this->assigneeid, 'poasassignmentid' => $poasassignmentid));
-    	if ($this->mform->is_cancelled()) {
-    		redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
-    	}
-    	else {
-    		if($data = $this->mform->get_data()) {
-    			$poasmodel->save_grade($this->assigneeid, $data);
-    			redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
-    		}
-    	}
-    	
+        $poasmodel = poasassignment_model::get_instance();
+        $cmid = $poasmodel->get_cm()->id;
+        $poasassignmentid = $poasmodel->get_poasassignment()->id;
+        $this->mform = new grade_form(null,array('id' => $cmid, 'assigneeid' => $this->assigneeid, 'poasassignmentid' => $poasassignmentid));
+        if ($this->mform->is_cancelled()) {
+            redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
+        }
+        else {
+            if($data = $this->mform->get_data()) {
+                $poasmodel->save_grade($this->assigneeid, $data);
+                redirect(new moodle_url('view.php',array('id'=>$cmid,'page'=>'submissions')),null,0);
+            }
+        }
+
     }
     function view() {
-    	$model = poasassignment_model::get_instance();
+        $model = poasassignment_model::get_instance();
         $data = $model->get_rating_data($this->assigneeid);
         $this->mform->set_data($data);
         $this->mform->display();
@@ -89,8 +89,8 @@ class grade_form extends moodleform {
                                                 html_writer::link($taskviewurl,get_string('stundetstask','poasassignment'))));
         
         $mform->addElement('header','studentsubmission',get_string('studentsubmission','poasassignment'));
-		require_once('attempts.php');
-		$mform->addElement('static',null,null,attempts_page::show_attempt($attempt));
+        require_once('attempts.php');
+        $mform->addElement('static',null,null,attempts_page::show_attempt($attempt));
         $mform->addElement('header','gradeeditheader',get_string('gradeeditheader','poasassignment'));
         $criterions=$DB->get_records('poasassignment_criterions',array('poasassignmentid'=>$instance['poasassignmentid']));
         for($i=0;$i<101;$i++) 

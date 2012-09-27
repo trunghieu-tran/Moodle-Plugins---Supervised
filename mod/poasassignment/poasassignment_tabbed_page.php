@@ -59,20 +59,20 @@ class poasassignment_tabbed_page {
                         'page' => 'view')));
         }
         $currentpath = poasassignment_model::$extpages[$page];
-		require_once($currentpath);
-		$this->currentpage = $page;
+        require_once($currentpath);
+        $this->currentpage = $page;
     }
 
     /** 
-	 * Displays content of the current page, if possible
+     * Displays content of the current page, if possible
      */
     function view() {
         global $PAGE;
         $pagetype = $this->currentpage . "_page";
         $model = poasassignment_model::get_instance();
-		// Проверка стандартной capability на просмотр модуля
+        // Проверка стандартной capability на просмотр модуля
         require_capability('mod/poasassignment:view', $model->get_context());
-		
+
         // Check available date or students
         if (!$model->is_opened()) {
             print_error('thismoduleisntopenedyet',
@@ -87,15 +87,15 @@ class poasassignment_tabbed_page {
         }
         
         // Check abilities and execute page's logic
-		$poasassignmentpage = new $pagetype($model->get_cm(), 
-											$model->get_poasassignment());
-		$poasassignmentpage->require_ability_to_view();
-		$poasassignmentpage->pre_view();
-		// Display header
-		echo $this->get_header($this->currentpage);
-		// Display body
-		$poasassignmentpage->view();
-		// Display footer
+        $poasassignmentpage = new $pagetype($model->get_cm(),
+                                            $model->get_poasassignment());
+        $poasassignmentpage->require_ability_to_view();
+        $poasassignmentpage->pre_view();
+        // Display header
+        echo $this->get_header($this->currentpage);
+        // Display body
+        $poasassignmentpage->view();
+        // Display footer
         echo $this->get_footer();
     }
 
