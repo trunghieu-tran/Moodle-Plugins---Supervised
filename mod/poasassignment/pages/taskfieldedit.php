@@ -279,8 +279,11 @@ class taskfieldedit_page extends abstract_page {
     	else {
     		$model = poasassignment_model::get_instance();
 
-    		// Delete old task values
-    		$model->delete_fieldvalues($this->fieldid);
+
+            $save_fieldvalues = $model->changing_field_without_deleting_task_values($this->fieldid, (object)$_POST);
+            // Delete old task values
+            if (!$save_fieldvalues)
+                $model->delete_fieldvalues($this->fieldid);
     		
     		// Update task field, insert new task field variants
     		$model->update_task_field($this->fieldid, (object)$_POST);
