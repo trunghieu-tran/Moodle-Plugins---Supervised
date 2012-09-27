@@ -2374,4 +2374,20 @@ class poasassignment_model {
         global $DB;
         return $DB->get_record('poasassignment', array('id' => $poasassignmentid));
     }
+
+    /**
+     * Compares field in database with it's new params. Returns true, if old task values
+     * can be used with new field params. (e.g. same type and variants).
+     *
+     * @param $fieldid field id
+     * @param $newfield new field params
+     * @return bool true, if old task values can be saved
+     */
+    public function changing_field_without_deleting_task_values($fieldid, $newfield) {
+        $oldfield = $this->get_task_field($fieldid);
+        $sametype = $newfield->ftype == $oldfield->ftype;
+        $newfield->variants = explode("\r\n", $newfield->variants);
+        $samevariants = $newfield->variants == $oldfield->variants;
+        return $sametype && $samevariants;
+    }
 }
