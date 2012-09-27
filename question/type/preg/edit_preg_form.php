@@ -28,7 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
 
+MoodleQuickForm::registerElementType('text_button',
+    $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
+    'MoodleQuickForm_text_button');
+    
 /**
  * Preg editing form definition.
  */
@@ -49,11 +54,13 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
-            $mform->registerNoSubmitButton('regextest');
-            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');
-            array_splice($repeated, 2, 0, array( '0' => $tmp));
-
-            //$repeated[] = $mform->createElement('html', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For test regex push this button<input type="submit" formaction="http://localhost/moodle/question/type/preg/ast_preg_form.php" formtarget="_blank" value="Test regex">');
+            global $CFG;
+            /*$mform->registerNoSubmitButton('regextest');
+            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
+            
+            $tmp = & $mform->createElement('text_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 80));
+            array_splice($repeated, 1, 1, array( '0' => $tmp));
+            
             return $repeated;
     }
     /**
