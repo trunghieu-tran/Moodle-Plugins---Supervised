@@ -8,19 +8,93 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
 
-    function test_intersect_positive_ranges() {
-        $range1 = array(array('negative' => false, 0 => 0, 1 => 10));
-        $range2 = array(array('negative' => false, 0 => 3, 1 => 13));
-        $range3 = array(array('negative' => false, 0 => 2, 1 => 7), array('negative' => false, 0 => 8, 1 => 9));
-        $result = qtype_preg_unicode::intersect_ranges(array($range1, $range2, $range3));
-        $this->assertTrue(count($result) === 2);
-        $this->assertTrue($result[0][0] === 3);
-        $this->assertTrue($result[0][1] === 7);
-        $this->assertTrue($result[1][0] === 8);
-        $this->assertTrue($result[1][1] === 9);
+    function test_next_part_and_reduce_range() {
+        // Case 1: 2nd range starts in the middle of the 1st one, and the 1st ends in the middle of the 2nd.
+        $range1 = array(0, 10);
+        $range2 = array(5, 15);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 0);
+        $this->assertTrue($result[1] === 4);
+        $this->assertTrue($range1[0] === 5);
+        $this->assertTrue($range2[0] === 5);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 5);
+        $this->assertTrue($result[1] === 10);
+        $this->assertTrue($range1 === null);
+        $this->assertTrue($range2[0] === 11);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 11);
+        $this->assertTrue($result[1] === 15);
+        $this->assertTrue($range1 === null);
+        $this->assertTrue($range2 === null);
+
+        // Case 2: the 2nd range starts before the 1st one, but both end at the same point.
+        $range1 = array(5, 10);
+        $range2 = array(0, 10);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 0);
+        $this->assertTrue($result[1] === 4);
+        $this->assertTrue($range1[0] === 5);
+        $this->assertTrue($range2[0] === 5);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 5);
+        $this->assertTrue($result[1] === 10);
+        $this->assertTrue($range1 === null);
+        $this->assertTrue($range2 === null);
+
+        // Case 3: 2 identical ranges.
+        $range1 = array(5, 10);
+        $range2 = array(5, 10);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 5);
+        $this->assertTrue($result[1] === 10);
+        $this->assertTrue($range1 === null);
+        $this->assertTrue($range2 === null);
+
+        // Case 4: 2 identical ranges of the only point.
+        $range1 = array(5, 5);
+        $range2 = array(5, 5);
+
+        $result = qtype_preg_unicode::next_part($range1, $range2);
+        qtype_preg_unicode::reduce_range($range1, $result);
+        qtype_preg_unicode::reduce_range($range2, $result);
+        $this->assertTrue($result[0] === 5);
+        $this->assertTrue($result[1] === 5);
+        $this->assertTrue($range1 === null);
+        $this->assertTrue($range2 === null);
     }
 
-    function test_intersect_negative_ranges() {
+    function test_intersect_positive_ranges() {
+        $ranges1 = array(array(1, 10));
+        $ranges2 = array(array(2, 7), array(8, 9));
+        //$result = qtype_preg_unicode::intersect_ranges($ranges1, $ranges2);
+        //$result = qtype_preg_unicode::kinda_operator($ranges1, $ranges2, true, false, false, false, false, false);
+        //$this->assertTrue(count($result) === 2);
+       /* $this->assertTrue($result[0][0] === 3);
+        $this->assertTrue($result[0][1] === 7);
+        $this->assertTrue($result[1][0] === 8);
+        $this->assertTrue($result[1][1] === 9);*/
+    }
+
+    /*function test_intersect_negative_ranges() {
         $range1 = array(array('negative' => true, 0 => 10, 1 => 100));
         $range2 = array(array('negative' => true, 0 => 300, 1 => 0x10FFFD));
         $range3 = array(array('negative' => true, 0 => 150, 1 => 250));
@@ -51,7 +125,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) === 1);
         $this->assertTrue($result[0][0] === 100);
         $this->assertTrue($result[0][1] === 200);
-    }
+    }*/
 
     function test_get_ranges_from_charset() {
         $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('a'));

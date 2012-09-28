@@ -22,7 +22,7 @@
  * @author     Valeriy Streltsov <vostreltsov@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -7733,5 +7733,120 @@ class qtype_preg_unicode extends textlib {
         }
         $ord = qtype_poasquestion_string::ord($utf8chr);
         return (self::search_number_binary($ord, $ranges) !== false);
+    }
+
+    public static function next_part(&$range1, &$range2) {
+        // Handle the special cases: one or both ranges are null.
+        if ($range1 === null && $range2 === null) {
+            return null;
+        } else if ($range2 === null) {
+            return $range1;
+        } else if ($range1 === null) {
+            return $range2;
+        }
+
+        $start1 = $range1[0];
+        $end1 = $range1[1];
+        $start2 = $range2[0];
+        $end2 = $range2[1];
+        if ($start1 < $start2) {
+            // Return the part before the second range start.
+            $start = $start1;
+            if ($end1 >= $start2) {
+                $end = $start2 - 1;
+            } else {
+                $end = $end1;
+            }
+        } else if ($start1 === $start2) {
+            // Return the minimal common part.
+            $start = $start1;
+            $end = min($end1, $end2);
+        } else {
+            // Symmetric operation.
+            return self::next_part($range2, $range1);
+        }
+        return array($start, $end);
+    }
+
+    public static function reduce_range(&$range, &$part) {
+        $rangeend = $range[1];
+        $partend = $part[1];
+        if ($partend < $rangeend) {
+            $range[0] = $partend + 1;
+        } else {
+            $range = null;
+        }
+    }
+
+    public static function kinda_operator(&$ranges1, &$ranges2, $xy, $xny, $nxy, $nxny, $negative1, $negative2) {
+        $index1 = 0;
+        $index2 = 0;
+        $ranges1negpart = false;    // are we between (x1, x2) and (x3, x4) groups?
+        $ranges2negpart = false;
+        $done = false;
+
+        $range1 = $ranges1[0];
+        $range2 = $ranges2[0];
+
+        $range1mod = $range1;
+        $range2mod = $range2;
+
+        $result = array();
+
+        $done = false;
+
+        $cnt = 0;
+
+        while (!$done) {
+            $part = self::next_part($range1mod, $range2mod);
+            echo 'range: (' . $part[0] . ', ' . $part[1] . ');' . "\n";
+            //var_dump($part);
+
+            $x = ($part[0] >= $range1[0] && $part[1] <= $range1[1] && !$ranges1negpart);
+            $y = ($part[0] >= $range2[0] && $part[1] <= $range2[1] && !$ranges2negpart);
+
+            $add = ($xy && $x && $y) ||
+                   ($xny && $x && !$y) ||
+                   ($nxy && !$x && $y) ||
+                   ($nxny && !$x && !$y);
+
+            if ($add) {
+                $result[] = $part;
+            }
+
+            // Shift both ranges.
+            self::reduce_range($range1mod, $part);
+            self::reduce_range($range2mod, $part);
+
+            var_dump($range1mod);
+            var_dump($range2mod);
+
+            if ($range1mod === null) {
+                if (!$ranges1negpart) {
+                    $tmp = ($index1 === count($ranges1) - 1) ? self::max_possible_code() : $ranges1[$index1 + 1][0];
+                    $range1 = array($ranges1[$index1][1] + 1, $tmp);
+                    $ranges1negpart = true;
+                } else {
+                    $range1 = $ranges1[++$index1];
+                    $ranges1negpart = false;
+                }
+                $range1mod = $range1;
+            }
+
+            if ($range2mod === null) {
+                if (!$ranges2negpart) {
+                    $tmp = ($index2 === count($ranges2) - 1) ? self::max_possible_code() : $ranges2[$index2 + 1][0];
+                    $range2 = array($ranges2[$index2][1] + 1, $tmp);
+                    $ranges2negpart = true;
+                } else {
+                    $range2 = $ranges2[++$index2];
+                    $ranges2negpart = false;
+                }
+                $range2mod = $range2;
+            }
+
+            $cnt++;
+            $done = ($cnt > 4);//($range1 === null && $range2 === null);
+        }
     }
 }
