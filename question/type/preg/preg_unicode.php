@@ -7723,7 +7723,6 @@ class qtype_preg_unicode extends textlib {
             }
         }
         $result = array_values($result);
-        //var_dump($result);
         return $result;
     }
 
@@ -7778,7 +7777,11 @@ class qtype_preg_unicode extends textlib {
         }
     }
 
-    public static function kinda_operator(&$ranges1, &$ranges2, $xy, $xny, $nxy, $nxny, $negative1, $negative2) {
+    public static function kinda_operator(&$ranges1, &$ranges2, $xy, $xny, $nxy, $nxny) {
+        if ($ranges1 == null || $ranges2 == null) {
+            return array();
+        }
+
         $index1 = 0;
         $index2 = 0;
         $ranges1negpart = false;    // are we between (x1, x2) and (x3, x4) groups?
@@ -7791,43 +7794,50 @@ class qtype_preg_unicode extends textlib {
         $range1mod = $range1;
         $range2mod = $range2;
 
-        $result = array();
-
         $done = false;
 
-        $cnt = 0;
+        if ($nxny && $range1[0] > 0 && $range2[0] > 0) {
+            $result = array(array(0, min($range1[0], $range2[0]) - 1));
+        } else {
+            $result = array();
+        }
 
         while (!$done) {
             $part = self::next_part($range1mod, $range2mod);
-            echo 'range: (' . $part[0] . ', ' . $part[1] . ');' . "\n";
-            //var_dump($part);
+            //self::print_range('current part: ', $part);
 
             $x = ($part[0] >= $range1[0] && $part[1] <= $range1[1] && !$ranges1negpart);
             $y = ($part[0] >= $range2[0] && $part[1] <= $range2[1] && !$ranges2negpart);
 
-            $add = ($xy && $x && $y) ||
-                   ($xny && $x && !$y) ||
-                   ($nxy && !$x && $y) ||
+            $add = ($xy   &&  $x &&  $y)  ||
+                   ($xny  &&  $x && !$y)  ||
+                   ($nxy  && !$x &&  $y)  ||
                    ($nxny && !$x && !$y);
 
             if ($add) {
-                $result[] = $part;
+                $count = count($result);
+                if ($count > 0 && $result[$count - 1][1] === $part[0] - 1) {
+                    $result[$count - 1][1] = $part[1];
+                } else {
+                    $result[] = $part;
+                }
             }
 
             // Shift both ranges.
             self::reduce_range($range1mod, $part);
             self::reduce_range($range2mod, $part);
 
-            var_dump($range1mod);
-            var_dump($range2mod);
-
             if ($range1mod === null) {
                 if (!$ranges1negpart) {
-                    $tmp = ($index1 === count($ranges1) - 1) ? self::max_possible_code() : $ranges1[$index1 + 1][0];
-                    $range1 = array($ranges1[$index1][1] + 1, $tmp);
-                    $ranges1negpart = true;
+                    if ($range1[1] < self::max_possible_code()) {
+                        $tmp = ($index1 === count($ranges1) - 1) ? self::max_possible_code() : $ranges1[$index1 + 1][0] - 1;
+                        $range1 = array($ranges1[$index1][1] + 1, $tmp);
+                        $ranges1negpart = true;
+                    } else {
+                        $range1 = null;
+                    }
                 } else {
-                    $range1 = $ranges1[++$index1];
+                    $range1 = ($index1 < count($ranges1) - 1) ? $ranges1[++$index1] : null;
                     $ranges1negpart = false;
                 }
                 $range1mod = $range1;
@@ -7835,18 +7845,26 @@ class qtype_preg_unicode extends textlib {
 
             if ($range2mod === null) {
                 if (!$ranges2negpart) {
-                    $tmp = ($index2 === count($ranges2) - 1) ? self::max_possible_code() : $ranges2[$index2 + 1][0];
-                    $range2 = array($ranges2[$index2][1] + 1, $tmp);
-                    $ranges2negpart = true;
+                    if ($range2[1] < self::max_possible_code()) {
+                        $tmp = ($index2 === count($ranges2) - 1) ? self::max_possible_code() : $ranges2[$index2 + 1][0] - 1;
+                        $range2 = array($ranges2[$index2][1] + 1, $tmp);
+                        $ranges2negpart = true;
+                    } else {
+                        $range2 = null;
+                    }
                 } else {
-                    $range2 = $ranges2[++$index2];
+                    $range2 = ($index2 < count($ranges2) - 1) ? $ranges2[++$index2] : null;
                     $ranges2negpart = false;
                 }
                 $range2mod = $range2;
             }
 
-            $cnt++;
-            $done = ($cnt > 4);//($range1 === null && $range2 === null);
+            $done = ($range1 === null && $range2 === null);
         }
+        return $result;
+    }
+
+    private static function print_range($text, $range) {
+        echo $text . '(' . $range[0] . ', ' . $range[1] . ');' . "\n";
     }
 }
