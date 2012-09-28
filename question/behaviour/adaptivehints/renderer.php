@@ -54,6 +54,9 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
                     'class' => 'submit btn',
                 );
+                if ($options->readonly) {
+                    $attributes['disabled'] = 'disabled';
+                }
                 $output .= html_writer::empty_tag('input', $attributes);
 
                 //Cost message
