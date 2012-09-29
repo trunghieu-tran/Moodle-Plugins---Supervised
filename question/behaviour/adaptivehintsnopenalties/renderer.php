@@ -20,7 +20,7 @@ class qbehaviour_adaptivehintsnopenalties_renderer extends qbehaviour_adaptivehi
         return '';
     }
 
-    public function button_cost($str, $penalty) {
+    public function button_cost($str, $penalty, $options) {
         return '';
     }
 }
