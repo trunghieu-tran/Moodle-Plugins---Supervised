@@ -38,16 +38,16 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 
 %{
   
-  // @var int number of  current parsed lexeme.
-  private  $counter = 0;
+    // @var int number of  current parsed lexeme.
+    private  $counter = 0;
   
-  public function get_errors() {
-      return array();
-  }
+    public function get_errors() {
+        return array();
+    }
   
-  private function create_token($name, $value) {
+    private function create_token($name, $value) {
         // get name of object
-        $objectname = 'block_formal_langs_language_simple_english_' . $name;
+        $objectname = 'block_formal_langs_token_simple_english_' . $name;
         // create token object
         $res = new $objectname(null, strtoupper($name), $value, $this->return_pos(), $this->counter);
         // increase token count
@@ -55,8 +55,11 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 
         return $res;
     }
-  
-  private function return_pos() {
+    private function is_white_space($string) {
+        $whitespace = array(" ", "\t", "\n", "\r", "f", "\v");
+        return in_array($string[0], $whitespace);
+    }
+    private function return_pos() {
         $begin_line = $this->yyline;
         $begin_col = $this->yycol;
 
@@ -78,9 +81,11 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %}
 
 %%
-(([a-zA-Z]+('s|'re|'t|s')?)|'tis)                               { return $this->create_token('word',$this->yytext()); }
-[0-9]+                                                          { return $this->create_token('numeric',$this->yytext()); } 
-[ \t]                                                           {  }
-("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")  { return $this->create_token('punctuation',$this->yytext()); } 
-("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*")                   { return $this->create_token('typographic_mark',$this->yytext()); } 
-.                                                               { return $this->create_token('other',$this->yytext());}  
+('twou'dn't|'e'll|'e's|'tisn't|'twasn't|'twon't|'twou'd|'twouldn't|'n'|'kay|'sfoot|'taint|'tweren't|'tshall|'twixt|'twon't|'twou'dn't|'zat) { return $this->create_token('word',$this->yytext()); }
+('cause|'d|'fraid|'hood|i'|a'|-in'|'m|mo'|'neath|o'|o'th'|po'|'pon|'re|'round|'s|'sblood|'scuse|'sup)                                       { return $this->create_token('word',$this->yytext()); }
+('t|t'|th'|'tis|'twas|'tween|'twere|'twill|'twould|'um|'ve)                                                                                 { return $this->create_token('word',$this->yytext()); }
+[a-zA-Z]+(['\-][a-zA-Z]+)*([sS]'|[oO]'|[hH]')?                                                                                              { return $this->create_token('word',$this->yytext()); }
+[0-9]+                                                                                                                                      { return $this->create_token('numeric',$this->yytext()); }
+("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                              { return $this->create_token('punctuation',$this->yytext()); } 
+("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*"|"$")                                                                                           { return $this->create_token('typographic_mark',$this->yytext()); }
+.                                                                                                                                           { if (!$this->is_white_space($this->yytext())) return $this->create_token('other',$this->yytext());}
