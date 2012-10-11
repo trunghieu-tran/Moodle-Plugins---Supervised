@@ -2385,6 +2385,8 @@ class poasassignment_model {
      */
     public function changing_field_without_deleting_task_values($fieldid, $newfield) {
         $oldfield = $this->get_task_field($fieldid);
+        if (!isset($oldfield->variants))
+            $oldfield->variants = array();
         $sametype = $newfield->ftype == $oldfield->ftype;
         $newfield->variants = explode("\r\n", $newfield->variants);
         $samevariants = $newfield->variants == $oldfield->variants;
