@@ -84,7 +84,7 @@ class submissions_page extends abstract_page {
         if($indtasks) {
             if($assignee && $assignee->taskid != 0) {
                 $task = $DB->get_record('poasassignment_tasks',array('id'=>$assignee->taskid));
-                $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid'=>$assignee->taskid,'id'=>$this->cm->id),'v','get');
+                $taskurl = new moodle_url('view.php',array('page' => 'taskview', 'taskid' => $assignee->taskid,'id' => $this->cm->id, 'assigneeid' => $assignee->id));
                 $deleteurl = new moodle_url('warning.php',array('action'=>'canceltask','assigneeid'=>$assignee->id,'id'=>$this->cm->id),'d','post');
                 $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
                             '" class="iconsmall" alt="'.get_string('canceltask', 'poasassignment').'" title="'.get_string('canceltask', 'poasassignment').'" /></a>';
