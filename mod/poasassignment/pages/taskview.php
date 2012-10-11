@@ -10,10 +10,10 @@ class taskview_page extends abstract_page {
         global $DB;
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
         $this->from = optional_param('from', 'tasks', PARAM_TEXT);
+        $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
     }
     
     function has_satisfying_parameters() {
-        //TODO приватность
         global $DB, $USER;
         if(!$this->task = $DB->get_record('poasassignment_tasks', array('id' => $this->taskid))) {        
             $this->lasterror = 'errornonexistenttask';
@@ -65,6 +65,7 @@ class taskview_page extends abstract_page {
         $model = poasassignment_model::get_instance();
         $poasassignmentid = $model->get_poasassignment()->id;
 
+        $canmanagetasks = has_capability('mod/poasassignment:managetasks', $model->get_context());
 
         $fields = $DB->get_records('poasassignment_fields',
             array('poasassignmentid' => $poasassignmentid));
@@ -84,6 +85,11 @@ class taskview_page extends abstract_page {
                 echo $OUTPUT->heading(get_string('itsnotyourtask', 'poasassignment'));
             }
         }
+        elseif ($canmanagetasks && $this->assigneeid) {
+            $userinfo = $model->get_user_by_assigneeid($this->assigneeid);
+            if ($userinfo)
+                echo $OUTPUT->heading(get_string('studentstask', 'poasassignment') . ' ' . $userinfo->firstname . ' ' . $userinfo->lastname);
+        }
         $html .= '<table>';
         $html .= '<tr><td align="right"><b>'.get_string('taskname','poasassignment').'</b>:</td>';
         $html .= '<td class="c1">'.$this->task->name.'</td></tr>';
@@ -91,12 +97,18 @@ class taskview_page extends abstract_page {
         $html .= '<tr><td align="right"><b>'.get_string('taskintro','poasassignment').'</b>:</td>';
         $html .= '<td class="c1">'.$this->task->description.'</td></tr>';
 
-            
+
         foreach ($fields as $field) {
-            if (!$field->secretfield || $owntask || has_capability('mod/poasassignment:managetasks', $model->get_context())) {
+            if (!$field->secretfield || $owntask || $canmanagetasks) {
                 // If it is random value and our task, load value from DB
-                if ($field->random && ($owntask || has_capability('mod/poasassignment:managetasks',$model->get_context()))) {
-                    $assigneeid = $model->assignee->id;
+                if ($field->random && ($owntask || ($canmanagetasks && $this->assigneeid))) {
+                    if ($canmanagetasks) {
+                        $assigneeid = $this->assigneeid;
+                    }
+                    elseif ($owntask) {
+                        $assigneeid = $model->assignee->id;
+                    }
+
                     $taskvalue = $DB->get_record('poasassignment_task_values',array('fieldid'=>$field->id,
                                                                         'taskid'=>$this->taskid,
                                                                         'assigneeid'=>$assigneeid));

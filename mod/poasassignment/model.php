@@ -2390,4 +2390,24 @@ class poasassignment_model {
         $samevariants = $newfield->variants == $oldfield->variants;
         return $sametype && $samevariants;
     }
+
+    /**
+     * Get user info by assignee id
+     *
+     * @param $assigneeid assignee id
+     * @return mixed user info or false
+     */
+    public function get_user_by_assigneeid($assigneeid) {
+        global $DB;
+        $sql = '
+        SELECT firstname, lastname
+        FROM {user}
+        JOIN {poasassignment_assignee} on {poasassignment_assignee}.userid={user}.id
+        WHERE {poasassignment_assignee}.id = ?';
+        $result = $DB->get_record_sql($sql, array($assigneeid));
+        if ($result)
+            return $result;
+        else
+            return false;
+    }
 }
