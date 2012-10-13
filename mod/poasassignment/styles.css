@@ -63,3 +63,6 @@ table.task-owners,
 a:link.hiddentask, a:visited.hiddentask {
     color: #AAAAAA;
 }
+.random-field {
+    font-weight: bold;
+}
