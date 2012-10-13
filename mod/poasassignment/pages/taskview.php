@@ -10,7 +10,7 @@ class taskview_page extends abstract_page {
         global $DB;
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
         $this->from = optional_param('from', 'tasks', PARAM_TEXT);
-        $this->assigneeid = optional_param('assigneeid', 0, PARAM_INT);
+        $this->assigneeid = optional_param('assigneeid', false, PARAM_INT);
     }
     
     function has_satisfying_parameters() {
@@ -97,12 +97,12 @@ class taskview_page extends abstract_page {
         $html .= '<tr><td align="right"><b>'.get_string('taskintro','poasassignment').'</b>:</td>';
         $html .= '<td class="c1">'.$this->task->description.'</td></tr>';
 
-
         foreach ($fields as $field) {
             if (!$field->secretfield || $owntask || $canmanagetasks) {
                 // If it is random value and our task, load value from DB
                 if ($field->random && ($owntask || ($canmanagetasks && $this->assigneeid))) {
-                    if ($canmanagetasks) {
+
+                    if ($canmanagetasks && $this->assigneeid) {
                         $assigneeid = $this->assigneeid;
                     }
                     elseif ($owntask) {
@@ -114,8 +114,8 @@ class taskview_page extends abstract_page {
                                                                         'assigneeid'=>$assigneeid));
                 }
                 else {
-                    $taskvalue=$DB->get_record('poasassignment_task_values', array('fieldid' => $field->id,
-                                                                        'taskid' => $this->taskid));
+                    $taskvalue = $DB->get_record('poasassignment_task_values', array('fieldid' => $field->id,
+                                                                        'taskid' => $this->taskid), '*', IGNORE_MULTIPLE);
                 }
                 
                 $html .= '<tr><td align="right"><b>' . $field->name;
@@ -124,7 +124,7 @@ class taskview_page extends abstract_page {
                 }
                 $html .= '</b>:</td>';
                 if (!$taskvalue) {
-                    $html .= '<td class="c1"><span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span></td></tr>';
+                    $str = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
                 }
                 else {
                     $str = ' ';
@@ -164,8 +164,15 @@ class taskview_page extends abstract_page {
                         }
                         $str = $taskvalue->value;
                     }
-                    $html .= '<td class="c1">' . $str . '</td></tr>';
                 }
+                if ($field->random) {
+                    if (!$owntask) {
+                        if (($canmanagetasks && !$this->assigneeid) || !$canmanagetasks) {
+                            $str = '<span class="random-field">'.get_string('randomfield', 'poasassignment').'</span>';
+                        }
+                    }
+                }
+                $html .= '<td class="c1">' . $str . '</td></tr>';
             }
         }
         $html .= '</table>';
