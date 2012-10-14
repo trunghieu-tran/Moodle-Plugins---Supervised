@@ -9,10 +9,13 @@ class taskedit_page extends abstract_page {
     private $owners;
     
     function __construct($cm,$poasassignment) {
+        $model = poasassignment_model::get_instance();
+
         $this->taskid = optional_param('taskid', 0, PARAM_INT);
         $this->mode   = optional_param('mode', null, PARAM_INT);
         $this->cm = $cm;
         $this->poasassignment = $poasassignment;
+        $this->owners = $model->get_task_owners($this->taskid);
     }
     function get_cap() {
         return 'mod/poasassignment:managetasks';
@@ -57,6 +60,9 @@ class taskedit_page extends abstract_page {
         }
         if ($this->mode == 'changeconfirmed') {
             $this->update_confirmed();
+        }
+        if (isset($_REQUEST["submitbutton"])) {
+            $this->check_quite_update();
         }
         
         $poasassignmentid = $model->get_poasassignment()->id;
@@ -252,16 +258,15 @@ class taskedit_page extends abstract_page {
     public function confirm_update($data) {
         global $OUTPUT, $CFG;
         $model = poasassignment_model::get_instance();
-        $owners = $model->get_task_owners($this->taskid);
 
         // Open form
         echo '<form action="view.php?page=taskedit&id='.$this->cm->id.'" method="post">';
 
-        echo '<input type="hidden" name="ownerscount" value="'.count($owners).'"/>';
+        echo '<input type="hidden" name="ownerscount" value="'.count($this->owners).'"/>';
         // If there are students, that own this task, show them
-        if (count($owners) > 0) {
+        if (count($this->owners) > 0) {
             // Show owners table
-            $usersinfo = $model->get_users_info($owners);
+            $usersinfo = $model->get_users_info($this->owners);
             print_string('ownersofthetask', 'poasassignment');
             require_once ('poasassignment_view.php');
             $extcolumns = array(
@@ -293,7 +298,7 @@ class taskedit_page extends abstract_page {
         // Ask user to confirm delete
         echo '<br/>';
         print_string('changetaskconfirmation', 'poasassignment');
-        if (count($owners) > 0) {
+        if (count($this->owners) > 0) {
             echo ' <span class="poasassignment-critical">(';
             print_string('changingtaskwillchangestudentsdata', 'poasassignment');
             echo ')</span>';
@@ -315,6 +320,19 @@ class taskedit_page extends abstract_page {
         echo '<input type="hidden" name="mode" value="changeconfirmed"/>';
         echo '<div class="poasassignment-confirmation-buttons">'.$yesbutton.$nobutton.'</div>';
         echo '</form>';
+    }
+
+    /**
+     * Checks, if there is no owners of task being updated and skips confirm screen
+     */
+    private function check_quite_update() {
+        $model = poasassignment_model::get_instance();
+
+        // If there is no owners, do quite update
+        if (count($this->owners) == 0) {
+            $model->update_task(required_param('taskid', PARAM_INT), (object)$_POST);
+            redirect(new moodle_url('view.php', array('page' => 'tasks', 'id' => $this->cm->id)));
+        }
     }
     
     public static function display_in_navbar() {
