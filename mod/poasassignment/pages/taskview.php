@@ -77,7 +77,12 @@ class taskview_page extends abstract_page {
 
         $html = '';
         $html .= $OUTPUT->box_start();
-        if(has_capability('mod/poasassignment:havetask', $model->get_context())) {
+        if ($canmanagetasks && $this->assigneeid) {
+            $userinfo = $model->get_user_by_assigneeid($this->assigneeid);
+            if ($userinfo)
+                echo $OUTPUT->heading(get_string('studentstask', 'poasassignment') . ' ' . $userinfo->firstname . ' ' . $userinfo->lastname);
+        }
+        elseif(has_capability('mod/poasassignment:havetask', $model->get_context())) {
             if ($owntask) {
                 echo $OUTPUT->heading(get_string('itsyourtask', 'poasassignment'));
             }
@@ -85,11 +90,7 @@ class taskview_page extends abstract_page {
                 echo $OUTPUT->heading(get_string('itsnotyourtask', 'poasassignment'));
             }
         }
-        elseif ($canmanagetasks && $this->assigneeid) {
-            $userinfo = $model->get_user_by_assigneeid($this->assigneeid);
-            if ($userinfo)
-                echo $OUTPUT->heading(get_string('studentstask', 'poasassignment') . ' ' . $userinfo->firstname . ' ' . $userinfo->lastname);
-        }
+
         $html .= '<table>';
         $html .= '<tr><td align="right"><b>'.get_string('taskname','poasassignment').'</b>:</td>';
         $html .= '<td class="c1">'.$this->task->name.'</td></tr>';
