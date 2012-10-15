@@ -52,50 +52,6 @@ class qtype_correctwriting_lexical_analyzer {
      */
     public function __construct($question, $answer, $responsestr=null) {
 
-        $this->answerobj = $answer;
-        $this->answerstr = $answer->answer;
-        $this->responsestr = $responsestr;
-        $this->question = $question;
-        
-        $language = $question->get_used_language();
-        $responsestring = $language->create_from_string($responsestr); 
-        $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
-        // We assume that, lexical analyzer must fix all the lexical mistakes and find them at all
-        // Because, why not? He must fix a lexical mistakes, but if can't fix stuff, he can put some mistakes.
-        // If question starts working with lexical errors, what should it do? Which mistakes should it take - 
-        // lexical_analyzer's or own? How he manages to split lexical_analyzer's mistakes from sequence_analyzer's
-        // Do we need another loop with is_a?
-        $mistakes = array();
-        if (count($responsestring->stream->tokens) != 0) {
-            foreach($responsestring->stream->tokens as $index => $token) {
-                if (is_a($token, "block_formal_langs_c_token_character")) {
-                    $value = $token->value();
-                    $len = strlen($token->value());
-                    if ($value[0] == 'L') {
-                        $len = $len - 1;
-                    }
-                    if ($len > 3) {
-                       $mistakes[] = new qtype_correctwriting_c_language_multicharacter_literal($question, $responsestring, $token);
-                    }
-                }
-                if (is_a($token,"block_formal_langs_c_token_unknown")) {
-                    $value = $token->value();
-                    if ($value == '"') {
-                        $mistakes[] = new qtype_correctwriting_c_language_unmatched_quote_mistake($question, $responsestring, $token);
-                    } elseif ($value == "\'") {
-                        $mistakes[] = new qtype_correctwriting_c_language_unmatched_single_quote_mistake($question, $responsestring, $token);
-                    } else {
-                        $mistakes[] = new qtype_correctwriting_c_language_unknown_symbol_mistake($question, $responsestring, $token);
-                    }
-                }
-            }
-        }
-
-        
-        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $responsestring);
-        $this->correctedresponse= $responsestring->stream->tokens;
-        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
-        $this->fitness = $analyzer->fitness();
         //TODO:
         //0. Create language object
         //1. Scan answer and response - Pashaev
@@ -110,6 +66,42 @@ class qtype_correctwriting_lexical_analyzer {
         //NOTE: if responsestr is null just check for errors - Pashaev
         //NOTE: if some stage create errors, stop processing right there
         //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
+
+        $this->answerobj = $answer;
+        $this->answerstr = $answer->answer;
+        $this->responsestr = $responsestr;
+        $this->question = $question;
+        
+        $language = $question->get_used_language();
+        $responsestring = $language->create_from_string($responsestr); 
+        $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+
+        //7. Set array of mistakes accordingly - Birukova
+        $mistakes = array();
+        if (count($responsestring->stream->errors) != 0) {
+            foreach($responsestring->stream->errors as $index => $error) {
+                $mistake = new qtype_correctwriting_lexical_mistake();
+                $message =  $error->errormessage;
+                $mistake->languagename = $question->get_used_language()->name();
+                $mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
+                $mistake->answermistaken = null;
+                $mistake->answer = null;
+                $mistake->response = $responsestr;
+                $mistake->responsemistaken = $error->tokenindex;
+                $mistake->weight = $question->lexicalerrorweight;
+                $mistake->correctedresponse = null;
+                $mistake->correctedresponseindex = null;
+                $mistake->mistakemsg = $message;
+                $mistakes[] = $mistake;
+            }
+        }
+
+        
+        $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $responsestring);
+        $this->correctedresponse= $responsestring->stream->tokens;
+        $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
+        $this->fitness = $analyzer->fitness();
+
     }
 
     public function get_corrected_response() {
