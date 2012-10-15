@@ -1378,12 +1378,35 @@ class poasassignment_model {
     }
 
     /**
+     * Get all users who are enrolled for the course
+     *
+     * @return array users ids
+     */
+    public function get_course_users() {
+        global $COURSE, $DB;
+        $userids = array();
+
+        $context = get_context_instance( CONTEXT_COURSE, $COURSE->id );
+        $query = '
+            SELECT u.id AS id
+            FROM mdl_role_assignments AS a, mdl_user AS u
+            WHERE contextid=' . $context->id . ' AND roleid<>0 AND a.userid=u.id;';
+
+        $rs = $DB->get_recordset_sql($query);
+
+        foreach( $rs as $r ) {
+            $userids[] = $r->id;
+        }
+        return $userids;
+    }
+    /**
      * Get list of users, who have active tasks
      *
      * @access public
      * @return array of ids
      */
     public function get_users_with_active_tasks() {
+
         global $DB;
         if ($usersid = get_enrolled_users(
             get_context_instance(CONTEXT_MODULE,$this->cm->id),
@@ -1393,10 +1416,11 @@ class poasassignment_model {
 
             $usersid = array_keys($usersid);
         }
+        $enrolledusers = $this->get_course_users();
         // Add users that haven't capability but have task
         $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid'=>$this->poasassignment->id, 'cancelled' => 0), 'id', 'id, userid, taskid');
         foreach ($assignees as $assignee) {
-            if ($assignee->taskid > 0 && array_search($assignee->userid, $usersid) === false) {
+            if ($assignee->taskid > 0 && array_search($assignee->userid, $usersid) === false && in_array($assignee->userid, $enrolledusers)) {
                 if (!has_capability('mod/poasassignment:havetask', $this->get_context(), $assignee->userid))
                     array_push($usersid, $assignee->userid);
             }
