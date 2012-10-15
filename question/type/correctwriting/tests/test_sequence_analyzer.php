@@ -77,7 +77,7 @@ class qtype_correctwriting_sa_test_utils {
         for($i = 0;$i < count($lcss);$i++) {
             $haslcs = $haslcs || ($lcss[$i] == $testlcs);
         }
-        $test->assertTrue($haslcs, var_export($testlcs,true) . " was not found in " . var_export($lcss, true));
+        $test->assertTrue($haslcs, var_export($testlcs,true) . ' was not found in ' . var_export($lcss, true));
     }
 }
 

@@ -141,7 +141,7 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Remove old unused descriptions
         $oldanswerunused = array_diff($oldanswerunused, $oldanswerused);
         if ($oldanswerunused !=null) {
-            block_formal_langs_processed_string::delete_descriptions_by_id("question_answers", $oldanswerunused);
+            block_formal_langs_processed_string::delete_descriptions_by_id('question_answers', $oldanswerunused);
         }
         return $result;
     }
@@ -153,7 +153,7 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function delete_question($questionid, $contextid) {
         global $DB;
         $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '$questionid' ");
-        block_formal_langs_processed_string::delete_descriptions_by_id("question_answers",$answerids);
+        block_formal_langs_processed_string::delete_descriptions_by_id('question_answers',$answerids);
 
         parent::delete_question($questionid, $contextid);
     }

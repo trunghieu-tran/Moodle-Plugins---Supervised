@@ -93,13 +93,13 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('maxmistakepercentage', 0.7);
         $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
 
-        $mform->setAdvanced("lexicalerrorthreshold");
-        $mform->setAdvanced("lexicalerrorweight");
-        $mform->setAdvanced("absentmistakeweight");
-        $mform->setAdvanced("addedmistakeweight");
-        $mform->setAdvanced("movedmistakeweight");
-        $mform->setAdvanced("hintgradeborder");
-        $mform->setAdvanced("maxmistakepercentage");
+        $mform->setAdvanced('lexicalerrorthreshold');
+        $mform->setAdvanced('lexicalerrorweight');
+        $mform->setAdvanced('absentmistakeweight');
+        $mform->setAdvanced('addedmistakeweight');
+        $mform->setAdvanced('movedmistakeweight');
+        $mform->setAdvanced('hintgradeborder');
+        $mform->setAdvanced('maxmistakepercentage');
 
         $languages = block_formal_langs::available_langs();
         
@@ -245,7 +245,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     foreach($stream->errors as $error) {
                          $errormessages[] = $error->errormessage;
                     }
-                    $errors["answer[$key]"] = implode("<BR>", $errormessages);
+                    $errors["answer[$key]"] = implode('<BR>', $errormessages);
                 }
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
