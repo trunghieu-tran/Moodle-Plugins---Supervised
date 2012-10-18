@@ -67,7 +67,9 @@ class analogy_choice extends taskgiver{
 
     function process_before_tasks($cmid, $poasassignment) {
         global $USER, $DB;
-        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+        $hascaptohavetask = has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context());
+        $error = poasassignment_model::get_instance()->check_dates();
+        if ($hascaptohavetask && !$error) {
             if (!poasassignment_model::user_have_active_task($USER->id, $poasassignment->id)) {
                 $data = $this->get_settings($poasassignment->id);
                 if ($data->originalinstance > 0) {
