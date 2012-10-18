@@ -82,7 +82,7 @@ class taskview_page extends abstract_page {
             if ($userinfo)
                 echo $OUTPUT->heading(get_string('studentstask', 'poasassignment') . ' ' . $userinfo->firstname . ' ' . $userinfo->lastname);
         }
-        elseif(has_capability('mod/poasassignment:havetask', $model->get_context())) {
+        if(has_capability('mod/poasassignment:havetask', $model->get_context())) {
             if ($owntask) {
                 echo $OUTPUT->heading(get_string('itsyourtask', 'poasassignment'));
             }
