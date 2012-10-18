@@ -183,10 +183,22 @@ switch ($action) {
         $userid = optional_param('userid', -1, PARAM_INT);
         $PAGE->set_url('/mod/poasassignment/warning.php?id='.$cm->id.'&taskid='.$taskid.'&action=taketask&userid='.$userid);
 
-        if(!isset($taskid) || $taskid<1)
+        // Only task manager can provide task to another user
+        if ($USER->id != $userid) {
+            require_capability('mod/poasassignment:managetasks', $context);
+        }
+
+        if ($USER->id == $userid && $error = $poasmodel->check_dates()) {
+            print_error($error, 'poasassignment');
+        }
+
+        if(!isset($taskid) || $taskid<1) {
             print_error('invalidtaskid','poasassignment');
-        if(!isset($userid) || $userid<1)
+        }
+
+        if(!isset($userid) || $userid<1) {
             print_error('invaliduserid','poasassignment');
+        }
         echo $OUTPUT->header();
         echo $OUTPUT->heading($poasassignment->name);
         echo $OUTPUT->box_start();
