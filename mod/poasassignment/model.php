@@ -84,6 +84,11 @@ class poasassignment_model {
                             'cyclicrandom' => POASASSIGNMENT_CYCLIC_RANDOM);
 
     /**
+     * Cached result of check_dates result
+     */
+    private $checkdateerror = null;
+
+    /**
      * Constructor. Cannot be called outside of the class
      * @param $poasassignment module instance
      */
@@ -1885,6 +1890,9 @@ class poasassignment_model {
      * @return string error message
      */
     public function check_dates() {
+        if ($this->checkdateerror === false || is_string($this->checkdateerror))
+            return $this->checkdateerror;
+
         if (has_capability('mod/poasassignment:havetask', $this->get_context())
             && $this->get_poasassignment()->choicedate != 0) {
             if (time() > $this->get_poasassignment()->choicedate) {
@@ -1896,17 +1904,22 @@ class poasassignment_model {
                         // Try to get random task
                         $taskid = poasassignment_model::get_random_task_id($this->get_available_tasks($USER->id));
                         if ($taskid == -1 ) {
+                            $this->checkdateerror = 'errormodulehavenotasktogiveyou';
                             return 'errormodulehavenotasktogiveyou';
                         }
                         $this->bind_task_to_assignee($USER->id, $taskid);
                     }
                     else {
                         // Return error
+                        $this->checkdateerror = 'erroryouhadtochoosetask';
                         return 'erroryouhadtochoosetask';
                     }
                 }
             }
+            else
+                $this->checkdateerror = false;
         }
+        return false;
     }
 
     /**
@@ -2023,7 +2036,7 @@ class poasassignment_model {
      */
     public function get_task_owners($taskid) {
         global $DB;
-        $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid, 'cancelled' => 0), 'userid', 'userid, id');
+        $assignees = $DB->get_records('poasassignment_assignee', array('taskid' => $taskid, 'cancelled' => 0), 'userid', 'id, userid');
         return $assignees;
     }
     
