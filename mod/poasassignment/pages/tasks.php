@@ -64,10 +64,12 @@ class tasks_page extends abstract_page {
             $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
             $student = html_writer::link($userurl, fullname($user, true));
             echo $OUTPUT->heading(get_string('providetaskto', 'poasassignment'). ' ' . $student);
+
             $this->view_table($hascapmanage, false);
         }
         else {
-
+            if ($error = poasassignment_model::get_instance()->check_dates())
+                echo '<div class="poasassignment-critical center">'.get_string($error, 'poasassignment').'</div>';
             $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
             require_once ($tg->path);
             $taskgivername = $tg->name;

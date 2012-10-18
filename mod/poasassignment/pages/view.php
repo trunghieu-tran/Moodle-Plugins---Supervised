@@ -51,29 +51,36 @@ class view_page extends abstract_page {
         if ($this->poasassignment->flags & ACTIVATE_INDIVIDUAL_TASKS) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             echo $OUTPUT->heading(get_string('status','poasassignment'));
-            $assignee = $poasmodel->get_assignee($USER->id, $this->poasassignment->id);
+            if ($error = $poasmodel->check_dates()) {
+                echo '<div class="poasassignment-critical">' . get_string($error, 'poasassignment') . '</div>';
+            }
+            else {
+                $assignee = $poasmodel->get_assignee($USER->id, $this->poasassignment->id);
                 if ($assignee && $assignee->taskid > 0) {
-                    echo get_string('youhavetask', 'poasassignment');
-                    echo ' ';
+                    echo get_string('youhavetask', 'poasassignment') . ' ';
                     // Show link to the task
                     $taskurl = new moodle_url('view.php',
-                                              array('page' => 'taskview',
-                                                    'taskid' => $assignee->taskid,
-                                                    'id' => $this->cm->id,
-                                                    'from' => 'view'),
-                                              'v',
-                                              'get');
-                    $task=$DB->get_record('poasassignment_tasks', array('id'=>$assignee->taskid));
+                        array('page' => 'taskview',
+                            'taskid' => $assignee->taskid,
+                            'id' => $this->cm->id,
+                            'from' => 'view'),
+                        'v',
+                        'get');
+                    $task = $DB->get_record('poasassignment_tasks', array('id' => $assignee->taskid));
                     echo html_writer::link($taskurl, $task->name);
 
                     // If user can cancel task - show cancel button
                     if($poasmodel->can_cancel_task($assignee->id, $this->context)) {
-                    //if (has_capability('mod/poasassignment:managetasks', $this->context)) {
-                        $deleteurl = new moodle_url('warning.php', array('action'=>'canceltask',
-                                                                        'assigneeid'=>$assignee->id,
-                                                                        'id'=>$this->cm->id), 'd', 'post');
-                        $deleteicon = '<a href="'.$deleteurl.'">'.'<img src="'.$OUTPUT->pix_url('t/delete').
-                                '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                        //if (has_capability('mod/poasassignment:managetasks', $this->context)) {
+                        $deleteurl = new moodle_url('warning.php',
+                            array(
+                                'action'=>'canceltask',
+                                'assigneeid'=>$assignee->id,
+                                'id'=>$this->cm->id),
+                            'd',
+                            'post');
+                        $deleteicon = '<a href="' . $deleteurl . '">'.'<img src="' . $OUTPUT->pix_url('t/delete').
+                            '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
                         echo ' '.$deleteicon;
                     }
 
@@ -88,25 +95,25 @@ class view_page extends abstract_page {
                     if(!empty($this->poasassignment->deadline)) {
                         echo '<br><br>';
                         echo '<b>' .
-                        get_string('timetocompletetask', 'poasassignment') .
-                        ': ' .
-                        poasassignment_model::time_difference($this->poasassignment->deadline) .
-                        '</b>';
+                            get_string('timetocompletetask', 'poasassignment') .
+                            ': ' .
+                            poasassignment_model::time_difference($this->poasassignment->deadline) .
+                            '</b>';
                     }
                 }
-            //}
-            else {
-                // If user have no task - show link to task page
-                echo get_string('youhavenotask', 'poasassignment');
-                $taskspageurl = new moodle_url('view.php', array('id'=>$this->cm->id, 'page'=>'tasks'));
-                echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
-                if(!empty($this->poasassignment->choicedate) && time() < $this->poasassignment->choicedate) {
-                    echo '<br><br>';
-                    echo '<b>' .
-                        get_string('timetochoosetask', 'poasassignment') .
-                        ': ' .
-                        poasassignment_model::time_difference($this->poasassignment->choicedate) .
-                        '</b>';
+                else {
+                    // If user have no task - show link to task page
+                    echo get_string('youhavenotask', 'poasassignment');
+                    $taskspageurl = new moodle_url('view.php', array('id'=>$this->cm->id, 'page'=>'tasks'));
+                    echo ' '.html_writer::link($taskspageurl, get_string('gototasskpage', 'poasassignment'));
+                    if(!empty($this->poasassignment->choicedate) && time() < $this->poasassignment->choicedate) {
+                        echo '<br><br>';
+                        echo '<b>' .
+                            get_string('timetochoosetask', 'poasassignment') .
+                            ': ' .
+                            poasassignment_model::time_difference($this->poasassignment->choicedate) .
+                            '</b>';
+                    }
                 }
             }
             echo $OUTPUT->box_end();

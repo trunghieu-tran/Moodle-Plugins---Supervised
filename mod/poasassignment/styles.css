@@ -66,3 +66,6 @@ a:link.hiddentask, a:visited.hiddentask {
 .random-field {
     font-weight: bold;
 }
+.center {
+    text-align: center;
+}

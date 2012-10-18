@@ -81,10 +81,6 @@ class poasassignment_tabbed_page {
                     null,
                     userdate(time()).' < '.userdate($model->get_poasassignment()->availabledate));
         }
-
-        if ($error = $model->check_dates()) {
-            print_error($error, 'poasassignment', new moodle_url('/course/view.php', array('id'=>$model->get_cm()->course)));
-        }
         
         // Check abilities and execute page's logic
         $poasassignmentpage = new $pagetype($model->get_cm(),
