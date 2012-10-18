@@ -18,9 +18,11 @@ class studentschoice extends taskgiver {
      * @return mixed html code to add after task name
      */
     function get_task_extra_string($taskid, $cmid) {
-        global $USER,$OUTPUT;
+        global $USER, $OUTPUT;
+        $model = poasassignment_model::get_instance();
         $takeicon = '';
-        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+        $hascaptohavetask = has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context());
+        if ($hascaptohavetask && !$model->check_dates()) {
             // Require mod/poasassignment:havetask to show 'take task' link
             $takeurl = new moodle_url('warning.php?id='.$cmid.'&action=taketask&taskid='.$taskid.'&userid='.$USER->id);
             $takeicon = '<a href="'.$takeurl.'">'.'<img src="'.$OUTPUT->pix_url('taketask','poasassignment').
