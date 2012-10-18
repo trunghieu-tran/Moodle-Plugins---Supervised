@@ -15,8 +15,11 @@ class parameterchoice extends taskgiver{
     }
 
     function parameter_search($cmid, $poasassignment) {
-        global $DB,$USER;
         $poasmodel = poasassignment_model::get_instance();
+        if ($poasmodel->check_dates())
+            return null;
+        global $DB,$USER;
+
         $poasmodel->cash_instance($poasassignment->id);
         $poasmodel->cash_assignee_by_user_id($USER->id);
         $mform = new parametersearch_form(null, array('poasassignmentid' => $poasassignment->id, 'id' => $cmid));
@@ -93,24 +96,7 @@ class parameterchoice extends taskgiver{
                 if (count($satisfyingtasks) > 0) {
                     shuffle($satisfyingtasks);
                     $taskid = $satisfyingtasks[rand(0, count($satisfyingtasks) - 1)];
-                    /*$taskid = $satisfyingtasks[0];
-                    $tasktimesmet = 1;
-                    $tmp = 0;
-                    for ($i = 0; $i < count($satisfyingtasks); $i++) {
-                        for ($j = 0; $j < count($satisfyingtasks); $j++) {
-                            if ($satisfyingtasks[$i] == $satisfyingtasks[$j]) {
-                                $tmp++;
-                            }
-                            if ($tmp > $tasktimesmet) {
-                                $taskid = $satisfyingtasks[$i];
-                                $tasktimesmet = $tmp;
-                            }
-                        }
-                         $tasktimesmet = $tmp;
-                         $tmp = 0;
-                    }*/
-                    //echo 'task with id'.$taskid.' was met '.$tasktimesmet.' times';
-                    $poasmodel->bind_task_to_assignee($USER->id,$taskid);
+
                     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
                 else { 
@@ -122,7 +108,9 @@ class parameterchoice extends taskgiver{
     }
     
     function process_before_tasks($cmid, $poasassignment) {
-        if (has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context())) {
+        $model = poasassignment_model::get_instance();
+        $hascaptohavetask = has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context());
+        if ($hascaptohavetask && !$model->check_dates()) {
             $mform = $this->parameter_search($cmid, $poasassignment);
             $mform->display();
         }
@@ -268,15 +256,7 @@ class parametersearch_form extends moodleform {
                     return $errors;
                 }
             }
-            /* if($field->ftype==NUMBER && !is_int($data['field'.$field->id])) {
-                if(strlen($data['field'.$field->id])>0) {
-                    $errors['field'.$field->id]=get_string('errormustbeint','poasassignment');
-                    return $errors;
-                }
-            } */
-
         }
-
         return true;
     }
 }
