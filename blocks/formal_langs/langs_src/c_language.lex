@@ -96,7 +96,16 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $a->line = $this->yyline;
         $a->position = $this->yycol;
         $a->symbol = $symbol;
-        $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
+        $errormessage = 'clanguageunknownsymbol';
+        if (mb_strlen($symbol) == 1) {
+            if ($symbol[0] == '\'') {
+                $errormessage = 'clanguageunmatchedsquote';
+            }
+            if ($symbol[0] == '"') {
+                $errormessage = 'clanguageunmatchedquote';
+            }
+        }
+        $res->errormessage = get_string($errormessage,'block_formal_langs',$a);
         $this->errors[] = $res;
     }
 
@@ -117,7 +126,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
   
     private function create_token($class,$value) {
         // create token object
-        $classname = "block_formal_langs_c_token_" . $class;
+        $classname = 'block_formal_langs_c_token_' . $class;
         $res = new $classname(null, $class, $value, $this->return_pos(), $this->counter);
         // increase token count
         $this->counter++;
@@ -127,7 +136,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 
     private function create_buffered_token($class,$value) {
             // create token object
-            $classname = "block_formal_langs_c_token_" . $class;
+            $classname = 'block_formal_langs_c_token_' . $class;
             $res = new $classname(null, $class, $value, $this->return_buffered_pos(), $this->counter);
             // increase token count
             $this->counter++;
@@ -136,7 +145,8 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     }
 
     private function is_white_space($string) {
-        $whitespace = array(" ", "\t", "\n", "\r", "f", "\v");
+        // Here we need to escape symbols, so double quotes are inavoidable
+        $whitespace = array(' ', "\t", "\n", "\r", "f", "\v");
         return in_array($string[0], $whitespace);
     }
     // Enters state with buffered output
@@ -152,6 +162,25 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         return $this->create_buffered_token($tokentype,$this->buffer());
     }
 
+    protected function check_and_create_character()
+    {
+        $result = $this->leavebufferedstate('character');
+        $maxcharacterlength = 3;
+        $value = $result->value();
+        if ($value[0] == 'L')
+            $maxcharacterlength = $maxcharacterlength + 1;
+        if ( mb_strlen($value) > $maxcharacterlength) {
+            $res = new block_formal_langs_lexical_error();
+            $res->tokenindex = $this->counter - 1;
+            $a = new stdClass();
+            $a->line = $result->position()->linestart();
+            $a->position = $result->position()->colstart();
+            $a->symbol = $value;
+            $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
+            $this->errors[] = $res;
+        }
+        return $result;
+    }
   
     private function return_pos() {
         $begin_line = $this->yyline;
@@ -316,7 +345,7 @@ INC = "#include"
 <CHARACTER> \\\?                         { $this->append('?'); break;}
 <CHARACTER> \\[0-7]+                     { $this->append(block_formal_langs_octal_to_decimal_char(substr($this->yytext(),1))); break;}
 <CHARACTER> \\[xX][0-9a-fA-F]+           { $this->append(block_formal_langs_hex_to_decimal_char(substr($this->yytext(),2))); break;}
-<CHARACTER> '                            { return $this->leavebufferedstate('character');  }
+<CHARACTER> '                            { return $this->check_and_create_character();  }
 <CHARACTER> .                            { $this->append($this->yytext()); break;}
 <STRING> \\'                             { $this->append('\''); break;}
 <STRING> \\a                             { $this->append("\a"); break;}

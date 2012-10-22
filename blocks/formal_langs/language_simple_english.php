@@ -49,7 +49,7 @@ class block_formal_langs_predefined_simple_english_lexer_raw extends JLexBase  {
         return $res;
     }
     private function is_white_space($string) {
-        $whitespace = array(" ", "\t", "\n", "\r", "f", "\v");
+        $whitespace = array(' ', "\t", "\n", "\r", "f", "\v");
         return in_array($string[0], $whitespace);
     }
     private function return_pos() {

@@ -99,6 +99,7 @@ abstract class block_formal_langs_abstract_language {
     /**
      *  Creates a processed string from string
      *  @param string $string string
+     *  @return block_formal_langs_processed_string string
      */
      public function create_from_string($string) {
         $result = new block_formal_langs_processed_string($this);
@@ -108,9 +109,10 @@ abstract class block_formal_langs_abstract_language {
 
      /**
       *  Creates a processed string from table and id in BD (string optional)
-      *  @param string $table table name
-      *  @param string $id    id of source table
-      *  @param string $string string data
+      *  @param string $tablename table name
+      *  @param string $tableid    id of source table
+      *  @param string|null $string string data
+      *  @return block_formal_langs_processed_string processed string
       */
     public function create_from_db($tablename, $tableid, $string = null) {
         $result = new block_formal_langs_processed_string($this);
@@ -153,7 +155,8 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
      *
      */
     public function scan(&$processedstring) {
-         // Lexer must be a valid JLexPHP class, or implement next_token() and get_errors()
+        // Lexer must be a valid JLexPHP class, or implement next_token() and get_errors()
+        // Also it can implement find_errors for seeking of deferred errors
         $scanerclass = 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
         $string = $processedstring->string;
         if (is_a($string,'qtype_poasquestion_string') == true) {
@@ -165,6 +168,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         while ($token = $this->scaner->next_token()) {
             $tokens[] = $token;
         }
+
         $stream = new block_formal_langs_token_stream();
         $stream->tokens = $tokens;
         $stream->errors = $this->scaner->get_errors();
