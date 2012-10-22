@@ -517,11 +517,17 @@ class  block_formal_langs_lexical_error {
 
     public $tokenindex;
 
-    /** @var User interface string (i.e. received using get_string) describing error to the user*/
+    /**
+     * User interface string (i.e. received using get_string) describing error to the user
+     * @var string
+     */
     public $errormessage;
 
-    /** @var Corrected token object if possible, null otherwise */
-   public $correctedtoken; 
+    /**
+     *  Corrected token object if possible, null otherwise
+     *  @var block_formal_langs_token_base
+     */
+    public $correctedtoken;
 }
 
 /**

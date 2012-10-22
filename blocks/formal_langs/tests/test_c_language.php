@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines unit-tests for token_base is same
+ * Defines unit-tests for C language
  *
  * For a complete info, see qtype_correctwriting_token_base
  *
@@ -11,34 +11,24 @@
  */
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 
-/**
- * Test utilities to make test simpler
- */
-class block_formal_langs_c_language_test_utils {
-    /**
-     * @param block_formal_langs_c_language_test $test used test
-     * @param array $lexemes tested lexemes
-     * @param string $object class name
-     */
-    public static function test_objects($test, $lexemes, $object) {
-        $lang = new block_formal_langs_language_c_language();
-        $processedstring = $lang->create_from_string(implode(' ', $lexemes));
-        $result = $processedstring->stream->tokens;
-        $test->assertTrue(count($result) == count($lexemes), count($result) . ' tokens given in test ');
-        for($i = 0; $i < count($result); $i++) {
-            $test->assertTrue(is_a($result[$i], $object), get_class($result[$i]) . ' class object is given at position '. $i);
-            $value = $result[$i]->value();
-            $test->assertTrue($value == $lexemes[$i], $value. ' is given at position '. $i);
 
-        }
-    }
-}
 
  /**
   * Tests a simple english language
   */
 class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
+
+    /**
+     * Utilities for testing
+     * @var block_formal_langs_language_test_utils
+     */
+    protected $utils;
+
+    public function __construct() {
+        $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_c_language', $this);
+    }
     // Tests a lexer of simple english language
     public function test_lexer() {
         $lang = new block_formal_langs_language_c_language();
@@ -59,7 +49,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
                       'return', 'sizeof', 'static', 'struct', 'register',
                       'switch', 'typedef', 'union', 'volatile', 'while');
         $o = 'block_formal_langs_c_token_keyword';
-        block_formal_langs_c_language_test_utils::test_objects($this,$kwds,$o);
+        $this->utils->test_object($kwds, $o);
     }
 
     // Tests typename keywords
@@ -67,14 +57,14 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         // Keywords
         $kwds = array('char', 'double', 'float', 'int','long', 'signed', 'unsigned', 'void');
         $o = 'block_formal_langs_c_token_typename';
-        block_formal_langs_c_language_test_utils::test_objects($this,$kwds,$o);
+        $this->utils->test_object($kwds, $o);
     }
 
     // Tests identifiers
     public function test_identifiers() {
         $tests = array('a0_2', 'A__', '__AW1__A');
         $o = 'block_formal_langs_c_token_identifier';
-        block_formal_langs_c_language_test_utils::test_objects($this,$tests,$o);
+        $this->utils->test_object($tests, $o);
     }
 
     // Tests integral numbers
@@ -84,7 +74,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
                        '0xABCDEFU', '0xABCDEFl', '0xABCDEFL','1e+1','1E+1u',
                        '1e+1U', '1e+1l', '1e+1L');
         $o = 'block_formal_langs_c_token_numeric';
-        block_formal_langs_c_language_test_utils::test_objects($this,$tests,$o);
+        $this->utils->test_object($tests, $o);
     }
     // Tests unmatched elements
     public function test_unmatched_elements() {
@@ -109,7 +99,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
                        '<=', '>=', '==', '!=', '.', '&', '|', '^', '!', '~',
                        '-', '+', '*', '/', '%', '<', '>', '~=');
         $o = 'block_formal_langs_c_token_operators';
-        block_formal_langs_c_language_test_utils::test_objects($this,$tests,$o);
+        $this->utils->test_object($tests, $o);
     }
 
     // Tests various tokens
@@ -149,14 +139,14 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
                        '22.22f', '22.22F', '22.22l', '22.22L', '.22e-1f',
                        '.22e-1F', '.22e-1l', '.22e-1L');
         $o = 'block_formal_langs_c_token_numeric';
-        block_formal_langs_c_language_test_utils::test_objects($this,$tests,$o);
+        $this->utils->test_object($tests, $o);
     }
     // Tests preprocessor directives
     public function test_preprocessor() {
         $tests = array('#include <stdio.h>', '#include "stdio.h"', '#define',
                        '#if', '#ifdef', '#elif', '#else', '#endif', '#', '##');
         $o = 'block_formal_langs_c_token_preprocessor';
-        block_formal_langs_c_language_test_utils::test_objects($this,$tests,$o);
+        $this->utils->test_object($tests, $o);
     }
 
     // Tests singleline comments
