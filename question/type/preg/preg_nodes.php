@@ -318,7 +318,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-        if ($pos < 0 || $pos >= $str->length()) {
+		if ($pos < 0 || $pos >= $str->length()) {
             return false;
         }
         $result = false;
@@ -402,11 +402,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
                         $tmp['negative'] = true;
-                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
@@ -423,11 +423,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
                     foreach ($otherranges as &$tmp)
                         $tmp['negative'] = true;
-                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
@@ -478,11 +478,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
                         $tmp['negative'] = true;
-                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
@@ -499,11 +499,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
                     foreach ($otherranges as &$tmp)
                         $tmp['negative'] = true;
-                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
