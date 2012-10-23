@@ -136,91 +136,172 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return array array of individual lcs arrays
      */
     public static function lcs($answerstream, $responsestream) {
-        // Extract answer and response array of stream
+        // Extract data from method
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
-        
-        // An array of matches, where keys are indexes of answer and values are arrays of 
-        // indexes from response
+        // Find all matches, they become nodes of a graph.
+        // After that we can use Floyd-Warshall algorithm
         $matches = array();
-        // Fill an array of matches filling an lcs data
-        $answercount = count($answer);
-        $responsecount = count($response);
-        // Flag, that determines whether we found a match
-        $hasmatch = false;
-        for ($i = 0;$i < $answercount;$i++) {
-            $matches[$i] = array();
-            for ($j = 0;$j < $responsecount;$j++) {
+        // Match is defined as tuple <i,j>
+        for ($i = 0; $i < count($answer); $i++) {
+            for($j = 0; $j < count($response); $j++) {
                 if ($answer[$i]->is_same($response[$j])) {
-                    $matches[$i][] = $j;
-                    $hasmatch = true;
+                    $matches[] = array($i, $j);
                 }
             }
         }
-    
-        // If no matches are found, stop right there
-        if ($hasmatch == false) {
+
+
+        // If nothing found - no matches, return
+        if (count($matches) === 0)
             return array();
+        // Matrix of longest paths on graph, defined as matches
+        // nodes, where edged defined as for all n1,n2
+        // edge between n1 and n2 exist, if n1 < n2 <=> n1[0] < n2[0] && n1[1] < n2[1]
+        // Way in matrix is defined as tuple <sum of weight, center node index>
+        // A predecessor matrix, needed for computing is merged with common way matrix
+        // We fill only upper-right part, because we can easily prove, that
+        // only upper-right part will be filled
+        $waymatrix = array();
+        for ($i = 0; $i < count($matches); $i++) {
+            $waymatrix[$i] = array();
+            for($j = $i; $j < count($matches); $j++) {
+                $waymatrix[$i][$j] = array(0, null);
+                if ($matches[$i][0] < $matches[$j][0] && $matches[$i][1] < $matches[$j][1]) {
+                    $waymatrix[$i][$j][0] = -1;
+                }
+            }
         }
-        // An array of found common subsequences, where a subsequence is hash data, to current subsequence,
-        // where ['maxind'] - maximum index, which can be taken when appending 
-        //       ['lcs']    - array, which is represented an lcs, as described in description of function
-        $tmplcs = array();
-    
-        // Compute temporary lcs data
-        for($currenttoken = $answercount - 1;$currenttoken > -1;$currenttoken--) {
-            // Copy only maximum length LCS from older CS array
-            $lcslen = 0;
-            for($i = 0;$i < count($tmplcs);$i++) {
-                if (count($tmplcs[$i]['lcs']) > $lcslen) {
-                    $lcslen = count($tmplcs[$i]['lcs']);
-                }
-            }
-            $newtmplcs = array();
-            for($i = 0;$i < count($tmplcs);$i++) {
-                if (count($tmplcs[$i]['lcs']) == $lcslen) {
-                    $newtmplcs[] = $tmplcs[$i];
-                }
-            }
-            
-            for($currentmatch = 0;$currentmatch < count($matches[$currenttoken]);$currentmatch++) {
-                // Scan existing suffixes and push match to it if can, changing maxind to current match
-                for ($currentcs = 0;$currentcs < count($tmplcs);$currentcs++) {
-                    // If we can append to current match (found symbol index is lesser then bound)
-                    if($tmplcs[$currentcs]['maxind'] > $matches[$currenttoken][$currentmatch]) {
-                        // Copy suffix and prepend our token to it
-                        $suffix = $tmplcs[$currentcs];
-                        $suffix['maxind'] = $matches[$currenttoken][$currentmatch];
-                        $suffix['lcs'][$currenttoken] = $matches[$currenttoken][$currentmatch];
-                        $newtmplcs[] = $suffix;
+
+
+
+        // This is slightly modified Floyd-Warshall algorithm runned for this graph
+        // He sets a center node, so restoration of path will be more complicated
+        // An unusual boundaries is set because ther must exist all of element
+        // and due to some fill method the bounds can be deduced.
+        for ($k = 0; ($k < count($matches)); $k++) {
+
+            for($i = 0; $i <= $k; $i++) {
+                for($j = $k;  $j < count($matches); $j++) {
+                    $iklength = $waymatrix[$i][$k][0];
+                    $kjlength = $waymatrix[$k][$j][0];
+                    $newlength = $iklength + $kjlength;
+                    $oldlength = $waymatrix[$i][$j][0];
+                    if ($newlength < $oldlength && $iklength !== 0 && $kjlength !== 0) {
+                        $waymatrix[$i][$j][0] = $newlength;
+                        $waymatrix[$i][$j][1] = $k;
                     }
                 }
-                // Create new suffix and add it to a tmplcs
-                $suffix['maxind'] = $matches[$currenttoken][$currentmatch];
-                $suffix['lcs'] = array();
-                $suffix['lcs'][$currenttoken] = $matches[$currenttoken][$currentmatch];
-                $newtmplcs[] = $suffix;
             }
-            $tmplcs = $newtmplcs;
+
         }
-    
-        // Find length of LCS
-        $lcslen = 0;
-        for($i = 0;$i < count($tmplcs);$i++) {
-            if (count($tmplcs[$i]['lcs']) > $lcslen) {
-                $lcslen = count($tmplcs[$i]['lcs']);
-            }
-        }
-    
-        // Filter LCS from array of CS
-        $lcs = array();
-        for($i=0;$i < count($tmplcs);$i++) {
-            if (count($tmplcs[$i]['lcs']) == $lcslen) {
-                $lcs[] = $tmplcs[$i]['lcs'];
+
+
+
+
+        // Minimal weight of way in this method refers to a longest sequence
+        $minimalweight = 0;
+        // Array of ways as a tuple <from_match, to_match>, where matches are nodes
+        $ways = array();
+
+        // Find minimal weight
+        for($i = 0; $i < count($matches); $i++) {
+            for($j = $i; $j < count($matches); $j++) {
+                if ($waymatrix[$i][$j][0] < $minimalweight)
+                    $minimalweight = $waymatrix[$i][$j][0];
             }
         }
-    
-        return $lcs;        
+
+        $onematches = ($minimalweight ===0);
+
+        // Find ways, matched for minimal weight
+        for($i = 0; ($i < count($matches)) && !$onematches; $i++) {
+            for($j = $i; $j < count($matches); $j++) {
+                if ($waymatrix[$i][$j][0] == $minimalweight)
+                    $ways[] = array($i, $j);
+            }
+        }
+
+
+
+        // In case of one match, we can simly reconstruct it as array of matches
+        $matchesways = array();
+        if ($onematches)
+        {
+            for ($i=0;$i<count($matches);$i++) {
+                $matchesways[] = array( $matches[$i] );
+            }
+        }
+
+        // Reconstruct ways as array of match indexes
+        for($i = 0; ($i < count($ways)) && !$onematches; $i++) {
+            // Creates a new global way task for finding a way
+            $waytask = new stdClass();
+            $waytask->i = $ways[$i][0]; // These fields defines nodes, where
+            $waytask->j = $ways[$i][1]; // way between them must be reconstructed
+            $waytask->iktask = null;    // These are references
+            $waytask->kjtask = null;    // which will be filled, when we are deferring loops
+            $waytask->result = array(); // In this field result is stored
+
+
+            $evalqueue = array( $waytask );
+            $deferqueue = array();
+            // When this loop is over, some primitive ways are computed
+            // and deferqueue is filled backwards with new items
+            while ( count($evalqueue) ) {
+                $task = array_shift($evalqueue);
+                $ti = $task->i;
+                $tj = $task->j;
+                $k = $waymatrix[$ti][$tj][1];
+                if ($k === null) {
+                    $task->result = array( $matches[$ti], $matches[$tj] );
+                } else {
+                    // Create task for reconstructing a way from i to k
+                    $iktask = new stdClass();
+                    $iktask->i = $ti;
+                    $iktask->j = $k;
+                    $iktask->iktask = null;
+                    $iktask->kjtask = null;
+                    $iktask->result = array();
+                    $task->iktask = $iktask;
+                    $evalqueue[] = $iktask;
+
+                    $kjtask = new stdClass();
+                    $kjtask->i = $k;
+                    $kjtask->j = $tj;
+                    $kjtask->iktask = null;
+                    $kjtask->kjtask = null;
+                    $kjtask->result = array();
+                    $task->kjtask = $kjtask;
+                    $evalqueue[] = $kjtask;
+
+                    if (count($deferqueue) == 0) {
+                        $deferqueue[] = $task;
+                    } else {
+                        array_unshift($deferqueue, $task);
+                    }
+                }
+            }
+
+            // Now, we could just reconstruct ways for data
+            while( count($deferqueue) ) {
+                $task = array_shift($deferqueue);
+                // Now we merge ways from task and put them into result
+                $task->result = array_merge( $task->iktask->result, array_slice($task->kjtask->result, 1) );
+            }
+            $matchesways[] = $waytask->result;
+        }
+
+        // Now we convert LCS to result format
+        for($i = 0; $i < count($matchesways); $i++) {
+            $lcs = array();
+            for($j = 0; $j < count($matchesways[$i]); $j++) {
+                $lcs[$matchesways[$i][$j][0]] = $matchesways[$i][$j][1];
+            }
+            $matchesways[$i] = $lcs;
+        }
+
+        return $matchesways;
     }
     /**
      * Creates a new mistake, that represents case, when one lexeme moved to other position
