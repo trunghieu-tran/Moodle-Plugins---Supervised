@@ -7,6 +7,9 @@ require_once dirname(dirname(__FILE__)).'/taskgiver.php';
 require_once($CFG->libdir.'/formslib.php');
 class parameterchoice extends taskgiver{
 
+    private $mform = NULL;
+    private $message = "";
+
     public static function has_settings() {
         return true;
     }
@@ -87,7 +90,6 @@ class parameterchoice extends taskgiver{
                     }
                 }
 
-                //echo implode(',',$satisfyingtasks).'<br>';
                 $taskswithmismatch = array_unique($taskswithmismatch);
                 if (count ($fields) > 1 && count($taskswithmismatch) > 0) {
                     // If there are tasks that matched not all search fields, don't use them
@@ -100,19 +102,27 @@ class parameterchoice extends taskgiver{
                     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
                 else { 
-                    echo get_string('nosatisfyingtasks','poasassignmenttaskgivers_parameterchoice');
+                    $this->message = get_string('nosatisfyingtasks','poasassignmenttaskgivers_parameterchoice');
                 }
             }
         }
         return $mform;
     }
+
+    public function process_before_output($cmid, $poasassignment) {
+        $model = poasassignment_model::get_instance();
+        $hascaptohavetask = has_capability('mod/poasassignment:havetask', $model->get_context());
+        if ($hascaptohavetask && !$model->check_dates()) {
+            $this->mform = $this->parameter_search($cmid, $poasassignment);
+        }
+    }
     
     function process_before_tasks($cmid, $poasassignment) {
-        $model = poasassignment_model::get_instance();
-        $hascaptohavetask = has_capability('mod/poasassignment:havetask', poasassignment_model::get_instance()->get_context());
-        if ($hascaptohavetask && !$model->check_dates()) {
-            $mform = $this->parameter_search($cmid, $poasassignment);
-            $mform->display();
+        if (isset($this->mform)) {
+            if ($this->message) {
+                echo $this->message;
+            }
+            $this->mform->display();
         }
     }
     //put your code here
