@@ -7,9 +7,26 @@ require_once($CFG->dirroot.'/lib/tablelib.php');
 class tasks_page extends abstract_page {
     var $poasassignment;
     private $userid = -1;
-    function tasks_page($cm,$poasassignment) {
+
+    private $taskgiver;                     // cached current taskgiver
+    private $taskgiverinstance;             // stored taskgiver instance
+
+    private $hascapmanage;                  // has capability to manage tasks
+    private $hascaphavetask;                // has capability to have task
+
+    function __construct($cm,$poasassignment) {
+        global $DB;
+
         $this->poasassignment = $poasassignment;
-        $this->cm=$cm;
+        $this->cm = $cm;
+
+
+        $this->userid = optional_param('userid', -1, PARAM_INT);
+
+        $this->hascapmanage = has_capability('mod/poasassignment:managetasks', get_context_instance(CONTEXT_MODULE, $this->cm->id));
+        $this->hascaphavetask = has_capability('mod/poasassignment:havetask', get_context_instance(CONTEXT_MODULE, $this->cm->id));
+
+        $this->taskgiver = $DB->get_record('poasassignment_taskgivers', array('id' => $this->poasassignment->taskgiverid));
     }
 
     /**
@@ -17,9 +34,8 @@ class tasks_page extends abstract_page {
      */
     function is_providing_task() {
         $correctuserid = $this->userid > 0;
-        $hascapmanage = has_capability('mod/poasassignment:managetasks', get_context_instance(CONTEXT_MODULE, $this->cm->id));
         $userhavetask = poasassignment_model::user_have_active_task($this->userid, $this->poasassignment->id);
-        return ($correctuserid && $hascapmanage && !$userhavetask);
+        return ($correctuserid && $this->hascapmanage && !$userhavetask);
     }
 
     function has_satisfying_parameters() {
@@ -32,8 +48,7 @@ class tasks_page extends abstract_page {
         $model = poasassignment_model::get_instance();
         if ($assignee = $model->get_assignee($USER->id,$this->poasassignment->id)){
             if (isset($assignee->taskid) && $assignee->taskid > 0) {
-                if (!has_capability('mod/poasassignment:managetasks',
-                        get_context_instance(CONTEXT_MODULE,$this->cm->id))) {
+                if (!$this->hascapmanage) {
                     $this->lasterror='alreadyhavetask';
                     return false;
                 }
@@ -43,44 +58,39 @@ class tasks_page extends abstract_page {
     }
 
     function pre_view() {
-        //global $DB;
-
+        if ($this->taskgiver) {
+            require_once ($this->taskgiver->path);
+            $taskgivername = $this->taskgiver->name;
+            $this->taskgiverinstance = new $taskgivername();
+        }
+        if (!$this->is_providing_task() && $this->hascaphavetask) {
+            $this->taskgiverinstance->process_before_output($this->cm->id, $this->poasassignment);
+        }
     }
     function view() {
         global $DB,$OUTPUT,$USER,$PAGE;
-        $this->userid = optional_param('userid', -1, PARAM_INT);
-        $hascapmanage = has_capability('mod/poasassignment:managetasks',
-                            get_context_instance(CONTEXT_MODULE, $this->cm->id));
-        if (!$this->is_providing_task()) {
-            $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
-            require_once ($tg->path);
-            $taskgivername = $tg->name;
-            $taskgiver = new $taskgivername();
-            $taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
-        }
-        // Use taskgiver, if user doesn't provides a task for a student
         if ($this->is_providing_task()) {
             $user = $DB->get_record('user', array('id' => $this->userid));
             $userurl = new moodle_url('/user/profile.php', array('id' => $user->id));
             $student = html_writer::link($userurl, fullname($user, true));
             echo $OUTPUT->heading(get_string('providetaskto', 'poasassignment'). ' ' . $student);
 
-            $this->view_table($hascapmanage, false);
+            $this->view_table($this->hascapmanage, false);
         }
-        else {
+        if (!$this->is_providing_task()) {
+
+            $this->taskgiverinstance->process_before_tasks($this->cm->id, $this->poasassignment);
+
             if ($error = poasassignment_model::get_instance()->check_dates())
                 echo '<div class="poasassignment-critical center">'.get_string($error, 'poasassignment').'</div>';
-            $tg = $DB->get_record('poasassignment_taskgivers', array('id'=>$this->poasassignment->taskgiverid));
-            require_once ($tg->path);
-            $taskgivername = $tg->name;
-            $taskgiver = new $taskgivername();
-            //$taskgiver->process_before_tasks($this->cm->id, $this->poasassignment);
-            if ($hascapmanage || $taskgivername::show_tasks()) {
-                $this->view_table($hascapmanage, $taskgiver);
-                $taskgiver->process_after_tasks($this->cm->id, $this->poasassignment);
+
+            $taskgivername = $this->taskgiver->name;
+            if ($this->hascapmanage || $taskgivername::show_tasks()) {
+                $this->view_table();
+                $this->taskgiverinstance->process_after_tasks($this->cm->id, $this->poasassignment);
             }
 
-            if ($hascapmanage) {
+            if ($this->hascapmanage) {
                 $id = $this->cm->id;
                 echo '<div align="center">';
                 echo $OUTPUT->single_button(new moodle_url('view.php', array('id' => $id, 'page' => 'taskedit')),get_string('addtask','poasassignment'));
@@ -89,7 +99,7 @@ class tasks_page extends abstract_page {
         }
 
     }
-    private function view_table($hascapmanage, $taskgiver) {
+    private function view_table() {
         global $DB, $OUTPUT, $PAGE, $USER;
         $poasmodel = poasassignment_model::get_instance($this->poasassignment);
         $table = new flexible_table('mod-poasassignment-tasks');
@@ -105,7 +115,7 @@ class tasks_page extends abstract_page {
         if (count($fields)) {
             foreach ($fields as $field) {
                 if ($field->showintable>0) {
-                    if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
+                    if ($this->hascapmanage ||(!$this->hascapmanage && !$field->secretfield)) {
                         $columnname = $field->name;
                         $header = $field->name;
                         $columns[] = $columnname;
@@ -151,7 +161,7 @@ class tasks_page extends abstract_page {
         }
         foreach ($tasks as $task) {
             // Hide hidden tasks from students
-            if (!$hascapmanage && $task->hidden)
+            if (!$this->hascapmanage && $task->hidden)
                 continue;
 
             $row = array();
@@ -190,11 +200,11 @@ class tasks_page extends abstract_page {
                         array('title' => get_string('view')));
                 }
 
-                if ($taskgiver) {
-                    $namecolumn .= $taskgiver->get_task_extra_string($task->id,$this->cm->id);
+                if ($this->taskgiverinstance) {
+                    $namecolumn .= $this->taskgiverinstance->get_task_extra_string($task->id,$this->cm->id);
                 }
 
-                if ($hascapmanage) {
+                if ($this->hascapmanage) {
 
                     $updateurl = new moodle_url('view.php',
                                                 array('taskid'=>$task->id,'id'=>$this->cm->id,'page' => 'taskedit'),'u','get');
@@ -247,7 +257,7 @@ class tasks_page extends abstract_page {
             foreach ($fields as $field) {
                 $value = '<span class="poasassignment-critical">'.get_string('notdefined', 'poasassignment').'</span>';
                 if ($field->showintable>0) {
-                    if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
+                    if ($this->hascapmanage ||(!$this->hascapmanage && !$field->secretfield)) {
                         $taskvalue=$DB->get_record('poasassignment_task_values',
                                                     array('taskid'=>$task->id, 'fieldid'=>$field->id, 'assigneeid'=>0));
                         if ($field->random == 1) {
