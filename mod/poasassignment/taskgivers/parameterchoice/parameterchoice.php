@@ -96,7 +96,7 @@ class parameterchoice extends taskgiver{
                 if (count($satisfyingtasks) > 0) {
                     shuffle($satisfyingtasks);
                     $taskid = $satisfyingtasks[rand(0, count($satisfyingtasks) - 1)];
-
+                    $poasmodel->bind_task_to_assignee($USER->id, $taskid);
                     redirect(new moodle_url('/mod/poasassignment/view.php',array('id'=>$cmid,'page'=>'view')),null,0);
                 }
                 else { 
