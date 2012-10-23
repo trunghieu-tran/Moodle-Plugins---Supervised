@@ -106,11 +106,27 @@ class tasks_page extends abstract_page {
             foreach ($fields as $field) {
                 if ($field->showintable>0) {
                     if ($hascapmanage ||(!$hascapmanage && !$field->secretfield)) {
-                        $columns[] = $field->name;
-                        if (has_capability('mod/poasassignment:seefielddescription', get_context_instance(CONTEXT_MODULE, $this->cm->id)))
-                            $headers[] = $field->name . ' ' . $poasmodel->help_icon($field->description);
-                        else
-                            $headers[] = $field->name;
+                        $columnname = $field->name;
+                        $header = $field->name;
+                        $columns[] = $columnname;
+                        if (has_capability('mod/poasassignment:seefielddescription', get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+                            $header .= ' ' . $poasmodel->help_icon($field->description);
+                        }
+
+                        if (has_capability('mod/poasassignment:managetasksfields', get_context_instance(CONTEXT_MODULE, $this->cm->id))) {
+                            $updateurl = new moodle_url('view.php',
+                                array('id' => $this->cm->id,
+                                    'fieldid' => $field->id,
+                                    'page' => 'taskfieldedit')
+                            );
+                            $updateicon = '<a href="' . $updateurl . '">' . '<img src="' .
+                                $OUTPUT->pix_url('t/edit') . '" class="iconsmall" alt="' .
+                                get_string('edit') . '" title="' . get_string('edit') .'" /></a>';
+
+                            $header .= ' ' . $updateicon;
+                        }
+
+                        $headers[] = $header;
                     }
                 }
             }
