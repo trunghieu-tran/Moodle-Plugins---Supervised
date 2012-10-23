@@ -15,11 +15,16 @@ global $CFG;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot.'/question/type/preg/question.php');
-require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
+//require_once($CFG->dirroot.'/question/type/preg/preg_hints.php');
 //require_once($CFG->dirroot.'/question/type/preg/renderer.php');
-require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
-require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
+//require_once($CFG->dirroot.'/question/type/preg/preg_regex_handler.php');
+//require_once($CFG->dirroot.'/question/type/preg/preg_dotstyleprovider.php');
 require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_description.php');
+require_once($CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php');
+
+MoodleQuickForm::registerElementType('text_and_button',
+    $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
+    'MoodleQuickForm_text_and_button');
 
 class qtype_preg_authors_tool_form extends moodleform {
 
@@ -45,9 +50,9 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('header', 'regex_edit_header', 'Input regex here:');
         $mform->addHelpButton('regex_edit_header','regex_edit_header', 'qtype_preg');
         
-        $mform->addElement('text', 'regex_text', 'Input regex', array('size' => 100));        
+        $mform->addElement('text', 'regex_text', 'Input regex', array('size' => 100));
         $mform->addElement('submit', 'regex_check', 'Check');
-        $mform->addElement('button', 'regex_back', 'Back (and save regex in this field)'); 
+        $mform->addElement('button', 'regex_back', 'Back (and save regex in this field)');
         
         //Add tree
         $mform->addElement('header', 'regex_tree_header', 'Interactive tree');
@@ -66,12 +71,14 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('html', '<div id="description_handler"></div>');
         
         //Add tool for check regexp match        
-        $mform->addElement('header', 'regex_match_header', 'Input string for check here:');
-        $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');
+        /*$mform->addElement('header', 'regex_match_header', 'Input string for check here:');
+        $mform->addHelpButton('regex_match_header','regex_match_header','qtype_preg');*/
         
-        $mform->addElement('text', 'regex_match_text', 'Input string', array('size' => 100));
+        /*$mform->addElement('text', 'regex_match_text', 'Input string', array('size' => 100));
         $mform->registerNoSubmitButton('regex_check_string');
-        $mform->addElement('button', 'regex_check_string', 'Check string');
+        $mform->addElement('button', 'regex_check_string', 'Check string');*/
+
+        /*$mform->addElement('text_and_button', 'regex_match_text', 'regex_check_string', 'Input string', array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 100));
 
         $mform->registerNoSubmitButton('regex_next_character');
         $mform->addElement('button', 'regex_next_character', 'Get next character');
@@ -80,7 +87,7 @@ class qtype_preg_authors_tool_form extends moodleform {
         $mform->addElement('button', 'regex_check_match', 'Check match');
         
         $mform->addElement('textarea', 'must_not_match', 'Must not match', 'wrap="virtual" rows="10" cols="100"');
-        $mform->addElement('button', 'regex_check_not_match', 'Check no match');
+        $mform->addElement('button', 'regex_check_not_match', 'Check no match');*/
         
     }
     

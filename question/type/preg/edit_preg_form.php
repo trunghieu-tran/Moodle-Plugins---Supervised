@@ -30,9 +30,9 @@ require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.p
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
 
-MoodleQuickForm::registerElementType('text_button',
+MoodleQuickForm::registerElementType('text_and_button',
     $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
-    'MoodleQuickForm_text_button');
+    'MoodleQuickForm_text_and_button');
     
 /**
  * Preg editing form definition.
@@ -58,7 +58,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
             
-            $tmp = & $mform->createElement('text_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 80));
+            $tmp = & $mform->createElement('text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
             
             return $repeated;
