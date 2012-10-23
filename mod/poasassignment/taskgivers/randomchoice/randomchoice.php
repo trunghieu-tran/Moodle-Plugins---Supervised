@@ -11,7 +11,7 @@ class randomchoice extends taskgiver {
         return false;
     }
 
-    function process_before_tasks($cmid, $poasassignment) {
+    function process_before_output($cmid, $poasassignment) {
         global $USER;
         $model = poasassignment_model::get_instance();
         if (has_capability('mod/poasassignment:havetask', $model->get_context()) && !$model->check_dates()) {
