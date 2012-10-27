@@ -13,7 +13,7 @@
  * lexical mistakes possible.
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Sergey Pashaev, Birukova Maria, Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov, Birukova Maria, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
@@ -52,31 +52,21 @@ class qtype_correctwriting_lexical_analyzer {
      */
     public function __construct($question, $answer, $responsestr=null) {
 
-        //TODO:
-        //0. Create language object
-        //1. Scan answer and response - Pashaev
-        //  - call language object to do it
-        //2. Check for full match - stop processing if answer and response arrays are equal - Pashaev
-        //3. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
-        //4. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
-        //5. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Pashaev
-        //6. Select best fitted sequence analyzer using their fitness method - Birukova or Pashaev
-        //7. Set array of mistakes accordingly - Birukova
-        //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
-        //NOTE: if responsestr is null just check for errors - Pashaev
-        //NOTE: if some stage create errors, stop processing right there
-        //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
-
         $this->answerobj = $answer;
         $this->answerstr = $answer->answer;
         $this->responsestr = $responsestr;
         $this->question = $question;
-        
+
+        //TODO:
+        //0. Create language object
         $language = $question->get_used_language();
+        //1. Scan answer and response - Mamontov
+        //  - call language object to do it
         $responsestring = $language->create_from_string($responsestr); 
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
+        //2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
 
-        //7. Set array of mistakes accordingly - Birukova
+        //3. Set array of mistakes from lexer errors - Mamontov
         $mistakes = array();
         if (count($responsestring->stream->errors) != 0) {
             foreach($responsestring->stream->errors as $index => $error) {
@@ -96,12 +86,20 @@ class qtype_correctwriting_lexical_analyzer {
             }
         }
 
-        
+        //4. Look for matched pairs group using block_formal_langs_token_stream::look_for_token_pairs - Birukova
+        //5. Create corrected response using block_formal_langs_token_stream::correct_mistakes - Birukova
+        //6. Create qtype_correctwriting_sequence_analyzer for each group of pairs, passing corrected array of tokens - Birukova or Mamontov
         $analyzer = new qtype_correctwriting_sequence_analyzer($question, $answerstring, $language, $responsestring);
+
+        //7. Select best fitted sequence analyzer using their fitness method - Birukova or Mamontov
+        //8. Set array of mistakes accordingly - Birukova and Mamontov
+        //  - matches_to_mistakes function  + merging mistakes from sequence analyzer
         $this->correctedresponse= $responsestring->stream->tokens;
         $this->mistakes = array_merge($mistakes, $analyzer->mistakes());
         $this->fitness = $analyzer->fitness();
-
+        //NOTE: if responsestr is null just check for errors - Mamontov
+        //NOTE: if some stage create errors in answer, stop processing right there
+        //NOTE: throw exception (c.f. moodle_exception and preg_exception) if there are errors when responsestr!==null - e.g. during real analysis
     }
 
     public function get_corrected_response() {
