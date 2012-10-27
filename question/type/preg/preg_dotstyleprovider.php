@@ -283,9 +283,9 @@ class qtype_preg_dot_style_provider {
             $result = '<font color="blue">' . $tooltip . '</font>';
         } else {
             // Replacement of service and non-printable characters.
-            $service = array('"' => '&#34;',
+            $service = array('&' => '&#38;',
+                             '"' => '&#34;',
                              '\\\\'=> '&#92;',
-                             //'&' => '&#38;',
                              '{' => '&#123;',
                              '}' => '&#125;',
                              '>' => '&#62;',
@@ -309,9 +309,7 @@ class qtype_preg_dot_style_provider {
                                          '\r' => get_string('description_charD', 'qtype_preg')
                                          );
             $result = $userinscription->data;
-            if (qtype_poasquestion_string::strpos($result, '&') !== false) {
-                $result = str_replace('&', '&#38;', $result);
-            }
+
             foreach ($service as $key => $value) {
                 if (qtype_poasquestion_string::strpos($result, $key) !== false) {
                     $result = str_replace($key, $value, $result);
