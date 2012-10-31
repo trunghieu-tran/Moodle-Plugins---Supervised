@@ -315,6 +315,26 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        
        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with multialter!');
    }
+   
+   function test_create_graph_double_qoute()
+   {
+		$tree = new qtype_preg_author_tool_explain_graph('".\\"');
+		
+		$etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
+		$etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('"'), 'ellipse', 'black', $etalon, 0);
+		$etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(chr(10).'printing character (including space)'), 'ellipse', 'green', $etalon, 1);
+		$etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('"'), 'ellipse', 'black', $etalon, 2);
+		$etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
+		$etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+		$etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[1]);
+		$etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[2]);
+		$etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[3], $etalon->nodes[0]);
+		$etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[4]);
+		
+		$result = $tree->create_graph();
+		
+		$this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with double quote!');
+   }
 }
 
 ?>
