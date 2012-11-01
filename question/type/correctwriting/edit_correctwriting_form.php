@@ -229,31 +229,59 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     public function validation($data, $files) {
         
         $errors = parent::validation($data, $files);
+
+        // Scan for errors
+        $lang = block_formal_langs::lang_object($data['langid']);
+        $br = html_writer::empty_tag('br');
+        foreach($data['answer'] as $key => $value) {
+            $processedstring = $lang->create_from_string($value);
+            $stream = $processedstring->stream;
+
+            if (count($stream->errors) != 0) {
+                $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
+                foreach($stream->errors as $error) {
+                    $errormessages[] = $error->errormessage;
+                }
+                $errors["answer[$key]"] = implode($br, $errormessages);
+            }
+        }
+
         if (array_key_exists('lexemedescriptions', $data) == false) {
             $this->first_time = false;
             // We place it here, because it will look nicer and won't shift any of strings 
             // in lexeme descriptions field
-            $errors['answer[0]'] = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+            $mesg = get_string('enterlexemedescriptions', 'qtype_correctwriting');
+            if (array_key_exists('answer[0]', $errors) != 0 ) {
+                $errors['answer[0]'] .= $br . $mesg;
+            }  else {
+                $errors['answer[0]'] = $mesg;
+            }
         } else {
-            $lang = block_formal_langs::lang_object($data['langid']);
             foreach($data['answer'] as $key => $value) {
                 $processedstring = $lang->create_from_string($value);
                 $stream = $processedstring->stream;
                 $tokens = $stream->tokens;
-                if (count($stream->errors) != 0) {
-                    $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
-                    foreach($stream->errors as $error) {
-                         $errormessages[] = $error->errormessage;
-                    }
-                    $errors["answer[$key]"] = implode('<BR>', $errormessages);
-                }
+
                 $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
                 if (strlen($value) != 0 && count($descriptions)!=0 ) {
+                    $fieldkey =  "answer[$key]";
+                    $mesg = null;
                     if (count($tokens) > count($descriptions)) {
-                        $errors["answer[$key]"] = get_string('writemoredescriptions', 'qtype_correctwriting');
+                        $mesg = get_string('writemoredescriptions', 'qtype_correctwriting');
                     }
                     if (count($tokens) < count($descriptions)) {
-                        $errors["answer[$key]"] = get_string('writelessdescriptions', 'qtype_correctwriting');
+                        $mesg = get_string('writelessdescriptions', 'qtype_correctwriting');
+                    }
+                    if ($mesg) {
+                        if (array_key_exists($fieldkey, $errors) == false) {
+                            $errors[$fieldkey] = $mesg;
+                        } else {
+                            if (mb_strlen($errors[$fieldkey]) == 0) {
+                                $errors[$fieldkey] = $mesg;
+                            } else {
+                                $errors[$fieldkey] .= $br . $mesg;
+                            }
+                        }
                     }
                 }
             }
