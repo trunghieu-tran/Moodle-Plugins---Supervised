@@ -54,7 +54,7 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
                                     'po\'', '\'pon', '\'re', '\'round', '\'s', '\'sblood',
                                     '\'scuse', '\'sup');
         $contractions[$i++] = array('\'t', 't\'', 'th\'', '\'tis', '\'twas', '\'tween',
-                                    '\'twere', '\'twill', '\'twould', '\'um', '\'ve' );
+                                    '\'twere', '\'twill', '\'twould', '\'um', '\'ve', '\'em' );
         foreach($contractions as $c) {
             $this->utils->test_exact_matches($c);
         }
@@ -107,5 +107,11 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
         $this->assertTrue($result[3]->value() == 'text');
         $this->assertTrue($result[4]->value() == '\'');
     }
+
+    public function test_unicode_apostrophe()  {
+        $lang = new block_formal_langs_language_simple_english();
+        $speech = "madmans";
+    }
+
 }
  ?>
