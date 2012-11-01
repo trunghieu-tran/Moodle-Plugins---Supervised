@@ -60,7 +60,11 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
                 $a->description = $this->answerstring->node_description($answerindex);
                 $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
             } else {
-                $a->value = $this->answer[$answerindex]->value();
+                $data = $this->answer[$answerindex]->value();
+                if (!is_string($data)) {
+                    $data = $data->string();
+                }
+                $a->value = $data;
                 $a->line = $this->answer[$answerindex]->position()->linestart();
                 $a->position = $this->answer[$answerindex]->position()->colstart();
                 $this->mistakemsg = get_string('movedmistakemessagenodescription','qtype_correctwriting',$a);
@@ -94,7 +98,10 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         
         //Create a mistake message
         $a = new stdClass();
-        $a->value = $this->response[$responseindex]->value();
+        $data = $this->response[$responseindex]->value();
+        if (!is_string($data))
+            $data = $data->string();
+        $a->value = $data;
         $a->line = $this->position->linestart();
         $a->position = $this->position->colstart();
         $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
@@ -142,7 +149,11 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
                 $a->description = $this->answerstring->node_description($answerindex);
                 $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
             } else {
-                $a->value = $answer->stream->tokens[$answerindex]->value();
+                $data = $this->answer[$answerindex]->value();
+                if (!is_string($data)) {
+                    $data = $data->string();
+                }
+                $a->value = $data;
                 $this->mistakemsg = get_string('absentmistakemessagenodescription','qtype_correctwriting',$a);
             }
         }
