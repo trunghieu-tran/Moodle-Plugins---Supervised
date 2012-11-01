@@ -85,7 +85,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
         $a = new stdClass();
         $a->line = $this->yyline;
         $a->position = $this->yycol;
-        $a->symbol = $symbol;
+        $a->symbol = $symbol->string();
         $errormessage = 'clanguageunknownsymbol';
         if (mb_strlen($symbol) == 1) {
             if ($symbol[0] == '\'') {
@@ -104,7 +104,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
         $a = new stdClass();
         $a->line = $this->stateyyline;
         $a->position = $this->stateyycol;
-        $a->symbol = $symbol;
+        $a->symbol = $symbol->string();
         $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
         $this->errors[] = $res;
     }
@@ -156,7 +156,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
             $res->tokenindex = $this->counter - 1;
             $a = new stdClass();
             $a->line = $result->position()->linestart();
-            $a->position = $result->position()->colstart();
+            $a->col = $result->position()->colstart();
             $a->symbol = $value;
             $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
             $this->errors[] = $res;

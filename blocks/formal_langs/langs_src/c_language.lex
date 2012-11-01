@@ -95,7 +95,9 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $a = new stdClass();
         $a->line = $this->yyline;
         $a->position = $this->yycol;
-        $a->symbol = $symbol;
+
+
+        $a->symbol = $symbol->string();
         $errormessage = 'clanguageunknownsymbol';
         if (mb_strlen($symbol) == 1) {
             if ($symbol[0] == '\'') {
@@ -115,7 +117,8 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $a = new stdClass();
         $a->line = $this->stateyyline;
         $a->position = $this->stateyycol;
-        $a->symbol = $symbol;
+        $a->symbol = $symbol->string();
+
         $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
         $this->errors[] = $res;
     }
@@ -174,7 +177,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
             $res->tokenindex = $this->counter - 1;
             $a = new stdClass();
             $a->line = $result->position()->linestart();
-            $a->position = $result->position()->colstart();
+            $a->col = $result->position()->colstart();
             $a->symbol = $value;
             $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
             $this->errors[] = $res;
