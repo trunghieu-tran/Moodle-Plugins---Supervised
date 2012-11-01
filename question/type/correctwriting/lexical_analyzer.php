@@ -65,7 +65,22 @@ class qtype_correctwriting_lexical_analyzer {
         $responsestring = $language->create_from_string($responsestr); 
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
         //2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
-
+        $responsetokens = $responsestring->stream->tokens;
+        $answertokens =  $answerstring->stream->tokens;
+        if (count($responsetokens) == count($answertokens)) {
+            $same = true;
+            if (count($responsetokens) != 0) {
+               for($i = 0; $i < count($responsetokens); $i++) {
+                   $same = ($same && $responsetokens[$i]->is_same($answertokens[$i]));
+               }
+            }
+            if ($same) {
+                $this->correctedresponse = $responsetokens;
+                $this->mistakes = array();
+                $this->fitness = 0;
+                return;
+            }
+        }
         //3. Set array of mistakes from lexer errors - Mamontov
         $mistakes = array();
         if (count($responsestring->stream->errors) != 0) {
