@@ -83,9 +83,9 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %%
 ('twou'dn't|'e'll|'e's|'tisn't|'twasn't|'twon't|'twou'd|'twouldn't|'n'|'kay|'sfoot|'taint|'tweren't|'tshall|'twixt|'twon't|'twou'dn't|'zat) { return $this->create_token('word',$this->yytext()); }
 ('cause|'d|'fraid|'hood|i'|a'|-in'|'m|mo'|'neath|o'|o'th'|po'|'pon|'re|'round|'s|'sblood|'scuse|'sup)                                       { return $this->create_token('word',$this->yytext()); }
-('t|t'|th'|'tis|'twas|'tween|'twere|'twill|'twould|'um|'ve)                                                                                 { return $this->create_token('word',$this->yytext()); }
+('t|t'|th'|'tis|'twas|'tween|'twere|'twill|'twould|'um|'ve|'em)                                                                             { return $this->create_token('word',$this->yytext()); }
 [a-zA-Z]+(['\-][a-zA-Z]+)*([sS]'|[oO]'|[hH]')?                                                                                              { return $this->create_token('word',$this->yytext()); }
 [0-9]+                                                                                                                                      { return $this->create_token('numeric',$this->yytext()); }
-("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                              { return $this->create_token('punctuation',$this->yytext()); } 
+("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                              { return $this->create_token('punctuation',$this->yytext()); }
 ("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*"|"$")                                                                                           { return $this->create_token('typographic_mark',$this->yytext()); }
 .                                                                                                                                           { if (!$this->is_white_space($this->yytext())) return $this->create_token('other',$this->yytext());}
