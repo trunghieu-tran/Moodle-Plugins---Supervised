@@ -11,7 +11,7 @@ defined('MOODLE_INTERNAL') || die();
  * _try - number of submissions (inherited from adaptive)
  * _rawfraction - fraction for the step without penalties (inherited from adaptive)
  * _hashint - there was hint requested in the step
- * _hintbuttons - render hint buttons, could be 'active' or 'readonly'
+ * _resp_hintbtns, _nonresp_hintbtns - variables are set if buttons for response-based and non-response based hints should be rendered in the step
  * _render_<hintname> - true if hint with hintname should be rendered when rendering question next time
  * _penalty - penalty added in this state (used for rendering and summarising mainly)
  * _totalpenalties - sum of all penalties already done
