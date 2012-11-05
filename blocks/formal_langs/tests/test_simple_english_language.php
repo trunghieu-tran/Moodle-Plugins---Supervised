@@ -110,7 +110,10 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
 
     public function test_unicode_apostrophe()  {
         $lang = new block_formal_langs_language_simple_english();
-        $speech = "madmans";
+        $test = "madman’s";
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue($result[0]->value() == "madman's");
     }
 
 }

@@ -46,6 +46,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 
 %%
 
+%unicode
 %function next_token
 %char
 %line

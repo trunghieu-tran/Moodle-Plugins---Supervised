@@ -146,7 +146,15 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             $this->parser = new $parserclass();
         }
     }
-    
+    /** Preprocesses a string before scanning. This can be used for simplifying analyze
+        and some other purposes, like merging some different variations of  same character
+        into one
+        @param string $string input string for scanning
+        @return string
+     */
+    protected function preprocess_for_scan($string) {
+        return $string;
+    }
     /**
      * Fills token stream field of the processed string objects
      *
@@ -162,6 +170,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         if (is_a($string,'qtype_poasquestion_string') == true) {
             $string = $string->string();
         }
+        $string = $this->preprocess_for_scan($string);
         $this->scaner = new $scanerclass(fopen('data://text/plain;base64,' . base64_encode($string), 'r'));
         //Now, we are splitting text into lexemes
         $tokens = array();
