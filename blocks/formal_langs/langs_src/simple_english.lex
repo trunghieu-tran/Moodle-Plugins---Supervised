@@ -20,6 +20,15 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
         parent::__construct(null,null);
     }
     
+    /** Preprocesses a string before scanning. This can be used for simplifying analyze
+        and some other purposes, like merging some different variations of  same character
+        into one
+        @param string $string input string for scanning
+        @return string
+     */
+    protected function preprocess_for_scan($string) {
+        return str_replace('’', "'", $string);
+    }
     
     public function name() {
         return 'simple_english';
@@ -32,6 +41,7 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %function next_token
 %char
 %line
+%unicode
 %full
 %class block_formal_langs_predefined_simple_english_lexer_raw
 
@@ -78,14 +88,19 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
         
         return $res;
     }
+    
 %}
 
+
+A = '
+
 %%
-('twou'dn't|'e'll|'e's|'tisn't|'twasn't|'twon't|'twou'd|'twouldn't|'n'|'kay|'sfoot|'taint|'tweren't|'tshall|'twixt|'twon't|'twou'dn't|'zat) { return $this->create_token('word',$this->yytext()); }
-('cause|'d|'fraid|'hood|i'|a'|-in'|'m|mo'|'neath|o'|o'th'|po'|'pon|'re|'round|'s|'sblood|'scuse|'sup)                                       { return $this->create_token('word',$this->yytext()); }
-('t|t'|th'|'tis|'twas|'tween|'twere|'twill|'twould|'um|'ve|'em)                                                                             { return $this->create_token('word',$this->yytext()); }
-[a-zA-Z]+(['\-][a-zA-Z]+)*([sS]'|[oO]'|[hH]')?                                                                                              { return $this->create_token('word',$this->yytext()); }
+
+({A}twou{A}dn{A}t|{A}e{A}ll|{A}e{A}s|{A}tisn{A}t|{A}twasn{A}t|{A}twon{A}t|{A}twou{A}d|{A}twouldn{A}t|{A}n{A}|{A}kay|{A}sfoot|{A}taint|{A}tweren{A}t|{A}tshall|{A}twixt|{A}twon{A}t|{A}twou{A}dn{A}t|{A}zat) { return $this->create_token('word',$this->yytext()); }
+({A}cause|{A}d|{A}fraid|{A}hood|i{A}|a{A}|-in{A}|{A}m|mo{A}|{A}neath|o{A}|o{A}th{A}|po{A}|{A}pon|{A}re|{A}round|{A}s|{A}sblood|{A}scuse|{A}sup)                                                             { return $this->create_token('word',$this->yytext()); }
+({A}t|t{A}|th{A}|{A}tis|{A}twas|{A}tween|{A}twere|{A}twill|{A}twould|{A}um|{A}ve|{A}em)                                                                                                                     { return $this->create_token('word',$this->yytext()); }
+[a-zA-Z]+([\u2019'\-][a-zA-Z]+)*([sS]{A}|[oO]{A}|[hH]{A})?                                                                                                                                                  { return $this->create_token('word',$this->yytext()); }
 [0-9]+                                                                                                                                      { return $this->create_token('numeric',$this->yytext()); }
-("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                              { return $this->create_token('punctuation',$this->yytext()); }
+("."|","|";"|":"|"!"|"?"|"?!"|"!!"|"!!!"|"\""|'|"("|")"|"...")                                                                       { return $this->create_token('punctuation',$this->yytext()); }
 ("+"|"-"|"="|"<"|">"|"@"|"#"|"%"|"^"|"&"|"*"|"$")                                                                                           { return $this->create_token('typographic_mark',$this->yytext()); }
 .                                                                                                                                           { if (!$this->is_white_space($this->yytext())) return $this->create_token('other',$this->yytext());}

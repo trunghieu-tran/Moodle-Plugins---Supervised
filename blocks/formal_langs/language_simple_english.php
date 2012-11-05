@@ -17,6 +17,15 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
     public function __construct() {
         parent::__construct(null,null);
     }
+    /** Preprocesses a string before scanning. This can be used for simplifying analyze
+        and some other purposes, like merging some different variations of  same character
+        into one
+        @param string $string input string for scanning
+        @return string
+     */
+    protected function preprocess_for_scan($string) {
+        return str_replace('’', "'", $string);
+    }
     public function name() {
         return 'simple_english';
     }
