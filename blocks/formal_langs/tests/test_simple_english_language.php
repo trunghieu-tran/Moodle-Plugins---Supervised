@@ -113,7 +113,7 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
         $test = "madman’s";
         $processedstring = $lang->create_from_string($test);
         $result = $processedstring->stream->tokens;
-        $this->assertTrue($result[0]->value() == "madman's");
+        $this->assertTrue($result[0]->value() == $test);
     }
 
 }

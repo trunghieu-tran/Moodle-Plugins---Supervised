@@ -27,7 +27,7 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
         @return string
      */
     protected function preprocess_for_scan($string) {
-        return str_replace('’', "'", $string);
+        return $string;
     }
     
     public function name() {
@@ -42,7 +42,6 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %char
 %line
 %unicode
-%full
 %class block_formal_langs_predefined_simple_english_lexer_raw
 
 
@@ -92,7 +91,7 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
 %}
 
 
-A = '
+A = ('|\u2019)
 
 %%
 
