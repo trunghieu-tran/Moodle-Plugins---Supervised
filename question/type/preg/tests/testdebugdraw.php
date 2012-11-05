@@ -1,5 +1,10 @@
 <?php
 
+/*
+   To deal with $CFG->path add the following line to phpunit.xml inside <php> ... </php> tags.
+   const name="QTYPE_PREG_TEST_CONFIG_PATHTODOT" value="/usr/bin/dot"/>
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;

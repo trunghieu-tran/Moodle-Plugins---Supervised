@@ -253,21 +253,25 @@ class qtype_preg_regex_handler {
 
     protected function look_for_circumflex($root) {
         if (is_a($root, 'qtype_preg_leaf')) {
+            // Expression starts from ^
             return ($root->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         } else if (is_a($root, 'qtype_preg_node_infinite_quant')) {
+            // Expression starts from .*
             $operand = $root->operands[0];
             return ($root->leftborder === 0 && is_a($operand, 'qtype_preg_leaf_charset') &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
         } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
+            // Check the first operand for concatenation and subpatterns.
             return $this->look_for_circumflex($root->operands[0]);
         } else if (is_a($root, 'qtype_preg_node_alt')) {
+            // Every branch of alternative is anchored.
             $cf = true;
             $empty = false;
             foreach ($root->operands as $operand) {
                 $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
                 $cf = $cf && $this->look_for_circumflex($operand);
             }
-            return $cf || $empty;
+            return $cf /*|| $empty*/;
         }
         return false;
     }
