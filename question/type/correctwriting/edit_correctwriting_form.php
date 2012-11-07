@@ -240,7 +240,12 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             if (count($stream->errors) != 0) {
                 $errormessages = array(get_string('foundlexicalerrors', 'qtype_correctwriting'));
                 foreach($stream->errors as $error) {
-                    $errormessages[] = $error->errormessage;
+                    $token = $stream->tokens[$error->tokenindex];
+                    $tokenpos = $token->position();
+                    $emesg = $error->errormessage . mb_substr($answer, 0, $tokenpos->colstart() - 1);
+                    $emesg = $emesg . '<b>' .  mb_substr($answer, $tokenpos->colstart(), $tokenpos->colend() -  $tokenpos->colstart() ) . '</b>';
+                    $emesg = $emesg .  mb_substr($answer, $tokenpos->colend() + 1);
+                    $errormessages[] = $emesg;
                 }
                 $errors["answer[$key]"] = implode($br, $errormessages);
             }
