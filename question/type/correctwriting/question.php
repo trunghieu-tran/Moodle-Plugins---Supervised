@@ -375,11 +375,18 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     }
     
     public function get_correct_response() {
-        $keys = array_keys($this->answers);
-        if (count($keys)==0) {
-            return null;
+        if (count($this->answers)!=0) {          
+            $maxfraction = -1;
+            $maxkey = null;
+            foreach($this->answers as $key => $answer) {
+                if ($answer->fraction > $maxfraction) {
+                    $maxfraction = $answer->fraction;
+                    $maxkey = $key;
+                }
+            }
+            return array($maxkey => $this->answers[$maxkey]);
         }
-        return array($keys[0] => $this->answers[$keys[0]]);
+        return null;
     }
 
    //Creates all information about mistakes, passed into mistakes    
