@@ -353,6 +353,32 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
     }
 
+    function data_for_test_alt_7() {
+        $test1 = array( 'str'=>'abcef',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>5,1=>3));
+
+        $test2 = array( 'str'=>'abce',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>4, 1=>3),
+                        'left'=>array(1),
+                        'next'=>'f');
+
+        $test3 = array( 'str'=>'abcdef',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>4, 1=>4),
+                        'length'=>array(0=>2, 1=>0));
+
+        return array('regex'=>'(abc|)ef',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     function data_for_test_charset_1() {
         $test1 = array('str'=>'3',
                        'is_match'=>true,

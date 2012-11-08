@@ -251,27 +251,41 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-    protected function look_for_circumflex($root) {
-        if (is_a($root, 'qtype_preg_leaf')) {
+    protected function look_for_circumflex($node, $prevnodes = array()) {
+        $newprevnodes = $prevnodes;
+        $newprevnodes[] = $node;
+
+        if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
-            return ($root->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        } else if (is_a($root, 'qtype_preg_node_infinite_quant')) {
+            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        } else if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
             // Expression starts from .*
-            $operand = $root->operands[0];
-            return ($root->leftborder === 0 && is_a($operand, 'qtype_preg_leaf_charset') &&
+            $operand = $node->operands[0];
+            return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
-        } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
+        } else if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
             // Check the first operand for concatenation and subpatterns.
-            return $this->look_for_circumflex($root->operands[0]);
-        } else if (is_a($root, 'qtype_preg_node_alt')) {
+            return $this->look_for_circumflex($node->operands[0], $newprevnodes);
+        } else if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
             // Every branch of alternative is anchored.
             $cf = true;
             $empty = false;
-            foreach ($root->operands as $operand) {
+            foreach ($node->operands as $operand) {
                 $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                $cf = $cf && $this->look_for_circumflex($operand);
+                $cf = $cf && $this->look_for_circumflex($operand, $newprevnodes);
             }
-            return $cf /*|| $empty*/;
+            if ($empty) {
+                // Emptiness makes anchor if there's nothing after the alternative.
+                $nothingafteralt = true;
+                foreach ($prevnodes as $tmp) {
+                    if ($tmp->type == qtype_preg_node::TYPE_NODE_CONCAT) {
+                        $nothingafteralt = false;
+                        break;
+                    }
+                }
+                $empty = $empty && $nothingafteralt;
+            }
+            return $cf || $empty;
         }
         return false;
     }
