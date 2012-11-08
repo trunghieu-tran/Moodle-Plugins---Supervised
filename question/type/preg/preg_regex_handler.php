@@ -251,10 +251,7 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-    protected function look_for_circumflex($node, $prevnodes = array()) {
-        $newprevnodes = $prevnodes;
-        $newprevnodes[] = $node;
-
+    protected function look_for_circumflex($node, $wasconcat = false) {
         if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
@@ -265,26 +262,16 @@ class qtype_preg_regex_handler {
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
         } else if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
             // Check the first operand for concatenation and subpatterns.
-            return $this->look_for_circumflex($node->operands[0], $newprevnodes);
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
         } else if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
             // Every branch of alternative is anchored.
             $cf = true;
             $empty = false;
             foreach ($node->operands as $operand) {
                 $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                $cf = $cf && $this->look_for_circumflex($operand, $newprevnodes);
+                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
             }
-            if ($empty) {
-                // Emptiness makes anchor if there's nothing after the alternative.
-                $nothingafteralt = true;
-                foreach ($prevnodes as $tmp) {
-                    if ($tmp->type == qtype_preg_node::TYPE_NODE_CONCAT) {
-                        $nothingafteralt = false;
-                        break;
-                    }
-                }
-                $empty = $empty && $nothingafteralt;
-            }
+            $empty = $empty && !$wasconcat;
             return $cf || $empty;
         }
         return false;
