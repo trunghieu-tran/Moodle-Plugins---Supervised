@@ -384,7 +384,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                     $maxkey = $key;
                 }
             }
-            return array($maxkey => $this->answers[$maxkey]);
+            return array('answer' => $this->answers[$maxkey]->answer);
         }
         return null;
     }
