@@ -5725,7 +5725,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0,1=>0,2=>18),
                         'length'=>array(0=>23,1=>18,2=>5),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO1';
+
         return array('regex'=>'(.*\D)(\d+)$',
                      'tests'=>array($test1));
     }
@@ -5737,7 +5737,7 @@ echo 'OLOLO1';
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO1.1';
+
         return array('regex'=>'^\D*(?!123)',
                      'tests'=>array($test1));
     }
@@ -5840,7 +5840,7 @@ echo 'OLOLO1.1';
                         'left'=>array(4),
                         'next'=>'[W-]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO16';
+
         return array('regex'=>'^[W-]46]',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
@@ -5928,7 +5928,7 @@ echo 'OLOLO16';
                         'left'=>array(1),
                         'next'=>'[W-\]46]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO17';
+
         return array('regex'=>'^[W-\]46]',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
@@ -5940,7 +5940,7 @@ echo 'OLOLO17';
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>10),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO18';
+
         return array('regex'=>'\d\d\/\d\d\/\d\d\d\d',
                      'tests'=>array($test1));
     }
@@ -5961,7 +5961,7 @@ echo 'OLOLO18';
                         'left'=>array(9),
                         'next'=>'o',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO20';
+
         return array('regex'=>'word (?:[a-zA-Z0-9]+ ){0,10}otherword',
                      'tests'=>array($test1, $test2));
     }
@@ -5975,7 +5975,7 @@ echo 'OLOLO20';
                         'left'=>array(9),
                         'next'=>'o',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO22';
+
         return array('regex'=>'word (?:[a-zA-Z0-9]+ ){0,300}otherword',
                      'tests'=>array($test1));
     }
@@ -6001,7 +6001,7 @@ echo 'OLOLO22';
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO24';
+
         return array('regex'=>'^(a){0,0}',
                      'tests'=>array($test1, $test2, $test3));
     }
@@ -6217,7 +6217,7 @@ echo 'OLOLO24';
                         'index_first'=>array(0=>0,1=>2),
                         'length'=>array(0=>3,1=>1),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO32';
+
         return array('regex'=>'^(a){1,3}',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
@@ -7569,7 +7569,7 @@ echo 'OLOLO32';
                         'index_first'=>array(0=>0,1=>0,2=>4),
                         'length'=>array(0=>5,1=>4,2=>1),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO64';
+
         return array('regex'=>'(\d+)(\w)',
                      'tests'=>array($test1, $test2));
     }
@@ -10609,7 +10609,7 @@ echo 'OLOLO64';
                         'left'=>array(1),
                         'next'=>'y',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO128';
+
         return array('regex'=>'\by\b',
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
@@ -12372,7 +12372,7 @@ echo 'OLOLO128';
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO256';
+
         return array('regex'=>'a[^bc]d',
                      'modifiers'=>'i',
                      'tests'=>array($test1));
@@ -22251,7 +22251,7 @@ however, we need the complication for Perl. */
                         'index_first'=>array(0=>0,1=>0,2=>3),
                         'length'=>array(0=>4,1=>1,2=>1),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
-echo 'OLOLO512';
+
         return array('regex'=>'(a)(?2){2}(.)',
                      'tests'=>array($test1));
     }
