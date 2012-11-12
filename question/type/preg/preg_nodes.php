@@ -1005,7 +1005,7 @@ class qtype_preg_charset_flag {
                 $res = new qtype_preg_charset_flag;
                 $str = new qtype_poasquestion_string('');
                 for ($i = 0; $i < $this->data->length(); $i++) {
-                    if ($other->match($this->data, $i)) {
+                    if ($other->match($this->data, $i, true)) {
                         $str->concatenate($this->data[$i]);
                     }
                 }
