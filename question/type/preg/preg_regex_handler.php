@@ -255,15 +255,15 @@ class qtype_preg_regex_handler {
         if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        } else if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
             // Expression starts from .*
             $operand = $node->operands[0];
-            return ($node->leftborder === 0 && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
+            return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
-        } else if ($node->type == qtype_preg_node::TYPE_NODE_CONCAT || $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
             // Check the first operand for concatenation and subpatterns.
-            return $this->look_for_circumflex($node->operands[0], $wasconcat || $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
-        } else if ($node->type == qtype_preg_node::TYPE_NODE_ALT) {
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
             // Every branch of alternative is anchored.
             $cf = true;
             $empty = false;
