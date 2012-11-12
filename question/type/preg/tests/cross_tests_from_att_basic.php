@@ -344,8 +344,7 @@ class qtype_preg_cross_tests_from_att_basic {
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>1,1=>1,2=>1));
-global $PREGDEBUG;
-$PREGDEBUG=true;
+
         return array( 'regex'=>'((a|a)|a)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
@@ -357,8 +356,7 @@ $PREGDEBUG=true;
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>0,2=>3),
                         'length'=>array(0=>4,1=>3,2=>1));
-global $PREGDEBUG;
-$PREGDEBUG=false;
+
         return array( 'regex'=>'(a*)(a|aa)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
