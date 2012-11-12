@@ -1219,6 +1219,9 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return node subtree with ?
     */
     protected function &convert_finite_quant($node) {
+		if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
+			return $node;//TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
+		}
         if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
             $tmp = $node->operands[0];
             $subroot = new qtype_preg_node_concat;
