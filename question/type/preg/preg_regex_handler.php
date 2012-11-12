@@ -268,7 +268,7 @@ class qtype_preg_regex_handler {
             $cf = true;
             $empty = false;
             foreach ($root->operands as $operand) {
-                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $empty = $empty || isset($operand->subtype) && $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
                 $cf = $cf && $this->look_for_circumflex($operand);
             }
             return $cf /*|| $empty*/;
