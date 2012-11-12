@@ -693,7 +693,9 @@ class qtype_preg_dfa_node_infinite_quant extends qtype_preg_dfa_operator {
     }
 }
 class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quant {
-
+	
+	const MAX_SIZE=50;
+	
     public function followpos(&$fpmap) {
         qtype_preg_dfa_operator::followpos($fpmap);
     }
@@ -702,5 +704,14 @@ class qtype_preg_dfa_node_finite_quant extends qtype_preg_dfa_node_infinite_quan
         $this->print_indent($indent);
         echo 'type: node finite quant<br/>';
         parent::print_self($indent);
+    }
+	public function accept() {
+        if (!$this->pregnode->greed) {
+            return get_string('ungreedyquant', 'qtype_preg');
+        }
+		if ($this->pregnode->rightborder-$this->pregnode->leftborder > self::MAX_SIZE) {
+			return get_string('toolargequant', 'qtype_preg');
+		}
+        return true;
     }
 }
