@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
-require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
