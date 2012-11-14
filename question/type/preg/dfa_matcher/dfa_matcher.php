@@ -1192,7 +1192,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 break;
             //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
             case 'node_subpatt':
-                $pregnode = $pregnode->operands[0];
+                $pregnode = clone $pregnode->operands[0];
                 return $this->from_preg_node($pregnode);
                 break;
             case 'node_alt':
