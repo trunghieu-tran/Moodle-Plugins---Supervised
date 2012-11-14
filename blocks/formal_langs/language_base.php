@@ -9,6 +9,7 @@
  */
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/stringstream/stringstream.php');
 
 abstract class block_formal_langs_abstract_language {
 
@@ -171,7 +172,9 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             $string = $string->string();
         }
         $string = $this->preprocess_for_scan($string);
-        $this->scaner = new $scanerclass(fopen('data://text/plain;base64,' . base64_encode($string), 'r'));
+        StringStreamController::createRef('str', $string);
+        $pseudofile = fopen('string://str', 'r');
+        $this->scaner = new $scanerclass($pseudofile);
         //Now, we are splitting text into lexemes
         $tokens = array();
         while ($token = $this->scaner->next_token()) {
