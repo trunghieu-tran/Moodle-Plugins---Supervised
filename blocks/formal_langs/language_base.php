@@ -9,7 +9,7 @@
  */
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/stringstream/stringstream.php');
+require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstream.php');
 
 abstract class block_formal_langs_abstract_language {
 
