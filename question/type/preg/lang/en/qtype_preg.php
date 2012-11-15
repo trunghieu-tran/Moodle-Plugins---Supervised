@@ -63,6 +63,7 @@ $string['questioneditingheading'] = 'Question editing settings';
 $string['regex_handler'] = 'Regex handler';
 $string['subpattern'] = 'Subpattern';
 $string['tobecontinued'] = '...';
+$string['toolargequant'] = 'Too large finite quantificator';
 $string['toomanyerrors'] = '.......{$a} more errors';
 $string['ungreedyquant'] = 'ungreedy quantifiers';
 $string['unsupported'] = '{$a->nodename} in position from  {$a->indfirst} to {$a->indlast} is unsupported by the {$a->engine}';
