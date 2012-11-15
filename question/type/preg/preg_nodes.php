@@ -923,9 +923,11 @@ class qtype_preg_charset_flag {
             foreach (self::$flagtypes as $index => $flagtype) {
                 if ($flagtype === $this->data) {
                     $selfindex = $index;
-                    if ($this->negative) {
+                    if ($this->negative && isset($selfindex)) {
                         $selfindex += 13;
-                    }
+                    } else if (!isset($selfindex)) {
+						return false;
+					}
                     break;
                 }
             }
@@ -938,6 +940,9 @@ class qtype_preg_charset_flag {
                     break;
                 }
             }
+			if (!isset($selfinsex)) {
+				return false;
+			}
             $result = self::$intersection[26 * $selfindex + $otherindex];
             if ($result === 'set') {
                 $result = false;
@@ -1005,7 +1010,7 @@ class qtype_preg_charset_flag {
                 $res = new qtype_preg_charset_flag;
                 $str = new qtype_poasquestion_string('');
                 for ($i = 0; $i < $this->data->length(); $i++) {
-                    if ($other->match($this->data, $i)) {
+                    if ($other->match($this->data, $i, true)) {
                         $str->concatenate($this->data[$i]);
                     }
                 }
