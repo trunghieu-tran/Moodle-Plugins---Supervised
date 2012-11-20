@@ -333,7 +333,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         //fill in the first row and column  
         for($i=0;$i<=$str1_len;$i++)
             $mas[$i][0]=$i;
-        for($j=0;j<=$str2_len;$j++)
+        for($j=0;$j<=$str2_len;$j++)
             $mas[0][$j]=$j;
         //calculation
         for($i=1;$i<=$str1_len;$i++)
@@ -349,7 +349,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 $diag=$mas[$i-1][$j-1]+$cost;//replacement
                 $mas[$i][$j]=Min(Min($up,$left),$diag);
                 if($i>1 && $j>1 && $str1[$i-1]==$str2[$j-2] && $str1[$i-2]==$str2[$j-1])
-                    $mas[$i][$j]=Min($mas[$i][$], $mas[$i-2][$j+2]+$cost);//transposition
+                    $mas[$i][$j]=Min($mas[$i][$j], $mas[$i-2][$j-2]+$cost);//transposition
             }
         }
         return $mas[$str1_len][$str2_len];

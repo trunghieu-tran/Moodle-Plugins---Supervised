@@ -10,9 +10,9 @@
  * @package questions
  */
 
-require_once($CFG->dirroot.'/blocks/formal_langs/token_base.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 
-class qtype_correctwriting_token_base_test_1 extends UnitTestCase {
+class block_formal_langs_token_base_test extends UnitTestCase {
     function test_damerau_levenshtein_tb() {
         $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('hello', 'ehllo')==1);//transposition
         $this->assertTrue(block_formal_langs_token_base::damerau_levenshtein('hello', 'hello')==0);//words identical        
