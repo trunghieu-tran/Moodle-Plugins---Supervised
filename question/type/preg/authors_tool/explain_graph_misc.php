@@ -15,11 +15,11 @@ class qtype_preg_author_tool_explain_graph_node {
 
     public $shape   = 'ellipse';  // shape of node on image
     public $color   = 'black';    // color of node on image
-    public $owner   = null;       // owner of node
+    public $owner   = NULL;       // owner of node
     public $label   = '';         // data of node on image
-    public $id      = -1;          // id of node
+    public $id      = -1;         // id of node
     public $fill    = '';         // filling of node on image
-    public $invert  = false;
+    public $invert  = FALSE;
     
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
@@ -103,8 +103,6 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $this->id      = $id;
     }
     
-    //private static $counter = 0; // counter for generating id for nodes in graph
-    
     /**
      * Creates text file with dot instructions.
      */
@@ -112,8 +110,6 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
-
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
