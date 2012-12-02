@@ -252,7 +252,7 @@ class qtype_preg_regex_handler {
     }
 
     protected function look_for_circumflex($node, $wasconcat = false) {
-		if (is_a($node, 'qtype_preg_leaf')) {
+        if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
             return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
         } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
@@ -325,9 +325,9 @@ class qtype_preg_regex_handler {
         }
         //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
-			$this->dst_root = clone $this->ast_root;
-            $this->dst_root = $this->from_preg_node($this->dst_root);
             $this->look_for_anchors();
+            $this->dst_root = clone $this->ast_root;
+            $this->dst_root = $this->from_preg_node($this->dst_root);
         //}
         fclose($pseudofile);
     }
