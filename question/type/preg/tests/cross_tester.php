@@ -441,6 +441,22 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Check that Abstract Syntax Tree conaints only childs of qtype_preg_node class.
+     *
+     * Sometimes there could be matcher's concrete nodes there, which may lead to errors.
+     */
+     protected function check_ast($node, $enginename, $regex) {
+        if (!is_a($node, 'qtype_preg_node')) {
+            echo "ABSTRACT SYNTAX TREE CONTAINS NON-AST NODES FOR MATCHER $enginename AND REGEX $regex";
+        }
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach($node->operands as $operand) {
+                $this->check_ast($operand, $enginename, $regex);
+            }
+        }
+     }
+
+    /**
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
@@ -491,6 +507,9 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 if ($this->check_for_errors($matcher)) {
                     continue;
                 }
+
+                //Check that AST contains only preg_nodes.
+                $this->check_ast($matcher->get_ast_root(), $matcher->name(), $regex);
 
                 // Iterate over all tests.
                 foreach ($data['tests'] as $expected) {
