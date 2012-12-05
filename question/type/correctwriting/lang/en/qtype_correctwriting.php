@@ -3,8 +3,8 @@
 //Lang string file for the correct writing question type
 
 $string['correctwriting'] = 'Correct writing';
-$string['movedmistakemessage'] = '{$a->description} is moved ';
-$string['movedmistakemessagenodescription'] = 'A lexeme {$a->value} at {$a->line}:{$a->position} is moved ';
+$string['movedmistakemessage'] = '{$a->description} is misplaced ';
+$string['movedmistakemessagenodescription'] = 'A lexeme {$a->value} at {$a->line}:{$a->position} is misplaced ';
 $string['addedmistakemessage'] = 'A lexeme "{$a->value}" at {$a->line}:{$a->position} is odd in response ';
 $string['absentmistakemessage'] = '{$a->description} is absent in response ';
 $string['absentmistakemessagenodescription'] = 'A lexeme "{$a->value}" is absent in response ';
@@ -16,7 +16,7 @@ $string['lexicalerrorthreshold'] = 'Lexical error threshold (as fraction to leng
 $string['lexicalerrorweight'] = 'Penalty for lexical error';
 $string['absentmistakeweight'] = 'Penalty for absent lexeme in student response';
 $string['addedmistakeweight'] = 'Penalty for odd lexeme in student response';
-$string['movedmistakeweight'] = 'Penalty for moving lexeme in student response';
+$string['movedmistakeweight'] = 'Penalty for misplacing lexeme in student response';
 $string['hintgradeborder'] = 'Minimum grade for answer with non-exact matching';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes in student answer for non-exact matching';
 $string['lexemedescriptions'] = 'Descriptions for lexemes';
