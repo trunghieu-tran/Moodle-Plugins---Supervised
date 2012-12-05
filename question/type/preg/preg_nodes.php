@@ -1343,7 +1343,14 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
         die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
     }
     public function tohr() {
-        return '(?'.$this->posopt.'-'.$this->negopt;
+        $result = '(?';
+        if (!empty($this->posopt) {
+            $result .= $this->posopt;
+        }
+        if (!empty($this->negopt) {
+            $result .= '-'.$this->negopt;
+        }
+        return $result.')';
     }
 }
 
