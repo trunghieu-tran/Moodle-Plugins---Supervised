@@ -68,7 +68,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     }
                     $penalty = $hintobj->penalty_for_specific_hint($response);
                     if ($penalty != 0) {
-                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Òote that reported penalty is approximation since user could change response in adaptive
+                        $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Note that reported penalty is approximation since user could change response in adaptive.
                     }
                 } else {
                     $penalty = $hintobj->penalty_for_specific_hint(null);
@@ -78,10 +78,10 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                 }
                 $output .= html_writer::empty_tag('br');
 
-                /*if (!$options->readonly) {
-                $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
+                if (!$options->readonly) {
+                    $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
                         array($attributes['id'], $qa->get_slot()));
-                }*/
+                }
             }
         }
 
