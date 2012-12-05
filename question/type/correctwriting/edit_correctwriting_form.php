@@ -44,7 +44,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     protected function definition_inner($mform) {
         // Add lexical error threshold field     
-        $mform->addElement('text', 'lexicalerrorthreshold', 
+        // Uncomment  some unused field
+        /*
+        $mform->addElement('text', 'lexicalerrorthreshold',
                            get_string('lexicalerrorthreshold', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('lexicalerrorthreshold', PARAM_FLOAT);
@@ -57,6 +59,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('lexicalerrorweight', PARAM_FLOAT);
         $mform->setDefault('lexicalerrorweight', 0.05);
         $mform->addRule('lexicalerrorweight', null, 'required', null, 'client');
+
+        */
         // Add absent mistake weight field
         $mform->addElement('text', 'absentmistakeweight', 
                            get_string('absentmistakeweight', 'qtype_correctwriting'),
