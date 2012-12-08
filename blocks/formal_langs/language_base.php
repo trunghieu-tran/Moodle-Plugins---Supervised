@@ -201,14 +201,14 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
      * User-visible name of the language
      */
     public function ui_name() {
-        return get_string('lang_' . $this->name() , 'qtype_correctwriting');
+        return get_string('lang_' . $this->name() , 'block_formal_langs');
     }
 
     /**
      * User description (help) for the language
      */
     public function description() {
-        return get_string('lang_' . $this->name() . '_help' , 'qtype_correctwriting');
+        return get_string('lang_' . $this->name() . '_help' , 'block_formal_langs');
     }
 }
 
