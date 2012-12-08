@@ -32,6 +32,9 @@ class block_formal_langs extends block_base {
         //Map, that checks amount of unique names in table. Populate it with values
         $counts = array();
         foreach($records as $record) {
+            if ($record->name !== null) {//Predefined language, ui_name is actually a language string, so replace it with actual name.
+                $record->ui_name = get_string('lang_' . $record->name , 'block_formal_langs');
+            }
             if (array_key_exists($record->ui_name, $counts)) {
                 $counts[$record->ui_name] = $counts[$record->ui_name] + 1;
             } else {
