@@ -15,7 +15,7 @@ function xmldb_block_formal_langs_install() {
     $DB->insert_record('block_formal_langs',$lang);
 
     $lang = new stdClass();
-    $lang->ui_name = 'C language (lexer only)';
+    $lang->ui_name = 'C programming language';
     $lang->description = 'C language, with only lexer. One-line comments not supported';
     $lang->name = 'c_language';
     $lang->scanrules = null;
