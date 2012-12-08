@@ -1344,10 +1344,10 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
     }
     public function tohr() {
         $result = '(?';
-        if (!empty($this->posopt) {
+        if (!empty($this->posopt)) {
             $result .= $this->posopt;
         }
-        if (!empty($this->negopt) {
+        if (!empty($this->negopt)) {
             $result .= '-'.$this->negopt;
         }
         return $result.')';
