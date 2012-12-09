@@ -172,19 +172,25 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             $string = $string->string();
         }
         $string = $this->preprocess_for_scan($string);
-        StringStreamController::createRef('str', $string);
-        $pseudofile = fopen('string://str', 'r');
-        $this->scaner = new $scanerclass($pseudofile);
-        //Now, we are splitting text into lexemes
-        $tokens = array();
-        while ($token = $this->scaner->next_token()) {
-            $tokens[] = $token;
+        $stream = new block_formal_langs_token_stream();
+        $stream->tokens = array();
+        $stream->errors = array();
+        if ($string !== '') {
+            StringStreamController::createRef('str', $string);
+            $pseudofile = fopen('string://str', 'r');
+            $this->scaner = new $scanerclass($pseudofile);
+            //Now, we are splitting text into lexemes
+            $tokens = array();
+            while ($token = $this->scaner->next_token()) {
+                $tokens[] = $token;
+            }
+
+            $stream->tokens = $tokens;
+            $stream->errors = $this->scaner->get_errors();
         }
 
-        $stream = new block_formal_langs_token_stream();
-        $stream->tokens = $tokens;
-        $stream->errors = $this->scaner->get_errors();
         $processedstring->stream = $stream;
+
     }
     
     /**
