@@ -2,9 +2,9 @@ Perl-compatible regular expression question
 -------------------------------------------
 
 Authors:
-1. Idea, design, question type code, error reporting, hinting behaviours - Oleg Sychev
+1. Idea, design, question type code, error reporting, hinting - Oleg Sychev
 2. Parsing regular expression, DFA regular expression matching engine - Dmitriy Kolesov
-3. NFA regular expression matching engine, backreferences, matchers cross-testing - Valeriy Streltsov
+3. NFA regular expression matching engine, backreferences, matchers cross-testing, Unicode support - Valeriy Streltsov
 
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;
@@ -16,7 +16,7 @@ questions. It supports full regular expression syntax and can be used with expre
 that php preg extension can handle. Regular expressions can be used to specify wide array of patterns for student
 answer to match. You can find some links to the descriptions of regular expression syntax in the question docs.
 
-Preg question is also able to hint next character for a specified penalty in adaptive behaviour if the student is stuck.
+Preg question is also able to hint next character or lexem for a specified penalty in adaptive behaviour if the student is stuck.
 
 You could use hinting without the need to know anything about regular expressions. Choosing Moodle Shortanswer
 notation allows you to just copy answers from shortanswer question and have hinting capabilities. '*' wildcard is supported.
@@ -28,12 +28,13 @@ To work with hinting, Preg question type needs to behaviours: adaptivehints and 
 They all need to be installed in order for question to work. You could download question type and behaviours
 in one archive (from GoogleCode or GitHub) or separately.
 
-If you download one archive, unpacking it you should found "question" folder. Copy it in the main directory of
-Moodle installation (the one containing config.php) - it will install everything in the correct places.
+If you downloaded one archive, unpacking it you should found "question" and "blocks" folders. Copy them in the main 
+directory of Moodle installation (the one containing config.php) - it will install everything in the correct places.
 
-If you download question and behaviours separately (for example because Moodle Plugins Directory don't allow
-them to be downloaded together), you should get 3 archives. Place "preg" folder in the question/type folder 
-of Moodle installation. "adaptivehints" and "adaptivehintsnopenalties" should be placed in question/behaviour folder.
+If you downloaded all parts separately (for example because Moodle Plugins Directory don't allow
+them to be downloaded together), you should get 5 archives. Place "preg" and "poasquestion" folders in the question/type
+folder of Moodle installation. "adaptivehints" and "adaptivehintsnopenalties" should be placed in question/behaviour folder.
+"formal_langs" should be placed in the blocks folder.
 
 After having files in place login as administrator and go to the notifications page.
 
@@ -44,7 +45,7 @@ See "Matching engines" section for more information.
 3. Hinting
 DFA and NFA matching engines support hinting for partial matching. If there is no full match in the response,
 question chooses the partial match that has less characters to complete matching. It could also show
-a next character that leads to the shortest path to complete matching as a hint (with adding hint penalty)
+a next character (or lexem) that leads to the shortest path to complete matching as a hint (with adding hint penalty)
 when using adaptive behaviour. Only answers with grade greater or equal hint grade border are used in hinting.
 
 
