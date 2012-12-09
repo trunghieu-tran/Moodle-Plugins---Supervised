@@ -301,10 +301,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
         
-        // If errors don't found - exit
+        /* If errors don't found - exit
         if (count($errors) !=0 ) {
             return $errors;
-        }
+        }*/
         
         return $errors;
     }
