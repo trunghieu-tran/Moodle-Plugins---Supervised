@@ -3,7 +3,7 @@
  * Defines base language class.
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Sergey Pashaev, Mamontov Dmitriy Volgograd State Technical University
+ * @author Oleg Sychev, Mamontov Dmitriy Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package blocks
  */
@@ -128,7 +128,7 @@ abstract class block_formal_langs_abstract_language {
  * Predefined language class.
  *
  * @copyright &copy; 2012  Oleg Sychev
- * @author    2012 Sergey Pashaev, Volgograd State Technical University
+ * @author    2012 Oleg Sychev, Mamontov Dmitriy, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 abstract class block_formal_langs_predefined_language extends block_formal_langs_abstract_language {
@@ -217,7 +217,7 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
  * Customized language class.
  *
  * @copyright &copy; 2012  Oleg Sychev
- * @author  2012 Sergey Pashaev, Volgograd State Technical University
+ * @author  2012 Oleg Sychev, Mamontov Dmitriy, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 class block_formal_langs_userdefined_language extends block_formal_langs_abstract_language {
