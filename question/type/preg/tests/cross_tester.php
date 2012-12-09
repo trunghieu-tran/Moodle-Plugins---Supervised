@@ -35,7 +35,7 @@
 *              'index_first'=>array(0=>0),         // Start indexes of all subpatterns should be matched, keys are subpattern numbers. Not necessary to define unmatched subpatterns.   *
 *              'length'=>array(0=>2),              // Lengths of all subpatterns should be matched. Not necessary to define unmatched subpatterns.                                      *
 *              'left'=>0,                          // Number of characters left to complete match. Not necessary if 'full' is true.                                                     *
-*              'next'=>'',                         // A string of possible next characters in case of not full match. Not necessary if 'full' is true.                                  *
+*              'next'=>'',                         // A regular expression of possible next characters in case of not full match. Not necessary if 'full' is true.                      *
 *              'tags'=>array());                   // Tags for the string, see the cross-tester class constants. Not necessary element, default value is array().                       *
 *                                                                                                                                                                                       *
 *     Here's an example test function:                                                                                                                                                  *
@@ -315,7 +315,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 }
                 if (!$sum) {
                     $result = false;
-                    echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . " and " . $obtained->left . ", the new values are " . $obtained->extendedmatch->length() . " and " . $obtained->extendedmatch->left . " (extra-tested by $enginename)<br/>";
+                    echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . ' and ' . $obtained->left . ', the new values are ' . $obtained->extendedmatch->length() . ' and ' . $obtained->extendedmatch->left . " (extra-tested by $enginename)<br/>";
                 }
             }
         }
@@ -499,7 +499,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     $matcher = $this->question->get_matcher($enginename, $regex, false, strpos($modifiers, 'i') === false, null, $notation);
                     $matcher->set_options($matchoptions);
                 } catch (Exception $e) {
-                    echo "EXCEPTION CATCHED DURING BUILDING MATCHER, test name is " . $methodname .  "\n" . $e->getMessage() . "\n";
+                    echo 'EXCEPTION CATCHED DURING BUILDING MATCHER, test name is ' . $methodname .  "\n" . $e->getMessage() . "\n";
                     continue;
                 }
 
