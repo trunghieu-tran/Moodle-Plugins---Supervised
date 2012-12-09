@@ -157,6 +157,11 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         return get_string('pleaseenterananswer', 'qtype_correctwriting');
     }
+
+    public function is_gradable_response(array $response) {
+        return $this->is_complete_response($response);
+    }
+
     /** Returns used language in question
         @return block_formal_langs_abstract_language used language
      */
@@ -166,11 +171,13 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         return $this->usedlanguage;
     }
+
     /** Flushes cached data. TODO: Remove
       */
     public function invalidate_cache() {
         $this->gradecachevalid = false;
     }
+
     /**  Performs grading response, using lexical analyzer.
          @param array $response student response  as array ( 'answer' => string of student response )
      */
@@ -178,6 +185,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         $this->get_best_fit_answer($response);
         return $this->matchedgradestate;
     }
+
     /**  Returns a best fit answer, for specified response and saves results into a cache
          @param array $response student response  as array ( 'answer' => string of student response )
      */
@@ -214,6 +222,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         }
         return $this->answers[$this->matchedanswerid];
     }
+
     /** Computes a fraction of student response, based on alayzer
      *  @param float  $fraction maximum fraction of student response
      *  @param object $analyzer lexical analyzer
@@ -237,6 +246,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     public function matches_exact($answer, $analyzer,  $stream) {
         return count($analyzer->mistakes()) == 0;
     }
+
     /**
      * Performs exact matching  for answer
      * @param stdClass $answer answer object
@@ -259,6 +269,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     public function compute_exact_match_fraction($answer, $analyzer) {
         return $answer->fraction;
     }
+
     /**
      * Computes fraction for non-exact match. Used as callback in check match
      * @param stdClass $answer answer type
@@ -268,12 +279,14 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     public function compute_nonexact_match_fraction($answer, $analyzer) {
         return $this->compute_fraction($answer->fraction, $analyzer);
     }
+ 
     /** Checks, whether student answer matches non-exact match answer and if matches, grades it
       *  @param string $response student response
       *  @param array  $answers  array of exact match answers
       *  @return bool  whether it was matched
       */
-    public function check_match_answers($response, $answers) {
+
+      public function check_match_answers($response, $answers) {
         // Don't scan if no need for this
         if (count($answers) == 0) {
             return false;
@@ -338,6 +351,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
 
         return $matched;
     }
+
     /** Grades  as wrong answer to an answer of max fraction
         @param string $response student response    
       */    
@@ -356,6 +370,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
         $this->matchedgradestate = array(0, question_state::$gradedwrong);
     }
+
     /**  Returns matching answer. Must return matching answer found when response was being graded.
          @param array $response student response  as array ( 'answer' => string of student response )
      */
@@ -373,7 +388,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         
         return $result;
     }
-    
+
     public function get_correct_response() {
         if (count($this->answers)!=0) {          
             $maxfraction = -1;
@@ -422,7 +437,6 @@ class qtype_correctwriting_question extends question_graded_automatically  {
        $addedlexemes  = array();
        $movedlexemes = array();
 
-       
        foreach($analyzer->mistakes() as $mistake) {
            // If this is lexical mistake, we should mark some lexeme as fixed
            if (is_a($mistake,'qtype_correctwriting_lexical_mistake')) {
@@ -445,7 +459,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                 }
             } 
        }
-       
+
        //Gather all section
        $resultsections[] = implode(',,,',$fixedlexemes);
        $resultsections[] = implode(',,,',$absentlexemes);
