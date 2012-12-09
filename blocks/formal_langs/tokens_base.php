@@ -5,7 +5,7 @@
  * @package    blocks
  * @subpackage formal_langs
  * @copyright &copy; 2011 Oleg Sychev, Volgograd State Technical University
- * @author     Oleg Sychev, Sergey Pashaev, Maria Birukova
+ * @author     Oleg Sychev, Mamontov Dmitriy, Maria Birukova
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_string.php');
@@ -684,7 +684,7 @@ class block_formal_langs_processed_string {
      */
     public function set_corrected_stream($stream) {
         //TODO - define, how it should differs from set_stream
-        $this->stream = $stream;
+        $this->tokenstream = $stream;
     }
     /**
      * Sets a token stream. Must be used by lexer, to set a stream for scan
@@ -715,7 +715,6 @@ class block_formal_langs_processed_string {
      */
     public function save_descriptions($descriptions)  {
         global $DB;
-        //TODO: Connect here to DB and insert/update descriptions
         $this->set_descriptions($descriptions);
 
         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
