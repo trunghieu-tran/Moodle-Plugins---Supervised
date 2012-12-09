@@ -30,7 +30,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 /**
  * Correctwriting question editing form definition.
  *
- * @copyright  2011 Sychev Oleg, Mamontov Dmitry
+ * @copyright  2011 Sychev Oleg
+ * @author     Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
