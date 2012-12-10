@@ -72,7 +72,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     protected $map;//map of symbol's following
     protected $maxstatecount;
     protected $maxpasscount;
-	protected $zero_quant_deleted;
+	protected $zeroquantdeleted;
 
     public function name() {
         return 'dfa_matcher';
@@ -199,7 +199,12 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $extstr = substr($str, 0, $result->offset + $result->index+1);
         if ($result->next===0) {
         } else {
-            $extstr .= $result->next;
+			if ($result->next=='stringstart') {
+				$extstr = '';
+			} elseif ($result->next=='stringend' || $result->next=='wordchar' || $result->next=='notwordchar' || $result->next=='notstringstart' || $result->next=='notstringend') {
+			} else {
+				$extstr .= $result->next;
+			}
         }
         if (!is_object($extstr)) {
         	   $extstr = new qtype_poasquestion_string($extstr);
@@ -630,7 +635,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
-		$this->zero_quant_deleted = false;
+		$this->zeroquantdeleted = false;
         if (isset($CFG->qtype_preg_dfa_state_limit)) {
             $this->maxstatecount = $CFG->qtype_preg_dfa_state_limit;
         } else {
@@ -1184,12 +1189,12 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return corresponding dfa_preg_node child class instance
     */
     public function &from_preg_node($pregnode) {
-        if (!$this->zero_quant_deleted) {
+        if (!$this->zeroquantdeleted) {
 			$res = self::delete_zero_quant($pregnode);
-			if (is_a('preg_node', $res)) {
+			if ($res!==true && $res!==false) {
 				$pregnode = $res;
 			}
-			$this->zero_quant_deleted=true;
+			$this->zeroquantdeleted=true;
 		}
 		$name = $pregnode->name();
         switch ($name) {
@@ -1234,7 +1239,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 				$res=self::delete_zero_quant($node->operands[0]);
                 if ($node->rightborder==0 || $res===true) {
 					return true;
-				} elseif (is_a('preg_node', $res)) {
+				} elseif (is_a($res, 'preg_node')) {
 					$node->operands[0] = $res;
 				}
                 break;
@@ -1252,10 +1257,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 $res = array();
 				$res[0]=self::delete_zero_quant($node->operands[0]);
 				$res[1]=self::delete_zero_quant($node->operands[1]);
-				if (is_a($res[0], 'preg_node')) {
+				if (is_a($res, 'preg_node')) {
 					$node->operands[0] = $res[0];
 				}
-				if (is_a($res[1], 'preg_node')) {
+				if (is_a($res, 'preg_node')) {
 					$node->operands[1] = $res[1];
 				}
 				if ($res[0]===true && $res[1]===true) {
@@ -1283,7 +1288,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 				if ($res[0]===true && $res[1]===true) {
 					return true;
 				} else if ($res[0]===true) {
-					return $node->operands[0];
+					return $node->operands[1];
 				} else if ($res[1]===true) {
 					return $node->operands[0];
 				}
