@@ -201,7 +201,22 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         } else {
 			if ($result->next=='stringstart') {
 				$extstr = '';
-			} elseif ($result->next=='stringend' || $result->next=='wordchar' || $result->next=='notwordchar' || $result->next=='notstringstart' || $result->next=='notstringend') {
+			} elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
+			} elseif ($result->next=='wordchar') {
+				$tmpflag = new qtype_preg_charset_flag;
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmp = new qtype_preg_leaf_charset;
+				$tmp->flags = array(array($tmpflag));
+				$length=1;
+				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
+			} elseif ($result->next=='notwordchar') {
+				$tmpflag = new qtype_preg_charset_flag;
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmpflag->negative = true;
+				$tmp = new qtype_preg_leaf_charset;
+				$tmp->flags = array(array($tmpflag));
+				$length=1;
+				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
 			} else {
 				$extstr .= $result->next;
 			}
