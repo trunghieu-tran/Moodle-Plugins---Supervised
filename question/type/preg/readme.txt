@@ -64,6 +64,7 @@ regular expression is too complex or hinting is inactive etc) or just have bug i
 
 5. Bugs, suggestions and giving back
 Please report bugs in GoogleCode tracker (set Component-Preg label) - this is preferable way - or Moodle tracker.
+Google Code tracker could be found there: http://code.google.com/p/oasychev-moodle-plugins/issues/list
 You also may post a suggestions of how to develop question type in the future, but please accompany them with information of
 who are you, how you are using question type and how you intend to use enchancements you suggest pedagogically.
 
