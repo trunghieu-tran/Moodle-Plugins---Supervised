@@ -13542,11 +13542,11 @@ class qtype_preg_cross_tests_from_pcre {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test2 = array( 'str'=>'*** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>1),
-                        'left'=>array(3),
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(4),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
