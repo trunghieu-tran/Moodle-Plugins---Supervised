@@ -560,7 +560,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         echo 'implement add_flag before use!';
     }
 
-    public function push_negative() {
+    /*public function push_negative() {
         if (!$this->negative || $this->flags === null) {
             return;
         }
@@ -591,8 +591,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 $this->flags[$i][$j]->negative = !$this->flags[$i][$j]->negative;
             }
         }
-        $this->reduce_dnf();
-    }
+        //$this->reduce_dnf();
+    }*/
 
     /**
      * Intersects this charset with other one.
@@ -614,11 +614,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
         $result->israngecalculated = false;
-        $result->reduce_dnf();
+        //$result->reduce_dnf();
         return $result;
     }
 
-    public function reduce_dnf() {
+    /*public function reduce_dnf() {
         if ($this->flags === null) {
             return;
         }
@@ -673,7 +673,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         if ($working) {
             $this->reduce_dnf();
         }
-    }
+    }*/
 
     /**
      * Substracts other charset from this.

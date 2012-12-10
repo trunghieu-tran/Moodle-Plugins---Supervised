@@ -560,7 +560,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                     
-                    $this->connection[$index][$number]->pregnode->push_negative();
+                    //$this->connection[$index][$number]->pregnode->push_negative();
                     if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
                         array_push($equnum, $num);
                     }
@@ -1192,7 +1192,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                 break;
             //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
             case 'node_subpatt':
-                $pregnode = clone $pregnode->operands[0];
+                $pregnode = $pregnode->operands[0];
                 return $this->from_preg_node($pregnode);
                 break;
             case 'node_alt':
