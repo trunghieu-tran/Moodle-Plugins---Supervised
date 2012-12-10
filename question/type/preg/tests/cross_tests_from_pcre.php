@@ -15938,12 +15938,12 @@ class qtype_preg_cross_tests_from_pcre {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test3 = array( 'str'=>'*** Failers',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
-                        'left'=>array(2),
-                        'next'=>'D',
+                        'index_first'=>array(0=>5),
+                        'length'=>array(0=>1),
+                        'left'=>array(3),
+                        'next'=>'[Bb]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'abcE',

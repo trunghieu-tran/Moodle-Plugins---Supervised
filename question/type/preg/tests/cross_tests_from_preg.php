@@ -536,7 +536,7 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(2),
-                        'next'=>'[a-z 0-9]');
+                        'next'=>'[a-z0-9]');
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3),
