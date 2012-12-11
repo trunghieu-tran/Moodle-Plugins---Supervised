@@ -85,17 +85,25 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
     */
     public function __construct($language,$answer,$response,$responseindex) { 
         $this->languagename = $language->name();
-        
+
         $this->answer = $answer->stream->tokens;
         $this->response = $response->stream->tokens;
-        
+
         $this->position = $this->response[$responseindex]->position();
         //Fill answer data
         $this->answermistaken = array();
         //Fill response data
-        $this->responsemistaken = array();
-        $this->responsemistaken[] = $responseindex;
-        
+        $this->responsemistaken = array($responseindex);
+
+        //Find, if such token exists in answer (to call it extraneous) or not (to write that it should not be there)
+        $exists = false;
+        foreach ($this->answer as $answertoken) {
+            if ($answertoken->value() == $this->response[$responseindex]->value()) {
+                $exists = true;
+                break;
+            }
+        }
+
         //Create a mistake message
         $a = new stdClass();
         $data = $this->response[$responseindex]->value();
@@ -104,7 +112,11 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         $a->value = $data;
         $a->line = $this->position->linestart();
         $a->position = $this->position->colstart();
-        $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
+        if ($exists) {
+            $this->mistakemsg = get_string('addedmistakemessage','qtype_correctwriting',$a);
+        } else {
+            $this->mistakemsg = get_string('addedmistakemessage_notexist','qtype_correctwriting',$a);
+        }
     }
 }
 
@@ -123,17 +135,17 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
      */
     public function __construct($language,$answer,$answerindex,$response) {
        $this->languagename = $language->name();
-        
+
        $this->answer = $answer->stream->tokens;
        $this->response = $response->stream->tokens;
-        
+
        $this->position = $this->answer[$answerindex]->position();
        //Fill answer data
        $this->answermistaken=array();
        $this->answermistaken[] = $answerindex;
        //Fill response data
        $this->responsemistaken = array();
-       
+
        $this->answerstring = $answer; 
        $this->mistakemsg = null;       
     }

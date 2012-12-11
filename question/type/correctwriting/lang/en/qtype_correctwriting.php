@@ -3,9 +3,10 @@
 //Lang string file for the correct writing question type
 
 $string['absentmistakemessage'] = '{$a->description} is missing in response ';
-$string['absentmistakemessagenodescription'] = 'The token "{$a->value}" is missing in response ';
-$string['absentmistakeweight'] = 'Penalty for missing token in student\'s response';
-$string['addedmistakemessage'] = 'The token "{$a->value}" at {$a->line}:{$a->position} is odd in response ';
+$string['absentmistakemessagenodescription'] = '"{$a->value}" is missing in response ';
+$string['absentmistakeweight'] = 'Penalty for missing token in student\'s response ';
+$string['addedmistakemessage'] = 'There is extra "{$a->value}" in response';
+$string['addedmistakemessage_notexist'] = '"{$a->value}" should not be in response';
 $string['addedmistakeweight'] = 'Penalty for odd token in student\'s response';
 $string['caseno'] = 'No, case is unimportant';
 $string['casesensitive'] = 'Case sensitivity';
@@ -21,7 +22,7 @@ $string['lexicalerrorthreshold'] = 'Lexical error threshold (as fraction to leng
 $string['lexicalerrorweight'] = 'Penalty for lexical error';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes in student\'s response';
 $string['movedmistakemessage'] = '{$a->description} misplaced ';
-$string['movedmistakemessagenodescription'] = 'The token "{$a->value}" at {$a->line}:{$a->position} is misplaced ';
+$string['movedmistakemessagenodescription'] = 'The "{$a->value}" at {$a->line}:{$a->position} is misplaced ';
 $string['movedmistakeweight'] = 'Penalty for misplaced token in student\'s response';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['pluginname'] = 'Correct writing';
@@ -29,6 +30,6 @@ $string['pluginname_help'] = 'Test';
 $string['pluginname_link'] = 'question/type/correctwriting';
 $string['pluginnameadding'] = 'Adding a correct writing  question';
 $string['pluginnameediting'] = 'Editing a correct writing  question';
-$string['pluginnamesummary'] = 'Question type that can automatically find mistakes in the string response and grade it with penalties. It currently supports token sequence errors: finding misplaced, absent and odd tokens.';
+$string['pluginnamesummary'] = 'Question type that can automatically find mistakes in the string response and grade it with penalties. It currently supports token sequence errors: finding misplaced, absent and extra tokens.';
 $string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
 $string['writemoredescriptions']  = 'Supplied amount of descriptions are less than amount of tokens';

@@ -3,9 +3,10 @@
 //Lang string file for the correct writing question type
 
 $string['correctwriting'] = 'Correct writing';
-$string['movedmistakemessage'] = '{$a->description} перемещен ';
-$string['movedmistakemessagenodescription'] = '{$a->value}, которая находится {$a->line}:{$a->position} перемещена ';
+$string['movedmistakemessage'] = '{$a->description} не на месте ';
+$string['movedmistakemessagenodescription'] = '{$a->value}, которая находится {$a->line}:{$a->position} не на месте ';
 $string['addedmistakemessage'] = '"{$a->value}" at {$a->line}:{$a->position} - лишняя в ответе ';
+$string['addedmistakemessage_notexist'] = '"{$a->value}" at {$a->line}:{$a->position} - лишняя в ответе ';
 $string['absentmistakemessage'] = '{$a->description} отсутствует в ответе ';
 $string['absentmistakemessagenodescription'] = '"{$a->value}" отсутствует в ответе ';
 $string['pleaseenterananswer'] = 'Пожалуйста, введите ответ.';
