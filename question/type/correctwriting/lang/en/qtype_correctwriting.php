@@ -5,7 +5,7 @@
 $string['absentmistakemessage'] = '{$a->description} is missing';
 $string['absentmistakemessagenodescription'] = '"{$a->value}" is missing';
 $string['absentmistakeweight'] = 'Penalty for missing token in student\'s response';
-$string['addedmistakemessage'] = 'There is extra "{$a->value}"';
+$string['addedmistakemessage'] = 'there is extra "{$a->value}"';
 $string['addedmistakemessage_notexist'] = '"{$a->value}" should not be in response';
 $string['addedmistakeweight'] = 'Penalty for odd token in student\'s response';
 $string['caseno'] = 'No, case is unimportant';
@@ -23,7 +23,7 @@ $string['lexicalerrorthreshold'] = 'Lexical error threshold (as fraction to leng
 $string['lexicalerrorweight'] = 'Penalty for lexical error';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes in student\'s response';
 $string['movedmistakemessage'] = '{$a->description} misplaced';
-$string['movedmistakemessagenodescription'] = 'The "{$a->value}" at {$a->line}:{$a->position} is misplaced';
+$string['movedmistakemessagenodescription'] = 'the "{$a->value}" at {$a->line}:{$a->position} is misplaced';
 $string['movedmistakeweight'] = 'Penalty for misplaced token in student\'s response';
 $string['pleaseenterananswer'] = 'Please enter an answer.';
 $string['pluginname'] = 'Correct writing';

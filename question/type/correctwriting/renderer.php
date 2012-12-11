@@ -52,14 +52,10 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                 $i = 1;
                 foreach($analyzer->mistakes() as $mistake) {
                    $mistakemesgs[] = $i.') '.$mistake->get_mistake_message();
-                   if ($i > 1) {
-                    $mistakemesgs[$i - 1] .= ';';
-                   }
                    $i++;
                 }
-                $mistakemesgs[$i - 1] .= '.';
                 $br = html_writer::empty_tag('br');
-                $myfeedback  = implode($br, $mistakemesgs) . $br;
+                $myfeedback  = implode(';' . $br, $mistakemesgs) . '.' . $br;
             }
         }
         return $myfeedback . $shortanswerfeedback; 
