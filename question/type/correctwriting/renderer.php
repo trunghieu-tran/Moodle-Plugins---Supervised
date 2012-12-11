@@ -36,24 +36,35 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
 
     public function specific_feedback(question_attempt $qa) {
-       $question = $qa->get_question();
-       $shortanswerfeedback = parent::specific_feedback($qa);
-       $myfeedback = '';
-       $analyzer = $question->matchedanalyzer;
-       if ($analyzer!=null) {
-           //Output mistakes messages
-           if (count($analyzer->mistakes())!=0) {
-               $mistakemesgs = array();
-               $mistakemesgs[] = get_string('foundmistakes', 'qtype_correctwriting');
-               foreach($analyzer->mistakes() as $mistake) {
-                   $mistakemesgs[] = $mistake->get_mistake_message();
-               }
-               $br = html_writer::empty_tag('br');
-               $myfeedback  = implode($br, $mistakemesgs) . $br;
-           }
-       }
-       return $myfeedback . $shortanswerfeedback; 
+        $question = $qa->get_question();
+        $shortanswerfeedback = parent::specific_feedback($qa);
+        $myfeedback = '';
+        $analyzer = $question->matchedanalyzer;
+        if ($analyzer!=null) {
+            //Output mistakes messages
+            if (count($analyzer->mistakes()) > 0) {
+                $mistakemesgs = array();
+                if (count($analyzer->mistakes()) == 1) {
+                    $mistakemesgs[] = get_string('foundmistake', 'qtype_correctwriting');
+                } else {
+                    $mistakemesgs[] = get_string('foundmistakes', 'qtype_correctwriting');
+                }
+                $i = 1;
+                foreach($analyzer->mistakes() as $mistake) {
+                   $mistakemesgs[] = $i.') '.$mistake->get_mistake_message();
+                   if ($i > 1) {
+                    $mistakemesgs[$i - 1] .= ';';
+                   }
+                   $i++;
+                }
+                $mistakemesgs[$i - 1] .= '.';
+                $br = html_writer::empty_tag('br');
+                $myfeedback  = implode($br, $mistakemesgs) . $br;
+            }
+        }
+        return $myfeedback . $shortanswerfeedback; 
    }
+
    //This wil be shown only if show right answer is setup 
    public function correct_response(question_attempt $qa) {
        global $CFG;
