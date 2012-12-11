@@ -2,14 +2,14 @@
 /**
  * Defines class of lexical analyzer for correct writing question.
  *
- * Lexical analyzer object is created for each correct answer and 
+ * Lexical analyzer object is created for each correct answer and
  * is responsible for tokenizing, looking for lexical mistakes (typos,
  * missing and extra separators etc) and other mistakes involving individual tokens,
- * merging resulting array of mistakes from all analyzers and determine 
+ * merging resulting array of mistakes from all analyzers and determine
  * answer fitness for the response.
  *
  * Lexical analyzers create and use sequence analyzers to determine structural mistakes.
- * There may be more than one sequence analyzer created if there are several equal groups of 
+ * There may be more than one sequence analyzer created if there are several equal groups of
  * lexical mistakes possible.
  *
  * @copyright &copy; 2011  Oleg Sychev
@@ -62,7 +62,7 @@ class qtype_correctwriting_lexical_analyzer {
         $language = $question->get_used_language();
         //1. Scan answer and response - Mamontov
         //  - call language object to do it
-        $responsestring = $language->create_from_string($responsestr); 
+        $responsestring = $language->create_from_string($responsestr);
         $answerstring = $language->create_from_db('question_answers', $answer->id, $answer->answer);
         //2. Check for full match - stop processing if answer and response arrays are equal - Mamontov
         $responsetokens = $responsestring->stream->tokens;

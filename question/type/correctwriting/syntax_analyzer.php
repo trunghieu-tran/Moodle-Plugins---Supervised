@@ -2,7 +2,7 @@
 /**
  * Defines class of syntax analyzer for correct writing question.
  *
- * Syntax analyzer object is created for each possible LCS of answer and response and 
+ * Syntax analyzer object is created for each possible LCS of answer and response and
  * is responsible for grouping tokens into abstract syntax tree (AST) and using it to
  * generate more descriptive mistakes, based on tree nodes (which may represent logically
  * grouped sequence of tokens) instead of just single tokens.
@@ -38,10 +38,10 @@ class qtype_correctwriting_syntax_analyzer {//object created for each lcs
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
      */
     public function __construct($answer, $language, $correctedresponse=null, $lcs=null) {
-        
+
         $this->errors = array();
         $this->mistakes  = array();
-        
+
         //TODO:
         // 0. Throw exception if language doesn't support parsing or syntax analyzer isnt' written yet
         //1. Create Abstract Syntax Tree for answer - Pashaev

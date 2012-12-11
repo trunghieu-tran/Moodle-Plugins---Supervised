@@ -58,10 +58,10 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                 $myfeedback  = implode(';' . $br, $mistakemesgs) . '.' . $br;
             }
         }
-        return $myfeedback . $shortanswerfeedback; 
+        return $myfeedback . $shortanswerfeedback;
    }
 
-   //This wil be shown only if show right answer is setup 
+   //This wil be shown only if show right answer is setup
    public function correct_response(question_attempt $qa) {
        global $CFG;
        $question = $qa->get_question();
@@ -73,11 +73,11 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                $mistakecodeddata = $question->create_image_information($analyzer);
                $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
                $imagesrc = html_writer::empty_tag('image', array('src' => $url));
-               $resulttext = $imagesrc . $resulttext; 
+               $resulttext = $imagesrc . $resulttext;
            }
        }
        // TODO: Uncomment if we need original shortanswer hint
        return $resulttext /*. parent::correct_response($qa) */;
    }
-   
+
 }

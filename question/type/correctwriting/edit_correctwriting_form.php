@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
-    
+
     /** Determines, whether lexeme descriptions is shown
         @var boolean
      */
@@ -44,7 +44,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
          @param object mform form data
      */
     protected function definition_inner($mform) {
-        // Add lexical error threshold field     
+        // Add lexical error threshold field
         // Uncomment  some unused field
         /*
         $mform->addElement('text', 'lexicalerrorthreshold',
@@ -54,7 +54,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('lexicalerrorthreshold', 0.33);
         $mform->addRule('lexicalerrorthreshold', null, 'required', null, 'client');
         // Add lexical error weight field
-        $mform->addElement('text', 'lexicalerrorweight', 
+        $mform->addElement('text', 'lexicalerrorweight',
                            get_string('lexicalerrorweight', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('lexicalerrorweight', PARAM_FLOAT);
@@ -63,35 +63,35 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         */
         // Add absent mistake weight field
-        $mform->addElement('text', 'absentmistakeweight', 
+        $mform->addElement('text', 'absentmistakeweight',
                            get_string('absentmistakeweight', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('absentmistakeweight', PARAM_FLOAT);
         $mform->setDefault('absentmistakeweight', 0.1);
         $mform->addRule('absentmistakeweight', null, 'required', null, 'client');
         // Add added mistake weight field
-        $mform->addElement('text', 'addedmistakeweight', 
+        $mform->addElement('text', 'addedmistakeweight',
                            get_string('addedmistakeweight', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('addedmistakeweight', PARAM_FLOAT);
         $mform->setDefault('addedmistakeweight', 0.1);
         $mform->addRule('addedmistakeweight', null, 'required', null, 'client');
         // Add moved mistake weight field
-        $mform->addElement('text', 'movedmistakeweight', 
+        $mform->addElement('text', 'movedmistakeweight',
                            get_string('movedmistakeweight', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('movedmistakeweight', PARAM_FLOAT);
         $mform->setDefault('movedmistakeweight', 0.05);
         $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
         // Add hint grade border
-        $mform->addElement('text', 'hintgradeborder', 
+        $mform->addElement('text', 'hintgradeborder',
                            get_string('hintgradeborder', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('hintgradeborder', PARAM_FLOAT);
         $mform->setDefault('hintgradeborder', 0.9);
         $mform->addRule('hintgradeborder', null, 'required', null, 'client');
         //Add max mistake percentage
-        $mform->addElement('text', 'maxmistakepercentage', 
+        $mform->addElement('text', 'maxmistakepercentage',
                            get_string('maxmistakepercentage', 'qtype_correctwriting'),
                            array('size' => 6));
         $mform->setType('maxmistakepercentage', PARAM_FLOAT);
@@ -107,7 +107,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setAdvanced('maxmistakepercentage');
 
         $languages = block_formal_langs::available_langs();
-        
+
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->addRule('langid', null, 'required', null, 'client');
 
@@ -129,16 +129,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $this->add_interactive_settings();
     }
-    
+
     function definition_after_data() {
         parent::definition_after_data();
-        
+
         //Get information about field data
         if ($this->hasdescriptions == true) {
             $mform =& $this->_form;
             $data = $mform->exportValues();
-         
-            
+
+
             $lang = block_formal_langs::lang_object($data['langid']);
             if ($lang!=null) {
                 //Parse descriptions to populate script
@@ -154,23 +154,23 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     $element->setLabel($newtext);
                     $element->setRows(count($textdata));
                 }
-         
+
             }
         }
     }
-    
+
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
         global $_REQUEST;
-        
-        
+
+
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
         // We use this, because this method is called before validation
-        // But we still can look into request to find out what we are looking to 
+        // But we still can look into request to find out what we are looking to
         $show_lexeme_descriptions = array_key_exists('lexemedescriptions', $_REQUEST);
-        $second_time_form = array_key_exists('name', $_REQUEST) && 
+        $second_time_form = array_key_exists('name', $_REQUEST) &&
                             !array_key_exists('lexemedescriptions', $_REQUEST);
         $show_lexeme_descriptions = $show_lexeme_descriptions || $second_time_form;
         if (array_key_exists('options', $this->question)) {
@@ -179,42 +179,42 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         if ($show_lexeme_descriptions) {
             $this->hasdescriptions = true;
             $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
-                                                get_string('lexemedescriptions', 'qtype_correctwriting'), 
+                                                get_string('lexemedescriptions', 'qtype_correctwriting'),
                                                 array('rows' => 25, 'cols' => 80));
             $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
         }
         return $repeated;
     }
-    
+
     protected function data_preprocessing($question) {
-        
+
         $question = parent::data_preprocessing($question);
-        
+
         return $question;
     }
-    
+
     /**
      * Perform setting data for lexemes
      * @param object $question the data being passed to the form.
      * @return object $question the modified data.
      */
     protected function data_preprocessing_answers($question, $withanswerfiles = false) {
-        global $DB;    
+        global $DB;
         $question = parent::data_preprocessing_answers($question, $withanswerfiles);
         $key = 0;
-        
-        
+
+
         if (array_key_exists('options',$question) && array_key_exists('answers',$question->options)) {
             $lang = block_formal_langs::lang_object($question->options->langid);
-        
+
             $answerids = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
             $descriptions = array();
             if ($answerids != null) {
                 $descriptions = block_formal_langs_processed_string::get_descriptions_as_array('question_answers', $answerids);
             }
-            
+
             foreach ($question->options->answers as $id => $answer) {
-                $string = $lang->create_from_db('question_answers',$id);            
+                $string = $lang->create_from_db('question_answers',$id);
                 $string = '';
                 if (count($descriptions[$id]) != 0) {
                    if (strlen(trim($descriptions[$id][0])) == 0) {
@@ -223,16 +223,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
                 $string = $string . implode("\n", $descriptions[$id]);
                 $question->options->answers[$id]->lexemedescriptions = $string;
-            
+
                 $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
                 $key++;
             }
         }
         return $question;
     }
-    
+
     public function validation($data, $files) {
-        
+
         $errors = parent::validation($data, $files);
 
         // Scan for errors
@@ -263,7 +263,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         if (array_key_exists('lexemedescriptions', $data) == false) {
             $this->first_time = false;
-            // We place it here, because it will look nicer and won't shift any of strings 
+            // We place it here, because it will look nicer and won't shift any of strings
             // in lexeme descriptions field
             $mesg = get_string('enterlexemedescriptions', 'qtype_correctwriting');
             if (array_key_exists('answer[0]', $errors) != 0 ) {
@@ -301,16 +301,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
             }
         }
-        
+
         /* If errors don't found - exit
         if (count($errors) !=0 ) {
             return $errors;
         }*/
-        
+
         return $errors;
     }
     public function qtype() {
         return 'correctwriting';
     }
  }
- 

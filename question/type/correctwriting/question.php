@@ -37,69 +37,69 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting_question extends question_graded_automatically  {
     //Fields defining a question
-    /** Whether answers should be graded case-sensitively. 
+    /** Whether answers should be graded case-sensitively.
      *  @var boolean
      */
     public $usecase;
-    /** Array of question_answer objects, presenting answers 
-     *  @var array  
+    /** Array of question_answer objects, presenting answers
+     *  @var array
      */
     public $answers = array();
     //Typical answer objects usually contains answer (string), fraction and feedback fields
-    //Our answer object should also contain elementnames array, with teacher-given sematic names 
+    //Our answer object should also contain elementnames array, with teacher-given sematic names
     //for either important nodes (when syntax analysis is posssible) or all tokens (otherwise).
     /** Threshold, defining maximum percent of token length mistake weight could be to provide a valid matched pair
      *  @var int
      */
     public $lexicalerrorthreshold = 0;
-    /** Weight of lexical error 
+    /** Weight of lexical error
      *  @var float
      */
     public $lexicalerrorweight = 0.1;
-    
+
     /** Language id in the languages table
-     *  @var int 
+     *  @var int
      */
     public $langid = 0;
-    /** Language object, used in language 
+    /** Language object, used in language
      *  @var blocks_formal_langs_abstract_language
      */
     public $usedlanguage = null;
     //Other necessary question data like penalty for each type of mistakes etc
 
-    
+
     /** Weight of error, when one lexeme is moved from one place to another
-     *  @var float 
-     */ 
+     *  @var float
+     */
     public $movedmistakeweight = 0.1;
     /** Weight of error, when one lexeme in response is absent
      *  @var float
      */
-    public $absentmistakeweight = 0.1; 
+    public $absentmistakeweight = 0.1;
     /** Weight of error, when one lexeme is added to response
      *  @var float
      */
     public $addedmistakeweight = 0.1;
-    
-    
+
+
     /** Minimum grade for non-exact match answer
      *  @var float
-     */      
+     */
     public $hintgradeborder = 0.9;
     /** Maximum mistake percent to length of answer in lexemes  for answer to be matched
      *  @var float
-     */     
+     */
     public $maxmistakepercentage = 0.7;
-    
+
     /** Whether cache is valid
      *  @var boolean
      */
     public $gradecachevalid = false;
-    /** A cached response 
+    /** A cached response
      *  @var string
      */
     public $gradecachedanswer = '';
-    /** A cached matched answer id 
+    /** A cached matched answer id
      *  @var int
      */
     public $matchedanswerid = null;
@@ -111,7 +111,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
      *  @var array
      */
     public $matchedgradestate = null;
-    
+
     // Returns expected data from form
     public function get_expected_data() {
         return array('answer' => PARAM_RAW_TRIMMED);
@@ -129,7 +129,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         return array_key_exists('answer', $response) &&
                 ($response['answer'] || $response['answer'] === '0');
     }
-    
+
     /** Checks, whether two responses are the same
         @param array prevresponse previous response
         @param array newresponse  new response
@@ -139,19 +139,19 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         return question_utils::arrays_same_at_key_missing_is_blank(
                 $prevresponse, $newresponse, 'answer');
     }
-    
+
 
     public function get_answers() {
         return $this->answers;
     }
-    
+
     /** Returns a validation error for response
         @param array response user response
         @return string validation error
       */
-    public function get_validation_error(array $response) {        
+    public function get_validation_error(array $response) {
         //print_r($response);
-        
+
         if ($this->is_gradable_response($response)) {
             return '';
         }
@@ -200,7 +200,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
             return $this->matchedgradestate;
         }
-        
+
         foreach($this->answers as $id => $answer) {
             if (is_a($answer->answer,'qtype_poasquestion_string') == false) {
                 $answer->answer = new qtype_poasquestion_string($answer->answer);
@@ -212,7 +212,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                 $answer->answer->tolower();
             }
         }
-        
+
         $this->gradecachevalid = true;
         $this->gradecachedanswer = $response['answer'];
 
@@ -279,7 +279,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     public function compute_nonexact_match_fraction($answer, $analyzer) {
         return $this->compute_fraction($answer->fraction, $analyzer);
     }
- 
+
     /** Checks, whether student answer matches non-exact match answer and if matches, grades it
       *  @param string $response student response
       *  @param array  $answers  array of exact match answers
@@ -353,8 +353,8 @@ class qtype_correctwriting_question extends question_graded_automatically  {
     }
 
     /** Grades  as wrong answer to an answer of max fraction
-        @param string $response student response    
-      */    
+        @param string $response student response
+      */
     public function grade_as_wrong_response_to_max_fraction($response) {
         $fid = null;
         $prec = 0.0001;
@@ -362,9 +362,9 @@ class qtype_correctwriting_question extends question_graded_automatically  {
             if (abs($answer->fraction - 1) < $prec ) {
                 $fid = $id;
                 break;
-            } 
+            }
         }
-        
+
         $this->matchedanswerid = $fid;
         $answer = $this->answers[$fid];
         $this->matchedanalyzer = new  qtype_correctwriting_lexical_analyzer($this, $answer, $response);
@@ -385,12 +385,12 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         $result = $this->answers[$this->matchedanswerid];
         $result = clone $result;
         $result->fraction =  $this->matchedgradestate[0];
-        
+
         return $result;
     }
 
     public function get_correct_response() {
-        if (count($this->answers)!=0) {          
+        if (count($this->answers)!=0) {
             $maxfraction = -1;
             $maxkey = null;
             foreach($this->answers as $key => $answer) {
@@ -404,7 +404,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
         return null;
     }
 
-   //Creates all information about mistakes, passed into mistakes    
+   //Creates all information about mistakes, passed into mistakes
    public function create_image_information($analyzer) {
        $question = $this;
        $keys = array_keys($question->answers);
@@ -412,11 +412,11 @@ class qtype_correctwriting_question extends question_graded_automatically  {
        if ($question->matchedanswerid!=null) {
           $answer = $question->answers[$question->matchedanswerid]->answer;
        }
-       
+
        $language = block_formal_langs::lang_object($this->langid);
        //Create sections, that will be passed into an URL
        $resultsections = array();
-       
+
        //Create answer section
        $answertokenvalues = array();
        $answertokens = $language->create_from_string($answer);
@@ -431,7 +431,7 @@ class qtype_correctwriting_question extends question_graded_automatically  {
            $responsetokenvalues[] = base64_encode($token->value());
        }
        $resultsections[] = implode(',,,',$responsetokenvalues);
-       
+
        $fixedlexemes = array();
        $absentlexemes = array();
        $addedlexemes  = array();
@@ -455,9 +455,9 @@ class qtype_correctwriting_question extends question_graded_automatically  {
                 }
             } else {
                 for($i = 0;$i < count($mistake->answermistaken);$i++) {
-                    $movedlexemes[] = $mistake->answermistaken[$i] . '_' . $mistake->responsemistaken[$i]; 
+                    $movedlexemes[] = $mistake->answermistaken[$i] . '_' . $mistake->responsemistaken[$i];
                 }
-            } 
+            }
        }
 
        //Gather all section
@@ -465,8 +465,8 @@ class qtype_correctwriting_question extends question_graded_automatically  {
        $resultsections[] = implode(',,,',$absentlexemes);
        $resultsections[] = implode(',,,',$addedlexemes);
        $resultsections[] = implode(',,,',$movedlexemes);
-       
+
        return  base64_encode(implode(';;;',$resultsections));
-   }    
+   }
 }
  ?>
