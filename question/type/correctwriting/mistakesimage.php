@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// A vertical space between answer and response 
+// A vertical space between answer and response
 define('ANSWER_RESPONSE_VERTICAL_SPACE', 50);
 // A horizontal space between two lexemes on image
 define('ROW_HORIZONTAL_SPACE', 7);
@@ -37,7 +37,7 @@ define('LINE_WIDTH', 2);
 define('ARROW_LENGTH', 5);
 // An arrow angle in radians
 define('ARROW_ANGLE', 0.5);
-// Define a space for frame 
+// Define a space for frame
 define('FRAME_SPACE', 2);
 // A thickness of drawn frame
 define('FRAME_THICKNESS', 1);
@@ -80,7 +80,7 @@ class qtype_correctwriting_abstract_label
    }
    /** Sets a connection point for drawing an arrow
         @param stdClass $currentrect rectangle, where it should be placed with fields x,y,width, height.
-        @param bool  $bottom         whether point should placed on bottom part of rectangle, or top       
+        @param bool  $bottom whether point should placed on bottom part of rectangle, or top
      */
    protected function set_connection_point($currentrect,$bottom) {
        $this->connection = array();
@@ -89,7 +89,7 @@ class qtype_correctwriting_abstract_label
        if ($bottom == true) {
            $this->connection[] = $currentrect->y+$currentrect->height+TINY_SPACE;
        } else {
-           $this->connection[] = $currentrect->y - TINY_SPACE; 
+           $this->connection[] = $currentrect->y - TINY_SPACE;
        }
        $this->rectangle = $currentrect;
    }
@@ -98,19 +98,19 @@ class qtype_correctwriting_abstract_label
        @param resource $im image resource, where it should be painted
        @param array    $palette palette of colors as associtive array. Currently with colors, can be accessed as 'black', 'red'
        @param stdClass $currentrect rectangle, where it should be painted with fields x,y,width, height.
-       @param bool  $bottom         whether point should placed on bottom part of rectangle, or top      
+       @param bool  $bottom         whether point should placed on bottom part of rectangle, or top
      */
    public function paint(&$im, $palette, $currentrect, $bottom) {
-       $this->set_connection_point($currentrect, $bottom);     
+       $this->set_connection_point($currentrect, $bottom);
    }
 }
-/** An empty label is used as a stub, when we are skipping parts in the table in cases, 
-    when we draw an absent lexemes or added lexemes. 
- */ 
+/** An empty label is used as a stub, when we are skipping parts in the table in cases,
+    when we draw an absent lexemes or added lexemes.
+ */
 class qtype_correctwriting_empty_label extends qtype_correctwriting_abstract_label
 {
 
-} 
+}
  /** A label, that prints a lexeme at specified point. Also contains an info about, whether
      it was fixed, which is used, when painting a label
   */
@@ -124,10 +124,10 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
     @var bool  whether this lexeme was fixed. Fixed means, it should be painted red
     */
    protected $fixed;
-   
+
    /** Constructs new non-fixed lexeme label with specified text
        @param string $text text of lexeme
-    */   
+    */
    public function __construct($text) {
        // Get font metics
        $width = imagefontwidth(FONT_SIZE);
@@ -149,12 +149,12 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
        @param resource $im image resource, where it should be painted
        @param array    $palette palette of colors as associtive array. Currently with colors, can be accessed as 'black', 'red'
        @param stdClass $currentrect rectangle, where it should be painted with fields x,y,width, height.
-       @param bool  $bottom         whether point should placed on bottom part of rectangle, or top      
-     */ 
+       @param bool  $bottom         whether point should placed on bottom part of rectangle, or top
+     */
    public function paint(&$im, $palette, $currentrect, $bottom) {
        // Set connection point
        parent::paint($im, $palette, $currentrect, $bottom);
-       
+
        // Set color according to fixed parameter
        $color = $palette['black'];
        if ($this->fixed) {
@@ -165,10 +165,10 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
        // Paint a string
        imagestring($im, FONT_SIZE, $x, $currentrect->y, $this->text, $color);
    }
-} 
+}
 /** A table cell consists of two rows - answer and response. Answer is placed in the top of image,
-    response is placed in bottom of image. It can paint itself to image and must return 
-    connection and coordinates and size   
+    response is placed in bottom of image. It can paint itself to image and must return
+    connection and coordinates and size
   */
 class qtype_correctwriting_table_cell
 {
@@ -186,7 +186,7 @@ class qtype_correctwriting_table_cell
      */
    public function __construct($answer, $response) {
        $this->answer = $answer;
-       $this->response = $response; 
+       $this->response = $response;
    }
    /** Returns a maximum size of labels in a cell
        @return array of coordinates as array(width, height)
@@ -239,25 +239,25 @@ class qtype_correctwriting_table_cell
        Response part - at bottom of image, starting from this point.
        @param resource $im image resource, where it should be painted
        @param array    $palette palette of colors as associtive array. Currently with colors, can be accessed as 'black', 'red'
-       @param array    $currentpos upper-left coordinates for drawing a table cell as array(x, y).  
-     */ 
+       @param array    $currentpos upper-left coordinates for drawing a table cell as array(x, y).
+     */
    public function paint(&$im, $palette, $currentpos) {
        // Compute max label size part
        $labelsize = $this->get_max_label_size();
        // Compute rectangles for painting answer and response
-       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE, 
+       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE,
                                    'width' => $labelsize[0] + ROW_HORIZONTAL_SPACE, 'height' => $labelsize[1]);
-       $height = imagesy($im);                            
-       $responserect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE, 
+       $height = imagesy($im);
+       $responserect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE,
                                      'width' => $labelsize[0], 'height' => $labelsize[1]);
-       // Draw an answer and response                              
+       // Draw an answer and response
        $this->answer->paint($im, $palette, $answerrect, true );
        $this->response->paint($im, $palette, $responserect, false );
    }
 }
 
 /**  A special container for mistakes, found in student response
- */ 
+ */
 class qtype_correctwriting_mistake_container
 {
   /**
@@ -269,10 +269,10 @@ class qtype_correctwriting_mistake_container
     */
    private $addedlexemes;
    /**
-     @var array array of indexes of added lexemes as stdClass( 'answer' => answer index, 'response' => response index) 
+     @var array array of indexes of added lexemes as stdClass( 'answer' => answer index, 'response' => response index)
     */
    private $movedlexemes;
-   
+
    /**
     *  Constructs a container, from other string
     *  @param absentstring string with absent lexeme indexes, separated by ',,,'
@@ -303,11 +303,11 @@ class qtype_correctwriting_mistake_container
    public function is_moved_or_added_response($index) {
        return $this->is_in_arrays('addedlexemes','response',$index);
    }
-   
+
    /** Checks, whether an index lexeme is in some arrays
        @param string  $skippedarrayname  a skipped array name for skipped lexemes. Must be absentlexemes pr addedlexemes
        @param string  $movedfieldname    describes, whether it answer or response. Used as field name for moved lexeme
-       @param int     $index             index of analyzed lexeme       
+       @param int     $index             index of analyzed lexeme
     */
    protected function is_in_arrays($skippedarrayname, $movedfieldname, $index) {
        $result = false;
@@ -330,13 +330,13 @@ class qtype_correctwriting_mistake_container
        return $result;
    }
 
-   /** Returns an absent lexeme indexes 
+   /** Returns an absent lexeme indexes
      @return array array of absent lexemes
      */
    public function get_absent_lexeme_indexes() {
        return $this->absentlexemes;
    }
-   /** Returns an added lexeme indexes 
+   /** Returns an added lexeme indexes
      @return array array of absent lexemes
      */
    public function get_added_lexeme_indexes() {
@@ -347,11 +347,11 @@ class qtype_correctwriting_mistake_container
     */
    public function get_moves() {
        return $this->movedlexemes;
-   }   
+   }
 }
 /**  A container, which contains lcs, found in student answe
- */ 
-class qtype_correctwriting_lcs_extractor 
+ */
+class qtype_correctwriting_lcs_extractor
 {
    /**
      @var lcs lcs as array of stdClass('answer' => answer index, 'response' => response index)
@@ -373,14 +373,14 @@ class qtype_correctwriting_lcs_extractor
                $lcsanswers[] = $answerindex;
            }
        }
-   
+
        // Extract response part as array
        for($responseindex = 0; $responseindex < $responsecount ; $responseindex++) {
            if ($mistakes->is_moved_or_added_response($responseindex) == false) {
                $lcsresponses[] = $responseindex;
            }
        }
-       
+
        // Merge parts
        $this->lcs = array();
        for ($i = 0; $i < count($lcsanswers); $i++)
@@ -390,15 +390,15 @@ class qtype_correctwriting_lcs_extractor
            $entry->response = $lcsresponses[$i];
            $this->lcs[] = $entry;
        }
-       
+
    }
-   
+
    public function lcs() {
        return $this->lcs;
-   }   
+   }
 }
 /** A table, which represens a printed data.  Can be built using LCS and, arrays of lexemes and mistake
-    container  
+    container
 */
 class qtype_correctwriting_table
 {
@@ -407,11 +407,11 @@ class qtype_correctwriting_table
     */
    private $table;
    /**
-     @var  array indexes of cells for answer in $table field 
+     @var  array indexes of cells for answer in $table field
      */
    private $answertable;
    /**
-     @var array indexes of cells for response in $table field 
+     @var array indexes of cells for response in $table field
      */
    private $responsetable;
    /**
@@ -430,20 +430,20 @@ class qtype_correctwriting_table
      */
    public function __construct($answer, $response, $lcs, $mistakes) {
        $this->lcs = $lcs;
-       
+
        // Create a labels for table
        $this->mistakes = $mistakes;
        $this->table = array();
        $answerlabel = new qtype_correctwriting_lexeme_label('Answer: ');
        $responselabel = new qtype_correctwriting_lexeme_label('Response: ');
        $this->table[] = new qtype_correctwriting_table_cell($answerlabel, $responselabel);
-       
+
        // Build table
        if (count($lcs->lcs()) != 0) {
            $this->build_table_using_lcs($answer, $response, $lcs->lcs(), $mistakes);
        } else {
            $this->build_table_without_lcs($answer, $response, $mistakes);
-       } 
+       }
    }
    /** Builds a new table, using LCS
        @param array $answer array of qtype_correctwriting_lexeme_label, representing an answer part of question
@@ -459,14 +459,14 @@ class qtype_correctwriting_table
            // Compute begin part of region
            $answerbegin = $lcs[$i]->answer + 1;
            $responsebegin = $lcs[$i]->response + 1;
-           
-           // Add  LCS part       
-           $this->table[] = new qtype_correctwriting_table_cell($answer[$answerbegin - 1], 
+
+           // Add  LCS part
+           $this->table[] = new qtype_correctwriting_table_cell($answer[$answerbegin - 1],
                                                                 $response[$responsebegin - 1]);
            $lastindex = count($this->table) - 1 ;
            $this->answertable[$answerbegin - 1] = $lastindex;
            $this->responsetable[$responsebegin - 1] = $lastindex;
-           
+
            // Compute end part of lcs
            $answerend = count($answer);
            $responseend = count($response);
@@ -475,11 +475,11 @@ class qtype_correctwriting_table
                $answerend = $lcs[$i+1]->answer;
                $responseend = $lcs[$i+1]->response;
            }
-           
+
            // Add odd parts
            $this->create_cell_range($answer, $answerbegin, $answerend, 'create_answer_cell');
            $this->create_cell_range($response, $responsebegin, $responseend , 'create_response_cell');
-           
+
        }
    }
    /** Builds a new table, without LCS use
@@ -572,7 +572,7 @@ class qtype_correctwriting_table
        @param string $method creation method for range. Must be either of 'create_answer_cell', 'create_response_cell'
      */
    protected function create_cell_range ($labelarray, $begin, $end , $method) {
-       $i = $begin;   
+       $i = $begin;
        while($i < $end) {
            $this->$method($labelarray, $i);
             $i++;
@@ -621,7 +621,7 @@ class qtype_correctwriting_arrow_builder {
    public function __construct($table) {
        $this->table = $table;
    }
-   
+
    /** Draws an arrows  for mistakes
        @param resource $im image
        @param array $palette associative array of colors
@@ -698,8 +698,8 @@ class qtype_correctwriting_arrow_builder {
            imageline($im, $p1x, $p1y, $p2x, $p2y, $color);
        }
    }
-   /** Draws a directed arrow 
-       @param resource $im image 
+   /** Draws a directed arrow
+       @param resource $im image
        @param int      $color color, which it should be painted by
        @param array    $p1   first point as array(x, y)
        @param array    $p2   second point as array(x, y)
@@ -713,14 +713,14 @@ class qtype_correctwriting_arrow_builder {
        $point = $p2;
        if ($markbegin == true) {
            $point = $p1;
-           $angle = atan2($p2[1]-$p1[1],$p2[0]-$p1[0]); 
+           $angle = atan2($p2[1]-$p1[1],$p2[0]-$p1[0]);
        }
        // Draw tail
        $pmin = array($point[0] + ARROW_LENGTH * cos($angle + ARROW_ANGLE),$point[1] + ARROW_LENGTH * sin($angle + ARROW_ANGLE));
        $pmax = array($point[0] + ARROW_LENGTH * cos($angle - ARROW_ANGLE),$point[1] + ARROW_LENGTH * sin($angle - ARROW_ANGLE));
        imageline($im, $point[0], $point[1], $pmin[0], $pmin[1], $color);
        imageline($im, $point[0], $point[1], $pmax[0], $pmax[1], $color);
-   }   
+   }
 }
 
 /** Main class, which should be used to create and output image
@@ -731,11 +731,11 @@ class qtype_correctwriting_image_generator
      @var qtype_correctwriting_table built table of lexemes
     */
    private $table;
-   
+
    /** Constructs a generator, scanning sections
      @param array $sections used sections, passed to a script
     */
-   public function __construct($sections) {       
+   public function __construct($sections) {
        // Preprocess answers
        $answer = array();
        $base64answers = explode(',,,',$sections[0]);
@@ -769,29 +769,29 @@ class qtype_correctwriting_image_generator
    public function produce_image() {
        // Align labels in a rows, without a links between them
        $size = $this->table->get_size();
-       
+
        // Create image
        $sizex = $size[0] + 2 * FRAME_SPACE;
        $sizey = $size[1] + 2 * FRAME_SPACE;
        $im = imagecreatetruecolor($sizex, $sizey);
-      
+
        // Fill palette
        $palette = array();
        $palette['white'] = imagecolorallocate($im, 255, 255, 255);
        $palette['black'] = imagecolorallocate($im, 0, 0, 0);
        $palette['red']   = imagecolorallocate($im, 255, 0, 0);
-       
+
        // Set image background to white
        imagefill($im,0,0,$palette['white']);
-       
+
        // Draw a rectangle frame
        imagesetthickness($im, FRAME_THICKNESS);
        imageline($im, 0, 0, $sizex - 1, 0, $palette['black']);
        imageline($im, $sizex - 1, 0, $sizex - 1, $sizey - 1, $palette['black']);
        imageline($im, $sizex - 1, $sizey - 1, 0, $sizey - 1, $palette['black']);
        imageline($im, 0, $sizey - 1, 0, 0, $palette['black']);
-       
-       
+
+
        // Draw a table
        $this->table->paint($im, $palette);
        // Generate image
@@ -804,26 +804,26 @@ class qtype_correctwriting_image_generator
    }
 
 }
-   
+
 // Scan parameter and check, whether it's malformed
 if (strlen($_GET['data']) != 0) {
 
    // Decode passed parameter and split it to sections
    $data = base64_decode($_GET['data']);
    $sections = explode(';;;',$data);
-   
+
    // If amount of section is six, we can build image
    if (count($sections) == 6 ) {
-   
+
        // Create a generator, which take all staff
        $generator = new qtype_correctwriting_image_generator($sections);
        $generator->produce_image();
    } else {
-   
-       // TODO: Change it to more appropriate. We do not perform localization, 
+
+       // TODO: Change it to more appropriate. We do not perform localization,
        // since we can't access Moodle from here
        echo 'Error generating image: malformed data';
-   }       
+   }
 } else {
 
        // If no data supplied, we can't build image.

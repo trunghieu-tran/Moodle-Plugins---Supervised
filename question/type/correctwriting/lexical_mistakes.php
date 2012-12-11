@@ -7,9 +7,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
- 
+
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 
 // A marker class to indicate errors from lexical analyzer. We need them to indicate

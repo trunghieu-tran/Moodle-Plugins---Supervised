@@ -3,7 +3,7 @@
  * Defines patterns class for lexer.
  *
  * @package    qtype
- * @subpackage autofeedback
+ * @subpackage correctwriting
  * @copyright &copy; 2011 Sergey Pashaev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */

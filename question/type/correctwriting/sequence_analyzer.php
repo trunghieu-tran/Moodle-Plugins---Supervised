@@ -2,14 +2,14 @@
 /**
  * Defines class of sequence analyzer for correct writing question.
  *
- * Sequence analyzer object is created for each possible set of lexical mistakes and 
+ * Sequence analyzer object is created for each possible set of lexical mistakes and
  * is responsible for finding common parts of answer regarding sequence of tokens.
  * Longest common sequence algorithm is used to determine it.
  *
  * Sequence analyzers create and use syntax analyzers to determine structural mistakes using
- * language grammar. When using grammar analyzer is impossible, it determines sequence mistakes 
+ * language grammar. When using grammar analyzer is impossible, it determines sequence mistakes
  * using lcs, i.e. misplaced, extra and missing tokens.
- * There may be more than one syntax analyzer created if there are several LCS'es of 
+ * There may be more than one syntax analyzer created if there are several LCS'es of
  * answer and response.
  *
  * @copyright &copy; 2011  Oleg Sychev
@@ -37,9 +37,9 @@ class  qtype_correctwriting_sequence_analyzer {
     protected $mistakes;             // Array of mistake objects - student errors (structural errors)
 
     private   $fitness;              // Fitness for response
-    
+
     private   $question;             // Used question by analyzer
-     
+
     /**
      * Do all processing and fill all member variables
      * Passed response could be null, than object used just to find errors in the answers, token count etc...
@@ -56,7 +56,7 @@ class  qtype_correctwriting_sequence_analyzer {
                 if ($language->could_parse()) {
                     $analyzer = new qtype_correctwriting_syntax_analyzer($answer, $language, null, null);
                     $this->errors = $analyzer->errors();
-                } 
+                }
             } else {
                 //Fill weights of sequence errors
                 $weights = new stdClass;
@@ -81,7 +81,7 @@ class  qtype_correctwriting_sequence_analyzer {
         //NOTE: if some stage create errors, stop processing right there (done?)
     }
     /**
-     * Scans for a mistakes in response, computing lcs and 
+     * Scans for a mistakes in response, computing lcs and
      * performing syntax analysis
      * @param object $weights weights of errors
      */
@@ -93,7 +93,7 @@ class  qtype_correctwriting_sequence_analyzer {
             // If no LCS found perform searching with empty array
             $alllcs[] = array();
         }
-        
+
         if ($this->language->could_parse()) {
             //Otherwise scan all of lcs
             $maxmistakes = array();
@@ -105,20 +105,20 @@ class  qtype_correctwriting_sequence_analyzer {
                                                                      $this->correctedresponse,
                                                                      $alllcs[$i]);
                 $fitness = $analyzer->fitness();
-                
+
                 //If answer has errors stop processing here
                 $haserrors = $analyzer->has_errors();
                 if ($haserrors == true) {
                  $this->errors = $analyzer->errors();
                 }
-                
-                if (($isfirst == true || $fitness > $maxfitness) && $haserrors==false) { 
+
+                if (($isfirst == true || $fitness > $maxfitness) && $haserrors==false) {
                     $maxmistakes = $analyzer->mistakes();
                     $maxfitness = $fitness;
                     $isfirst = false;
                 }
             }
-            
+
             //Set self-properties to return proper values
             $this->mistakes = $maxmistakes;
             $this->fitness = $maxfitness;
@@ -132,7 +132,7 @@ class  qtype_correctwriting_sequence_analyzer {
      * Array of individual lcs contains answer indexes as keys and response indexes as values.
      * There may be more than one lcs for a given pair of strings.
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
-     * @param  block_formal_langs_token_stream $responsestream array of response tokens 
+     * @param  block_formal_langs_token_stream $responsestream array of response tokens
      * @return array array of individual lcs arrays
      */
     public static function lcs($answerstream, $responsestream) {
@@ -310,9 +310,9 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_moved_mistake($answerindex,$responseindex) {
-        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer, 
+        return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer,
                                                              $answerindex,
-                                                             $this->correctedresponse, 
+                                                             $this->correctedresponse,
                                                              $responseindex);
     }
     /**
@@ -321,9 +321,9 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_added_mistake($responseindex) {
-        return new qtype_correctwriting_lexeme_added_mistake($this->language, 
+        return new qtype_correctwriting_lexeme_added_mistake($this->language,
                                                              $this->answer,
-                                                             $this->correctedresponse, 
+                                                             $this->correctedresponse,
                                                              $responseindex);
     }
     /**
@@ -332,8 +332,8 @@ class  qtype_correctwriting_sequence_analyzer {
      * @return object a mistake
      */
     private function create_absent_mistake($answerindex) {
-        return new qtype_correctwriting_lexeme_absent_mistake($this->language, 
-                                                              $this->answer, 
+        return new qtype_correctwriting_lexeme_absent_mistake($this->language,
+                                                              $this->answer,
                                                               $answerindex,
                                                               $this->correctedresponse);
     }
@@ -343,7 +343,7 @@ class  qtype_correctwriting_sequence_analyzer {
      * @param array $lcs LCS
      * @param object $weights weights of errors
      * @return array array of mistake objects
-     */	
+     */
     public function matches_to_mistakes($lcs,$weights) {
         $answer = &$this->answer->stream->tokens;
         $response = &$this->correctedresponse->stream->tokens;
@@ -353,31 +353,31 @@ class  qtype_correctwriting_sequence_analyzer {
         for ($i = 0;$i < $answercount;$i++) {
             $answerused[] = false;
         }
-    
+
         // Determines, whether response tokens are used in mistake computation
         $responseused = array();
         $responsecount = count($response);
         for ($i = 0;$i < $responsecount;$i++) {
             $responseused[] = false;
         }
-    
-        // This result will be returned from function 
+
+        // This result will be returned from function
         $result = array();
-        
+
         // These are counts of each types of errors, used to compute fitness
         $counts = new stdClass;
         $counts->moved = 0;
         $counts->added = 0;
         $counts->absent = 0;
-    
+
         // Scan lcs to mark excluded lexemes
         foreach($lcs as $answerindex => $responseindex) {
             // Mark lexemes as used
             $answerused[$answerindex] = true;
             $responseused[$responseindex] = true;
         }
-    
-        // Determine removed and moved lexemes by scanning answer 
+
+        // Determine removed and moved lexemes by scanning answer
         for ($i = 0;$i < $answercount;$i++) {
             // If this lexeme is not in LCS
             if ($answerused[$i] == false) {
@@ -407,16 +407,16 @@ class  qtype_correctwriting_sequence_analyzer {
                 }
             }
         }
-    
+
         //Determine added lexemes from reponse
         for ($i = 0;$i < $responsecount;$i++) {
             if ($responseused[$i] == false) {
                 $mistake = $this->create_added_mistake($i);
                 $result[] = $mistake;
                 $mistake->weight = $weights->addedweight;
-                $counts->added = $counts->added + 1;          
+                $counts->added = $counts->added + 1;
             }
-        }        
+        }
 
         //Compute fitness-function
         $this->fitness = $this->compute_fitness($counts,$weights);

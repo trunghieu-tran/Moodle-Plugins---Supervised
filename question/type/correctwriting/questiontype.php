@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting extends qtype_shortanswer {
 
-    
+
     /** Returns fields, that differ from standard Moodle question fields
         and table
         @return array extra fields
@@ -49,10 +49,10 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Replace shortanswer table with our table
         $result[0]= 'qtype_correctwriting';
         // Language, which will be used for analysis
-        $result[] = 'langid';        
+        $result[] = 'langid';
         // Penalty for absent lexeme mistake
         $result[] = 'absentmistakeweight';
-        // Penalty for odd lexeme mistake  
+        // Penalty for odd lexeme mistake
         $result[] = 'addedmistakeweight';
         // Penalty for moved lexeme mistake
         $result[] = 'movedmistakeweight';
@@ -72,55 +72,55 @@ class qtype_correctwriting extends qtype_shortanswer {
     public function questionid_column_name() {
         return 'questionid';
     }
-    
+
     /** Loads a question type specific options for  the question
         @return bool              Indicates success or failure
         @param  object $question  The  question object, which must be filled with appropriate data
      */
     public function get_question_options($question) {
         global $DB;
-        
-        
+
+
         // Extra question fields will do job, like loading some answers for question
         if (!parent::get_question_options($question)) {
             return false;
         }
         return true;
     }
-    
-    
-    
-    /** Saves a question 
+
+
+
+    /** Saves a question
         @param object $question question data
       */
     public function save_question_options($question) {
         global $DB;
-        
+
         // Result of saving
         $result = new stdClass();
 
         //Context, where question belongs to
         $context = $question->context;
-        
-        
+
+
         $answers = $question->answer;
-        
+
         //We need an old answers in order to delete some old records
         $oldanswerunused = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
-        
+
         // Save main question data
         $result = parent::save_question_options($question);
-        
+
         $lang = block_formal_langs::lang_object($question->langid);
-         
-        
+
+
         // Answers contains an array of answer ids
         $insertedanswerids = explode(',',$question->answers);
         // Used lexeme descriptions for symbols
         $descriptions = $question->lexemedescriptions;
         $currentid = 0;
         $currentdescription = 0;
-        
+
         $oldanswerused = array();
         // Insert all the new answers
         foreach ($question->answer as $key => $answerdata) {
@@ -133,7 +133,7 @@ class qtype_correctwriting extends qtype_shortanswer {
             $description = $descriptions[$currentdescription];
             $string = $lang->create_from_db('question_answers',$insertedanswerids[$currentid]);
             $string->save_descriptions(explode(PHP_EOL, $description));
-            
+
             $oldanswerused[] = $insertedanswerids[$currentid];
             $currentid = $currentid + 1;
             $currentdescription = $currentdescription + 1;
@@ -145,10 +145,10 @@ class qtype_correctwriting extends qtype_shortanswer {
         }
         return $result;
     }
-    
-    /** Removes a symbols from tables and everything about question. 
+
+    /** Removes a symbols from tables and everything about question.
      * @param int $questionid the question being deleted.
-     * @param int $contextid the context this question belongs to. 
+     * @param int $contextid the context this question belongs to.
      */
     public function delete_question($questionid, $contextid) {
         global $DB;

@@ -3,24 +3,24 @@
  * Defines an implementation of mistakes, that are determined by computing LCS and comparing answer and response
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Dmitriy Mamontov, Volgograd State Technical University
+ * @author Oleg Sychev, Dmitriy Mamontov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
- 
+
 require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php');
 
 // A marker class to indicate errors from sequence_analyzer
 class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
-   
+
 }
 
 
 // A mistake, that consists from moving one lexeme to different position, than original
 class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_sequence_mistake {
-    /** 
+    /**
      * @var block_formal_langs_processed_string processed string of answer
      */
     protected $answerstring;
@@ -34,20 +34,20 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
      */
     public function __construct($language,$answer,$answerindex,$response,$responseindex) {
         $this->languagename = $language->name();
-        
+
         $this->answer = $answer->stream->tokens;
         $this->response = $response->stream->tokens;
-        
+
         $this->position = $this->response[$responseindex]->position();
-        
-        $this->answerstring = $answer; 
+
+        $this->answerstring = $answer;
         $this->mistakemsg = null;
         //Fill answer data
         $this->answermistaken = array();
         $this->answermistaken[] = $answerindex;
         //Fill response data
         $this->responsemistaken = array();
-        $this->responsemistaken[] = $responseindex; 
+        $this->responsemistaken[] = $responseindex;
     }
     /** Performs a mistake message creation if needed
      */
@@ -83,7 +83,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
     * @param array  $response      array response tokens
     * @param int    $responseindex index of response token
     */
-    public function __construct($language,$answer,$response,$responseindex) { 
+    public function __construct($language,$answer,$response,$responseindex) {
         $this->languagename = $language->name();
 
         $this->answer = $answer->stream->tokens;
@@ -107,8 +107,9 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         //Create a mistake message
         $a = new stdClass();
         $data = $this->response[$responseindex]->value();
-        if (!is_string($data))
+        if (!is_string($data)) {
             $data = $data->string();
+        }
         $a->value = $data;
         $a->line = $this->position->linestart();
         $a->position = $this->position->colstart();
@@ -122,7 +123,7 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
 
 // A mistake, that consists of  skipping a lexeme from answer
 class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_sequence_mistake {
-    /** 
+    /**
      * @var block_formal_langs_processed_string processed string of answer
      */
     protected $answerstring;
@@ -146,8 +147,8 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
        //Fill response data
        $this->responsemistaken = array();
 
-       $this->answerstring = $answer; 
-       $this->mistakemsg = null;       
+       $this->answerstring = $answer;
+       $this->mistakemsg = null;      
     }
 
     /** Performs a mistake message creation if needed
