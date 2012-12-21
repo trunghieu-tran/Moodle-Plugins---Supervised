@@ -1,28 +1,27 @@
-%name preg_parser_
+%name qtype_preg_
 %include{
+    global $CFG;
+    require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
+    require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 }
 %include_class {
-    //Root of the Abstract Syntax Tree (AST)
+    // Root of the Abstract Syntax Tree (AST).
     private $root;
-    //Are there any errors during the parsing
-    private $error;
-    //Copies of preg_node_error for errors during the parsing
+    // Objects of qtype_preg_node_error for errors during the parsing.
     private $errornodes;
-    //Count of reduces made
+    // Count of reduces made.
     private $reducecount;
-    //Open-parenthesis strings
-    private $parens;
-    //Quantifier strings
-    private $quants;
+    // Node id counter.
+    private $idcounter;
+    // Handling options
+    public $handlingoptions;
 
     function __construct() {
-        $this->error = false;
         $this->errornodes = array();
         $this->reducecount = 0;
-        $this->parens = array(preg_node_subpatt::SUBTYPE_SUBPATT => '(', 'grouping' => '(?:', preg_node_subpatt::SUBTYPE_ONCEONLY => '(?>', 
-                              preg_node_assert::SUBTYPE_PLA => '(?=', preg_node_assert::SUBTYPE_PLB => '(?<=',preg_node_assert::SUBTYPE_NLA => '(?!', preg_node_assert::SUBTYPE_NLB => '(?<!',
-                              preg_node_cond_subpatt::SUBTYPE_PLA => '(?(?=', preg_node_cond_subpatt::SUBTYPE_PLB => '(?(?<=',preg_node_cond_subpatt::SUBTYPE_NLA => '(?(?!', preg_node_cond_subpatt::SUBTYPE_NLB => '(?(?<!');
+        $this->idcounter = 0;
+        $this->handlingoptions = new qtype_preg_handling_options();
     }
 
     function get_root() {
@@ -30,7 +29,7 @@
     }
 
     function get_error() {
-        return $this->error;
+        return (count($this->errornodes) > 0);
     }
 
     public function get_error_nodes() {
@@ -38,32 +37,149 @@
     }
 
     /**
-    * Create and return an error node, also add it to the array of parser errors
-    @param subtype type of error
-    @param firstindxs array of starting indexes of highlited areas
-    @param lastindxs array of ending indexes of highlited areas
-    @param addinfo additional info, supplied for this error
-    @return preg_node_error object
-    */
-    protected function create_error_node($subtype, $firstindxs = null, $lastindxs = null, $addinfo = null) {
-        $newnode = new preg_node_error;
-        $newnode->subtype = $subtype;
-        if ($firstindxs !== null) {
-            $newnode->firstindxs = $firstindxs;
-        }
-        if ($lastindxs !== null) {
-            $newnode->lastindxs = $lastindxs;
-        }
-        $newnodw->addinfo = $addinfo;
+     * Creates and returns an error node, also adds it to the array of parser errors
+     * @param subtype type of error
+     * @param indfirst the starting index of the highlited area
+     * @param indlast the ending index of the highlited area
+     * @param addinfo additional info, supplied for this error
+     * @return qtype_preg_node_error object
+     */
+    protected function create_error_node($subtype, $indfirst = -1, $indlast = -1, $addinfo = null, $userinscription, $operands = array()) {
+        $newnode = new qtype_preg_node_error($subtype, $addinfo);
+        $newnode->set_user_info($indfirst, $indlast, $userinscription);
+        $newnode->operands = $operands;
+        $newnode->id = $this->idcounter++;
         $this->errornodes[] = $newnode;
-        $this->error = true;
         return $newnode;
+    }
+
+    /**
+     * Creates error node(s) if there is an error in the given node.
+     * @param node the node to be checked.
+     */
+    protected function create_error_node_from_lexer($node) {
+        if (isset($node->type) && $node->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            $this->create_error_node($node->subtype, $node->indfirst, $node->indlast, $node->addinfo, $node->userinscription);
+        }
+        if (!isset($node->error)) {
+            return;
+        }
+        if (is_array($node->error)) {
+            foreach ($node->error as $error) {
+                $this->create_error_node($error->subtype, $error->indfirst, $error->indlast, $error->addinfo, $error->userinscription);
+            }
+        } else if ($node->error !== null) {
+            $this->create_error_node($node->error->subtype, $node->error->indfirst, $node->error->indlast, $node->error->addinfo, $node->error->userinscription);
+        }
+    }
+
+    /**
+      * Creates and return correct parenthesis node (subpattern, groping or assertion).
+      *
+      * Used to avoid code duplication between empty and non-empty parenthesis.
+      * @param parens parenthesis token from lexer
+      * @param exprnode the node for expression inside parenthesis
+      */
+    protected function create_parens_node($parens, $exprnode) {
+        $result = null;
+        if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
+            $result = $exprnode;
+        } else {
+            if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+                $result = new qtype_preg_node_subpatt();
+            } else if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $parens->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
+                $result = new qtype_preg_node_subpatt();
+                $result->number = $parens->number;
+            } else {
+                $result = new qtype_preg_node_assert();
+            }
+            $result->subtype = $parens->subtype;
+            $result->operands[0] = $exprnode;
+            $result->id = $this->idcounter++;
+            $result->userinscription = new qtype_preg_userinscription($parens->userinscription->data . '...)');
+        }
+        $result->set_user_info($parens->indfirst, $exprnode->indlast + 1, $result->userinscription);
+        return $result;
+    }
+
+    protected function create_cond_subpatt_assertion_node($paren, $assertnode, $exprnode) {
+        if ($assertnode === null) {
+            $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $assertnode->set_user_info($paren->indlast, $paren->indlast, new qtype_preg_userinscription());
+            $assertnode->id = $this->idcounter++;
+        }
+        if ($exprnode === null) {
+            $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $exprnode->set_user_info($assertnode->indlast + 1, $assertnode->indlast + 1, new qtype_preg_userinscription());
+            $exprnode->id = $this->idcounter++;
+        }
+        if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
+            $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+            $result->operands[0] = $exprnode;
+        } else {
+            // Error: only one or two top-level alternative allowed in a conditional subpattern.
+            if ($exprnode->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || $exprnode->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
+                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode, $assertnode));
+                $this->reducecount++;
+                return $result;
+            } else {
+                $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+                $result->operands[0] = $exprnode->operands[0];
+                $result->operands[1] = $exprnode->operands[1];
+            }
+        }
+        if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA) {
+            $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
+        } else if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB) {
+            $subtype = qtype_preg_node_assert::SUBTYPE_PLB;
+        } else if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA) {
+            $subtype = qtype_preg_node_assert::SUBTYPE_NLA;
+        } else {
+            $subtype = qtype_preg_node_assert::SUBTYPE_NLB;
+        }
+        $result->operands[2] = new qtype_preg_node_assert($subtype);
+        $result->operands[2]->operands[0] = $assertnode;
+        $result->operands[2]->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($paren->userinscription->data, 2) . '...)');
+        $result->operands[2]->id = $this->idcounter++;
+        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...)...|...)'));
+        $result->id = $this->idcounter++;
+        $this->reducecount++;
+        return $result;
+    }
+
+    protected function create_cond_subpatt_other_node($paren, $exprnode) {
+        if ($exprnode === null) {
+            $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $exprnode->set_user_info($paren->indlast + 2, $paren->indlast + 2, new qtype_preg_userinscription());
+            $exprnode->id = $this->idcounter++;
+        }
+        if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
+            $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+            $result->operands[0] = $exprnode;
+        } else {
+             // Error: only one or two top-level alternative allowed in a conditional subpattern.
+            if ($exprnode->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || $exprnode->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
+                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode));
+                $this->reducecount++;
+                return $result;
+            } else {
+                $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+                $result->operands[0] = $exprnode->operands[0];
+                $result->operands[1] = $exprnode->operands[1];
+            }
+        }
+        if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT) {
+            $result->number = $paren->number;
+        }
+        $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...|...)'));
+        $result->id = $this->idcounter++;
+        $this->reducecount++;
+        return $result;
     }
 }
 %parse_failure {
-    if (!$this->error) {
-        $this->create_error_node(preg_node_error::SUBTYPE_UNKNOWN_ERROR);
-        $this->error = true;
+    if (count($this->errornodes) === 0) {
+        $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR);
     }
 }
 %nonassoc ERROR_PREC_VERY_SHORT.
@@ -78,209 +194,158 @@
 start ::= lastexpr(B). {
     $this->root = B;
 }
+
 expr(A) ::= expr(B) expr(C). [CONC] {
-    A = new preg_node_concat;
+    A = new qtype_preg_node_concat();
+    A->set_user_info(B->indfirst, C->indlast, new qtype_preg_userinscription());
     A->operands[0] = B;
     A->operands[1] = C;
+    A->id = $this->idcounter++;
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = C->indlast;
 }
+
 expr(A) ::= expr(B) ALT expr(C). {
-    //ECHO 'ALT <br/>';
-    A = new preg_node_alt;
+    A = new qtype_preg_node_alt();
+    A->set_user_info(B->indfirst, C->indlast, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
     A->operands[1] = C;
+    A->id = $this->idcounter++;
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = C->indlast;
 }
+
 expr(A) ::= expr(B) ALT. {
-    A = new preg_node_alt;
+    A = new qtype_preg_node_alt();
+    A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
-    A->operands[1] = new preg_leaf_meta;
-    A->operands[1]->subtype = preg_leaf_meta::SUBTYPE_EMPTY;
+    A->operands[1] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->operands[1]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
+    A->operands[1]->id = $this->idcounter++;
+    A->id = $this->idcounter++;
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast + 1;
+}
+
+expr(A) ::= ALT expr(B). {
+    A = new qtype_preg_node_alt();
+    A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
+    A->operands[0] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->operands[0]->set_user_info(B->indfirst + 1, B->indlast + 1, new qtype_preg_userinscription());
+    A->operands[0]->id = $this->idcounter++;
+    A->operands[1] = B;
+    A->id = $this->idcounter++;
+    $this->reducecount++;
 }
 
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
+    A->set_user_info(B->indfirst, C->indlast, C->userinscription);
     A->operands[0] = B;
+    A->id = $this->idcounter++;
+    $this->create_error_node_from_lexer(C);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = C->indlast;
+}
+
+expr(A) ::= OPENBRACK(B) CLOSEBRACK. {
+    $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    $emptynode->set_user_info(B->indlast, B->indlast, new qtype_preg_userinscription());
+    $emptynode->id = $this->idcounter++;
+    A = $this->create_parens_node(B, $emptynode);
+    $this->create_error_node_from_lexer(B);
+    $this->reducecount++;
 }
 
 expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK. {
-    //ECHO 'SUBPATT '.$this->parens[B].'<br/>';
-    if (B->subtype !== 'grouping') {
-        if (B->subtype === preg_node_subpatt::SUBTYPE_SUBPATT || B->subtype === preg_node_subpatt::SUBTYPE_ONCEONLY) {
-            A = new preg_node_subpatt;
-            A->number = B->number;
-        } else {
-            A = new preg_node_assert;
-        }
-        //if (B->subtype !== preg_node::TYPE_NODE_SUBPATT) {
-            A->subtype = B->subtype;
-       // }
-        A->operands[0] = C;
-    } else {//grouping node
-        A = C;
-    }
+    A = $this->create_parens_node(B, C);
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = C->indlast + 1;
 }
+
 expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK expr(C) CLOSEBRACK. {
-    //ECHO  'CONDSUB TF <br/>';
-    A = new preg_node_cond_subpatt;
-    if (C->type != preg_node::TYPE_NODE_ALT) {
-        A->operands[0] = C;
+    if (D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
+        D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
+        A = $this->create_cond_subpatt_assertion_node(D, B, C);
     } else {
-        if (C->operands[0]->type == preg_node::TYPE_NODE_ALT || C->operands[1]->type == preg_node::TYPE_NODE_ALT) {
-            //One or two top-level alternative allowed in conditional subpattern 
-            A = $this->create_error_node(preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, array(D->indfirst), array(C->indlast+1));
-            $this->reducecount++;
-            return;
-        } else {
-            A->operands[0] = C->operands[0];
-            A->operands[1] = C->operands[1];
-        }
+        A = $this->create_cond_subpatt_other_node(D, C);
     }
-    A->operands[2] = new preg_node_assert;
-    A->operands[2]->subtype = D->subtype;
-    A->operands[2]->operands[0] = B;
-    $this->reducecount++;
-    A->indfirst = D->indfirst;
-    A->indlast = C->indlast + 1;
 }
+
+expr(A) ::= CONDSUBPATT(D) expr(B) CLOSEBRACK CLOSEBRACK. {
+    if (D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
+        D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
+        A = $this->create_cond_subpatt_assertion_node(D, B, null);
+    } else {
+        A = $this->create_cond_subpatt_other_node(D, null);
+    }
+}
+
+expr(A) ::= CONDSUBPATT(D) CLOSEBRACK expr(C) CLOSEBRACK. {
+    if (D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
+        D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
+        A = $this->create_cond_subpatt_assertion_node(D, null, C);
+    } else {
+        A = $this->create_cond_subpatt_other_node(D, C);
+    }
+}
+
+expr(A) ::= CONDSUBPATT(D) CLOSEBRACK CLOSEBRACK. {
+    if (D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
+        D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || D->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
+        A = $this->create_cond_subpatt_assertion_node(D, null, null);
+    } else {
+        A = $this->create_cond_subpatt_other_node(D, null);
+    }
+}
+
 expr(A) ::= PARSLEAF(B). {
-    //ECHO 'LEAF <br/>';
-    if (B->type != preg_node::TYPE_LEAF_CHARSET || !B->w && !B->W) {
-        A = B;
-    } else if (B->w) {
-        A = new preg_node_alt;
-        A->operands[0] = new preg_leaf_meta;
-        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[1] = B;
-    } else if (B->W) {
-        A = new preg_node_alt;
-        A->operands[0] = new preg_leaf_meta;
-        A->operands[0]->subtype = preg_leaf_meta::SUBTYPE_WORD_CHAR;
-        A->operands[0]->negative = true;
-        A->operands[1] = B;
-    }
+    A = B;
+    A->id = $this->idcounter++;
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
 }
+
 lastexpr(A) ::= expr(B). {
     A = B;
     $this->reducecount++;
 }
 
 expr(A) ::= expr(B) CLOSEBRACK. [ERROR_PREC] {
-    //ECHO 'UNOPENPARENS <br/>';
-    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indlast + 1), array(B->indlast + 1));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, B->indlast + 1, B->indlast + 1, null, null, array(B));
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast + 1;
 }
 
 expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
-    //ECHO 'CLOSEPARENATSTART <br/>';
-    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, array(B->indfirst), array(B->indfirst));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN, B->indfirst, B->indlast, ')', new qtype_preg_userinscription(')'));
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
 }
 
 expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $emptyparens = false;
-    foreach($this->errornodes as $key=>$node) {
-        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//empty parens, avoiding two error messages
-            unset($this->errornodes[$key]);
-            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(B->indlast + 1), $this->parens[B->subtype]);
-            $emptyparens = true;
-            A->indlast = B->indlast + 1;
-        }
-    }
-    if (!$emptyparens) {//regular unclosed parens
-        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
-        A->indlast = C->indlast;
-    }
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst, B->indlast, B->userinscription->data, B->userinscription, array(C));
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
-    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst,  B->indlast, B->userinscription->data, B->userinscription);
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
 }
 
-expr(A) ::= CONDSUBPATT(B) expr CLOSEBRACK(D) expr(C). [ERROR_PREC] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    $emptyparens = false;
-    foreach($this->errornodes as $key=>$node) {
-        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == D->indlast + 1) {//empty parens, avoiding two error messages
-            unset($this->errornodes[$key]);
-            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(D->indlast + 1), $this->parens[B->subtype]);
-            $emptyparens = true;
-            A->indlast = D->indlast + 1;
-        }
-    }
-    if (!$emptyparens) {//regular unclosed parens
-        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
-        A->indlast = C->indlast;
-    }
+expr(A) ::= CONDSUBPATT(B) expr(E) CLOSEBRACK(D) expr(C). [ERROR_PREC] {
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst, B->indlast, B->userinscription->data, B->userinscription, array(C, E));
     $this->reducecount++;
-    A->indfirst = B->indfirst;
 }
 
 expr(A) ::= CONDSUBPATT(B) expr(C). [ERROR_PREC_SHORT] {
-    //ECHO 'UNCLOSEDPARENS <br/>';
-    //Two unclosed parens for conditional subpatterns
-    //Create only one error node to avoid confusion when reporting errors to the user
-    $emptyparens = false;
-    foreach($this->errornodes as $key=>$node) {
-        if ($node->subtype == preg_node_error::SUBTYPE_WRONG_CLOSE_PAREN && $node->indfirst == B->indlast + 1) {//unclosed parens + empty parens, avoiding two error messages
-            unset($this->errornodes[$key]);
-            A = $this->create_error_node(preg_node_error::SUBTYPE_EMPTY_PARENS, array(B->indfirst), array(B->indlast + 1), $this->parens[B->subtype]);
-            $emptyparens = true;
-            A->indlast = B->indlast + 1;
-        }
-    }
-    if (!$emptyparens) {//two unclosed parens
-        A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst), array(B->indlast), $this->parens[B->subtype]);
-        A->indlast = C->indlast;
-    }
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst, B->indlast, B->userinscription->data, B->userinscription, array(C));
     $this->reducecount++;
-    A->indfirst = B->indfirst;
 }
 
 expr(A) ::= CONDSUBPATT(B). [ERROR_PREC_VERY_SHORT] {
-    A = $this->create_error_node(preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, array(B->indfirst),  array(B->indlast), $this->parens[B->subtype]);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_OPEN_PAREN, B->indfirst,  B->indlast, B->userinscription->data, B->userinscription);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
 }
-
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
-    A = $this->create_error_node(preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, array(B->indfirst),  array(B->indlast));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->indfirst,  B->indlast, B->userinscription->data, B->userinscription);
+    $this->create_error_node_from_lexer(B);
     $this->reducecount++;
-    A->indfirst = B->indfirst;
-    A->indlast = B->indlast;
-}
-
-lastexpr(A) ::= lastexpr(B) LEXERROR(C). {
-    A = $this->create_error_node(C->subtype, array(C->indfirst), array(C->indlast));
-    $this->reducecount++;
-    A->indfirst = C->indfirst;//NOTE - indexes may depends on C->subtype, take into account if another lexer error would be found
-    A->indlast = C->indlast;
 }
