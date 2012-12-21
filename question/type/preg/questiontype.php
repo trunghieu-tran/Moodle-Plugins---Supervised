@@ -1,63 +1,60 @@
-<?php  // $Id: questiontype.php,v 1.4 beta 2010/08/08 16:47:26 oasychev & dvkolesov Exp $
+<?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the question type class for the preg question type.
+ * Defines the Preg question type class.
  *
- * @copyright &copy; 2008  Sychev Oleg 
- * @author Sychev Oleg, Volgograd State Technical University
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package questions
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-///////////////////
-/// preg ///
-///////////////////
- 
-/// QUESTION TYPE CLASS //////////////////
 
-require_once($CFG->dirroot.'/question/type/shortanswer/questiontype.php');
-require_once($CFG->dirroot.'/question/type/preg/question.php');
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 class qtype_preg extends qtype_shortanswer {
-    private $graphvizpath = '';    // path to dot.exe of graphviz
-    
-    public function __construct() {
-        global $CFG;
-        if (isset($CFG->qtype_preg_graphvizpath)) {
-            $this->graphvizpath = $CFG->qtype_preg_graphvizpath;
-        } else {
-            $this->graphvizpath = '';
-        }
-    }
 
     /*public function questionid_column_name() {
         return 'questionid';
     }*/
 
     /**
-    * returns an array of engines
-    * key = engine indentifier, value = interface string with engine name
-    */
+     * Returns an array of available engines.
+     * key = engine indentifier, value = interface string with engine name.
+     */
     public function available_engines() {
-        return array(   'preg_php_matcher' => get_string('preg_php_matcher','qtype_preg'),
-                        'dfa_preg_matcher' => get_string('dfa_preg_matcher','qtype_preg'),
-                        'nfa_preg_matcher' => get_string('nfa_preg_matcher','qtype_preg')/*,
-                        'backtracking_preg_matcher' => 'backtracking_preg_matcher'*/
+        return array(   'php_preg_matcher' => get_string('php_preg_matcher','qtype_preg'),
+                        'dfa_matcher' => get_string('dfa_matcher','qtype_preg'),
+                        'nfa_matcher' => get_string('nfa_matcher','qtype_preg')/*,
+                        'backtracking_matcher' => 'backtracking_matcher'*/
                     );
     }
 
     /**
-    * returns an array of supported notations
-    * key = notation indentifier, value = interface string with notation name
-    */
+     * Returns an array of supported notations.
+     * key = notation indentifier, value = interface string with notation name.
+     */
     public function available_notations() {
         return array(   'native' => get_string('notation_native', 'qtype_preg'),
                         'mdlshortanswer' => get_string('notation_mdlshortanswer', 'qtype_preg')
                     );
-    }
-
-    //We are a child of shortanswer question
-    function requires_qtypes() {
-        return array('shortanswer');
     }
 
     function name() {
@@ -67,17 +64,29 @@ class qtype_preg extends qtype_shortanswer {
     public function extra_question_fields() {
         $extraquestionfields = parent::extra_question_fields();
         array_splice($extraquestionfields, 0, 1, 'qtype_preg');
-        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usehint', 'hintpenalty', 'hintgradeborder', 'engine', 'notation');
+        array_push($extraquestionfields, 'correctanswer', 'exactmatch', 'usecharhint', 'charhintpenalty', 'hintgradeborder', 'engine', 'notation', 'uselexemhint', 'lexemhintpenalty', 'langid', 'lexemusername');
         return $extraquestionfields;
     }
 
     function save_question_options($question) {
         //Fill in some data that could be absent due to disabling form controls
-        if (!isset($question->usehint)) {
-            $question->usehint = false;
+        if (!isset($question->usecharhint)) {
+            $question->usecharhint = false;
         }
-        if (!isset($question->hintpenalty)) {
-            $question->hintpenalty = 0;
+        if (!isset($question->charhintpenalty)) {
+            $question->charhintpenalty = 0;
+        }
+        if (!isset($question->uselexemhint)) {
+            $question->uselexemhint = false;
+        }
+        if (!isset($question->lexemhintpenalty)) {
+            $question->lexemhintpenalty = 0;
+        }
+        if (!isset($question->lexemusername)) {
+            $question->lexemusername = '';
+        }
+        if (!isset($question->langid)) {
+            $question->langid = 0;
         }
         if (!isset($question->hintgradeborder)) {
             $question->hintgradeborder = 1;
@@ -86,55 +95,20 @@ class qtype_preg extends qtype_shortanswer {
         //Sanity check for engine capabilities - disabling form controls works really strange...
         $questionobj = new qtype_preg_question;
         $querymatcher = $questionobj->get_query_matcher($question->engine);
-        if (!$querymatcher->is_supporting(preg_matcher::NEXT_CHARACTER)) {
-            $question->usehint = false;
+        if (!$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+            $question->usecharhint = false;
+            $question->uselexemhint = false;
         }
 
         parent::save_question_options($question);
     }
 
-    function test_response(&$question, $state, $answer) {
+    /*function test_response(&$question, $state, $answer) {
         // Trim the response before it is saved in the database. See MDL-10709
         $state->responses[''] = trim($state->responses['']);
-        $matcher =& $this->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id);
+        $hintneeded = ($question->usecharhint || $question->uselexemhint) && $answer->fraction >= $question->hintgradeborder;
+        $matcher = $question->get_matcher($question->options->engine, $answer->answer, $question->options->exactmatch, $question->options->usecase, $answer->id, $question->notation);
         return $matcher->match($state->responses['']);
-    }
-
-    public function get_temp_dir($componentname) {
-        global $CFG;
-        $dir = $CFG->dataroot.'/temp/preg/'.$componentname.'/';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        return $dir;
-    }
-
-    public function is_dot_installed() {
-        if ($this->graphvizpath === '') {
-            return false;
-        }
-        $dotexefilename = $this->graphvizpath.'/dot.exe';
-        if (!file_exists($dotexefilename)) {
-            return false;
-        }
-        return true;
-    }
-
-    public function execute_dot($dotfilename, $jpegfilename = null) {
-        if (!$this->is_dot_installed()) {
-            return;
-        }
-        $jpgpath = pathinfo($dotfilename, PATHINFO_DIRNAME);
-        if ($jpegfilename === null) {            
-            $filename = pathinfo($dotfilename, PATHINFO_FILENAME);
-            $jpgfn = $jpgpath.'/'.$filename.'.jpg';
-        } else {
-            $jpgfn = $jpgpath.'/'.$jpegfilename;
-        }
-        chdir($this->graphvizpath);
-        exec("dot.exe -Tjpg -o\"$jpgfn\" -Kdot $dotfilename");
-    }
+    }*/
 
 }
-//// END OF CLASS ////
-?>

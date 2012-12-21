@@ -1,85 +1,147 @@
 <?php
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Preg question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Preg question renderer class.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Oleg Sychev
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
- * Generates the output for short answer questions.
- *
- * @copyright  2011 Oleg Sychev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Generates the output for preg questions.
  */
 class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
-        $question = $qa->get_question();
-        $currentanswer = $qa->get_last_qt_var('answer');
         $result = parent::formulation_and_controls($qa,$options);
 
-        //Show colored string if appropriable (i.e. any answer is given)
-        //We must show colored string along with specific_feedback if after student answered wrong specific feedback is shown, but general feedback is not
-        //If all feedback is shown alike, colored string should be shown there
         return $result;
     }
 
-    //Overloading feedback to add colored string 
+    public function correct_response(question_attempt $qa) {
+        $question = $qa->get_question();
+        $response = $qa->get_last_qt_var('answer');
+
+        if ($response) {//Generate response-specific correct answer if there is response
+            $correctanswer = $question->get_correct_response_ext(array('answer' => $response));
+        } else {
+            $correctanswer = $question->get_correct_response();
+        }
+
+        if (!$correctanswer) {
+            return '';
+        }
+
+        return get_string('correctansweris', 'qtype_shortanswer', s($correctanswer['answer']));
+    }
+
+    //Overloading feedback to add colored string
     public function feedback(question_attempt $qa, question_display_options $options) {
 
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
         if(!$currentanswer) {
-            return '';
+            $currentanswer = '';
         }
 
-        //////Colored string
+        //Determine requested hint(s)
         $hintmessage = '';
-        //TODO - decide exact conditions to show colored string. $options->correctness seems too tight - in adaptive mode it isn't shown until all is graded
-        //if ($options->correctness == question_display_options::VISIBLE) {
-        if ($options->feedback == question_display_options::VISIBLE || $qa->get_last_step()->has_behaviour_var('_render_hintnextchar')) {//specific feedback is possible or hint is requested
-            //Calculate strings for response coloring
-            $parts = $question->response_correctness_parts(array('answer' => $currentanswer));
-            if ($parts !== null) {
-
-                $wronghead = '';
-                if ($parts['wronghead'] !== '') {//if there is wrong heading
-                    $wronghead = html_writer::tag('span', htmlspecialchars($parts['wronghead']), array('class' => $this->feedback_class(0)));
-                }
-
-                $correctpart = '';
-                if ($parts['correctpart'] != '') {//there were any match
-                    $correctpart = html_writer::tag('span', htmlspecialchars($parts['correctpart']), array('class' => $this->feedback_class(1)));
-                }
-
-                $hintedcharacter = '';
-                if ($qa->get_last_step()->has_behaviour_var('_render_hintnextchar') && $parts['hintedcharacter'] !== '') {//if hint requested and possible
-                    $hintedcharacter = html_writer::tag('span', htmlspecialchars($parts['hintedcharacter']), array('class' => $this->feedback_class(0.5)));
-                }
-
-                $wrongtail = '';
-                if ($parts['wrongtail']) {//if there is wrong tail
-                    $wrongtail =  html_writer::tag('span', htmlspecialchars($parts['wrongtail']), array('class' => $this->feedback_class(0)));
-                }
-
-                $hintmessage = $wronghead.$correctpart.$hintedcharacter.$wrongtail.html_writer::empty_tag('br');
+        $hintkeys = array();
+        $hints = $question->available_specific_hints();
+        foreach ($hints as $key => $value) {
+            if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
+                $hintkeys[] = $key;
             }
         }
 
-        /*TODO - find out how to define classes in plugins and add separate class for hint message*/
-        //$hintmessage = html_writer::tag('div', $hintmessage, array('class' => 'specificfeedback'));//TODO  - this may not be needed as rendererbase.php provides div on it's own
+        //Render hints
+        if (!empty($hintkeys)) {//Hint requested.
+            foreach ($hintkeys as $hintkey) {
+                $hintobj = $question->hint_object($hintkey);
+                $hintmessage .= $hintobj->render_hint($this, array('answer' => $currentanswer));
+                $hintmessage .= html_writer::empty_tag('br');
+            }
+        } elseif ($options->feedback == question_display_options::VISIBLE) {
+            //Specific feedback is possible, render colored string - TODO - decide when to render colored string.
+            $hintobj =  $question->hint_object('hintmatchingpart');
+            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
+            if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
+                $hintmessage .= html_writer::empty_tag('br');
+            }
+        }
 
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
+    }
+
+    /** Renders matched part of the response */
+    public function render_matched($str) {
+        if ($str !== '') {
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(1)));
+        }
+        return '';
+    }
+
+    /** Renders unmatched part of the response */
+    public function render_unmatched($str) {
+        if ($str !== '') {
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0)));
+        }
+        return '';
+    }
+
+    /** Renders hinted part of the response*/
+    public function render_hinted($str) {
+        if ($str !== '') {
+            return html_writer::tag('span', htmlspecialchars($str), array('class' => $this->feedback_class(0.5)));
+        }
+        return '';
+    }
+
+    /** Renders part of the response that should be deleted*/
+    public function render_deleted($str) {
+        if ($str !== '') {
+            return html_writer::tag('span', html_writer::tag('del', htmlspecialchars($str)), array('class' => $this->feedback_class(0)));
+        }
+        return '';
+    }
+
+    /** Renders part of the response that should be inserted*/
+    public function render_inserted($str) {
+        if ($str !== '') {
+            return html_writer::tag('ins', htmlspecialchars($str));
+        }
+        return '';
+    }
+
+    /** Renders to be continued specifier*/
+    public function render_tobecontinued() {
+        return get_string('tobecontinued', 'qtype_preg', null);
     }
 
     public function specific_feedback(question_attempt $qa) {
@@ -91,29 +153,6 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         }
 
         //////Teacher-defined feedback text for that answer
-        $bestfit = $question->get_best_fit_answer(array('answer' => $currentanswer));
-        $feedback = '';
-        //If best fit answer is found and there is at least partial match
-        if (isset($bestfit['answer']) && $bestfit['match']['is_match'] && $bestfit['match']['full']) {
-            $answer = $bestfit['answer'];
-            if ($answer->feedback) {
-                $feedbacktext = $question->insert_subpatterns($answer->feedback, array('answer' => $currentanswer));
-                $feedback = $question->format_text($feedbacktext, $answer->feedbackformat,
-                    $qa, 'question', 'answerfeedback', $answer->id);
-            }
-        }
-
-        return $feedback;
-    }
-
-    public function correct_response(question_attempt $qa) {
-
-        $correctresponse = $qa->get_question()->get_correct_response(); 
-        $answer = $correctresponse['answer'];
-        if (!$answer) { //Correct answer isn't set by the teacher
-            return '';
-        }
-
-        return get_string('correctansweris', 'qtype_shortanswer', s($answer));
+        return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
 }

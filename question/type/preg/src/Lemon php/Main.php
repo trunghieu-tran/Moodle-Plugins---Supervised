@@ -1815,7 +1815,7 @@ class LemonData {
     ** a pointer to the opened file. */
     private function tplt_open()
     {
-        $templatename = dirname(__FILE__) . '\\' . "Lempar.php";
+        $templatename = dirname(__FILE__) . '/' . "Lempar.php";
         $buf = $this->filenosuffix . '.lt';
         if (file_exists($buf) && is_readable($buf)) {
             $tpltname = $buf;
