@@ -47,13 +47,16 @@ class qtype_preg_error {
         }
     }
 
-     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2) {
+     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2, $preservemsg = false) {
+        if (!$preservemsg) {
+            $errormsg = htmlspecialchars($errormsg);
+        }
         $this->index_first = $index_first;
         $this->index_last = $index_last;
         if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . htmlspecialchars($errormsg);
+            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
         } else {
-            $this->errormsg = htmlspecialchars($errormsg);
+            $this->errormsg = $errormsg;
         }
      }
 }
