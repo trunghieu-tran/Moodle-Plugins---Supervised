@@ -108,6 +108,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
+        global $CFG;
         $a = new stdClass;
         if ($indexes['start'] == -1 && $indexes['end'] == -2) {
             $a->indfirst = 0;
@@ -119,6 +120,7 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
+        $a->link = $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettingpreg';
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('too_large_fa', 'qtype_preg', $a);
     }
 }
