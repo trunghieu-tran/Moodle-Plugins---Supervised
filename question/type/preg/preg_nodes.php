@@ -318,7 +318,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     protected function match_inner($str, $pos, &$length, $matcherstateobj = null) {
-		if ($pos < 0 || $pos >= $str->length()) {
+        if ($pos < 0 || $pos >= $str->length()) {
             return false;
         }
         $result = false;
@@ -433,27 +433,27 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         //comparing ranges of this and other charsets
         if (is_array($ranges)) {
-		      $included = true;        
+              $included = true;
         } else {
             return false;
         }
         /*foreach($ranges as $i=>$ran) {
-        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+               $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
         }
         foreach($otherranges as $i=>$ran) {
-        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+               $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-			   if (current($ranges)!=current($otherranges)) {
-				    $included = false;
-				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-					     next($ranges);				    
-				    }
-				    if (current($ranges)!==false) {
-                    $included = true;				    
-				    }*/
-			   }        
+               if (current($ranges)!=current($otherranges)) {
+                    $included = false;
+                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                         next($ranges);
+                    }
+                    if (current($ranges)!==false) {
+                    $included = true;
+                    }*/
+               }
         }
         return $included;
     }
@@ -509,27 +509,27 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
         //comparing ranges of this and other charsets
         if (is_array($ranges)) {
-		      $included = false;        
+              $included = false;
         } else {
             return false;
         }
         /*foreach($ranges as $i=>$ran) {
-        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+               $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
         }
         foreach($otherranges as $i=>$ran) {
-        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+               $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-			   if (current($ranges)==current($otherranges)) {
-				    $included = true;
-				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-					     next($ranges);				    
-				    }
-				    if (current($ranges)!==false) {
-                    $included = true;				    
-				    }*/
-			   }        
+               if (current($ranges)==current($otherranges)) {
+                    $included = true;
+                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                         next($ranges);
+                    }
+                    if (current($ranges)!==false) {
+                    $included = true;
+                    }*/
+               }
         }
         return $included;
     }
@@ -926,8 +926,8 @@ class qtype_preg_charset_flag {
                     if ($this->negative && isset($selfindex)) {
                         $selfindex += 13;
                     } else if (!isset($selfindex)) {
-						return false;
-					}
+                        return false;
+                    }
                     break;
                 }
             }
@@ -940,9 +940,9 @@ class qtype_preg_charset_flag {
                     break;
                 }
             }
-			if (!isset($selfinsex)) {
-				return false;
-			}
+            if (!isset($selfinsex)) {
+                return false;
+            }
             $result = self::$intersection[26 * $selfindex + $otherindex];
             if ($result === 'set') {
                 $result = false;
@@ -1597,11 +1597,14 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
     const SUBTYPE_DUPLICATE_SUBPATTERNS = 'duplicate_node_subpatt';
 
     /** Subpattern number. */
-    public $number = 0;
+    public $number = -1;
+    /** Array of numbers of nested subpatterns. */
+    public $nested = array();
 
-    public function __construct($number = 0) {
+    public function __construct($number = -1, $nested = array()) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
         $this->number = $number;
+        $this->nested = $nested;
     }
 
     //TODO - ui_nodename()
@@ -1630,11 +1633,11 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
     const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
 
     /** Subpattern number. */
-    public $number = 0;
+    public $number = -1;
     /** Is condition satisfied?. */
     public $condbranch = null;
 
-    public function __construct($subtype = null, $number = 0, $condbranch = null) {
+    public function __construct($subtype = null, $number = -1, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
         $this->subtype = $subtype;
         $this->number = $number;
