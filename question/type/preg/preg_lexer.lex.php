@@ -30,28 +30,39 @@ class qtype_preg_token {
         $this->value = $value;
     }
 }
+class qtype_preg_optstack_item {
+    public $modifiers;
+    public $subpattnum;
+    public $subpattname;
+    public $parennum;
+    public function __construct($modifiers, $subpattnum, $subpattname, $parennum) {
+        $this->modifiers = $modifiers;
+        $this->subpattnum = $subpattnum;
+        $this->subpattname = $subpattname;
+        $this->parennum = $parennum;
+    }
+}
 
 
 class qtype_preg_lexer extends JLexBase  {
-    const YY_BUFFER_SIZE = 512;
-    const YY_F = -1;
-    const YY_NO_STATE = -1;
-    const YY_NOT_ACCEPT = 0;
-    const YY_START = 1;
-    const YY_END = 2;
-    const YY_NO_ANCHOR = 4;
-    const YY_BOL = 65536;
-    var $YY_EOF = 65537;
+	const YY_BUFFER_SIZE = 512;
+	const YY_F = -1;
+	const YY_NO_STATE = -1;
+	const YY_NOT_ACCEPT = 0;
+	const YY_START = 1;
+	const YY_END = 2;
+	const YY_NO_ANCHOR = 4;
+	const YY_BOL = 65536;
+	var $YY_EOF = 65537;
 
-    public $matcher;
-    public $handlingoptions;
-    protected $errors;
-    protected $lastsubpatt;
-    protected $maxsubpatt;
-    protected $subpatternmap;
-    protected $backrefs;
-    protected $optstack;
-    protected $optcount;
+    public $handlingoptions;                // Regex handling options set from the outside.
+    protected $errors;                      // Array of lexical errors found.
+    protected $lastsubpatt;                 // Number of the last lexed subpattern, used to deal with (?| ... ) constructions.
+    protected $maxsubpatt;                  // Max subpattern number.
+    protected $subpatternmap;               // Map of subpatterns name => number.
+    protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subpatterns.
+    protected $optstack;                    // Stack containing additional information about subpatterns (modifiers, current subpattern name, etc).
+    protected $optcount;                    // Number of items in the above stack.
     protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
     protected $charsetcount;                // Number of characters in the charset excluding flags.
     protected $charsetset;                  // Characters of the charset.
@@ -240,13 +251,13 @@ class qtype_preg_lexer extends JLexBase  {
             for ($i = 0; $i < $set->length(); $i++) {
                 $modname = $set[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->$modname = true;
+                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = true;
                 }
             }
             for ($i = 0; $i < $unset->length(); $i++) {
                 $modname = $unset[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->$modname = false;
+                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = false;
                 }
             }
         }
@@ -546,7 +557,7 @@ class qtype_preg_lexer extends JLexBase  {
         }
         $node = new qtype_preg_leaf_backref($name);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $this->backrefs[] = $node;
@@ -564,7 +575,7 @@ class qtype_preg_lexer extends JLexBase  {
         }
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $this->backrefs[] = $node;
@@ -587,7 +598,7 @@ class qtype_preg_lexer extends JLexBase  {
         $node = new qtype_preg_leaf_charset();
         $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
         $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $node->subtype = $subtype;
@@ -609,7 +620,7 @@ class qtype_preg_lexer extends JLexBase  {
     protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         if ($number[2] === 'R') {
@@ -781,24 +792,19 @@ class qtype_preg_lexer extends JLexBase  {
         }
         return null;
     }
-    protected $yy_count_chars = true;
+	protected $yy_count_chars = true;
 
-    function __construct($stream) {
-        parent::__construct($stream);
-        $this->yy_lexical_state = self::YYINITIAL;
+	function __construct($stream) {
+		parent::__construct($stream);
+		$this->yy_lexical_state = self::YYINITIAL;
 
-    $this->matcher                   = null;
     $this->errors                    = array();
     $this->lastsubpatt               = 0;
     $this->maxsubpatt                = 0;
     $this->subpatternmap             = array();
     $this->backrefs                  = array();
     $this->optstack                  = array();
-    $this->optstack[0]               = new stdClass;
-    $this->optstack[0]->i            = false;
-    $this->optstack[0]->subpattnum   = -1;
-    $this->optstack[0]->subpattname  = null;
-    $this->optstack[0]->parennum     = -1;
+    $this->optstack[0]               = new qtype_preg_optstack_item(array('i' => false), -1, null, -1);
     $this->optcount                  = 1;
     $this->charset                   = null;
     $this->charsetcount              = 0;
@@ -806,10 +812,10 @@ class qtype_preg_lexer extends JLexBase  {
     $this->charsetuserinscription    = null;
     $this->charsetuserinscriptionraw = null;
     $this->handlingoptions           = new qtype_preg_handling_options();
-    }
+	}
 
-    private function yy_do_eof () {
-        if (false === $this->yy_eof_done) {
+	private function yy_do_eof () {
+		if (false === $this->yy_eof_done) {
 
     // End of the expression inside a character class.
     if ($this->charset !== null) {
@@ -830,407 +836,407 @@ class qtype_preg_lexer extends JLexBase  {
             }
         }
     }
-        }
-        $this->yy_eof_done = true;
-    }
-    const YYINITIAL = 0;
-    const CHARSET = 1;
-    static $yy_state_dtrans = array(
-        0,
-        199
-    );
-    static $yy_acpt = array(
-        /* 0 */ self::YY_NOT_ACCEPT,
-        /* 1 */ self::YY_NO_ANCHOR,
-        /* 2 */ self::YY_NO_ANCHOR,
-        /* 3 */ self::YY_NO_ANCHOR,
-        /* 4 */ self::YY_NO_ANCHOR,
-        /* 5 */ self::YY_NO_ANCHOR,
-        /* 6 */ self::YY_NO_ANCHOR,
-        /* 7 */ self::YY_NO_ANCHOR,
-        /* 8 */ self::YY_NO_ANCHOR,
-        /* 9 */ self::YY_NO_ANCHOR,
-        /* 10 */ self::YY_NO_ANCHOR,
-        /* 11 */ self::YY_NO_ANCHOR,
-        /* 12 */ self::YY_NO_ANCHOR,
-        /* 13 */ self::YY_NO_ANCHOR,
-        /* 14 */ self::YY_NO_ANCHOR,
-        /* 15 */ self::YY_NO_ANCHOR,
-        /* 16 */ self::YY_NO_ANCHOR,
-        /* 17 */ self::YY_NO_ANCHOR,
-        /* 18 */ self::YY_NO_ANCHOR,
-        /* 19 */ self::YY_NO_ANCHOR,
-        /* 20 */ self::YY_NO_ANCHOR,
-        /* 21 */ self::YY_NO_ANCHOR,
-        /* 22 */ self::YY_NO_ANCHOR,
-        /* 23 */ self::YY_NO_ANCHOR,
-        /* 24 */ self::YY_NO_ANCHOR,
-        /* 25 */ self::YY_NO_ANCHOR,
-        /* 26 */ self::YY_NO_ANCHOR,
-        /* 27 */ self::YY_NO_ANCHOR,
-        /* 28 */ self::YY_NO_ANCHOR,
-        /* 29 */ self::YY_NO_ANCHOR,
-        /* 30 */ self::YY_NO_ANCHOR,
-        /* 31 */ self::YY_NO_ANCHOR,
-        /* 32 */ self::YY_NO_ANCHOR,
-        /* 33 */ self::YY_NO_ANCHOR,
-        /* 34 */ self::YY_NO_ANCHOR,
-        /* 35 */ self::YY_NO_ANCHOR,
-        /* 36 */ self::YY_NO_ANCHOR,
-        /* 37 */ self::YY_NO_ANCHOR,
-        /* 38 */ self::YY_NO_ANCHOR,
-        /* 39 */ self::YY_NO_ANCHOR,
-        /* 40 */ self::YY_NO_ANCHOR,
-        /* 41 */ self::YY_NO_ANCHOR,
-        /* 42 */ self::YY_NO_ANCHOR,
-        /* 43 */ self::YY_NO_ANCHOR,
-        /* 44 */ self::YY_NO_ANCHOR,
-        /* 45 */ self::YY_NO_ANCHOR,
-        /* 46 */ self::YY_NO_ANCHOR,
-        /* 47 */ self::YY_NO_ANCHOR,
-        /* 48 */ self::YY_NO_ANCHOR,
-        /* 49 */ self::YY_NO_ANCHOR,
-        /* 50 */ self::YY_NO_ANCHOR,
-        /* 51 */ self::YY_NO_ANCHOR,
-        /* 52 */ self::YY_NO_ANCHOR,
-        /* 53 */ self::YY_NO_ANCHOR,
-        /* 54 */ self::YY_NO_ANCHOR,
-        /* 55 */ self::YY_NO_ANCHOR,
-        /* 56 */ self::YY_NO_ANCHOR,
-        /* 57 */ self::YY_NO_ANCHOR,
-        /* 58 */ self::YY_NO_ANCHOR,
-        /* 59 */ self::YY_NO_ANCHOR,
-        /* 60 */ self::YY_NO_ANCHOR,
-        /* 61 */ self::YY_NO_ANCHOR,
-        /* 62 */ self::YY_NO_ANCHOR,
-        /* 63 */ self::YY_NO_ANCHOR,
-        /* 64 */ self::YY_NO_ANCHOR,
-        /* 65 */ self::YY_NO_ANCHOR,
-        /* 66 */ self::YY_NO_ANCHOR,
-        /* 67 */ self::YY_NO_ANCHOR,
-        /* 68 */ self::YY_NO_ANCHOR,
-        /* 69 */ self::YY_NO_ANCHOR,
-        /* 70 */ self::YY_NO_ANCHOR,
-        /* 71 */ self::YY_NO_ANCHOR,
-        /* 72 */ self::YY_NO_ANCHOR,
-        /* 73 */ self::YY_NO_ANCHOR,
-        /* 74 */ self::YY_NO_ANCHOR,
-        /* 75 */ self::YY_NO_ANCHOR,
-        /* 76 */ self::YY_NO_ANCHOR,
-        /* 77 */ self::YY_NO_ANCHOR,
-        /* 78 */ self::YY_NO_ANCHOR,
-        /* 79 */ self::YY_NO_ANCHOR,
-        /* 80 */ self::YY_NO_ANCHOR,
-        /* 81 */ self::YY_NO_ANCHOR,
-        /* 82 */ self::YY_NO_ANCHOR,
-        /* 83 */ self::YY_NO_ANCHOR,
-        /* 84 */ self::YY_NO_ANCHOR,
-        /* 85 */ self::YY_NO_ANCHOR,
-        /* 86 */ self::YY_NO_ANCHOR,
-        /* 87 */ self::YY_NO_ANCHOR,
-        /* 88 */ self::YY_NO_ANCHOR,
-        /* 89 */ self::YY_NO_ANCHOR,
-        /* 90 */ self::YY_NO_ANCHOR,
-        /* 91 */ self::YY_NO_ANCHOR,
-        /* 92 */ self::YY_NO_ANCHOR,
-        /* 93 */ self::YY_NO_ANCHOR,
-        /* 94 */ self::YY_NO_ANCHOR,
-        /* 95 */ self::YY_NO_ANCHOR,
-        /* 96 */ self::YY_NO_ANCHOR,
-        /* 97 */ self::YY_NO_ANCHOR,
-        /* 98 */ self::YY_NO_ANCHOR,
-        /* 99 */ self::YY_NO_ANCHOR,
-        /* 100 */ self::YY_NO_ANCHOR,
-        /* 101 */ self::YY_NO_ANCHOR,
-        /* 102 */ self::YY_NO_ANCHOR,
-        /* 103 */ self::YY_NO_ANCHOR,
-        /* 104 */ self::YY_NO_ANCHOR,
-        /* 105 */ self::YY_NO_ANCHOR,
-        /* 106 */ self::YY_NO_ANCHOR,
-        /* 107 */ self::YY_NO_ANCHOR,
-        /* 108 */ self::YY_NO_ANCHOR,
-        /* 109 */ self::YY_NO_ANCHOR,
-        /* 110 */ self::YY_NO_ANCHOR,
-        /* 111 */ self::YY_NO_ANCHOR,
-        /* 112 */ self::YY_NO_ANCHOR,
-        /* 113 */ self::YY_NO_ANCHOR,
-        /* 114 */ self::YY_NO_ANCHOR,
-        /* 115 */ self::YY_NO_ANCHOR,
-        /* 116 */ self::YY_NO_ANCHOR,
-        /* 117 */ self::YY_NO_ANCHOR,
-        /* 118 */ self::YY_NOT_ACCEPT,
-        /* 119 */ self::YY_NO_ANCHOR,
-        /* 120 */ self::YY_NO_ANCHOR,
-        /* 121 */ self::YY_NO_ANCHOR,
-        /* 122 */ self::YY_NO_ANCHOR,
-        /* 123 */ self::YY_NO_ANCHOR,
-        /* 124 */ self::YY_NO_ANCHOR,
-        /* 125 */ self::YY_NO_ANCHOR,
-        /* 126 */ self::YY_NO_ANCHOR,
-        /* 127 */ self::YY_NO_ANCHOR,
-        /* 128 */ self::YY_NO_ANCHOR,
-        /* 129 */ self::YY_NO_ANCHOR,
-        /* 130 */ self::YY_NO_ANCHOR,
-        /* 131 */ self::YY_NO_ANCHOR,
-        /* 132 */ self::YY_NO_ANCHOR,
-        /* 133 */ self::YY_NO_ANCHOR,
-        /* 134 */ self::YY_NO_ANCHOR,
-        /* 135 */ self::YY_NO_ANCHOR,
-        /* 136 */ self::YY_NO_ANCHOR,
-        /* 137 */ self::YY_NO_ANCHOR,
-        /* 138 */ self::YY_NO_ANCHOR,
-        /* 139 */ self::YY_NO_ANCHOR,
-        /* 140 */ self::YY_NO_ANCHOR,
-        /* 141 */ self::YY_NO_ANCHOR,
-        /* 142 */ self::YY_NO_ANCHOR,
-        /* 143 */ self::YY_NO_ANCHOR,
-        /* 144 */ self::YY_NO_ANCHOR,
-        /* 145 */ self::YY_NO_ANCHOR,
-        /* 146 */ self::YY_NO_ANCHOR,
-        /* 147 */ self::YY_NO_ANCHOR,
-        /* 148 */ self::YY_NO_ANCHOR,
-        /* 149 */ self::YY_NO_ANCHOR,
-        /* 150 */ self::YY_NO_ANCHOR,
-        /* 151 */ self::YY_NO_ANCHOR,
-        /* 152 */ self::YY_NO_ANCHOR,
-        /* 153 */ self::YY_NO_ANCHOR,
-        /* 154 */ self::YY_NO_ANCHOR,
-        /* 155 */ self::YY_NOT_ACCEPT,
-        /* 156 */ self::YY_NO_ANCHOR,
-        /* 157 */ self::YY_NO_ANCHOR,
-        /* 158 */ self::YY_NO_ANCHOR,
-        /* 159 */ self::YY_NO_ANCHOR,
-        /* 160 */ self::YY_NO_ANCHOR,
-        /* 161 */ self::YY_NO_ANCHOR,
-        /* 162 */ self::YY_NO_ANCHOR,
-        /* 163 */ self::YY_NO_ANCHOR,
-        /* 164 */ self::YY_NO_ANCHOR,
-        /* 165 */ self::YY_NO_ANCHOR,
-        /* 166 */ self::YY_NOT_ACCEPT,
-        /* 167 */ self::YY_NO_ANCHOR,
-        /* 168 */ self::YY_NO_ANCHOR,
-        /* 169 */ self::YY_NO_ANCHOR,
-        /* 170 */ self::YY_NO_ANCHOR,
-        /* 171 */ self::YY_NOT_ACCEPT,
-        /* 172 */ self::YY_NO_ANCHOR,
-        /* 173 */ self::YY_NO_ANCHOR,
-        /* 174 */ self::YY_NOT_ACCEPT,
-        /* 175 */ self::YY_NO_ANCHOR,
-        /* 176 */ self::YY_NOT_ACCEPT,
-        /* 177 */ self::YY_NOT_ACCEPT,
-        /* 178 */ self::YY_NOT_ACCEPT,
-        /* 179 */ self::YY_NOT_ACCEPT,
-        /* 180 */ self::YY_NOT_ACCEPT,
-        /* 181 */ self::YY_NOT_ACCEPT,
-        /* 182 */ self::YY_NOT_ACCEPT,
-        /* 183 */ self::YY_NOT_ACCEPT,
-        /* 184 */ self::YY_NOT_ACCEPT,
-        /* 185 */ self::YY_NOT_ACCEPT,
-        /* 186 */ self::YY_NOT_ACCEPT,
-        /* 187 */ self::YY_NOT_ACCEPT,
-        /* 188 */ self::YY_NOT_ACCEPT,
-        /* 189 */ self::YY_NOT_ACCEPT,
-        /* 190 */ self::YY_NOT_ACCEPT,
-        /* 191 */ self::YY_NOT_ACCEPT,
-        /* 192 */ self::YY_NOT_ACCEPT,
-        /* 193 */ self::YY_NOT_ACCEPT,
-        /* 194 */ self::YY_NOT_ACCEPT,
-        /* 195 */ self::YY_NOT_ACCEPT,
-        /* 196 */ self::YY_NOT_ACCEPT,
-        /* 197 */ self::YY_NOT_ACCEPT,
-        /* 198 */ self::YY_NOT_ACCEPT,
-        /* 199 */ self::YY_NOT_ACCEPT,
-        /* 200 */ self::YY_NOT_ACCEPT,
-        /* 201 */ self::YY_NOT_ACCEPT,
-        /* 202 */ self::YY_NOT_ACCEPT,
-        /* 203 */ self::YY_NOT_ACCEPT,
-        /* 204 */ self::YY_NOT_ACCEPT,
-        /* 205 */ self::YY_NOT_ACCEPT,
-        /* 206 */ self::YY_NOT_ACCEPT,
-        /* 207 */ self::YY_NOT_ACCEPT,
-        /* 208 */ self::YY_NOT_ACCEPT,
-        /* 209 */ self::YY_NOT_ACCEPT,
-        /* 210 */ self::YY_NOT_ACCEPT,
-        /* 211 */ self::YY_NOT_ACCEPT,
-        /* 212 */ self::YY_NOT_ACCEPT,
-        /* 213 */ self::YY_NOT_ACCEPT,
-        /* 214 */ self::YY_NOT_ACCEPT,
-        /* 215 */ self::YY_NOT_ACCEPT,
-        /* 216 */ self::YY_NOT_ACCEPT,
-        /* 217 */ self::YY_NOT_ACCEPT,
-        /* 218 */ self::YY_NOT_ACCEPT,
-        /* 219 */ self::YY_NOT_ACCEPT,
-        /* 220 */ self::YY_NOT_ACCEPT,
-        /* 221 */ self::YY_NOT_ACCEPT,
-        /* 222 */ self::YY_NOT_ACCEPT,
-        /* 223 */ self::YY_NOT_ACCEPT,
-        /* 224 */ self::YY_NOT_ACCEPT,
-        /* 225 */ self::YY_NOT_ACCEPT,
-        /* 226 */ self::YY_NOT_ACCEPT,
-        /* 227 */ self::YY_NOT_ACCEPT,
-        /* 228 */ self::YY_NOT_ACCEPT,
-        /* 229 */ self::YY_NOT_ACCEPT,
-        /* 230 */ self::YY_NOT_ACCEPT,
-        /* 231 */ self::YY_NOT_ACCEPT,
-        /* 232 */ self::YY_NOT_ACCEPT,
-        /* 233 */ self::YY_NOT_ACCEPT,
-        /* 234 */ self::YY_NOT_ACCEPT,
-        /* 235 */ self::YY_NOT_ACCEPT,
-        /* 236 */ self::YY_NOT_ACCEPT,
-        /* 237 */ self::YY_NOT_ACCEPT,
-        /* 238 */ self::YY_NOT_ACCEPT,
-        /* 239 */ self::YY_NOT_ACCEPT,
-        /* 240 */ self::YY_NOT_ACCEPT,
-        /* 241 */ self::YY_NOT_ACCEPT,
-        /* 242 */ self::YY_NOT_ACCEPT,
-        /* 243 */ self::YY_NOT_ACCEPT,
-        /* 244 */ self::YY_NOT_ACCEPT,
-        /* 245 */ self::YY_NOT_ACCEPT,
-        /* 246 */ self::YY_NOT_ACCEPT,
-        /* 247 */ self::YY_NO_ANCHOR,
-        /* 248 */ self::YY_NO_ANCHOR,
-        /* 249 */ self::YY_NO_ANCHOR,
-        /* 250 */ self::YY_NOT_ACCEPT,
-        /* 251 */ self::YY_NOT_ACCEPT,
-        /* 252 */ self::YY_NOT_ACCEPT,
-        /* 253 */ self::YY_NOT_ACCEPT,
-        /* 254 */ self::YY_NOT_ACCEPT,
-        /* 255 */ self::YY_NOT_ACCEPT,
-        /* 256 */ self::YY_NOT_ACCEPT,
-        /* 257 */ self::YY_NOT_ACCEPT,
-        /* 258 */ self::YY_NOT_ACCEPT,
-        /* 259 */ self::YY_NOT_ACCEPT,
-        /* 260 */ self::YY_NOT_ACCEPT,
-        /* 261 */ self::YY_NOT_ACCEPT,
-        /* 262 */ self::YY_NOT_ACCEPT,
-        /* 263 */ self::YY_NOT_ACCEPT,
-        /* 264 */ self::YY_NOT_ACCEPT,
-        /* 265 */ self::YY_NOT_ACCEPT,
-        /* 266 */ self::YY_NOT_ACCEPT,
-        /* 267 */ self::YY_NOT_ACCEPT,
-        /* 268 */ self::YY_NOT_ACCEPT,
-        /* 269 */ self::YY_NOT_ACCEPT,
-        /* 270 */ self::YY_NOT_ACCEPT,
-        /* 271 */ self::YY_NOT_ACCEPT,
-        /* 272 */ self::YY_NOT_ACCEPT,
-        /* 273 */ self::YY_NOT_ACCEPT,
-        /* 274 */ self::YY_NOT_ACCEPT,
-        /* 275 */ self::YY_NOT_ACCEPT,
-        /* 276 */ self::YY_NOT_ACCEPT,
-        /* 277 */ self::YY_NOT_ACCEPT,
-        /* 278 */ self::YY_NOT_ACCEPT,
-        /* 279 */ self::YY_NOT_ACCEPT,
-        /* 280 */ self::YY_NOT_ACCEPT,
-        /* 281 */ self::YY_NOT_ACCEPT,
-        /* 282 */ self::YY_NOT_ACCEPT,
-        /* 283 */ self::YY_NOT_ACCEPT,
-        /* 284 */ self::YY_NOT_ACCEPT,
-        /* 285 */ self::YY_NOT_ACCEPT,
-        /* 286 */ self::YY_NOT_ACCEPT,
-        /* 287 */ self::YY_NOT_ACCEPT,
-        /* 288 */ self::YY_NOT_ACCEPT,
-        /* 289 */ self::YY_NOT_ACCEPT,
-        /* 290 */ self::YY_NOT_ACCEPT,
-        /* 291 */ self::YY_NOT_ACCEPT,
-        /* 292 */ self::YY_NOT_ACCEPT,
-        /* 293 */ self::YY_NOT_ACCEPT,
-        /* 294 */ self::YY_NOT_ACCEPT,
-        /* 295 */ self::YY_NOT_ACCEPT,
-        /* 296 */ self::YY_NOT_ACCEPT,
-        /* 297 */ self::YY_NOT_ACCEPT,
-        /* 298 */ self::YY_NOT_ACCEPT,
-        /* 299 */ self::YY_NOT_ACCEPT,
-        /* 300 */ self::YY_NOT_ACCEPT,
-        /* 301 */ self::YY_NOT_ACCEPT,
-        /* 302 */ self::YY_NOT_ACCEPT,
-        /* 303 */ self::YY_NOT_ACCEPT,
-        /* 304 */ self::YY_NOT_ACCEPT,
-        /* 305 */ self::YY_NOT_ACCEPT,
-        /* 306 */ self::YY_NOT_ACCEPT,
-        /* 307 */ self::YY_NOT_ACCEPT,
-        /* 308 */ self::YY_NOT_ACCEPT,
-        /* 309 */ self::YY_NOT_ACCEPT,
-        /* 310 */ self::YY_NOT_ACCEPT,
-        /* 311 */ self::YY_NOT_ACCEPT,
-        /* 312 */ self::YY_NOT_ACCEPT,
-        /* 313 */ self::YY_NOT_ACCEPT,
-        /* 314 */ self::YY_NOT_ACCEPT,
-        /* 315 */ self::YY_NOT_ACCEPT,
-        /* 316 */ self::YY_NOT_ACCEPT,
-        /* 317 */ self::YY_NOT_ACCEPT,
-        /* 318 */ self::YY_NOT_ACCEPT,
-        /* 319 */ self::YY_NOT_ACCEPT,
-        /* 320 */ self::YY_NOT_ACCEPT,
-        /* 321 */ self::YY_NOT_ACCEPT,
-        /* 322 */ self::YY_NOT_ACCEPT,
-        /* 323 */ self::YY_NOT_ACCEPT,
-        /* 324 */ self::YY_NOT_ACCEPT,
-        /* 325 */ self::YY_NOT_ACCEPT,
-        /* 326 */ self::YY_NOT_ACCEPT,
-        /* 327 */ self::YY_NOT_ACCEPT,
-        /* 328 */ self::YY_NOT_ACCEPT,
-        /* 329 */ self::YY_NOT_ACCEPT,
-        /* 330 */ self::YY_NOT_ACCEPT,
-        /* 331 */ self::YY_NOT_ACCEPT,
-        /* 332 */ self::YY_NOT_ACCEPT,
-        /* 333 */ self::YY_NO_ANCHOR,
-        /* 334 */ self::YY_NOT_ACCEPT,
-        /* 335 */ self::YY_NOT_ACCEPT,
-        /* 336 */ self::YY_NOT_ACCEPT,
-        /* 337 */ self::YY_NOT_ACCEPT,
-        /* 338 */ self::YY_NOT_ACCEPT,
-        /* 339 */ self::YY_NOT_ACCEPT,
-        /* 340 */ self::YY_NOT_ACCEPT,
-        /* 341 */ self::YY_NOT_ACCEPT,
-        /* 342 */ self::YY_NOT_ACCEPT,
-        /* 343 */ self::YY_NOT_ACCEPT,
-        /* 344 */ self::YY_NOT_ACCEPT,
-        /* 345 */ self::YY_NOT_ACCEPT,
-        /* 346 */ self::YY_NOT_ACCEPT,
-        /* 347 */ self::YY_NOT_ACCEPT,
-        /* 348 */ self::YY_NOT_ACCEPT,
-        /* 349 */ self::YY_NOT_ACCEPT,
-        /* 350 */ self::YY_NOT_ACCEPT,
-        /* 351 */ self::YY_NOT_ACCEPT,
-        /* 352 */ self::YY_NOT_ACCEPT,
-        /* 353 */ self::YY_NOT_ACCEPT,
-        /* 354 */ self::YY_NOT_ACCEPT,
-        /* 355 */ self::YY_NOT_ACCEPT,
-        /* 356 */ self::YY_NOT_ACCEPT,
-        /* 357 */ self::YY_NOT_ACCEPT,
-        /* 358 */ self::YY_NOT_ACCEPT,
-        /* 359 */ self::YY_NOT_ACCEPT,
-        /* 360 */ self::YY_NOT_ACCEPT,
-        /* 361 */ self::YY_NOT_ACCEPT,
-        /* 362 */ self::YY_NO_ANCHOR,
-        /* 363 */ self::YY_NOT_ACCEPT,
-        /* 364 */ self::YY_NOT_ACCEPT,
-        /* 365 */ self::YY_NOT_ACCEPT,
-        /* 366 */ self::YY_NOT_ACCEPT,
-        /* 367 */ self::YY_NOT_ACCEPT,
-        /* 368 */ self::YY_NOT_ACCEPT,
-        /* 369 */ self::YY_NOT_ACCEPT,
-        /* 370 */ self::YY_NOT_ACCEPT,
-        /* 371 */ self::YY_NOT_ACCEPT,
-        /* 372 */ self::YY_NOT_ACCEPT,
-        /* 373 */ self::YY_NOT_ACCEPT,
-        /* 374 */ self::YY_NOT_ACCEPT,
-        /* 375 */ self::YY_NOT_ACCEPT,
-        /* 376 */ self::YY_NOT_ACCEPT,
-        /* 377 */ self::YY_NO_ANCHOR,
-        /* 378 */ self::YY_NOT_ACCEPT,
-        /* 379 */ self::YY_NOT_ACCEPT,
-        /* 380 */ self::YY_NOT_ACCEPT,
-        /* 381 */ self::YY_NOT_ACCEPT,
-        /* 382 */ self::YY_NOT_ACCEPT,
-        /* 383 */ self::YY_NOT_ACCEPT,
-        /* 384 */ self::YY_NOT_ACCEPT,
-        /* 385 */ self::YY_NOT_ACCEPT,
-        /* 386 */ self::YY_NOT_ACCEPT,
-        /* 387 */ self::YY_NOT_ACCEPT,
-        /* 388 */ self::YY_NOT_ACCEPT
-    );
-        static $yy_cmap = array(
+		}
+		$this->yy_eof_done = true;
+	}
+	const YYINITIAL = 0;
+	const CHARSET = 1;
+	static $yy_state_dtrans = array(
+		0,
+		199
+	);
+	static $yy_acpt = array(
+		/* 0 */ self::YY_NOT_ACCEPT,
+		/* 1 */ self::YY_NO_ANCHOR,
+		/* 2 */ self::YY_NO_ANCHOR,
+		/* 3 */ self::YY_NO_ANCHOR,
+		/* 4 */ self::YY_NO_ANCHOR,
+		/* 5 */ self::YY_NO_ANCHOR,
+		/* 6 */ self::YY_NO_ANCHOR,
+		/* 7 */ self::YY_NO_ANCHOR,
+		/* 8 */ self::YY_NO_ANCHOR,
+		/* 9 */ self::YY_NO_ANCHOR,
+		/* 10 */ self::YY_NO_ANCHOR,
+		/* 11 */ self::YY_NO_ANCHOR,
+		/* 12 */ self::YY_NO_ANCHOR,
+		/* 13 */ self::YY_NO_ANCHOR,
+		/* 14 */ self::YY_NO_ANCHOR,
+		/* 15 */ self::YY_NO_ANCHOR,
+		/* 16 */ self::YY_NO_ANCHOR,
+		/* 17 */ self::YY_NO_ANCHOR,
+		/* 18 */ self::YY_NO_ANCHOR,
+		/* 19 */ self::YY_NO_ANCHOR,
+		/* 20 */ self::YY_NO_ANCHOR,
+		/* 21 */ self::YY_NO_ANCHOR,
+		/* 22 */ self::YY_NO_ANCHOR,
+		/* 23 */ self::YY_NO_ANCHOR,
+		/* 24 */ self::YY_NO_ANCHOR,
+		/* 25 */ self::YY_NO_ANCHOR,
+		/* 26 */ self::YY_NO_ANCHOR,
+		/* 27 */ self::YY_NO_ANCHOR,
+		/* 28 */ self::YY_NO_ANCHOR,
+		/* 29 */ self::YY_NO_ANCHOR,
+		/* 30 */ self::YY_NO_ANCHOR,
+		/* 31 */ self::YY_NO_ANCHOR,
+		/* 32 */ self::YY_NO_ANCHOR,
+		/* 33 */ self::YY_NO_ANCHOR,
+		/* 34 */ self::YY_NO_ANCHOR,
+		/* 35 */ self::YY_NO_ANCHOR,
+		/* 36 */ self::YY_NO_ANCHOR,
+		/* 37 */ self::YY_NO_ANCHOR,
+		/* 38 */ self::YY_NO_ANCHOR,
+		/* 39 */ self::YY_NO_ANCHOR,
+		/* 40 */ self::YY_NO_ANCHOR,
+		/* 41 */ self::YY_NO_ANCHOR,
+		/* 42 */ self::YY_NO_ANCHOR,
+		/* 43 */ self::YY_NO_ANCHOR,
+		/* 44 */ self::YY_NO_ANCHOR,
+		/* 45 */ self::YY_NO_ANCHOR,
+		/* 46 */ self::YY_NO_ANCHOR,
+		/* 47 */ self::YY_NO_ANCHOR,
+		/* 48 */ self::YY_NO_ANCHOR,
+		/* 49 */ self::YY_NO_ANCHOR,
+		/* 50 */ self::YY_NO_ANCHOR,
+		/* 51 */ self::YY_NO_ANCHOR,
+		/* 52 */ self::YY_NO_ANCHOR,
+		/* 53 */ self::YY_NO_ANCHOR,
+		/* 54 */ self::YY_NO_ANCHOR,
+		/* 55 */ self::YY_NO_ANCHOR,
+		/* 56 */ self::YY_NO_ANCHOR,
+		/* 57 */ self::YY_NO_ANCHOR,
+		/* 58 */ self::YY_NO_ANCHOR,
+		/* 59 */ self::YY_NO_ANCHOR,
+		/* 60 */ self::YY_NO_ANCHOR,
+		/* 61 */ self::YY_NO_ANCHOR,
+		/* 62 */ self::YY_NO_ANCHOR,
+		/* 63 */ self::YY_NO_ANCHOR,
+		/* 64 */ self::YY_NO_ANCHOR,
+		/* 65 */ self::YY_NO_ANCHOR,
+		/* 66 */ self::YY_NO_ANCHOR,
+		/* 67 */ self::YY_NO_ANCHOR,
+		/* 68 */ self::YY_NO_ANCHOR,
+		/* 69 */ self::YY_NO_ANCHOR,
+		/* 70 */ self::YY_NO_ANCHOR,
+		/* 71 */ self::YY_NO_ANCHOR,
+		/* 72 */ self::YY_NO_ANCHOR,
+		/* 73 */ self::YY_NO_ANCHOR,
+		/* 74 */ self::YY_NO_ANCHOR,
+		/* 75 */ self::YY_NO_ANCHOR,
+		/* 76 */ self::YY_NO_ANCHOR,
+		/* 77 */ self::YY_NO_ANCHOR,
+		/* 78 */ self::YY_NO_ANCHOR,
+		/* 79 */ self::YY_NO_ANCHOR,
+		/* 80 */ self::YY_NO_ANCHOR,
+		/* 81 */ self::YY_NO_ANCHOR,
+		/* 82 */ self::YY_NO_ANCHOR,
+		/* 83 */ self::YY_NO_ANCHOR,
+		/* 84 */ self::YY_NO_ANCHOR,
+		/* 85 */ self::YY_NO_ANCHOR,
+		/* 86 */ self::YY_NO_ANCHOR,
+		/* 87 */ self::YY_NO_ANCHOR,
+		/* 88 */ self::YY_NO_ANCHOR,
+		/* 89 */ self::YY_NO_ANCHOR,
+		/* 90 */ self::YY_NO_ANCHOR,
+		/* 91 */ self::YY_NO_ANCHOR,
+		/* 92 */ self::YY_NO_ANCHOR,
+		/* 93 */ self::YY_NO_ANCHOR,
+		/* 94 */ self::YY_NO_ANCHOR,
+		/* 95 */ self::YY_NO_ANCHOR,
+		/* 96 */ self::YY_NO_ANCHOR,
+		/* 97 */ self::YY_NO_ANCHOR,
+		/* 98 */ self::YY_NO_ANCHOR,
+		/* 99 */ self::YY_NO_ANCHOR,
+		/* 100 */ self::YY_NO_ANCHOR,
+		/* 101 */ self::YY_NO_ANCHOR,
+		/* 102 */ self::YY_NO_ANCHOR,
+		/* 103 */ self::YY_NO_ANCHOR,
+		/* 104 */ self::YY_NO_ANCHOR,
+		/* 105 */ self::YY_NO_ANCHOR,
+		/* 106 */ self::YY_NO_ANCHOR,
+		/* 107 */ self::YY_NO_ANCHOR,
+		/* 108 */ self::YY_NO_ANCHOR,
+		/* 109 */ self::YY_NO_ANCHOR,
+		/* 110 */ self::YY_NO_ANCHOR,
+		/* 111 */ self::YY_NO_ANCHOR,
+		/* 112 */ self::YY_NO_ANCHOR,
+		/* 113 */ self::YY_NO_ANCHOR,
+		/* 114 */ self::YY_NO_ANCHOR,
+		/* 115 */ self::YY_NO_ANCHOR,
+		/* 116 */ self::YY_NO_ANCHOR,
+		/* 117 */ self::YY_NO_ANCHOR,
+		/* 118 */ self::YY_NOT_ACCEPT,
+		/* 119 */ self::YY_NO_ANCHOR,
+		/* 120 */ self::YY_NO_ANCHOR,
+		/* 121 */ self::YY_NO_ANCHOR,
+		/* 122 */ self::YY_NO_ANCHOR,
+		/* 123 */ self::YY_NO_ANCHOR,
+		/* 124 */ self::YY_NO_ANCHOR,
+		/* 125 */ self::YY_NO_ANCHOR,
+		/* 126 */ self::YY_NO_ANCHOR,
+		/* 127 */ self::YY_NO_ANCHOR,
+		/* 128 */ self::YY_NO_ANCHOR,
+		/* 129 */ self::YY_NO_ANCHOR,
+		/* 130 */ self::YY_NO_ANCHOR,
+		/* 131 */ self::YY_NO_ANCHOR,
+		/* 132 */ self::YY_NO_ANCHOR,
+		/* 133 */ self::YY_NO_ANCHOR,
+		/* 134 */ self::YY_NO_ANCHOR,
+		/* 135 */ self::YY_NO_ANCHOR,
+		/* 136 */ self::YY_NO_ANCHOR,
+		/* 137 */ self::YY_NO_ANCHOR,
+		/* 138 */ self::YY_NO_ANCHOR,
+		/* 139 */ self::YY_NO_ANCHOR,
+		/* 140 */ self::YY_NO_ANCHOR,
+		/* 141 */ self::YY_NO_ANCHOR,
+		/* 142 */ self::YY_NO_ANCHOR,
+		/* 143 */ self::YY_NO_ANCHOR,
+		/* 144 */ self::YY_NO_ANCHOR,
+		/* 145 */ self::YY_NO_ANCHOR,
+		/* 146 */ self::YY_NO_ANCHOR,
+		/* 147 */ self::YY_NO_ANCHOR,
+		/* 148 */ self::YY_NO_ANCHOR,
+		/* 149 */ self::YY_NO_ANCHOR,
+		/* 150 */ self::YY_NO_ANCHOR,
+		/* 151 */ self::YY_NO_ANCHOR,
+		/* 152 */ self::YY_NO_ANCHOR,
+		/* 153 */ self::YY_NO_ANCHOR,
+		/* 154 */ self::YY_NO_ANCHOR,
+		/* 155 */ self::YY_NOT_ACCEPT,
+		/* 156 */ self::YY_NO_ANCHOR,
+		/* 157 */ self::YY_NO_ANCHOR,
+		/* 158 */ self::YY_NO_ANCHOR,
+		/* 159 */ self::YY_NO_ANCHOR,
+		/* 160 */ self::YY_NO_ANCHOR,
+		/* 161 */ self::YY_NO_ANCHOR,
+		/* 162 */ self::YY_NO_ANCHOR,
+		/* 163 */ self::YY_NO_ANCHOR,
+		/* 164 */ self::YY_NO_ANCHOR,
+		/* 165 */ self::YY_NO_ANCHOR,
+		/* 166 */ self::YY_NOT_ACCEPT,
+		/* 167 */ self::YY_NO_ANCHOR,
+		/* 168 */ self::YY_NO_ANCHOR,
+		/* 169 */ self::YY_NO_ANCHOR,
+		/* 170 */ self::YY_NO_ANCHOR,
+		/* 171 */ self::YY_NOT_ACCEPT,
+		/* 172 */ self::YY_NO_ANCHOR,
+		/* 173 */ self::YY_NO_ANCHOR,
+		/* 174 */ self::YY_NOT_ACCEPT,
+		/* 175 */ self::YY_NO_ANCHOR,
+		/* 176 */ self::YY_NOT_ACCEPT,
+		/* 177 */ self::YY_NOT_ACCEPT,
+		/* 178 */ self::YY_NOT_ACCEPT,
+		/* 179 */ self::YY_NOT_ACCEPT,
+		/* 180 */ self::YY_NOT_ACCEPT,
+		/* 181 */ self::YY_NOT_ACCEPT,
+		/* 182 */ self::YY_NOT_ACCEPT,
+		/* 183 */ self::YY_NOT_ACCEPT,
+		/* 184 */ self::YY_NOT_ACCEPT,
+		/* 185 */ self::YY_NOT_ACCEPT,
+		/* 186 */ self::YY_NOT_ACCEPT,
+		/* 187 */ self::YY_NOT_ACCEPT,
+		/* 188 */ self::YY_NOT_ACCEPT,
+		/* 189 */ self::YY_NOT_ACCEPT,
+		/* 190 */ self::YY_NOT_ACCEPT,
+		/* 191 */ self::YY_NOT_ACCEPT,
+		/* 192 */ self::YY_NOT_ACCEPT,
+		/* 193 */ self::YY_NOT_ACCEPT,
+		/* 194 */ self::YY_NOT_ACCEPT,
+		/* 195 */ self::YY_NOT_ACCEPT,
+		/* 196 */ self::YY_NOT_ACCEPT,
+		/* 197 */ self::YY_NOT_ACCEPT,
+		/* 198 */ self::YY_NOT_ACCEPT,
+		/* 199 */ self::YY_NOT_ACCEPT,
+		/* 200 */ self::YY_NOT_ACCEPT,
+		/* 201 */ self::YY_NOT_ACCEPT,
+		/* 202 */ self::YY_NOT_ACCEPT,
+		/* 203 */ self::YY_NOT_ACCEPT,
+		/* 204 */ self::YY_NOT_ACCEPT,
+		/* 205 */ self::YY_NOT_ACCEPT,
+		/* 206 */ self::YY_NOT_ACCEPT,
+		/* 207 */ self::YY_NOT_ACCEPT,
+		/* 208 */ self::YY_NOT_ACCEPT,
+		/* 209 */ self::YY_NOT_ACCEPT,
+		/* 210 */ self::YY_NOT_ACCEPT,
+		/* 211 */ self::YY_NOT_ACCEPT,
+		/* 212 */ self::YY_NOT_ACCEPT,
+		/* 213 */ self::YY_NOT_ACCEPT,
+		/* 214 */ self::YY_NOT_ACCEPT,
+		/* 215 */ self::YY_NOT_ACCEPT,
+		/* 216 */ self::YY_NOT_ACCEPT,
+		/* 217 */ self::YY_NOT_ACCEPT,
+		/* 218 */ self::YY_NOT_ACCEPT,
+		/* 219 */ self::YY_NOT_ACCEPT,
+		/* 220 */ self::YY_NOT_ACCEPT,
+		/* 221 */ self::YY_NOT_ACCEPT,
+		/* 222 */ self::YY_NOT_ACCEPT,
+		/* 223 */ self::YY_NOT_ACCEPT,
+		/* 224 */ self::YY_NOT_ACCEPT,
+		/* 225 */ self::YY_NOT_ACCEPT,
+		/* 226 */ self::YY_NOT_ACCEPT,
+		/* 227 */ self::YY_NOT_ACCEPT,
+		/* 228 */ self::YY_NOT_ACCEPT,
+		/* 229 */ self::YY_NOT_ACCEPT,
+		/* 230 */ self::YY_NOT_ACCEPT,
+		/* 231 */ self::YY_NOT_ACCEPT,
+		/* 232 */ self::YY_NOT_ACCEPT,
+		/* 233 */ self::YY_NOT_ACCEPT,
+		/* 234 */ self::YY_NOT_ACCEPT,
+		/* 235 */ self::YY_NOT_ACCEPT,
+		/* 236 */ self::YY_NOT_ACCEPT,
+		/* 237 */ self::YY_NOT_ACCEPT,
+		/* 238 */ self::YY_NOT_ACCEPT,
+		/* 239 */ self::YY_NOT_ACCEPT,
+		/* 240 */ self::YY_NOT_ACCEPT,
+		/* 241 */ self::YY_NOT_ACCEPT,
+		/* 242 */ self::YY_NOT_ACCEPT,
+		/* 243 */ self::YY_NOT_ACCEPT,
+		/* 244 */ self::YY_NOT_ACCEPT,
+		/* 245 */ self::YY_NOT_ACCEPT,
+		/* 246 */ self::YY_NOT_ACCEPT,
+		/* 247 */ self::YY_NO_ANCHOR,
+		/* 248 */ self::YY_NO_ANCHOR,
+		/* 249 */ self::YY_NO_ANCHOR,
+		/* 250 */ self::YY_NOT_ACCEPT,
+		/* 251 */ self::YY_NOT_ACCEPT,
+		/* 252 */ self::YY_NOT_ACCEPT,
+		/* 253 */ self::YY_NOT_ACCEPT,
+		/* 254 */ self::YY_NOT_ACCEPT,
+		/* 255 */ self::YY_NOT_ACCEPT,
+		/* 256 */ self::YY_NOT_ACCEPT,
+		/* 257 */ self::YY_NOT_ACCEPT,
+		/* 258 */ self::YY_NOT_ACCEPT,
+		/* 259 */ self::YY_NOT_ACCEPT,
+		/* 260 */ self::YY_NOT_ACCEPT,
+		/* 261 */ self::YY_NOT_ACCEPT,
+		/* 262 */ self::YY_NOT_ACCEPT,
+		/* 263 */ self::YY_NOT_ACCEPT,
+		/* 264 */ self::YY_NOT_ACCEPT,
+		/* 265 */ self::YY_NOT_ACCEPT,
+		/* 266 */ self::YY_NOT_ACCEPT,
+		/* 267 */ self::YY_NOT_ACCEPT,
+		/* 268 */ self::YY_NOT_ACCEPT,
+		/* 269 */ self::YY_NOT_ACCEPT,
+		/* 270 */ self::YY_NOT_ACCEPT,
+		/* 271 */ self::YY_NOT_ACCEPT,
+		/* 272 */ self::YY_NOT_ACCEPT,
+		/* 273 */ self::YY_NOT_ACCEPT,
+		/* 274 */ self::YY_NOT_ACCEPT,
+		/* 275 */ self::YY_NOT_ACCEPT,
+		/* 276 */ self::YY_NOT_ACCEPT,
+		/* 277 */ self::YY_NOT_ACCEPT,
+		/* 278 */ self::YY_NOT_ACCEPT,
+		/* 279 */ self::YY_NOT_ACCEPT,
+		/* 280 */ self::YY_NOT_ACCEPT,
+		/* 281 */ self::YY_NOT_ACCEPT,
+		/* 282 */ self::YY_NOT_ACCEPT,
+		/* 283 */ self::YY_NOT_ACCEPT,
+		/* 284 */ self::YY_NOT_ACCEPT,
+		/* 285 */ self::YY_NOT_ACCEPT,
+		/* 286 */ self::YY_NOT_ACCEPT,
+		/* 287 */ self::YY_NOT_ACCEPT,
+		/* 288 */ self::YY_NOT_ACCEPT,
+		/* 289 */ self::YY_NOT_ACCEPT,
+		/* 290 */ self::YY_NOT_ACCEPT,
+		/* 291 */ self::YY_NOT_ACCEPT,
+		/* 292 */ self::YY_NOT_ACCEPT,
+		/* 293 */ self::YY_NOT_ACCEPT,
+		/* 294 */ self::YY_NOT_ACCEPT,
+		/* 295 */ self::YY_NOT_ACCEPT,
+		/* 296 */ self::YY_NOT_ACCEPT,
+		/* 297 */ self::YY_NOT_ACCEPT,
+		/* 298 */ self::YY_NOT_ACCEPT,
+		/* 299 */ self::YY_NOT_ACCEPT,
+		/* 300 */ self::YY_NOT_ACCEPT,
+		/* 301 */ self::YY_NOT_ACCEPT,
+		/* 302 */ self::YY_NOT_ACCEPT,
+		/* 303 */ self::YY_NOT_ACCEPT,
+		/* 304 */ self::YY_NOT_ACCEPT,
+		/* 305 */ self::YY_NOT_ACCEPT,
+		/* 306 */ self::YY_NOT_ACCEPT,
+		/* 307 */ self::YY_NOT_ACCEPT,
+		/* 308 */ self::YY_NOT_ACCEPT,
+		/* 309 */ self::YY_NOT_ACCEPT,
+		/* 310 */ self::YY_NOT_ACCEPT,
+		/* 311 */ self::YY_NOT_ACCEPT,
+		/* 312 */ self::YY_NOT_ACCEPT,
+		/* 313 */ self::YY_NOT_ACCEPT,
+		/* 314 */ self::YY_NOT_ACCEPT,
+		/* 315 */ self::YY_NOT_ACCEPT,
+		/* 316 */ self::YY_NOT_ACCEPT,
+		/* 317 */ self::YY_NOT_ACCEPT,
+		/* 318 */ self::YY_NOT_ACCEPT,
+		/* 319 */ self::YY_NOT_ACCEPT,
+		/* 320 */ self::YY_NOT_ACCEPT,
+		/* 321 */ self::YY_NOT_ACCEPT,
+		/* 322 */ self::YY_NOT_ACCEPT,
+		/* 323 */ self::YY_NOT_ACCEPT,
+		/* 324 */ self::YY_NOT_ACCEPT,
+		/* 325 */ self::YY_NOT_ACCEPT,
+		/* 326 */ self::YY_NOT_ACCEPT,
+		/* 327 */ self::YY_NOT_ACCEPT,
+		/* 328 */ self::YY_NOT_ACCEPT,
+		/* 329 */ self::YY_NOT_ACCEPT,
+		/* 330 */ self::YY_NOT_ACCEPT,
+		/* 331 */ self::YY_NOT_ACCEPT,
+		/* 332 */ self::YY_NOT_ACCEPT,
+		/* 333 */ self::YY_NO_ANCHOR,
+		/* 334 */ self::YY_NOT_ACCEPT,
+		/* 335 */ self::YY_NOT_ACCEPT,
+		/* 336 */ self::YY_NOT_ACCEPT,
+		/* 337 */ self::YY_NOT_ACCEPT,
+		/* 338 */ self::YY_NOT_ACCEPT,
+		/* 339 */ self::YY_NOT_ACCEPT,
+		/* 340 */ self::YY_NOT_ACCEPT,
+		/* 341 */ self::YY_NOT_ACCEPT,
+		/* 342 */ self::YY_NOT_ACCEPT,
+		/* 343 */ self::YY_NOT_ACCEPT,
+		/* 344 */ self::YY_NOT_ACCEPT,
+		/* 345 */ self::YY_NOT_ACCEPT,
+		/* 346 */ self::YY_NOT_ACCEPT,
+		/* 347 */ self::YY_NOT_ACCEPT,
+		/* 348 */ self::YY_NOT_ACCEPT,
+		/* 349 */ self::YY_NOT_ACCEPT,
+		/* 350 */ self::YY_NOT_ACCEPT,
+		/* 351 */ self::YY_NOT_ACCEPT,
+		/* 352 */ self::YY_NOT_ACCEPT,
+		/* 353 */ self::YY_NOT_ACCEPT,
+		/* 354 */ self::YY_NOT_ACCEPT,
+		/* 355 */ self::YY_NOT_ACCEPT,
+		/* 356 */ self::YY_NOT_ACCEPT,
+		/* 357 */ self::YY_NOT_ACCEPT,
+		/* 358 */ self::YY_NOT_ACCEPT,
+		/* 359 */ self::YY_NOT_ACCEPT,
+		/* 360 */ self::YY_NOT_ACCEPT,
+		/* 361 */ self::YY_NOT_ACCEPT,
+		/* 362 */ self::YY_NO_ANCHOR,
+		/* 363 */ self::YY_NOT_ACCEPT,
+		/* 364 */ self::YY_NOT_ACCEPT,
+		/* 365 */ self::YY_NOT_ACCEPT,
+		/* 366 */ self::YY_NOT_ACCEPT,
+		/* 367 */ self::YY_NOT_ACCEPT,
+		/* 368 */ self::YY_NOT_ACCEPT,
+		/* 369 */ self::YY_NOT_ACCEPT,
+		/* 370 */ self::YY_NOT_ACCEPT,
+		/* 371 */ self::YY_NOT_ACCEPT,
+		/* 372 */ self::YY_NOT_ACCEPT,
+		/* 373 */ self::YY_NOT_ACCEPT,
+		/* 374 */ self::YY_NOT_ACCEPT,
+		/* 375 */ self::YY_NOT_ACCEPT,
+		/* 376 */ self::YY_NOT_ACCEPT,
+		/* 377 */ self::YY_NO_ANCHOR,
+		/* 378 */ self::YY_NOT_ACCEPT,
+		/* 379 */ self::YY_NOT_ACCEPT,
+		/* 380 */ self::YY_NOT_ACCEPT,
+		/* 381 */ self::YY_NOT_ACCEPT,
+		/* 382 */ self::YY_NOT_ACCEPT,
+		/* 383 */ self::YY_NOT_ACCEPT,
+		/* 384 */ self::YY_NOT_ACCEPT,
+		/* 385 */ self::YY_NOT_ACCEPT,
+		/* 386 */ self::YY_NOT_ACCEPT,
+		/* 387 */ self::YY_NOT_ACCEPT,
+		/* 388 */ self::YY_NOT_ACCEPT
+	);
+		static $yy_cmap = array(
  38, 38, 38, 38, 38, 38, 38, 38, 38, 39, 14, 38, 38, 17, 38, 38, 38, 38, 38, 38,
  38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 39, 23, 39, 13, 62, 39, 39, 18,
  11, 12, 3, 2, 6, 30, 32, 39, 5, 68, 68, 68, 68, 68, 68, 68, 67, 67, 20, 39,
@@ -4509,7 +4515,7 @@ class qtype_preg_lexer extends JLexBase  {
  38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
  38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 0, 0,);
 
-        static $yy_rmap = array(
+		static $yy_rmap = array(
  0, 1, 2, 3, 4, 5, 6, 1, 7, 1, 1, 1, 8, 1, 9, 1, 10, 1, 1, 11,
  1, 12, 13, 1, 14, 1, 1, 1, 1, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1,
  1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 21, 22, 1, 1, 1, 1, 23, 1, 24, 1,
@@ -4531,7 +4537,7 @@ class qtype_preg_lexer extends JLexBase  {
  242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261,
  262, 263, 264, 265, 266, 267, 268, 269, 270,);
 
-        static $yy_nxt = array(
+		static $yy_nxt = array(
 array(
  1, 2, 3, 4, 5, 122, 122, 122, 6, 7, 122, 8, 9, 122, -1, 122, 122, -1, 122, 122,
  122, 10, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 11, 12, 122, 122, 122, 122, 122, 122,
@@ -6160,91 +6166,91 @@ array(
 ),
 );
 
-    public function /*Yytoken*/ nextToken ()
+	public function /*Yytoken*/ nextToken ()
  {
-        $yy_anchor = self::YY_NO_ANCHOR;
-        $yy_state = self::$yy_state_dtrans[$this->yy_lexical_state];
-        $yy_next_state = self::YY_NO_STATE;
-        $yy_last_accept_state = self::YY_NO_STATE;
-        $yy_initial = true;
+		$yy_anchor = self::YY_NO_ANCHOR;
+		$yy_state = self::$yy_state_dtrans[$this->yy_lexical_state];
+		$yy_next_state = self::YY_NO_STATE;
+		$yy_last_accept_state = self::YY_NO_STATE;
+		$yy_initial = true;
 
-        $this->yy_mark_start();
-        $yy_this_accept = self::$yy_acpt[$yy_state];
-        if (self::YY_NOT_ACCEPT != $yy_this_accept) {
-            $yy_last_accept_state = $yy_state;
-            $this->yy_mark_end();
-        }
-        while (true) {
-            if ($yy_initial && $this->yy_at_bol) $yy_lookahead = self::YY_BOL;
-            else $yy_lookahead = $this->yy_advance();
-            $yy_next_state = self::$yy_nxt[self::$yy_rmap[$yy_state]][self::$yy_cmap[$yy_lookahead]];
-            if ($this->YY_EOF == $yy_lookahead && true == $yy_initial) {
-                $this->yy_do_eof();
-                return null;
-            }
-            if (self::YY_F != $yy_next_state) {
-                $yy_state = $yy_next_state;
-                $yy_initial = false;
-                $yy_this_accept = self::$yy_acpt[$yy_state];
-                if (self::YY_NOT_ACCEPT != $yy_this_accept) {
-                    $yy_last_accept_state = $yy_state;
-                    $this->yy_mark_end();
-                }
-            }
-            else {
-                if (self::YY_NO_STATE == $yy_last_accept_state) {
-                    throw new Exception("Lexical Error: Unmatched Input.");
-                }
-                else {
-                    $yy_anchor = self::$yy_acpt[$yy_last_accept_state];
-                    if (0 != (self::YY_END & $yy_anchor)) {
-                        $this->yy_move_end();
-                    }
-                    $this->yy_to_mark();
-                    switch ($yy_last_accept_state) {
-                        case 1:
-
-                        case -2:
-                            break;
-                        case 2:
-                            {                     // Quantifier ?
+		$this->yy_mark_start();
+		$yy_this_accept = self::$yy_acpt[$yy_state];
+		if (self::YY_NOT_ACCEPT != $yy_this_accept) {
+			$yy_last_accept_state = $yy_state;
+			$this->yy_mark_end();
+		}
+		while (true) {
+			if ($yy_initial && $this->yy_at_bol) $yy_lookahead = self::YY_BOL;
+			else $yy_lookahead = $this->yy_advance();
+			$yy_next_state = self::$yy_nxt[self::$yy_rmap[$yy_state]][self::$yy_cmap[$yy_lookahead]];
+			if ($this->YY_EOF == $yy_lookahead && true == $yy_initial) {
+				$this->yy_do_eof();
+				return null;
+			}
+			if (self::YY_F != $yy_next_state) {
+				$yy_state = $yy_next_state;
+				$yy_initial = false;
+				$yy_this_accept = self::$yy_acpt[$yy_state];
+				if (self::YY_NOT_ACCEPT != $yy_this_accept) {
+					$yy_last_accept_state = $yy_state;
+					$this->yy_mark_end();
+				}
+			}
+			else {
+				if (self::YY_NO_STATE == $yy_last_accept_state) {
+					throw new Exception("Lexical Error: Unmatched Input.");
+				}
+				else {
+					$yy_anchor = self::$yy_acpt[$yy_last_accept_state];
+					if (0 != (self::YY_END & $yy_anchor)) {
+						$this->yy_move_end();
+					}
+					$this->yy_to_mark();
+					switch ($yy_last_accept_state) {
+						case 1:
+							
+						case -2:
+							break;
+						case 2:
+							{                     // Quantifier ?
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greed, $possessive);
 }
-                        case -3:
-                            break;
-                        case 3:
-                            {                     // Quantifier +
+						case -3:
+							break;
+						case 3:
+							{                     // Quantifier +
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
 }
-                        case -4:
-                            break;
-                        case 4:
-                            {                     // Quantifier *
+						case -4:
+							break;
+						case 4:
+							{                     // Quantifier *
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
 }
-                        case -5:
-                            break;
-                        case 5:
-                            {                 // Just to avoid exceptions.
+						case -5:
+							break;
+						case 5:
+							{                 // Just to avoid exceptions.
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
-                        case -6:
-                            break;
-                        case 6:
-                            {               // Beginning of a charset: [^ or [ or [^] or []
+						case -6:
+							break;
+						case 6:
+							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
@@ -6260,167 +6266,167 @@ array(
     }
     $this->yybegin(self::CHARSET);
 }
-                        case -7:
-                            break;
-                        case 7:
-                            {
+						case -7:
+							break;
+						case 7:
+							{
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
 }
-                        case -8:
-                            break;
-                        case 8:
-                            {                               // Beginning of a subpattern
+						case -8:
+							break;
+						case 8:
+							{                               // Beginning of a subpattern
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_SUBPATT, $this->yychar, $this->yychar, new qtype_preg_userinscription('('), $this->lastsubpatt));
 }
-                        case -9:
-                            break;
-                        case 9:
-                            {
+						case -9:
+							break;
+						case 9:
+							{
     $this->pop_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(0, $this->yychar, $this->yychar, new qtype_preg_userinscription(')')));
 }
-                        case -10:
-                            break;
-                        case 10:
-                            {
+						case -10:
+							break;
+						case 10:
+							{
     // Reset subpattern numeration inside a (?|...) group.
     if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->subpattnum != -1) {
         $this->lastsubpatt = $this->optstack[$this->optcount - 1]->subpattnum;
     }
     return new qtype_preg_token(qtype_preg_yyParser::ALT, new qtype_preg_lexem(0, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('|')));
 }
-                        case -11:
-                            break;
-                        case 11:
-                            {
+						case -11:
+							break;
+						case 11:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-                        case -12:
-                            break;
-                        case 12:
-                            {           // ERROR: \ at end of pattern.
+						case -12:
+							break;
+						case 12:
+							{           // ERROR: \ at end of pattern.
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_SLASH_AT_END_OF_PATTERN, htmlspecialchars('\\'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-                        case -13:
-                            break;
-                        case 13:
-                            {
+						case -13:
+							break;
+						case 13:
+							{
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_DOLLAR);
 }
-                        case -14:
-                            break;
-                        case 14:
-                            {                     // Control sequence
+						case -14:
+							break;
+						case 14:
+							{                     // Control sequence
     return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
 }
-                        case -15:
-                            break;
-                        case 15:
-                            {
+						case -15:
+							break;
+						case 15:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
 }
-                        case -16:
-                            break;
-                        case 16:
-                            {
+						case -16:
+							break;
+						case 16:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-                        case -17:
-                            break;
-                        case 17:
-                            {
+						case -17:
+							break;
+						case 17:
+							{
     // TODO: matches new line unicode sequences.
     // \B, \R, and \X are not special inside a character class.
     throw new Exception('\R is not implemented yet');
 }
-                        case -18:
-                            break;
-                        case 18:
-                            {
+						case -18:
+							break;
+						case 18:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $text === '\D');
 }
-                        case -19:
-                            break;
-                        case 19:
-                            {
+						case -19:
+							break;
+						case 19:
+							{
     // TODO: matches any character except new line characters. For now, the same as dot.
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-                        case -20:
-                            break;
-                        case 20:
-                            {
+						case -20:
+							break;
+						case 20:
+							{
     // TODO: matches any one data unit. For now implemented the same way as dot.
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-                        case -21:
-                            break;
-                        case 21:
-                            {              // Named backreference.
+						case -21:
+							break;
+						case 21:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -22:
-                            break;
-                        case 22:
-                            {              // Named backreference.
+						case -22:
+							break;
+						case 22:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -23:
-                            break;
-                        case 23:
-                            {
+						case -23:
+							break;
+						case 23:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
 }
-                        case -24:
-                            break;
-                        case 24:
-                            {
+						case -24:
+							break;
+						case 24:
+							{
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, htmlspecialchars('\c'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-                        case -25:
-                            break;
-                        case 25:
-                            {
+						case -25:
+							break;
+						case 25:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B));
 }
-                        case -26:
-                            break;
-                        case 26:
-                            {
+						case -26:
+							break;
+						case 26:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C));
 }
-                        case -27:
-                            break;
-                        case 27:
-                            {
+						case -27:
+							break;
+						case 27:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A));
 }
-                        case -28:
-                            break;
-                        case 28:
-                            {
+						case -28:
+							break;
+						case 28:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));
 }
-                        case -29:
-                            break;
-                        case 29:
-                            {
+						case -29:
+							break;
+						case 29:
+							{
     return $this->form_charset($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
 }
-                        case -30:
-                            break;
-                        case 30:
-                            {
+						case -30:
+							break;
+						case 30:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -6440,79 +6446,79 @@ array(
         }
     }
 }
-                        case -31:
-                            break;
-                        case 31:
-                            {
+						case -31:
+							break;
+						case 31:
+							{
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_A);
 }
-                        case -32:
-                            break;
-                        case 32:
-                            {
+						case -32:
+							break;
+						case 32:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $text === '\H');
 }
-                        case -33:
-                            break;
-                        case 33:
-                            {
+						case -33:
+							break;
+						case 33:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $text === '\S');
 }
-                        case -34:
-                            break;
-                        case 34:
-                            {
+						case -34:
+							break;
+						case 34:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::VSPACE, $text === '\V');
 }
-                        case -35:
-                            break;
-                        case 35:
-                            {
+						case -35:
+							break;
+						case 35:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $text === '\W');
 }
-                        case -36:
-                            break;
-                        case 36:
-                            {
+						case -36:
+							break;
+						case 36:
+							{
     // TODO: reset start of match.
     throw new Exception('\K is not implemented yet');
 }
-                        case -37:
-                            break;
-                        case 37:
-                            {
+						case -37:
+							break;
+						case 37:
+							{
     // TODO: matches  any number of Unicode characters that form an extended Unicode sequence.
     // \B, \R, and \X are not special inside a character class.
     throw new Exception('\R is not implemented yet');
 }
-                        case -38:
-                            break;
-                        case 38:
-                            {
+						case -38:
+							break;
+						case 38:
+							{
     $text = $this->yytext();
     return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_B, $text === '\B');
 }
-                        case -39:
-                            break;
-                        case 39:
-                            {
+						case -39:
+							break;
+						case 39:
+							{
     $text = $this->yytext();
     return $this->form_simple_assertion($text, $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_Z, $text === '\Z');
 }
-                        case -40:
-                            break;
-                        case 40:
-                            {
+						case -40:
+							break;
+						case 40:
+							{
     return $this->form_simple_assertion($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_leaf_assert::SUBTYPE_ESC_G);
 }
-                        case -41:
-                            break;
-                        case 41:
-                            {
+						case -41:
+							break;
+						case 41:
+							{
     $text = $this->yytext();
     $str = $this->recognize_qe_sequence($text);
     $res = array();
@@ -6521,19 +6527,19 @@ array(
     }
     return $res;
 }
-                        case -42:
-                            break;
-                        case 42:
-                            {
+						case -42:
+							break;
+						case 42:
+							{
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-                        case -43:
-                            break;
-                        case 43:
-                            {
+						case -43:
+							break;
+						case 43:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
@@ -6570,18 +6576,18 @@ array(
     }
     return $res;
 }
-                        case -44:
-                            break;
-                        case 44:
-                            {                      // Quantifier {m}
+						case -44:
+							break;
+						case 44:
+							{                      // Quantifier {m}
     $text = $this->yytext();
     $count = (int)qtype_poasquestion_string::substr($text, 1, $this->yylength() - 2);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $count, $count, false, true, false);
 }
-                        case -45:
-                            break;
-                        case 45:
-                            {           // Conditional subpattern - named or numeric
+						case -45:
+							break;
+						case 45:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -6592,10 +6598,10 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -46:
-                            break;
-                        case 46:
-                            {
+						case -46:
+							break;
+						case 46:
+							{
     $text = $this->yytext();
     $delimpos = qtype_poasquestion_string::strpos($text, '-');
     if ($delimpos !== false) {
@@ -6622,10 +6628,10 @@ array(
         }
     }
 }
-                        case -47:
-                            break;
-                        case 47:
-                            {                    // Comment
+						case -47:
+							break;
+						case 47:
+							{                    // Comment
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, htmlspecialchars($text));
@@ -6635,65 +6641,65 @@ array(
         return $this->nextToken();
     }
 }
-                        case -48:
-                            break;
-                        case 48:
-                            {
+						case -48:
+							break;
+						case 48:
+							{
     $this->push_opt_lvl();
     $this->lastsubpatt++;
     $this->maxsubpatt = max($this->maxsubpatt, $this->lastsubpatt);
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem_subpatt(qtype_preg_node_subpatt::SUBTYPE_ONCEONLY, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?>'), $this->lastsubpatt));
 }
-                        case -49:
-                            break;
-                        case 49:
-                            {                 // Named subpattern (?<name>...)
+						case -49:
+							break;
+						case 49:
+							{                 // Named subpattern (?<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
 }
-                        case -50:
-                            break;
-                        case 50:
-                            {                 // Named subpattern (?'name'...)
+						case -50:
+							break;
+						case 50:
+							{                 // Named subpattern (?'name'...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
 }
-                        case -51:
-                            break;
-                        case 51:
-                            {             // Named backreference.
+						case -51:
+							break;
+						case 51:
+							{             // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
 }
-                        case -52:
-                            break;
-                        case 52:
-                            {
+						case -52:
+							break;
+						case 52:
+							{
     $this->push_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?:')));
 }
-                        case -53:
-                            break;
-                        case 53:
-                            {                             // Duplicate subpattern numbers gropu
+						case -53:
+							break;
+						case 53:
+							{                             // Duplicate subpattern numbers gropu
     $this->push_opt_lvl($this->lastsubpatt);    // Save the top-level subpattern number.
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_subpatt::SUBTYPE_GROUPING, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?|')));
 }
-                        case -54:
-                            break;
-                        case 54:
-                            {
+						case -54:
+							break;
+						case 54:
+							{
     $this->push_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?=')));
 }
-                        case -55:
-                            break;
-                        case 55:
-                            {
+						case -55:
+							break;
+						case 55:
+							{
     $this->push_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLA, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?!')));
 }
-                        case -56:
-                            break;
-                        case 56:
-                            {
+						case -56:
+							break;
+						case 56:
+							{
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
@@ -6710,10 +6716,10 @@ array(
     } else {
     }
 }
-                        case -57:
-                            break;
-                        case 57:
-                            {
+						case -57:
+							break;
+						case 57:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -6726,29 +6732,29 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-                        case -58:
-                            break;
-                        case 58:
-                            {
+						case -58:
+							break;
+						case 58:
+							{
     $text = $this->yytext();
     return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_poasquestion_string::substr($text, 2));
 }
-                        case -59:
-                            break;
-                        case 59:
-                            {              // Named backreference.
+						case -59:
+							break;
+						case 59:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '<', '>');
 }
-                        case -60:
-                            break;
-                        case 60:
-                            {              // Named backreference.
+						case -60:
+							break;
+						case 60:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '\'', '\'');
 }
-                        case -61:
-                            break;
-                        case 61:
-                            {
+						case -61:
+							break;
+						case 61:
+							{
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
     if ($char === null) {
@@ -6759,10 +6765,10 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $char);
     }
 }
-                        case -62:
-                            break;
-                        case 62:
-                            {           // Quantifier {m,}
+						case -62:
+							break;
+						case 62:
+							{           // Quantifier {m,}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -6773,10 +6779,10 @@ array(
     $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greed, $possessive);
 }
-                        case -63:
-                            break;
-                        case 63:
-                            {           // Quantifier {,n}
+						case -63:
+							break;
+						case 63:
+							{           // Quantifier {,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -6787,19 +6793,19 @@ array(
     $rightborder = (int)qtype_poasquestion_string::substr($text, 2, $textlen - 3);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greed, $possessive);
 }
-                        case -64:
-                            break;
-                        case 64:
-                            {      // ERROR: POSIX class outside character set.
+						case -64:
+							break;
+						case 64:
+							{      // ERROR: POSIX class outside character set.
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_POSIX_CLASS_OUTSIDE_CHARSET, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error);
 }
-                        case -65:
-                            break;
-                        case 65:
-                            {
+						case -65:
+							break;
+						case 65:
+							{
     $text = $this->yytext();
     $delimpos = qtype_poasquestion_string::strpos($text, '-');
     if ($delimpos !== false) {
@@ -6830,23 +6836,23 @@ array(
         }
     }
 }
-                        case -66:
-                            break;
-                        case 66:
-                            {
+						case -66:
+							break;
+						case 66:
+							{
     $text = $this->yytext();
     return $this->form_recursion($text, $this->yychar, $this->yylength(), $text);
 }
-                        case -67:
-                            break;
-                        case 67:
-                            {                 // Conditional subpattern - numeric
+						case -67:
+							break;
+						case 67:
+							{                 // Conditional subpattern - numeric
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', true);
 }
-                        case -68:
-                            break;
-                        case 68:
-                            {                            // Error - empty condition
+						case -68:
+							break;
+						case 68:
+							{                            // Error - empty condition
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
@@ -6854,56 +6860,56 @@ array(
                  new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $error),
                  new qtype_preg_token(qtype_preg_yyParser::CLOSEBRACK, new qtype_preg_lexem(null, -1, -1, null)));
 }
-                        case -69:
-                            break;
-                        case 69:
-                            {       // Conditional subpattern - named
+						case -69:
+							break;
+						case 69:
+							{       // Conditional subpattern - named
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '>)', false, 4);
 }
-                        case -70:
-                            break;
-                        case 70:
-                            {       // Conditional subpattern - named
+						case -70:
+							break;
+						case 70:
+							{       // Conditional subpattern - named
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '\')', false, 4);
 }
-                        case -71:
-                            break;
-                        case 71:
-                            {             // Conditional subpattern - recursion
+						case -71:
+							break;
+						case 71:
+							{             // Conditional subpattern - recursion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, ')');
 }
-                        case -72:
-                            break;
-                        case 72:
-                            {       // ERROR: Unrecognized character after (?<
+						case -72:
+							break;
+						case 72:
+							{       // ERROR: Unrecognized character after (?<
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA, htmlspecialchars('(?<'));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, $error);
 }
-                        case -73:
-                            break;
-                        case 73:
-                            {
+						case -73:
+							break;
+						case 73:
+							{
     $this->push_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_PLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<=')));
 }
-                        case -74:
-                            break;
-                        case 74:
-                            {
+						case -74:
+							break;
+						case 74:
+							{
     $this->push_opt_lvl();
     return new qtype_preg_token(qtype_preg_yyParser::OPENBRACK, new qtype_preg_lexem(qtype_preg_node_assert::SUBTYPE_NLB, $this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription('(?<!')));
 }
-                        case -75:
-                            break;
-                        case 75:
-                            {                // Named subpattern (?P<name>...)
+						case -75:
+							break;
+						case 75:
+							{                // Named subpattern (?P<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 4, '>');
 }
-                        case -76:
-                            break;
-                        case 76:
-                            {
+						case -76:
+							break;
+						case 76:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -6926,10 +6932,10 @@ array(
     }
     return $res;
 }
-                        case -77:
-                            break;
-                        case 77:
-                            {   // Quantifier {m,n}
+						case -77:
+							break;
+						case 77:
+							{   // Quantifier {m,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -6942,22 +6948,22 @@ array(
     $rightborder = (int)qtype_poasquestion_string::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
 }
-                        case -78:
-                            break;
-                        case 78:
-                            {                           // Conditional subpattern - assertion
+						case -78:
+							break;
+						case 78:
+							{                           // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
 }
-                        case -79:
-                            break;
-                        case 79:
-                            {                           // Conditional subpattern - assertion
+						case -79:
+							break;
+						case 79:
+							{                           // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_NLA);
 }
-                        case -80:
-                            break;
-                        case 80:
-                            {
+						case -80:
+							break;
+						case 80:
+							{
     $text = $this->yytext();
     $num = (int)qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     // Is it a relative backreference? Is so, convert it to an absolute one.
@@ -6966,10 +6972,10 @@ array(
     }
     return $this->form_backref($text, $this->yychar, $this->yylength(), $num);
 }
-                        case -81:
-                            break;
-                        case 81:
-                            {
+						case -81:
+							break;
+						case 81:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
@@ -6985,35 +6991,35 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
 }
-                        case -82:
-                            break;
-                        case 82:
-                            {                          // Conditional subpattern - assertion
+						case -82:
+							break;
+						case 82:
+							{                          // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_PLB);
 }
-                        case -83:
-                            break;
-                        case 83:
-                            {                          // Conditional subpattern - assertion
+						case -83:
+							break;
+						case 83:
+							{                          // Conditional subpattern - assertion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_NLB);
 }
-                        case -84:
-                            break;
-                        case 84:
-                            {                   // Conditional subpattern - define
+						case -84:
+							break;
+						case 84:
+							{                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
-                        case -85:
-                            break;
-                        case 85:
-                            {
+						case -85:
+							break;
+						case 85:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
 }
-                        case -86:
-                            break;
-                        case 86:
-                            {
+						case -86:
+							break;
+						case 86:
+							{
     $this->charset->indlast = $this->yychar;
     $this->charset->israngecalculated = false;
     if ($this->charsetset !== '') {
@@ -7034,7 +7040,7 @@ array(
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
-    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
         $this->charset->caseinsensitive = true;
     }
     $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $this->charset);
@@ -7046,69 +7052,69 @@ array(
     $this->yybegin(self::YYINITIAL);
     return $res;
 }
-                        case -87:
-                            break;
-                        case 87:
-                            {
+						case -87:
+							break;
+						case 87:
+							{
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-                        case -88:
-                            break;
-                        case 88:
-                            {
+						case -88:
+							break;
+						case 88:
+							{
     $text = $this->yytext();
     $negative = ($text === '\D' || $text === '[:^digit:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::DIGIT, $negative);
 }
-                        case -89:
-                            break;
-                        case 89:
-                            {
+						case -89:
+							break;
+						case 89:
+							{
     // TODO: matches any character except new line characters. For now, the same as dot.
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN);
 }
-                        case -90:
-                            break;
-                        case 90:
-                            {
+						case -90:
+							break;
+						case 90:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x07));
 }
-                        case -91:
-                            break;
-                        case 91:
-                            {
+						case -91:
+							break;
+						case 91:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x1B));
 }
-                        case -92:
-                            break;
-                        case 92:
-                            {
+						case -92:
+							break;
+						case 92:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0C));
 }
-                        case -93:
-                            break;
-                        case 93:
-                            {
+						case -93:
+							break;
+						case 93:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0A));
 }
-                        case -94:
-                            break;
-                        case 94:
-                            {
+						case -94:
+							break;
+						case 94:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x0D));
 }
-                        case -95:
-                            break;
-                        case 95:
-                            {
+						case -95:
+							break;
+						case 95:
+							{
     $this->add_flag_to_charset($this->yytext(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(0x09));
 }
-                        case -96:
-                            break;
-                        case 96:
-                            {
+						case -96:
+							break;
+						case 96:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -7129,44 +7135,44 @@ array(
         }
     }
 }
-                        case -97:
-                            break;
-                        case 97:
-                            {
+						case -97:
+							break;
+						case 97:
+							{
     $text = $this->yytext();
     $negative = ($text === '\H' || $text === '\V' || $text === '[:^blank:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::HSPACE, $negative);
 }
-                        case -98:
-                            break;
-                        case 98:
-                            {
+						case -98:
+							break;
+						case 98:
+							{
     $text = $this->yytext();
     $negative = ($text === '\S' || $text === '[:^space:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::SPACE, $negative);
 }
-                        case -99:
-                            break;
-                        case 99:
-                            {
+						case -99:
+							break;
+						case 99:
+							{
     $text = $this->yytext();
     $negative = ($text === '\W' || $text === '[:^word:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD, $negative);
 }
-                        case -100:
-                            break;
-                        case 100:
-                            {
+						case -100:
+							break;
+						case 100:
+							{
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     $this->charset->error[] = $error;
     $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
 }
-                        case -101:
-                            break;
-                        case 101:
-                            {
+						case -101:
+							break;
+						case 101:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -7180,10 +7186,10 @@ array(
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-                        case -102:
-                            break;
-                        case 102:
-                            {
+						case -102:
+							break;
+						case 102:
+							{
     $text = $this->yytext();
     $char = $this->calculate_cx($text);
     if ($char === null) {
@@ -7195,27 +7201,27 @@ array(
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char);
     }
 }
-                        case -103:
-                            break;
-                        case 103:
-                            {
+						case -103:
+							break;
+						case 103:
+							{
     $text = $this->yytext();
     $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_POSIX_CLASS, htmlspecialchars($text));
     $error->set_user_info($this->yychar, $this->yychar + $this->yylength() - 1, new qtype_preg_userinscription());
     $this->charset->error[] = $error;
     $this->charsetuserinscription[] = new qtype_preg_userinscription($text);
 }
-                        case -104:
-                            break;
-                        case 104:
-                            {
+						case -104:
+							break;
+						case 104:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-                        case -105:
-                            break;
-                        case 105:
-                            {
+						case -105:
+							break;
+						case 105:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -7238,17 +7244,17 @@ array(
         }
     }
 }
-                        case -106:
-                            break;
-                        case 106:
-                            {
+						case -106:
+							break;
+						case 106:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $this->recognize_qe_sequence($text));
 }
-                        case -107:
-                            break;
-                        case 107:
-                            {
+						case -107:
+							break;
+						case 107:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 3, $this->yylength() - 4);
     $code = hexdec($str);
@@ -7265,127 +7271,127 @@ array(
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8($code));
     }
 }
-                        case -108:
-                            break;
-                        case 108:
-                            {
+						case -108:
+							break;
+						case 108:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^graph:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::GRAPH, $negative);
 }
-                        case -109:
-                            break;
-                        case 109:
-                            {
+						case -109:
+							break;
+						case 109:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^ascii:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ASCII, $negative);
 }
-                        case -110:
-                            break;
-                        case 110:
-                            {
+						case -110:
+							break;
+						case 110:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^alnum:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALNUM, $negative);
 }
-                        case -111:
-                            break;
-                        case 111:
-                            {
+						case -111:
+							break;
+						case 111:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^alpha:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::ALPHA, $negative);
 }
-                        case -112:
-                            break;
-                        case 112:
-                            {
+						case -112:
+							break;
+						case 112:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^cntrl:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::CNTRL, $negative);
 }
-                        case -113:
-                            break;
-                        case 113:
-                            {
+						case -113:
+							break;
+						case 113:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^print:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PRIN, $negative);
 }
-                        case -114:
-                            break;
-                        case 114:
-                            {
+						case -114:
+							break;
+						case 114:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^punct:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::PUNCT, $negative);
 }
-                        case -115:
-                            break;
-                        case 115:
-                            {
+						case -115:
+							break;
+						case 115:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^upper:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::UPPER, $negative);
 }
-                        case -116:
-                            break;
-                        case 116:
-                            {
+						case -116:
+							break;
+						case 116:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^lower:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::LOWER, $negative);
 }
-                        case -117:
-                            break;
-                        case 117:
-                            {
+						case -117:
+							break;
+						case 117:
+							{
     $text = $this->yytext();
     $negative = ($text === '[:^xdigit:]');
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::XDIGIT, $negative);
 }
-                        case -118:
-                            break;
-                        case 119:
-                            {                     // Quantifier ?
+						case -118:
+							break;
+						case 119:
+							{                     // Quantifier ?
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, 1, $lazy, $greed, $possessive);
 }
-                        case -119:
-                            break;
-                        case 120:
-                            {                     // Quantifier +
+						case -119:
+							break;
+						case 120:
+							{                     // Quantifier +
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 1, null, $lazy, $greed, $possessive);
 }
-                        case -120:
-                            break;
-                        case 121:
-                            {                     // Quantifier *
+						case -120:
+							break;
+						case 121:
+							{                     // Quantifier *
     $text = $this->yytext();
     $greed = $this->yylength() === 1;
     $lazy = qtype_poasquestion_string::substr($text, 1, 1) === '?';
     $possessive = !$greed && !$lazy;
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, 0, null, $lazy, $greed, $possessive);
 }
-                        case -121:
-                            break;
-                        case 122:
-                            {                 // Just to avoid exceptions.
+						case -121:
+							break;
+						case 122:
+							{                 // Just to avoid exceptions.
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, $text);
 }
-                        case -122:
-                            break;
-                        case 123:
-                            {               // Beginning of a charset: [^ or [ or [^] or []
+						case -122:
+							break;
+						case 123:
+							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
@@ -7401,42 +7407,42 @@ array(
     }
     $this->yybegin(self::CHARSET);
 }
-                        case -123:
-                            break;
-                        case 124:
-                            {                     // Control sequence
+						case -123:
+							break;
+						case 124:
+							{                     // Control sequence
     return $this->form_control($this->yytext(), $this->yychar, $this->yylength());
 }
-                        case -124:
-                            break;
-                        case 125:
-                            {
+						case -124:
+							break;
+						case 125:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::substr($text, 1, 1));
 }
-                        case -125:
-                            break;
-                        case 126:
-                            {
+						case -125:
+							break;
+						case 126:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-                        case -126:
-                            break;
-                        case 127:
-                            {              // Named backreference.
+						case -126:
+							break;
+						case 127:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -127:
-                            break;
-                        case 128:
-                            {              // Named backreference.
+						case -127:
+							break;
+						case 128:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -128:
-                            break;
-                        case 129:
-                            {
+						case -128:
+							break;
+						case 129:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -7456,10 +7462,10 @@ array(
         }
     }
 }
-                        case -129:
-                            break;
-                        case 130:
-                            {
+						case -129:
+							break;
+						case 130:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
@@ -7496,10 +7502,10 @@ array(
     }
     return $res;
 }
-                        case -130:
-                            break;
-                        case 131:
-                            {           // Conditional subpattern - named or numeric
+						case -130:
+							break;
+						case 131:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -7510,10 +7516,10 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -131:
-                            break;
-                        case 132:
-                            {                    // Comment
+						case -131:
+							break;
+						case 132:
+							{                    // Comment
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
         $error = new qtype_preg_node_error(qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING, htmlspecialchars($text));
@@ -7523,28 +7529,28 @@ array(
         return $this->nextToken();
     }
 }
-                        case -132:
-                            break;
-                        case 133:
-                            {                 // Named subpattern (?<name>...)
+						case -132:
+							break;
+						case 133:
+							{                 // Named subpattern (?<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
 }
-                        case -133:
-                            break;
-                        case 134:
-                            {                 // Named subpattern (?'name'...)
+						case -133:
+							break;
+						case 134:
+							{                 // Named subpattern (?'name'...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '\'');
 }
-                        case -134:
-                            break;
-                        case 135:
-                            {             // Named backreference.
+						case -134:
+							break;
+						case 135:
+							{             // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
 }
-                        case -135:
-                            break;
-                        case 136:
-                            {
+						case -135:
+							break;
+						case 136:
+							{
     // TODO: callouts. For now this rule will return either error or exception :)
     $text = $this->yytext();
     if (qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) !== ')') {
@@ -7561,10 +7567,10 @@ array(
     } else {
     }
 }
-                        case -136:
-                            break;
-                        case 137:
-                            {
+						case -136:
+							break;
+						case 137:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -7577,29 +7583,29 @@ array(
         return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-                        case -137:
-                            break;
-                        case 138:
-                            {
+						case -137:
+							break;
+						case 138:
+							{
     $text = $this->yytext();
     return $this->form_backref($text, $this->yychar, $this->yylength(), (int)qtype_poasquestion_string::substr($text, 2));
 }
-                        case -138:
-                            break;
-                        case 139:
-                            {              // Named backreference.
+						case -138:
+							break;
+						case 139:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '<', '>');
 }
-                        case -139:
-                            break;
-                        case 140:
-                            {              // Named backreference.
+						case -139:
+							break;
+						case 140:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '\'', '\'');
 }
-                        case -140:
-                            break;
-                        case 141:
-                            {           // Quantifier {m,}
+						case -140:
+							break;
+						case 141:
+							{           // Quantifier {m,}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -7610,10 +7616,10 @@ array(
     $leftborder = (int)qtype_poasquestion_string::substr($text, 1, $textlen - 1);
     return $this->form_quant($text, $this->yychar, $this->yylength(), true, $leftborder, null, $lazy, $greed, $possessive);
 }
-                        case -141:
-                            break;
-                        case 142:
-                            {           // Quantifier {,n}
+						case -141:
+							break;
+						case 142:
+							{           // Quantifier {,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -7624,40 +7630,40 @@ array(
     $rightborder = (int)qtype_poasquestion_string::substr($text, 2, $textlen - 3);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, 0, $rightborder, $lazy, $greed, $possessive);
 }
-                        case -142:
-                            break;
-                        case 143:
-                            {                 // Conditional subpattern - numeric
+						case -142:
+							break;
+						case 143:
+							{                 // Conditional subpattern - numeric
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', true);
 }
-                        case -143:
-                            break;
-                        case 144:
-                            {       // Conditional subpattern - named
+						case -143:
+							break;
+						case 144:
+							{       // Conditional subpattern - named
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '>)', false, 4);
 }
-                        case -144:
-                            break;
-                        case 145:
-                            {       // Conditional subpattern - named
+						case -144:
+							break;
+						case 145:
+							{       // Conditional subpattern - named
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, '\')', false, 4);
 }
-                        case -145:
-                            break;
-                        case 146:
-                            {             // Conditional subpattern - recursion
+						case -145:
+							break;
+						case 146:
+							{             // Conditional subpattern - recursion
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION, ')');
 }
-                        case -146:
-                            break;
-                        case 147:
-                            {                // Named subpattern (?P<name>...)
+						case -146:
+							break;
+						case 147:
+							{                // Named subpattern (?P<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 4, '>');
 }
-                        case -147:
-                            break;
-                        case 148:
-                            {   // Quantifier {m,n}
+						case -147:
+							break;
+						case 148:
+							{   // Quantifier {m,n}
     $text = $this->yytext();
     $textlen = $this->yylength();
     $lastchar = qtype_poasquestion_string::substr($text, $textlen - 1, 1);
@@ -7670,31 +7676,31 @@ array(
     $rightborder = (int)qtype_poasquestion_string::substr($text, $delimpos + 1, $textlen - 2 - $delimpos);
     return $this->form_quant($text, $this->yychar, $this->yylength(), false, $leftborder, $rightborder, $lazy, $greed, $possessive);
 }
-                        case -148:
-                            break;
-                        case 149:
-                            {                   // Conditional subpattern - define
+						case -148:
+							break;
+						case 149:
+							{                   // Conditional subpattern - define
     return $this->form_cond_subpatt($this->yytext(), $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE, ')');
 }
-                        case -149:
-                            break;
-                        case 150:
-                            {
+						case -149:
+							break;
+						case 150:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
 }
-                        case -150:
-                            break;
-                        case 151:
-                            {
+						case -150:
+							break;
+						case 151:
+							{
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-                        case -151:
-                            break;
-                        case 152:
-                            {
+						case -151:
+							break;
+						case 152:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -7715,10 +7721,10 @@ array(
         }
     }
 }
-                        case -152:
-                            break;
-                        case 153:
-                            {
+						case -152:
+							break;
+						case 153:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 2);
     $negative = (qtype_poasquestion_string::substr($text, 1, 1) === 'P');
@@ -7732,17 +7738,17 @@ array(
         $this->add_flag_to_charset($text, qtype_preg_charset_flag::UPROP, $subtype, $negative);
     }
 }
-                        case -153:
-                            break;
-                        case 154:
-                            {
+						case -153:
+							break;
+						case 154:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-                        case -154:
-                            break;
-                        case 156:
-                            {               // Beginning of a charset: [^ or [ or [^] or []
+						case -154:
+							break;
+						case 156:
+							{               // Beginning of a charset: [^ or [ or [^] or []
     $text = $this->yytext();
     $this->charset = new qtype_preg_leaf_charset();
     $this->charset->indfirst = $this->yychar;
@@ -7758,22 +7764,22 @@ array(
     }
     $this->yybegin(self::CHARSET);
 }
-                        case -155:
-                            break;
-                        case 157:
-                            {              // Named backreference.
+						case -155:
+							break;
+						case 157:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -156:
-                            break;
-                        case 158:
-                            {              // Named backreference.
+						case -156:
+							break;
+						case 158:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -157:
-                            break;
-                        case 159:
-                            {
+						case -157:
+							break;
+						case 159:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -7793,10 +7799,10 @@ array(
         }
     }
 }
-                        case -158:
-                            break;
-                        case 160:
-                            {           // Conditional subpattern - named or numeric
+						case -158:
+							break;
+						case 160:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -7807,37 +7813,37 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -159:
-                            break;
-                        case 161:
-                            {                 // Named subpattern (?<name>...)
+						case -159:
+							break;
+						case 161:
+							{                 // Named subpattern (?<name>...)
     return $this->form_named_subpatt($this->yytext(), $this->yychar, $this->yylength(), 3, '>');
 }
-                        case -160:
-                            break;
-                        case 162:
-                            {             // Named backreference.
+						case -160:
+							break;
+						case 162:
+							{             // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 4, '=', ')');
 }
-                        case -161:
-                            break;
-                        case 163:
-                            {
+						case -161:
+							break;
+						case 163:
+							{
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $text);
 }
-                        case -162:
-                            break;
-                        case 164:
-                            {
+						case -162:
+							break;
+						case 164:
+							{
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-                        case -163:
-                            break;
-                        case 165:
-                            {
+						case -163:
+							break;
+						case 165:
+							{
     $text = $this->yytext();
     if ($this->yylength() < 3) {
         $str = qtype_poasquestion_string::substr($text, 1);
@@ -7858,22 +7864,22 @@ array(
         }
     }
 }
-                        case -164:
-                            break;
-                        case 167:
-                            {              // Named backreference.
+						case -164:
+							break;
+						case 167:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -165:
-                            break;
-                        case 168:
-                            {              // Named backreference.
+						case -165:
+							break;
+						case 168:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -166:
-                            break;
-                        case 169:
-                            {           // Conditional subpattern - named or numeric
+						case -166:
+							break;
+						case 169:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -7884,45 +7890,45 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -167:
-                            break;
-                        case 170:
-                            {
+						case -167:
+							break;
+						case 170:
+							{
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-                        case -168:
-                            break;
-                        case 172:
-                            {              // Named backreference.
+						case -168:
+							break;
+						case 172:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -169:
-                            break;
-                        case 173:
-                            {
+						case -169:
+							break;
+						case 173:
+							{
     $text = $this->yytext();
     $char = qtype_poasquestion_string::substr($text, 1, 1);
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, $char, false, $char !== '-');
 }
-                        case -170:
-                            break;
-                        case 175:
-                            {              // Named backreference.
+						case -170:
+							break;
+						case 175:
+							{              // Named backreference.
     return $this->form_named_backref($this->yytext(), $this->yychar, $this->yylength(), 3, '{', '}');
 }
-                        case -171:
-                            break;
-                        case 247:
-                            {
+						case -171:
+							break;
+						case 247:
+							{
     $text = $this->yytext();
     return $this->form_charset($text, $this->yychar, $this->yylength(), qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
-                        case -172:
-                            break;
-                        case 248:
-                            {
+						case -172:
+							break;
+						case 248:
+							{
     $text = $this->yytext();
     $str = qtype_poasquestion_string::substr($text, 1);
     if ((int)$str < 10 || ((int)$str <= $this->maxsubpatt && (int)$str < 100)) {
@@ -7959,10 +7965,10 @@ array(
     }
     return $res;
 }
-                        case -173:
-                            break;
-                        case 249:
-                            {           // Conditional subpattern - named or numeric
+						case -173:
+							break;
+						case 249:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -7973,10 +7979,10 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -174:
-                            break;
-                        case 333:
-                            {           // Conditional subpattern - named or numeric
+						case -174:
+							break;
+						case 333:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -7987,10 +7993,10 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -175:
-                            break;
-                        case 362:
-                            {           // Conditional subpattern - named or numeric
+						case -175:
+							break;
+						case 362:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -8001,10 +8007,10 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -176:
-                            break;
-                        case 377:
-                            {           // Conditional subpattern - named or numeric
+						case -176:
+							break;
+						case 377:
+							{           // Conditional subpattern - named or numeric
     $text = $this->yytext();
     $rightoffset = 0;
     qtype_poasquestion_string::substr($text, $this->yylength() - 1, 1) === ')' && $rightoffset++;
@@ -8015,24 +8021,24 @@ array(
     $numeric = $data !== '' && ctype_digit($data);
     return $this->form_cond_subpatt($text, $this->yychar, $this->yylength(), qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT, ')', $numeric, 3);
 }
-                        case -177:
-                            break;
-                        default:
-                        $this->yy_error('INTERNAL',false);
-                    case -1:
-                    }
-                    $yy_initial = true;
-                    $yy_state = self::$yy_state_dtrans[$this->yy_lexical_state];
-                    $yy_next_state = self::YY_NO_STATE;
-                    $yy_last_accept_state = self::YY_NO_STATE;
-                    $this->yy_mark_start();
-                    $yy_this_accept = self::$yy_acpt[$yy_state];
-                    if (self::YY_NOT_ACCEPT != $yy_this_accept) {
-                        $yy_last_accept_state = $yy_state;
-                        $this->yy_mark_end();
-                    }
-                }
-            }
-        }
-    }
+						case -177:
+							break;
+						default:
+						$this->yy_error('INTERNAL',false);
+					case -1:
+					}
+					$yy_initial = true;
+					$yy_state = self::$yy_state_dtrans[$this->yy_lexical_state];
+					$yy_next_state = self::YY_NO_STATE;
+					$yy_last_accept_state = self::YY_NO_STATE;
+					$this->yy_mark_start();
+					$yy_this_accept = self::$yy_acpt[$yy_state];
+					if (self::YY_NOT_ACCEPT != $yy_this_accept) {
+						$yy_last_accept_state = $yy_state;
+						$this->yy_mark_end();
+					}
+				}
+			}
+		}
+	}
 }
