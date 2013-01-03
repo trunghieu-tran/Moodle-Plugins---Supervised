@@ -1564,7 +1564,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         }
     }
 }
-<CHARSET> \\0[0-7][0-7][0-7]? {
+<CHARSET> \\[0-7][0-7]?[0-7]? {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
