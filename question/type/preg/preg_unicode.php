@@ -7768,12 +7768,15 @@ class qtype_preg_unicode extends textlib {
     }
 
     public static function reduce_range(&$range, &$part) {
+        $rangestart = $range[0];
         $rangeend = $range[1];
         $partend = $part[1];
-        if ($partend < $rangeend) {
-            $range[0] = $partend + 1;
-        } else {
-            $range = null;
+        if ($partend >= $rangestart) {
+            if ($partend < $rangeend) {
+                $range[0] = $partend + 1;
+            } else {
+                $range = null;
+            }
         }
     }
 
