@@ -511,12 +511,12 @@ class qtype_correctwriting_question extends question_graded_automatically
             if (is_object($this->matchedanalyzer)) {
                 $mistakes = $this->matchedanalyzer->mistakes();
                 foreach ($mistakes as $mistake) {
-                    if (is_a($mistake, 'qtype_correctwriting_lexeme_moved_mistake') || is_a($mistake, 'qtype_correctwriting_lexeme_absent_mistake')) {
-                        //Missing or misplaced tokens have similar hints.
-                        $tokendescr = $mistake->token_description($mistake->answermistaken[0]);
-                        if ($tokendescr !== null) {//No need to show "what is" hint if there was no token description.
-                            $key = 'hintwhatis_' . $mistake->mistake_key();
-                            $hints[$key] = get_string('whatis', 'qtype_correctwriting', $tokendescr);
+                    foreach($mistake->supported_hints() as $hintname) {
+                        $classname =  'qtype_correctwriting_' . $hintname;
+                        $key = $hintname . '_' . $mistake->mistake_key();
+                        $hintobj = new $classname($this, $key, $mistake);
+                        if ($hintobj->hint_available()) {
+                            $hints[$key] = $hintobj->hint_description();
                         }
                     }
                 }
@@ -533,23 +533,21 @@ class qtype_correctwriting_question extends question_graded_automatically
     public function hint_object($hintkey, $response = null) {
         $classname = substr($hintkey, 0, strpos($hintkey, '_'));//First '_' separates classname from mistake key.
         $mistakekey = substr($hintkey, strpos($hintkey, '_')+1);
-        $hintclass = 'qtype_correctwriting_'.$classname;
+        $hintclass = 'qtype_correctwriting_' . $classname;
         if ($response !== null) {
             $this->get_best_fit_answer($response);//Be sure to have correct cached values.
             if (is_object($this->matchedanalyzer)) {
                 $mistakes = $this->matchedanalyzer->mistakes();
-                $hintmistake = null;
                 foreach($mistakes as $mistake) {
                     if ($mistake->mistake_key() == $mistakekey) {
                         $hintmistake = $mistake;
                         break;
                     }
                 }
-
                 return new $hintclass($this, $hintkey, $hintmistake);
             }
         }
-        return null;
+        return new $hintclass($this, $hintkey, null);
     }
 
 }

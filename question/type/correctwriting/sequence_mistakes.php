@@ -14,7 +14,6 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 
 // A marker class to indicate errors from sequence_analyzer
 abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
-
 }
 
 
@@ -54,7 +53,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
             //Create a mistake message
             $a = new stdClass();
             $answerindex = $this->answermistaken[0];
-            $a->description = $this->token_description($answerindex);
+            $a->description = $this->token_descriptions();
             if ($a->description !== null) {
                 $this->mistakemsg = get_string('movedmistakemessage','qtype_correctwriting',$a);
             } else {
@@ -76,6 +75,10 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
      */
     public function mistake_key() {
         return 'moved_'.$this->answermistaken[0].'_'.$this->responsemistaken[0];//'movedtoken_' is better, but too long for question_attempt_step_data name column (32)
+    }
+
+    public function supported_hints() {
+        return array('hintwhatis');
     }
 }
 
@@ -166,7 +169,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
             //Create a mistake message
             $a = new stdClass();
             $answerindex = $this->answermistaken[0];
-            $a->description = $this->token_description($answerindex);
+            $a->description = $this->token_descriptions();
             if ($a->description !== null) {
                 $this->mistakemsg = get_string('absentmistakemessage','qtype_correctwriting',$a);
             } else {
@@ -183,6 +186,10 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
 
     public function mistake_key() {
         return 'absent_'.$this->answermistaken[0];//'absenttoken_' is better, but too long for question_attempt_step_data name column (32)
+    }
+
+    public function supported_hints() {
+        return array('hintwhatis');
     }
 }
 
