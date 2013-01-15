@@ -42,14 +42,48 @@ abstract class  qtype_correctwriting_response_mistake {
     protected $answerstring;
 
     /**
-     * @param int $answerindex   index of answer token to look for description
+     * Return a comma-separated list of token desciprions of these tokens, null if there is none
+     * @param andvalue bool get strings like "{descr} is {value}"
      */
-    public function token_description($answerindex) {
-        $descript = null;
-        if ( is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {
-            $descript = $this->answerstring->node_description($answerindex);
+    public function token_descriptions($andvalue = false) {
+        $descripts = array();
+        foreach ($this->answermistaken as $answerindex) {
+            if (is_object($this->answerstring) && $this->answerstring->has_description($answerindex)) {
+                $description = $this->answerstring->node_description($answerindex);
+                if ($andvalue) {
+                    $a = new stdClass;
+                    $a->tokendescr = $description;
+                    $a->tokenvalue = $this->answer[$answerindex]->value();
+                    if (!is_string($a->tokenvalue)) {
+                        $a->tokenvalue = $a->tokenvalue->string();
+                    }
+                    $description = get_string('whatishint', 'qtype_correctwriting', $a);
+                }
+                $descripts[] = $description;
+            }
         }
+
+        if (count($descripts) == 0) {//Return null if no descriptions available
+            $descript = null;
+        } else {
+            $descript = $this->comma_and_list($descripts);
+        }
+
         return $descript;
+    }
+
+    /**
+     * Returns a comma-separated list of strings, with 'and' as last separator
+     */
+    public function comma_and_list($strings) {
+        $last = array_pop($strings);
+        $list = '';
+        if (count($strings) > 0) {
+            $list = implode(', ', $strings);
+            $list .= get_string('and', 'qtype_correctwriting');
+        }
+        $list .= $last;
+        return $list;
     }
 
     /** Returns a message for mistakes. Used for lazy message initiallization.
@@ -65,5 +99,12 @@ abstract class  qtype_correctwriting_response_mistake {
      * Used for finding mistake for hinting etc.
      */
     abstract public function mistake_key();
+
+    /**
+     * Returns an array of supported hint class names (without qtype_correctwriting prefix)
+     */
+    public function supported_hints() {
+        return array();
+    }
 }
 ?>

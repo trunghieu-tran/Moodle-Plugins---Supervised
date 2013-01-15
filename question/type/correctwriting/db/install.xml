@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/correctwriting/db" VERSION="20131215" COMMENT="XMLDB file for CorrectWriting question type"
+<XMLDB PATH="question/type/correctwriting/db" VERSION="20130115" COMMENT="XMLDB file for CorrectWriting question type"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >

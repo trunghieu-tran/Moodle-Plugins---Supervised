@@ -35,13 +35,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 /**
  * "What is" hint shows a token value instead of token description
  *
- * @copyright  2011 Sychev Oleg
+ * @copyright  2013 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
 
     //@var mistake, with which this hint is associated
     protected $mistake;
+    //@var token(s) descriptions for the hint
+    protected $tokendescr;
 
     public function hint_type() {
         return qtype_specific_hint::CHOOSEN_MULTIPLE_INSTANCE_HINT;
@@ -54,12 +56,13 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
         $this->question = $question;
         $this->hintkey = $hintkey;
         $this->mistake = $mistake;
+        if ($mistake !== null) {
+            $this->tokendescr = $this->mistake->token_descriptions();
+        }
     }
 
     public function hint_description() {
-        $tokendescr = $this->mistake->token_description($this->mistake->answermistaken[0]);//TODO - get better one for mistakes with more than 1 answer token
-        //Token description should exists there, otherwise there should be no such hint object at all (cf. question class, available hints method.
-        return get_string('whatis', 'qtype_correctwriting', $tokendescr);
+        return get_string('whatis', 'qtype_correctwriting', $this->tokendescr);
     }
 
     //"What is" hint is obviously response based, since it used to better understand mistake message.
@@ -67,10 +70,13 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
         return true;
     }
 
-    //This hint is always available if hint, otherwise question will return null instead of hint object.
-    //The hint is disabled when penalty is set above 1.
-    public function hint_available($response = null) {//TODO - maybe create a non-available null instance of the hint object instead?
-        return ($this->question->whatishintpenalty <= 1.0);
+    /**
+     * The hint is disabled when penalty is set above 1.
+     * Mistake === null if attempt to create hint was unsuccessfull
+     * Tokendescr === null if there are no token with description on this mistake
+     */
+    public function hint_available($response = null) {
+        return $this->question->whatishintpenalty <= 1.0 && $this->mistake !== null && $this->tokendescr !== null;
     }
 
     public function penalty_for_specific_hint($response = null) {
@@ -83,13 +89,11 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
     }
 
     public function render_hint($renderer, $response = null) {
-        $answerindex = $this->mistake->answermistaken[0];
-        $a = new stdClass;
-        $a->tokendescr = $this->mistake->token_description($answerindex);//TODO - get better one for mistakes with more than 1 answer token
-        $a->tokenvalue = $this->mistake->answer[$answerindex]->value();
-        if (!is_string($a->tokenvalue)) {
-            $a->tokenvalue = $a->tokenvalue->string();
+        if ($this->mistake !== null) {
+            $hinttext = new qtype_poasquestion_string($this->mistake->token_descriptions(true));
+            //Capitalize first letter
+            $hinttext[0] = textlib::strtoupper($hinttext[0]);
+            return $hinttext;
         }
-        return get_string('whatishint', 'qtype_correctwriting', $a);
     }
 }

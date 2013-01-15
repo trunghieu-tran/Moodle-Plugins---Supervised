@@ -88,8 +88,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     $hintkey = 'hintwhatis_' . $mistake->mistake_key();
                     if (array_key_exists($hintkey, $hints)) {//There is "what is" hint for that mistake.
                         $hintobj = $question->hint_object($hintkey, array('answer' => $currentanswer));
-
-                        if (is_object($hintobj)) {//There could be no hint object if response was changed in adaptive behaviour.
+                        if (is_object($hintobj) && $hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
                             if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
                                 $msg .= $br . $hintobj->render_hint($this, array('answer' => $currentanswer));
                             } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
