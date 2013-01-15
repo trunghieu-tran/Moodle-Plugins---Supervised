@@ -84,15 +84,18 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     } else {
                         $msg .= '.';
                     }
-                    //Render "what is" hint button or hint.
-                    $hintkey = 'hintwhatis_' . $mistake->mistake_key();
-                    if (array_key_exists($hintkey, $hints)) {//There is "what is" hint for that mistake.
-                        $hintobj = $question->hint_object($hintkey, array('answer' => $currentanswer));
-                        if (is_object($hintobj) && $hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
-                            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
-                                $msg .= $br . $hintobj->render_hint($this, array('answer' => $currentanswer));
-                            } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
-                                $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
+                    //Render hint buttons and/or hints.
+                    foreach ($mistake->supported_hints() as $hintname) {
+                        $hintkey = $hintname . '_' . $mistake->mistake_key();
+                        if (array_key_exists($hintkey, $hints)) {//There is hint for that mistake.
+                            $classname =  'qtype_correctwriting_' . $hintname;
+                            $hintobj = new $classname($question, $hintkey, $mistake);
+                            if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
+                                if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
+                                    $msg .= $br . $hintobj->render_hint($this, array('answer' => $currentanswer));
+                                } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
+                                    $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
+                                }
                             }
                         }
                     }

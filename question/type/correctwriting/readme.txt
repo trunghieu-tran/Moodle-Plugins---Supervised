@@ -2,7 +2,7 @@ Correct writing question
 -------------------------------------------
 
 Authors:
-1. Idea, string analysis method, general architecture - Oleg Sychev
+1. Idea, string analysis method, general architecture, hints implementation - Oleg Sychev
 2. Question type code, sequence analyzer - Dmitry Mamontov
 
 Thanks going to:
