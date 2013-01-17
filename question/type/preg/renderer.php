@@ -72,24 +72,40 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         //Determine requested hint(s)
         $hintmessage = '';
         $hintkeys = array();
-        $hints = $question->available_specific_hints();
-        foreach ($hints as $key => $value) {
-            if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
-                $hintkeys[] = $key;
+        $hints = $question->available_specific_hints(array('answer' => $currentanswer));
+        foreach ($hints as $hintkey => $value) {
+            $behaviour = $qa->get_behaviour();
+            $copykey = $hintkey;
+            $hintkey = $behaviour->adjust_hintkey($hintkey, true);
+            if ($copykey != $hintkey) {//Adjusting changed key, so there may be other instances to render.
+                $maxnumber = substr($hintkey, strpos($hintkey, '#') + 1);
+                for ($i = 0; $i < $maxnumber; $i++) {
+                    if ($qa->get_last_step()->has_behaviour_var('_render_'.$copykey.$i)) {
+                        $hintkeys[] = $copykey.$i;
+                    }
+                }
+            }
+            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
+                $hintkeys[] = $hintkey;
             }
         }
 
         //Render hints
+        $coloredhintrendered = false;
         if (!empty($hintkeys)) {//Hint requested.
             foreach ($hintkeys as $hintkey) {
                 $hintobj = $question->hint_object($hintkey);
-                $hintmessage .= $hintobj->render_hint($this, array('answer' => $currentanswer));
+                $hintmessage .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
                 $hintmessage .= html_writer::empty_tag('br');
+                if ($hintkey == 'hintnextchar' || $hintkey == 'hintnextlexem') {
+                    $coloredhintrendered = true;
+                }
             }
-        } elseif ($options->feedback == question_display_options::VISIBLE) {
-            //Specific feedback is possible, render colored string - TODO - decide when to render colored string.
-            $hintobj =  $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
+        } 
+        if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
+            //Specific feedback is possible and no hint including colored string is rendered, so render colored string.
+            $hintobj = $question->hint_object('hintmatchingpart');
+            $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
             if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
                 $hintmessage .= html_writer::empty_tag('br');
             }

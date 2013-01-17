@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
-require_once($CFG->dirroot . '/question/type/preg/question.php');//Contains question_with_specific_hints interface for now
+require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');//Contains question_with_specific_hints interface for now
 
 class qbehaviour_adaptivehints extends qbehaviour_adaptive {
     const IS_ARCHETYPAL = false;
@@ -41,6 +41,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $step = $this->qa->get_last_step();
         if ($this->qa->get_state()->is_active()) {//returning an array of hint buttons
             foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey => $hintdescription) {
+                $hintkey = $this->adjust_hintkey($hintkey);
                 $expected[$hintkey.'btn'] = PARAM_BOOL;
             }
         }
@@ -51,10 +52,31 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         parent::adjust_display_options($options);//there seems to nothing to be done until question_display_options will be passed to specific_feedback function of question renderer
     }
 
+    /**
+     * Adjust hintkey, adding number for sequential multiple instance hints.
+     *
+     * Passed hintkey should ends with # character to be appended with number.
+     * @param minusminus bool should we get available hint key instead of next one
+     */
+    public function adjust_hintkey($hintkey, $minusminus = false) {
+        if (substr($hintkey, -1) == '#') {
+            $i = 0;
+            while ($this->qa->get_last_behaviour_var('_render_' . $hintkey . $i) !== null) {
+                $i++;
+            }
+            if ($minusminus) {
+                $i--;
+            }
+            $hintkey = $hintkey . $i;
+        }
+        return $hintkey;
+    }
+
     ////Summarise functions
     public function summarise_action(question_attempt_step $step) {
         //Summarise hint action
         foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey => $hintdescription) {
+            $hintkey = $this->adjust_hintkey($hintkey);
             if ($step->has_behaviour_var($hintkey.'btn')) {
                 return $this->summarise_hint($step, $hintkey, $hintdescription);
             }
@@ -85,6 +107,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $result = null;
         // Process hint button press.
         foreach ($this->question->available_specific_hints($pendingstep->get_qt_data()) as $hintkey => $hintdescription) {
+            $hintkey = $this->adjust_hintkey($hintkey);
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
                 $result = $this->process_hint($pendingstep, $hintkey);
             }
@@ -109,9 +132,8 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     public function process_hint(question_attempt_pending_step $pendingstep, $hintkey) {
         $status = $this->process_save($pendingstep);
-
         $response = $pendingstep->get_qt_data();
-        $hintobj = $this->question->hint_object($hintkey, $pendingstep->get_qt_data());
+        $hintobj = $this->question->hint_object($hintkey, $response);
         if (!$hintobj->hint_available($response)) {//Couldn't compute hint for such response
             return question_attempt::DISCARD;
         }
@@ -146,6 +168,15 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
             foreach ($prevhints as $prevhintkey => $value) {
                 if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey)) {
                     $pendingstep->set_behaviour_var('_render_'.$prevhintkey, true);
+                }
+                if (substr($prevhintkey, -1) == '#') {//Sequential multi-instance hint - should check all instances.
+                    $adjustedkey = $this->adjust_hintkey($prevhintkey);
+                    $maxnumber = substr($adjustedkey, strpos($adjustedkey, '#') + 1);
+                    for ($i = 0; $i < $maxnumber; $i++) {
+                        if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey.$i)) {
+                            $pendingstep->set_behaviour_var('_render_'.$prevhintkey.$i, true);
+                        }
+                    }
                 }
             }
         }

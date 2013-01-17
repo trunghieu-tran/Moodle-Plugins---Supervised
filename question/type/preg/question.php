@@ -456,6 +456,9 @@ class qtype_preg_question extends question_graded_automatically
     */
     public function available_specific_hints($response = null) {
         $hinttypes = array();
+        if (count($this->hints) > 0) {
+            $hinttypes['hintmoodle#'] = get_string('teachertext', 'qtype_poasquestion', '');
+        }
         if ($this->usecharhint) {
             $hinttypes['hintnextchar'] = get_string('hintnextchar', 'qtype_preg');
         }
@@ -471,6 +474,12 @@ class qtype_preg_question extends question_graded_automatically
      * Returns a hint object for given type
      */
     public function hint_object($hintkey, $response = null) {
+        //Moodle-specific hints.
+        if (substr($hintkey, 0, 11) == 'hintmoodle#') {
+            return new qtype_poasquestion_hintmoodle($this, $hintkey);
+        }
+
+        //Preg specific hints
         $hintclass = 'qtype_preg_'.$hintkey;
         return new $hintclass($this, $hintkey);
     }
