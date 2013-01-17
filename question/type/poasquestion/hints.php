@@ -151,6 +151,59 @@ abstract class qtype_specific_hint {
      * Renders hint information for given response using question renderer.
      *
      * Response may be omitted for non-response based hints.
+     * @param renderer question renderer which could be used to render things
      */
-    abstract public function render_hint($renderer, $response = null);
+    abstract public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null);
+}
+
+/**
+ * Class for compatibility with Moodle teacher-defined text and other hints
+ *
+ * @copyright  2013 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
+
+    /** @var int A number of hint in question, getted from hintkey*/
+    protected $number;
+
+    public function hint_type() {
+        return qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT;
+    }
+
+    /**
+     * Constructs hint object, remember question to use.
+     */
+    public function __construct($question, $hintkey) {
+        $this->question = $question;
+        $this->hintkey = $hintkey;
+        //Hintkey is like <hintname>#<number>
+        $this->number = substr($hintkey, strpos($hintkey, '#') + 1);
+    }
+
+    public function hint_description() {
+        $number = '';
+        if (is_numeric($this->number)) {
+            $number = get_string ("No", 'qtype_poasquestion', $this->number + 1);
+        }
+        return get_string('teachertext', 'qtype_poasquestion', $number);
+    }
+
+     public function hint_response_based() {
+        return false;//Teacher-defined text hint has nothing to do with student's response.
+     }
+
+     public function hint_available($response = null) {
+        return is_numeric($this->number) && $this->number < count($this->question->hints);
+     }
+
+     public function penalty_for_specific_hint($response = null) {
+        return $this->question->penalty;
+     }
+
+     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+        $hint = $this->question->hints[$this->number];
+        $hint->adjust_display_options($options);//For the hints like question_hint_with_parts.
+        return $this->question->format_hint($hint, $qa);
+     }
 }

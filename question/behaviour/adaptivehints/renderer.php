@@ -31,6 +31,8 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         //Render buttons that should be rendered by behaviour.
          foreach ($question->available_specific_hints() as $hintkey => $hintdescription) {
 
+            $behaviour = $qa->get_behaviour();
+            $hintkey = $behaviour->adjust_hintkey($hintkey);
             $hintobj = $question->hint_object($hintkey);
 
             if (!$hintobj->button_rendered_by_question()) {//Button(s) isn't rendered by the question, so behaviour must render it.
