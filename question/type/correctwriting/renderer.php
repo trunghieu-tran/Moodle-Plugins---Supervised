@@ -85,8 +85,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     //Render hint buttons and/or hints.
                     foreach ($mistake->supported_hints() as $hintname) {
                         $hintkey = $hintname . '_' . $mistake->mistake_key();
-                        if (array_key_exists($hintkey, $hints)) {//There is hint for that mistake.
-                            unset($hints[$hintkey]);//Unset to not render twice.
+                        if (in_array($hintkey, $hints)) {//There is hint for that mistake.
+                            $hints = array_diff($hints, array($hintkey));
                             $classname =  'qtype_correctwriting_' . $hintname;
                             $hintobj = new $classname($question, $hintkey, $mistake);
                             if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
@@ -106,7 +106,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
         }
         //Render non-mistake hints if requested.
         $hints = $behaviour->adjust_hints($hints);
-        foreach($hints as $hintkey => $value) {
+        foreach ($hints as $hintkey) {
             if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
                 $hintobj = $question->hint_object($hintkey);
                 $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
