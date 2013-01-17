@@ -457,13 +457,13 @@ class qtype_preg_question extends question_graded_automatically
     public function available_specific_hints($response = null) {
         $hinttypes = array();
         if (count($this->hints) > 0) {
-            $hinttypes['hintmoodle#'] = get_string('teachertext', 'qtype_poasquestion', '');
+            $hinttypes[] = 'hintmoodle#';
         }
         if ($this->usecharhint) {
-            $hinttypes['hintnextchar'] = get_string('hintnextchar', 'qtype_preg');
+            $hinttypes[] = 'hintnextchar';
         }
         if ($this->uselexemhint) {
-            $hinttypes['hintnextlexem'] = get_string('hintnextlexem', 'qtype_preg', $this->lexemusername);
+            $hinttypes[] = 'hintnextlexem';
         }
         return $hinttypes;
     }

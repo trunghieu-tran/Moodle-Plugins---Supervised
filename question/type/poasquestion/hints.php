@@ -41,9 +41,9 @@ interface question_with_qtype_specific_hints {
     /**
      * Returns an array of available specific hint types depending on question settings
      *
-     * The keys are hint type indentifiers, unique for the qtype.
-     * The values are interface strings with the hint description (without "hint" word!)
-     * If a question allows for multiple instance choosen hints, it should return a separate key for each instance. That may depend on $response.
+     * The values are hint type indentifiers (hintkeys), unique for the qtype.
+     * For multiple instance sequential hints hintkeys should end with '#' character.
+     * For multiple instance choosen hints a separate key for each instance should be returned. That may depend on $response.
      */
     public function available_specific_hints($response = null);
 

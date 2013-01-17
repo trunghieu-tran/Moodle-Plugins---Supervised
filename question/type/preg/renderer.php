@@ -75,7 +75,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $behaviour = $qa->get_behaviour();
         $hints = $behaviour->adjust_hints($hints);
         $coloredhintrendered = false;//Is hint showing colored string is rendered?
-        foreach ($hints as $hintkey => $value) {
+        foreach ($hints as $hintkey) {
             if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
                 $hintobj = $question->hint_object($hintkey);
                 $hintmessage .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
