@@ -40,7 +40,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
         $step = $this->qa->get_last_step();
         if ($this->qa->get_state()->is_active()) {//returning an array of hint buttons
-            foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey => $hintdescription) {
+            foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey) {
                 $hintkey = $this->adjust_hintkey($hintkey);
                 $expected[$hintkey.'btn'] = PARAM_BOOL;
             }
@@ -78,16 +78,16 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
      */
     public function adjust_hints($hints) {
         $result = array();
-        foreach ($hints as $hintkey => $value) {
+        foreach ($hints as $hintkey) {
             if (substr($hintkey, -1) == '#') {
                 $adjustedkey = $this->adjust_hintkey($hintkey);
                 $maxnumber = substr($adjustedkey, strpos($adjustedkey, '#') + 1);
                 for ($i = 0; $i <= $maxnumber; $i++) {
                     $key = $hintkey . $i;
-                    $result[$key] = $value;
+                    $result[] = $key;
                 }
             } else {
-                $result[$hintkey] = $value;
+                $result[] = $hintkey;
             }
         }
         return $result;
@@ -96,7 +96,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
     ////Summarise functions
     public function summarise_action(question_attempt_step $step) {
         //Summarise hint action
-        foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey => $hintdescription) {
+        foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey) {
             $hintkey = $this->adjust_hintkey($hintkey);
             if ($step->has_behaviour_var($hintkey.'btn')) {
                 return $this->summarise_hint($step, $hintkey);
@@ -128,7 +128,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
         $result = null;
         // Process hint button press.
-        foreach ($this->question->available_specific_hints($pendingstep->get_qt_data()) as $hintkey => $hintdescription) {
+        foreach ($this->question->available_specific_hints($pendingstep->get_qt_data()) as $hintkey) {
             $hintkey = $this->adjust_hintkey($hintkey);
             if ($pendingstep->has_behaviour_var($hintkey.'btn')) {
                 $result = $this->process_hint($pendingstep, $hintkey);
@@ -187,7 +187,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         $prevhintstep = $this->qa->get_last_step();
         if ($prevhintstep->has_behaviour_var('_hashint') && $this->is_same_response($pendingstep)) {
             $prevhints = $this->adjust_hints($this->question->available_specific_hints($pendingstep->get_qt_data()));
-            foreach ($prevhints as $prevhintkey => $value) {
+            foreach ($prevhints as $prevhintkey) {
                 if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey)) {
                     $pendingstep->set_behaviour_var('_render_'.$prevhintkey, true);
                 }
