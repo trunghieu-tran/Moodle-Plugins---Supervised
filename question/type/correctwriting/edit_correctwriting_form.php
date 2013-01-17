@@ -105,6 +105,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('whatishintpenalty', 1.1);
         $mform->addRule('whatishintpenalty', null, 'required', null, 'client');
         $mform->addHelpButton('whatishintpenalty', 'whatishintpenalty', 'qtype_correctwriting');
+        //Add "where" text hint penalty
+        $mform->addElement('text', 'wheretxthintpenalty',
+                           get_string('wheretxthintpenalty', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('wheretxthintpenalty', PARAM_FLOAT);
+        $mform->setDefault('wheretxthintpenalty', 1.1);
+        $mform->addRule('wheretxthintpenalty', null, 'required', null, 'client');
+        $mform->addHelpButton('wheretxthintpenalty', 'wheretxthintpenalty', 'qtype_correctwriting');
+
 
         $mform->setAdvanced('lexicalerrorthreshold');
         $mform->setAdvanced('lexicalerrorweight');

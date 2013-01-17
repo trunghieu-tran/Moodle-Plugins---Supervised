@@ -86,6 +86,25 @@ abstract class  qtype_correctwriting_response_mistake {
         return $list;
     }
 
+    /**
+      * Returns token description if available, token value in quotes otherwise
+      */
+    public function token_descr_or_value($answerindex) {
+        $result = '';
+        if (is_object($this->answerstring)) {
+            if ($this->answerstring->has_description($answerindex)) {
+                $result = $this->answerstring->node_description($answerindex);
+            } else {
+                $result = $this->answer[$answerindex]->value();
+                if (!is_string($result)) {
+                        $result = $result->string();
+                }
+                $result = '"' . $result . '"';
+            }
+        }
+        return $result;
+    }
+
     /** Returns a message for mistakes. Used for lazy message initiallization.
         @return string mistake message
      */

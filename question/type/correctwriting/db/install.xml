@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/correctwriting/db" VERSION="20130115" COMMENT="XMLDB file for CorrectWriting question type"
+<XMLDB PATH="question/type/correctwriting/db" VERSION="20130118" COMMENT="XMLDB file for CorrectWriting question type"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -17,7 +17,8 @@
         <FIELD NAME="usecase" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether, analysis of question should be case-sensitive" PREVIOUS="lexicalerrorweight" NEXT="hintgradeborder"/>
         <FIELD NAME="hintgradeborder" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.9" SEQUENCE="false" DECIMALS="7" COMMENT="A grade border when non-exact match is supplied." PREVIOUS="usecase" NEXT="maxmistakepercentage"/>
         <FIELD NAME="maxmistakepercentage" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.7" SEQUENCE="false" DECIMALS="7" COMMENT="A maximum percentage to discard total errors. If mistakes/length of teacher answer bigger than this, the teacher answer is discarded." PREVIOUS="hintgradeborder" NEXT="whatishintpenalty"/>
-        <FIELD NAME="whatishintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for &quot;what is&quot; hint. Setting above 1 will disable this hint for the question" PREVIOUS="maxmistakepercentage"/>
+        <FIELD NAME="whatishintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for &quot;what is&quot; hint. Setting above 1 will disable this hint for the question" PREVIOUS="maxmistakepercentage" NEXT="wheretxthintpenalty"/>
+        <FIELD NAME="wheretxthintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for text &quot;where&quot; hint" PREVIOUS="whatishintpenalty"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>

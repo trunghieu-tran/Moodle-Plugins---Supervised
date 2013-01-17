@@ -66,6 +66,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result[] = 'maxmistakepercentage';
         //Penalty for "what is" hint.
         $result[] = 'whatishintpenalty';
+        //Penalty for "where" text hint.
+        $result[] = 'wheretxthintpenalty';
         return $result;
     }
     /** Returns a name of foreign key columns for question type
