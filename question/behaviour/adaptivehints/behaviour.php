@@ -72,22 +72,44 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         return $hintkey;
     }
 
+    /**
+     * Adjust hints array, replacing every hintkey that ends with # with a whole 
+     * bunch of numbers up to used in this attempt.
+     */
+    public function adjust_hints($hints) {
+        $result = array();
+        foreach ($hints as $hintkey => $value) {
+            if (substr($hintkey, -1) == '#') {
+                $adjustedkey = $this->adjust_hintkey($hintkey);
+                $maxnumber = substr($adjustedkey, strpos($adjustedkey, '#') + 1);
+                for ($i = 0; $i <= $maxnumber; $i++) {
+                    $key = $hintkey . $i;
+                    $result[$key] = $value;
+                }
+            } else {
+                $result[$hintkey] = $value;
+            }
+        }
+        return $result;
+    }
+
     ////Summarise functions
     public function summarise_action(question_attempt_step $step) {
         //Summarise hint action
         foreach ($this->question->available_specific_hints($step->get_qt_data()) as $hintkey => $hintdescription) {
             $hintkey = $this->adjust_hintkey($hintkey);
             if ($step->has_behaviour_var($hintkey.'btn')) {
-                return $this->summarise_hint($step, $hintkey, $hintdescription);
+                return $this->summarise_hint($step, $hintkey);
             }
         }
 
         return parent::summarise_action($step);
     }
 
-    public function summarise_hint(question_attempt_step $step, $hintkey, $hintdescription) {
+    public function summarise_hint(question_attempt_step $step, $hintkey) {
         $response = $step->get_qt_data();
         $hintobj = $this->question->hint_object($hintkey, $step->get_qt_data());
+        $hintdescription = $hintobj->hint_description();
         $a = new stdClass();
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);
@@ -164,19 +186,10 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
         //Copy previous _render_hintxxx variables if previous state is hint state and response is same.
         $prevhintstep = $this->qa->get_last_step();
         if ($prevhintstep->has_behaviour_var('_hashint') && $this->is_same_response($pendingstep)) {
-            $prevhints = $this->question->available_specific_hints($pendingstep->get_qt_data());
+            $prevhints = $this->adjust_hints($this->question->available_specific_hints($pendingstep->get_qt_data()));
             foreach ($prevhints as $prevhintkey => $value) {
                 if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey)) {
                     $pendingstep->set_behaviour_var('_render_'.$prevhintkey, true);
-                }
-                if (substr($prevhintkey, -1) == '#') {//Sequential multi-instance hint - should check all instances.
-                    $adjustedkey = $this->adjust_hintkey($prevhintkey);
-                    $maxnumber = substr($adjustedkey, strpos($adjustedkey, '#') + 1);
-                    for ($i = 0; $i < $maxnumber; $i++) {
-                        if ($prevhintstep->has_behaviour_var('_render_'.$prevhintkey.$i)) {
-                            $pendingstep->set_behaviour_var('_render_'.$prevhintkey.$i, true);
-                        }
-                    }
                 }
             }
         }
