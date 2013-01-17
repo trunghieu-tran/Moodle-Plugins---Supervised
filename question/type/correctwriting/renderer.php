@@ -40,9 +40,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
      */
     public function feedback(question_attempt $qa, question_display_options $options) {
         $output = '';
-        if ($options->feedback) {
-            $output .= $this->specific_feedback_with_options($qa, $options);
-        }
+        $output .= $this->specific_feedback_with_options($qa, $options);
 
         $output .= parent::feedback($qa, $options);
 
@@ -62,7 +60,9 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             $currentanswer = '';
         }
         $hints = $question->available_specific_hints(array('answer' => $currentanswer));
-        if ($analyzer!=null) {
+        $behaviour = $qa->get_behaviour();
+        $behaviourrenderer =$behaviour->get_renderer($PAGE);
+        if ($analyzer!=null && $options->feedback) {//Show feedback message only witho $options->feedback set, but Moodle hints - anyway
             //Output mistakes messages
             if (count($analyzer->mistakes()) > 0) {
                 $mistakescnt = count($analyzer->mistakes());
@@ -74,8 +74,6 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                 $myfeedback .= $br;
 
                 $i = 1;
-                $behaviour = $qa->get_behaviour();
-                $behaviourrenderer =$behaviour->get_renderer($PAGE);
                 foreach($analyzer->mistakes() as $mistake) {
                     //Render mistake message.
                     $msg = $i.') '.$mistake->get_mistake_message();
@@ -88,11 +86,12 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     foreach ($mistake->supported_hints() as $hintname) {
                         $hintkey = $hintname . '_' . $mistake->mistake_key();
                         if (array_key_exists($hintkey, $hints)) {//There is hint for that mistake.
+                            unset($hints[$hintkey]);//Unset to not render twice.
                             $classname =  'qtype_correctwriting_' . $hintname;
                             $hintobj = new $classname($question, $hintkey, $mistake);
                             if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
                                 if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
-                                    $msg .= $br . $hintobj->render_hint($this, array('answer' => $currentanswer));
+                                    $msg .= $br . $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
                                 } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
                                     $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
                                 }
@@ -103,6 +102,26 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                     $myfeedback .= $br;
                     $i++;
                 }
+            }
+        }
+        //Render non-mistake hints if requested.
+        foreach($hints as $hintkey => $value) {
+            $copykey = $hintkey;
+            $hintkey = $behaviour->adjust_hintkey($hintkey, true);
+            if ($copykey != $hintkey) {//Adjusting changed key, so there may be other instances to render.
+                $maxnumber = substr($hintkey, strpos($hintkey, '#') + 1);
+                for ($i = 0; $i < $maxnumber; $i++) {
+                    if ($qa->get_last_step()->has_behaviour_var('_render_'.$copykey.$i)) {
+                        $hintobj = $question->hint_object($copykey.$i);
+                        $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                        $myfeedback .= $br;
+                    }
+                }
+            }
+            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
+                $hintobj = $question->hint_object($hintkey);
+                $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                $myfeedback .= $br;
             }
         }
         return $myfeedback . $shortanswerfeedback;

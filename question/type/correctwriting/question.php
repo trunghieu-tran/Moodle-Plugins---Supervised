@@ -506,6 +506,9 @@ class qtype_correctwriting_question extends question_graded_automatically
     */
     public function available_specific_hints($response = null) {
         $hints = array();
+        if (count($this->hints) > 0) {
+            $hints['hintmoodle#'] = get_string('teachertext', 'qtype_poasquestion', '');
+        }
         if ($response !== null) {
             $this->get_best_fit_answer($response);//Be sure to have correct cached values.
             if (is_object($this->matchedanalyzer)) {
@@ -531,6 +534,12 @@ class qtype_correctwriting_question extends question_graded_automatically
      * Returns a hint object for given type
      */
     public function hint_object($hintkey, $response = null) {
+        //Moodle-specific hints.
+        if (substr($hintkey, 0, 11) == 'hintmoodle#') {
+            return new qtype_poasquestion_hintmoodle($this, $hintkey);
+        }
+
+        //CorrectWriting specific hints.
         $classname = substr($hintkey, 0, strpos($hintkey, '_'));//First '_' separates classname from mistake key.
         $mistakekey = substr($hintkey, strpos($hintkey, '_')+1);
         $hintclass = 'qtype_correctwriting_' . $classname;
