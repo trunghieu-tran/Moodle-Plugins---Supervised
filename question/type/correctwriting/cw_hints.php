@@ -88,7 +88,7 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
         return true;
     }
 
-    public function render_hint($renderer, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         if ($this->mistake !== null) {
             $hinttext = new qtype_poasquestion_string($this->mistake->token_descriptions(true));
             //Capitalize first letter
