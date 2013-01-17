@@ -25,15 +25,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version  = 2012090300;
+$plugin->version  = 2013011800;
 $plugin->requires = 2012062501;
-$plugin->release = 'Preg 2.3';
-$plugin->maturity = MATURITY_BETA;
+$plugin->release = 'Preg 2.3.1';
+$plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
-    'qbehaviour_adaptivehints' => 2011111902,
-    'qbehaviour_adaptivehintsnopenalties' => 2011111902,
-    'qtype_poasquestion' => 2012060900,
+    'qbehaviour_adaptivehints' => 2013011800,
+    'qbehaviour_adaptivehintsnopenalties' => 2013011800,
+    'qtype_poasquestion' => 2013011800,
     'block_formal_langs' => 2012021400
 );

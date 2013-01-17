@@ -56,16 +56,12 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
      * Adjust hintkey, adding number for sequential multiple instance hints.
      *
      * Passed hintkey should ends with # character to be appended with number.
-     * @param minusminus bool should we get available hint key instead of next one
      */
-    public function adjust_hintkey($hintkey, $minusminus = false) {
+    public function adjust_hintkey($hintkey) {
         if (substr($hintkey, -1) == '#') {
             $i = 0;
             while ($this->qa->get_last_behaviour_var('_render_' . $hintkey . $i) !== null) {
                 $i++;
-            }
-            if ($minusminus) {
-                $i--;
             }
             $hintkey = $hintkey . $i;
         }
