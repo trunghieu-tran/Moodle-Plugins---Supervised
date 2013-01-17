@@ -105,19 +105,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             }
         }
         //Render non-mistake hints if requested.
+        $hints = $behaviour->adjust_hints($hints);
         foreach($hints as $hintkey => $value) {
-            $copykey = $hintkey;
-            $hintkey = $behaviour->adjust_hintkey($hintkey, true);
-            if ($copykey != $hintkey) {//Adjusting changed key, so there may be other instances to render.
-                $maxnumber = substr($hintkey, strpos($hintkey, '#') + 1);
-                for ($i = 0; $i < $maxnumber; $i++) {
-                    if ($qa->get_last_step()->has_behaviour_var('_render_'.$copykey.$i)) {
-                        $hintobj = $question->hint_object($copykey.$i);
-                        $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                        $myfeedback .= $br;
-                    }
-                }
-            }
             if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
                 $hintobj = $question->hint_object($hintkey);
                 $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
