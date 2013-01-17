@@ -25,15 +25,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_correctwriting';
-$plugin->version  = 2013011500;
+$plugin->version  = 2013011800;
 $plugin->requires = 2011121310;
 $plugin->release = 'Correct Writing 2.3';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
-    'qbehaviour_adaptivehints' => 2011111902,
-    'qbehaviour_adaptivehintsnopenalties' => 2011111902,
-    'qtype_poasquestion' => 2012060900,
+    'qbehaviour_adaptivehints' => 2013011800,
+    'qbehaviour_adaptivehintsnopenalties' => 2013011800,
+    'qtype_poasquestion' => 2013011800,
     'block_formal_langs' => 2012021400
 );

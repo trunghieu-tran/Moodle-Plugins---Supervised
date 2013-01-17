@@ -100,6 +100,11 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $whatishintpenalty = 1.1;
 
+    /** Penalty for "where" text hint. Penalties more than 1 will disable hint.
+     *  @var float
+     */
+    public $wheretxthintpenalty = 1.1;
+
     /** Whether cache is valid
      *  @var boolean
      */
@@ -515,7 +520,7 @@ class qtype_correctwriting_question extends question_graded_automatically
                 $mistakes = $this->matchedanalyzer->mistakes();
                 foreach ($mistakes as $mistake) {
                     foreach($mistake->supported_hints() as $hintname) {
-                        $classname =  'qtype_correctwriting_' . $hintname;
+                        $classname =  'qtype_correctwriting_hint' . $hintname;
                         $key = $hintname . '_' . $mistake->mistake_key();
                         $hintobj = new $classname($this, $key, $mistake);
                         if ($hintobj->hint_available()) {
@@ -542,7 +547,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         //CorrectWriting specific hints.
         $classname = substr($hintkey, 0, strpos($hintkey, '_'));//First '_' separates classname from mistake key.
         $mistakekey = substr($hintkey, strpos($hintkey, '_')+1);
-        $hintclass = 'qtype_correctwriting_' . $classname;
+        $hintclass = 'qtype_correctwriting_hint' . $classname;
         if ($response !== null) {
             $this->get_best_fit_answer($response);//Be sure to have correct cached values.
             if (is_object($this->matchedanalyzer)) {

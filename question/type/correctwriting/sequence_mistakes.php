@@ -78,7 +78,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
     }
 
     public function supported_hints() {
-        return array('hintwhatis');
+        return array('whatis', 'wheretxt');
     }
 }
 
@@ -189,7 +189,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
     }
 
     public function supported_hints() {
-        return array('hintwhatis');
+        return array('whatis', 'wheretxt');
     }
 }
 

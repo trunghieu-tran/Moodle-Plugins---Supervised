@@ -42,5 +42,20 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2013011500, 'qtype', 'correctwriting');
     }
 
+    if ($oldversion < 2013011800) {
+
+        // Define field wheretxthintpenalty to be added to qtype_correctwriting
+        $table = new xmldb_table('qtype_correctwriting');
+        $field = new xmldb_field('wheretxthintpenalty', XMLDB_TYPE_NUMBER, '4, 2', null, XMLDB_NOTNULL, null, '1.1', 'whatishintpenalty');
+
+        // Conditionally launch add field wheretxthintpenalty
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // correctwriting savepoint reached
+        upgrade_plugin_savepoint(true, 2013011800, 'qtype', 'correctwriting');
+    }
+
     return true;
 }
