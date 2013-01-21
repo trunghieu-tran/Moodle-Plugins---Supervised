@@ -34,7 +34,42 @@ class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugi
      */
     protected function define_question_plugin_structure() {
         $plugin = $this->define_question_plugin_structure_inner();
+        /**
+         * @var backup_plugin_element $pluginwrapper
+         */
         $pluginwrapper = $plugin->get_child($this->get_recommended_name());
+
+        // Why we add those into plugin wrapper? Because there
+        // are no way we could reach a question id otherwise
+        // It will cause a errors in backup otherwise, since id structure
+        // will be broken
+
+        $langfields = array('ui_name', 'description', 'name', 'scanrules', 'parserules', 'version', 'visible');
+        $child = new backup_nested_element('language', array('id'), $langfields);
+        $pluginwrapper->add_child($child);
+        $child->set_source_sql('
+            SELECT * FROM {block_formal_langs}
+             WHERE id IN (SELECT langid FROM {qtype_correctwriting}
+             WHERE questionid = :question);
+        ',
+        array('question' => backup::VAR_PARENTID)
+        );
+
+        // Because we can't include descriptions in answer, we
+        // include them as one table part
+
+        $dscrfields = array('tableid', 'number', 'description');
+        $child = new backup_nested_element('descriptions', array('id'), $dscrfields);
+        $pluginwrapper->add_child($child);
+        $child->set_source_sql('
+            SELECT * FROM {block_formal_langs_node_dscr}
+            WHERE tablename = \'question_answers\' AND tableid IN (
+              SELECT id FROM {question_answers} WHERE question = :question
+            );
+        ',
+        array('question' => backup::VAR_PARENTID)
+        );
+
 
         return $plugin;
     }
@@ -68,7 +103,6 @@ class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugi
         $pluginwrapper->add_child($child);
 
         $child->set_source_table($tablename, array($qtypeobj->questionid_column_name() => backup::VAR_PARENTID));
-        // Include additional data to wrapper
 
         // Don't need to annotate ids nor files.
         return $plugin;
