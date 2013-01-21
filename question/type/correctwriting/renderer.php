@@ -105,12 +105,15 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             }
         }
         //Render non-mistake hints if requested.
-        $hints = $behaviour->adjust_hints($hints);
-        foreach ($hints as $hintkey) {
-            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
-                $hintobj = $question->hint_object($hintkey);
-                $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                $myfeedback .= $br;
+        // BUGFIX: Immediate feedback in Moodle 2.3 don't have adjust_hints method
+        if (method_exists($behaviour, 'adjust_hints')) {
+            $hints = $behaviour->adjust_hints($hints);
+            foreach ($hints as $hintkey) {
+                if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
+                    $hintobj = $question->hint_object($hintkey);
+                    $myfeedback .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                    $myfeedback .= $br;
+                }
             }
         }
         return $myfeedback . $shortanswerfeedback;
