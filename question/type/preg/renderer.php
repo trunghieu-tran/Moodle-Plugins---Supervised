@@ -70,18 +70,20 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         }
 
         //Render hints
-        $hintmessage = '';
-        $hints = $question->available_specific_hints(array('answer' => $currentanswer));
+        $coloredhintrendered = false;//Is hint showing colored string rendered?
         $behaviour = $qa->get_behaviour();
-        $hints = $behaviour->adjust_hints($hints);
-        $coloredhintrendered = false;//Is hint showing colored string is rendered?
-        foreach ($hints as $hintkey) {
-            if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
-                $hintobj = $question->hint_object($hintkey);
-                $hintmessage .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                $hintmessage .= html_writer::empty_tag('br');
-                if ($hintkey == 'hintnextchar' || $hintkey == 'hintnextlexem') {
-                    $coloredhintrendered = true;
+        $hintmessage = '';
+        $br =  html_writer::empty_tag('br');
+        if (is_a($behaviour, 'qbehaviour_adaptivehints')) {//TODO change 'qbehaviour_adaptivehints' to abstract hinting behaviour when it will be done.
+            $hints = $question->available_specific_hints(array('answer' => $currentanswer));
+            $hints = $behaviour->adjust_hints($hints);
+            foreach ($hints as $hintkey) {
+                if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
+                    $hintobj = $question->hint_object($hintkey);
+                    $hintmessage .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer)) . $br;
+                    if ($hintkey == 'hintnextchar' || $hintkey == 'hintnextlexem') {
+                        $coloredhintrendered = true;
+                    }
                 }
             }
         }
@@ -91,7 +93,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             $hintobj = $question->hint_object('hintmatchingpart');
             $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
             if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
-                $hintmessage .= html_writer::empty_tag('br');
+                $hintmessage .= $br;
             }
         }
 
