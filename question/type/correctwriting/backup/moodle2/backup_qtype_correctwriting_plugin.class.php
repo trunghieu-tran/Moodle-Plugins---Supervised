@@ -39,13 +39,15 @@ class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugi
          */
         $pluginwrapper = $plugin->get_child($this->get_recommended_name());
 
+        $qtypeobj = question_bank::get_qtype($this->pluginname);
+
         // Why we add those into plugin wrapper? Because there
         // are no way we could reach a question id otherwise
         // It will cause a errors in backup otherwise, since id structure
         // will be broken
 
         $langfields = array('ui_name', 'description', 'name', 'scanrules', 'parserules', 'version', 'visible');
-        $child = new backup_nested_element('language', array('id'), $langfields);
+        $child = new backup_nested_element($qtypeobj->name() . '_language', array('id'), $langfields);
         $pluginwrapper->add_child($child);
         $child->set_source_sql('
             SELECT * FROM {block_formal_langs}
@@ -59,7 +61,7 @@ class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugi
         // include them as one table part
 
         $dscrfields = array('tableid', 'number', 'description');
-        $child = new backup_nested_element('descriptions', array('id'), $dscrfields);
+        $child = new backup_nested_element($qtypeobj->name() . '_descriptions', array('id'), $dscrfields);
         $pluginwrapper->add_child($child);
         $child->set_source_sql('
             SELECT * FROM {block_formal_langs_node_dscr}
