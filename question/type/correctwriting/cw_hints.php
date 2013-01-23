@@ -76,11 +76,15 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
      * Tokendescr === null if there are no token with description on this mistake
      */
     public function hint_available($response = null) {
-        return $this->question->whatishintpenalty <= 1.0 && $this->mistake !== null && $this->tokendescr !== null;
+        return $this->penalty_for_specific_hint($response) <= 1.0 && $this->mistake !== null && $this->tokendescr !== null;
     }
 
     public function penalty_for_specific_hint($response = null) {
-        return $this->question->whatishintpenalty;
+        $penalty = $this->question->whatishintpenalty;
+        if (is_a($this->mistake, 'qtype_correctwriting_lexeme_absent_mistake')) {
+            $penalty *= $this->question->absenthintpenaltyfactor;
+        }
+        return $penalty;
     }
 
     //Buttons are rendered by the question to place them in specific feedback near relevant mistake message.

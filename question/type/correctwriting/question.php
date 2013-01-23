@@ -105,6 +105,11 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $wheretxthintpenalty = 1.1;
 
+    /** Penalty factor for hints, diclosing token value, for absent token mistake.
+     *  @var float
+     */
+    public $absenthintpenaltyfactor = 1;
+
     /** Whether cache is valid
      *  @var boolean
      */

@@ -2,6 +2,8 @@
 
 //Lang string file for the correct writing question type
 
+$string['absenthintpenaltyfactor'] = 'Penalty factor for absent token mistake hints';
+$string['absenthintpenaltyfactor_help'] = 'For hints, revealing a token text, absent token mistake is a special case. Other mistakes means student at least tried to typed anything close to this token anywhere in response, but absent token means he does not type it at all. So for that particular mistake hints will reveal more information. The factor allows you to increase penalty for such hints. If resulting penalty will exceed 1, the hint will be disabled.';
 $string['absentmistakemessage'] = '{$a->description} is missing';
 $string['absentmistakemessagenodescription'] = '"{$a->value}" is missing';
 $string['absentmistakeweight'] = 'Penalty for missing token in student\'s response';
@@ -33,6 +35,7 @@ $string['pluginname_link'] = 'question/type/correctwriting';
 $string['pluginnameadding'] = 'Adding a correct writing  question';
 $string['pluginnameediting'] = 'Editing a correct writing  question';
 $string['pluginnamesummary'] = 'Question type that can automatically find mistakes in the string response and grade it with penalties. It currently supports token sequence errors: finding misplaced, absent and extra tokens.';
+$string['questioneditingheading'] = 'Question editing settings';
 $string['whatis'] = 'what is {$a}';
 $string['whatishint'] = 'the {$a->tokendescr} is "{$a->tokenvalue}"';
 $string['whatishintpenalty'] = 'Penalty for "what is" hint';

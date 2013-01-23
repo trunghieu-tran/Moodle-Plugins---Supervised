@@ -113,7 +113,14 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('wheretxthintpenalty', 1.1);
         $mform->addRule('wheretxthintpenalty', null, 'required', null, 'client');
         $mform->addHelpButton('wheretxthintpenalty', 'wheretxthintpenalty', 'qtype_correctwriting');
-
+        //Absent token hint penalty factor
+        $mform->addElement('text', 'absenthintpenaltyfactor',
+                           get_string('absenthintpenaltyfactor', 'qtype_correctwriting'),
+                           array('size' => 6));
+        $mform->setType('absenthintpenaltyfactor', PARAM_FLOAT);
+        $mform->setDefault('absenthintpenaltyfactor', 1);
+        $mform->addRule('absenthintpenaltyfactor', null, 'required', null, 'client');
+        $mform->addHelpButton('absenthintpenaltyfactor', 'absenthintpenaltyfactor', 'qtype_correctwriting');
 
         $mform->setAdvanced('lexicalerrorthreshold');
         $mform->setAdvanced('lexicalerrorweight');
@@ -122,6 +129,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setAdvanced('movedmistakeweight');
         $mform->setAdvanced('hintgradeborder');
         $mform->setAdvanced('maxmistakepercentage');
+        $mform->setAdvanced('absenthintpenaltyfactor');
 
         $languages = block_formal_langs::available_langs();
 
