@@ -241,6 +241,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
+        $automaton->set_end_state($body['end']);
         $stack[] = $body;
     }
 
@@ -314,6 +315,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
+        $automaton->set_end_state($body['end']);
         $stack[] = $body;
     }
 
