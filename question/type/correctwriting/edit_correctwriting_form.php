@@ -1,12 +1,12 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Correct Writing question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Correct Writing is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Correct Writing is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * Correctwriting question editing form definition.
  *
  * @copyright  2011 Sychev Oleg
- * @author     Mamontov Dmitry
+ * @author     Mamontov Dmitry, Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
@@ -54,6 +54,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('lexicalerrorthreshold', PARAM_FLOAT);
         $mform->setDefault('lexicalerrorthreshold', 0.33);
         $mform->addRule('lexicalerrorthreshold', null, 'required', null, 'client');
+        $mform->addHelpButton('lexicalerrorthreshold', 'lexicalerrorthreshold', 'qtype_correctwriting');
         // Add lexical error weight field
         $mform->addElement('text', 'lexicalerrorweight',
                            get_string('lexicalerrorweight', 'qtype_correctwriting'),
@@ -61,7 +62,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('lexicalerrorweight', PARAM_FLOAT);
         $mform->setDefault('lexicalerrorweight', 0.05);
         $mform->addRule('lexicalerrorweight', null, 'required', null, 'client');
-
+        $mform->addHelpButton('lexicalerrorweight', 'lexicalerrorweight', 'qtype_correctwriting');
         */
         // Add absent mistake weight field
         $mform->addElement('text', 'absentmistakeweight',
@@ -70,6 +71,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('absentmistakeweight', PARAM_FLOAT);
         $mform->setDefault('absentmistakeweight', 0.1);
         $mform->addRule('absentmistakeweight', null, 'required', null, 'client');
+        $mform->addHelpButton('absentmistakeweight', 'absentmistakeweight', 'qtype_correctwriting');
         // Add added mistake weight field
         $mform->addElement('text', 'addedmistakeweight',
                            get_string('addedmistakeweight', 'qtype_correctwriting'),
@@ -77,6 +79,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('addedmistakeweight', PARAM_FLOAT);
         $mform->setDefault('addedmistakeweight', 0.1);
         $mform->addRule('addedmistakeweight', null, 'required', null, 'client');
+        $mform->addHelpButton('addedmistakeweight', 'addedmistakeweight', 'qtype_correctwriting');
         // Add moved mistake weight field
         $mform->addElement('text', 'movedmistakeweight',
                            get_string('movedmistakeweight', 'qtype_correctwriting'),
@@ -84,6 +87,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('movedmistakeweight', PARAM_FLOAT);
         $mform->setDefault('movedmistakeweight', 0.05);
         $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
+        $mform->addHelpButton('movedmistakeweight', 'movedmistakeweight', 'qtype_correctwriting');
         // Add hint grade border
         $mform->addElement('text', 'hintgradeborder',
                            get_string('hintgradeborder', 'qtype_correctwriting'),
@@ -91,6 +95,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('hintgradeborder', PARAM_FLOAT);
         $mform->setDefault('hintgradeborder', 0.9);
         $mform->addRule('hintgradeborder', null, 'required', null, 'client');
+        $mform->addHelpButton('hintgradeborder', 'hintgradeborder', 'qtype_correctwriting');
         //Add max mistake percentage
         $mform->addElement('text', 'maxmistakepercentage',
                            get_string('maxmistakepercentage', 'qtype_correctwriting'),
@@ -98,6 +103,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setType('maxmistakepercentage', PARAM_FLOAT);
         $mform->setDefault('maxmistakepercentage', 0.7);
         $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
+        $mform->addHelpButton('maxmistakepercentage', 'maxmistakepercentage', 'qtype_correctwriting');
         //Add "what is" hint penalty
         $mform->addElement('text', 'whatishintpenalty',
                            get_string('whatishintpenalty', 'qtype_correctwriting'),
@@ -137,6 +143,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->addRule('langid', null, 'required', null, 'client');
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
+        $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
 
         // Actually, this part is copied from shortanswer. When shortanswer
         // gives a change to change his inner definition to correct, than it must
