@@ -44,6 +44,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
          @param object mform form data
      */
     protected function definition_inner($mform) {
+        global $CFG;
         // Add lexical error threshold field
         // Uncomment  some unused field
         /*
@@ -135,6 +136,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->addRule('langid', null, 'required', null, 'client');
+        $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
 
         // Actually, this part is copied from shortanswer. When shortanswer
         // gives a change to change his inner definition to correct, than it must
