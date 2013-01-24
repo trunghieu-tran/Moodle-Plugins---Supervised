@@ -25,9 +25,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');//Contains question_with_specific_hints interface for now
+require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');//Contains question_with_specific_hints and behaviour_with_hints interfaces for now
 
-class qbehaviour_adaptivehints extends qbehaviour_adaptive {
+class qbehaviour_adaptivehints extends qbehaviour_adaptive implements behaviour_with_hints {
     const IS_ARCHETYPAL = false;
 
 
@@ -70,7 +70,7 @@ class qbehaviour_adaptivehints extends qbehaviour_adaptive {
 
     /**
      * Adjust hints array, replacing every hintkey that ends with # with a whole 
-     * bunch of numbers up to used in this attempt.
+     * bunch of numbers up to max used in this attempt.
      */
     public function adjust_hints($hints) {
         $result = array();

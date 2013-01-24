@@ -74,7 +74,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $behaviour = $qa->get_behaviour();
         $hintmessage = '';
         $br =  html_writer::empty_tag('br');
-        if (is_a($behaviour, 'qbehaviour_adaptivehints')) {//TODO change 'qbehaviour_adaptivehints' to abstract hinting behaviour when it will be done.
+        if (is_a($behaviour, 'behaviour_with_hints')) {
             $hints = $question->available_specific_hints(array('answer' => $currentanswer));
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {

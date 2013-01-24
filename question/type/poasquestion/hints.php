@@ -55,6 +55,21 @@ interface question_with_qtype_specific_hints {
     public function hint_object($hintkey, $response = null);
 }
 
+interface behaviour_with_hints {
+    /**
+     * Adjust hintkey, adding number for sequential multiple instance hints.
+     *
+     * Passed hintkey should ends with # character to be appended with number.
+     */
+    public function adjust_hintkey($hintkey);
+
+    /**
+     * Adjust hints array, replacing every hintkey that ends with # with a whole 
+     * bunch of numbers up to max used in this attempt.
+     */
+    public function adjust_hints($hints);
+}
+
 /**
  * Base class for question-type specific hints
  *
