@@ -36,11 +36,6 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
  class qtype_correctwriting_edit_form extends qtype_shortanswer_edit_form {
 
-    /** Determines, whether lexeme descriptions is shown
-        @var boolean
-     */
-    private $hasdescriptions = false;
-
     /** Determines second time form, where descriptions controls is first shown.
         @var boolean
      */
@@ -151,6 +146,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
         $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
 
+        //Determine whether this is first time, second time or another time form.
+        $name = optional_param('name', '', PARAM_TEXT);
+        if ($name != '') {//Not first time form.
+            $confirmed = optional_param('confirmed', false, PARAM_BOOL);
+            if (!$confirmed) {
+                $this->secondtimeform = true;
+                if (array_key_exists('options', $this->question)) {
+                    $this->secondtimeform = !array_key_exists('answers', $this->question->options);
+                }
+            }
+            $mform->addElement('hidden', 'confirmed', true);
+        }
+
         parent::definition_inner($mform);
 
         $answersinstruct = $mform->getElement('answersinstruct');
@@ -160,11 +168,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     function definition_after_data() {
         parent::definition_after_data();
 
+        $mform =& $this->_form;
+        $data = $mform->exportValues();
         //Get information about field data
-        if ($this->hasdescriptions == true) {
-            $mform =& $this->_form;
-            $data = $mform->exportValues();
-
+        if (array_key_exists('answer', $data)) {
             $lang = block_formal_langs::lang_object($data['langid']);
             if ($lang!=null) {
                 //Parse descriptions to populate script
@@ -188,42 +195,29 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                     }
                 }
             }
+        }
 
-            //Now we should pass empty answers too.
-            $answercount = $data['noanswers'];
-            for ($i = 0; $i < $answercount; $i++) {
-                if (!array_key_exists($i, $data['answer'])) {//This answer is empty and was not processed by previous loop.
-                    $mform->removeElement('lexemedescriptions[' . $i . ']');
-                    $mform->addElement('hidden', 'lexemedescriptions[' . $i . ']', '');
-                }
+        //Now we should pass empty answers too.
+        $answercount = $data['noanswers'];
+        for ($i = 0; $i < $answercount; $i++) {
+            if (!array_key_exists('answer', $data) || !array_key_exists($i, $data['answer'])) {//This answer is empty and was not processed by previous loop.
+                $mform->removeElement('lexemedescriptions[' . $i . ']');
+                $mform->addElement('hidden', 'lexemedescriptions[' . $i . ']', '');
             }
         }
+        
     }
 
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption)
     {
-        global $_REQUEST;
-
 
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
-        // We use this, because this method is called before validation
-        // But we still can look into request to find out what we are looking to
-        $showlexemedescriptions = array_key_exists('lexemedescriptions', $_REQUEST);
-        $this->secondtimeform = array_key_exists('name', $_REQUEST) &&
-                            !array_key_exists('lexemedescriptions', $_REQUEST);
-        $showlexemedescriptions = $showlexemedescriptions || $this->secondtimeform;
-        if (array_key_exists('options', $this->question)) {
-            $showlexemedescriptions = $showlexemedescriptions || array_key_exists('answers', $this->question->options);
-        }
-        if ($showlexemedescriptions) {
-            $this->hasdescriptions = true;
-            $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
-                                                get_string('lexemedescriptions', 'qtype_correctwriting'),
-                                                array('rows' => 2, 'cols' => 80));
-            $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
-        }
+        $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
+                                            get_string('lexemedescriptions', 'qtype_correctwriting'),
+                                            array('rows' => 2, 'cols' => 80));
+        $repeatedoptions['lexemedescriptions']['type'] = PARAM_TEXT;
         return $repeated;
     }
 
@@ -302,7 +296,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
         }
 
-        if ($this->secondtimeform ) {//Second time form is a unique case: first appearance of token descriptions before user.
+        if ($this->secondtimeform) {//Second time form is a unique case: first appearance of token descriptions before user.
             // We place it here, because it will look nicer and won't shift any of strings
             // in lexeme descriptions field
             $mesg = get_string('enterlexemedescriptions', 'qtype_correctwriting');
@@ -311,7 +305,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }  else {
                 $errors['answer[0]'] = $mesg;
             }
-        } else {
+        } else {//More than second time form, so check descriptions count.
             $fractions = $data['fraction'];
             foreach($data['answer'] as $key => $value) {
                 $processedstring = $lang->create_from_string($value);
@@ -319,8 +313,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $tokens = $stream->tokens;
 
                 if (count($tokens) > 0 && $fractions[$key] >= $data['hintgradeborder']) {//Token descriptions needed for this answer.
-                    $descriptions = explode(PHP_EOL, $data['lexemedescriptions'][$key]);
-                    if (strlen($value) != 0 && count($descriptions)!=0 ) {
+                    $descriptionstring = $data['lexemedescriptions'][$key];
+                    if (trim($value) != '' /*&& trim($descriptionstring) != ''*/) {//Uncomment if empty descriptions will be good as "no descriptions" variant.
+                        $descriptions = explode(PHP_EOL, $descriptionstring);
                         $fieldkey =  "answer[$key]";
                         $mesg = null;
                         if (count($tokens) > count($descriptions)) {
@@ -333,7 +328,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                             if (array_key_exists($fieldkey, $errors) == false) {
                                 $errors[$fieldkey] = $mesg;
                             } else {
-                                if (mb_strlen($errors[$fieldkey]) == 0) {
+                                if (textlib::strlen($errors[$fieldkey]) == 0) {
                                     $errors[$fieldkey] = $mesg;
                                 } else {
                                     $errors[$fieldkey] .= $br . $mesg;
