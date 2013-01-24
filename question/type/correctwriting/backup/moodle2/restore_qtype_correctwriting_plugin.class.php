@@ -22,22 +22,64 @@
  * @copyright  2011 Sychev Oleg, Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');
- 
- class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plugin {
-     /**
-      * Processes question data
-      * @var
-      */
-     protected $question_data;
+require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');
+require_once ($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
+class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plugin {
+     /**
+      * Language id
+      * @var int
+      */
+     protected $langid;
+    /**
+     * Abstract language data
+     * @var block_formal_langs_abstract_language
+     */
+     protected $langobject;
+     /**
+      * Old question id
+      * @var int
+      */
+     protected $oldquestion;
+     /**
+      * New question id
+      * @var  int
+      */
+     protected $newquestion;
+     /**
+      * Question type of plugin
+      * @var  question_type
+      */
+     protected $qtype;
+     /**
+      * Whether question is created
+      * @var bool
+      */
+     protected $questioncreated;
+     /**
+      * Answer mapping data
+      * @var array
+      */
+     protected $answermapping;
+     /**
+      * Mapping of answer to count of lexemes in it by oldid
+      * @var array
+      */
+     protected $tokencountmapping;
+    /**
+     * Mapping of answers to array of token description by oldid
+     * @var  array
+     */
+    protected $tokendescriptionmapping;
      /**
       * Returns the paths to be handled by the plugin at question level.
       */
      protected function define_question_plugin_structure() {
          $paths = parent::define_question_plugin_structure();
 
+
          $qtypeobj = question_bank::get_qtype($this->pluginname);
+         $this->qtype = $qtypeobj;
 
          // Add in-depth paths
          $elepath = $this->get_pathfor('/' . $qtypeobj->name() . '_language');
@@ -48,15 +90,101 @@
          return $paths; // And we return the interesting paths.
      }
 
+    /**
+     * Restarts mechanism of restoring.
+     * Wonder why dispatcher for  event of beginning is not in restore mechanism
+     */
+    protected function refill_class_fields() {
+        // Simple initialization
+        $this->langid = null;
+        $this->langobject = null;
+        $this->oldquestion = null;
+        $this->newquestion = null;
+        $this->questioncreated = null;
+        $this->answermapping = null;
+        $this->tokencountmapping = null;
+        $this->tokendescriptionmapping = null;
+     }
+    /**
+     * Saves old answer ids, because we can't found those otherwise
+     */
+    public function process_question_answer($data) {
+        // If started new question - invalidate values
+        $oldparentid = $this->get_old_parentid('question');
+        if ($oldparentid != $this->oldquestion) {
+            $this->refill_class_fields();
+        }
+
+        if (is_array($this->answermapping) == false) {
+            $this->answermapping = array();
+        }
+        // Populate mapping with old ids
+        $this->answermapping[] = $data['id'];
+        parent::process_question_answer($data);
+    }
+    /**
+     * Because of annoying bug in code, we must copy this code and fix bug
+     */
+    public function process_poasquestion($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Detect if the question is created or mapped.
+        $oldquestionid   = $this->get_old_parentid('question');
+        $newquestionid   = $this->get_new_parentid('question');
+        $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
+
+        // If the question has been created by restore, we need to create its qtype_... too.
+        if ($questioncreated) {
+            $qtypeobj = question_bank::get_qtype($this->pluginname);
+            $extraquestionfields = $qtypeobj->extra_question_fields();
+            $tablename = array_shift($extraquestionfields);
+
+            // Adjust some columns.
+            $qtfield = $qtypeobj->questionid_column_name();
+            $data->$qtfield = $newquestionid;
+
+
+            // Insert record.
+            $newitemid = $DB->insert_record($tablename, $data);
+
+            // Create mapping.
+            $this->set_mapping($tablename, $oldid, $newitemid);
+        }
+    }
      /**
       * Processes question descriptions
       * This  method is called when restoring path question_descriptions
       * @param array $data
-     */
+      */
     public function process_correctwriting($data) {
-        $this->question_data = $data;
+        $olddata = $data;
         $this->process_poasquestion($data);
 
+        $this->oldquestion   = $this->get_old_parentid('question');
+        $this->newquestion   = $this->get_new_parentid('question');
+        $this->questioncreated = $this->get_mappingid('question_created', $this->oldquestion) ? true : false;
+        $this->langid = $olddata['langid'];
+
+        /* Uncomment on bug cases
+        echo '<pre>';
+        echo "Before proccesssing correctwriting\n";
+        print_r($this->answermapping);
+        echo '</pre>';
+        */
+        $answersarr = $this->answermapping;
+        $this->answermapping  = array();
+        foreach($answersarr as $id => $answer) {
+            $this->answermapping[$answer] = $this->get_mappingid('question_answer', $answer);
+        }
+        /* Uncomment on bug cases
+        echo '<pre>';
+        echo "After proccesssing correctwriting\n";
+        print_r($this->answermapping);
+        echo '</pre>';
+        */
     }
 
      /**
@@ -66,45 +194,112 @@
      public function process_question_language($data) {
          global $DB;
 
-         $data = (object)$data;
-         $oldid = $data->id;
-
-         // Detect if the question is created or mapped
-         // TODO: Move it in common code
-         $oldquestionid   = $this->get_old_parentid('question');
-         $newquestionid   = $this->get_new_parentid('question');
-         $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
-
          /**
-          * Here we have data array as defined
-          * [id] =>
-          * [ui_name] =>
-          * [description] =>
-          * [name] =>
-          * [scanrules] =>
-          * [parserules] =>
-          * [version] =>
-          * [visible] =>
+          * Here we have data array defined as tuple
+          * <id, ui_name, description, name, scanrules, parserules, version visible>
           */
+         $data = (object)$data;
+
+         // Seek for language and insert it if not found, handling some error stuff
+         // Also cannot compare strings in some common case.
+         $sql = 'SELECT id
+                      FROM {block_formal_langs}
+                     WHERE ';
+         $filternames = array('name', 'version');
+         $filtervalues = array($data->name, $data->version);
+         if ($data->scanrules != null || $data->parserules != null) {
+             $filternames[] = 'scanrules';
+             $filternames[] =  'parserules';
+             $filtervalues[]  = $data->scanrules;
+             $filtervalues[]  = $data->parserules;
+         }
+         // Transform columns into sql comparisons
+         $sqlfilternames = array();
+         foreach($filternames as $name) {
+             $sqlfilternames[] = $DB->sql_compare_text($name, 512) . ' = ' . $DB->sql_compare_text('?', 512);
+         }
+         // Build actual sql request
+         $sql .= implode(' AND ', $sqlfilternames);
+         $sql .= ';';
+
+         $record = $DB->get_record_sql($sql, $filtervalues);
+         $newlangid = null;
+         if ($record == false) {
+            $newlangid = $DB->insert_record('block_formal_langs', (array)$data);
+            $this->update_langid($newlangid);
+            $this->langid = $newlangid;
+         } else {
+            if ($this->langid != $record->id) {
+                $newlangid = $record->id;
+                $this->update_langid($newlangid);
+                $this->langid = $newlangid;
+            }
+         }
+
+         // Scan answers to detect how many decriptions we must insert
+         // Map count of answer lexemes to each answer
+         $this->langobject = block_formal_langs::lang_object($this->langid);
+         $this->tokencountmapping = array();
+         $this->tokendescriptionmapping = array();
+         /** Uncomment on bug case
+         echo '<pre>';
+         echo "At language\n";
+         print_r($this->answermapping);
+         echo '</pre>';
+         */
+         foreach($this->answermapping as $oldanswerid => $newid) {
+             $answer = $DB->get_record('question_answers', array('id' => $newid));
+             // Uncomment on bug
+             //if (is_object($answer) == false) {
+             //    echo '|| Import failed for answer ' . $newid . '||';
+             //}
+             $ps = $this->langobject->create_from_string($answer->answer);
+             /**
+              * @var block_formal_langs_token_stream $stream
+              */
+             $stream = $ps->stream;
+             $tokens = $stream->tokens;
+             $this->tokencountmapping[$oldanswerid] = count($tokens);
+             $this->tokendescriptionmapping[$oldanswerid] = array();
+         }
+
      }
 
      /**
-      * Processes question descriptions
+      * Updates language identifier in qtype table,
+      * @param int $langid setting it to a new id
+      */
+     private function update_langid($langid) {
+         global $DB;
+         //For a successfull update we must fetch id field for correctwriting
+         $qtype_id = $DB->get_field('qtype_correctwriting','id', array($this->qtype->questionid_column_name() => $this->newquestion), MUST_EXIST);
+         $qdata = new stdClass();
+         $qdata->id = $qtype_id;
+         $qdata->langid = $langid;
+
+         $DB->update_record('qtype_correctwriting', $qdata);
+     }
+
+     /**
+      * Processes question descriptions, called for each description.
       * This  method is called when restoring path question_descriptions
       * @param array $data
       */
      public function process_question_descriptions($data) {
-         // Detect if the question is created or mapped
-         // TODO: Move it in common code
-
          /**
-          * Here we have data array as defined
-          * [id]=>
-          * [tableid] =>
-          * [number] =>
-          * [description] =>
+          * Here we have data array defined as tup;e
+          * <id, tableid, number, description>
           */
-
+         $answer = $data['tableid'];
+         $description = $data['description'];
+         // Remove \r and \n from string, because they are stored like this in XML
+         $description = str_replace(array("\r", "\n"), array('', ''), $description);
+         $this->tokendescriptionmapping[$answer][intval($data['number'])] = $description;
+         if (count($this->tokendescriptionmapping[$answer]) == $this->tokencountmapping[$answer]) {
+             $string = $this->langobject->create_from_db('question_answers', $this->answermapping[$answer]);
+             ksort($this->tokendescriptionmapping[$answer]);
+             $string->save_descriptions($this->tokendescriptionmapping[$answer]);
+         }
      }
  }
  
