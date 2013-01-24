@@ -83,7 +83,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                         $msg .= '.';
                     }
                     //Render hint buttons and/or hints.
-                    if (is_a($behaviour, 'qbehaviour_adaptivehints')) {//TODO change 'qbehaviour_adaptivehints' to abstract hinting behaviour when it will be done.
+                    if (is_a($behaviour, 'behaviour_with_hints')) {
                         foreach ($mistake->supported_hints() as $hintname) {
                             $hintkey = $hintname . '_' . $mistake->mistake_key();
                             if (in_array($hintkey, $hints)) {//There is hint for that mistake.
@@ -107,7 +107,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             }
         }
         //Render non-mistake hints if requested.
-        if (is_a($behaviour, 'qbehaviour_adaptivehints')) {//TODO change 'qbehaviour_adaptivehints' to abstract hinting behaviour when it will be done.
+        if (is_a($behaviour, 'behaviour_with_hints')) {
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
                 if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
