@@ -282,14 +282,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 foreach($stream->errors as $error) {
                     $token = $stream->tokens[$error->tokenindex];
                     $tokenpos = $token->position();
-                    $emesg = $error->errormessage . qtype_poasquestion_string::substr($value, 0, $tokenpos->colstart() -
-                                                                                                 1);
-                    $emesg = $emesg . '<b>' .
-                                        qtype_poasquestion_string::substr($value,
-                                                                          $tokenpos->colstart(),
-                                                                          $tokenpos->colend() -  $tokenpos->colstart()).
-                                        '</b>';
-                    $emesg = $emesg .  qtype_poasquestion_string::substr($value, $tokenpos->colend() + 1);
+                    $emesg = $error->errormessage . $br . textlib::substr($value, 0, $tokenpos->colstart() - 1);
+                    $emesg .= '<b>' . textlib::substr($value, $tokenpos->colstart(),
+                                                             $tokenpos->colend() -  $tokenpos->colstart()) . '</b>';
+                    $emesg .= textlib::substr($value, $tokenpos->colend() + 1);
                     $errormessages[] = $emesg;
                 }
                 $errors["answer[$key]"] = implode($br, $errormessages);
