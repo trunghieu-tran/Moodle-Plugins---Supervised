@@ -1,10 +1,9 @@
 <?php
 /**
- * Defines unit-tests for Simple English language
+ * Defines unit-tests for syntax analysis
  *
- * For a complete info, see qtype_correctwriting_token_base
  *
- * @copyright &copy; 2011  Dmitry Mamontov
+ * @copyright &copy; 2012  Dmitry Mamontov
  * @author Oleg Sychev, Dmitriy Mamontov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
@@ -13,10 +12,137 @@ global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar_parser.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 
+
 /**
  * Tests a parser table data
  */
 class block_formal_langs_syntax_parser_test extends PHPUnit_Framework_TestCase {
+    /**
+     * Tests dangling else grammar
+     */
+    public function test_if_then() {
+        $grammar = '
+            %nonassoc then
+            %nonassoc else
+            program ::= stmt
+            program ::= program stmt
+            stmt ::= expr ;
+            stmt ::= if_stmt
+            if_stmt ::= if expr then stmt
+            if_stmt ::= if expr then stmt else stmt
+        ';
+        $r = new block_formal_langs_parser_rule_helper();
+        $g = $r->parser_test_grammar($grammar);
+
+        //echo 'Building table';
+
+        //$t = $r->table($g);
+
+        //echo 'Table built';
+
+        //$this->assertTrue(count($g->errors()) == 0, 'Grammar is still ambiguous');
+
+        //Because PHP goes mad when building a table
+        //TODO: Optimize FIRST(X)  - most allocations is in there
+    }
+
+    /**
+     * Tests reduce-reduce conflict deducing on grammar, given as ambiguous
+     * in bison grammar, denoted here
+     * @url http://www.gnu.org/software/bison/manual/html_node/Reduce_002fReduce.html
+     */
+    public function test_reduce_reduce_bison() {
+        $grammar = '
+            sequence ::= epsilon
+            sequence ::= maybeword
+            sequence ::= sequence word
+            maybeword ::= epsilon
+            maybeword ::= word
+        ';
+        $r = new block_formal_langs_parser_rule_helper();
+        $g = $r->grammar($grammar);
+
+        $tbl = new block_formal_langs_grammar_table($g);
+        $e = $g->errors();
+        /**
+         * Currently, somehow we resolved some problems with it
+         * If some bugs will be found, we can reduce stuff to
+         * Chomsky normal form, through eliminating epsilon productions
+         * http://www.idt.mdh.se/kurser/cd5560/02_03/senaste_nytt/cf-languages-crib-sheet.pdf
+         */
+        $this->assertTrue(count($e) == 2  , 'There must be two conflicts!');
+        // Two conflicts are  . $ and  . word
+        $this->assertTrue($e[0]->type == block_formal_langs_grammar_error::$REDUCE_REDUCE_CONFLICT, 'Not reduce-reduce conflict at 0');
+        $this->assertTrue($e[1]->type == block_formal_langs_grammar_error::$REDUCE_REDUCE_CONFLICT, 'Not Reduce-reduce conflict at 1');
+        /**
+         *  @var block_formal_langs_grammar_error $err
+         */
+        $err = $e[0];
+        /**
+         * @var block_formal_langs_grammar_production_rule $action1rule
+         */
+        $action1rule = $err->action1->rule;
+        /**
+         * @var block_formal_langs_grammar_production_rule $action2rule
+         */
+        $action2rule = $err->action2->rule;
+        $naw = $action1rule->left()->type() == 'maybeword' || $action2rule->left()->type() == 'sequence';
+        $wan = $action1rule->left()->type() == 'sequence' || $action2rule->left()->type() == 'maybeword';
+        $this->assertTrue($naw || $wan, 'Weird reduce-reduce conflict: ' . var_export($err, true));
+        /**
+         *  @var block_formal_langs_grammar_error $err
+         */
+        $err = $e[1];
+        /**
+         * @var block_formal_langs_grammar_production_rule $action1rule
+         */
+        $action1rule = $err->action1->rule;
+        /**
+         * @var block_formal_langs_grammar_production_rule $action2rule
+         */
+        $action2rule = $err->action2->rule;
+        $naw = $action1rule->left()->type() == 'maybeword' || $action2rule->left()->type() == 'sequence';
+        $wan = $action1rule->left()->type() == 'sequence' || $action2rule->left()->type() == 'maybeword';
+        $this->assertTrue($naw || $wan, 'Weird reduce-reduce conflict: ' . var_export($err, true));
+
+
+    }
+
+    /**
+     *  Tests reduce-reduce conflict deducing
+     */
+    public function test_reduce_reduce() {
+        $grammar = '
+            nonterminal ::= num + num
+            nonterminal ::= num + weird
+            weird ::= num
+        ';
+        $r = new block_formal_langs_parser_rule_helper();
+        $g = $r->grammar($grammar);
+        $tbl = new block_formal_langs_grammar_table($g);
+        // And here we go - what rule we should use in sequence while num + num . - reduce to weird
+        // or nonterminal ?
+        $e = $g->errors();
+        $this->assertTrue(count($e) == 1  , 'There must be one conflict!');
+        /**
+         *  @var block_formal_langs_grammar_error $err
+         */
+        $err = $e[0];
+        $this->assertTrue($err->type == block_formal_langs_grammar_error::$REDUCE_REDUCE_CONFLICT, 'This is not reduce-reduce conflict');
+        /**
+         * @var block_formal_langs_grammar_production_rule $action1rule
+         */
+        $action1rule = $err->action1->rule;
+        /**
+         * @var block_formal_langs_grammar_production_rule $action2rule
+         */
+        $action2rule = $err->action2->rule;
+        $naw = $action1rule->left()->type() == 'nonterminal' || $action2rule->left()->type() == 'weird';
+        $wan = $action1rule->left()->type() == 'weird' || $action2rule->left()->type() == 'nonterminal';
+
+        $this->assertTrue($naw || $wan, 'Weird reduce-reduce conflict: ' . var_export($err, true));
+    }
+
     /**
      * Tests conflict resolving, using precedence
      */
@@ -164,7 +290,15 @@ class block_formal_langs_syntax_parser_test extends PHPUnit_Framework_TestCase {
         $r = new block_formal_langs_parser_rule_helper();
         $g = $r->grammar($grammar);
         $tbl = new block_formal_langs_grammar_table($g);
-        $this->assertTrue(count($g->errors()) > 0  , 'There must be conflicts!');
+        $e = $g->errors();
+        $this->assertTrue(count($e) == 1  , 'There must be one conflict!');
+        /**
+         *  @var block_formal_langs_grammar_error $err
+         */
+        $err = $e[0];
+        $this->assertTrue($err->type == block_formal_langs_grammar_error::$SHIFT_REDUCE_CONFLICT, 'This is non shift-reduce conflict!');
+        $this->assertTrue($err->symbol->type() == '+', 'Conflict lookahead symbol must be +');
+
 
     }
 
@@ -183,7 +317,35 @@ class block_formal_langs_syntax_parser_test extends PHPUnit_Framework_TestCase {
         $r = new block_formal_langs_parser_rule_helper();
         $g = $r->grammar($grammar);
         $tbl = new block_formal_langs_grammar_table($g);
-        $this->assertTrue(count($g->errors()) > 0  , 'There must be conflicts!');
+        $e = $g->errors();
+        $this->assertTrue(count($e) == 4  , 'There must exact 4 conflicts!');
+        // This is a bit tricky, but real errors will occur in some cases when
+        // [expr + expr, +] - reduce to expr or shift
+        // [expr * expr, +] - reduce to expr or shift
+        // [expr + expr, *] - reduce to expr or shift
+        // [expr * expr, *] - reduce to expr or shift
+        // so, if you can see there are 4 kinds of errors
+        $nonshiftreduce = array();
+        $plus = array();
+        $multiply = array();
+        for($i = 0; $i < count($e); $i++) {
+            /**
+             * @var block_formal_langs_grammar_error $fe
+             */
+            $fe = $e[$i];
+            if ($fe->type != block_formal_langs_grammar_error::$SHIFT_REDUCE_CONFLICT) {
+                $nonshiftreduce[] = $fe;
+            }
+            if ($fe->symbol->type() == '+') {
+                $plus[] = $fe;
+            }
+            if ($fe->symbol->type() == '*') {
+                $multiply[] = $fe;
+            }
+        }
+        $this->assertTrue(count($nonshiftreduce) == 0, 'Found non shift-reduce errors: '. var_export($nonshiftreduce, true));
+        $this->assertTrue(count($plus) == 2, 'Some +-based conflicts found' . var_export($plus, true));
+        $this->assertTrue(count($multiply) == 2, 'Some *-based conflicts found' . var_export($multiply, true));
     }
     /**
      * Tests grammar when no rules is supplied

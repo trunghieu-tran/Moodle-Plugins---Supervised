@@ -36,6 +36,7 @@ class block_formal_langs_grammar_closure {
      *   @return array of block_formal_langs_grammar_lr_one_item closures
      */
     public function closure($I) {
+        //echo 'Entered closure';
         $QI = $I;
         $RI = $I;
         while(count($QI) != 0) {
@@ -47,9 +48,10 @@ class block_formal_langs_grammar_closure {
 
             $a = $item->symbol();
 
+            //echo 'Entering first';
             $firstclass= new block_formal_langs_grammar_first($this->g);
             $first = $firstclass->first(array_merge($beta, array($a)));
-
+            //echo 'Left first';
 
             $definitions = $this->g->get_definitions_for($B->type());
             for($i = 0; $i < count($definitions); $i++) {
@@ -74,6 +76,7 @@ class block_formal_langs_grammar_closure {
                 }
             }
         }
+        //echo 'Left closure';
         return $RI;
     }
 }
@@ -94,7 +97,7 @@ class block_formal_langs_grammar_goto {
         for($i = 0; $i < count($II); $i++) {
             /** @var block_formal_langs_grammar_lr_one_item $IIi  */
             $IIi = $II[$i];
-            if ($IIi->is_dot_part_equals($X)) {
+            if ($IIi->is_dot_part_equals($X) && $IIi->item()->rightcount() > $IIi->item()->position()) {
                 $J[] = $IIi->clone_move_dot_forward();
             }
         }

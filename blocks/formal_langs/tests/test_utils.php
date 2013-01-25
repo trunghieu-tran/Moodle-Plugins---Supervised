@@ -11,7 +11,7 @@
  */
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
-require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar_parser.php');
 
 
 /**
@@ -318,9 +318,141 @@ class block_formal_langs_language_parser_digraph {
 }
 
 /**
+ * Basic node for terminal test stuff
+ */
+abstract class block_formal_langs_parser_test_node_base {
+    /**
+     * Type of terminal
+     * @var string
+     */
+    public $type;
+
+    /**
+     * Constructs a new simple terminal node
+     * @param string $type
+     */
+    public function __construct($type) {
+        $this->type = $type;
+    }
+
+    /**
+     * Return type of node
+     * @return string
+     */
+    public function type() {
+        return $this->type;
+    }
+
+    /**
+     * Outputs node as type data
+     * @return mixed
+     */
+    abstract public function output();
+}
+
+/**
+ * Terminal node for test
+ */
+class  block_formal_langs_parser_test_terminal_node extends block_formal_langs_parser_test_node_base {
+
+    public function output() {
+        return $this->type();
+    }
+}
+
+/**
+ * Non-terminal node for test
+ */
+class block_formal_langs_parser_test_nonterminal_node extends block_formal_langs_parser_test_node_base {
+    /**
+     * Children array
+     * @var array of  block_formal_langs_parser_test_node_base
+     */
+    protected $children;
+
+    /**
+     * Constructs new nonterminal node
+     * @param string $type
+     * @param array $children
+     */
+    public function __construct($type, $children) {
+        parent::__construct($type);
+        $this->children = $children;
+    }
+
+    public function output() {
+        $c = array();
+        /**
+         * @var block_formal_langs_parser_test_node_base $child
+         */
+        foreach($this->children as $child) {
+            $c = $child->output();
+        }
+        return array( $this->type(),  $c);
+    }
+
+
+}
+
+/**
+ * A simple action, which creates some action stuff
+ */
+class block_formal_langs_test_parser_action extends block_formal_langs_grammar_action {
+
+
+    public function reduce($rule, $children) {
+        return new block_formal_langs_parser_test_nonterminal_node($rule->left()->type(), $children);
+    }
+
+}
+
+/**
+ * An interaction wrapper on parser
+ */
+class block_formal_langs_parser_test_wrapper extends block_formal_langs_lexer_parser_interaction_wrapper {
+    /**
+     * A tokens array
+     * @var array
+     */
+    protected $tokens;
+    /**
+     * Current token index
+     * @var int
+     */
+    protected $current;
+
+    public function __construct($string) {
+        parent::__construct(null);
+        $s1 = preg_replace('/[ ]+/', ' ', $string);
+        $this->tokens = explode(' ', $s1);
+        $this->current = 0;
+    }
+
+    public function next_token() {
+        if ($this->current == count($this->tokens)) {
+            return null;
+        }
+        $result = $this->tokens[$this->current];
+        $this->current += 1;
+        return new block_formal_langs_parser_test_terminal_node($result);
+    }
+
+    public function error($parser, $symbol) {
+        parent::error($parser, $symbol);
+        throw new Exception('Parse failed!');
+    }
+}
+
+/**
  * Class, designed to support fast grammar creation
  */
 class block_formal_langs_parser_rule_helper {
+    /**
+     *  A delegate for constructing action
+     *  It may be any delegate, which implements method action(string $type)
+     *  @var block_formal_langs_grammar_action
+     */
+    public $action = null;
     /**
      * Returns a production symbol, according to type
      * @param string $type string type data
@@ -367,7 +499,11 @@ class block_formal_langs_parser_rule_helper {
                 }
             }
         }
-        $r = new block_formal_langs_grammar_replace_action();
+        if ($this->action == null) {
+            $r = new block_formal_langs_grammar_replace_action();
+        } else {
+            $r = clone $this->action;
+        }
         $right = $this->symbol(trim($ruleparts[0]));
         return array('rule' => new block_formal_langs_grammar_production_rule($right , $leftrule, $r),
                      'prec' => $symbol
@@ -422,6 +558,42 @@ class block_formal_langs_parser_rule_helper {
         return $g;
     }
 
+    /**
+     * Creates a grammar for parsing tests
+     * @param string $s  string with grammar
+     * @return block_formal_langs_grammar
+     */
+    public function parser_test_grammar($s) {
+        $this->action = new block_formal_langs_test_parser_action();
+        $g  = $this->grammar($s);
+        $this->action = null;
+        return $g;
+    }
+
+    /**
+     * Returns a table for grammar
+     * @param block_formal_langs_grammar $g grammar
+     * @return block_formal_langs_grammar_table
+     */
+    public function table($g) {
+        return new block_formal_langs_grammar_table($g);
+    }
+
+    /**
+     * Parses some data in tables
+     * @param  block_formal_langs_grammar_table $table
+     * @param string $string parsed string
+     * @return mixed output tree
+     */
+    public function parse($table, $string) {
+        $w = new block_formal_langs_parser_test_wrapper($string);
+        $p = new block_formal_langs_grammar_parser($table, $w);
+        /**
+         * @var block_formal_langs_parser_test_node_base
+         */
+        $result = $p->parse();
+        return $result->output();
+    }
     /**
      * Performs a new test
      * @param string $grammar grammar data

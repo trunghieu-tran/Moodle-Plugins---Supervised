@@ -96,6 +96,7 @@ class block_formal_langs_grammar_production_rule {
      *  @return block_formal_langs_grammar_production_symbol
      */
     public function right($i) {
+
         return $this->right[$i];
     }
     /** Returns an action, assigned to a rule
@@ -158,6 +159,7 @@ class block_formal_langs_grammar_lr_zero_item {
     public function __construct($rule, $pos) {
         $this->rule = $rule;
         $this->position = $pos;
+        assert($this->position <= $rule->rightcount());
     }
     /** Returns a rule, which LR(0)-item corresponds to
      *  @return block_formal_langs_grammar_production_rule
@@ -217,6 +219,7 @@ class block_formal_langs_grammar_lr_zero_item {
      */
     public function partbeforedot() {
         $result = array();
+
         if ($this->position == 0) {
             $result[] = new block_formal_langs_grammar_epsilon_symbol();
         } else {
