@@ -501,12 +501,13 @@ abstract class qtype_preg_finite_automaton {
                             $lab = $lab . "$num,";
                         }
                     }
-
+                    $lab = substr($lab, 0, strlen($lab) - 1);
+                    $lab = '"' . str_replace('"', '\"', $lab) . '"';
                     // Dummy transitions are displayed dotted.
                     if ($curtransition->consumechars) {
-                        $result .= "$index1->$index2" . "[label = \"$lab\"];\n";
+                        $result .= "$index1->$index2" . "[label = $lab];\n";
                     } else {
-                        $result .= "$index1->$index2" . "[label = \"$lab\", style = dotted];\n";
+                        $result .= "$index1->$index2" . "[label = $lab, style = dotted];\n";
                     }
                 }
             }
