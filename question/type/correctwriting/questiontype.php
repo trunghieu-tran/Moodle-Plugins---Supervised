@@ -68,6 +68,9 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result[] = 'whatishintpenalty';
         //Penalty for "where" text hint.
         $result[] = 'wheretxthintpenalty';
+        //Absent token hints penalty factor
+        $result[] = 'absenthintpenaltyfactor';
+
         return $result;
     }
     /** Returns a name of foreign key columns for question type

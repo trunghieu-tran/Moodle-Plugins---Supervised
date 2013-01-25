@@ -83,17 +83,19 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                         $msg .= '.';
                     }
                     //Render hint buttons and/or hints.
-                    foreach ($mistake->supported_hints() as $hintname) {
-                        $hintkey = $hintname . '_' . $mistake->mistake_key();
-                        if (in_array($hintkey, $hints)) {//There is hint for that mistake.
-                            $hints = array_diff($hints, array($hintkey));
-                            $classname =  'qtype_correctwriting_hint' . $hintname;
-                            $hintobj = new $classname($question, $hintkey, $mistake);
-                            if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
-                                if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
-                                    $msg .= $br . $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                                } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
-                                    $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
+                    if (is_a($behaviour, 'behaviour_with_hints')) {
+                        foreach ($mistake->supported_hints() as $hintname) {
+                            $hintkey = $hintname . '_' . $mistake->mistake_key();
+                            if (in_array($hintkey, $hints)) {//There is hint for that mistake.
+                                $hints = array_diff($hints, array($hintkey));
+                                $classname =  'qtype_correctwriting_hint' . $hintname;
+                                $hintobj = new $classname($question, $hintkey, $mistake);
+                                if ($hintobj->hint_available()) {//There could be no hint object if response was changed in adaptive behaviour.
+                                    if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {//Hint is requested, so render hint.
+                                        $msg .= $br . $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                                    } else if ($hintobj->hint_available(array('answer' => $currentanswer))){//Hint is not requested, render button to be able to request it.
+                                        $msg .= $br . $behaviourrenderer->render_hint_button($qa, $options, $hintobj);
+                                    }
                                 }
                             }
                         }
@@ -105,8 +107,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             }
         }
         //Render non-mistake hints if requested.
-        // BUGFIX: Immediate feedback in Moodle 2.3 don't have adjust_hints method
-        if (method_exists($behaviour, 'adjust_hints')) {
+        if (is_a($behaviour, 'behaviour_with_hints')) {
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
                 if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {

@@ -57,5 +57,19 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2013011800, 'qtype', 'correctwriting');
     }
 
+    if ($oldversion < 2013012300) {
+
+        // Define field absenthintpenaltyfactor to be added to qtype_correctwriting
+        $table = new xmldb_table('qtype_correctwriting');
+        $field = new xmldb_field('absenthintpenaltyfactor', XMLDB_TYPE_NUMBER, '4, 1', null, XMLDB_NOTNULL, null, '1', 'wheretxthintpenalty');
+
+        // Conditionally launch add field absenthintpenaltyfactor
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // correctwriting savepoint reached
+        upgrade_plugin_savepoint(true, 2013012300, 'qtype', 'correctwriting');
+    }
     return true;
 }
