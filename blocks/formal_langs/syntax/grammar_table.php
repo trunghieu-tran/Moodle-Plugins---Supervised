@@ -40,8 +40,11 @@ class block_formal_langs_grammar_table {
         $this->lr1goto = array();
         $this->action = array();
         if ($this->g->valid()) {
+            //echo 'Compute items';
             $this->compute_items();
+            //echo 'Replace sets with same kernel';
             $this->replace_sets_with_same_kernel_by_union();
+            //echo 'Build action';
             $builder = new block_formal_langs_grammar_action_builder($g, $this->lr1items, $this->lr1goto);
             $this->action = $builder->action();
         }
@@ -191,11 +194,12 @@ class block_formal_langs_grammar_table {
         $this->lr1goto = array();
         $symbols = $this->g->symbols();
         for($setindex = 0; $setindex < count($this->lr1items); $setindex++) {
-            $currentset = $this->lr1items[$setindex];
+            $currentset =  $this->lr1items[$setindex];
             for($symindex = 0; $symindex < count($symbols); $symindex++ ) {
                 /** @var block_formal_langs_grammar_production_symbol $currentsym  */
                 $currentsym = $symbols[$symindex];
                 $mygoto = $goto->run($this->g, $currentset , $currentsym);
+                //print_r($mygoto);
                 if (count($mygoto)!=0) {
                     $supersetindex = $this->get_lr1_subset_index($mygoto, $this->lr1items);
                     if ($supersetindex == -1) {

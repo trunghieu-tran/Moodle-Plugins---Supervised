@@ -17,6 +17,189 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
  * Tests a parser table data
  */
 class block_formal_langs_syntax_parser_test extends PHPUnit_Framework_TestCase {
+
+    /**
+     * Tests complex grammar
+     */
+    public function test_complex() {
+        $grammar = '
+            %nonassoc then
+            %nonassoc else
+            %left + -
+            %left *
+            %left )
+            program ::= stmt
+            program ::= program stmt
+            stmt    ::= id = expr ;
+            stmt    ::= fun_call ;
+            expr    ::= fun_call
+            expr    ::= num
+            expr    ::= ( expr )
+            expr    ::= expr + expr
+            expr    ::= expr * expr
+            stmt    ::= if expr then stmt
+            stmt    ::= if expr then stmt else stmt
+            fun_call ::= id args
+            args    ::= ( )
+            args    ::= ( expr_list )
+            expr_list ::= expr
+            expr_list ::= expr_list , expr
+        ';
+        $r = new block_formal_langs_parser_rule_helper();
+        $g = $r->parser_test_grammar($grammar);
+        $t = $r->table($g);
+        $this->assertTrue(count($g->errors()) == 0, 'Grammar is still ambiguous');
+
+        $testtree = $r->parse($t, 'if num then id ( num ) ;');
+        $validtree = array( 'program', array( array( 'stmt',
+            array( 'if', array( 'expr', array( 'num' )), 'then', array( 'stmt',
+                array(
+                    array( 'fun_call', array(
+                        'id',
+                        array( 'args',
+                            array( '(',
+                                array( 'expr_list',
+                                    array( array( 'expr', array( 'num' )) )),
+                                   ')'
+                            ))
+                    )),
+                    ';'
+                ))
+            ))
+        ));
+        $this->assertTrue($testtree == $validtree, 'Build another tree instead of valid one' . var_export($testtree, true));
+        $testtree = $r->parse($t, 'id ( ( num + num ) * num , num ) ; id = num + num * num ;', false);
+        $validtree = array( 'program',
+            array( array( 'program', array(
+                array( 'stmt',
+                    array( array( 'fun_call',
+                        array( 'id',
+                            array( 'args', array(
+                                '(',
+                                array( 'expr_list', array(
+                                    array( 'expr_list',
+                                        array(
+                                            array( 'expr',
+                                                array( array( 'expr', array(
+                                                    '(',
+                                                    array( 'expr',
+                                                        array( array( 'expr',
+                                                            array( 'num' )),
+                                                            '+',
+                                                            array( 'expr', array( 'num' ))
+                                                        )
+                                                    ),
+                                                    ')'
+                                                )),
+                                                '*',
+                                                array( 'expr', array( 'num' ))
+                                                ))
+                                        )),
+                                    ',',
+                                    array( 'expr', array( 'num' ))
+                                )),
+                                ')'
+                            ))
+                        )),
+                        ';'
+                    ))
+            )),
+            array( 'stmt',
+                array(
+                    'id', '=',
+                    array( 'expr',
+                        array( array( 'expr',
+                            array( 'num' )),
+                        '+',
+                        array( 'expr',
+                            array( array( 'expr', array( 'num' )),
+                            '*',
+                            array( 'expr', array( 'num' ))
+                        ))
+                        )),
+                    ';'
+                ))
+         ));
+        $this->assertTrue($testtree == $validtree, 'Build another tree instead of valid one' . var_export($testtree, true));
+        $testtree = $r->parse($t, 'if num then if num then id = num ; else id ( ) ;', false);
+        $validtree = array( 'program', array(
+            array( 'stmt',
+                array( 'if',
+                       array( 'expr', array( 'num' )),
+                      'then',
+                       array( 'stmt', array(
+                            'if',
+                            array( 'expr', array( 'num' )),
+                            'then',
+                            array( 'stmt', array( 'id', '=', array( 'expr', array( 'num' )), ';' )),
+                            'else',
+                            array( 'stmt',
+                                array( array( 'fun_call',
+                                    array( 'id', array( 'args', array( '(', ')' ))
+                                )),
+                                ';'
+                                ))
+                       ))
+                ))
+        ));
+        $this->assertTrue($testtree == $validtree, 'Build another tree instead of valid one' . var_export($testtree, true));
+    }
+    /**
+     * Tests grammar with parenthesis
+     */
+    public function test_parenthesis() {
+        $grammar = '
+            %left + -
+            %left *
+            %left )
+            program ::= stmt
+            program ::= program stmt
+            stmt    ::= id = expr ;
+            expr    ::= num
+            expr    ::= expr + expr
+            expr    ::= expr - expr
+            expr    ::= expr * expr
+            expr    ::= ( expr )
+        ';
+        $r = new block_formal_langs_parser_rule_helper();
+        $g = $r->parser_test_grammar($grammar);
+        $t = $r->table($g);
+
+        $this->assertTrue(count($g->errors()) == 0, 'Grammar is still ambiguous');
+        $testtree = $r->parse($t, 'id = num ; id = num * ( num + ( num ) ) ;');
+        $validtree = array( 'program', array( array( 'program', array(
+            array( 'stmt', array(
+                'id', '=',
+                array( 'expr',
+                    array( 'num' )
+                ),
+                ';'
+            ))
+        )),
+            array( 'stmt', array(
+                'id', '=',
+                array( 'expr',
+                    array( array( 'expr',  array( 'num' ) ),
+                        '*',
+                        array( 'expr',  array( '(',
+                            array( 'expr', array(
+                                array( 'expr', array( 'num' )),
+                                '+',
+                                array( 'expr', array(
+                                    '(',
+                                    array( 'expr', array( 'num' )),
+                                    ')'
+                                ))
+                            )),
+                            ')'
+                        ))
+                    )),
+                ';'
+            ))
+        ));
+        $this->assertTrue($testtree == $validtree, 'Build another tree instead of valid one' . var_export($testtree, true));
+
+    }
     /**
      * Tests dangling else grammar
      */
@@ -33,17 +216,27 @@ class block_formal_langs_syntax_parser_test extends PHPUnit_Framework_TestCase {
         ';
         $r = new block_formal_langs_parser_rule_helper();
         $g = $r->parser_test_grammar($grammar);
+        $t = $r->table($g);
 
-        //echo 'Building table';
+        $this->assertTrue(count($g->errors()) == 0, 'Grammar is still ambiguous');
 
-        //$t = $r->table($g);
+        $testtree = $r->parse($t, 'if expr then if expr then expr ; else expr ;');
+        $validtree = array('program', array(array('stmt',
+            array(array('if_stmt',
+                array('if', 'expr', 'then',
+                    array('stmt', array (
+                        array('if_stmt', array(
+                            'if', 'expr', 'then',
+                            array('stmt', array('expr', ';')),
+                            'else',
+                            array('stmt', array('expr', ';'))
+                        ))
+                    ))
+                )
+            ))
+        )));
 
-        //echo 'Table built';
-
-        //$this->assertTrue(count($g->errors()) == 0, 'Grammar is still ambiguous');
-
-        //Because PHP goes mad when building a table
-        //TODO: Optimize FIRST(X)  - most allocations is in there
+        $this->assertTrue($testtree == $validtree, 'Build another tree instead of valid one' . var_export($testtree, true));
     }
 
     /**

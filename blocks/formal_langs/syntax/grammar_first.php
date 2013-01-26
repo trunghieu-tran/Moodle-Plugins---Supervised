@@ -86,20 +86,19 @@ class block_formal_langs_grammar_first {
      */
     private function first_for_definition($x, $parentresult, $definition) {
         $result = array();
-        $a = array();
-        for($i = 0 ; $i < $definition->rightcount(); $i++) {
+        $epsilon_is_in_all =  true;
+        for($i = 0 ; ($i < $definition->rightcount()) && $epsilon_is_in_all; $i++) {
             if ($definition->right($i)->type() == $x->type()) {
-                $a[] = $parentresult;
+                $temp = $parentresult;
             } else {
-                $a[] = $this->first_for_element($definition->right($i));
+                $temp = $this->first_for_element($definition->right($i));
             }
+            $this->merge_if($result, $temp, $epsilon_is_in_all);
+            $epsilon_is_in_all = $epsilon_is_in_all && $this->has_epsilon($temp);
         }
 
-        $this->merge_if($result, $a[0], true);
-        for($i = 1 ; $i < count($a); $i++) {
-            $this->merge_if($result, $a[$i], $this->epsilon_is_in_all_sets($a, 0, $i));
-        }
-        if ($this->epsilon_is_in_all_sets($a)) {
+
+        if ($epsilon_is_in_all) {
             $result[] = new block_formal_langs_grammar_epsilon_symbol();
         }
 
@@ -111,16 +110,15 @@ class block_formal_langs_grammar_first {
      *  @return array of block_formal_langs_grammar_production_symbol - array of active prefixes
      */
     private function first_for_array($x) {
-        $a = array();
         $result = array();
-        for($i = 0; $i < count($x) ; $i++) {
-            $a[] = $this->first_for_element($x[$i]);
+        $epsilon_is_in_all =  true;
+        for($i = 0; ($i < count($x)) && $epsilon_is_in_all ; $i++) {
+            $temp = $this->first_for_element($x[$i]);
+            $this->merge_if($result, $temp, $epsilon_is_in_all);
+            $epsilon_is_in_all = $epsilon_is_in_all && $this->has_epsilon($temp);
         }
-        $this->merge_if($result, $a[0], true);
-        for($i = 1 ; $i < count($a); $i++) {
-            $this->merge_if($result, $a[$i], $this->epsilon_is_in_all_sets($a, 0, $i));
-        }
-        if ($this->epsilon_is_in_all_sets($a)) {
+
+        if ($epsilon_is_in_all) {
             $result[] = new block_formal_langs_grammar_epsilon_symbol();
         }
         return $result;
@@ -141,7 +139,6 @@ class block_formal_langs_grammar_first {
         for($i = 0; $i < count($set); $i++ ) {
             /** @var block_formal_langs_grammar_production_symbol $el  */
             $el = $set[$i];
-
             $contains = false;
             for($j = 0 ; $j < count($result); $j++) {
                 /** @var block_formal_langs_grammar_production_symbol $rel  */
@@ -154,6 +151,19 @@ class block_formal_langs_grammar_first {
         }
     }
 
+    /**
+     * Whether epsilon symbol is in set
+     * @param array $array of array of  block_formal_langs_grammar_production_symbol multiple sets to check with
+     * @return bool has it epsilon or not
+     */
+    private function has_epsilon($array) {
+        for($i = 0; $i < count($array); $i++) {
+
+            if ($array[$i]->is_epsilon())
+                return true;
+        }
+        return false;
+    }
 
     /** Whether epsilon symbol is in all sets in a range
      *   @param array $array of array of  block_formal_langs_grammar_production_symbol multiple sets to check with
@@ -168,14 +178,7 @@ class block_formal_langs_grammar_first {
         }
         $ok = true;
         for($i = $from; $i < $to; $i++) {
-            $contains = false;
-            for ($j = 0; $j < count($array[$i]); $j++) {
-                /** @var block_formal_langs_grammar_production_symbol $s  */
-                $s = $array[$i][$j];
-                if ($s->is_epsilon()) {
-                    $contains = true;
-                }
-            }
+            $contains = $this->has_epsilon($array[$i]);
             $ok = $ok && $contains;
         }
         return $ok;

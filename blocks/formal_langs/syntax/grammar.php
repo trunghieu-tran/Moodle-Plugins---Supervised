@@ -519,12 +519,12 @@ class block_formal_langs_grammar {
             /** @var block_formal_langs_grammar_production_rule $rule  */
             $rule = $this->rules[$i];
             $sym = $rule->left();
-            if ($this->is_symbol_in_symbol_set($sym, $res) == false) {
+            if ($this->is_symbol_in_symbol_set($sym, $res) == false  /** && $sym->is_epsilon() == false*/) {
                 $res[] = clone $sym;
             }
             for($j = 0; $j < $rule->rightcount(); $j++) {
                 $sym = $rule->right($j);
-                if ($this->is_symbol_in_symbol_set($sym, $res) == false) {
+                if ($this->is_symbol_in_symbol_set($sym, $res) == false /** && $sym->is_epsilon() == false */) {
                     $res[] = clone $sym;
                 }
             }
