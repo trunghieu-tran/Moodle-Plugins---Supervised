@@ -656,6 +656,7 @@ class qtype_correctwriting_arrow_builder {
            foreach($this->table->lcs_extractor()->lcs() as $entry) {
                $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
+               $p2[0] = $p1[0];
                $this->draw_arrow($im, $palette['black'], $p1, $p2, false);
            }
        }
