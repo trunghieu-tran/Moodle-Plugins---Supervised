@@ -348,6 +348,12 @@ abstract class block_formal_langs_parser_test_node_base {
      * @return mixed
      */
     abstract public function output();
+
+    /**
+     * Dumps a data  into string
+     * @return string
+     */
+    abstract public function dump();
 }
 
 /**
@@ -357,6 +363,10 @@ class  block_formal_langs_parser_test_terminal_node extends block_formal_langs_p
 
     public function output() {
         return $this->type();
+    }
+
+    public function dump() {
+        return '\'' . $this->type() . '\'';
     }
 }
 
@@ -386,11 +396,23 @@ class block_formal_langs_parser_test_nonterminal_node extends block_formal_langs
          * @var block_formal_langs_parser_test_node_base $child
          */
         foreach($this->children as $child) {
-            $c = $child->output();
+            $c[] = $child->output();
         }
         return array( $this->type(),  $c);
     }
 
+    public function dump() {
+
+        $c = array();
+        /**
+         * @var block_formal_langs_parser_test_node_base $child
+         */
+        foreach($this->children as $child) {
+            $c[] = $child->dump();
+        }
+        $ftype = '\'' . $this->type() . '\'';
+        return 'array( ' . $ftype  . ', array( ' . implode(', ', $c) . ' ))';
+    }
 
 }
 
@@ -583,15 +605,19 @@ class block_formal_langs_parser_rule_helper {
      * Parses some data in tables
      * @param  block_formal_langs_grammar_table $table
      * @param string $string parsed string
+     * @param bool $dump whether we should dump result to string
      * @return mixed output tree
      */
-    public function parse($table, $string) {
+    public function parse($table, $string, $dump = false) {
         $w = new block_formal_langs_parser_test_wrapper($string);
         $p = new block_formal_langs_grammar_parser($table, $w);
         /**
-         * @var block_formal_langs_parser_test_node_base
+         * @var block_formal_langs_parser_test_node_base $result
          */
         $result = $p->parse();
+        if ($dump == true) {
+            return $result->dump();
+        }
         return $result->output();
     }
     /**
