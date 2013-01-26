@@ -40,6 +40,10 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
         return qtype_specific_hint::SINGLE_INSTANCE_HINT;
     }
 
+    public function hint_description() {
+        return get_string('hintcolouredstring', 'qtype_preg');
+    }
+
     /**
      * Is hint based on response or not?
      *
@@ -147,6 +151,10 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
         return false;//Could do without response to hint first character.
     }
 
+    public function hint_description() {
+        return get_string('hintnextchar', 'qtype_preg');
+    }
+
     /**
      * Returns whether response allows for the hint to be done
      */
@@ -203,6 +211,10 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
 
     public function hint_response_based() {
         return false;//Could do without response to hint first character.
+    }
+
+    public function hint_description() {
+        return get_string('hintnextlexem', 'qtype_preg', $this->question->lexemusername);
     }
 
     /**
