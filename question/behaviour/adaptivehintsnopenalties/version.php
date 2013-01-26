@@ -2,7 +2,7 @@
 
 $plugin->component = 'qbehaviour_adaptivehintsnopenalties';
 $plugin->version  = 2013011800;
-$plugin->requires = 2011070100;
+$plugin->requires = 2012062500;
 $plugin->release = 'Adaptive with hints (no penalties) behaviour 2.3.1';
 $plugin->maturity = MATURITY_STABLE;
 
