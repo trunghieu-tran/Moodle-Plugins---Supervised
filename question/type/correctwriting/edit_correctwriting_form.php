@@ -41,108 +41,42 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     private $secondtimeform = false;
 
+    /** List of floating value fields of the form - to automatically process them
+     * Key is field name, value contains default value and whether field is advanced
+     * There should be strings with "key" and "key_help" in the language file.
+     */
+     //TODO - uncomment first two fields when integrating Birukova code
+    private $floatfields = array(/*'lexicalerrorthreshold' => array('default' => 0.33, 'advanced' => true), //Lexical error threshold field
+                            'lexicalerrorweight' => array('default' => 0.05, 'advanced' => true),*/     //Lexical error weight field
+                            'absentmistakeweight' => array('default' => 0.1, 'advanced' => true),       //Absent token mistake weight field
+                            'addedmistakeweight' => array('default' => 0.1, 'advanced' => true),        //Extra token mistake weight field
+                            'movedmistakeweight' => array('default' => 0.05, 'advanced' => true),       //Moved token mistake weight field
+                            'hintgradeborder' => array('default' => 0.9, 'advanced' => true),           //Hint grade border
+                            'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true),      //Max mistake percentage
+                            'whatishintpenalty' => array('default' => 1.1, 'advanced' => false),        //"What is" hint penalty
+                            'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false),      //"Where" text hint penalty
+                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true));  //Absent token mistake hint penalty factor
+
     /**  Fills an inner definition of form fields
          @param object mform form data
      */
     protected function definition_inner($mform) {
         global $CFG;
-        // Add lexical error threshold field
-        // Uncomment  some unused field
-        /*
-        $mform->addElement('text', 'lexicalerrorthreshold',
-                           get_string('lexicalerrorthreshold', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('lexicalerrorthreshold', PARAM_FLOAT);
-        $mform->setDefault('lexicalerrorthreshold', 0.33);
-        $mform->addRule('lexicalerrorthreshold', null, 'required', null, 'client');
-        $mform->addHelpButton('lexicalerrorthreshold', 'lexicalerrorthreshold', 'qtype_correctwriting');
-        // Add lexical error weight field
-        $mform->addElement('text', 'lexicalerrorweight',
-                           get_string('lexicalerrorweight', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('lexicalerrorweight', PARAM_FLOAT);
-        $mform->setDefault('lexicalerrorweight', 0.05);
-        $mform->addRule('lexicalerrorweight', null, 'required', null, 'client');
-        $mform->addHelpButton('lexicalerrorweight', 'lexicalerrorweight', 'qtype_correctwriting');
-        */
-        // Add absent mistake weight field
-        $mform->addElement('text', 'absentmistakeweight',
-                           get_string('absentmistakeweight', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('absentmistakeweight', PARAM_FLOAT);
-        $mform->setDefault('absentmistakeweight', 0.1);
-        $mform->addRule('absentmistakeweight', null, 'required', null, 'client');
-        $mform->addHelpButton('absentmistakeweight', 'absentmistakeweight', 'qtype_correctwriting');
-        // Add added mistake weight field
-        $mform->addElement('text', 'addedmistakeweight',
-                           get_string('addedmistakeweight', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('addedmistakeweight', PARAM_FLOAT);
-        $mform->setDefault('addedmistakeweight', 0.1);
-        $mform->addRule('addedmistakeweight', null, 'required', null, 'client');
-        $mform->addHelpButton('addedmistakeweight', 'addedmistakeweight', 'qtype_correctwriting');
-        // Add moved mistake weight field
-        $mform->addElement('text', 'movedmistakeweight',
-                           get_string('movedmistakeweight', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('movedmistakeweight', PARAM_FLOAT);
-        $mform->setDefault('movedmistakeweight', 0.05);
-        $mform->addRule('movedmistakeweight', null, 'required', null, 'client');
-        $mform->addHelpButton('movedmistakeweight', 'movedmistakeweight', 'qtype_correctwriting');
-        // Add hint grade border
-        $mform->addElement('text', 'hintgradeborder',
-                           get_string('hintgradeborder', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('hintgradeborder', PARAM_FLOAT);
-        $mform->setDefault('hintgradeborder', 0.9);
-        $mform->addRule('hintgradeborder', null, 'required', null, 'client');
-        $mform->addHelpButton('hintgradeborder', 'hintgradeborder', 'qtype_correctwriting');
-        //Add max mistake percentage
-        $mform->addElement('text', 'maxmistakepercentage',
-                           get_string('maxmistakepercentage', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('maxmistakepercentage', PARAM_FLOAT);
-        $mform->setDefault('maxmistakepercentage', 0.7);
-        $mform->addRule('maxmistakepercentage', null, 'required', null, 'client');
-        $mform->addHelpButton('maxmistakepercentage', 'maxmistakepercentage', 'qtype_correctwriting');
-        //Add "what is" hint penalty
-        $mform->addElement('text', 'whatishintpenalty',
-                           get_string('whatishintpenalty', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('whatishintpenalty', PARAM_FLOAT);
-        $mform->setDefault('whatishintpenalty', 1.1);
-        $mform->addRule('whatishintpenalty', null, 'required', null, 'client');
-        $mform->addHelpButton('whatishintpenalty', 'whatishintpenalty', 'qtype_correctwriting');
-        //Add "where" text hint penalty
-        $mform->addElement('text', 'wheretxthintpenalty',
-                           get_string('wheretxthintpenalty', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('wheretxthintpenalty', PARAM_FLOAT);
-        $mform->setDefault('wheretxthintpenalty', 1.1);
-        $mform->addRule('wheretxthintpenalty', null, 'required', null, 'client');
-        $mform->addHelpButton('wheretxthintpenalty', 'wheretxthintpenalty', 'qtype_correctwriting');
-        //Absent token hint penalty factor
-        $mform->addElement('text', 'absenthintpenaltyfactor',
-                           get_string('absenthintpenaltyfactor', 'qtype_correctwriting'),
-                           array('size' => 6));
-        $mform->setType('absenthintpenaltyfactor', PARAM_FLOAT);
-        $mform->setDefault('absenthintpenaltyfactor', 1);
-        $mform->addRule('absenthintpenaltyfactor', null, 'required', null, 'client');
-        $mform->addHelpButton('absenthintpenaltyfactor', 'absenthintpenaltyfactor', 'qtype_correctwriting');
 
-        $mform->setAdvanced('lexicalerrorthreshold');
-        $mform->setAdvanced('lexicalerrorweight');
-        $mform->setAdvanced('absentmistakeweight');
-        $mform->setAdvanced('addedmistakeweight');
-        $mform->setAdvanced('movedmistakeweight');
-        $mform->setAdvanced('hintgradeborder');
-        $mform->setAdvanced('maxmistakepercentage');
-        $mform->setAdvanced('absenthintpenaltyfactor');
+        foreach ($this->floatfields as $name => $params) {
+            $mform->addElement('text', $name, get_string($name, 'qtype_correctwriting'), array('size' => 6));
+            $mform->setType($name, PARAM_FLOAT);
+            $mform->setDefault($name, $params['default']);
+            $mform->addRule($name, null, 'required', null, 'client');
+            $mform->addHelpButton($name, $name, 'qtype_correctwriting');
+            if ($params['advanced']) {
+                $mform->setAdvanced($name);
+            }
+        }
 
         $languages = block_formal_langs::available_langs();
 
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
-        $mform->addRule('langid', null, 'required', null, 'client');
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
         $mform->addHelpButton('langid', 'langid', 'qtype_correctwriting');
 
