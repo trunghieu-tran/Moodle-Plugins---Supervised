@@ -159,6 +159,13 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $question = parent::data_preprocessing($question);
 
+        //Remove trailing 0s from floating value fields
+        foreach ($this->floatfields as $name => $params) {
+            if (isset($question->$name)) {
+                $question->$name = 0 + $question->$name;
+            }
+        }
+
         return $question;
     }
 
