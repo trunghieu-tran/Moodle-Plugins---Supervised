@@ -43,7 +43,7 @@ class block_formal_langs_ast {
     }
 
     public function print_tree() {
-        traverse($root, 'print_node');
+        traverse($this->root, 'print_node');
     }
     
     public function traverse($node, $callback) {
@@ -54,7 +54,7 @@ class block_formal_langs_ast {
         }
 
         foreach($node->childs as $child) {//TODO - why no callback for non-leaf nodes?
-            traverse($child, $callback);
+            $this->traverse($child, $callback);
         }
     }
 
@@ -126,7 +126,7 @@ class block_formal_langs_node_position {
                 $maxcolend = $node->colend;
         }
 
-        return new block_formal_langs_node_position($minlinestart, $maxlinened, $mincolstart, $maxcolend);
+        return new block_formal_langs_node_position($minlinestart, $maxlineend, $mincolstart, $maxcolend);
     }
 }
 
@@ -281,6 +281,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         $this->value = $value;
         $this->position = $position;
         $this->tokenindex = $index;
+    }
+
+    /**
+     * Returns name of lexeme kind
+     * @return name of lexeme kind
+     */
+    public function name() {
+        $className = get_class($this);
+        $name = str_replace('block_formal_langs_','', $className);
+        return $name;
     }
 
     /**

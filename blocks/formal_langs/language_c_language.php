@@ -12,6 +12,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
+require_once($CFG->dirroot.'/lib/textlib.class.php');
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
 {
     public function __construct() {
@@ -33,6 +34,9 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     if (strlen($matches[0]) == 2) {
         $string = chr(intval($code));
     } else {
+        //  mb_convert_encoding left intentionally, because
+        // textlib uses iconv to convert, and iconv fails
+        // to conver from entities
         $string = mb_convert_encoding('&#' . intval($code) . ';', 'UTF-8', 'HTML-ENTITIES');
     }
     return $string;

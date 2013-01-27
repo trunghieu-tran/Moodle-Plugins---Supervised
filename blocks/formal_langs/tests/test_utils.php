@@ -12,6 +12,7 @@
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar_parser.php');
+require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 
 /**
@@ -508,7 +509,7 @@ class block_formal_langs_parser_rule_helper {
         $prec = false;
         foreach($leftpart as $part) {
             $trimpart = trim($part);
-            if (mb_strlen($trimpart) != 0) {
+            if (textlib::strlen($trimpart) != 0) {
                 if ($trimpart == '%prec') {
                     $prec = true;
                 } else {
@@ -551,7 +552,7 @@ class block_formal_langs_parser_rule_helper {
         $prec = 1;
         foreach($wdata as $string) {
             $tr = trim($string);
-            if (mb_strlen($tr) != 0) {
+            if (textlib::strlen($tr) != 0) {
                 if ($tr[0] != '%') {
                     $ruledata = $this->rule($tr);
                     $rules[] = $ruledata['rule'];
