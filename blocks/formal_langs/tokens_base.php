@@ -541,6 +541,13 @@ class  block_formal_langs_lexical_error {
 }
 
 /**
+ * A special class for error for scanning
+ */
+class block_formal_langs_scanning_error extends block_formal_langs_lexical_error {
+
+}
+
+/**
  * Represents a processed string
  *
  * Contains a string, a token stream (if the string is tokenized) and a syntax tree (or array of trees) if parsed

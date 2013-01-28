@@ -95,7 +95,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     }
 
     private function create_error($symbol) {
-        $res = new block_formal_langs_lexical_error();
+        $res = new block_formal_langs_scanning_error();
         $res->tokenindex = $this->counter;
         $a = new stdClass();
         $a->line = $this->yyline;
