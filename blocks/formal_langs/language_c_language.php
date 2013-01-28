@@ -84,7 +84,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
         return $result;
     }
     private function create_error($symbol) {
-        $res = new block_formal_langs_lexical_error();
+        $res = new block_formal_langs_scanning_error();
         $res->tokenindex = $this->counter;
         $a = new stdClass();
         $a->line = $this->yyline;
