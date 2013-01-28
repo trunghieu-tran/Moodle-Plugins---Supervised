@@ -76,6 +76,11 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     protected $endyyline = 0;
     // @var int end yycolumn
     protected $endyycol  = 0;
+    // @var bool state - is a state for returning error
+    protected $endstate = false;
+    // @var mixed token
+    protected $endtoken;
+
 
     private function startbuffer() {
         $this->stateyyline = $this->yyline;
@@ -116,42 +121,54 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $this->errors[] = $res;
     }
 
-    private function create_buffer_error($symbol) {
+    private function create_buffer_error($symbol, $token_backward_offset = 0) {
         $res = new block_formal_langs_lexical_error();
-        $res->tokenindex = $this->counter;
+        $res->tokenindex = $this->counter - $token_backward_offset;
         $a = new stdClass();
         $a->line = $this->stateyyline;
         $a->position = $this->stateyycol;
+        $a->col = $this->stateyycol;
         $a->symbol = $symbol->string();
-
-        $res->errormessage = get_string('lexical_error_message','block_formal_langs',$a);
+        $errormessage = 'lexical_error_message';
+        if ($a->symbol[0] == '\'') {
+            $errormessage = 'clanguageunmatchedsquote';
+        }
+        if ($a->symbol[0] == '"') {
+            $errormessage = 'clanguageunmatchedquote';
+        }
+        $res->errormessage = get_string($errormessage,'block_formal_langs',$a);
         $this->errors[] = $res;
     }
 
     public function get_errors() {
         return $this->errors;
     }
-  
-    private function create_token($class,$value) {
+
+    private function create_token_with_position($class, $value, $position) {
         // create token object
         $classname = 'block_formal_langs_c_token_' . $class;
-        $res = new $classname(null, $class, $value, $this->return_pos(), $this->counter);
+        $res = new $classname(null, $class, $value, $position, $this->counter);
         // increase token count
         $this->counter++;
 
         return $res;
     }
 
-    private function create_buffered_token($class,$value) {
-            // create token object
-            $classname = 'block_formal_langs_c_token_' . $class;
-            $res = new $classname(null, $class, $value, $this->return_buffered_pos(), $this->counter);
-            // increase token count
-            $this->counter++;
-
-            return $res;
+    private function create_token_from_pos($class, $value, $poscb) {
+        return $this->create_token_with_position($class, $value, $this->$poscb());
     }
 
+    private function create_token($class,$value) {
+        return $this->create_token_from_pos($class, $value, 'return_pos');
+    }
+
+    private function create_buffered_token($class,$value) {
+        return $this->create_token_from_pos($class, $value, 'return_buffered_pos');
+    }
+
+    private function create_buffered_error_token($class, $value) {
+        return $this->create_token_from_pos($class, $value, 'return_error_token_pos');
+    }
     private function is_white_space($string) {
         // Here we need to escape symbols, so double quotes are inavoidable
         $whitespace = array(' ', "\t", "\n", "\r", "f", "\v");
@@ -209,16 +226,23 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         
         return $res;
     }
-
-    private function return_buffered_pos() {
-        $begin_line = $this->stateyyline;
-        $begin_col = $this->stateyycol;
-        $end_line =  $this->endyyline;
-        $end_col =  $this->endyycol;
+    private function return_pos_by_field($blfield, $bcfield, $elfield, $ecfield)  {
+        $begin_line = $this->$blfield;
+        $begin_col = $this->$bcfield;
+        $end_line =  $this->$elfield;
+        $end_col =  $this->$ecfield;
 
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
 
         return $res;
+    }
+
+    private function return_buffered_pos() {
+        return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
+    }
+
+    private function return_error_token_pos() {
+        return $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
     }
 
     private function advance_buffered_pos() {
@@ -233,6 +257,30 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         }
     }
 
+    private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
+        $pos = $this->return_error_token_pos();
+        $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset);
+        $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend());
+        $this->endstate = true;
+
+        $realstring = $tokenstring;
+        if (is_object($realstring)) {
+            $realstring = $realstring->string();
+        }
+        $token1string = textlib::substr($realstring,0, $splitoffset);
+        $token2string = textlib::substr($realstring, $splitoffset, null);
+        $token1string = new qtype_poasquestion_string($token1string);
+        $token2string = new qtype_poasquestion_string($token2string);
+
+        $token1 =  $this->create_token_with_position('unknown', $token1string, $pos1);
+        $token2 =  $this->create_token_with_position('unknown', $token2string, $pos2);
+
+        $this->create_buffer_error($errorstring, 2);
+        $this->endstate = true;
+        $this->endtoken = $token2;
+        $this->yybegin(self::YYINITIAL);
+        return $token1;
+    }
 %}
 
 %eofval{
@@ -240,19 +288,18 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $this->yybegin(self::YYINITIAL);
         return $this->create_token('singleline_comment', $this->buffer());
     } else if ($this->yy_lexical_state == self::MULTILINE_COMMENT)  {
-        $this->yybegin(self::YYINITIAL);
-        $this->create_buffer_error($this->statestring);
-        return $this->create_token('unknown', $this->buffer());
+        return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
     } else if ($this->yy_lexical_state == self::STRING)  {
-        $this->yybegin(self::YYINITIAL);
-        $this->create_buffer_error($this->statestring);
-        return $this->create_token('unknown', $this->statestring);
+        return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
     } else if ($this->yy_lexical_state == self::CHARACTER)  {
-        $this->yybegin(self::YYINITIAL);
-        $this->create_buffer_error($this->statestring);
-        return $this->create_token('unknown', $this->buffer());
+        return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
     } else {
-        return null;
+        if ($this->endstate) {
+            $this->endstate = false;
+            return $this->endtoken;
+        } else {
+            return null;
+        }
     }
 %eofval}
 
