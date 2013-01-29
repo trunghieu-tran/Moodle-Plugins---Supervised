@@ -99,6 +99,33 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $answersinstruct->setText(get_string('answersinstruct', 'qtype_correctwriting'));
     }
 
+    /**
+     * Computes label for data
+     * @param $textdata
+     * @return string
+     */
+    function get_label($textdata) {
+        $rows = count($textdata);
+        $cols = 1;
+        for ($i = 0; $i < count($textdata); $i++) {
+            $len = textlib::strlen($textdata[$i]);
+            if ($len > $cols) {
+                $cols = textlib::strlen($textdata[$i]);
+            }
+        }
+        // A tab for IE-like browser
+        $cols += 2;
+        $lf = '&#10;';
+        $newtext = implode($lf, $textdata);
+        // display: inline is used because label accepts only inline entities inside
+        $attrs = array('style' => 'display: inline;', 'readonly' => 'readonly');
+        $attrs['rows'] = $rows;
+        $attrs['cols'] = $cols;
+        $begin = html_writer::start_tag('textarea', $attrs);
+        $end = html_writer::end_tag('textarea');
+        return $begin . $newtext . $end;
+    }
+
     function definition_after_data() {
         parent::definition_after_data();
 
@@ -119,7 +146,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         foreach($tokens as $token) {
                             $textdata[] = htmlspecialchars($token->value());
                         }
-                        $newtext = implode('<br />', $textdata);
+                        $newtext = $this->get_label($textdata);
                         $element=$mform->getElement('lexemedescriptions[' . $key . ']');
                         $element->setLabel($newtext);
                         $element->setRows(count($textdata));
