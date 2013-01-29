@@ -86,10 +86,9 @@
             $result = $exprnode;
         } else {
             if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
-                $result = new qtype_preg_node_subpatt();
+                $result = new qtype_preg_node_subpatt(-1, $this->get_nested_subpatts($exprnode));
             } else if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $parens->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
-                $result = new qtype_preg_node_subpatt();
-                $result->number = $parens->number;
+                $result = new qtype_preg_node_subpatt($parens->number, $this->get_nested_subpatts($exprnode));
             } else {
                 $result = new qtype_preg_node_assert();
             }
@@ -175,6 +174,19 @@
         $result->id = $this->idcounter++;
         $this->reducecount++;
         return $result;
+    }
+
+    protected function get_nested_subpatts($root) {
+        $result = array();
+        if ($root->type === qtype_preg_node::TYPE_NODE_SUBPATT) {
+            $result[] = $root->number;
+        }
+        if (is_a($root, 'qtype_preg_operator')) {
+            foreach ($root->operands as $operand) {
+                $result = array_merge($result, $this->get_nested_subpatts($operand));
+            }
+        }
+        return array_values(array_unique($result));
     }
 }
 %parse_failure {
