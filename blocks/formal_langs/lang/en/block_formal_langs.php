@@ -7,8 +7,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  
-$string['clanguagemulticharliteral'] = 'There is multicharacter literal at {$a->line}:{$a->col}';
-$string['clanguageunknownsymbol'] = 'There is unknown symbol "{$a->value}" at {$a->line}:{$a->col}';
+$string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'There is unknown character "{$a->value}" at {$a->line}:{$a->col}';
 $string['clanguageunmatchedquote'] = 'There is unmatched quote at {$a->line}:{$a->col}';
 $string['clanguageunmatchedsquote'] = 'There is unmatched single quote at {$a->line}:{$a->col}';
 $string['lang_c_language'] = 'C programming language';
