@@ -107,8 +107,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setType('lexemhintpenalty', PARAM_NUMBER);
         $mform->addHelpButton('lexemhintpenalty','lexemhintpenalty','qtype_preg');
         $langs = block_formal_langs::available_langs();//TODO - add context
-        $mform->addElement('select','langid',get_string('langselect','qtype_preg'),$langs);
-        $mform->setDefault('langid',2);//TODO - add admin setting
+        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $langs);
+        $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
         $mform->addHelpButton('langid','langselect','qtype_preg');
         $mform->addElement('text', 'lexemusername', get_string('lexemusername','qtype_preg'), array('size' => 54));
         $mform->setDefault('lexemusername','word');

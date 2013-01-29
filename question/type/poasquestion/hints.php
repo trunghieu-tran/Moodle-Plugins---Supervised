@@ -41,9 +41,9 @@ interface question_with_qtype_specific_hints {
     /**
      * Returns an array of available specific hint types depending on question settings
      *
-     * The keys are hint type indentifiers, unique for the qtype.
-     * The values are interface strings with the hint description (without "hint" word!)
-     * If a question allows for multiple instance choosen hints, it should return a separate key for each instance. That may depend on $response.
+     * The values are hint type indentifiers (hintkeys), unique for the qtype.
+     * For multiple instance sequential hints hintkeys should end with '#' character.
+     * For multiple instance choosen hints a separate key for each instance should be returned. That may depend on $response.
      */
     public function available_specific_hints($response = null);
 
@@ -53,6 +53,21 @@ interface question_with_qtype_specific_hints {
      * Returns a hint object for given type, for multiple instance choosen hints response may be needed to generate correct object.
      */
     public function hint_object($hintkey, $response = null);
+}
+
+interface behaviour_with_hints {
+    /**
+     * Adjust hintkey, adding number for sequential multiple instance hints.
+     *
+     * Passed hintkey should ends with # character to be appended with number.
+     */
+    public function adjust_hintkey($hintkey);
+
+    /**
+     * Adjust hints array, replacing every hintkey that ends with # with a whole 
+     * bunch of numbers up to max used in this attempt.
+     */
+    public function adjust_hints($hints);
 }
 
 /**
@@ -82,6 +97,9 @@ abstract class qtype_specific_hint {
     /** @var object Question object, created this hint*/
     protected $question;
 
+    /** @var string Hint key for this hint, useful for choosen miltiple instance hints*/
+    protected $hintkey;
+
     /**
      * Returns one of hint type constants (single instance etc).
      */
@@ -90,9 +108,22 @@ abstract class qtype_specific_hint {
     /**
      * Constructs hint object, remember question to use.
      */
-    public function __construct($question) {
+    public function __construct($question, $hintkey) {
         $this->question = $question;
+        $this->hintkey = $hintkey;
     }
+
+    /**
+     * Returns hint key, passed to the constructor.
+     */
+    public function hint_key() {
+        return $this->hintkey;
+    }
+
+    /**
+     * Returns hint description to show on the hint button etc.
+     */
+    abstract public function hint_description();
 
     /**
      * Is hint based on response or not?
@@ -135,6 +166,59 @@ abstract class qtype_specific_hint {
      * Renders hint information for given response using question renderer.
      *
      * Response may be omitted for non-response based hints.
+     * @param renderer question renderer which could be used to render things
      */
-    abstract public function render_hint($renderer, $response = null);
+    abstract public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null);
+}
+
+/**
+ * Class for compatibility with Moodle teacher-defined text and other hints
+ *
+ * @copyright  2013 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
+
+    /** @var int A number of hint in question, getted from hintkey*/
+    protected $number;
+
+    public function hint_type() {
+        return qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT;
+    }
+
+    /**
+     * Constructs hint object, remember question to use.
+     */
+    public function __construct($question, $hintkey) {
+        $this->question = $question;
+        $this->hintkey = $hintkey;
+        //Hintkey is like <hintname>#<number>
+        $this->number = substr($hintkey, strpos($hintkey, '#') + 1);
+    }
+
+    public function hint_description() {
+        $number = '';
+        if (is_numeric($this->number)) {
+            $number = get_string ("No", 'qtype_poasquestion', $this->number + 1);
+        }
+        return get_string('teachertext', 'qtype_poasquestion', $number);
+    }
+
+     public function hint_response_based() {
+        return false;//Teacher-defined text hint has nothing to do with student's response.
+     }
+
+     public function hint_available($response = null) {
+        return is_numeric($this->number) && $this->number < count($this->question->hints);
+     }
+
+     public function penalty_for_specific_hint($response = null) {
+        return $this->question->penalty;
+     }
+
+     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+        $hint = $this->question->hints[$this->number];
+        $hint->adjust_display_options($options);//For the hints like question_hint_with_parts.
+        return $this->question->format_hint($hint, $qa);
+     }
 }

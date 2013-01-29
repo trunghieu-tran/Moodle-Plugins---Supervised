@@ -7681,7 +7681,9 @@ class qtype_preg_unicode extends textlib {
         $index = 0;
         for ($i = 1; $i < count($ords); $i++) {
             $neword = $ords[$i];
-            if ((int)$neword == (int)$prevord + 1) {
+            if ($neword == $prevord) {
+                // Do nothing.
+            } else if ($neword == $prevord + 1) {
                 $result[$index][1]++;
             } else {
                 $result[] = array($neword, $neword);
@@ -7768,12 +7770,15 @@ class qtype_preg_unicode extends textlib {
     }
 
     public static function reduce_range(&$range, &$part) {
+        $rangestart = $range[0];
         $rangeend = $range[1];
         $partend = $part[1];
-        if ($partend < $rangeend) {
-            $range[0] = $partend + 1;
-        } else {
-            $range = null;
+        if ($partend >= $rangestart) {
+            if ($partend < $rangeend) {
+                $range[0] = $partend + 1;
+            } else {
+                $range = null;
+            }
         }
     }
 

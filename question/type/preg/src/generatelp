@@ -1,15 +1,21 @@
 #/bin/sh
-SOURCE="${BASH_SOURCE[0]}"
-DIR="$( dirname "$SOURCE" )"
-TARGETDIR="$( dirname "$DIR" )"
+
+SOURCE=$(readlink -f $0)
+DIR_SOURCE=$(dirname $SOURCE)
+DIR_JLEX=$DIR_SOURCE"/JLexPhp"
+DIR_LEMON=$DIR_SOURCE"/Lemon php"
+DIR_TARGET=$(dirname $DIR_SOURCE)
+
 echo "Generating lexer..."
-cd $DIR"/JLexPhp"
+cd "$DIR_JLEX"
 java JLexPHP.Main ../preg_lexer.lex
+
 echo "Generating parser..."
-cd $DIR"/Lemon php"
+cd "$DIR_LEMON"
 php Main.php
+
 echo "Copying files..."
-cd $DIR
-mv preg_lexer.lex.php $TARGETDIR
-mv preg_parser.php $TARGETDIR
+cd "$DIR_SOURCE"
+mv preg_lexer.lex.php $DIR_TARGET
+mv preg_parser.php $DIR_TARGET
 echo "Done!"

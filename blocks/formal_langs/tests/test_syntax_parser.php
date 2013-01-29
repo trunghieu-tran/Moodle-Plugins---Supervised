@@ -3,7 +3,7 @@
  * Defines unit-tests for syntax analysis
  *
  *
- * @copyright &copy; 2012  Dmitry Mamontov
+ * @copyright &copy; 2011 Oleg Sychev, Volgograd State Technical University
  * @author Oleg Sychev, Dmitriy Mamontov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
