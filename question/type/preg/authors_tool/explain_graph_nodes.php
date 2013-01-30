@@ -79,13 +79,13 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
 
             case qtype_preg_node::TYPE_LEAF_ASSERT:
                 if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
-                    return get_string('description_circumflex', 'qtype_preg');
+                    return array(get_string('description_circumflex', 'qtype_preg'));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
-                    return get_string('description_dollar', 'qtype_preg');
+                    return array(get_string('description_dollar', 'qtype_preg'));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
-                    return ($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg'));
+                    return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
                 else
-                    return get_string('explain_unknow_assert', 'qtype_preg');
+                    return array(get_string('explain_unknow_assert', 'qtype_preg'));
 
             case qtype_preg_node::TYPE_LEAF_BACKREF:
                 return array(get_string('explain_backref', 'qtype_preg') . $this->pregnode->number);
@@ -368,12 +368,12 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $graph, $this->pregnode->id - 0.1);
+            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $right->entries[count($right->entries) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $left->entries[count($left->entries) - 1]);
             $graph->entries[] = end($graph->nodes);
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $graph, $this->pregnode->id - 0.2);
+            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->exits[] = end($graph->nodes);

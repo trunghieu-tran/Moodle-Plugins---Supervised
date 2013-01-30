@@ -56,10 +56,10 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(chr(10).'printing character (including space)'), 'ellipse', 'green', $etalon, 0);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(chr(10).'not decimal digit'), 'ellipse', 'green', $etalon, 1);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[1]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[2], $etalon->nodes[0]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[3]);
@@ -125,8 +125,8 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $tree = new qtype_preg_author_tool_explain_graph('^$');
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('beginning of the string\nend of the string', $etalon->nodes[0], $etalon->nodes[1]);
 
        $result = $tree->create_graph();
@@ -206,10 +206,10 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('subpattern #1', 'solid; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0], -1);
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
 
@@ -223,12 +223,12 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
 
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('subpattern #1', 'solid; color=black');
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0], -1);
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('at a word boundary', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('a'), 'ellipse', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[0]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->nodes[2]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
@@ -244,12 +244,12 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
        $etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('subpattern #1', 'solid; color=black');
        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('a'), 'ellipse', 'black', $etalon->subgraphs[0], 0);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0], -1);
-       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon->subgraphs[0], -1);
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
+       $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon->subgraphs[0], -1);
        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[1], $etalon->subgraphs[0]->nodes[0]);
        $etalon->subgraphs[0]->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->subgraphs[0]->nodes[2]);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('beginning of the string', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[1]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('end of the string', $etalon->subgraphs[0]->nodes[2], $etalon->nodes[1]);
 
@@ -284,17 +284,17 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
        $etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
 
        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('abc'), 'ellipse', 'black', $etalon, 0);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('acb'), 'ellipse', 'black', $etalon, 1);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bac'), 'ellipse', 'black', $etalon, 2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bca'), 'ellipse', 'black', $etalon, 3);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cab'), 'ellipse', 'black', $etalon, 4);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cba'), 'ellipse', 'black', $etalon, 5);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('acb'), 'ellipse', 'black', $etalon, 5);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bac'), 'ellipse', 'black', $etalon, 11);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('bca'), 'ellipse', 'black', $etalon, 17);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cab'), 'ellipse', 'black', $etalon, 23);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('cba'), 'ellipse', 'black', $etalon, 29);
 
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $etalon, -1);
 
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -2);
-       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -3);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
+       $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
 
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[6], $etalon->nodes[5]);
        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[5], $etalon->nodes[7]);
