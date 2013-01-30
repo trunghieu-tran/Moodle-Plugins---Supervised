@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -402,11 +402,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
                         $tmp['negative'] = true;
-                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
@@ -423,37 +423,37 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
                     foreach ($otherranges as &$tmp)
                         $tmp['negative'] = true;
-                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
         //comparing ranges of this and other charsets
         if (is_array($ranges)) {
-		      $included = true;        
+              $included = true;
         } else {
             return false;
         }
         /*foreach($ranges as $i=>$ran) {
-        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+               $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
         }
         foreach($otherranges as $i=>$ran) {
-        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+               $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-			   if (current($ranges)!=current($otherranges)) {
-				    $included = false;
-				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-					     next($ranges);				    
-				    }
-				    if (current($ranges)!==false) {
-                    $included = true;				    
-				    }*/
-			   }        
+               if (current($ranges)!=current($otherranges)) {
+                    $included = false;
+                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                         next($ranges);
+                    }
+                    if (current($ranges)!==false) {
+                    $included = true;
+                    }*/
+               }
         }
         return $included;
     }
@@ -478,11 +478,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $ranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $ranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($this->negative) {
                     foreach ($ranges as &$tmp)
                         $tmp['negative'] = true;
-                    $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $ranges = qtype_preg_unicode::intersect_ranges($ranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
@@ -499,37 +499,37 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                 foreach ($currange as &$tmp) {
                     $tmp['negative'] = $flag->negative;
                 }
-                $otherranges = qtype_preg_unicode::intersect_ranges(array($range, $currange));
+                $otherranges = qtype_preg_unicode::intersect_ranges($range, $currange);
                 if ($other->negative) {
                     foreach ($otherranges as &$tmp)
                         $tmp['negative'] = true;
-                    $otherranges = qtype_preg_unicode::intersect_ranges(array($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code())));
+                    $otherranges = qtype_preg_unicode::intersect_ranges($otherranges, array('negative' => false, 0 => 0, 1 => qtype_preg_unicode::max_possible_code()));
                 }
             }
         }
         //comparing ranges of this and other charsets
         if (is_array($ranges)) {
-		      $included = false;        
+              $included = false;
         } else {
             return false;
         }
         /*foreach($ranges as $i=>$ran) {
-        	   $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
+               $ranges[$i] = array ('negative'=>false, 0=>$ranges[$i][0], 1=>$ranges[$i][1]);
         }
         foreach($otherranges as $i=>$ran) {
-        	   $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
+               $otherranges[$i] = array ('negative'=>false, 0=>$otherranges[$i][0], 1=>$otherranges[$i][1]);
         }
         $ranges = qtype_preg_unicode::intersect_ranges(array($ranges, $otherranges));*/
         for (reset($ranges), reset($otherranges); $included && current($ranges)!==false; next($ranges), next($otherranges)) {
-			   if (current($ranges)==current($otherranges)) {
-				    $included = true;
-				    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
-					     next($ranges);				    
-				    }
-				    if (current($ranges)!==false) {
-                    $included = true;				    
-				    }*/
-			   }        
+               if (current($ranges)==current($otherranges)) {
+                    $included = true;
+                    /*while (next($ranges)!==false && current($ranges)!=current($otherranges)) {
+                         next($ranges);
+                    }
+                    if (current($ranges)!==false) {
+                    $included = true;
+                    }*/
+               }
         }
         return $included;
     }
@@ -560,40 +560,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         echo 'implement add_flag before use!';
     }
 
-    public function push_negative() {
-        if (!$this->negative || $this->flags === null) {
-            return;
-        }
-        if (isset($this->flags[0]) && is_array($this->flags[0]) && isset($this->flags[0][0]) && isset($this->flags[1]) && is_array($this->flags[1])) {
-            $this->flags[0] = $this->flags[1];
-        }
-        $result = $this->flags[0];
-        foreach ($this->flags as $i => $disjunct) {
-            if ($i != 0) {
-                $result2 = array();
-                foreach ($result as $resflag) {
-                    foreach ($disjunct as $disflag) {
-                        if (is_array($resflag)) {
-                            $tmp = $resflag;
-                        } else {
-                            $tmp = array($resflag);
-                        }
-                        $tmp[] = $disflag;
-                        $result2[] = $tmp;
-                    }
-                }
-                $result = $result2;
-            }
-        }
-        foreach ($this->flags as $i => $disjunct) {
-            foreach ($this->flags[$i] as $j=>$flag) {
-                $this->flags[$i][$j] = clone $this->flags[$i][$j];
-                $this->flags[$i][$j]->negative = !$this->flags[$i][$j]->negative;
-            }
-        }
-        $this->reduce_dnf();
-    }
-
     /**
      * Intersects this charset with other one.
      * @param other charset to intersect with.
@@ -614,65 +580,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $result = new qtype_preg_leaf_charset;
         $result->flags = $resflags;
         $result->israngecalculated = false;
-        $result->reduce_dnf();
         return $result;
-    }
-
-    public function reduce_dnf() {
-        if ($this->flags === null) {
-            return;
-        }
-        $working = false;
-        foreach ($this->flags as $key => $disjunct) {
-            foreach ($this->flags[$key] as $index => $flag) {
-                if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$index])) {
-                    if ($flag->type === qtype_preg_charset_flag::SET && !$flag->negative) {
-                        foreach ($disjunct as $flag2) {
-                            $this->flags[$key][$index] = $this->flags[$key][$index]->intersect($flag2);
-                            if ($this->flags[$key][$index] === null) {
-                                $this->flags[$key] = null;
-                                break;
-                            }
-                        }
-                        $this->flags[$key] = array($this->flags[$key][$index]);
-                    } else if ($flag->type === qtype_preg_charset_flag::SET || $flag->type === qtype_preg_charset_flag::FLAG) { // A negative set or a flag.
-                        foreach ($disjunct as $i => $flag2) {
-                            if (is_array($this->flags) && isset($this->flags[$key]) && is_array($this->flags[$key]) && isset($this->flags[$key][$i])) {
-                                $intersected = $this->flags[$key][$index]->intersect($flag2);
-                                if ($intersected === null) {
-                                    $this->flags[$key] = null;
-                                    break;
-                                } else if ($intersected !== false) {
-                                    $this->flags[$key][$index] = $intersected;
-                                    if ($i != $index) {
-                                        $working = true;
-                                        $this->flags[$key][$i] = null;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        $dnf = array();
-        foreach ($this->flags as $disjunct) {
-            if ($disjunct !== null) {
-                $disj = null;
-                foreach ($disjunct as $flag) {
-                    if ($flag !== null) {
-                        $disj[] = $flag;
-                    }
-                }
-                if ($disj !== null) {
-                    $dnf[] = $disj;
-                }
-            }
-        }
-        $this->flags = $dnf;
-        if ($working) {
-            $this->reduce_dnf();
-        }
     }
 
     /**
@@ -857,9 +765,6 @@ class qtype_preg_charset_flag {
     /** Characters, flag or unicode property if this is a TYPE_SET, TYPE_FLAG or TYPE_UPROP correspondingly. */
     public $data;
 
-    static protected $flagtypes;
-    static protected $intersection;
-
     public function __clone() {
         if (is_object($this->data)) {
             $this->data = clone $this->data;
@@ -911,164 +816,6 @@ class qtype_preg_charset_flag {
             $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
         }
         return ($result xor $this->negative);
-    }
-
-    /**
-     * Intersect this flag with other if possible.
-     * @param other other flag to intersect with.
-     * @return the intersection as a qtype_preg_charset_flag object if the intersection is possible, null if the intersection is empty and false if the intersection is impossible.
-     */
-    public function intersect(qtype_preg_charset_flag $other) {
-        if ($this->type === qtype_preg_charset_flag::FLAG && $other->type === qtype_preg_charset_flag::FLAG) {
-            foreach (self::$flagtypes as $index => $flagtype) {
-                if ($flagtype === $this->data) {
-                    $selfindex = $index;
-                    if ($this->negative) {
-                        $selfindex += 13;
-                    }
-                    break;
-                }
-            }
-            foreach (self::$flagtypes as $index => $flagtype) {
-                if ($flagtype === $other->data) {
-                    $otherindex = $index;
-                    if ($other->negative) {
-                        $otherindex += 13;
-                    }
-                    break;
-                }
-            }
-            $result = self::$intersection[26 * $selfindex + $otherindex];
-            if ($result === 'set') {
-                $result = false;
-            }
-            if ($result === false || $result === null) {
-                return $result;
-            } else {
-                $res = new qtype_preg_charset_flag;
-                if ($result[0] === '-') {
-                    $res->set_data(qtype_preg_charset_flag::FLAG, qtype_poasquestion_string::substr($result, 1));
-                    $res->negative = true;
-                } else {
-                    $res->set_data(qtype_preg_charset_flag::FLAG, $result);
-                }
-                return $res;
-            }
-        } else if ($this->type === qtype_preg_charset_flag::FLAG && $other->type === qtype_preg_charset_flag::SET) {
-            if ($other->negative) {
-                return false;
-            }
-            $res = new qtype_preg_charset_flag;
-            $str = new qtype_poasquestion_string('');
-            for ($i = 0; $i < $other->data->length(); $i++) {
-                if ($this->match($other->data, $i)) {
-                    $str->concatenate($other->data[$i]);
-                }
-            }
-            if ($str->length() === 0) {
-                return null;
-            }
-            $res->set_data(qtype_preg_charset_flag::SET, $str);
-            return $res;
-        } else if ($this->type === qtype_preg_charset_flag::SET && $other->type === qtype_preg_charset_flag::FLAG) {
-            return $other->intersect($this);
-        } else if ($this->type === qtype_preg_charset_flag::SET && $other->type === qtype_preg_charset_flag::SET) {
-            if ($this->negative && $other->negative) {
-                $res = new qtype_preg_charset_flag;
-                $str = clone $this->data;
-                $str->concatenate($other->data);
-                $resstr = new qtype_poasquestion_string('');
-                for ($i = 0; $i < $str->length(); $i++) {
-                    if (qtype_poasquestion_string::strpos($str, $str[$i]) == $i) {
-                        $resstr->concatenate($str[$i]);
-                    }
-                }
-                $res->negative = true;
-                if ($resstr->length() === 0) {
-                    return null;
-                }
-                $res->set_data(qtype_preg_charset_flag::SET, $resstr);
-            } else if ($this->negative && !$other->negative) {
-                $res = new qtype_preg_charset_flag;
-                $str = new qtype_poasquestion_string('');
-                for ($i = 0; $i < $other->data->length(); $i++) {
-                    if ($this->match($other->data, $i)) {
-                        $str->concatenate($other->data[$i]);
-                    }
-                }
-                if ($str->length() === 0) {
-                    return null;
-                }
-                $res->set_data(qtype_preg_charset_flag::SET, $str);
-                return $res;
-            } else {
-                $res = new qtype_preg_charset_flag;
-                $str = new qtype_poasquestion_string('');
-                for ($i = 0; $i < $this->data->length(); $i++) {
-                    if ($other->match($this->data, $i)) {
-                        $str->concatenate($this->data[$i]);
-                    }
-                }
-                if ($str->length() === 0) {
-                    return null;
-                }
-                $res->set_data(qtype_preg_charset_flag::SET, $str);
-                return $res;
-            }
-            return $res;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Substract this flag with other, if possible.
-     * @param other other flag for substraction.
-     * @return result of substraction as preg_charset flag, if substraction is possible, null if substraction is empty and false if substraction is impossible
-     */
-    public function substract(qtype_preg_charset_flag $other) {
-        $copy = clone $other;
-        return $this->intersect($copy);
-    }
-
-    public function __construct() {
-        if (is_array(self::$flagtypes)) {
-            return;
-        }
-
-        self::$flagtypes = array(self::DIGIT, self::XDIGIT, self::SPACE, self::WORD, self::ALNUM, self::ALPHA, self::ASCII, self::CNTRL, self::GRAPH, self::LOWER, self::UPPER, self::PRIN, self::PUNCT);
-
-        self::$intersection = array(
-
-        //               digit,         xdigit,         space,         word,             alnum,          alpha,         ascii,        cntrl,         graph,           lower,         upper,         print,          punct,         ndigit,              nxdigit,              nspace,            nword,               nalnum,              nalpha,              nascii,           ncntrl,            ngraph,            nlower,               nupper,             nprint,           npunct
-        /*digit*/        self::DIGIT,   self::DIGIT,    null,          self::DIGIT,      self::DIGIT,    null,          'set',        null,          self::DIGIT,     null,          null,          self::DIGIT,    null,          null,                null,                 self::DIGIT,       null,                 null,                self::DIGIT,         false,            self::DIGIT,       null,              self::DIGIT,          self::DIGIT,        null,             self::DIGIT,
-        /*xdigit*/       self::DIGIT,   self::XDIGIT,   null,          self::XDIGIT,     self::XDIGIT,   'set',         'set',        null,          self::XDIGIT,    'set',         'set',         self::XDIGIT,   null,          'set',               null,                 self::XDIGIT,      null,                 null,                self::DIGIT,         false,            self::XDIGIT,      null,              false,                false,              null,             self::XDIGIT,
-        /*space*/        null,          null,           self::SPACE,   null,             null,           null,          'set',        null,          null,            null,          null,          self::SPACE,    null,          self::SPACE,         self::SPACE,          null,              self::SPACE,          self::SPACE,         self::SPACE,         false,            self::SPACE,       self::SPACE,       self::SPACE,          self::SPACE,        null,             self::SPACE,
-        /*word*/         self::DIGIT,   self::XDIGIT,   null,          self::WORD    ,   self::ALNUM,    self::ALPHA,   'set',        null,          self::WORD,      self::LOWER,   self::UPPER,   self::WORD,     null,          self::ALNUM,         false,                self::WORD,        null,                 'set',               false,               false,            self::WORD,        null,              false,                false,              null,             self::WORD,
-        /*alnum*/        self::DIGIT,   self::XDIGIT,   null,          self::ALNUM,      self::ALNUM,    self::ALPHA,   'set',        null,          self::ALNUM,     self::LOWER,   self::UPPER,   self::ALNUM,    null,          self::ALPHA,         false,                self::ALNUM,       null,                 null,                self::DIGIT,         false,            self::ALNUM,       null,              false,                false,              null,             self::ALNUM,
-        /*alpha*/        null,          false,          null,          self::ALPHA,      self::ALPHA,    self::ALPHA,   'set',        null,          self::ALPHA,     self::LOWER,   self::UPPER,   self::ALPHA,    null,          self::ALPHA,         false,                self::ALPHA,       null,                 null,                null,                false,            self::ALPHA,       null,              self::UPPER,          self::LOWER,        null,             self::ALPHA,
-        /*ascii*/        'set',         'set',          'set',         'set',            'set',          'set',         self::ASCII,  'set',         'set',           'set',         'set',         'set',          'set',         'set',               'set',                'set',             'set',                'set',               'set',               null,             'set',             'set',             'set',                'set',              'set',            'set',
-        /*cntrl*/        null,          null,           null,          null,             null,           null,          'set',        self::CNTRL,   false,           null,          null,          false,          null,          self::CNTRL,         self::CNTRL,          self::CNTRL,       self::CNTRL,          self::CNTRL,         self::CNTRL,         false,            null,              false,             self::CNTRL,          self::CNTRL,        false,            false,
-        /*graph*/        self::DIGIT,   self::XDIGIT,   null,          self::WORD,       self::ALNUM,    self::ALPHA,   'set',        false,         self::GRAPH,     self::LOWER,   self::UPPER,   self::PRIN,     false,         false,               false,                false,             false,                false,               false,               false,            false,             null,              false,                false,              false,            false,
-        /*lower*/        null,          null,           null,          self::LOWER,      self::LOWER,    self::LOWER,   'set',        null,          self::LOWER,     self::LOWER,   null,          self::LOWER,    null,          self::LOWER,         false,                self::LOWER,       null,                 null,                null,                false,            self::LOWER,       null,              null,                 self::LOWER,        null,             self::LOWER,
-        /*upper*/        null,          null,           null,          self::UPPER,      self::UPPER,    self::UPPER,   'set',        null,          self::UPPER,     null,          self::UPPER,   self::UPPER,    null,          self::UPPER,         false,                self::UPPER,       null,                 null,                null,                false,            self::UPPER,       null,              self::UPPER,          null,               null,             self::UPPER,
-        /*print*/        self::DIGIT,   self::XDIGIT,   self::SPACE,   self::WORD,       self::ALNUM,    self::ALPHA,   'set',        false,         self::GRAPH,     self::LOWER,   self::UPPER,   self::PRIN,     self::PUNCT,   false,               false,                false,             false,                false,               false,               false,            false,             false,             false,                false,              null,             false,
-        /*punct*/        null,          null,           null,          null,             null,           null,          'set',        false,         null,            null,          null,          self::PUNCT,    self::PUNCT,   self::PUNCT,         self::PUNCT,          self::PUNCT,       self::PUNCT,          self::PUNCT,         self::PUNCT,         false,            false,             self::PUNCT,       self::PUNCT,          self::PUNCT,        null,             null,
-        /*ndigit*/       null,          'set',          self::SPACE,   self::ALNUM,      self::ALPHA,    self::ALPHA,   'set',        self::CNTRL,   false,           self::LOWER,   self::UPPER,   false,          self::PUNCT,   '-'.self::DIGIT,     '-'.self::XDIGIT,     false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALNUM,     false,            false,             '-'.self::GRAPH,   false,                false,              '-'.self::PRIN,   false,
-        /*nxdigit*/      null,          null,           self::SPACE,   false,            false,          false,         'set',        self::CNTRL,   false,           self::LOWER,   false,         false,          self::PUNCT,   '-'.self::XDIGIT,    '-'.self::XDIGIT,     false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALNUM,     false,            false,             '-'.self::GRAPH,   false,                false,              '-'.self::PRIN,   false,
-        /*nspace*/       self::DIGIT,   self::XDIGIT,   null,          self::WORD,       self::ALNUM,    self::ALPHA,   'set',        self::CNTRL,   false,           self::LOWER,   self::UPPER,   false,          self::PUNCT,   false,               false,                '-'.self::SPACE,   false,                false,               false,               false,            false,             false,             false,                false,              '-'.self::PRIN,   false,
-        /*nword*/        null,          null,           self::SPACE,   null,             null,           null,          'set',        self::CNTRL,   false,           null,          null,          false,          self::PUNCT,   '-'.self::WORD,      '-'.self::WORD,       false,             '-'.self::WORD,       '-'.self::WORD,      '-'.self::WORD,      false,            false,             '-'.self::GRAPH,   '-'.self::WORD,       '-'.self::WORD,     '-'.self::PRIN,   false,
-        /*nalnum*/       null,          null,           self::SPACE,   'set',            null,           null,          'set',        self::CNTRL,   false,           null,          null,          false,          self::PUNCT,   '-'.self::ALNUM,     '-'.self::ALNUM,      false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALNUM,     false,            false,             '-'.self::GRAPH,   '-'.self::ALNUM,      '-'.self::ALNUM,    '-'.self::PRIN,   false,
-        /*nalpha*/       self::DIGIT,   self::DIGIT,    self::SPACE,   false,            self::DIGIT,    null,          'set',        self::CNTRL,   false,           null,          null,          false,          self::PUNCT,   '-'.self::ALNUM,     '-'.self::ALNUM,      false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALPHA,     false,            false,             '-'.self::GRAPH,   '-'.self::ALPHA,      '-'.self::ALPHA,    '-'.self::PRIN,   false,
-        /*nascii*/       false,         false,          false,         false,            false,          false,         null,         false,         false,           false,         false,         false,          false,         false,               false,                false,             false,                false,               false,               '-'.self::ASCII,  false,             false,             false,                false,              false,            false,
-        /*ncntrl*/       self::DIGIT,   self::XDIGIT,   self::SPACE,   self::WORD,       self::ALNUM,    self::ALPHA,   'set',        null,          false,           self::LOWER,   self::UPPER,   false,          false,         false,               false,                false,             false,                false,               false,               false,            '-'.self::CNTRL,   false,             false,                false,              false,            false,
-        /*ngraph*/       null,          null,           self::SPACE,   null,             null,           null,          'set',        false,         null,            null,          null,          false,          self::PUNCT,   '-'.self::GRAPH,     '-'.self::GRAPH,      false,             '-'.self::GRAPH,      '-'.self::GRAPH,     '-'.self::GRAPH,     false,            false,             '-'.self::GRAPH,   '-'.self::GRAPH,      '-'.self::GRAPH,    '-'.self::PRIN,   false,
-        /*nlower*/       self::DIGIT,   false,          self::SPACE,   false,            false,          self::UPPER,   'set',        self::CNTRL,   false,           null,          self::UPPER,   false,          self::PUNCT,   false,               false,                false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALPHA,     false,            false,             '-'.self::GRAPH,   '-'.self::LOWER,      '-'.self::ALPHA,    '-'.self::PRIN,   false,
-        /*nupper*/       self::DIGIT,   false,          self::SPACE,   false,            false,          self::LOWER,   'set',        self::CNTRL,   false,           self::LOWER,   null,          false,          self::PUNCT,   false,               false,                false,             '-'.self::WORD,       '-'.self::ALNUM,     '-'.self::ALPHA,     false,            false,             '-'.self::GRAPH,   '-'.self::ALPHA,      '-'.self::UPPER,    '-'.self::PRIN,   false,
-        /*nprint*/       null,          null,           null,          null,             null,           null,          'set',        false,         false,           null,          null,          null,           null,          '-'.self::PRIN,      '-'.self::PRIN,       '-'.self::PRIN,    '-'.self::PRIN,       '-'.self::PRIN,      '-'.self::PRIN,      false,            false,             '-'.self::PRIN,    '-'.self::PRIN,       '-'.self::PRIN,     '-'.self::PRIN,   '-'.self::PRIN,
-        /*npunct*/       self::DIGIT,   self::XDIGIT,   self::SPACE,   self::WORD,       self::ALNUM,    self::ALPHA,   'set',        false,         false,           self::LOWER,   self::UPPER,   false,          null,          false,               false,                false,             false,                false,               false,               false,            false,             false,             false,                false,              '-'.self::PRIN,   '-'.self::PUNCT
-
-       );
     }
 
     public function tohr() {
@@ -1338,7 +1085,14 @@ class qtype_preg_leaf_option extends qtype_preg_leaf {
         die ('TODO: implements abstract function character for qtype_preg_leaf_option class before use it!');
     }
     public function tohr() {
-        return '(?'.$this->posopt.'-'.$this->negopt;
+        $result = '(?';
+        if (!empty($this->posopt)) {
+            $result .= $this->posopt;
+        }
+        if (!empty($this->negopt)) {
+            $result .= '-'.$this->negopt;
+        }
+        return $result.')';
     }
 }
 
@@ -1585,11 +1339,14 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
     const SUBTYPE_DUPLICATE_SUBPATTERNS = 'duplicate_node_subpatt';
 
     /** Subpattern number. */
-    public $number = 0;
+    public $number = -1;
+    /** Array of numbers of nested subpatterns. */
+    public $nested = array();
 
-    public function __construct($number = 0) {
+    public function __construct($number = -1, $nested = array()) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
         $this->number = $number;
+        $this->nested = $nested;
     }
 
     //TODO - ui_nodename()
@@ -1618,11 +1375,11 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
     const SUBTYPE_NLB = 'nlb_node_cond_subpatt';
 
     /** Subpattern number. */
-    public $number = 0;
+    public $number = -1;
     /** Is condition satisfied?. */
     public $condbranch = null;
 
-    public function __construct($subtype = null, $number = 0, $condbranch = null) {
+    public function __construct($subtype = null, $number = -1, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBPATT;
         $this->subtype = $subtype;
         $this->number = $number;

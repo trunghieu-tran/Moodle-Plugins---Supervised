@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Checks file access for preg questions.
  */
-function qtype_preg_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {) {
+function qtype_preg_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB, $CFG;
     require_once($CFG->libdir . '/questionlib.php');
     question_pluginfile($course, $context, 'qtype_preg', $filearea, $args, $forcedownload, $options);

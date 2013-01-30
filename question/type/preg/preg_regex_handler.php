@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
-require_once($CFG->dirroot . '/question/type/preg/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_exception.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
 
@@ -251,22 +251,27 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-    protected function look_for_circumflex($root) {
-        if (is_a($root, 'qtype_preg_leaf')) {
-            return ($root->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
-        } else if (is_a($root, 'qtype_preg_node_infinite_quant')) {
-            $operand = $root->operands[0];
-            return ($root->leftborder === 0 && is_a($operand, 'qtype_preg_leaf_charset') &&
+    protected function look_for_circumflex($node, $wasconcat = false) {
+        if (is_a($node, 'qtype_preg_leaf')) {
+            // Expression starts from ^
+            return ($node->subtype === qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0) {
+            // Expression starts from .*
+            $operand = $node->operands[0];
+            return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::PRIN);
-        } else if (is_a($root, 'qtype_preg_node_concat') || is_a($root, 'qtype_preg_node_subpatt')) {
-            return $this->look_for_circumflex($root->operands[0]);
-        } else if (is_a($root, 'qtype_preg_node_alt')) {
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
+            // Check the first operand for concatenation and subpatterns.
+            return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
+            // Every branch of alternative is anchored.
             $cf = true;
             $empty = false;
-            foreach ($root->operands as $operand) {
-                $empty = $empty || $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
-                $cf = $cf && $this->look_for_circumflex($operand);
+            foreach ($node->operands as $operand) {
+                $empty = $empty || isset($operand->subtype) && $operand->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY;
+                $cf = $cf && $this->look_for_circumflex($operand, $wasconcat);
             }
+            $empty = $empty && !$wasconcat;
             return $cf || $empty;
         }
         return false;
@@ -320,8 +325,9 @@ class qtype_preg_regex_handler {
         }
         //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
-            $this->dst_root = $this->from_preg_node($this->ast_root);
             $this->look_for_anchors();
+            $this->dst_root = clone $this->ast_root;
+            $this->dst_root = $this->from_preg_node($this->dst_root);
         //}
         fclose($pseudofile);
     }

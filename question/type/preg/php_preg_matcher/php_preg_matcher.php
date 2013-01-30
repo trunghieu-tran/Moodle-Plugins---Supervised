@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -91,7 +91,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         $for_regexp = '/'.$for_regexp.'/u';
 
         if (preg_match($for_regexp,'test') === false) {//preg_match returns false when regular expression contains error
-            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex','qtype_preg'));
+            $this->errors[] = new qtype_preg_error(get_string('error_PCREincorrectregex','qtype_preg'), '' , -2, -2, true);//Preserve error message to show the link
             return false;
         }
 

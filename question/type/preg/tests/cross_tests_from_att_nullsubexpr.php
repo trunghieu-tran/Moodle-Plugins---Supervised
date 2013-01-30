@@ -549,7 +549,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>0),
                         'length'=>array(0=>1,1=>0,2=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)',
+        return array( 'regex'=>'(a*)*(x)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -561,7 +561,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>1),
                         'length'=>array(0=>2,1=>1,2=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)',
+        return array( 'regex'=>'(a*)*(x)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -573,7 +573,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>1),
                         'length'=>array(0=>2,1=>1,2=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)',
+        return array( 'regex'=>'(a*)*(x)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -585,7 +585,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>0,3=>1),
                         'length'=>array(0=>1,1=>0,2=>1,3=>0));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)\\(\\1\\)',
+        return array( 'regex'=>'(a*)*(x)(\\1)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -597,7 +597,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>1,2=>1,3=>2),
                         'length'=>array(0=>2,1=>0,2=>1,3=>0));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)\\(\\1\\)',
+        return array( 'regex'=>'(a*)*(x)(\\1)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -609,7 +609,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>2),
                         'length'=>array(0=>3,1=>1,2=>1,3=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)\\(\\1\\)',
+        return array( 'regex'=>'(a*)*(x)(\\1)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -621,7 +621,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>2,4=>3),
                         'length'=>array(0=>4,1=>1,2=>1,3=>1,4=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)\\(\\1\\)\\(x\\)',
+        return array( 'regex'=>'(a*)*(x)(\\1)(x)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }
@@ -633,7 +633,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                         'index_first'=>array(0=>0,1=>1,2=>1,3=>2,4=>2),
                         'length'=>array(0=>3,1=>0,2=>1,3=>0,4=>1));
 
-        return array( 'regex'=>'\\(a*\\)*\\(x\\)\\(\\1\\)\\(x\\)',
+        return array( 'regex'=>'(a*)*(x)(\\1)(x)',
                       'tests'=>array($test1),
                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
     }

@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -72,6 +72,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     protected $map;//map of symbol's following
     protected $maxstatecount;
     protected $maxpasscount;
+	protected $zeroquantdeleted;
 
     public function name() {
         return 'dfa_matcher';
@@ -198,7 +199,27 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $extstr = substr($str, 0, $result->offset + $result->index+1);
         if ($result->next===0) {
         } else {
-            $extstr .= $result->next;
+			if ($result->next=='stringstart') {
+				$extstr = '';
+			} elseif ($result->next=='stringend' || $result->next=='notstringstart' || $result->next=='notstringend') {
+			} elseif ($result->next=='wordchar') {
+				$tmpflag = new qtype_preg_charset_flag;
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmp = new qtype_preg_leaf_charset;
+				$tmp->flags = array(array($tmpflag));
+				$length=1;
+				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
+			} elseif ($result->next=='notwordchar') {
+				$tmpflag = new qtype_preg_charset_flag;
+				$tmpflag->set_data(qtype_preg_charset_flag::FLAG, qtype_preg_charset_flag::WORD);
+				$tmpflag->negative = true;
+				$tmp = new qtype_preg_leaf_charset;
+				$tmp->flags = array(array($tmpflag));
+				$length=1;
+				$extstr .= $tmp->next_character($extstr, $offset+$result->index, $length);
+			} else {
+				$extstr .= $result->next;
+			}
         }
         if (!is_object($extstr)) {
         	   $extstr = new qtype_poasquestion_string($extstr);
@@ -560,7 +581,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                     
-                    $this->connection[$index][$number]->pregnode->push_negative();
+                    //$this->connection[$index][$number]->pregnode->push_negative();
                     if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
                         array_push($equnum, $num);
                     }
@@ -629,6 +650,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
+		$this->zeroquantdeleted = false;
         if (isset($CFG->qtype_preg_dfa_state_limit)) {
             $this->maxstatecount = $CFG->qtype_preg_dfa_state_limit;
         } else {
@@ -1182,7 +1204,14 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     * @return corresponding dfa_preg_node child class instance
     */
     public function &from_preg_node($pregnode) {
-        $name = $pregnode->name();
+        if (!$this->zeroquantdeleted) {
+			$res = self::delete_zero_quant($pregnode);
+			if ($res!==true && $res!==false) {
+				$pregnode = $res;
+			}
+			$this->zeroquantdeleted=true;
+		}
+		$name = $pregnode->name();
         switch ($name) {
             case 'node_finite_quant':
                 $pregnode = $this->convert_finite_quant($pregnode);
@@ -1213,12 +1242,85 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return parent::from_preg_node($pregnode);
     }
 
+	/**
+	* Function delete zero quants subtree from syntax tree
+	* @param node is the subroot of syntax tree, don't need call this function for other node
+	* return true if subtree full deleted or new subroot if changed, false otherwise
+	*/
+	protected function delete_zero_quant($node) {
+		$name = $node->name();
+        switch ($name) {
+            case 'node_finite_quant':
+				$res=self::delete_zero_quant($node->operands[0]);
+                if ($node->rightborder==0 || $res===true) {
+					return true;
+				} elseif (is_a($res, 'preg_node')) {
+					$node->operands[0] = $res;
+				}
+                break;
+			case 'node_assert':
+			case 'node_subpatt':
+            case 'node_infinite_quant':
+                $res=self::delete_zero_quant($node->operands[0]);
+                if ($res===true) {
+					return true;
+				} elseif (is_a('preg_node', $res)) {
+					$node->operands[0] = $res;
+				}
+				break;
+            case 'node_alt':
+                $res = array();
+				$res[0]=self::delete_zero_quant($node->operands[0]);
+				$res[1]=self::delete_zero_quant($node->operands[1]);
+				if (is_a($res, 'preg_node')) {
+					$node->operands[0] = $res[0];
+				}
+				if (is_a($res, 'preg_node')) {
+					$node->operands[1] = $res[1];
+				}
+				if ($res[0]===true && $res[1]===true) {
+					return true;
+				} else if ($res[0]===true) {
+					$newsubroot = new qtype_preg_node_finite_quant;
+					$newsubroot->operands[0] = $node->operands[1];
+					return $newsubroot;
+				} else if ($res[1]===true) {
+					$newsubroot = new qtype_preg_node_finite_quant;
+					$newsubroot->operands[0] = $node->operands[0];
+					return $newsubroot;
+				}
+				break;
+			case 'node_concat':
+                $res = array();
+				$res[0]=self::delete_zero_quant($node->operands[0]);
+				$res[1]=self::delete_zero_quant($node->operands[1]);
+				if (is_a($res[0], 'preg_node')) {
+					$node->operands[0] = $res[0];
+				}
+				if (is_a($res[1], 'preg_node')) {
+					$node->operands[1] = $res[1];
+				}
+				if ($res[0]===true && $res[1]===true) {
+					return true;
+				} else if ($res[0]===true) {
+					return $node->operands[1];
+				} else if ($res[1]===true) {
+					return $node->operands[0];
+				}
+				break;
+        }
+		return false;
+	}
+	
     /**
     * Function converts operand{} quantificator to operand and operand? combination
     * @param node node with {}
     * @return node subtree with ?
     */
     protected function &convert_finite_quant($node) {
+		if ($node->rightborder - $node->leftborder > qtype_preg_dfa_node_finite_quant::MAX_SIZE) {
+			return $node;//TODO: increase finite quantificator performance for accepting normal size of quantificator, when will more time.
+		}
         if (!($node->leftborder==0 && $node->rightborder==1 || $node->leftborder==1 && $node->rightborder==1)) {
             $tmp = $node->operands[0];
             $subroot = new qtype_preg_node_concat;

@@ -36,6 +36,20 @@ class qtype_preg_token {
     }
 }
 
+class qtype_preg_optstack_item {
+    public $modifiers;
+    public $subpattnum;
+    public $subpattname;
+    public $parennum;
+
+    public function __construct($modifiers, $subpattnum, $subpattname, $parennum) {
+        $this->modifiers = $modifiers;
+        $this->subpattnum = $subpattnum;
+        $this->subpattname = $subpattname;
+        $this->parennum = $parennum;
+    }
+}
+
 %%
 %class qtype_preg_lexer
 %function nextToken
@@ -47,18 +61,13 @@ NOTSPECIALI = [^"\^-[]"]                                 // Special characters i
 MODIFIER    = [^"(|)<>#':=!PCR"0-9]                      // Excluding reserved (?... sequences, returning error if there is something weird.
 ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\backreference names.
 %init{
-    $this->matcher                   = null;
     $this->errors                    = array();
     $this->lastsubpatt               = 0;
     $this->maxsubpatt                = 0;
     $this->subpatternmap             = array();
     $this->backrefs                  = array();
     $this->optstack                  = array();
-    $this->optstack[0]               = new stdClass;
-    $this->optstack[0]->i            = false;
-    $this->optstack[0]->subpattnum   = -1;
-    $this->optstack[0]->subpattname  = null;
-    $this->optstack[0]->parennum     = -1;
+    $this->optstack[0]               = new qtype_preg_optstack_item(array('i' => false), -1, null, -1);
     $this->optcount                  = 1;
     $this->charset                   = null;
     $this->charsetcount              = 0;
@@ -90,15 +99,14 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     }
 %eof}
 %{
-    public $matcher;
-    public $handlingoptions;
-    protected $errors;
-    protected $lastsubpatt;
-    protected $maxsubpatt;
-    protected $subpatternmap;
-    protected $backrefs;
-    protected $optstack;
-    protected $optcount;
+    public $handlingoptions;                // Regex handling options set from the outside.
+    protected $errors;                      // Array of lexical errors found.
+    protected $lastsubpatt;                 // Number of the last lexed subpattern, used to deal with (?| ... ) constructions.
+    protected $maxsubpatt;                  // Max subpattern number.
+    protected $subpatternmap;               // Map of subpatterns name => number.
+    protected $backrefs;                    // Array of backreference leafs. Used ad the end of lexical analysis to check for backrefs to unexisting subpatterns.
+    protected $optstack;                    // Stack containing additional information about subpatterns (modifiers, current subpattern name, etc).
+    protected $optcount;                    // Number of items in the above stack.
     protected $charset;                     // An instance of qtype_preg_leaf_charset, used when in CHARSET state.
     protected $charsetcount;                // Number of characters in the charset excluding flags.
     protected $charsetset;                  // Characters of the charset.
@@ -296,13 +304,13 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
             for ($i = 0; $i < $set->length(); $i++) {
                 $modname = $set[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->$modname = true;
+                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = true;
                 }
             }
             for ($i = 0; $i < $unset->length(); $i++) {
                 $modname = $unset[$i];
                 if (qtype_poasquestion_string::strpos($allowed, $modname) !== false) {
-                    $this->optstack[$this->optcount - 1]->$modname = false;
+                    $this->optstack[$this->optcount - 1]->modifiers[$modname] = false;
                 }
             }
         }
@@ -635,7 +643,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
         $node = new qtype_preg_leaf_backref($name);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $this->backrefs[] = $node;
@@ -655,7 +663,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
 
         $node = new qtype_preg_leaf_backref($number);
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $this->backrefs[] = $node;
@@ -680,7 +688,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         $node = new qtype_preg_leaf_charset();
         $uitype = ($subtype === qtype_preg_charset_flag::SET) ? qtype_preg_userinscription::TYPE_GENERAL : qtype_preg_userinscription::TYPE_CHARSET_FLAG;
         $node->set_user_info($pos, $pos + $length - 1, array(new qtype_preg_userinscription($text, $uitype)));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         $node->subtype = $subtype;
@@ -703,7 +711,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     protected function form_recursion($text, $pos, $length, $number) {
         $node = new qtype_preg_leaf_recursion();
         $node->set_user_info($pos, $pos + $length - 1, new qtype_preg_userinscription($text));
-        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+        if (is_a($node, 'qtype_preg_leaf') && $this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
             $node->caseinsensitive = true;
         }
         if ($number[2] === 'R') {
@@ -1556,7 +1564,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
         }
     }
 }
-<CHARSET> \\0[0-7][0-7][0-7]? {
+<CHARSET> \\[0-7][0-7]?[0-7]? {
     $text = $this->yytext();
     $this->add_flag_to_charset($text, qtype_preg_charset_flag::SET, qtype_poasquestion_string::code2utf8(octdec(qtype_poasquestion_string::substr($text, 1))));
 }
@@ -1673,7 +1681,7 @@ ALNUM       = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subpattern\b
     if (count($this->charset->error) === 0) {
         $this->charset->error = null;
     }
-    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->i) {
+    if ($this->optcount > 0 && $this->optstack[$this->optcount - 1]->modifiers['i']) {
         $this->charset->caseinsensitive = true;
     }
     $res = new qtype_preg_token(qtype_preg_yyParser::PARSLEAF, $this->charset);

@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -38,6 +38,10 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
 
     public function hint_type() {
         return qtype_specific_hint::SINGLE_INSTANCE_HINT;
+    }
+
+    public function hint_description() {
+        return get_string('hintcolouredstring', 'qtype_preg');
     }
 
     /**
@@ -114,7 +118,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response
      */
-    public function render_hint($renderer, $response) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
@@ -147,6 +151,10 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
         return false;//Could do without response to hint first character.
     }
 
+    public function hint_description() {
+        return get_string('hintnextchar', 'qtype_preg');
+    }
+
     /**
      * Returns whether response allows for the hint to be done
      */
@@ -168,7 +176,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, $response) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         return $this->render_stringextension_hint($renderer, $response);
     }
 
@@ -205,6 +213,10 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
         return false;//Could do without response to hint first character.
     }
 
+    public function hint_description() {
+        return get_string('hintnextlexem', 'qtype_preg', $this->question->lexemusername);
+    }
+
     /**
      * Returns whether response allows for the hint to be done
      */
@@ -226,7 +238,7 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, $response) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options,$response = null) {
         return $this->render_stringextension_hint($renderer, $response);
     }
 
