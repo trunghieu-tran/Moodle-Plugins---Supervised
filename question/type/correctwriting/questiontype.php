@@ -188,6 +188,20 @@ class qtype_correctwriting extends qtype_shortanswer {
 
         return $result . $lang;
     }
+    /*
+     * Imports question from the Moodle XML format
+     * Updates langid according to found or inserted language,
+     * also sets a descriptions, according to new data for descriptions
+     */
+    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+        global $DB;
+        $qo = parent::import_from_xml($data, $question, $format, $extra);
+        // TODO:
+        // insert or update langid, due info in XML
+        // set lexeme descriptions arrays as  array of array of string,
+        // arranged in certified order
+        return $qo;
+    }
     /** Removes a symbols from tables and everything about question.
      * @param int $questionid the question being deleted.
      * @param int $contextid the context this question belongs to.
