@@ -89,7 +89,6 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     }
     // Appends a symbol string to a buffer
     private function append($sym) {
-        $this->advance_buffered_pos();
         $this->statestring->concatenate($sym);
     }
     // Returns buffer
@@ -216,10 +215,10 @@ function block_formal_langs_hex_to_decimal_char($matches) {
             $num_lines = count($lines);
             
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = strlen($lines[$num_lines -1]) - 1;
+            $end_col = strlen($lines[$num_lines -1]);
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + strlen($this->yytext()) - 1;
+            $end_col = $begin_col + strlen($this->yytext());
         }
         
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col);
@@ -238,6 +237,8 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     }
 
     private function return_buffered_pos() {
+        $this->endyyline = $this->yyline;
+        $this->endyycol = $this->yycol + textlib::strlen($this->yytext());
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'endyyline', 'endyycol');
     }
 
@@ -245,17 +246,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
     }
 
-    private function advance_buffered_pos() {
-        if(strpos($this->yytext(), '\n')) {
-            $lines = explode("\n", $this->yytext());
-            $num_lines = count($lines);
 
-            $this->endyyline = $this->endyyline + $num_lines - 1;
-            $this->endyycol = strlen($lines[$num_lines -1]) - 1;
-        } else {
-            $this->endyycol = $this->endyycol + strlen($this->yytext()) - 1;
-        }
-    }
 
     private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
         $pos = $this->return_error_token_pos();
@@ -286,7 +277,9 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 %eofval{
     if ($this->yy_lexical_state == self::SINGLELINE_COMMENT) {
         $this->yybegin(self::YYINITIAL);
-        return $this->create_token('singleline_comment', $this->buffer());
+        $pos = $this->return_pos_by_field('stateyyline', 'stateyycol', 'yyline', 'yycol');
+        $t = $this->create_token_with_position('singleline_comment', $this->statestring, $pos);
+        return $t;
     } else if ($this->yy_lexical_state == self::MULTILINE_COMMENT)  {
         return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
     } else if ($this->yy_lexical_state == self::STRING)  {
