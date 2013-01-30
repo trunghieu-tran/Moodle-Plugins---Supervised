@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -144,6 +144,16 @@ abstract class qtype_preg_nfa_operator extends qtype_preg_nfa_node {
             array_push($this->operands, $matcher->from_preg_node($operand));
         }
     }
+
+    public static function add_ending_eps_transition_if_needed(&$automaton, &$stack_item) {
+        if (count($stack_item['end']->outgoing_transitions()) > 0) {
+            $end = new qtype_preg_fa_state();
+            $automaton->add_state($end);
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $stack_item['end']->add_transition(new qtype_preg_nfa_transition($stack_item['end'], $epsleaf, $end));
+            $stack_item['end'] = $end;
+        }
+    }
 }
 
 /**
@@ -186,20 +196,8 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
         $first = array_pop($stack);
 
         // It is necessary to add eps-transitions to the end of each automaton if they represent quantifiers.
-        if (count($first['end']->outgoing_transitions()) > 0) {
-            $end = new qtype_preg_fa_state;
-            $automaton->add_state($end);
-            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $first['end']->add_transition(new qtype_preg_nfa_transition($first['end'], $epsleaf, $end));
-            $first['end'] = $end;
-        }
-        if (count($second['end']->outgoing_transitions()) > 0) {
-            $end = new qtype_preg_fa_state;
-            $automaton->add_state($end);
-            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-            $second['end']->add_transition(new qtype_preg_nfa_transition($second['end'], $epsleaf, $end));
-            $second['end'] = $end;
-        }
+        qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $first);
+        qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $second);
 
         // Now, merge start and end states.
         $automaton->update_state_references($second['start'], $first['start']);
@@ -240,8 +238,10 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         }
 
         // The body automaton can be skipped by an eps-transition.
+        qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
+        $automaton->set_end_state($body['end']);
         $stack[] = $body;
     }
 
@@ -312,8 +312,10 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         $body = array_pop($stack);
 
         // The body automaton can be skipped by an eps-transition.
+        qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $body['start']->add_transition(new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end']));
+        $automaton->set_end_state($body['end']);
         $stack[] = $body;
     }
 
@@ -332,10 +334,10 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         $borderstates = array();    // States to which separating eps-transitions will be added.
 
         // Linking automatons to the resulting one.
-        $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         for ($i = 0; $i < $rightborder; $i++) {
             $cur = array_pop($stack);
             if ($i >= $leftborder) {
+                qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $cur);
                 $borderstates[] = $cur['start'];
             }
             if ($res === null) {
@@ -352,6 +354,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
 
         // Adding eps-transitions after first m bodies.
         foreach ($borderstates as $state) {
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $state->add_transition(new qtype_preg_nfa_transition($state, $epsleaf, $res['end']));
         }
         $automaton->set_start_state($res['start']);

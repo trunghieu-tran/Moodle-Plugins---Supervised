@@ -28,8 +28,11 @@ require_once($CFG->dirroot . '/question/behaviour/adaptivehints/behaviour.php');
 class qbehaviour_adaptivehintsnopenalties extends qbehaviour_adaptivehints {
     const IS_ARCHETYPAL = false;
 
-    public function summarise_hint(question_attempt_step $step, $hintkey, $hintdescription) {
+    public function summarise_hint(question_attempt_step $step, $hintkey) {
         $response = $step->get_qt_data();
+        $hintkey = $this->adjust_hintkey($hintkey);
+        $hintobj = $this->question->hint_object($hintkey, $step->get_qt_data());
+        $hintdescription = $hintobj->hint_description();
         $a = new stdClass();
         $a->hint = $hintdescription;
         $a->response = $this->question->summarise_response($response);

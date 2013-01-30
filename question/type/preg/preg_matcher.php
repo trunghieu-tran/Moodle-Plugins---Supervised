@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -373,6 +373,8 @@ class qtype_preg_matching_results {
             $extendedstr = $this->extendedmatch->str();
             if ($this->extendedmatch->extensionstart < $extendedstr->length()) {
                 $extension = $extendedstr->substring($this->extendedmatch->extensionstart, $extendedstr->length() - $this->extendedmatch->extensionstart);
+            } else {
+                $extension = new qtype_poasquestion_string('');
             }
         }
         return $extension->string();
@@ -490,6 +492,10 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Set all string as incorrect if there were no matching
             if (!$this->matchresults->is_match()) {
                 $this->matchresults->invalidate_match();
+                //Fill extension start as start of the match in extended string if it was generated.
+                if (is_object($this->matchresults->extendedmatch)) {
+                    $this->matchresults->extendedmatch->extensionstart = $this->matchresults->extendedmatch->index_first[0];
+                }
             } else {
                 //Do some sanity checks and calculate necessary fields
                 $this->matchresults->validate();
