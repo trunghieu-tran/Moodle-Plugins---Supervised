@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Poasquestion question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Poasquestion question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines hint classes for the POAS abstract question type.
+ * This file contains hint definitions, that is used by different poas questions.
  *
  * Note: interfaces and classes there are intentionally left without qtype_poasquestion prefix as
  *  they are intended for more general Moodle use after hinting behaviours would be complete.
@@ -41,9 +41,9 @@ interface question_with_qtype_specific_hints {
     /**
      * Returns an array of available specific hint types depending on question settings
      *
-     * The keys are hint type indentifiers, unique for the qtype.
-     * The values are interface strings with the hint description (without "hint" word!)
-     * If a question allows for multiple instance choosen hints, it should return a separate key for each instance. That may depend on $response.
+     * The values are hint type indentifiers (hintkeys), unique for the qtype.
+     * For multiple instance sequential hints hintkeys should end with '#' character.
+     * For multiple instance choosen hints a separate key for each instance should be returned. That may depend on $response.
      */
     public function available_specific_hints($response = null);
 
@@ -82,17 +82,33 @@ abstract class qtype_specific_hint {
     /** @var object Question object, created this hint*/
     protected $question;
 
+    /** @var string Hint key for this hint, useful for choosen miltiple instance hints*/
+    protected $hintkey;
+
     /**
      * Returns one of hint type constants (single instance etc).
      */
     abstract public function hint_type();
 
     /**
-     * Constructs hint object, remember question to use
+     * Constructs hint object, remember question to use.
      */
-    public function __construct($question) {
+    public function __construct($question, $hintkey) {
         $this->question = $question;
+        $this->hintkey = $hintkey;
     }
+
+    /**
+     * Returns hint key, passed to the constructor.
+     */
+    public function hint_key() {
+        return $this->hintkey;
+    }
+
+    /**
+     * Returns hint description to show on the hint button etc.
+     */
+    abstract public function hint_description();
 
     /**
      * Is hint based on response or not?
@@ -102,7 +118,7 @@ abstract class qtype_specific_hint {
     abstract public function hint_response_based();
 
     /**
-     * Returns whether question and response allows for the hint to be done
+     * Returns whether question and response allows for the hint to be done.
      */
     abstract public function hint_available($response = null);
 
@@ -110,11 +126,12 @@ abstract class qtype_specific_hint {
      * Returns whether response is used to calculate penalty (cost) for the hint.
      */
     public function penalty_response_based() {
-        return false; // Most hint have fixed penalty (cost).
+        return false;//Most hint have fixed penalty (cost)
     }
 
     /**
-     * Returns penalty (cost) for using specific hint of given hint type (possibly for given response)
+     * Returns penalty (cost) for using specific hint of given hint type (possibly for given response).
+     *
      * Even if response is used to calculate penalty, hint object should still return an approximation
      * to show to the student if $response is null.
      */
@@ -129,5 +146,64 @@ abstract class qtype_specific_hint {
         //By default, hint button should be rendered by behaviour.
         return false;
     }
+
+    /**
+     * Renders hint information for given response using question renderer.
+     *
+     * Response may be omitted for non-response based hints.
+     * @param renderer question renderer which could be used to render things
+     */
+    abstract public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null);
 }
 
+/**
+ * Class for compatibility with Moodle teacher-defined text and other hints
+ *
+ * @copyright  2013 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
+
+    /** @var int A number of hint in question, getted from hintkey*/
+    protected $number;
+
+    public function hint_type() {
+        return qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT;
+    }
+
+    /**
+     * Constructs hint object, remember question to use.
+     */
+    public function __construct($question, $hintkey) {
+        $this->question = $question;
+        $this->hintkey = $hintkey;
+        //Hintkey is like <hintname>#<number>
+        $this->number = substr($hintkey, strpos($hintkey, '#') + 1);
+    }
+
+    public function hint_description() {
+        $number = '';
+        if (is_numeric($this->number)) {
+            $number = get_string ("No", 'qtype_poasquestion', $this->number + 1);
+        }
+        return get_string('teachertext', 'qtype_poasquestion', $number);
+    }
+
+     public function hint_response_based() {
+        return false;//Teacher-defined text hint has nothing to do with student's response.
+     }
+
+     public function hint_available($response = null) {
+        return is_numeric($this->number) && $this->number < count($this->question->hints);
+     }
+
+     public function penalty_for_specific_hint($response = null) {
+        return $this->question->penalty;
+     }
+
+     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+        $hint = $this->question->hints[$this->number];
+        $hint->adjust_display_options($options);//For the hints like question_hint_with_parts.
+        return $this->question->format_hint($hint, $qa);
+     }
+}

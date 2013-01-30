@@ -1,18 +1,18 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Preg is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Preg.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Version information for the Preg question type.
@@ -25,15 +25,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version  = 2012090300;
+$plugin->version  = 2013011800;
 $plugin->requires = 2012062501;
-$plugin->release = 'Preg 2.3';
-$plugin->maturity = MATURITY_BETA;
+$plugin->release = 'Preg 2.3.1';
+$plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
-    'qbehaviour_adaptivehints' => 2011111902,
-    'qbehaviour_adaptivehintsnopenalties' => 2011111902,
-    'qtype_poasquestion' => 2012060900,
+    'qbehaviour_adaptivehints' => 2013011800,
+    'qbehaviour_adaptivehintsnopenalties' => 2013011800,
+    'qtype_poasquestion' => 2013011800,
     'block_formal_langs' => 2012021400
 );
