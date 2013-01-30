@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -47,13 +47,16 @@ class qtype_preg_error {
         }
     }
 
-     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2) {
+     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2, $preservemsg = false) {
+        if (!$preservemsg) {
+            $errormsg = htmlspecialchars($errormsg);
+        }
         $this->index_first = $index_first;
         $this->index_last = $index_last;
         if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . htmlspecialchars($errormsg);
+            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
         } else {
-            $this->errormsg = htmlspecialchars($errormsg);
+            $this->errormsg = $errormsg;
         }
      }
 }
@@ -108,6 +111,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
+        global $CFG;
         $a = new stdClass;
         if ($indexes['start'] == -1 && $indexes['end'] == -2) {
             $a->indfirst = 0;
@@ -119,6 +123,7 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a->engine = get_string($matcher->name(), 'qtype_preg');
         $this->index_first = $a->indfirst;
         $this->index_last = $a->indlast;
+        $a->link = $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettingpreg';
         $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('too_large_fa', 'qtype_preg', $a);
     }
 }

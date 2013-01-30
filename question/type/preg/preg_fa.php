@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -501,12 +501,13 @@ abstract class qtype_preg_finite_automaton {
                             $lab = $lab . "$num,";
                         }
                     }
-
+                    $lab = substr($lab, 0, strlen($lab) - 1);
+                    $lab = '"' . str_replace('"', '\"', $lab) . '"';
                     // Dummy transitions are displayed dotted.
                     if ($curtransition->consumechars) {
-                        $result .= "$index1->$index2" . "[label = \"$lab\"];\n";
+                        $result .= "$index1->$index2" . "[label = $lab];\n";
                     } else {
-                        $result .= "$index1->$index2" . "[label = \"$lab\", style = dotted];\n";
+                        $result .= "$index1->$index2" . "[label = $lab, style = dotted];\n";
                     }
                 }
             }

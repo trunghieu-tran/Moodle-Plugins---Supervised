@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -69,29 +69,31 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             $currentanswer = '';
         }
 
-        //Determine requested hint(s)
+        //Render hints
+        $coloredhintrendered = false;//Is hint showing colored string rendered?
+        $behaviour = $qa->get_behaviour();
         $hintmessage = '';
-        $hintkeys = array();
-        $hints = $question->available_specific_hints();
-        foreach ($hints as $key => $value) {
-            if ($qa->get_last_step()->has_behaviour_var('_render_'.$key)) {
-                $hintkeys[] = $key;
+        $br =  html_writer::empty_tag('br');
+        if (is_a($behaviour, 'behaviour_with_hints')) {
+            $hints = $question->available_specific_hints(array('answer' => $currentanswer));
+            $hints = $behaviour->adjust_hints($hints);
+            foreach ($hints as $hintkey) {
+                if ($qa->get_last_step()->has_behaviour_var('_render_'.$hintkey)) {
+                    $hintobj = $question->hint_object($hintkey);
+                    $hintmessage .= $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer)) . $br;
+                    if ($hintkey == 'hintnextchar' || $hintkey == 'hintnextlexem') {
+                        $coloredhintrendered = true;
+                    }
+                }
             }
         }
 
-        //Render hints
-        if (!empty($hintkeys)) {//Hint requested.
-            foreach ($hintkeys as $hintkey) {
-                $hintobj = $question->hint_object($hintkey);
-                $hintmessage .= $hintobj->render_hint($this, array('answer' => $currentanswer));
-                $hintmessage .= html_writer::empty_tag('br');
-            }
-        } elseif ($options->feedback == question_display_options::VISIBLE) {
-            //Specific feedback is possible, render colored string - TODO - decide when to render colored string.
-            $hintobj =  $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, array('answer' => $currentanswer));
+        //Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
+        if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
+            $hintobj = $question->hint_object('hintmatchingpart');
+            $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
             if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
-                $hintmessage .= html_writer::empty_tag('br');
+                $hintmessage .= $br;
             }
         }
 
