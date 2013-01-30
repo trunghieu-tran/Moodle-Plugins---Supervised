@@ -153,6 +153,41 @@ class qtype_correctwriting extends qtype_shortanswer {
         return $result;
     }
 
+    public function export_to_xml($question, qformat_xml $format, $extra=null) {
+        global $DB;
+
+        $result = parent::export_to_xml($question, $format, $extra);
+        $langrecord = $DB->get_record('block_formal_langs',array('id' => $question->options->langid));
+        $langfields = array('ui_name', 'description', 'name', 'scanrules', 'parserules', 'version', 'visible');
+        $lang = '    <language>' . PHP_EOL;
+        foreach ($langfields as $field) {
+            $exportedvalue = $format->xml_escape($langrecord->$field);
+            $lang .= '        <'  . $field . '>' . $exportedvalue . '</' . $field . '>' . PHP_EOL;
+        }
+        $lang .= '    </language>' . PHP_EOL;
+        $records = $DB->get_recordset_sql('
+            SELECT * FROM {block_formal_langs_node_dscr}
+            WHERE tablename = \'question_answers\' AND tableid IN (
+              SELECT id FROM {question_answers} WHERE question = :question
+            );
+        ', array('question' => $question->id));
+        $descrfields = array('tableid', 'number', 'description');
+        $lang .= '    <descriptions>' . PHP_EOL;
+        foreach($records as $record) {
+            $lang .= '        <token_description>' . PHP_EOL;
+            foreach ($descrfields as $field) {
+                if ($field == 'description') {
+                    $record->$field = str_replace(array("\n", "\r"),array('', ''), $record->$field);
+                }
+                $exportedvalue = $format->xml_escape($record->$field);
+                $lang .= '            <'  . $field . '>' . $exportedvalue . '</' . $field . '>' . PHP_EOL;
+            }
+            $lang .= '        </token_description>' . PHP_EOL;
+        }
+        $lang .= '    </descriptions>' . PHP_EOL;
+
+        return $result . $lang;
+    }
     /** Removes a symbols from tables and everything about question.
      * @param int $questionid the question being deleted.
      * @param int $contextid the context this question belongs to.
