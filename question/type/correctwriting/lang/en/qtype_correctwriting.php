@@ -47,6 +47,7 @@ $string['pluginnameadding'] = 'Adding a correct writing question';
 $string['pluginnameediting'] = 'Editing a correct writing question';
 $string['pluginnamesummary'] = 'Question type that can automatically find mistakes in the string response and grade it with penalties. It currently supports token sequence errors: finding misplaced, absent and extra tokens.';
 $string['questioneditingheading'] = 'Question editing settings';
+$string['tokens'] = 'Tokens';
 $string['whatis'] = 'what is {$a}';
 $string['whatishint'] = 'the {$a->tokendescr} is "{$a->tokenvalue}"';
 $string['whatishintpenalty'] = 'Penalty for "what is" hint';

@@ -177,7 +177,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
-        $repeated[] = $mform->createElement('static', 'descriptionslabel', '', get_string('lexemedescriptions', 'qtype_correctwriting'));
+        $repeated[] = $mform->createElement('static', 'descriptionslabel', get_string('tokens', 'qtype_correctwriting'), get_string('lexemedescriptions', 'qtype_correctwriting'));
         $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                             get_string('lexemedescriptions', 'qtype_correctwriting'),
                                             array('rows' => 2, 'cols' => 80));
