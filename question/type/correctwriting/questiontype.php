@@ -165,24 +165,20 @@ class qtype_correctwriting extends qtype_shortanswer {
             $lang .= '        <'  . $field . '>' . $exportedvalue . '</' . $field . '>' . PHP_EOL;
         }
         $lang .= '    </language>' . PHP_EOL;
-        $records = $DB->get_recordset_sql('
-            SELECT * FROM {block_formal_langs_node_dscr}
-            WHERE tablename = \'question_answers\' AND tableid IN (
-              SELECT id FROM {question_answers} WHERE question = :question
-            );
-        ', array('question' => $question->id));
-        $descrfields = array('tableid', 'number', 'description');
+
         $lang .= '    <descriptions>' . PHP_EOL;
-        foreach($records as $record) {
-            $lang .= '        <token_description>' . PHP_EOL;
-            foreach ($descrfields as $field) {
-                if ($field == 'description') {
-                    $record->$field = str_replace(array("\n", "\r"),array('', ''), $record->$field);
+
+        $langobj = block_formal_langs::lang_object($question->options->langid);
+        $string = $langobj->create_from_db('question_answers', 0);
+        $descriptions = $string->get_descriptions_as_array('question_answers', array_keys($question->options->answers));
+        foreach ($question->options->answers as $key => $answerdata) {
+                $answerdescriptions = $descriptions[$key];
+                $lang .= '        <answer_description>' . PHP_EOL;
+                foreach($answerdescriptions as $description) {
+                    $value = $format->xml_escape(str_replace(array("\n", "\r"),array('', ''), $description));
+                    $lang .= '            <description>'. $value .'</description>' . PHP_EOL;
                 }
-                $exportedvalue = $format->xml_escape($record->$field);
-                $lang .= '            <'  . $field . '>' . $exportedvalue . '</' . $field . '>' . PHP_EOL;
-            }
-            $lang .= '        </token_description>' . PHP_EOL;
+                $lang .= '        </answer_description>' . PHP_EOL;
         }
         $lang .= '    </descriptions>' . PHP_EOL;
 
@@ -194,12 +190,47 @@ class qtype_correctwriting extends qtype_shortanswer {
      * also sets a descriptions, according to new data for descriptions
      */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
-        global $DB;
         $qo = parent::import_from_xml($data, $question, $format, $extra);
-        // TODO:
+        if ($qo == false) {
+            return $qo;
+        }
+        $question_type = $data['@']['type'];
+        if ($question_type != $this->name()) {
+            return false;
+        }
+        $language = $format->getpath($data, array('#', 'language', 0, '#'), '');
+
+        $languagerecord = array();
+        foreach($language as $key => $value) {
+            if (is_numeric($key) == false) {
+                $languagerecord[$key]  = $value[0]['#'];
+            }
+        }
+
+        $answerdescriptions = $format->getpath($data, array('#', 'descriptions', 0, '#', 'answer_description'), '');
+        $lexemedescriptions = array();
+        foreach ($answerdescriptions as $answerdescription) {
+            if (count($answerdescription)) {
+                $descrarray = array();
+                $tokendescriptions  = $format->getpath($answerdescription, array('#', 'description'), '');
+                foreach($tokendescriptions as $description) {
+                    $descrarray[] = $description['#'];
+                }
+                if (count($descrarray) != 0) {
+                    $stringdescrs = implode(PHP_EOL, $descrarray);
+                } else {
+                    $stringdescrs = '';
+                }
+                $lexemedescriptions[] = $stringdescrs;
+            }
+        }
+
+
         // insert or update langid, due info in XML
+        $qo->langid = block_formal_langs::find_or_insert_language($languagerecord);
         // set lexeme descriptions arrays as  array of array of string,
         // arranged in certified order
+        $qo->lexemedescriptions = $lexemedescriptions;
         return $qo;
     }
     /** Removes a symbols from tables and everything about question.
