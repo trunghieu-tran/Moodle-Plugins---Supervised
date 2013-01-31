@@ -1180,6 +1180,31 @@ class poasassignment_model {
         $rec->id = $DB->insert_record('poasassignment_assignee', $rec);
         return $rec;
     }
+    public function evaluate_attempt($attemptid) {
+        global $DB;
+        // Get graders list
+        $usedgraders = $DB->get_records('poasassignment_used_graders',
+                                        array('poasassignmentid' => $this->poasassignment->id));
+        if(count($usedgraders) == 0) {
+            return;
+        }
+        $graderids = array();
+        foreach ($usedgraders as $usedgrader) {
+            $graderids[] = $usedgrader->graderid;
+        }
+        $inorequal = $DB->get_in_or_equal($graderids);
+        $sql = "SELECT * FROM {poasassignment_graders} WHERE id" . $inorequal[0]. "";
+        $graderrecords = $DB->get_records_sql($sql, $inorequal[1]);
+
+        // Call graders to evaluate attempt $attemptid
+        foreach ($graderrecords as $graderrecord) {
+            require_once($graderrecord->path);
+            $gradername = $graderrecord->name;
+            $grader = new $gradername;
+            $grader->evaluate_attempt($attemptid);
+        }
+
+    }
     // Runs after adding submission. Calls all graders, used in module.
     public function test_attempt($attemptid) {
         //echo 'testing';
@@ -1559,8 +1584,8 @@ class poasassignment_model {
     }
     function trigger_poasassignment_event($mode,$assigneeid) {
         $eventdata = new stdClass();
-        $eventdata->student=$assigneeid;
-        $eventdate->poasassignmentid=$this->poasassignment->id;
+        $eventdata->student = $assigneeid;
+        $eventdata->poasassignmentid = $this->poasassignment->id;
         if ($mode==TASK_RECIEVED) {
             events_trigger('poasassignment_task_recieved', $eventdata);
         }
@@ -2448,5 +2473,36 @@ class poasassignment_model {
             return $result;
         else
             return false;
+    }
+
+    /**
+     * This function adds plugin pages to the navigation menu
+     *
+     * @static
+     * @param string $subtype - The type of plugin (submission or feedback)
+     * @param part_of_admin_tree $admin - The handle to the admin menu
+     * @param admin_settingpage $settings - The handle to current node in the navigation tree
+     * @param stdClass $module - The handle to the current module
+     * @return None
+     */
+    public static function add_admin_plugin_settings($subtype, part_of_admin_tree $admin, admin_settingpage $settings, stdClass $module) {
+        global $CFG;
+
+        $plugins = get_plugin_list_with_file($subtype, 'settings.php', false);
+        $pluginsbyname = array();
+        foreach ($plugins as $plugin => $plugindir) {
+            $pluginname = get_string('pluginname', $subtype . '_'.$plugin);
+            $pluginsbyname[$pluginname] = $plugin;
+        }
+        ksort($pluginsbyname);
+        foreach ($pluginsbyname as $pluginname => $plugin) {
+            $settings = new admin_settingpage($subtype . '_'.$plugin,
+                $pluginname, 'moodle/site:config', !$module->visible);
+            if ($admin->fulltree) {
+                include($plugins[$plugin]);
+            }
+            $admin->add($subtype . 'plugins', $settings);
+        }
+
     }
 }

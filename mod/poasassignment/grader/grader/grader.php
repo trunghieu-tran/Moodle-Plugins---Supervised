@@ -79,6 +79,9 @@ abstract class grader {
     
     public function test_attempt($attemptid) {
     }
+
+    public function evaluate_attempt($attemptid) {
+    }
     
     /* private static $settings = array('feedback' => POASASSIGNMENT_GRADER_SHOW_TESTING_PROGRAM_FEEDBACK,
                                      'testinputdata' => POASASSIGNMENT_GRADER_SHOW_TEST_INPUT_DATA,

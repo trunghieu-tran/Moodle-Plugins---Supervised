@@ -60,7 +60,7 @@ class submission_page extends abstract_page {
                 //noitify teacher if needed
                 $model->email_teachers($model->assignee);
                 
-                $model->test_attempt($attemptid);
+                $model->evaluate_attempt($attemptid);
                 
                 redirect(new moodle_url('view.php', 
                                         array('id'=>$model->get_cm()->id, 'page'=>'view')), 
