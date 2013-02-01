@@ -73,7 +73,7 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         case 'leaf_meta':
         case 'leaf_assert':
         case 'leaf_backref':
-        case 'leaf_recursion:':
+        case 'leaf_recursion':
             return 'qtype_preg_author_tool_leaf';
         }
 
@@ -287,11 +287,11 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
 
             $tmpdnode = $graph->nodes[$i];
 
-            if ($tmpdnode->color == 'black' && $tmpdnode->shape == 'ellipse' && $tmpdnode->fill == '') {
+            if ($tmpdnode->color == 'black' && $tmpdnode->shape == 'ellipse') {
                 $neighbor = qtype_preg_author_tool_explain_graph::find_neighbor_dst($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
-                if ($neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $graph && $neighbor->fill == '') {
+                if ($neighbor->color == 'black' && $neighbor->shape == 'ellipse' && $neighbor->owner === $graph && $neighbor->fill == $tmpdnode->fill) {
                     //create the new unioned node
-                    $tmp = new qtype_preg_author_tool_explain_graph_node(array($tmpdnode->label[0] . $neighbor->label[0]), $neighbor->shape, $neighbor->color, $graph, $tmpdnode->id);
+                    $tmp = new qtype_preg_author_tool_explain_graph_node(array($tmpdnode->label[0] . $neighbor->label[0]), $neighbor->shape, $neighbor->color, $graph, $tmpdnode->id, $tmpdnode->fill);
 
                     //find link between left neighbor and current node, then change destination to new node
                     $tmpneighbor = qtype_preg_author_tool_explain_graph::find_neighbor_src($tmpdnode, qtype_preg_author_tool_explain_graph::$gmain);
@@ -508,18 +508,18 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
     public static function cmp_nodes(&$n1, &$n2) {
         if ($n1->color != $n2->color) {
             print(chr(10));
-            print('Colors of nodes failed!');
+            print('Colors of nodes failed! ' . $n1->color . ' != ' . $n2->color);
             print(chr(10));
             return false;
         }
         if ($n1->label != $n2->label) {
             print(chr(10));
-            print('Labels of nodes failed!');
+            print('Labels of nodes failed! '  . $n1->label . ' != ' . $n2->label);
             return false;
         }
         if ($n1->shape != $n2->shape) {
             print(chr(10));
-            print('Shapes of nodes failed!');
+            print('Shapes of nodes failed! '  . $n1->shape . ' != ' . $n2->shape);
             return false;
         }
 

@@ -78,21 +78,34 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     return array(get_string('explain_unknow_meta', 'qtype_preg'));
 
             case qtype_preg_node::TYPE_LEAF_ASSERT:
-                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
                     return array(get_string('description_circumflex', 'qtype_preg'));
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
                     return array(get_string('description_dollar', 'qtype_preg'));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
                     return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+                    return array(get_string('description_esc_a', 'qtype_preg'));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
+                    return array(get_string('description_esc_g', 'qtype_preg'));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
+                    return array(get_string('description_esc_z', 'qtype_preg'));
                 else
                     return array(get_string('explain_unknow_assert', 'qtype_preg'));
 
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-                return array(get_string('explain_backref', 'qtype_preg') . $this->pregnode->number);
+                if (is_integer($this->pregnode->number))
+                    return array(str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')));
+                else
+                    return array(str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg')));
 
             case qtype_preg_node::TYPE_LEAF_RECURSION:
-                return array(get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : ''));
-
+                if ($this->pregnode->number == 0)
+                    return array(get_string('description_recursion_all', 'qtype_preg'));
+                else if (is_integer($this->pregnode->number))
+                    return array(str_replace('%number', $this->pregnode->number, get_string('description_recursion', 'qtype_preg')));
+                else
+                    return array(str_replace('%name', $this->pregnode->number, get_string('description_recursion_name', 'qtype_preg')));
             default:
                 return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
