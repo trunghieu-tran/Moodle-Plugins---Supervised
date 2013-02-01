@@ -65,7 +65,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      */
     public $langid = 0;
     /** Language object, used in language
-     *  @var blocks_formal_langs_abstract_language
+     *  @var block_formal_langs_abstract_language
      */
     public $usedlanguage = null;
     //Other necessary question data like penalty for each type of mistakes etc
@@ -191,11 +191,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         return $this->usedlanguage;
     }
 
-    /** Flushes cached data. TODO: Remove
-      */
-    public function invalidate_cache() {
-        $this->gradecachevalid = false;
-    }
+
 
     /**  Performs grading response, using lexical analyzer.
          @param array $response student response  as array ( 'answer' => string of student response )
