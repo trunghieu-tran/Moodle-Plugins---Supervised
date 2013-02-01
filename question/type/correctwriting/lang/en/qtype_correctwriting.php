@@ -57,5 +57,7 @@ $string['wheretxtbetween'] = 'the {$a->token} could be placed between {$a->after
 $string['wheretxthint'] = 'where {$a} should be';
 $string['wheretxthintpenalty'] = 'Penalty for "where" text hint';
 $string['wheretxthintpenalty_help'] = '"Where" text hint shows student a text message about a place (between what tokens?) should be placed a missing or misplaced token. Token descriptions are used when possible, token value otherwise. Setting penalty above 1 will disable the hint.';
+$string['wherepichintpenalty'] = 'Penalty for "where" picture hint';
+$string['wherepichintpenalty_help'] = '"Where" picture hint shows student a picture about a place (between what tokens?) should be placed a missing or misplaced token. Token descriptions are used when possible, token value otherwise. Setting penalty above 1 will disable the hint.';
 $string['writelessdescriptions']  = 'Supplied amount of descriptions are more than amount of tokens';
 $string['writemoredescriptions']  = 'Supplied amount of descriptions are less than amount of tokens';

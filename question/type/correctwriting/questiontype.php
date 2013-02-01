@@ -70,6 +70,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result[] = 'wheretxthintpenalty';
         //Absent token hints penalty factor
         $result[] = 'absenthintpenaltyfactor';
+        //Penalty for "where" picture hint.
+        $result[] = 'wherepichintpenalty';
 
         return $result;
     }
