@@ -307,7 +307,7 @@ class  qtype_correctwriting_sequence_analyzer {
      * Creates a new mistake, that represents case, when one lexeme moved to other position
      * @param int $answerindex   index of lexeme in answer
      * @param int $responseindex index of lexeme in response
-     * @return object a mistake
+     * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_moved_mistake($answerindex,$responseindex) {
         return new qtype_correctwriting_lexeme_moved_mistake($this->language, $this->answer,
@@ -318,7 +318,7 @@ class  qtype_correctwriting_sequence_analyzer {
     /**
      * Creates a new mistake, that represents case, when odd lexeme is insert to index
      * @param int $responseindex index of lexeme in response
-     * @return object a mistake
+     * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_added_mistake($responseindex) {
         return new qtype_correctwriting_lexeme_added_mistake($this->language,
@@ -329,7 +329,7 @@ class  qtype_correctwriting_sequence_analyzer {
     /**
      * Creates a new mistake, that represents case, when lexeme is skipped
      * @param int $answerindex   index of lexeme in answer
-     * @return object a mistake
+     * @return qtype_correctwriting_lexeme_moved_mistake a mistake
      */
     private function create_absent_mistake($answerindex) {
         return new qtype_correctwriting_lexeme_absent_mistake($this->language,
@@ -396,11 +396,13 @@ class  qtype_correctwriting_sequence_analyzer {
                 // Determine type of mistake (moved or removed)
                 if ($ismoved) {
                     $mistake = $this->create_moved_mistake($i, $movedpos);
+                    $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->movedweight;
                     $result[] = $mistake;
                     $counts->moved  = $counts->moved + 1;
                 } else {
                     $mistake = $this->create_absent_mistake($i);
+                    $mistake->set_lcs($lcs);
                     $mistake->weight = $weights->absentweight;
                     $result[] = $mistake;
                     $counts->absent = $counts->absent + 1;
@@ -413,6 +415,7 @@ class  qtype_correctwriting_sequence_analyzer {
             if ($responseused[$i] == false) {
                 $mistake = $this->create_added_mistake($i);
                 $result[] = $mistake;
+                $mistake->set_lcs($lcs);
                 $mistake->weight = $weights->addedweight;
                 $counts->added = $counts->added + 1;
             }

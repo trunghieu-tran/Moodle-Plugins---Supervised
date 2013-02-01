@@ -180,3 +180,66 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
         return $hinttext;
     }
 }
+
+
+/**
+ * "Where picture" text hint shows how a token should be placed.
+ *
+ * @copyright  2013 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
+
+    //@var mistake, with which this hint is associated
+    protected $mistake;
+    //@var token(s) descriptions for the hint or value if no description available
+    protected $token = '';
+
+    public function hint_type() {
+        return qtype_specific_hint::CHOOSEN_MULTIPLE_INSTANCE_HINT;
+    }
+
+    /**
+     * Constructs hint object, remember question to use.
+     */
+    public function __construct($question, $hintkey, $mistake) {
+        $this->question = $question;
+        $this->hintkey = $hintkey;
+        $this->mistake = $mistake;
+        if ($mistake !== null) {
+            $this->token = $this->mistake->token_descr_or_value($this->mistake->answermistaken[0]);
+        }
+    }
+
+    public function hint_description() {
+        return get_string('wherepichint', 'qtype_correctwriting', $this->token);
+    }
+
+    //"Where" hint is obviously response based, since it used to better understand mistake message.
+    public function hint_response_based() {
+        return true;
+    }
+
+    /**
+     * The hint is disabled when penalty is set above 1.
+     * Mistake === null if attempt to create hint was unsuccessfull
+     */
+    public function hint_available($response = null) {
+        return $this->question->wherepichintpenalty <= 1.0 && $this->mistake !== null;
+    }
+
+    public function penalty_for_specific_hint($response = null) {
+        return $this->question->wherepichintpenalty;
+    }
+
+    //Buttons are rendered by the question to place them in specific feedback near relevant mistake message.
+    public function button_rendered_by_question() {
+        return true;
+    }
+
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+        $hinttext = 'Successfuly rendered hint for <pre> '. var_export($this->mistake, true)  . '</pre>!';
+
+        return $hinttext;
+    }
+}
