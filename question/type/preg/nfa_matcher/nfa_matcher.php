@@ -50,6 +50,20 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->set_source_info($sourceobj->str, $sourceobj->maxsubpatt, $sourceobj->subpatternmap);
     }
 
+    /**
+     * Resets the given subpattern to no match. In PCRE mode also resets all inner subpatterns.
+     */
+    public function reset_subpattern($number, $nested, $mode = qtype_preg_handling_options::MODE_PCRE) {
+        $numbers = array($number);
+        if ($mode == qtype_preg_handling_options::MODE_PCRE) {
+            $numbers = array_merge($numbers, $nested);
+        }
+        foreach ($numbers as $num) {
+            $this->index_first_new[$num] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->length_new[$num] = qtype_preg_matching_results::NO_MATCH_FOUND;
+        }
+    }
+
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
         $parentresult = parent::worse_than($other, $orequal, $longestmatch, $areequal);
         if ($areequal === false) {
@@ -168,10 +182,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $subpatt_end[] = ($value - 1) / 2;
             }
         }
+        // Reset all found subpatterns to no match.
+        foreach ($subpatt_start as $number) {
+            $newstate->reset_subpattern($number, $this->get_nested_subpatterns($number), $this->options->mode);
+        }
+
         // Set start indexes of subpatterns.
         foreach ($subpatt_start as $number) {
             $newstate->index_first_new[$number] = $startpos + $prevstate->length[0];
-            $newstate->length_new[$number] = qtype_preg_matching_results::NO_MATCH_FOUND;
         }
         // Set end indexes of subpatterns.
         foreach ($subpatt_end as $number) {
