@@ -44,6 +44,7 @@ $string['pluginname_link'] = 'question/type/correctwriting';
 $string['pluginnameadding'] = 'Добавление вопроса типа "Пишем правильно"';
 $string['pluginnameediting'] = 'Редактирование вопроса типа "Пишем правильно"';
 $string['pluginnamesummary'] = 'Тип вопроса, который умеет находить ошибки в ответе студента и оценивать его соответственно. В настоящее время он может определять отсутствующие, перемещенные и лишние лексемы.';
+$string['tokens'] = 'Лексемы';
 $string['whatis'] = 'что такое {$a}';
 $string['whatishint'] = '{$a->tokendescr} в данном случае "{$a->tokenvalue}"';
 $string['whatishintpenalty'] = 'Штраф за подсказу "что такое"';

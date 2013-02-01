@@ -154,6 +154,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         $element->setRows(count($textdata));
                     } else {//No need to enter token descriptions.
                         $mform->removeElement('lexemedescriptions[' . $key . ']');
+                        $mform->removeElement('descriptionslabel[' . $key . ']');
                         $mform->addElement('hidden', 'lexemedescriptions[' . $key . ']', '');//Adding hidden element with empty string to not confuse save_question_options.
                     }
                 }
@@ -165,6 +166,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         for ($i = 0; $i < $answercount; $i++) {
             if (!array_key_exists('answer', $data) || !array_key_exists($i, $data['answer'])) {//This answer is empty and was not processed by previous loop.
                 $mform->removeElement('lexemedescriptions[' . $i . ']');
+                $mform->removeElement('descriptionslabel[' . $i . ']');
                 $mform->addElement('hidden', 'lexemedescriptions[' . $i . ']', '');
             }
         }
@@ -177,6 +179,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         $repeated = parent::get_per_answer_fields($mform,$label,$gradeoptions,$repeatedoptions,$answersoption);
 
+        $repeated[] = $mform->createElement('static', 'descriptionslabel', get_string('tokens', 'qtype_correctwriting'), get_string('lexemedescriptions', 'qtype_correctwriting'));
         $repeated[] = $mform->createElement('textarea', 'lexemedescriptions',
                                             get_string('lexemedescriptions', 'qtype_correctwriting'),
                                             array('rows' => 2, 'cols' => 80));
@@ -266,14 +269,8 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         }
 
         if ($this->secondtimeform) {//Second time form is a unique case: first appearance of token descriptions before user.
-            // We place it here, because it will look nicer and won't shift any of strings
-            // in lexeme descriptions field
             $mesg = get_string('enterlexemedescriptions', 'qtype_correctwriting');
-            if (array_key_exists('answer[0]', $errors) != 0 ) {
-                $errors['answer[0]'] .= $br . $mesg;
-            }  else {
-                $errors['answer[0]'] = $mesg;
-            }
+            $errors['descriptionslabel[0]'] = $mesg;
         } else {//More than second time form, so check descriptions count.
             $fractions = $data['fraction'];
             foreach($data['answer'] as $key => $value) {
