@@ -55,7 +55,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                             'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true),      //Max mistake percentage
                             'whatishintpenalty' => array('default' => 1.1, 'advanced' => false),        //"What is" hint penalty
                             'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false),      //"Where" text hint penalty
-                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true));  //Absent token mistake hint penalty factor
+                            'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true),   //Absent token mistake hint penalty factor
+                            'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false)       //"Where" picture hint penalty
+                            );
 
     /**  Fills an inner definition of form fields
          @param object mform form data

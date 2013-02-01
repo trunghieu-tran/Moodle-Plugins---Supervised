@@ -70,6 +70,8 @@ class qtype_correctwriting extends qtype_shortanswer {
         $result[] = 'wheretxthintpenalty';
         //Absent token hints penalty factor
         $result[] = 'absenthintpenaltyfactor';
+        //Penalty for "where" picture hint.
+        $result[] = 'wherepichintpenalty';
 
         return $result;
     }
@@ -153,6 +155,86 @@ class qtype_correctwriting extends qtype_shortanswer {
         return $result;
     }
 
+    public function export_to_xml($question, qformat_xml $format, $extra=null) {
+        global $DB;
+
+        $result = parent::export_to_xml($question, $format, $extra);
+        $langrecord = $DB->get_record('block_formal_langs',array('id' => $question->options->langid));
+        $langfields = array('ui_name', 'description', 'name', 'scanrules', 'parserules', 'version', 'visible');
+        $lang = '    <language>' . PHP_EOL;
+        foreach ($langfields as $field) {
+            $exportedvalue = $format->xml_escape($langrecord->$field);
+            $lang .= '        <'  . $field . '>' . $exportedvalue . '</' . $field . '>' . PHP_EOL;
+        }
+        $lang .= '    </language>' . PHP_EOL;
+
+        $lang .= '    <descriptions>' . PHP_EOL;
+
+        $langobj = block_formal_langs::lang_object($question->options->langid);
+        $string = $langobj->create_from_db('question_answers', 0);
+        $descriptions = $string->get_descriptions_as_array('question_answers', array_keys($question->options->answers));
+        foreach ($question->options->answers as $key => $answerdata) {
+                $answerdescriptions = $descriptions[$key];
+                $lang .= '        <answer_description>' . PHP_EOL;
+                foreach($answerdescriptions as $description) {
+                    $value = $format->xml_escape(str_replace(array("\n", "\r"),array('', ''), $description));
+                    $lang .= '            <description>'. $value .'</description>' . PHP_EOL;
+                }
+                $lang .= '        </answer_description>' . PHP_EOL;
+        }
+        $lang .= '    </descriptions>' . PHP_EOL;
+
+        return $result . $lang;
+    }
+    /*
+     * Imports question from the Moodle XML format
+     * Updates langid according to found or inserted language,
+     * also sets a descriptions, according to new data for descriptions
+     */
+    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+        $qo = parent::import_from_xml($data, $question, $format, $extra);
+        if ($qo == false) {
+            return $qo;
+        }
+        $question_type = $data['@']['type'];
+        if ($question_type != $this->name()) {
+            return false;
+        }
+        $language = $format->getpath($data, array('#', 'language', 0, '#'), '');
+
+        $languagerecord = array();
+        foreach($language as $key => $value) {
+            if (is_numeric($key) == false) {
+                $languagerecord[$key]  = $value[0]['#'];
+            }
+        }
+
+        $answerdescriptions = $format->getpath($data, array('#', 'descriptions', 0, '#', 'answer_description'), '');
+        $lexemedescriptions = array();
+        foreach ($answerdescriptions as $answerdescription) {
+            if (count($answerdescription)) {
+                $descrarray = array();
+                $tokendescriptions  = $format->getpath($answerdescription, array('#', 'description'), '');
+                foreach($tokendescriptions as $description) {
+                    $descrarray[] = $description['#'];
+                }
+                if (count($descrarray) != 0) {
+                    $stringdescrs = implode(PHP_EOL, $descrarray);
+                } else {
+                    $stringdescrs = '';
+                }
+                $lexemedescriptions[] = $stringdescrs;
+            }
+        }
+
+
+        // insert or update langid, due info in XML
+        $qo->langid = block_formal_langs::find_or_insert_language($languagerecord);
+        // set lexeme descriptions arrays as  array of array of string,
+        // arranged in certified order
+        $qo->lexemedescriptions = $lexemedescriptions;
+        return $qo;
+    }
     /** Removes a symbols from tables and everything about question.
      * @param int $questionid the question being deleted.
      * @param int $contextid the context this question belongs to.

@@ -198,43 +198,11 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
           * Here we have data array defined as tuple
           * <id, ui_name, description, name, scanrules, parserules, version visible>
           */
-         $data = (object)$data;
+         $newid = block_formal_langs::find_or_insert_language($data);
+         if ($this->langid != $newid ) {
+             $this->update_langid($newid);
+         }
 
-         // Seek for language and insert it if not found, handling some error stuff
-         // Also cannot compare strings in some common case.
-         $sql = 'SELECT id
-                      FROM {block_formal_langs}
-                     WHERE ';
-         $filternames = array('name', 'version');
-         $filtervalues = array($data->name, $data->version);
-         if ($data->scanrules != null || $data->parserules != null) {
-             $filternames[] = 'scanrules';
-             $filternames[] =  'parserules';
-             $filtervalues[]  = $data->scanrules;
-             $filtervalues[]  = $data->parserules;
-         }
-         // Transform columns into sql comparisons
-         $sqlfilternames = array();
-         foreach($filternames as $name) {
-             $sqlfilternames[] = $DB->sql_compare_text($name, 512) . ' = ' . $DB->sql_compare_text('?', 512);
-         }
-         // Build actual sql request
-         $sql .= implode(' AND ', $sqlfilternames);
-         $sql .= ';';
-
-         $record = $DB->get_record_sql($sql, $filtervalues);
-         $newlangid = null;
-         if ($record == false) {
-            $newlangid = $DB->insert_record('block_formal_langs', (array)$data);
-            $this->update_langid($newlangid);
-            $this->langid = $newlangid;
-         } else {
-            if ($this->langid != $record->id) {
-                $newlangid = $record->id;
-                $this->update_langid($newlangid);
-                $this->langid = $newlangid;
-            }
-         }
 
          // Scan answers to detect how many decriptions we must insert
          // Map count of answer lexemes to each answer
@@ -278,6 +246,7 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
          $qdata->langid = $langid;
 
          $DB->update_record('qtype_correctwriting', $qdata);
+         $this->langid = $langid;
      }
 
      /**
