@@ -122,38 +122,7 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
         $this->answermapping[] = $data['id'];
         parent::process_question_answer($data);
     }
-    /**
-     * Because of annoying bug in code, we must copy this code and fix bug
-     */
-    public function process_poasquestion($data) {
-        global $DB;
 
-        $data = (object)$data;
-        $oldid = $data->id;
-
-        // Detect if the question is created or mapped.
-        $oldquestionid   = $this->get_old_parentid('question');
-        $newquestionid   = $this->get_new_parentid('question');
-        $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
-
-        // If the question has been created by restore, we need to create its qtype_... too.
-        if ($questioncreated) {
-            $qtypeobj = question_bank::get_qtype($this->pluginname);
-            $extraquestionfields = $qtypeobj->extra_question_fields();
-            $tablename = array_shift($extraquestionfields);
-
-            // Adjust some columns.
-            $qtfield = $qtypeobj->questionid_column_name();
-            $data->$qtfield = $newquestionid;
-
-
-            // Insert record.
-            $newitemid = $DB->insert_record($tablename, $data);
-
-            // Create mapping.
-            $this->set_mapping($tablename, $oldid, $newitemid);
-        }
-    }
      /**
       * Processes question descriptions
       * This  method is called when restoring path question_descriptions
@@ -161,6 +130,7 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
       */
     public function process_correctwriting($data) {
         $olddata = $data;
+        $this->supportdenormalizedanswers = false;
         $this->process_poasquestion($data);
 
         $this->oldquestion   = $this->get_old_parentid('question');
