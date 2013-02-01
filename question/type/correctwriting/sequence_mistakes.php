@@ -14,6 +14,27 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 
 // A marker class to indicate errors from sequence_analyzer
 abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwriting_response_mistake {
+    /**
+     * LCS as described in sequence analyzer, used in generating some hints, based on mistakes
+     * @var array
+     */
+    protected $lcs;
+
+    /**
+     * Sets an lcs for mistake
+     * @param $lcs
+     */
+    public function set_lcs($lcs) {
+        $this->lcs = $lcs;
+    }
+
+    /**
+     * Returns an lcs, which mistake is based on
+     * @return array
+     */
+    public function lcs() {
+        return $this->lcs;
+    }
 }
 
 
