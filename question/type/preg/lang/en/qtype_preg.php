@@ -224,7 +224,7 @@ $string['description_esc_g'] = 'at the first matching position in the subject';
 $string['description_backref'] = 'back reference to subpattern #%number';
 $string['description_backref_name'] = 'back reference to subpattern "%name"';
 // TYPE_LEAF_RECURSION
-$string['description_recursion_all'] = 'recursive match with whole regular expression                                 ';
+$string['description_recursion_all'] = 'recursive match with whole regular expression';
 $string['description_recursion'] = 'recursive match with subpattern #%number';
 $string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
 // TYPE_LEAF_OPTIONS
@@ -528,8 +528,6 @@ $string['description_empty_g'] = 'nothing(form g)';
 $string['author_tool_explain_graph'] = 'explain graph';
 
 $string['explain_subpattern'] = 'subpattern #';
-$string['explain_backref'] = 'the result of subpattern #';
-$string['explain_recursion'] = 'recursion';
 $string['explain_unknow_node'] = 'unknow node';
 $string['explain_unknow_meta'] = 'unknow meta';
 $string['explain_unknow_assert'] = 'unknow assert';
