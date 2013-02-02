@@ -71,8 +71,6 @@ class qtype_preg_regex_handler {
     protected $errors;
     /** Anchoring - object, with 'start' and 'end' logical fields, which are true if all regex is anchored. */
     protected $anchor;
-    /** Map of nested subpatterns. */
-    protected $nested_subpatt_map;
 
     /**
      * Returns class name without 'qtype_preg_' prefix.
@@ -193,13 +191,6 @@ class qtype_preg_regex_handler {
         }
     }
 
-    public function get_nested_subpatterns($number) {
-        if (array_key_exists($number, $this->nested_subpatt_map)) {
-            return $this->nested_subpatt_map[$number];
-        }
-        return array();
-    }
-
     /**
      * is this engine need a parsing of regular expression?
      * @return bool if parsing needed
@@ -291,18 +282,6 @@ class qtype_preg_regex_handler {
         return false;
     }
 
-    protected function set_nested_subpatterns($node) {
-        if (!is_a($node, 'qtype_preg_operator')) {
-            return;
-        }
-        if ($node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
-            $this->nested_subpatt_map[$node->number] = $node->nested;
-        }
-        foreach ($node->operands as $operand) {
-            $this->set_nested_subpatterns($operand);
-        }
-    }
-
     /**
      * Fill anchor field to show if regex is anchored using ast_root
      *
@@ -351,7 +330,6 @@ class qtype_preg_regex_handler {
         }
         //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
             $this->ast_root = $this->parser->get_root();
-            $this->set_nested_subpatterns($this->ast_root);
             $this->look_for_anchors();
             $this->dst_root = clone $this->ast_root;
             $this->dst_root = $this->from_preg_node($this->dst_root);
