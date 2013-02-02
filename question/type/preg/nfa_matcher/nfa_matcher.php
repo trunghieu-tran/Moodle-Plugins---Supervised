@@ -95,6 +95,33 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         return false;
     }
 
+    /**
+     * Writes subpatterns start\end information to this state.
+     */
+    public function write_subpatt_info($transition, $pos, $matchlen, $options) {
+        if ($options !== null && !$options->capturesubpatterns) {
+            return;
+        }
+        // Reset all found subpatterns to no match.
+        foreach ($transition->subpatt_start as $node) {
+            $this->reset_subpattern($node->number, $node->nested, $options->mode);
+        }
+
+        // Set start indexes of subpatterns.
+        foreach ($transition->subpatt_start as $node) {
+            $this->index_first_new[$node->number] = $pos;
+        }
+        // Set length of subpatterns.
+        foreach ($transition->subpatt_end as $node) {
+            if ($this->index_first_new[$node->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $this->length_new[$node->number] = $pos - $this->index_first_new[$node->number] + $matchlen;
+                // Replace old results with new results.
+                $this->index_first[$node->number] = $this->index_first_new[$node->number];
+                $this->length[$node->number] = $this->length_new[$node->number];
+            }
+        }
+    }
+
     public function concat_chr($char) {
         $this->str->concatenate($char);
     }
@@ -161,48 +188,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Writes new tag values to the new state reached from prevstate.
-     * @param newstate reference to the new state.
-     * @param prevstate previous state.
-     * @param transition a transition from prevstate to newstate.
-     * @param startpos start position of matching.
-     * @param length number of characters consumed by transition.
-     */
-    private function write_tag_values(&$newstate, $prevstate, $transition, $startpos, $length) {
-        if ($this->options !== null && !$this->options->capturesubpatterns) {
-            return;
-        }
-        // Get subpattern indexes.
-        $subpatt_start = array();
-        $subpatt_end = array();
-        foreach ($transition->tags as $value) {
-            if ($value % 2 === 0) {
-                $subpatt_start[] = $value / 2;
-            } else {
-                $subpatt_end[] = ($value - 1) / 2;
-            }
-        }
-        // Reset all found subpatterns to no match.
-        foreach ($subpatt_start as $number) {
-            $newstate->reset_subpattern($number, $this->get_nested_subpatterns($number), $this->options->mode);
-        }
-
-        // Set start indexes of subpatterns.
-        foreach ($subpatt_start as $number) {
-            $newstate->index_first_new[$number] = $startpos + $prevstate->length[0];
-        }
-        // Set end indexes of subpatterns.
-        foreach ($subpatt_end as $number) {
-            if ($newstate->index_first_new[$number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $newstate->length_new[$number] = $startpos + $prevstate->length[0] - $newstate->index_first_new[$number] + $length;
-                // Replace old results with new results.
-                $newstate->index_first[$number] = $newstate->index_first_new[$number];
-                $newstate->length[$number] = $newstate->length_new[$number];
-            }
-        }
-    }
-
-    /**
      * Returns an array of states which can be reached without consuming characters.
      * @param qtype_preg_nfa_processing_state startstate state to go from.
      * @param qtype_poasquestion_string str string being matched.
@@ -234,7 +219,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                                                         $transition->to, null, $length, $curstate);
                         $newstate->last_transition = $transition;
                         $newstate->length[0] += $length;
-                        $this->write_tag_values($newstate, $curstate, $transition, $startpos, $length);
+                        $newstate->write_subpatt_info($transition, $startpos + $curstate->length[0], $length, $this->options);
                         if (!array_key_exists($newstate->state->number, $result)) {
                             $newstates[] = $newstate;
                             $result[$newstate->state->number] = $newstate;
@@ -351,7 +336,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                             $newstate->concat_chr($newchr);
                         }
                         $newstate->length[0] += $length;
-                        $this->write_tag_values($newstate, $states[$curstate], $transition, $startpos, $length);
+                        $newstate->write_subpatt_info($transition, $startpos + $states[$curstate]->length[0], $length, $this->options);
                         // Saving the current result.
                         $zlc = $this->zero_length_closure($newstate, $str, $startpos);
                         foreach ($zlc as $curstatezlc) {
@@ -437,7 +422,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                                                         $transition->to, null, $length, $curstateobj);
                         $newstate->last_transition = $transition;
                         $newstate->length[0] += $length;
-                        $this->write_tag_values($newstate, $curstateobj, $transition, $startpos, $length);
+                        $newstate->write_subpatt_info($transition, $startpos + $curstateobj->length[0], $length, $this->options);
                         // Saving the current result.
                         $zlc = $this->zero_length_closure($newstate, $str, $startpos);
                         foreach ($zlc as $curstatezlc) {
