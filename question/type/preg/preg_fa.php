@@ -480,25 +480,16 @@ abstract class qtype_preg_finite_automaton {
                     $lab = $curtransition->pregleaf->tohr() . ',';
 
                     // Information about subpatterns.
-                    $subpatt_start = array();
-                    $subpatt_end = array();
-                    foreach ($curtransition->tags as $value) {
-                        if ($value % 2 == 0) {
-                            $subpatt_start[] = $value / 2;
-                        } else {
-                            $subpatt_end[] = ($value - 1) / 2;
-                        }
-                    }
-                    if (count($subpatt_start) > 0) {
+                    if (count($curtransition->subpatt_start) > 0) {
                         $lab = $lab . 'starts';
-                        foreach ($subpatt_start as $num) {
-                            $lab = $lab . "$num,";
+                        foreach ($curtransition->subpatt_start as $node) {
+                            $lab = $lab . "{$node->number},";
                         }
                     }
-                    if (count($subpatt_end) > 0) {
+                    if (count($curtransition->subpatt_end) > 0) {
                         $lab = $lab . 'ends';
-                        foreach ($subpatt_end as $num) {
-                            $lab = $lab . "$num,";
+                        foreach ($curtransition->subpatt_end as $node) {
+                            $lab = $lab . "{$node->number},";
                         }
                     }
                     $lab = substr($lab, 0, strlen($lab) - 1);
