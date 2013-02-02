@@ -376,19 +376,17 @@ class qtype_preg_explain_graph_test extends PHPUnit_Framework_TestCase
    function test_create_graph_caseinsensetive()
    {
 		$tree = new qtype_preg_author_tool_explain_graph('(?i:abc)');
-        print_r($tree->get_ast_root());
 
 		$etalon = new qtype_preg_author_tool_explain_graph_subgraph('', 'solid');
-		$etalon->subgraphs[] = new qtype_preg_author_tool_explain_graph_subgraph('subpattern #1', 'solid; color=black');
-        $etalon->subgraphs[0]->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('abc'), 'ellipse', 'black', $etalon->subgraphs[0], 0, ', style=filled, fillcolor=grey');
+        $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('abc'), 'ellipse', 'black', $etalon, 0, ', style=filled, fillcolor=grey');
         $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('begin'), 'box, style=filled', 'purple', $etalon, -1);
         $etalon->nodes[] = new qtype_preg_author_tool_explain_graph_node(array('end'), 'box, style=filled', 'purple', $etalon, -1);
-        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->subgraphs[0]->nodes[0]);
-        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->subgraphs[0]->nodes[0], $etalon->nodes[1]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[1], $etalon->nodes[0]);
+        $etalon->links[] = new qtype_preg_author_tool_explain_graph_link('', $etalon->nodes[0], $etalon->nodes[2]);
 
-		$result = $tree->create_graph();
-		
-		$this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with caseinsensetive!');
+        $result = $tree->create_graph();
+        
+        $this->assertTrue(qtype_preg_author_tool_explain_graph::cmp_graphs($result, $etalon), 'Failed with caseinsensetive!');
    }
 }
 

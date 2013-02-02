@@ -7,9 +7,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
  
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/explain_graph_misc.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
