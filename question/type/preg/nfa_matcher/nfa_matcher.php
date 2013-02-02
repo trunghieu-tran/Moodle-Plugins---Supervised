@@ -141,6 +141,13 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->str->concatenate($char);
     }
 
+    public function dump() {
+        foreach ($this->index_first as $key => $index) {
+            $length = $this->length[$key];
+            echo $key . ': (' . $index . ', ' . $length . ') ';
+        }
+        echo "\n";
+    }
 }
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
@@ -490,30 +497,20 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $curstates = $newstates;
         }
         // Find the best result.
-        foreach ($states as $tmp) {
-            if ($tmp !== null) {
-                $tmp->state = null;
-                $tmp->last_transition = null;
-            }
-        }
-        foreach ($partialmatches as $tmp) {
-            if ($tmp !== null) {
-                $tmp->state = null;
-                $tmp->last_transition = null;
-            }
-        }
         foreach ($states as $curresult) {
-            $eq = false;
-            if ($curresult !== null && $result->worse_than($curresult, false, false, $eq)) {
+            $areequal = false;
+            if ($curresult !== null && $result->worse_than($curresult, false, false, $areequal)) {
                 $result = $curresult;
                 $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() === true.
             }
         }
-        foreach ($partialmatches as $curresult) {
-            $eq = false;
-            if ($curresult !== null && $result->worse_than($curresult, false, false, $eq)) {
-                $result = $curresult;
-                $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() === true.
+        if (!$fullmatchfound) {
+            foreach ($partialmatches as $curresult) {
+                $areequal = false;
+                if ($curresult !== null && $result->worse_than($curresult, false, false, $areequal)) {
+                    $result = $curresult;
+                    $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() === true.
+                }
             }
         }
         return new qtype_preg_matching_results($result->full, $result->index_first, $result->length,
