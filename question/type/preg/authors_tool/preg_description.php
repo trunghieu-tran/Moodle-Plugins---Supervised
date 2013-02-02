@@ -9,10 +9,12 @@
  * @package questions
  */
 
+require_once(dirname(__FILE__) . '/../../../../config.php');
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
@@ -130,7 +132,7 @@ class qtype_preg_description_options extends qtype_preg_handling_options {
 /**
  * Handler, generating information for regular expression
  */
-class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
+class qtype_preg_author_tool_description extends qtype_preg_author_tool {
     
     /** @var qtype_preg_description_options options for description and state of description */
     public $options;
@@ -237,7 +239,38 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     protected function is_preg_node_acceptable($pregnode) {
         return true;
     }
-    
+
+    /**
+     * Generate description
+     * 
+     * @param array $json_array contains text of description
+     */
+    public function generate_json(&$json_array, $regextext, $id){
+        
+        global $CFG;
+
+        if(!empty($regextext)) {
+            if($id == -1){
+                
+                //Checking parser errors
+                $pars_error = false;
+                foreach($this->get_errors() as $error) {
+                    if (is_a($error, 'qtype_preg_parsing_error')) {
+                        $pars_error = true;
+                        break;
+                    }
+                }
+                
+                if($pars_error === false && $this->get_ast_root() !== NULL) {
+                    $json_array['description'] = $this->default_description();//Add tree                
+                } else {                
+                    $json_array['description'] = 'Ooops! I can\'t build description!';
+                }
+            }
+        } else {
+            $json_array['description'] = 'Ooops! I can\'t build description!';
+        }
+    }
 }
 
 

@@ -7,6 +7,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+
+require_once(dirname(__FILE__) . '/../../../../config.php');
  
 defined('MOODLE_INTERNAL') || die();
 
@@ -595,8 +597,39 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         return true;
     }
     
-    public function get_html() {
-        return null;
+    /**
+     * Generate image for explain graph
+     * 
+     * @param array $json_array contains link on image of explain graph
+     */
+    public function generate_json(&$json_array, $regextext, $id) {
+        
+        global $CFG;
+        
+        if(!empty($regextext)) {
+
+            //Checking parser errors
+            $pars_error = false;
+            foreach($this->get_errors() as $error) {
+                if (is_a($error, 'qtype_preg_parsing_error') || is_a($error, 'qtype_preg_accepting_error')) {
+                    $pars_error = true;
+                    break;
+                }
+            }
+
+            if($pars_error === false && $this->get_ast_root() !== NULL && $this->get_dst_root() !== NULL) {
+                
+                $graph = $this->create_graph($id);
+                $dot_instructions_graph = $graph->create_dot();
+                
+                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
+                
+            } else {
+                $json_array['graph_src'] = $CFG->wwwroot . '/question/type/preg/tmp_img/graph_err.png';
+            }
+        } else {
+            $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_def.png'; //Add graph
+        }
     }
 
     public function get_errors() {
@@ -606,6 +639,8 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
         }
         return $res;
     }
+
+
 }
 
 ?>
