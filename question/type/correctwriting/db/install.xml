@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/correctwriting/db" VERSION="20130123" COMMENT="XMLDB file for CorrectWriting question type"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="qtype_correctwriting" COMMENT="This table contains main options for CorrectWriting question">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Identifier, for connection for original moodle table to this table structure" PREVIOUS="id" NEXT="langid"/>
+        <FIELD NAME="langid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key, references the formal langs block table of languages" PREVIOUS="questionid" NEXT="absentmistakeweight"/>
+        <FIELD NAME="absentmistakeweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.33" SEQUENCE="false" DECIMALS="7" COMMENT="Penalty for each lexeme, that doesn't contains in student response" PREVIOUS="langid" NEXT="addedmistakeweight"/>
+        <FIELD NAME="addedmistakeweight" TYPE="number" LENGTH="12" NOTNULL="false" DEFAULT="0.33" SEQUENCE="false" DECIMALS="7" COMMENT="Penalty, for each added lexeme to student response" PREVIOUS="absentmistakeweight" NEXT="movedmistakeweight"/>
+        <FIELD NAME="movedmistakeweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.16" SEQUENCE="false" DECIMALS="7" COMMENT="A penalty for error, that consists of moving lexeme in student response." PREVIOUS="addedmistakeweight" NEXT="lexicalerrorthreshold"/>
+        <FIELD NAME="lexicalerrorthreshold" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.5" SEQUENCE="false" DECIMALS="7" COMMENT="Lexical error threshold for computing Damerau-Levenstein distance" PREVIOUS="movedmistakeweight" NEXT="lexicalerrorweight"/>
+        <FIELD NAME="lexicalerrorweight" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.08" SEQUENCE="false" DECIMALS="7" COMMENT="A penalty for lexical error." PREVIOUS="lexicalerrorthreshold" NEXT="usecase"/>
+        <FIELD NAME="usecase" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether, analysis of question should be case-sensitive" PREVIOUS="lexicalerrorweight" NEXT="hintgradeborder"/>
+        <FIELD NAME="hintgradeborder" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.9" SEQUENCE="false" DECIMALS="7" COMMENT="A grade border when non-exact match is supplied." PREVIOUS="usecase" NEXT="maxmistakepercentage"/>
+        <FIELD NAME="maxmistakepercentage" TYPE="number" LENGTH="12" NOTNULL="true" DEFAULT="0.7" SEQUENCE="false" DECIMALS="7" COMMENT="A maximum percentage to discard total errors. If mistakes/length of teacher answer bigger than this, the teacher answer is discarded." PREVIOUS="hintgradeborder" NEXT="whatishintpenalty"/>
+        <FIELD NAME="whatishintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for &quot;what is&quot; hint. Setting above 1 will disable this hint for the question" PREVIOUS="maxmistakepercentage" NEXT="wheretxthintpenalty"/>
+        <FIELD NAME="wheretxthintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for text &quot;where&quot; hint" PREVIOUS="whatishintpenalty" NEXT="absenthintpenaltyfactor"/>
+        <FIELD NAME="absenthintpenaltyfactor" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" DECIMALS="1" COMMENT="Penalty factor for absent token hints." PREVIOUS="wheretxthintpenalty" NEXT="wherepichintpenalty" />
+        <FIELD NAME="wherepichintpenalty" TYPE="number" LENGTH="4" NOTNULL="true" DEFAULT="1.1" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for picture &quot;where&quot; hint" PREVIOUS="absenthintpenaltyfactor" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questionid"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id" COMMENT="Foreign key, referencing the question table" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
