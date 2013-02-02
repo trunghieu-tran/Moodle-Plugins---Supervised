@@ -130,7 +130,6 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
       */
     public function process_correctwriting($data) {
         $olddata = $data;
-        $this->supportdenormalizedanswers = false;
         $this->process_poasquestion($data);
 
         $this->oldquestion   = $this->get_old_parentid('question');
