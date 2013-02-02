@@ -118,7 +118,7 @@ class qtype_preg_hintmatchingpart extends qtype_specific_hint {
     /**
      * Render colored string showing matched and non-matched parts of response
      */
-    public function render_hint($renderer, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $bestfit = $this->question->get_best_fit_answer($response);
         $matchresults = $bestfit['match'];
 
@@ -176,7 +176,7 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         return $this->render_stringextension_hint($renderer, $response);
     }
 
@@ -238,7 +238,7 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
     }
 
     ////qtype_preg_matching_hint functions implementation
-    public function render_hint($renderer, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options,$response = null) {
         return $this->render_stringextension_hint($renderer, $response);
     }
 
