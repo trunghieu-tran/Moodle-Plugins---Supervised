@@ -59,9 +59,34 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
             $numbers = array_merge($numbers, $nested);
         }
         foreach ($numbers as $num) {
-            $this->index_first_new[$num] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $this->length_new[$num] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            $this->index_first_new[$num] = self::NO_MATCH_FOUND;
+            $this->length_new[$num] = self::NO_MATCH_FOUND;
         }
+    }
+
+    /**
+     * Returns 1 if this beats other, -1 if other beats this, 0 otherwise.
+     */
+    public function leftmost_longest($other) {
+        foreach ($this->index_first as $key => $ind_this) {
+            if ($key == 0) {
+                continue;
+            }
+            $ind_that = $other->index_first[$key];
+            $len_this = $this->length[$key];
+            $len_that = $other->length[$key];
+            if (($ind_this !== self::NO_MATCH_FOUND && $ind_that === self::NO_MATCH_FOUND) ||
+                ($ind_this !== self::NO_MATCH_FOUND && $ind_this < $ind_that) ||
+                ($ind_this !== self::NO_MATCH_FOUND && $ind_this === $ind_that && $len_this > $len_that)) {
+                return 1;
+            }
+            if (($ind_that !== self::NO_MATCH_FOUND && $ind_this === self::NO_MATCH_FOUND) ||
+                ($ind_that !== self::NO_MATCH_FOUND && $ind_that < $ind_this) ||
+                ($ind_that !== self::NO_MATCH_FOUND && $ind_that === $ind_this && $len_that > $len_this)) {
+                return -1;
+            }
+        }
+        return 0;
     }
 
     public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
@@ -71,27 +96,17 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         }
 
         // Leftmost rule.
-        foreach ($this->index_first as $key => $ind1) {
-            if ($key === 0) {
-                continue;
-            }
-
-            $ind2 = $other->index_first[$key];
-            $len1 = $this->length[$key];
-            $len2 = $other->length[$key];
-
-            // Leftmost-longest rule.
-            if (($ind2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind1 === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                ($ind2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind2 < $ind1) ||
-                ($ind2 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind2 === $ind1 && $len2 > $len1)) {
-                return true;
-            }
-            if (($ind1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind2 === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                ($ind1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind1 < $ind2) ||
-                ($ind1 !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind1 === $ind2 && $len1 > $len2)) {
-                return false;
-            }
+        $leftmost = $this->leftmost_longest($other);
+        if ($leftmost == -1) {
+            return true;
+        } else if ($leftmost == 1) {
+            return false;
         }
+
+        if ($areequal !== null) {
+            $areequal = true;
+        }
+
         return false;
     }
 
@@ -113,7 +128,7 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         }
         // Set length of subpatterns.
         foreach ($transition->subpatt_end as $node) {
-            if ($this->index_first_new[$node->number] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            if ($this->index_first_new[$node->number] != self::NO_MATCH_FOUND) {
                 $this->length_new[$node->number] = $pos - $this->index_first_new[$node->number] + $matchlen;
                 // Replace old results with new results.
                 $this->index_first[$node->number] = $this->index_first_new[$node->number];
