@@ -44,14 +44,315 @@ define('INSERTION_MARK_LABEL_PADDING', 2);
 // A length of arrow end part
 define('ARROW_LENGTH', 5);
 // An arrow angle in radians
-define('ARROW_ANGLE', 0.5);
+define('ARROW_ANGLE', 1);
 // A space between arrow langind point and labels (used for moving lexeme)
 define('ARROW_INSERT_PADDING', 2);
 // A padding between middle part of token and starting of arrow for moving lexeme
 define('ARROW_TOP_PADDING', 2);
 // A padding for moving mistake height
-define('MOVING_LINE_HEIGHT', 2);
+define('MOVING_LINE_HEIGHT', 10);
+// A space between words
+define('WORD_SPACING', 4);
+// A thickness of drawn frame
+define('FRAME_THICKNESS', 1);
+// Defines a padding for frame label
+define('FRAME_LABEL_PADDING' , 4);
 
+/**
+ * A simple label for placing it and determining it's size
+ */
+class qtype_correctwriting_label {
+    /**
+     * Bounding rectangle for a label
+     * @var  stdClass
+     */
+    protected $rect;
+    /**
+     * Text data
+     * @var string text data
+     */
+    protected $text;
+
+    public function __construct($text) {
+        $this->text = $text;
+        $this->rect = new stdClass;
+        $this->rect->x = 0;
+        $this->rect->y = 0;
+        // Get font metics
+        $width = imagefontwidth(FONT_SIZE);
+        $height = imagefontheight(FONT_SIZE);
+        $this->rect->width = $width * strlen($text);
+        $this->rect->height = $height;
+    }
+
+    /**
+     * Returns a rectangle for label
+     * @return stdClass
+     */
+    public function rect() {
+        return $this->rect;
+    }
+
+    /**
+     * Sets a position for images
+     * @param int $x
+     * @param int $y
+     */
+    public function set_pos($x, $y) {
+        $this->rect->x = $x;
+        $this->rect->y = $y;
+    }
+
+    /**
+     * Paints text in an image
+     * @param resource $im
+     * @param array $palette
+     */
+    public function paint(&$im, $palette) {
+        // Set color according to fixed parameter
+        $color = $palette['black'];
+        // Paint a string
+        imagestring($im, FONT_SIZE, $this->rect->x, $this->rect->y, $this->text, $color);
+    }
+}
+
+class qtype_correctwriting_image {
+    /**
+     * An array of labels with data
+     * @var array data
+     */
+    protected $labels;
+    /**
+     * Data of mistake
+     * @var array
+     */
+    protected $data;
+    /**
+     * A size of image stuff
+     * @var stdClass
+     */
+    protected $imagesize;
+    /**
+     * Insertion part
+     * @var int
+     */
+    protected $insertionx;
+    /**
+     * Determines, whether mistake insertion position before or after
+     * @param int $position
+     * @param string $relative
+     * @return bool if has
+     */
+    protected function has_insertion_placed($position, $relative) {
+        $result = false;
+        if ($this->data['type'] == 'absent' || $this->data['type'] == 'moved') {
+           if ($this->data['insert_position'] == $position && $this->data['insert_relative'] == $relative) {
+               $result = true;
+           }
+        }
+        return $result;
+    }
+
+    /**
+     * Computes insertion width
+     */
+    protected function compute_insertion_width() {
+        $width = 0;
+        if ($this->data['type'] == 'absent') {
+            $width =  INSERTION_MARK_WIDTH + 2 * INSERTION_MARK_LABEL_PADDING;
+        }
+        if ($this->data['type'] == 'moved') {
+            $width = 2 * (ARROW_INSERT_PADDING + ARROW_LENGTH * cos(ARROW_ANGLE));
+        }
+        return $width;
+    }
+
+    /**
+     * Computes insertion height
+     * @return int insertion height
+     */
+    protected function compute_insertion_height() {
+        $height = 0;
+        if ($this->data['type'] == 'absent') {
+            $label = new qtype_correctwriting_label($this->data['token']);
+            $height = $label->rect()->height - INSERTION_MARK_Y_OFFSET;
+            $height += INSERTION_MARK_HEIGHT + INSERTION_MARK_TOP_PADDING;
+        }
+        if ($this->data['type'] == 'moved') {
+            $height =  ARROW_TOP_PADDING + MOVING_LINE_HEIGHT;
+
+        }
+        return $height;
+    }
+    /**
+     * Constructs image for data
+     * @param array $data
+     */
+    public function __construct($data) {
+        $this->data = $data;
+        $this->labels = array();
+        for($i = 0; $i <count($data['response']); $i++) {
+            $this->labels[] = new qtype_correctwriting_label($data['response'][$i]);
+        }
+        $this->imagesize = new stdClass();
+        $width = FRAME_LABEL_PADDING;
+        $height = 0;
+        $curx = FRAME_LABEL_PADDING;
+        $this->insertionx = 0;
+        // Compute max height
+        for ($i = 0; $i < count($this->labels); $i++) {
+            /**
+             * @var qtype_correctwriting_label $label
+             */
+            $label = $this->labels[$i];
+            if ($label->rect()->height > $height) {
+                $height = $label->rect()->height;
+            }
+        }
+        $gheight = FRAME_LABEL_PADDING;
+        $gheight += $this->compute_insertion_height();
+        for ($i = 0; $i < count($this->labels); $i++) {
+            if ($this->has_insertion_placed($i, 'before')) {
+                $width = $this->compute_insertion_width();
+                $curx += $width;
+                $this->insertionx = $curx - $width / 2;
+            }
+            /**
+             * @var qtype_correctwriting_label $label
+             */
+            $label = $this->labels[$i];
+            $label->set_pos($curx, $gheight);
+            $curx += $label->rect()->width;
+
+
+            if ($this->has_insertion_placed($i, 'after')) {
+                $width = $this->compute_insertion_width();
+                $curx += $width;
+                $this->insertionx =  $curx - $width / 2;
+            }
+            if ($i != count($this->labels) - 1) {
+                $curx += WORD_SPACING;
+            }
+            $width = $curx;
+        }
+
+        $height = $gheight + $height + FRAME_LABEL_PADDING;
+        $this->imagesize->width = $width + FRAME_LABEL_PADDING;
+        $this->imagesize->height = $height;
+        $this->fix_absent_mistake_sizes();
+    }
+
+    /**
+     * Fixes some mistakw, when upper token is longer than first
+     */
+    protected function fix_absent_mistake_sizes() {
+        if ($this->data['type'] == 'absent') {
+            $label = new qtype_correctwriting_label($this->data['token']);
+            $width = $label->rect()->width;
+            $offset = $this->insertionx - $width / 2;
+            if ( $offset < 0 ) {
+                $offset *= -1;
+                $offset += FRAME_LABEL_PADDING;
+                $this->imagesize->width = ($this->imagesize->width - $this->insertionx) + $offset;
+                $this->insertionx += $offset;
+                for($i = 0; $i < count($this->labels); $i++) {
+                    /**
+                     * @var qtype_correctwriting_label $label
+                     */
+                    $label = $this->labels[$i];
+                    $label->set_pos($label->rect()->x + $offset, $label->rect()->y);
+                }
+            }
+            if ($this->insertionx + $width / 2 > $this->imagesize->width) {
+                $this->imagesize->width =  $this->insertionx + $width / 2 + FRAME_LABEL_PADDING;
+            }
+        }
+    }
+
+    /**
+     * Draws an absent mistake
+     * @param resource $im
+     * @param array $palette
+     */
+    public function draw_absent_mistake(&$im, $palette) {
+        $rep = str_replace(array("\r", "\n"), array('', ''), $this->data['token']);
+        $label = new qtype_correctwriting_label($rep);
+        $topy = FRAME_LABEL_PADDING +  INSERTION_MARK_TOP_PADDING  + $label->rect()->height + INSERTION_MARK_Y_OFFSET;
+        $bottomy = $topy + INSERTION_MARK_HEIGHT;
+        $width  = INSERTION_MARK_WIDTH / 2;
+
+        imageline($im, $this->insertionx, $bottomy, $this->insertionx - $width / 2, $topy, $palette['red']);
+        imageline($im, $this->insertionx, $bottomy, $this->insertionx + $width / 2, $topy, $palette['red']);
+        $labeltopy = $topy - INSERTION_MARK_TOP_PADDING - $label->rect()->height;
+        $label->set_pos($this->insertionx - $label->rect()->width / 2, $labeltopy );
+        $label->paint($im, $palette);
+
+    }
+    /**
+     * Draws an absent mistake
+     * @param resource $im
+     * @param array $palette
+     */
+    public function draw_moved_mistake(&$im, $palette) {
+        /**
+         * @var qtype_correctwriting_label $sourcelabel
+         */
+        $sourcelabel = $this->labels[$this->data['source_position']];
+        $sourcex = $sourcelabel->rect()->x + $sourcelabel->rect()->width / 2;
+        $sourcey = $sourcelabel->rect()->y - ARROW_TOP_PADDING;
+        $topy = FRAME_LABEL_PADDING;
+        $smally =  FRAME_LABEL_PADDING  + MOVING_LINE_HEIGHT;
+        imageline($im, $sourcex, $sourcey, $sourcex, $topy, $palette['red'] );
+        imageline($im, $sourcex, $topy, $this->insertionx, $topy, $palette['red'] );
+        imageline($im, $this->insertionx, $topy, $this->insertionx, $smally, $palette['red'] );
+        $leftarrowx = $this->insertionx - ARROW_LENGTH * cos(ARROW_ANGLE);
+        $rightarrowx = $this->insertionx + ARROW_LENGTH * cos(ARROW_ANGLE);
+        $arrowy = $smally - ARROW_LENGTH * sin(ARROW_ANGLE);
+        imageline($im, $this->insertionx, $smally, $leftarrowx, $arrowy, $palette['red'] );
+        imageline($im, $this->insertionx, $smally, $rightarrowx, $arrowy, $palette['red'] );
+
+    }
+    /*! Produces an image performing all painting actions and sending it to buffer
+    */
+    public function produce_image() {
+
+        $im = imagecreatetruecolor($this->imagesize->width, $this->imagesize->height);
+
+        // Fill palette
+        $palette = array();
+        $palette['white'] = imagecolorallocate($im, 255, 255, 255);
+        $palette['black'] = imagecolorallocate($im, 0, 0, 0);
+        $palette['red']   = imagecolorallocate($im, 255, 0, 0);
+
+        // Set image background to white
+        imagefill($im,0,0,$palette['white']);
+
+        // Draw a rectangle frame
+        imagesetthickness($im, FRAME_THICKNESS);
+        $iw1 = $this->imagesize->width - 1;
+        $ih1 = $this->imagesize->height - 1;
+
+        imageline($im, 0, 0, $iw1, 0, $palette['black']);
+        imageline($im, $iw1, 0 , $iw1 , $ih1, $palette['black']);
+        imageline($im, $iw1, $ih1, 0, $ih1, $palette['black']);
+        imageline($im, 0, $ih1, 0, 0, $palette['black']);
+
+        for($i = 0; $i < count($this->labels); $i++) {
+            $this->labels[$i]->paint($im, $palette);
+        }
+        if ($this->data['type'] == 'absent') {
+            $this->draw_absent_mistake($im, $palette);
+        }
+        if ($this->data['type'] == 'moved') {
+            $this->draw_moved_mistake($im, $palette);
+        }
+
+        // Output image
+        header('Content-type: image/png');
+        imagepng($im);
+        imagedestroy($im);
+    }
+}
 
 /**
  * Decodes a wherepic request data
@@ -99,7 +400,8 @@ $success = true;
 $result = qtype_correctwriting_wherepic_data_decoder::decode($_REQUEST['data'], $success);
 
 if ($success) {
-    print_r($result);
+    $im = new qtype_correctwriting_image($result);
+    $im->produce_image();
 } else {
     echo 'Error: malformed data!';
 }
