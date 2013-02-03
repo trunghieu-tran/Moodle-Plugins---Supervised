@@ -251,12 +251,30 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         } else {
             $imagedata = $this->prepare_image_data_for_moved_mistake();
         }
-        // TODO: test this
+
         $url  = $CFG->wwwroot . '/question/type/correctwriting/wherepicimage.php?data=' . urlencode($imagedata);
         $imagesrc = html_writer::empty_tag('image', array('src' => $url));
         return $imagesrc;
     }
 
+    /**
+     * Converts token to string
+     * @param  block_formal_langs_token_base  $p
+     * @return string
+     */
+    protected static function to_string($p) {
+        return $p->value();
+    }
+
+    /**
+     * Creates response text for image
+     * @return string
+     */
+    protected function create_response_text_for_image() {
+        $temp  = array_map('qtype_correctwriting_hintwherepic::to_string', $this->mistake->response);
+        $temp = array_map('base64_encode', $temp);
+        return implode('|', $temp);
+    }
     /**
      * Prepares image data for added mistake
      */
@@ -267,7 +285,11 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
         $result[] = $pos->position;
         $result[] = $pos->relative;
-        $result[] = implode('|',array_map('base64_encode', $this->mistake->answer));
+        $result[] = $this->create_response_text_for_image();
+
+        //echo '<pre>';
+        //print_r($result);
+        //echo '</pre>';
 
         return base64_encode(implode(',,,', $result));
     }
@@ -281,7 +303,12 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
         $result[] = $pos->position;
         $result[] = $pos->relative;
-        $result[] = implode('|',array_map('base64_encode', $this->mistake->answer));
+        $result[] = $this->create_response_text_for_image();
+
+        //echo '<pre>';
+        //print_r($result);
+        //echo '</pre>';
+
         return base64_encode(implode(',,,', $result));
     }
     /**
@@ -300,11 +327,13 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
         $dist = 1;
         $curposition = $position + $direction;
         $found = null;
-        while($curposition > -1 && $curposition < count($selmistake->answer) && $found == null) {
+        //echo $direction;
+        while(($curposition > -1) && ($curposition < count($selmistake->answer)) && ($found === null)) {
+            //echo $curposition . ' ' . $found . '<br />';
             if (array_key_exists($curposition, $lcs)) {
-                $found = $curposition;
+                $found = $lcs[$curposition];
             } else {
-                $curposition = $position + $direction;
+                $curposition += $direction;
                 $dist = $dist + 1;
             }
         }
