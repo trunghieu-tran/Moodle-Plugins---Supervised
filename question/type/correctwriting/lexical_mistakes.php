@@ -20,10 +20,13 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
     // An array of fixed lexemes indexes
     public $correctedresponseindex;
 
-        public function mistake_key() {
+    public function mistake_key() {
         return '';//TODO - implement actually
     }
 }
 
+class qtype_correctwriting_scanning_miatake extends qtype_correctwriting_lexical_mistake {
+
+}
 
 ?>
