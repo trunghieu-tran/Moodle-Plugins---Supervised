@@ -538,6 +538,13 @@ class  block_formal_langs_lexical_error {
      *  @var block_formal_langs_token_base
      */
     public $correctedtoken;
+    /**
+     * A string, which determines a specific error kind.
+     * Can be used by external interface (like CorrectWriting's lexical analyzer)
+     * to handle specifical lexical error
+     * @var string
+     */
+    public $errorkind = null;
 }
 
 /**
