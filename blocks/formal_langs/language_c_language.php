@@ -177,7 +177,7 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
             $a->line = $result->position()->linestart();
             $a->col = $result->position()->colstart();
             $a->symbol = $value;
-            $res->errorkind = 'clanguagemulticharliteral'
+            $res->errorkind = 'clanguagemulticharliteral';
             $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
             $this->errors[] = $res;
         }

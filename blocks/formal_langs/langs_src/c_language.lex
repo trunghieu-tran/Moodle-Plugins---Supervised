@@ -200,7 +200,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
             $a->line = $result->position()->linestart();
             $a->col = $result->position()->colstart();
             $a->symbol = $value;
-            $res->errorkind = 'clanguagemulticharliteral'
+            $res->errorkind = 'clanguagemulticharliteral';
             $res->errormessage = get_string('clanguagemulticharliteral','block_formal_langs',$a);
             $this->errors[] = $res;
         }
