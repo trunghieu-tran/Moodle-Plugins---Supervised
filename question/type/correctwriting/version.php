@@ -34,6 +34,6 @@ $plugin->dependencies = array(
     'qtype_shortanswer' => 2011102700,
     'qbehaviour_adaptivehints' => 2013011800,
     'qbehaviour_adaptivehintsnopenalties' => 2013011800,
-    'qtype_poasquestion' => 2013011800,
+    'qtype_poasquestion' => 2013020200,
     'block_formal_langs' => 2012021400
 );
