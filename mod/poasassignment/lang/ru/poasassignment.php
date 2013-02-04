@@ -326,3 +326,4 @@ $string['subplugintype_poasassignmentanswertypes_plural'] = 'Типы ответ
 $string['subplugintype_poasassignmenttaskgivers_plural'] = 'Стратегии выдачи заданий';
 $string['subplugintype_poasassignmentadditional_plural'] = 'Дополнительно';
 $string['poasassignmentplugins'] = 'Плагины POAS Assignment';
+$string['submissions_help'] = 'На этой странице вы можете оценивать работы студентов';
