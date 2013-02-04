@@ -83,19 +83,39 @@ class qtype_correctwriting_lexical_analyzer {
         }
         //3. Set array of mistakes from lexer errors - Mamontov
         $mistakes = array();
+        // Mapping from error kind to our own language string
+        $mistakecustomhandling = array('clanguagemulticharliteral' => 'clanguagemulticharliteral');
         if (count($responsestring->stream->errors) != 0) {
+            /**
+             * @var block_formal_langs_lexical_error $error
+             */
             foreach($responsestring->stream->errors as $index => $error) {
-                $mistake = new qtype_correctwriting_scanning_miatake();
+                $mistake = new qtype_correctwriting_scanning_mistake();
+
                 $message =  $error->errormessage;
                 $mistake->languagename = $question->get_used_language()->name();
                 $mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
                 $mistake->answermistaken = null;
                 $mistake->answer = null;
                 $mistake->response = $responsestr;
-                $mistake->responsemistaken = $error->tokenindex;
+                $mistake->responsemistaken = array( $error->tokenindex );
                 $mistake->weight = $question->lexicalerrorweight;
                 $mistake->correctedresponse = null;
                 $mistake->correctedresponseindex = null;
+                if (array_key_exists($error->errorkind, $mistakecustomhandling)) {
+                    $a = new stdClass();
+                    /**
+                     * @var qtype_correctwriting_node_position $pos
+                     */
+                    $pos = $mistake->position;
+
+                    $a->linestart = $pos->linestart();
+                    $a->colstart = $pos->colstart();
+                    $a->lineend = $pos->lineend();
+                    $a->colend = $pos->colend();
+                    $a->value = $responsestring->stream->tokens[$error->tokenindex]->value();
+                    $message = get_string($mistakecustomhandling[$error->errorkind], $a);
+                }
                 $mistake->mistakemsg = $message;
                 $mistakes[] = $mistake;
             }

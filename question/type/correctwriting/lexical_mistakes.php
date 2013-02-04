@@ -25,7 +25,7 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
     }
 }
 
-class qtype_correctwriting_scanning_miatake extends qtype_correctwriting_lexical_mistake {
+class qtype_correctwriting_scanning_mistake extends qtype_correctwriting_lexical_mistake {
 
 }
 
