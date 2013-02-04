@@ -85,7 +85,7 @@ class qtype_correctwriting_lexical_analyzer {
         $mistakes = array();
         if (count($responsestring->stream->errors) != 0) {
             foreach($responsestring->stream->errors as $index => $error) {
-                $mistake = new qtype_correctwriting_lexical_mistake();
+                $mistake = new qtype_correctwriting_scanning_miatake();
                 $message =  $error->errormessage;
                 $mistake->languagename = $question->get_used_language()->name();
                 $mistake->position = $responsestring->stream->tokens[$error->tokenindex]->position();
