@@ -104,6 +104,7 @@ class qtype_correctwriting_lexical_analyzer {
                 $mistake->correctedresponseindex = null;
                 if (array_key_exists($error->errorkind, $mistakecustomhandling)) {
                     $a = new stdClass();
+                    
                     /**
                      * @var qtype_correctwriting_node_position $pos
                      */
