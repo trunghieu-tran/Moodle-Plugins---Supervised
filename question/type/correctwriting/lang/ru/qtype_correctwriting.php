@@ -17,6 +17,7 @@ $string['answersinstruct'] = 'Введите один или несколько 
 $string['caseno'] = 'Нет, регистр не важен';
 $string['casesensitive'] = 'Важен ли регистр?';
 $string['caseyes'] = 'Да, регистр важен';
+$string['clanguagemulticharliteral'] = 'Символьный литерал из нескольких символов на позиции {$a->linestart0}:{$a->colstart0}';
 $string['correctwriting'] = 'Пишем правильно';
 $string['enterlexemedescriptions']  = 'Пожалуйста, введите описания лексем';
 $string['hintgradeborder'] = 'Минимальная оценка ответа для анализа на ошибки';

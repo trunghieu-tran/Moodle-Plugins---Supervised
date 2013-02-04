@@ -17,6 +17,7 @@ $string['answersinstruct'] = 'Enter one or more correct answers. When you try to
 $string['caseno'] = 'No, case is unimportant';
 $string['casesensitive'] = 'Case sensitivity';
 $string['caseyes'] = 'Yes, case is important';
+$string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->linestart0}:{$a->colstart0}';
 $string['correctwriting'] = 'Correct writing';
 $string['defaultlangdescription'] = 'Language selected by default when creating a new question';
 $string['defaultlanglabel'] = 'Default language';
