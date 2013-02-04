@@ -100,7 +100,8 @@ class grade_form extends moodleform {
             $weightsum += $criterion->weight;
         
         $context = get_context_instance(CONTEXT_MODULE, $instance['id']);
-        
+
+        $options = new stdClass();
         $options->area    = 'poasassignment_comment';
         $options->pluginname = 'poasassignment';
         $options->component = 'mod_poasassignment';
