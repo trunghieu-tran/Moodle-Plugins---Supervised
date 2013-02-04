@@ -740,6 +740,7 @@ class poasassignment_model {
         $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$assigneeid));
         $attempt = $DB->get_record('poasassignment_attempts',array('assigneeid'=>$assigneeid,'attemptnumber'=>$attemptscount));
         $assignee = $DB->get_record('poasassignment_assignee',array('id'=>$attempt->assigneeid));
+        $data = new stdClass();
         $data->final = $assignee->finalized;
         if ($ratingvalues = $DB->get_records('poasassignment_rating_values',array('attemptid'=>$attempt->id))) {
             foreach ($ratingvalues as $ratingvalue) {
@@ -769,6 +770,7 @@ class poasassignment_model {
         $cm = get_coursemodule_from_instance('poasassignment', $this->poasassignment->id);
         $context = get_context_instance(CONTEXT_MODULE, $cm->id);
 
+        $options = new stdClass();
         $options->area    = 'poasassignment_comment';
         $options->pluginname = 'poasassignment';
         $options->context = $context;
@@ -1457,48 +1459,57 @@ class poasassignment_model {
         }
         return $usersid;
     }
+
+    /**
+     * Get statistics block for teacher - HTML with content like
+     * xx of XX works need grade (display count of ungraded works and total count)
+     *
+     * @return string
+     */
     function get_statistics() {
         global $DB,$OUTPUT,$CFG;
         $html = '';
         $cm = get_coursemodule_from_instance('poasassignment',$this->poasassignment->id);
         $groupmode = groups_get_activity_groupmode($cm);
         $currentgroup = groups_get_activity_group($cm, true);
-        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id.'&page=view');
-        $context=get_context_instance(CONTEXT_MODULE,$cm->id);
+        groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/poasassignment/view.php?id=' . $cm->id . '&page=view');
+        $context = get_context_instance(CONTEXT_MODULE,$cm->id);
         $notchecked=0;
         $count=0;
 
         if ($usersid = $this->get_users_with_active_tasks()) {
-            $count=count($usersid);
+            $count = count($usersid);
             foreach ($usersid as $userid) {
                 if ($assignee = $this->get_assignee($userid, $this->poasassignment->id)) {
-                    $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
-                    if ($attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount))) {
-                        if ($attempt->attemptdate>$attempt->ratingdate || !isset($attempt->rating))
-                        $notchecked++;
+                    $attemptscount = $DB->count_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
+                    if ($attempt = $DB->get_record('poasassignment_attempts', array('assigneeid' => $assignee->id, 'attemptnumber' => $attemptscount))) {
+                        if (!$this->attempt_is_checked($attempt)) {
+                            $notchecked++;
+                        }
                     }
                 }
             }
         }
 
         /// If we know how much students are enrolled on this task show "$notchecked of $count need grade" message
-        if ($count!=0) {
+        if ($count != 0) {
             $html = $notchecked.' '.get_string('of','poasassignment').' '.$count.' '.get_string('needgrade','poasassignment');
             $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions'));
             return "<align='right'>".html_writer::link($submissionsurl,$html);
         }
         else {
             $notchecked=0;
-            $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid'=>$this->poasassignment->id));
+            $assignees = $DB->get_records('poasassignment_assignee',array('poasassignmentid' => $this->poasassignment->id));
             foreach ($assignees as $assignee) {
-                $attemptscount=$DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
-                if ($attempt=$DB->get_record('poasassignment_attempts',array('assigneeid'=>$assignee->id,'attemptnumber'=>$attemptscount))) {
-                    if ($attempt->attemptdate>$attempt->ratingdate || !isset($attempt->rating))
-                    $notchecked++;
+                $attemptscount = $DB->count_records('poasassignment_attempts',array('assigneeid'=>$assignee->id));
+                if ($attempt = $DB->get_record('poasassignment_attempts',array('assigneeid' => $assignee->id,'attemptnumber' => $attemptscount))) {
+                    if (!$this->attempt_is_checked($attempt)) {
+                        $notchecked++;
+                    }
                 }
             }
             /// If there is no enrollment on this task but someone loaded anser show "$notchecked need grade" message
-            if ($notchecked!=0) {
+            if ($notchecked != 0) {
                 $html = $notchecked.' '.get_string('needgrade','poasassignment');
                 $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions'));
                 return "<align='right'>".html_writer::link($submissionsurl,$html);
@@ -1507,6 +1518,15 @@ class poasassignment_model {
         $html = get_string('noattempts','poasassignment');
         $submissionsurl = new moodle_url('view.php',array('id'=>$cm->id,'page'=>'submissions'));
         return "<align='right'>".html_writer::link($submissionsurl,$html);
+    }
+
+    function attempt_is_checked($attempt) {
+        if ($attempt->draft) {
+            return isset($attempt->ratingdate) && ($attempt->ratingdate > $attempt->attemptdate);
+        }
+        else {
+            return ($attempt->ratingdate > $attempt->attemptdate)  && isset($attempt->rating);
+        }
     }
 
     function get_penalty($attemptid) {
