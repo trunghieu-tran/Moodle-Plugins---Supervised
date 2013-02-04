@@ -190,7 +190,9 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
  */
 class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
 
-    //@var mistake, with which this hint is associated
+    /**
+     * @var qtype_correctwriting_sequence_mistake
+     */
     protected $mistake;
     //@var token(s) descriptions for the hint or value if no description available
     protected $token = '';
@@ -238,8 +240,152 @@ class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
     }
 
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
-        $hinttext = 'Successfuly rendered hint for <pre> '. var_export($this->mistake, true)  . '</pre>!';
+        global $CFG;
+        /**
+         * @var qtype_correctwriting_sequence_mistake $selmistake
+         */
+        $selmistake = $this->mistake;
+        $absent = 'absent_';
+        if (textlib::substr($selmistake->mistake_key(), 0, textlib::strlen($absent)) == $absent) {
+            $imagedata = $this->prepare_image_data_for_absent_mistake();
+        } else {
+            $imagedata = $this->prepare_image_data_for_moved_mistake();
+        }
 
-        return $hinttext;
+        $url  = $CFG->wwwroot . '/question/type/correctwriting/wherepicimage.php?data=' . urlencode($imagedata);
+        $imagesrc = html_writer::empty_tag('image', array('src' => $url));
+        return $imagesrc;
+    }
+
+    /**
+     * Converts token to string
+     * @param  block_formal_langs_token_base  $p
+     * @return string
+     */
+    protected static function to_string($p) {
+        return $p->value();
+    }
+
+    /**
+     * Creates response text for image
+     * @return string
+     */
+    protected function create_response_text_for_image() {
+        $temp  = array_map('qtype_correctwriting_hintwherepic::to_string', $this->mistake->response);
+        $temp = array_map('base64_encode', $temp);
+        return implode('|', $temp);
+    }
+    /**
+     * Prepares image data for added mistake
+     */
+    protected function prepare_image_data_for_absent_mistake() {
+        $result = array();
+        $result[]  = 'absent';
+        $result[] = base64_encode($this->mistake->token_descr_or_value($this->mistake->answermistaken[0]));
+        $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
+        $result[] = $pos->position;
+        $result[] = $pos->relative;
+        $result[] = $this->create_response_text_for_image();
+
+        //echo '<pre>';
+        //print_r($result);
+        //echo '</pre>';
+
+        return base64_encode(implode(',,,', $result));
+    }
+    /**
+     * Prepares image data for moved mistake
+     */
+    protected function prepare_image_data_for_moved_mistake() {
+        $result = array();
+        $result[]  = 'moved';
+        $result[] = $this->mistake->responsemistaken[0];
+        $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
+        $result[] = $pos->position;
+        $result[] = $pos->relative;
+        $result[] = $this->create_response_text_for_image();
+
+        //echo '<pre>';
+        //print_r($result);
+        //echo '</pre>';
+
+        return base64_encode(implode(',,,', $result));
+    }
+    /**
+     * Finds a nearest position to known $position of answer in response LCS, searching in direction
+     * @param int $position  a position
+     * @param int $direction sequence length
+     * @param int $dist distance from requested position, where match was found
+     * @return null|int position
+     */
+    private function find_response_position($position, $direction, &$dist) {
+        /**
+         * @var qtype_correctwriting_sequence_mistake $selmistake
+         */
+        $selmistake = $this->mistake;
+        $lcs = $selmistake->lcs();
+        $dist = 1;
+        $curposition = $position + $direction;
+        $found = null;
+        //echo $direction;
+        while(($curposition > -1) && ($curposition < count($selmistake->answer)) && ($found === null)) {
+            //echo $curposition . ' ' . $found . '<br />';
+            if (array_key_exists($curposition, $lcs)) {
+                $found = $lcs[$curposition];
+            } else {
+                $curposition += $direction;
+                $dist = $dist + 1;
+            }
+        }
+        return $found;
+    }
+    /**
+     * Finds insertion position for current mistake in response
+     * @param int $position position of token in answer string
+     * @return stdClass  <int position, string  relative before|after> int position of token in response string, relative
+     * determines where token should be placed, before or after selected
+     */
+    private function find_insertion_position_for($position) {
+        /**
+         * @var qtype_correctwriting_sequence_mistake $selmistake
+         */
+        $selmistake = $this->mistake;
+        $result = new stdClass();
+        $lcs = $selmistake->lcs();
+        if (count($lcs) == 0) {
+            $result->position = 0;
+            $result->relative = 'before';
+        } else {
+            $distprevious = 0;
+            $distnext = 0;
+            $posprevious = $this->find_response_position($position, -1, $distprevious);
+            $posnext = $this->find_response_position($position, 1, $distnext);
+            if ($posprevious === null) {
+                if ($posnext === null) {
+                    $result->position = 0;
+                    $result->relative = 'before';
+                } else {
+                    $result->position = $posnext;
+                    $result->relative = 'before';
+                }
+            }  else {
+                if ($posnext === null) {
+                    $result->position = $posprevious;
+                    $result->relative = 'after';
+                } else {
+                    // Pick nearest
+                    if ($distprevious < $distnext) {
+                        $result->position = $posprevious;
+                        $result->relative = 'after';
+                    }  else {
+                        $result->position = $posnext;
+                        $result->relative = 'before';
+                    }
+                }
+            }
+
+        }
+
+        return $result;
     }
 }
