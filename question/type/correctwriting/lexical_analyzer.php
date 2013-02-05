@@ -104,7 +104,6 @@ class qtype_correctwriting_lexical_analyzer {
                 $mistake->correctedresponseindex = null;
                 if (array_key_exists($error->errorkind, $mistakecustomhandling)) {
                     $a = new stdClass();
-                    
                     /**
                      * @var qtype_correctwriting_node_position $pos
                      */
@@ -115,7 +114,7 @@ class qtype_correctwriting_lexical_analyzer {
                     $a->lineend = $pos->lineend();
                     $a->colend = $pos->colend();
                     $a->value = $responsestring->stream->tokens[$error->tokenindex]->value();
-                    $message = get_string($mistakecustomhandling[$error->errorkind], $a);
+                    $message = get_string($mistakecustomhandling[$error->errorkind],  'qtype_correctwriting', $a);
                 }
                 $mistake->mistakemsg = $message;
                 $mistakes[] = $mistake;
