@@ -213,9 +213,7 @@ class qtype_correctwriting_question extends question_graded_automatically
         if (is_a($response['answer'],'qtype_poasquestion_string') == false) {
             $response['answer'] = new qtype_poasquestion_string($response['answer']);
         }
-        if (!$this->usecase) {
-            $response['answer']->tolower();
-        }
+
         if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
             return $this->matchedgradestate;
         }
@@ -225,12 +223,7 @@ class qtype_correctwriting_question extends question_graded_automatically
                 $answer->answer = new qtype_poasquestion_string($answer->answer);
             }
         }
-        // Make all symbols lowercase, when non case-sensitive settings
-        if (!$this->usecase) {
-            foreach($this->answers as $id => $answer) {
-                $answer->answer->tolower();
-            }
-        }
+
 
         $this->gradecachevalid = true;
         $this->gradecachedanswer = $response['answer'];
