@@ -38,6 +38,12 @@ define('INSERTION_MARK_Y_OFFSET', 2);
 define('INSERTION_MARK_TOP_PADDING', 2);
 // Defines  a space, where marked label should be placed
 define('INSERTION_MARK_LABEL_PADDING', 2);
+// Defines an insertion height for brackets
+define('INSERTION_BRACKET_HEIGHT', 6);
+// Defines an insertion spacing from left bracket part
+define('INSERTION_BRACKET_LEFT_SPACING', 3);
+// Defines an insertion spacing from rightbracket part
+define('INSERTION_BRACKET_RIGHT_SPACING', 3);
 // A length of arrow end part
 define('ARROW_LENGTH', 5);
 // An arrow angle in radians
@@ -45,7 +51,7 @@ define('ARROW_ANGLE', 1);
 // A space between arrow langind point and labels (used for moving lexeme)
 define('ARROW_INSERT_PADDING', 2);
 // A padding between middle part of token and starting of arrow for moving lexeme
-define('ARROW_TOP_PADDING', 2);
+define('ARROW_TOP_PADDING', 0);
 // A padding for moving mistake height
 define('MOVING_LINE_HEIGHT', 10);
 // A space between words
@@ -277,11 +283,26 @@ class qtype_correctwriting_image {
         $bottomy = $topy + INSERTION_MARK_HEIGHT;
         $width  = INSERTION_MARK_WIDTH / 2;
 
-        imageline($im, $this->insertionx, $bottomy, $this->insertionx - $width / 2, $topy, $palette['red']);
-        imageline($im, $this->insertionx, $bottomy, $this->insertionx + $width / 2, $topy, $palette['red']);
         $labeltopy = $topy - INSERTION_MARK_TOP_PADDING - $label->rect()->height;
         $label->set_pos($this->insertionx - $label->rect()->width / 2, $labeltopy );
         $label->paint($im, $palette);
+
+        $leftx = $this->insertionx - $width / 2;
+        $rightx = $this->insertionx + $width / 2;
+
+        $leftbound = $label->rect()->x - INSERTION_BRACKET_LEFT_SPACING;
+        $rightbound = $leftbound + $label->rect()->width  + INSERTION_BRACKET_RIGHT_SPACING;
+        imageline($im, $leftbound, $topy, $leftx, $topy, $palette['red']);
+        imageline($im, $rightbound, $topy, $rightx, $topy, $palette['red']);
+
+        imageline($im, $leftbound, $topy,
+                       $leftbound, $topy - INSERTION_BRACKET_HEIGHT, $palette['red']);
+        imageline($im, $rightbound, $topy,
+                       $rightbound, $topy - INSERTION_BRACKET_HEIGHT, $palette['red']);
+
+        imageline($im, $this->insertionx, $bottomy, $leftx, $topy, $palette['red']);
+        imageline($im, $this->insertionx, $bottomy, $rightx, $topy, $palette['red']);
+
 
     }
     /**
@@ -298,6 +319,9 @@ class qtype_correctwriting_image {
         $sourcey = $sourcelabel->rect()->y - ARROW_TOP_PADDING;
         $topy = FRAME_LABEL_PADDING;
         $smally =  FRAME_LABEL_PADDING  + MOVING_LINE_HEIGHT;
+        $endx = $sourcelabel->rect()->x + $sourcelabel->rect()->width;
+
+        imageline($im,  $sourcelabel->rect()->x, $sourcey, $endx, $sourcey, $palette['red'] );
         imageline($im, $sourcex, $sourcey, $sourcex, $topy, $palette['red'] );
         imageline($im, $sourcex, $topy, $this->insertionx, $topy, $palette['red'] );
         imageline($im, $this->insertionx, $topy, $this->insertionx, $smally, $palette['red'] );
