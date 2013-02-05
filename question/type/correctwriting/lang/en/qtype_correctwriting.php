@@ -31,7 +31,7 @@ $string['langid'] = 'Language of the answer';
 $string['langid_help'] = 'This language will be used to tokenize answers and responses to the question.';
 $string['lexemedescriptions'] = 'Descriptions for the tokens';
 $string['lexicalerrorthreshold'] = 'Lexical error threshold';
-$string['lexicalerrorthreshold_help'] = 'A maximum damerau-levenshtein distance between correct and incorrect words for incorrect word to be considered a typo. Enter it as a fraction of the length of the correct word.';//TODO - add hyperlink for damerau-levenshtein distance.
+$string['lexicalerrorthreshold_help'] = 'A maximum <a href = "http://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance">Damerau-Levenshtein distance</a> between correct and incorrect words for incorrect word to be considered a typo. Enter it as a fraction of the length of the correct word.';
 $string['lexicalerrorweight'] = 'Penalty for lexical mistake';
 $string['lexicalerrorweight_help'] = 'Penalty for each lexical mistake in student\'s response: a typo, an extra or absent separator etc.';
 $string['maxmistakepercentage'] = 'Maximum percent of mistakes';
