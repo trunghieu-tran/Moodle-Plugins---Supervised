@@ -351,7 +351,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return string
      */
     protected function string_caseinsensitive_value() {
-        $value = $this->value();
+        $value = $this->value;
         if (is_object($this->value)) {
             $value = clone $value;
             $value->tolower();
