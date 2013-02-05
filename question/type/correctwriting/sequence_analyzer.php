@@ -88,7 +88,7 @@ class  qtype_correctwriting_sequence_analyzer {
     private function scan_response_mistakes($weights) {
         $answertokens = $this->answer->stream;
         $responsetokens = $this->correctedresponse->stream;
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens);
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $this->question->usecase);
         if (count($alllcs) == 0) {
             // If no LCS found perform searching with empty array
             $alllcs[] = array();
@@ -133,9 +133,10 @@ class  qtype_correctwriting_sequence_analyzer {
      * There may be more than one lcs for a given pair of strings.
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
      * @param  block_formal_langs_token_stream $responsestream array of response tokens
+     * @param  bool $casesensitive whether comparisons must be case sensitive
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answerstream, $responsestream) {
+    public static function lcs($answerstream, $responsestream, $casesensitive = true) {
         // Extract data from method
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
@@ -145,7 +146,7 @@ class  qtype_correctwriting_sequence_analyzer {
         // Match is defined as tuple <i,j>
         for ($i = 0; $i < count($answer); $i++) {
             for($j = 0; $j < count($response); $j++) {
-                if ($answer[$i]->is_same($response[$j])) {
+                if ($answer[$i]->is_same($response[$j], $casesensitive)) {
                     $matches[] = array($i, $j);
                 }
             }
@@ -386,7 +387,7 @@ class  qtype_correctwriting_sequence_analyzer {
                 $movedpos = -1;
                 for ($j = 0;$j < $responsecount && $ismoved == false;$j++) {
                     // Check whether lexemes are equal
-                    $isequal = $answer[$i]->is_same($response[$j]);
+                    $isequal = $answer[$i]->is_same($response[$j], $this->question->usecase);
                     if ($isequal == true && $responseused[$j] == false) {
                         $ismoved = true;
                         $movedpos = $j;
