@@ -22,9 +22,6 @@
  * @copyright  2011 Sychev Oleg, Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-// Used font size
-define('FONT_SIZE', 4);
 // Defines a width for drawing lines of moving, removing or adding
 define('LINE_WIDTH', 2);
 // Defines a border between label and image border on X axis
@@ -59,6 +56,10 @@ define('FRAME_THICKNESS', 1);
 define('FRAME_LABEL_PADDING' , 4);
 
 /**
+ * This style of require_once is used intentionally, due to non-availability of Moodle here
+ */
+require_once(dirname(__FILE__) . '/textimagerenderer.php');
+/**
  * A simple label for placing it and determining it's size
  */
 class qtype_correctwriting_label {
@@ -75,14 +76,9 @@ class qtype_correctwriting_label {
 
     public function __construct($text) {
         $this->text = $text;
-        $this->rect = new stdClass;
+        $this->rect = qtype_correctwriting_get_text_bounding_box($text);
         $this->rect->x = 0;
         $this->rect->y = 0;
-        // Get font metics
-        $width = imagefontwidth(FONT_SIZE);
-        $height = imagefontheight(FONT_SIZE);
-        $this->rect->width = $width * strlen($text);
-        $this->rect->height = $height;
     }
 
     /**
@@ -112,7 +108,7 @@ class qtype_correctwriting_label {
         // Set color according to fixed parameter
         $color = $palette['black'];
         // Paint a string
-        imagestring($im, FONT_SIZE, $this->rect->x, $this->rect->y, $this->text, $color);
+        qtype_correctwriting_render_text($im, $this->rect->x, $this->rect->y, $this->text, $color);
     }
 }
 

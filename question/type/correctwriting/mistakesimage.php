@@ -29,8 +29,6 @@ define('ANSWER_RESPONSE_VERTICAL_SPACE', 50);
 define('ROW_HORIZONTAL_SPACE', 7);
 // A tiny space between arrow connector and label
 define('TINY_SPACE', 2);
-// Used font size
-define('FONT_SIZE', 4);
 // Defines a width for drawing lines of moving, removing or adding
 define('LINE_WIDTH', 2);
 // A length of arrow end part
@@ -41,6 +39,11 @@ define('ARROW_ANGLE', 0.5);
 define('FRAME_SPACE', 2);
 // A thickness of drawn frame
 define('FRAME_THICKNESS', 1);
+
+/**
+ * This style of require_once is used intentionally, due to non-availability of Moodle here
+ */
+require_once(dirname(__FILE__) . '/textimagerenderer.php');
 /* Defines a simple label, which can be printed on image.
    Must contain size and point for arrow connection, which will be used  to draw arrow to or from this point.
  */
@@ -129,11 +132,9 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
        @param string $text text of lexeme
     */
    public function __construct($text) {
-       // Get font metics
-       $width = imagefontwidth(FONT_SIZE);
-       $height = imagefontheight(FONT_SIZE);
+       $bbox = qtype_correctwriting_get_text_bounding_box($text);
        // Set label size according to computes metrics
-       $this->labelsize = array($width*strlen($text), $height);
+       $this->labelsize = array($bbox->width, $bbox->height);
        // As a default we assume the lexeme is correct
        $this->text = $text;
        $this->fixed  = false;
@@ -163,7 +164,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
        // Compute a middle parameter at center
        $x = $currentrect->x + $currentrect->width/2 - $this->labelsize[0]/2;
        // Paint a string
-       imagestring($im, FONT_SIZE, $x, $currentrect->y, $this->text, $color);
+       qtype_correctwriting_render_text($im, $x, $currentrect->y, $this->text, $color);
    }
 }
 /** A table cell consists of two rows - answer and response. Answer is placed in the top of image,
@@ -640,7 +641,7 @@ class qtype_correctwriting_arrow_builder {
        if (count($this->table->mistakes()->get_added_lexeme_indexes()) != 0 ) {
            foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
                $rect = $this->table->get_rect_by_response_index($index);
-               $this->draw_strikethrough($im, $palette['black'], $rect);
+               $this->draw_strikethrough($im, $palette['red'], $rect);
            }
        }
        // Draw moved lexemes arrows
