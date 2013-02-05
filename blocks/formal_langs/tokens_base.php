@@ -345,18 +345,39 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     public function look_for_matches($other, $threshold, $iscorrect) {
         // TODO: generic mistakes handling
     }
-    
-    
+
+    /**
+     * Returns a string caseinsensitive semantic value of token
+     * @return string
+     */
+    protected function string_caseinsensitive_value() {
+        $value = $this->value();
+        if (is_object($this->value)) {
+            $value = clone $value;
+            $value->tolower();
+            $value = $value->string();
+        } else {
+            $value = textlib::strtolower($value);
+        }
+        return $value;
+    }
     /**
      * Tests, whether other lexeme is the same as this lexeme
      *  
      * @param block_formal_langs_token_base $other other lexeme
+     * @param bool $casesensitive whether we should care about for case sensitive
      * @return boolean - if the same lexeme
      */
-    public function is_same($other) {
+    public function is_same($other, $casesensitive = true) {
         $result = false;
         if ($this->type == $other->type) {
-            $result = $this->value == $other->value;
+            if ($casesensitive) {
+                $result = $this->value == $other->value;
+            }  else {
+                $left = $this->string_caseinsensitive_value();
+                $right = $other->string_caseinsensitive_value();
+                $result = $left == $right;
+            }
         }
         return $result;
     }
