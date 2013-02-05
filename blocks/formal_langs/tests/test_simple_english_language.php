@@ -24,8 +24,17 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
      */
     protected $utils;
 
+
     public function __construct() {
         $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_simple_english', $this);
+    }
+
+    public function test_other_unicode() {
+        $lang = new block_formal_langs_language_simple_english();
+        $processedstring = $lang->create_from_string('а');
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 1, 'There must be one lexeme');
+        $this->assertTrue($result[0]->value() == 'а');
     }
 
     // Tests a lexer of simple english language
