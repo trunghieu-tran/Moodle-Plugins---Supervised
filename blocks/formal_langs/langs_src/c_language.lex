@@ -54,12 +54,12 @@ function block_formal_langs_hex_to_decimal_char($matches) {
 %function next_token
 %char
 %line
-%full
 %class block_formal_langs_predefined_c_language_lexer_raw
 %state CHARACTER
 %state STRING
 %state MULTILINE_COMMENT
 %state SINGLELINE_COMMENT
+
 
 %{
   
@@ -105,8 +105,12 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $a->line = $this->yyline;
         $a->position = $this->yycol;
 
+        $a->symbol = $symbol;
+        if (is_object($symbol)) {
+            $a->symbol = $symbol->string();
+        }
 
-        $a->symbol = $symbol->string();
+
         $errormessage = 'clanguageunknownsymbol';
         if (mb_strlen($symbol) == 1) {
             if ($symbol[0] == '\'') {
@@ -146,6 +150,9 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     private function create_token_with_position($class, $value, $position) {
         // create token object
         $classname = 'block_formal_langs_c_token_' . $class;
+        if (is_object($value) == false) {
+            $value = new qtype_poasquestion_string($value);
+        }
         $res = new $classname(null, $class, $value, $position, $this->counter);
         // increase token count
         $this->counter++;
@@ -171,7 +178,11 @@ function block_formal_langs_hex_to_decimal_char($matches) {
     private function is_white_space($string) {
         // Here we need to escape symbols, so double quotes are inavoidable
         $whitespace = array(' ', "\t", "\n", "\r", "f", "\v");
-        return in_array($string[0], $whitespace);
+        $unboxedstring = $string;
+        if (is_object($string)) {
+            $unboxedstring = $string->string();
+        }
+        return in_array($unboxedstring[0], $whitespace);
     }
     // Enters state with buffered output
     private function enterbufferedstate($state) {
@@ -193,7 +204,7 @@ function block_formal_langs_hex_to_decimal_char($matches) {
         $value = $result->value();
         if ($value[0] == 'L')
             $maxcharacterlength = $maxcharacterlength + 1;
-        if ( mb_strlen($value) > $maxcharacterlength) {
+        if ( textlib::strlen($value) > $maxcharacterlength) {
             $res = new block_formal_langs_lexical_error();
             $res->tokenindex = $this->counter - 1;
             $a = new stdClass();
