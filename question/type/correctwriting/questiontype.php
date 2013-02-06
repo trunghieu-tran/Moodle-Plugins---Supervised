@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/lib.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 /**
@@ -35,7 +36,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting extends qtype_shortanswer {
+class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwriting_can_preserving_serialize {
 
 
     /** Returns fields, that differ from standard Moodle question fields
@@ -120,39 +121,55 @@ class qtype_correctwriting extends qtype_shortanswer {
         // Save main question data
         $result = parent::save_question_options($question);
 
-        $lang = block_formal_langs::lang_object($question->langid);
+
+        $newanswers = $DB->get_records('question_answers', array('question' => $question->id), 'id ASC');
 
 
-        // Answers contains an array of answer ids
-        $insertedanswerids = explode(',',$question->answers);
-        // Used lexeme descriptions for symbols
-        $descriptions = $question->lexemedescriptions;
-        $currentid = 0;
-        $currentdescription = 0;
+        $storage = new stdClass();
+        $storage->descriptions = $question->lexemedescriptions;
+        $storage->question = $question;
+        $storage->currentdescription = 0;
+        $storage->currentid = 0;
+        $storage->lang = block_formal_langs::lang_object($question->langid);
 
-        $oldanswerused = array();
-        // Insert all the new answers
-        foreach ($question->answer as $key => $answerdata) {
-            // Check for, and ignore, completely blank answer from the form.
-            if (trim($answerdata) == '' && $question->fraction[$key] == 0 &&
-                    html_is_blank($question->feedback[$key]['text'])) {
-                $currentdescription = $currentdescription + 1;
-                continue;
-            }
-            $description = $descriptions[$currentdescription];
-            $string = $lang->create_from_db('question_answers',$insertedanswerids[$currentid]);
-            $string->save_descriptions(explode(PHP_EOL, $description));
-
-            $oldanswerused[] = $insertedanswerids[$currentid];
-            $currentid = $currentid + 1;
-            $currentdescription = $currentdescription + 1;
-        }
-        // Remove old unused descriptions
-        $oldanswerunused = array_diff($oldanswerunused, $oldanswerused);
-        if ($oldanswerunused !=null) {
-            block_formal_langs_processed_string::delete_descriptions_by_id('question_answers', $oldanswerunused);
-        }
+        $serializator = new qtype_correctwriting_preserving_serializator(
+                            $oldanswerunused, $newanswers, $this, $storage
+                        );
+        $serializator->save();
         return $result;
+    }
+
+    /**
+     * Saves a descriptions associated with answers
+     * @param int $key            key of anwer record
+     * @param stdClass $answer    answer data
+     * @param stdClass $storage  temporary storage, where can be stored some important between loops data
+     *                           One key is required - usedids, which can be used to handling some unused
+     * @param array    $oldvalues  Old values of serialized data
+     */
+    public function save_stored_data($key, $answer, &$storage, $oldvalues) {
+        if ( !($answer->fraction == 0 &&
+            html_is_blank($answer->feedback)))  {
+            $description = $storage->descriptions[$storage->currentdescription];
+            $string = $storage->lang->create_from_db('question_answers', $answer->id);
+            $string->save_descriptions(explode(PHP_EOL, $description));
+            if (in_array($answer->id, $oldvalues)) {
+                $oldids = $storage->usedids;
+                $oldids[] = $answer->id;
+                $storage->usedids = $oldids;
+            }
+        }
+        $storage->currentdescription += 1;
+    }
+
+    /**
+     * Removes unused descriptions
+     * @param array $ids unused description ids
+     * @param stdClass $storage storage data
+     */
+    public function handle_unused_records($ids, &$storage) {
+        // print_r($ids);
+        block_formal_langs_processed_string::delete_descriptions_by_id('question_answers', $ids);
     }
 
     public function export_to_xml($question, qformat_xml $format, $extra=null) {
