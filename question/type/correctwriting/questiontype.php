@@ -145,17 +145,18 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      * @param array    $oldvalues  Old values of serialized data
      */
     public function save_stored_data($key, $answer, &$storage, $oldvalues) {
-        //Check was removed, because if answer was saved
-        // it must have a descriptions and all checks are made by shortanswer
-        $description = $storage->descriptions[$storage->currentdescription];
-        $string = $storage->lang->create_from_db('question_answers', $answer->id);
-        $string->save_descriptions(explode(PHP_EOL, $description));
-        if (in_array($answer->id, $oldvalues)) {
-            $oldids = $storage->usedids;
-            $oldids[] = $answer->id;
-            $storage->usedids = $oldids;
+        if ($answer->fraction > $storage->question->hintgradeborder) {
+            //Check was removed, because if answer was saved
+            // it must have a descriptions and all checks are made by shortanswer
+            $description = $storage->descriptions[$storage->currentdescription];
+            $string = $storage->lang->create_from_db('question_answers', $answer->id);
+            $string->save_descriptions(explode(PHP_EOL, $description));
+            if (in_array($answer->id, $oldvalues)) {
+                $oldids = $storage->usedids;
+                $oldids[] = $answer->id;
+                $storage->usedids = $oldids;
+            }
         }
-
         $storage->currentdescription += 1;
     }
 
