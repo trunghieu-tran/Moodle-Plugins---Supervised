@@ -112,9 +112,6 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
         //Context, where question belongs to
         $context = $question->context;
 
-
-        $answers = $question->answer;
-
         //We need an old answers in order to delete some old records
         $oldanswerunused = $DB->get_fieldset_select('question_answers', 'id', " question = '{$question->id}' ");
 
@@ -148,17 +145,17 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
      * @param array    $oldvalues  Old values of serialized data
      */
     public function save_stored_data($key, $answer, &$storage, $oldvalues) {
-        if ( !($answer->fraction == 0 &&
-            html_is_blank($answer->feedback)))  {
-            $description = $storage->descriptions[$storage->currentdescription];
-            $string = $storage->lang->create_from_db('question_answers', $answer->id);
-            $string->save_descriptions(explode(PHP_EOL, $description));
-            if (in_array($answer->id, $oldvalues)) {
-                $oldids = $storage->usedids;
-                $oldids[] = $answer->id;
-                $storage->usedids = $oldids;
-            }
+        //Check was removed, because if answer was saved
+        // it must have a descriptions and all checks are made by shortanswer
+        $description = $storage->descriptions[$storage->currentdescription];
+        $string = $storage->lang->create_from_db('question_answers', $answer->id);
+        $string->save_descriptions(explode(PHP_EOL, $description));
+        if (in_array($answer->id, $oldvalues)) {
+            $oldids = $storage->usedids;
+            $oldids[] = $answer->id;
+            $storage->usedids = $oldids;
         }
+
         $storage->currentdescription += 1;
     }
 
