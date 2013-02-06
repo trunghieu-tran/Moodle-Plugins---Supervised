@@ -53,4 +53,8 @@ You could publish a paper or thesis about using this question type and send me r
 improve rating of this project. If you could publish a scientific paper on this question and it's use with
 me as co-author this would help much more, please inform me immediately if you choose to do so.
 
+When writing about using this question, you may wish to cite following sources:
+ -  Oleg Sychev, Dmitry Mamontov.  Determining token sequence mistakes in responses to questions with open
+  text answer. Arxiv e-print. URL: http://arxiv.org/abs/1301.2466
+
 You could also help by testing - either manual or unit-testing.
