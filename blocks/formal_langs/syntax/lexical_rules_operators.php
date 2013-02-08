@@ -41,6 +41,92 @@ class  block_formal_langs_lexical_matching_rule_type {
     public static $EOF_SYMBOL = 4;
 };
 
+class block_formal_langs_lexical_transition_rule {
+    /**
+     * Old state for transition
+     * @var int
+     */
+    public $oldstate;
+    /**
+     * A rule for matching transition
+     * @var block_formal_langs_lexical_matching_rule
+     */
+    public $rule;
+    /**
+     * A new states array
+     * @var array
+     */
+    public $newstates;
+}
+/**
+ * Describes a transition table for NFA/DFA
+ */
+class block_formal_langs_lexical_transition_table {
+    /**
+     * A transition table is described as array of block_formal_langs_lexical_transition_rule
+     * @var array
+     */
+    public $transitions = array();
+    /**
+     * Array of acceptable states for table. First state is always aceptable
+     * In common case, there is only one state, but in lexer case, it is one
+     * @var array acceptable state
+     */
+    public $acceptablestates = array();
+
+    /**
+     * Returns a transitions starting from state
+     * @param int $oldstate
+     * @return array of  block_formal_langs_lexical_transition_rule
+     */
+    public function transitions_for_state($oldstate) {
+        $result = array();
+        for($i = 0; $i < count($this->transitions); $i++) {
+            /**
+             * @var block_formal_langs_lexical_transition_rule $rule
+             */
+            $rule = $this->transitions[$i];
+            if ($rule->oldstate == $oldstate) {
+                $result[] = $rule;
+            }
+        }
+        return $result;
+    }
+
+    public function reenumerate($newstartingstate) {
+        for($i = 0; $i < count($this->transitions); $i++) {
+            /**
+             * @var block_formal_langs_lexical_transition_rule $rule
+             */
+            $rule = $this->transitions[$i];
+            $rule->oldstate += $newstartingstate;
+            for($i = 0; $i < count($rule->newstates); $i++) {
+                $rule->newstates[$i] += $newstartingstate;
+            }
+        }
+        for($i = 0; $i < count($this->acceptablestates); $i++) {
+            $this->acceptablestates[$i] += $newstartingstate;
+        }
+    }
+
+    /**
+     * Creates a transition rule. Other passes arguments are used to form a transition array
+     * @param int $oldstate starting state
+     * @param block_formal_langs_lexical_matching_rule $rule a transition rule
+     * @return array
+     */
+    public static function transition_rule($oldstate,$rule) {
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+
+        $a = new block_formal_langs_lexical_transition_rule();
+        $a->oldstate = $oldstate;
+        $a->rule = $rule;
+        $a->newstates = $args;
+        return $a;
+    }
+}
 /**
  *  A common lexical matching rule, which handles most of character style types
  */
@@ -366,5 +452,264 @@ class block_formal_langs_lexical_matching_rule  {
         }
         return $result;
      }
+
+    /**
+     * Builds a transition table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+        $result = new block_formal_langs_lexical_transition_table();
+        $result->transitions[] = $result->transition_rule(0, $this, 1);
+        $result->acceptablestates = array(1);
+    }
 };
 
+/**
+ * Determines an alternative operator
+ */
+class block_formal_langs_lexical_alternative_operator {
+    /**
+     * Child nodes
+     * @var array of child nodes, which must implement build_table method
+     */
+    public $children;
+
+    /**
+     * Constructs new alternative operator
+     * @param $children
+     */
+    public function __construct($children) {
+        $this->children = $children;
+    }
+    /**
+     * Builds a transition table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+        $result = self::build_non_concatenated($this->children);
+        // Merge leading acceptable states into one
+        $newacceptablestate = max($result->acceptablestates) + 1;
+        for($i = 0; $i < count($result->acceptablestates); $i++) {
+            $result->transitions[] = $result->transition_rule(
+                $result->acceptablestates[$i],
+                block_formal_langs_lexical_matching_rule::epsilon_rule(),
+                $newacceptablestate);
+        }
+        $result->acceptablestates = array( $newacceptablestate );
+        return $result;
+    }
+
+    /**
+     * Builds tansition table for non-concatenated nodes
+     * @param array $nodes
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public static function build_non_concatenated($nodes) {
+        /**
+         * @var  block_formal_langs_lexical_matching_rule $child
+         */
+        $child = $nodes[0];
+        $result = $child->build_table();
+        $result->reenumerate(1);
+        $result->transitions[] = $result->transition_rule(0,
+            block_formal_langs_lexical_matching_rule::epsilon_rule(),
+            1);
+        $currentoffset = $result->acceptablestates[0] + 1;
+        // Merge transition tables
+        for($i = 1; $i < count($nodes); $i++) {
+            $child = $nodes[$i];
+            $temp = $child->build_table();
+            $temp->reenumerate($currentoffset);
+            $result->transitions[] = $result->transition_rule(0,
+                block_formal_langs_lexical_matching_rule::epsilon_rule(),
+                $currentoffset);
+            $result->transitions = array_merge($result->transitions, $temp->transitions);
+            $result->acceptablestates[] = $temp->acceptablestates[0];
+            $currentoffset = $temp->acceptablestates[0] + 1;
+        }
+    }
+}
+
+/**
+ * A concatenation operator
+ */
+class block_formal_langs_lexical_concat_operator {
+    /**
+     * Nodes for concatenation operator
+     * @var array
+     */
+    protected $nodes;
+
+    /**
+     * Constructs a concatenation nodes
+     * @param array $nodes
+     */
+    public function __construct($nodes) {
+        $this->nodes = $nodes;
+    }
+
+    /**
+     * Builds a transition table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+        /**
+         * @var  block_formal_langs_lexical_matching_rule $child
+         */
+        $child = $this->nodes[0];
+        $result = $child->build_table();
+        $currentoffset = $result->acceptablestates[0] + 1;
+        for($i = 1; $i < count($this->nodes); $i++) {
+            $child = $this->nodes[$i];
+            $temp = $child->build_table();
+            $temp->reenumerate($currentoffset);
+            $result->transitions[] = $result->transition_rule(0,
+                block_formal_langs_lexical_matching_rule::epsilon_rule(),
+                $currentoffset);
+            $result->transitions = array_merge($result->transitions, $temp->transitions);
+            $result->acceptablestates = $temp->acceptablestates;
+            $currentoffset = $temp->acceptablestates[0] + 1;
+        }
+        return $result;
+    }
+}
+
+/**
+ * An infinite repetition for node
+ */
+class block_formal_langs_lexical_infinite_repetition {
+    /**
+     * An inifinite repetition node for matching
+     * @var block_formal_langs_lexical_matching_rule
+     */
+    protected $node;
+
+    /**
+     * A new node for repetition
+     * @param $node
+     */
+    public function __construct($node) {
+        $this->node = $node;
+    }
+
+    /**
+     * Builds a transition table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+        $result = $this->node->build_table();
+        $result->transitions[] = $result->transition_rule($result->acceptablestates[0],
+            block_formal_langs_lexical_matching_rule::eof_rule(),
+            0
+        );
+        return $result;
+    }
+}
+
+/**
+ * None or infinite repetition of same node
+ */
+class block_formal_langs_lexical_none_or_infinite_repetition {
+    /**
+     * A node
+     * @var block_formal_langs_lexical_matching_rule
+     */
+    protected $node;
+
+    /**
+     * A new node for repetition
+     * @param $node
+     */
+    public function __construct($node) {
+        $this->node = $node;
+    }
+
+    /**
+     * Builds a transition table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+        $fst = block_formal_langs_lexical_matching_rule::eof_rule();
+        $snd = new block_formal_langs_lexical_infinite_repetition($this->node);
+        $top = new block_formal_langs_lexical_alternative_operator(array($fst, $snd));
+        return $top->build_table();
+    }
+}
+
+/**
+ * A quantifier  for counting repeated instances
+ */
+class block_formal_langs_lexical_from_to_quantifier {
+    /**
+     * A specified node
+     * @var block_formal_langs_lexical_matching_rule
+     */
+    protected $node;
+    /**
+     * Minimum repetition of nodes
+     * @var int minimum repetition
+     */
+    protected $min;
+    /**
+     * Maximum repetition of nodes
+     * @var  int maximum repetition
+     */
+    protected $max;
+
+    /**
+     * Constructs a new node
+     * @param block_formal_langs_lexical_matching_rule $node  node for repetition
+     * @param int|null $min  null - is 0
+     * @param int|null $max  null - is infinite
+     */
+    public function __construct($node, $min = null, $max = null) {
+        $this->node = $node;
+        $this->min = $min;
+        $this->max = $max;
+    }
+
+    /**
+     * Builds alternative concatenations from min to max
+     * @param int $min
+     * @param int $max
+     * @return block_formal_langs_lexical_alternative_operator
+     */
+    protected function build_alternative_concatenations($min, $max) {
+        $alts = array();
+        for($i = $min; $i < $max; $i++) {
+            $concat = array();
+            for($j = 0; $j < $i; $j++) {
+                $concat[] = $this->node;
+            }
+            $alts[] = new block_formal_langs_lexical_concat_operator($concat);
+        }
+        $alt = new block_formal_langs_lexical_alternative_operator($alts);
+        return $alt;
+    }
+    /**
+     * Builds a new table
+     * @return block_formal_langs_lexical_transition_table
+     */
+    public function build_table() {
+       $result = null;
+       if ($this->min === 0 && $this->max === 0 || ($this->min > $this->max && $this->max !== null)) {
+           $result = block_formal_langs_lexical_matching_rule::eof_rule()->build_table();
+           return $result;
+       }
+       if ($this->min === 0 && $this->max === null) {
+           $a = new block_formal_langs_lexical_none_or_infinite_repetition($this->node);
+           $result = $a->build_table();
+           return $result;
+       }
+       if ($this->max === null) {
+           $alt = $this->build_alternative_concatenations($this->min, $this->max - 1);
+           $rep = new block_formal_langs_lexical_infinite_repetition($this->node);
+           $resnode = new block_formal_langs_lexical_concat_operator($alt, $rep);
+           $result = $resnode->build_table();
+       } else {
+           $alt = $this->build_alternative_concatenations($this->min, $this->max);
+           $result = $alt->build_table();
+       }
+        return $result;
+    }
+}
