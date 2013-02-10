@@ -10,9 +10,9 @@
  * @package questions
  */
 global $CFG;
+require_once($CFG->dirroot.'/lib/textlib.class.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/syntax/grammar_parser.php');
-require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 
 /**
@@ -636,5 +636,62 @@ class block_formal_langs_parser_rule_helper {
         $cgoto = new block_formal_langs_language_parser_digraph($correctgoto);
         $test->assertTrue( $cgoto->equal($testgoto), $cgoto->dump_compare($testgoto));
         $test->assertTrue( $caction->equal($testaction), $caction->dump_compare($testaction));
+    }
+}
+
+/**
+ * A rule helper, for testing lexer parts
+ */
+class block_formal_langs_lexical_test_helper {
+    /**
+     * Builds table from string. String is formatted as
+     * rule; rule, where rule is defined as int,type,[int][:int]
+     * where
+     * @param $string
+     * @return block_formal_langs_language_parser_digraph a table from string
+     */
+    public function table_from_string($string) {
+        $str = str_replace(array(' ', "\n", "\r"), array('', '', ''), $string);
+        $rules = explode(';', $str);
+        $denormalizedrules = array();
+        $result = array();
+        foreach($rules as $rule) {
+            if (textlib::strlen($rule)) {
+                $ruleparts = explode(',', $rule);
+                $oldstate = intval($ruleparts[0]);
+                $type = $ruleparts[1];
+                $newstates = explode(':', $ruleparts[2]);
+                $newstates = array_map('intval', $newstates);
+                $denormalizedrules[] = array($oldstate, $type, $newstates);
+
+                $result[$oldstate] = array('node' => 1, 'edges' => array());
+                foreach($newstates as $state) {
+                    $result[$state] = array('node' => 1, 'edges' => array());
+                }
+            }
+        }
+        foreach($denormalizedrules as $rule) {
+           if (count($rule[2]) > 1) {
+              $i = 0;
+              foreach($rule[2] as $newstate) {
+                  $result[$rule[0]]['edges'][$rule[1] . $i] = $newstate;
+                  $i++;
+              }
+           } else {
+               $result[$rule[0]]['edges'][$rule[1]] = $rule[2][0];
+           }
+        }
+        return new block_formal_langs_language_parser_digraph($result);
+    }
+    /**
+     * Performs a new test
+     * @param block_formal_langs_lexical_matching_rule $node node to test against
+     * @param string $string
+     * @param PHPUnit_Framework_TestCase $test test data
+     */
+    public function test_table($node, $string, $test) {
+        $testtable = $node->build_table()->to_digraph();
+        $table = $this->table_from_string($string);
+        $test->assertTrue( $table->equal($testtable), $table->dump_compare($testtable));
     }
 }

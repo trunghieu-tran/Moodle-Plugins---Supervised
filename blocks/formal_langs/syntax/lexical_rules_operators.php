@@ -57,6 +57,32 @@ class block_formal_langs_lexical_transition_rule {
      * @var array
      */
     public $newstates;
+
+    /**
+     * Constructs a new rule
+     * @param int $oldstate  old state
+     * @param block_formal_langs_lexical_matching_rule $rule rule for moving
+     * @param array $newstates  new states
+     */
+    public function __construct($oldstate, $rule, $newstates) {
+        $this->oldstate = $oldstate;
+        $this->rule = $rule;
+        $this->newstates = $newstates;
+    }
+    /**
+     * Writes a transition rule as dot language string
+     * @return string transition dot string
+     */
+    public function write_as_dot() {
+        $label = $this->rule->label();
+        $text = '';
+        for ($i = 0; $i < count($this->newstates); $i++) {
+            $newstate = $this->newstates[$i];
+            $text .= '    A_' . $this->oldstate . ' -> A_' . $newstate . ' [ label="' . $label . '" ];';
+            $text .= PHP_EOL;
+        }
+        return $text;
+    }
 }
 /**
  * Describes a transition table for NFA/DFA
@@ -100,8 +126,8 @@ class block_formal_langs_lexical_transition_table {
              */
             $rule = $this->transitions[$i];
             $rule->oldstate += $newstartingstate;
-            for($i = 0; $i < count($rule->newstates); $i++) {
-                $rule->newstates[$i] += $newstartingstate;
+            for($j = 0; $j < count($rule->newstates); $j++) {
+                $rule->newstates[$j] += $newstartingstate;
             }
         }
         for($i = 0; $i < count($this->acceptablestates); $i++) {
@@ -113,18 +139,91 @@ class block_formal_langs_lexical_transition_table {
      * Creates a transition rule. Other passes arguments are used to form a transition array
      * @param int $oldstate starting state
      * @param block_formal_langs_lexical_matching_rule $rule a transition rule
-     * @return array
+     * @return block_formal_langs_lexical_transition_rule
      */
     public static function transition_rule($oldstate,$rule) {
         $args = func_get_args();
         array_shift($args);
         array_shift($args);
 
-        $a = new block_formal_langs_lexical_transition_rule();
+        $a = new block_formal_langs_lexical_transition_rule(null, null, null);
         $a->oldstate = $oldstate;
         $a->rule = $rule;
         $a->newstates = $args;
         return $a;
+    }
+
+    /**
+     * Writes a transition rule as dot language string
+     * @return string transition dot string
+     */
+    public function write_as_dot() {
+        $result = 'graph G { ' . PHP_EOL;
+        $max = max($this->acceptablestates);
+        for($i = 0; $i <= $max; $i++) {
+            $result .=  '    A_' . $i . ' [label="' . $i . '", shape=ellipse];' . PHP_EOL;
+        }
+        for($i = 0; $i < count($this->transitions); $i++) {
+            /**
+             * @var block_formal_langs_lexical_transition_rule  $transition
+             */
+            $transition = $this->transitions[$i];
+            $result .= $transition->write_as_dot();
+        }
+        $result .= '}' . PHP_EOL;
+        return $result;
+    }
+
+    /**
+     * Converts a table to a digraph to be tested against
+     * @return block_formal_langs_language_parser_digraph
+     */
+    public function to_digraph() {
+        $result = array();
+        $maxstate = max($this->acceptablestates);
+        for($state = 0; $state <= $maxstate; $state++) {
+            $result[$state] = array('node' => 1, 'edges' => array());
+        }
+        for($i = 0; $i < count($this->transitions); $i++) {
+            /**
+             * @var block_formal_langs_lexical_transition_rule  $transition
+             */
+            $transition = $this->transitions[$i];
+            $label = $transition->rule->label();
+            if (count($transition->newstates) > 1) {
+               $j = 0;
+               foreach($transition->newstates as $state) {
+                   $result[$transition->oldstate]['edges'][$label . $j] = $state;
+                   $j++;
+               }
+            } else {
+                $result[$transition->oldstate]['edges'][$label] = $transition->newstates[0];
+            }
+        }
+        return new block_formal_langs_language_parser_digraph($result);
+    }
+
+    /**
+     * Inserts a new transition
+     * @param block_formal_langs_lexical_transition_rule  $ntransition
+     */
+    public function insert($ntransition) {
+        $found = false;
+        for($i = 0; $i < count($this->transitions); $i++) {
+            /**
+             * @var block_formal_langs_lexical_transition_rule  $transition
+             */
+            $transition = $this->transitions[$i];
+            if ($transition->oldstate == $ntransition->oldstate
+                && $transition->rule->is_same($ntransition->rule)
+                )  {
+                $transition->newstates = array_unique(array_merge($transition->newstates, $ntransition->newstates));
+                $found = true;
+            }
+        }
+        if ($found == false) {
+            $this->transitions[] = $ntransition;
+        }
     }
 }
 /**
@@ -149,6 +248,31 @@ class block_formal_langs_lexical_matching_rule  {
     public function __construct($type, $set = array()) {
         $this->type = $type;
         $this->characterset = $set;
+    }
+
+    /**
+     * Determines, whether rule is same as other
+     * @param block_formal_langs_lexical_matching_rule $o other
+     * @return bool whether other same
+     */
+    public function is_same($o) {
+        return $this->type == $o->type && $this->characterset == $o->characterset;
+    }
+
+    /**
+     * Determines, whether rule is in array
+     * @param array $a
+     * @return bool
+     */
+    public function is_in($a) {
+        if (count($a) != 0) {
+            foreach($a as $rule) {
+                if ($this->is_same($rule)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     /**
      *  Creates new epsilon matching rule
@@ -195,7 +319,7 @@ class block_formal_langs_lexical_matching_rule  {
     public static function charclass_rule($set) {
         return new block_formal_langs_lexical_matching_rule(
                    block_formal_langs_lexical_matching_rule_type::$MATCHANYONEFROMSET,
-                   array( $set )
+                   $set
                );      
     }
     
@@ -207,7 +331,7 @@ class block_formal_langs_lexical_matching_rule  {
     public static function neg_charclass_rule($set) {
         return new block_formal_langs_lexical_matching_rule(
                    block_formal_langs_lexical_matching_rule_type::$MATCHANYONENOTFROMSET,
-                   array( $set )
+                   $set
                );      
     }
     /**
@@ -218,7 +342,9 @@ class block_formal_langs_lexical_matching_rule  {
         $result = '.';
         $denormalizedcset = '[]';
         if (count($this->characterset)) {
-            $denormalizedcset =  '[' . implode('', $this->characterset) .']';  
+
+            $denormalizedcset = implode('', array_values($this->characterset));
+            $denormalizedcset =  '[' . $denormalizedcset  . ']';
         }
         if ($this->type == block_formal_langs_lexical_matching_rule_type::$EPSILON) {
             $result = 'eps';
@@ -461,6 +587,7 @@ class block_formal_langs_lexical_matching_rule  {
         $result = new block_formal_langs_lexical_transition_table();
         $result->transitions[] = $result->transition_rule(0, $this, 1);
         $result->acceptablestates = array(1);
+        return $result;
     }
 };
 
@@ -490,10 +617,10 @@ class block_formal_langs_lexical_alternative_operator {
         // Merge leading acceptable states into one
         $newacceptablestate = max($result->acceptablestates) + 1;
         for($i = 0; $i < count($result->acceptablestates); $i++) {
-            $result->transitions[] = $result->transition_rule(
+            $result->insert( $result->transition_rule(
                 $result->acceptablestates[$i],
                 block_formal_langs_lexical_matching_rule::epsilon_rule(),
-                $newacceptablestate);
+                $newacceptablestate) );
         }
         $result->acceptablestates = array( $newacceptablestate );
         return $result;
@@ -511,22 +638,22 @@ class block_formal_langs_lexical_alternative_operator {
         $child = $nodes[0];
         $result = $child->build_table();
         $result->reenumerate(1);
-        $result->transitions[] = $result->transition_rule(0,
-            block_formal_langs_lexical_matching_rule::epsilon_rule(),
-            1);
+        $epsilon = block_formal_langs_lexical_matching_rule::epsilon_rule();
+        $starting = array(1);
         $currentoffset = $result->acceptablestates[0] + 1;
         // Merge transition tables
         for($i = 1; $i < count($nodes); $i++) {
             $child = $nodes[$i];
             $temp = $child->build_table();
             $temp->reenumerate($currentoffset);
-            $result->transitions[] = $result->transition_rule(0,
-                block_formal_langs_lexical_matching_rule::epsilon_rule(),
-                $currentoffset);
+            $starting[] = $currentoffset;
             $result->transitions = array_merge($result->transitions, $temp->transitions);
             $result->acceptablestates[] = $temp->acceptablestates[0];
             $currentoffset = $temp->acceptablestates[0] + 1;
         }
+        $transition = new block_formal_langs_lexical_transition_rule(0, $epsilon, $starting);
+        $result->insert($transition);
+        return $result;
     }
 }
 
@@ -563,9 +690,10 @@ class block_formal_langs_lexical_concat_operator {
             $child = $this->nodes[$i];
             $temp = $child->build_table();
             $temp->reenumerate($currentoffset);
-            $result->transitions[] = $result->transition_rule(0,
+            $tr = $result->transition_rule($result->acceptablestates[0],
                 block_formal_langs_lexical_matching_rule::epsilon_rule(),
                 $currentoffset);
+            $result->insert($tr);
             $result->transitions = array_merge($result->transitions, $temp->transitions);
             $result->acceptablestates = $temp->acceptablestates;
             $currentoffset = $temp->acceptablestates[0] + 1;
@@ -598,10 +726,10 @@ class block_formal_langs_lexical_infinite_repetition {
      */
     public function build_table() {
         $result = $this->node->build_table();
-        $result->transitions[] = $result->transition_rule($result->acceptablestates[0],
-            block_formal_langs_lexical_matching_rule::eof_rule(),
+        $result->insert($result->transition_rule($result->acceptablestates[0],
+            block_formal_langs_lexical_matching_rule::epsilon_rule(),
             0
-        );
+        ));
         return $result;
     }
 }
@@ -629,7 +757,7 @@ class block_formal_langs_lexical_none_or_infinite_repetition {
      * @return block_formal_langs_lexical_transition_table
      */
     public function build_table() {
-        $fst = block_formal_langs_lexical_matching_rule::eof_rule();
+        $fst = block_formal_langs_lexical_matching_rule::epsilon_rule();
         $snd = new block_formal_langs_lexical_infinite_repetition($this->node);
         $top = new block_formal_langs_lexical_alternative_operator(array($fst, $snd));
         return $top->build_table();
@@ -676,12 +804,16 @@ class block_formal_langs_lexical_from_to_quantifier {
      */
     protected function build_alternative_concatenations($min, $max) {
         $alts = array();
-        for($i = $min; $i < $max; $i++) {
-            $concat = array();
-            for($j = 0; $j < $i; $j++) {
-                $concat[] = $this->node;
+        for($i = $min; $i <= $max; $i++) {
+            if ($i != 0) {
+                $concat = array();
+                for($j = 0; $j < $i; $j++) {
+                    $concat[] = $this->node;
+                }
+                $alts[] = new block_formal_langs_lexical_concat_operator($concat);
+            } else {
+                $alts[] = block_formal_langs_lexical_matching_rule::epsilon_rule();
             }
-            $alts[] = new block_formal_langs_lexical_concat_operator($concat);
         }
         $alt = new block_formal_langs_lexical_alternative_operator($alts);
         return $alt;
@@ -692,8 +824,8 @@ class block_formal_langs_lexical_from_to_quantifier {
      */
     public function build_table() {
        $result = null;
-       if ($this->min === 0 && $this->max === 0 || ($this->min > $this->max && $this->max !== null)) {
-           $result = block_formal_langs_lexical_matching_rule::eof_rule()->build_table();
+       if ($this->min === 0 && $this->max === 0 || ($this->min > $this->max && is_int($this->max))) {
+           $result = block_formal_langs_lexical_matching_rule::epsilon_rule()->build_table();
            return $result;
        }
        if ($this->min === 0 && $this->max === null) {
@@ -702,9 +834,17 @@ class block_formal_langs_lexical_from_to_quantifier {
            return $result;
        }
        if ($this->max === null) {
-           $alt = $this->build_alternative_concatenations($this->min, $this->max - 1);
-           $rep = new block_formal_langs_lexical_infinite_repetition($this->node);
-           $resnode = new block_formal_langs_lexical_concat_operator($alt, $rep);
+           if ($this->min == 1) {
+               $resnode = new block_formal_langs_lexical_infinite_repetition($this->node);
+           } else {
+               $concats = array();
+               for ($i = 0; $i < $this->min - 1; $i++) {
+                   $concats[] = $this->node;
+               }
+               $rep = new block_formal_langs_lexical_infinite_repetition($this->node);
+               $concats[] = $rep;
+               $resnode = new block_formal_langs_lexical_concat_operator($concats);
+           }
            $result = $resnode->build_table();
        } else {
            $alt = $this->build_alternative_concatenations($this->min, $this->max);
