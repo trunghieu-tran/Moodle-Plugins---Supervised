@@ -855,3 +855,32 @@ class block_formal_langs_lexical_from_to_quantifier {
         return $result;
     }
 }
+
+/**
+ * A simple lexical action for working with accepted data
+ */
+abstract class block_formal_langs_lexical_action  {
+    /**
+     * Accepts lexer state
+     * @param $lexer
+     * @param $acceptstate
+     * @return mixed some info data
+     */
+    abstract public function accept($lexer, $acceptstate);
+}
+
+
+/**
+ * A simple lexical action for working with accepted data
+ */
+class block_formal_langs_lexical_simple_action extends block_formal_langs_lexical_action {
+    /**
+     * Accepts lexer state
+     * @param block_formal_langs_lexical_automata $lexer lexical automata
+     * @param  block_formal_langs_lexical_automata_state $acceptstate
+     * @return mixed some info data
+     */
+    public function accept($lexer, $acceptstate) {
+        $lexer->set_result($acceptstate->buffer());
+    }
+}
