@@ -694,4 +694,31 @@ class block_formal_langs_lexical_test_helper {
         $table = $this->table_from_string($string);
         $test->assertTrue( $table->equal($testtable), $table->dump_compare($testtable));
     }
+
+    /**
+     * Determines, that pair (matching rule, state) is in resulting array for
+     * intersection testing
+     * @param array $pair
+     * @param array $result resulting state
+     * @param PHPUnit_Framework_TestCase $test test data
+     */
+    public function is_in_states($pair, $result, $test) {
+        /**
+         * @var block_formal_langs_lexical_matching_rule $rule
+         */
+        $rule = $pair[0];
+        $state = $pair[1];
+        $contains = false;
+        for($i = 0; $i < count($result); $i++) {
+            /**
+             * @var block_formal_langs_lexical_matching_rule $nrule
+             */
+            $nrule = $result[$i][0];
+            $nstate = $result[$i][1];
+            if ($rule->is_same($nrule) && $nstate == $state) {
+                $contains = true;
+            }
+        }
+        $test->assertTrue( $contains, var_export($result,true) );
+    }
 }

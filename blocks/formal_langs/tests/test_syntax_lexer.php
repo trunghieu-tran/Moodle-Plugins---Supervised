@@ -191,3 +191,167 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
         $h->test_table($top,$string,$this);
     }
 }
+
+class block_formal_langs_syntax_lexer_intersection_test extends PHPUnit_Framework_TestCase {
+    /**
+     * Tests epsilon node intersection
+     */
+    public function test_epsilon() {
+        $fst = block_formal_langs_lexical_matching_rule::epsilon_rule();
+        $snd = block_formal_langs_lexical_matching_rule::epsilon_rule();
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 1);
+        $h = new block_formal_langs_lexical_test_helper();
+        $h->is_in_states(array($fst, array(0, 1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::all_matching_rule();
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a'));
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+    }
+
+    /**
+     * Tests all matching rule intersection with others
+     */
+    public function test_all_matching() {
+        $fst = block_formal_langs_lexical_matching_rule::all_matching_rule();
+        $snd = block_formal_langs_lexical_matching_rule::epsilon_rule();
+        $result = $fst->intersect($snd);
+        $h = new block_formal_langs_lexical_test_helper();
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::all_matching_rule();
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 1);
+        $h->is_in_states(array($fst, array(0, 1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $r2 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a'));
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($r1, array(0,1)), $result, $this);
+        $h->is_in_states(array($r2, array(0)), $result, $this);
+
+        $result = $fst->intersect($r2);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($r1, array(0)), $result, $this);
+        $h->is_in_states(array($r2, array(0,1)), $result, $this);
+    }
+
+    /**
+     * Tests character class intersection
+     */
+    public function test_charclass() {
+        $fst = block_formal_langs_lexical_matching_rule::charclass_rule(array('a', 'b'));
+        $snd = block_formal_langs_lexical_matching_rule::epsilon_rule();
+        $result = $fst->intersect($snd);
+        $h = new block_formal_langs_lexical_test_helper();
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::all_matching_rule();
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a', 'b'));
+        $r2 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a', 'b'));
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($r1, array(1, 0)), $result, $this);
+        $h->is_in_states(array($r2, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::charclass_rule(array('c','d'));
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::charclass_rule(array('a','b'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a', 'b'));
+        $this->assertTrue(count($result) == 1);
+        $h->is_in_states(array($r1, array(0, 1)), $result, $this);
+
+
+        $snd = block_formal_langs_lexical_matching_rule::charclass_rule(array('b','c'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $r2 = block_formal_langs_lexical_matching_rule::charclass_rule(array('b'));
+        $r3 = block_formal_langs_lexical_matching_rule::charclass_rule(array('c'));
+        $this->assertTrue(count($result) == 3);
+        $h->is_in_states(array($r1, array(0)), $result, $this);
+        $h->is_in_states(array($r2, array(0, 1)), $result, $this);
+        $h->is_in_states(array($r3, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('c','d'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a', 'b'));
+        $r2 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a', 'b', 'c', 'd'));
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($r1, array(0, 1)), $result, $this);
+        $h->is_in_states(array($r2, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('b','c'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $r2 = block_formal_langs_lexical_matching_rule::charclass_rule(array('b'));
+        $r3 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a','b','c'));
+        $this->assertTrue(count($result) == 3);
+        $h->is_in_states(array($r1, array(0, 1)), $result, $this);
+        $h->is_in_states(array($r2, array(0)), $result, $this);
+        $h->is_in_states(array($r3, array(1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a','b'));
+        $result = $fst->intersect($snd);
+        $this->assertTrue(count($result) == 2);
+        $h->is_in_states(array($fst, array(0)), $result, $this);
+        $h->is_in_states(array($snd, array(1)), $result, $this);
+    }
+
+    /**
+     * Tests negative charclass intersection with others
+     * Since swapping was tested in other tests, we test only intersections between
+     * two negative charclasses
+     */
+    public function test_neg_char_class() {
+        $fst = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a', 'b'));
+        $result = $fst->intersect($fst);
+        $h = new block_formal_langs_lexical_test_helper();
+        $this->assertTrue(count($result) == 1);
+        $h->is_in_states(array($fst, array(0, 1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('c', 'd'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a','b'));
+        $r2 = block_formal_langs_lexical_matching_rule::charclass_rule(array('c','d'));
+        $r3 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a', 'b', 'c', 'd'));
+        $this->assertTrue(count($result) == 3, var_export($result, true));
+        $h->is_in_states(array($r1, array(1)), $result, $this);
+        $h->is_in_states(array($r2, array(0)), $result, $this);
+        $h->is_in_states(array($r3, array(0, 1)), $result, $this);
+
+        $snd = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('b', 'c'));
+        $result = $fst->intersect($snd);
+        $r1 = block_formal_langs_lexical_matching_rule::charclass_rule(array('a'));
+        $r2 = block_formal_langs_lexical_matching_rule::charclass_rule(array('c'));
+        $r3 = block_formal_langs_lexical_matching_rule::neg_charclass_rule(array('a', 'b', 'c'));
+        $this->assertTrue(count($result) == 3, var_export($result, true));
+        $h->is_in_states(array($r1, array(1)), $result, $this);
+        $h->is_in_states(array($r2, array(0)), $result, $this);
+        $h->is_in_states(array($r3, array(0, 1)), $result, $this);
+    }
+}

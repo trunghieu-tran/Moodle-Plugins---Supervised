@@ -449,7 +449,7 @@ class block_formal_langs_lexical_matching_rule  {
         if (count($a2) == 0) {
             return $a1;
         }
-        return array_diff($a1, $a2);
+        return array_values(array_diff($a1, $a2));
     }
 
     /**
@@ -462,7 +462,7 @@ class block_formal_langs_lexical_matching_rule  {
         if (count($a1) == 0 || count($a2) == 0) {
             return array();
         }
-        return array_intersect($a1, $a2);
+        return array_values(array_intersect($a1, $a2));
     }
 
     /**
@@ -478,7 +478,7 @@ class block_formal_langs_lexical_matching_rule  {
         if (count($a2) == 0) {
             return $a1;
         }
-        return array_unique(array_merge($a1, $a2));
+        return array_values(array_unique(array_merge($a1, $a2)));
     }
 
     /**
@@ -545,6 +545,7 @@ class block_formal_langs_lexical_matching_rule  {
         self::insert_rule($result, 'charclass', $fst, $froute);
         self::insert_rule($result, 'neg_charclass', $both, $broute);
         self::insert_rule($result, 'charclass', $snd, $sroute);
+        return $result;
     }
     /**
      * And now function, which is reason, why this is one class, that uses a type 
@@ -555,13 +556,14 @@ class block_formal_langs_lexical_matching_rule  {
      * @throws Exception if intersection where not properlt handled
      */
      public function intersect($other) {
-        $result = array(); 
+        $result = array();
+        $handled = false;
         if ($this->type == $other->type
             && ($this->type == block_formal_langs_lexical_matching_rule_type::$EPSILON
             ||  $this->type == block_formal_langs_lexical_matching_rule_type::$ALLMATCH)) {
             $result = array( array( clone $other, array(0, 1) ) );
+            $handled = true;
         } else {
-            $handled = false;
             $methods = array(
                 'EPSILON' => 'intersect_epsilon',
                 'ALLMATCH' => 'intersect_allmatch',
@@ -573,7 +575,7 @@ class block_formal_langs_lexical_matching_rule  {
                 $this->call_method_if_one_of_spec_type($other, $type, $method, $result, $handled);
             }
         }
-        if (count($result) == 0) {
+        if ($handled == false) {
             throw new Exception('Rule type was not handled!');
         }
         return $result;
