@@ -19,7 +19,7 @@ class block_formal_langs_lexical_automata_state {
      * A starting state, which determines work of automata
      * @var block_formal_langs_lexical_automata_starting_state
      */
-    public $startinstate;
+    public $startingstate;
     /**
      * A staring position for match in text
      * @var stdClass
@@ -178,18 +178,39 @@ class block_formal_langs_lexical_automata_starting_state {
     public static $EXCLUSIVE = 2;
 
     /** Builds and optimizes a table
+     *  @param block_formal_langs_lexer_interaction_wrapper
+     *  @param block_formal_langs_lexical_automata $automata
      */
-    public function build_tables() {
-        $this->build_nfa_table();
-        $this->exclude_epsilon();
+    public function build_tables($wrapper, $automata) {
+        if ($this->build_nfa_table($wrapper, $automata)) {
+            $this->exclude_epsilon();
+        }
     }
 
     /**
      * Builds a basic NFA table
-     * TODO
+     * @param block_formal_langs_lexer_interaction_wrapper $wrapper
+     * @param block_formal_langs_lexical_automata $automata
+     * @return bool
      */
-    public function build_nfa_table() {
-
+    public function build_nfa_table($wrapper, $automata) {
+        if (count($this->rules) == 0) {
+            $wrapper->table_build_error(block_formal_langs_lexer_table_error_type::$STATEISEMPTY, $this->statename);
+            $automata->table_error_occured();
+            return false;
+        }
+        if (count($this->rules) != count($this->actions)) {
+            $wrapper->table_build_error(block_formal_langs_lexer_table_error_type::$ACTIONSARENOTEQUALOFSTATES, $this->statename);
+            $automata->table_error_occured();
+            return false;
+        }
+        $this->table = block_formal_langs_lexical_alternative_operator::build_non_concatenated($this->rules);
+        $i = 0;
+        foreach($this->table->acceptablestates as $state) {
+            $this->statestoactions[$state] = $i;
+            $i++;
+        }
+        return true;
     }
 
     /**
@@ -200,12 +221,158 @@ class block_formal_langs_lexical_automata_starting_state {
     }
 }
 
-// TODO: Interface for lexical wrapper
 
+/**
+ * A error type enum for building states for automata
+ */
+class block_formal_langs_lexer_table_error_type {
+    /**
+     * A error, when automata enters a starting state, which doesn't exists at all
+     * @var int
+     */
+    public static $AUTOMATAENTERSNONEXISTENTSTATE = 1;
+    /**
+     * Error, when initial state is abdent in array
+     * @var int
+     */
+    public static $YYINITIALISABSENT = 2;
+    /**
+     * Error, when no rules, are assigned to state
+     * @var int
+     */
+    public static $STATEISEMPTY = 3;
+
+    /**
+     * Occurs, when there are more or less actions or equal of states
+     * @var int
+     */
+    public static $ACTIONSARENOTEQUALOFSTATES = 4;
+}
+/**
+ * Simple interface for interaction with other primitives
+ */
+interface block_formal_langs_lexer_interaction_wrapper {
+    /**
+     * Determines an action, which should be performed when table build error occurs
+     * @param $type
+     * @param $data
+     */
+    public function table_build_error($type, $data);
+
+    /**
+     * Determines an action, performed when tokenizing error occurs
+     * @param block_formal_langs_lexical_automata_state $state
+     */
+    public function tokenize_error($state);
+
+    /**
+     * Determines an action, which is performed when action was toggled in state
+     * after action finished it's work
+     * @param block_formal_langs_lexical_simple_action $action
+     * @param block_formal_langs_lexical_automata_state  $state
+     */
+    public function accept($action, $state);
+
+    /**
+     * Returns a symbol from position. Returns EOF symbol at end
+     * @param int $pos
+     * @return string|int
+     */
+    public function get($pos);
+    /**
+     * Sets assigned lexical automata
+     * @param block_formal_langs_lexical_automata $lexer
+     */
+    public function set_lexer($lexer);
+
+}
+
+class block_formal_langs_lexer_interaction_wrapper_impl {
+    /**
+     * An inner string for tokenizing
+     * @var string
+     */
+    protected $string;
+    /**
+     * A lexer for toggling data
+     * @var  block_formal_langs_lexical_automata
+     */
+    protected $lexer;
+    /**
+     * Array of matched tokens
+     * @var array
+     */
+    protected $tokens;
+
+    /**
+     * Constructs a wrapper from a string
+     * @param $string
+     */
+    public function __construct($string) {
+        $this->string = $string;
+        $this->tokens = array();
+    }
+
+    public function tokens() {
+        return $this->tokens;
+    }
+    /**
+     * Determines an action, which should be performed when table build error occurs
+     * @param $type
+     * @param $data
+     */
+    public function table_build_error($type, $data) {
+        echo 'Error' . $type . ' with ata : ' . $data;
+    }
+
+    /**
+     * Determines an action, performed when tokenizing error occurs
+     * @param block_formal_langs_lexical_automata_state $state
+     */
+    public function tokenize_error($state) {
+        echo 'Accepted';
+        echo $state->buffer();
+    }
+
+    /**
+     * Determines an action, which is performed when action was toggled in state
+     * after action finished it's work
+     * @param block_formal_langs_lexical_simple_action $action
+     * @param block_formal_langs_lexical_automata_state  $state
+     */
+    public function accept($action, $state) {
+        $this->tokens[] = $this->lexer->result();
+    }
+
+    /**
+     * Returns a symbol from position. Returns EOF symbol at end
+     * @param int $pos
+     * @return string|int
+     */
+    public function get($pos) {
+        if ($pos >= textlib::strlen($this->string)) {
+            return block_formal_langs_lexical_matching_rule_type::$EOF_SYMBOL;
+        }
+        return textlib::substr($this->string, $pos, 1);
+    }
+    /**
+     * Sets assigned lexical automata
+     * @param block_formal_langs_lexical_automata $lexer
+     */
+    public function set_lexer($lexer) {
+        $this->lexer = $lexer;
+    }
+
+}
 /**
  * A lexical automata for analyzing string sequences
  */
 class block_formal_langs_lexical_automata {
+    /**
+     * An interaction wrapper
+     * @var block_formal_langs_lexer_interaction_wrapper
+     */
+    protected $wrapper;
     /**
      * An array of starting states
      * @var array of block_formal_langs_lexical_automata_starting_state
@@ -236,6 +403,18 @@ class block_formal_langs_lexical_automata {
      * @var mixed
      */
     protected $acceptedresult = null;
+    /**
+     * Determines, whether fatal error on building table occurs
+     * @var bool
+     */
+    protected $error = false;
+
+    /**
+     * Determines, whether error, when creating tables occured
+     */
+    public function table_error_occured() {
+        $this->error = true;
+    }
 
 
     /**
@@ -247,10 +426,12 @@ class block_formal_langs_lexical_automata {
     /**
      * Contructs a lexer with following starting states
      * @param array $startingstates
-     * @param $wrapper wrapper for interaction with string
+     * @param block_formal_langs_lexer_interaction_wrapper $wrapper wrapper for interaction with string
      */
     public function __construct($startingstates, $wrapper) {
         $this->startingstates = $startingstates;
+        $this->wrapper = $wrapper;
+        $this->wrapper->set_lexer($this);
         // TODO:
         // 1. Build a tables and handle exceptions
         // 2. Optimize tables and exclude epsilon moves
@@ -327,5 +508,9 @@ class block_formal_langs_lexical_automata {
         return $this->acceptedresult;
     }
 
+
+    public function lex() {
+        // TODO: Implement
+    }
 
 }

@@ -861,6 +861,13 @@ class block_formal_langs_lexical_from_to_quantifier {
  */
 abstract class block_formal_langs_lexical_action  {
     /**
+     * Returns new starting state for lexer
+     * @return string
+     */
+    public function new_lexer_starting_state() {
+        return 'YYINITIAL';
+    }
+    /**
      * Accepts lexer state
      * @param $lexer
      * @param $acceptstate
@@ -882,5 +889,6 @@ class block_formal_langs_lexical_simple_action extends block_formal_langs_lexica
      */
     public function accept($lexer, $acceptstate) {
         $lexer->set_result($acceptstate->buffer());
+        $lexer->set_starting_state($this->new_lexer_starting_state());
     }
 }
