@@ -177,6 +177,33 @@ class block_formal_langs_lexical_automata_starting_state {
      */
     public static $EXCLUSIVE = 2;
 
+    /**
+     * Checks whether state transitions from all data are available
+     * @param block_formal_langs_lexer_interaction_wrapper $wrapper
+     * @param block_formal_langs_lexical_automata $automata
+     * @return bool whether check was successfull
+     */
+    public function check_state_transitions($wrapper, $automata) {
+        $error = false;
+        if (count($this->actions)) {
+            /**
+             * @var block_formal_langs_lexical_action $action
+             */
+            foreach($this->actions as $action) {
+                $nstate = $action->new_lexer_starting_state();
+                if ($automata->get_starting_state($nstate) == null
+                    && !$error) {
+                    $error = false;
+                    $wrapper->table_build_error(
+                      block_formal_langs_lexer_table_error_type::$AUTOMATAENTERSNONEXISTENTSTATE,
+                      (object)array('startingstate' => $this->statename, 'state' => $nstate)
+                    );
+                    $automata->table_error_occured();
+                }
+            }
+        }
+        return !$error;
+    }
     /** Builds and optimizes a table
      *  @param block_formal_langs_lexer_interaction_wrapper
      *  @param block_formal_langs_lexical_automata $automata
@@ -217,7 +244,7 @@ class block_formal_langs_lexical_automata_starting_state {
      * Builds an exclude epsilon data
      */
     public function exclude_epsilon() {
-
+        // TODO: Implement this
     }
 }
 
@@ -424,6 +451,37 @@ class block_formal_langs_lexical_automata {
     public $buffers = array();
 
     /**
+     * Returns a starting state by name
+     * @param string $startingstate a string state
+     * @return block_formal_langs_lexical_automata_starting_state|null null if not found
+     */
+    public function get_starting_state($startingstate) {
+        $result = null;
+        if (count($this->startingstates)) {
+            /**
+             *  block_formal_langs_lexical_automata_starting_state $state
+             */
+            foreach($this->startingstates as $state) {
+                if ($state->statename  == $startingstate) {
+                    $result = $state;
+                }
+            }
+        }
+        return $result;
+    }
+
+    protected function check_action_transitions() {
+        if (count($this->startingstates) != 0) {
+            /**
+             *  @var block_formal_langs_lexical_automata_starting_state $state
+             */
+            foreach($this->startingstates as $state) {
+                $state->check_state_transitions($this->wrapper, $this);
+            }
+        }
+        return !($this->error);
+    }
+    /**
      * Contructs a lexer with following starting states
      * @param array $startingstates
      * @param block_formal_langs_lexer_interaction_wrapper $wrapper wrapper for interaction with string
@@ -432,10 +490,21 @@ class block_formal_langs_lexical_automata {
         $this->startingstates = $startingstates;
         $this->wrapper = $wrapper;
         $this->wrapper->set_lexer($this);
-        // TODO:
-        // 1. Build a tables and handle exceptions
-        // 2. Optimize tables and exclude epsilon moves
-        // 3. If exceptions, handle it with wrapper
+        if ($this->get_starting_state('YYINITIAL') == null) {
+            $this->wrapper->table_build_error(
+                block_formal_langs_lexer_table_error_type::$YYINITIALISABSENT, null
+            );
+            $this->table_error_occured();
+        }  else {
+            if ($this->check_action_transitions()) {
+                /**
+                 * @var block_formal_langs_lexical_automata_starting_state $state
+                 */
+                foreach ($this->startingstates as $state) {
+                    $state->build_tables($wrapper, $this);
+                }
+            }
+        }
     }
 
     /**
@@ -508,8 +577,14 @@ class block_formal_langs_lexical_automata {
         return $this->acceptedresult;
     }
 
-
+    /**
+     * Performa actual lexical analysis
+     */
     public function lex() {
+        // If error occured, return nothing
+        if ($this->error) {
+            return;
+        }
         // TODO: Implement
     }
 
