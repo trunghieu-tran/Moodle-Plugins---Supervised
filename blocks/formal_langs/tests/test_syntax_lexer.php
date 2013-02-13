@@ -10,6 +10,7 @@
  */
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/syntax/lexical_rules_operators.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/syntax/lexical_finite_automata.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 
 
@@ -189,6 +190,61 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
             6,eps,7;
         ';
         $h->test_table($top,$string,$this);
+    }
+    
+    /** Tests various errors, which can occur, when building tables
+     */
+    public function test_lexer_table_errors() {
+        // Test absent YYINITIAL
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('');
+        $s = new block_formal_langs_lexical_automata_starting_state('NOTINITIAL');
+        $s->rules = array( block_formal_langs_lexical_transition_table::all_matching_rule() );
+        $s->actions = array( new block_formal_langs_lexical_simple_action() );
+        
+        $l = new block_formal_langs_lexical_automata(array($s), $w);
+        $errors = $l->table_errors();
+        $code = block_formal_langs_lexer_table_error_type::$YYINITIALISABSENT;
+        $this->assertTrue(in_array(array($code, null), $errors), 'YYINITIAL suddenly found in automata');
+        
+        // Test invalid action entering state
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('');
+        $s = new block_formal_langs_lexical_automata_starting_state('YYINITIAL');
+        $s->rules = array( block_formal_langs_lexical_transition_table::all_matching_rule() );
+        $s->actions = array( new block_formal_langs_lexical_simple_action('NOTINITIAL') );
+        
+        $l = new block_formal_langs_lexical_automata(array($s), $w);
+        $errors = $l->table_errors();
+        $code = block_formal_langs_lexer_table_error_type::$AUTOMATAENTERSNONEXISTENTSTATE;
+        $error = $errors[0];
+        $this->assertTrue($error[0] == $code, $error[0] . ' is not valid error code');
+        $this->assertTrue($error[1]->startingstate == 'YYINITIAL', $error[1]->startingstate);
+        $this->assertTrue($error[1]->state == 'NOTINITIAL', $error[1]->state);
+        
+        // Test empty state
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('');
+        $s = new block_formal_langs_lexical_automata_starting_state('YYINITIAL');
+        $s->rules = array( );
+        $s->actions = array( );
+        
+        $l = new block_formal_langs_lexical_automata(array($s), $w);
+        $errors = $l->table_errors();
+        $code = block_formal_langs_lexer_table_error_type::$STATEISEMPTY;
+        $error = $errors[0];
+        $this->assertTrue($error[0] == $code, $error[0] . ' is not valid error code');
+        $this->assertTrue($error[1] == 'YYINITIAL', $error[1]);
+
+        // Test incorrect supplied amounts of errors
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('');
+        $s = new block_formal_langs_lexical_automata_starting_state('YYINITIAL');
+        $s->rules = array( block_formal_langs_lexical_transition_table::all_matching_rule() );
+        $s->actions = array( );
+        
+        $l = new block_formal_langs_lexical_automata(array($s), $w);
+        $errors = $l->table_errors();
+        $code = block_formal_langs_lexer_table_error_type::$ACTIONSARENOTEQUALOFSTATES;
+        $error = $errors[0];
+        $this->assertTrue($error[0] == $code, $error[0] . ' is not valid error code');
+        $this->assertTrue($error[1] == 'YYINITIAL', $error[1]);        
     }
 }
 
