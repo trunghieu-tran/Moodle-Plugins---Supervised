@@ -119,6 +119,139 @@ class block_formal_langs_lexical_transition_table {
         return $result;
     }
 
+    /**
+     * Returns an epsilon-closure function for states
+     * @param int $oldstate
+     * @return array of  int
+     */
+    public function epsilon_closure($oldstate) {
+        $result = array($oldstate);
+        $stack = array($oldstate);
+        while(count($stack) != 0) {
+            $state = array_shift($stack);
+            $transitions = $this->transitions_for_state($state);
+            for($i = 0; $i < count($transitions); $i++) {
+                /**
+                 * @var block_formal_langs_lexical_transition_rule $rule
+                 */
+                $rule = $transitions[$i];
+                if ($rule->rule->is_epsilon()) {
+                    foreach($rule->newstates as $u) {
+                        if (!in_array($u, $result)) {
+                            $result[] = $u;
+                            $stack[] = $u;
+                        }
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Clones a transitions list
+     * @param array $transitions
+     * @return array
+     */
+    private function clone_transitions($transitions) {
+        $result = array();
+        if (count($transitions) != 0) {
+            foreach($transitions as $transition) {
+                $result[] = clone $transition;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Tries to intersect to rules and unions their returning states
+     * @param block_formal_langs_lexical_matching_rule $rule1
+     * @param block_formal_langs_lexical_matching_rule $rule2
+     * @param array $nstates1
+     * @param array $nstates2
+     * @param bool $disjoint new disjoint rule
+     * @return array of pairs (rule, new states)
+     */
+    public function try_intersect($rule1, $rule2, $nstates1, $nstates2, &$disjoint) {
+        $ok = false;
+        $intersectresult = $rule1->intersect($rule2);
+        $result = array();
+        foreach($intersectresult as $rulestates) {
+            $resultentry = array($rulestates[0], array());
+            foreach($rulestates[1] as $statesmapping) {
+                if ($statesmapping == 0) {
+                    $nmap = &$nstates1;
+                } else {
+                    $nmap = &$nstates2;
+                }
+                $resultentry[1] = block_formal_langs_lexical_matching_rule::union($resultentry[1], $nmap);
+            }
+
+            $result[] = $resultentry;
+        }
+        if (count($result) == 2) {
+            /**
+             * @var block_formal_langs_lexical_matching_rule $rrule1
+             * @var block_formal_langs_lexical_matching_rule $rrule2
+             *
+             */
+            $rrule1 = $result[0][0];
+            $rrule2 = $result[1][0];
+            $ok = ($rule1->is_same($rrule1) || $rule1->is_same($rrule2)) &&
+                  ($rule2->is_same($rrule1) || $rule2->is_same($rrule2));
+        }
+        $disjoint = ($disjoint && $ok);
+        return $result;
+    }
+
+    /**
+     * Builds new tansitions, disjointing and discarding epsilon transitions
+     * @param array $transitions of pairs(rule, array of new states)
+     * @return array of  pairs(rule, array of new states)
+     */
+    public function build_disjoint_transitions_for_transitions($transitions) {
+        $totalresult = array();
+        /**
+         * @var block_formal_langs_lexical_matching_rule $rule
+         */
+        foreach($transitions as $transition) {
+            $rule = $transition[0];
+            if ($rule->is_epsilon() == false) {
+                $totalresult[] = $transition;
+            }
+        }
+        do {
+            $tempresult = $totalresult;
+            $totalresult = array();
+            $disjoint = true;
+            while(count($tempresult) >= 2) {
+                $rule1 = array_shift($tempresult);
+                $rule2 = array_shift($tempresult);
+                $rules = $this->try_intersect($rule1[0], $rule2[0], $rule1[1], $rule2[1], $disjoint);
+                foreach($rules as $rule) {
+                    $totalresult[] = $rule;
+                }
+            }
+            if (count($tempresult) == 1) {
+                $disjoint = $disjoint && (count($totalresult) == 0);
+                $totalresult[] = array_shift($tempresult);
+            }
+        } while(!$disjoint);
+        return $totalresult;
+    }
+    /**
+     * Builds a disjoint transition arrays for states array.
+     * This function is useful, when merging multiple NFA states to one giant DFA state
+     * Then we should scan some entering characters, but we have some infinite alphabet
+     * Also we can discard some epsilon transitions, because we don't need those in DFA
+     * and they are already here
+     * @param array $states of int
+     * @return array of transitions from state with disjoint sets from one state to another
+     */
+    public function build_disjoint_transitions($states) {
+        // TODO: Implement
+    }
+
     public function reenumerate($newstartingstate) {
         for($i = 0; $i < count($this->transitions); $i++) {
             /**
@@ -365,12 +498,21 @@ class block_formal_langs_lexical_matching_rule  {
     public function is_zero_width() {
         return $this->type == block_formal_langs_lexical_matching_rule_type::$EPSILON;
     }
+
+    /**
+     * Determines, whether rule marked as epsilon
+     * @return boolean
+     */
+    public function is_epsilon() {
+        return $this->type == block_formal_langs_lexical_matching_rule_type::$EPSILON;
+    }
     /**
      * Determines, whether character matches rule
      * @param string $character character, that is tested against rule
+     * @param stdClass $position position for matching
      * @return boolean whether it matched rule
      */
-    public function match($character) {
+    public function match($character, $position) {
         $result = true;
         if ($this->type == block_formal_langs_lexical_matching_rule_type::$MATCHANYONEFROMSET) {
             $result = in_array($character, $this->characterset);
@@ -471,7 +613,7 @@ class block_formal_langs_lexical_matching_rule  {
      * @param array $a2
      * @return array
      */
-    protected static function union($a1, $a2) {
+    public static function union($a1, $a2) {
         if (count($a1) == 0) {
             return $a2;
         }
