@@ -241,10 +241,67 @@ class block_formal_langs_lexical_automata_starting_state {
     }
 
     /**
+     * Finds first unmarked DFA state
+     * @param array $dstates states
+     * @return int|null number of state, null if not found
+     */
+    private static function find_first_unmarked_state($dstates) {
+        $result = null;
+        for($i = 0; ($i < count($dstates)) && ($result === null); $i++) {
+            if ($dstates[$i][1] == false) {
+                $result = $i;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Finds a state in dsates, returning index on data
+     * @param array $dstates
+     * @param array $state
+     * @return int|null
+     */
+    private static function find_state_in_dstates($dstates, $state) {
+        $result = null;
+        for($i = 0; ($i < count($dstates)) && ($result === null); $i++) {
+            if ($dstates[$i][0] == $state) {
+                $result = $i;
+            }
+        }
+        return $result;
+    }
+    /**
      * Builds an exclude epsilon data
      */
     public function exclude_epsilon() {
-        // TODO: Implement this
+
+        // Here we build some DFA
+        $dstates = array(array($this->table->epsilon_closure(0), false));
+        $dtran = array();
+        $firstunmarked = 0;
+        do {
+            $dstates[$firstunmarked][1] = true;
+            $states = $dstates[$firstunmarked][0];
+            $disjointtransitions = $this->table->build_disjoint_transitions($states);
+            for($i = 0; $i < count($disjointtransitions); $i++) {
+                $transition = $disjointtransitions[$i];
+                $rule = $transition[0];
+                $nstates = $this->table->epsilon_closure($rule[1]);
+                $stateindex = $this->find_state_in_dstates($dstates, $nstates);
+                if ($stateindex === null) {
+                    $stateindex = count($dstates);
+                    $dstates[] = array($nstates, false);
+                }
+                $drule = new block_formal_langs_lexical_transition_rule($firstunmarked, $rule, array($stateindex));
+                $dtran[] = $drule;
+            }
+            $firstunmarked = self::find_first_unmarked_state($dstates);
+        } while($firstunmarked !== null);
+
+        // TODO:
+        // 1. Implement mapping some acceptable states to an DFA states
+        // 2. Implement mapping some actions to DFA states
+        // 3. Write tests
     }
 }
 
