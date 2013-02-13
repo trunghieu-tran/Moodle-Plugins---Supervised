@@ -882,6 +882,24 @@ abstract class block_formal_langs_lexical_action  {
  */
 class block_formal_langs_lexical_simple_action extends block_formal_langs_lexical_action {
     /**
+     * Defines a new starting state, which automata can enter
+     */
+    protected $startingstate;
+    /**
+     * Creates a starting simple state
+     * @param string $startingstate starting state which automata enters to
+     */
+    public function __construct($startingstate = 'YYINITIAL') {
+        $this->startingstate = $startingstate;
+    }
+    /**
+     * Returns new starting state for lexer
+     * @return string
+     */
+    public function new_lexer_starting_state() {
+        return $this->startingstate;
+    }
+    /**
      * Accepts lexer state
      * @param block_formal_langs_lexical_automata $lexer lexical automata
      * @param  block_formal_langs_lexical_automata_state $acceptstate

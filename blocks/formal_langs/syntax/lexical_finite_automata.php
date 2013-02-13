@@ -332,14 +332,30 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
     protected $tokens;
 
     /**
+     * All errors, which  occured while building tables
+     * @var array of array(code, null)
+     */
+    protected $tableerrors;
+    /**
      * Constructs a wrapper from a string
      * @param $string
      */
     public function __construct($string) {
         $this->string = $string;
         $this->tokens = array();
+        $this->tableerrors = array();
     }
-
+    /**
+     * Returns occured table errors
+     * @return array of table errors
+     */
+    public function table_errors() {
+        return $this->tableerrors;
+    }
+    /**
+     * Returns array of tokens
+     * @return array 
+     */
     public function tokens() {
         return $this->tokens;
     }
@@ -349,7 +365,7 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
      * @param $data
      */
     public function table_build_error($type, $data) {
-        echo 'Error' . $type . ' with ata : ' . $data;
+        $this->tableerrors[] = array($type, $data);        
     }
 
     /**
