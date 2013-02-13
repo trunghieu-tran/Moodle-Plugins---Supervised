@@ -100,6 +100,7 @@ class block_formal_langs_lexical_transition_table {
      */
     public $acceptablestates = array();
 
+
     /**
      * Returns a transitions starting from state
      * @param int $oldstate
@@ -124,7 +125,7 @@ class block_formal_langs_lexical_transition_table {
      * @param int $oldstate
      * @return array of  int
      */
-    public function epsilon_closure($oldstate) {
+    public function epsilon_closure_for_state($oldstate) {
         $result = array($oldstate);
         $stack = array($oldstate);
         while(count($stack) != 0) {
@@ -148,6 +149,27 @@ class block_formal_langs_lexical_transition_table {
         return $result;
     }
 
+    /**
+     * Computes epsilon closure for one state or multiple
+     * @param int|array $state
+     * @return array or int all other states
+     */
+    public function epsilon_closure($state) {
+        $result = null;
+        if (is_array($state)) {
+            $result = array();
+            if (count($state)) {
+                foreach($state as $currentstate) {
+                    $c = $this->epsilon_closure_for_state($currentstate);
+                    $result = block_formal_langs_lexical_matching_rule::union($result, $c);
+                }
+                sort($result);
+            }
+        } else {
+            $result = $this->epsilon_closure_for_state($state);
+        }
+        return $result;
+    }
     /**
      * Clones a transitions list
      * @param array $transitions
@@ -184,9 +206,10 @@ class block_formal_langs_lexical_transition_table {
                 } else {
                     $nmap = &$nstates2;
                 }
-                $resultentry[1] = block_formal_langs_lexical_matching_rule::union($resultentry[1], $nmap);
+                $newkstates = block_formal_langs_lexical_matching_rule::union($resultentry[1], $nmap);
+                $resultentry[1] = $newkstates;
             }
-
+            sort($resultentry[1]);
             $result[] = $resultentry;
         }
         if (count($result) == 2) {
@@ -209,7 +232,7 @@ class block_formal_langs_lexical_transition_table {
      * @param array $transitions of pairs(rule, array of new states)
      * @return array of  pairs(rule, array of new states)
      */
-    public function build_disjoint_transitions_for_transitions($transitions) {
+    protected function build_disjoint_transitions_for_transitions($transitions) {
         $totalresult = array();
         /**
          * @var block_formal_langs_lexical_matching_rule $rule
@@ -247,9 +270,23 @@ class block_formal_langs_lexical_transition_table {
      * and they are already here
      * @param array $states of int
      * @return array of transitions from state with disjoint sets from one state to another
+     *         as pair ($transtitions, array(new string))
      */
     public function build_disjoint_transitions($states) {
-        // TODO: Implement
+        $testtransitions = array();
+        if (count($states) != 0) {
+            foreach($states as $state) {
+                $ftransitions = $this->transitions_for_state($state);
+                for($i = 0; $i < count($ftransitions); $i++) {
+                    /**
+                     * @var block_formal_langs_lexical_transition_rule $transition
+                     */
+                    $transition = $ftransitions[$i];
+                    $testtransitions[] = array($transition->rule, $transition->newstates);
+                }
+            }
+        }
+        return $this->build_disjoint_transitions_for_transitions($testtransitions);
     }
 
     public function reenumerate($newstartingstate) {

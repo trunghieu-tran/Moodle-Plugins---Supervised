@@ -248,6 +248,55 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($error[0] == $code, $error[0] . ' is not valid error code');
         $this->assertTrue($error[1] == 'YYINITIAL', $error[1]);        
     }
+
+    /**
+     * Tests building transition sets
+     */
+    public function test_building_disjoint_transition_sets() {
+        $h = new block_formal_langs_lexical_test_helper();
+        $q = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $c = new block_formal_langs_lexical_concat_operator(array($q, $q));
+        $top = new block_formal_langs_lexical_alternative_operator(array($q, $c));
+
+        $table = $top->build_table();
+        // 0,1,3 is an actually an eps-closure of s0 - 0
+        $transitions = $table->build_disjoint_transitions(array(0,1,3));
+        $this->assertTrue(count($transitions) == 1);
+        $this->assertTrue($transitions[0][1] == array(2,4));
+        $rule = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $this->assertTrue($rule->is_same($transitions[0][0]));
+
+        // 2,4,5,7 is an actually an eps-closure of 2,4
+        $transitions = $table->build_disjoint_transitions(array(2,4,5,7));
+        $this->assertTrue(count($transitions) == 1);
+        $this->assertTrue($transitions[0][1] == array(6));
+        $rule = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $this->assertTrue($rule->is_same($transitions[0][0]));
+
+        //  6,7 is an actually anclosure of 6
+        $transitions = $table->build_disjoint_transitions(array(6,7));
+        $this->assertTrue(count($transitions) == 0);
+    }
+
+    /**
+     * Tests building epsilon closure computation
+     */
+    public function test_epsilon_closure() {
+        $h = new block_formal_langs_lexical_test_helper();
+        $q = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $c = new block_formal_langs_lexical_concat_operator(array($q, $q));
+        $top = new block_formal_langs_lexical_alternative_operator(array($q, $c));
+
+        $table = $top->build_table();
+        $closure = $table->epsilon_closure(0);
+        $this->assertTrue($closure == array(0, 1, 3));
+
+        $closure = $table->epsilon_closure(array(2, 4));
+        $this->assertTrue($closure == array(2, 4, 5, 7));
+
+        $closure = $table->epsilon_closure(array(6));
+        $this->assertTrue($closure == array(6, 7));
+    }
 }
 
 class block_formal_langs_syntax_lexer_intersection_test extends PHPUnit_Framework_TestCase {
