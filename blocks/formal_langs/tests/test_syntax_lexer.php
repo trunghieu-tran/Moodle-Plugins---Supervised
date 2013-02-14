@@ -282,7 +282,6 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
      * Tests building epsilon closure computation
      */
     public function test_epsilon_closure() {
-        $h = new block_formal_langs_lexical_test_helper();
         $q = block_formal_langs_lexical_matching_rule::simple_rule('a');
         $c = new block_formal_langs_lexical_concat_operator(array($q, $q));
         $top = new block_formal_langs_lexical_alternative_operator(array($q, $c));
@@ -296,6 +295,35 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
 
         $closure = $table->epsilon_closure(array(6));
         $this->assertTrue($closure == array(6, 7));
+    }
+
+    /**
+     * Tests optimizing some states, with exclude epsilon function
+     */
+    public function test_exclude_epsilon() {
+        $q = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $c = new block_formal_langs_lexical_concat_operator(array($q, $q));
+        $top = new block_formal_langs_lexical_alternative_operator(array($q, $c));
+
+        $action = new block_formal_langs_lexical_simple_action();
+
+        $s = new block_formal_langs_lexical_automata_starting_state();
+        $s->rules = array($top);
+        $s->actions = array($action);
+
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('');
+        $automata = new block_formal_langs_lexical_automata(array($s), $w);
+
+        $this->assertTrue(count($w->table_errors()) == 0);
+
+        $h = new block_formal_langs_lexical_test_helper();
+        $string = '
+           0,[a],1;
+           1,[a],2;
+        ';
+        $h->test_built_table($s->table,$string,$this);
+        $this->assertTrue($s->table->acceptablestates == array(1,2));
+        $this->assertTrue($s->statestoactions == array(1 => 0, 2 => 0));
     }
 }
 

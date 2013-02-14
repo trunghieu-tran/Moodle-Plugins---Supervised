@@ -228,7 +228,7 @@ class block_formal_langs_lexical_transition_table {
     }
 
     /**
-     * Builds new tansitions, disjointing and discarding epsilon transitions
+     * Builds new transitions, disjointing and discarding epsilon transitions
      * @param array $transitions of pairs(rule, array of new states)
      * @return array of  pairs(rule, array of new states)
      */

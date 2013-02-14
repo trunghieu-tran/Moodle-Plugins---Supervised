@@ -683,6 +683,18 @@ class block_formal_langs_lexical_test_helper {
         }
         return new block_formal_langs_language_parser_digraph($result);
     }
+
+    /**
+     * Performs a testing on built table
+     * @param block_formal_langs_lexical_transition_table $table
+     * @param string $string
+     * @param PHPUnit_Framework_TestCase $test
+     */
+    public function test_built_table($table, $string, $test) {
+        $testtable = $table->to_digraph();
+        $table = $this->table_from_string($string);
+        $test->assertTrue( $table->equal($testtable), $table->dump_compare($testtable));
+    }
     /**
      * Performs a new test
      * @param block_formal_langs_lexical_matching_rule $node node to test against
@@ -690,9 +702,7 @@ class block_formal_langs_lexical_test_helper {
      * @param PHPUnit_Framework_TestCase $test test data
      */
     public function test_table($node, $string, $test) {
-        $testtable = $node->build_table()->to_digraph();
-        $table = $this->table_from_string($string);
-        $test->assertTrue( $table->equal($testtable), $table->dump_compare($testtable));
+        $this->test_built_table($node->build_table(), $string, $test);
     }
 
     /**
