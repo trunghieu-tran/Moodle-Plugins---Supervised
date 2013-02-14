@@ -58,6 +58,20 @@ class block_formal_langs_lexical_automata_state {
      */
     public $movedfromzerowidthstates;
 
+    /**
+     * Returns all available transitions
+     * @return array all availble transitions from this state
+     */
+    public function get_available_transitions() {
+        $this->startingstate->table->transitions_for_state($this->state);
+    }
+    /**
+     * Tests, whether current state is acceptable
+     * @return bool
+     */
+    public function is_acceptable() {
+        return in_array($this->state, $this->startingstate->table->acceptablestates);
+    }
 
 
     /**
@@ -106,6 +120,13 @@ class block_formal_langs_lexical_automata_state {
     }
 
     /**
+     * Length of buffer
+     * @return int
+     */
+    public function length() {
+        return count($this->buffer);
+    }
+    /**
      * Returns a real buffer
      * @return string
      */
@@ -127,6 +148,17 @@ class block_formal_langs_lexical_automata_state {
         $a = new stdClass();
         $a->line = $line;
         $a->pos = $pos;
+        return $a;
+    }
+
+    public static function advance_position($oldpos, $char) {
+        $a = clone $oldpos;
+        if ($char == "\n") {
+            $a->line += 1;
+            $a->pos = 0;
+        } else {
+            $a->pos += 1;
+        }
         return $a;
     }
 }
@@ -406,7 +438,7 @@ interface block_formal_langs_lexer_interaction_wrapper {
     /**
      * Determines an action, which is performed when action was toggled in state
      * after action finished it's work
-     * @param block_formal_langs_lexical_simple_action $action
+     * @param block_formal_langs_lexical_simple_action|null $action
      * @param block_formal_langs_lexical_automata_state  $state
      */
     public function accept($action, $state);
@@ -422,7 +454,6 @@ interface block_formal_langs_lexer_interaction_wrapper {
      * @param block_formal_langs_lexical_automata $lexer
      */
     public function set_lexer($lexer);
-
 }
 
 class block_formal_langs_lexer_interaction_wrapper_impl {
@@ -447,12 +478,24 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
      * @var array of array(code, null)
      */
     protected $tableerrors;
+
+    /**
+     * Preprocesses a CP1251 string, or MAC, removing and replacing all to "\n"
+     * @param string $str
+     * @return string
+     */
+    public static function preprocess($str) {
+        $fstr = str_replace("\r\n", "\n", $str);
+        $fstr = str_replace("\r", "\n", $fstr);
+        return $fstr;
+    }
+
     /**
      * Constructs a wrapper from a string
      * @param $string
      */
     public function __construct($string) {
-        $this->string = $string;
+        $this->string = self::preprocess($string);
         $this->tokens = array();
         $this->tableerrors = array();
     }
@@ -491,11 +534,13 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
     /**
      * Determines an action, which is performed when action was toggled in state
      * after action finished it's work
-     * @param block_formal_langs_lexical_simple_action $action
+     * @param block_formal_langs_lexical_simple_action|null $action  null on EOF
      * @param block_formal_langs_lexical_automata_state  $state
      */
     public function accept($action, $state) {
-        $this->tokens[] = $this->lexer->result();
+        if ($this->lexer->result() != null) {
+            $this->tokens[] = $this->lexer->result();
+        }
     }
 
     /**
@@ -562,7 +607,16 @@ class block_formal_langs_lexical_automata {
      * @var bool
      */
     protected $error = false;
-
+    /**
+     * Last starting string position data
+     * @var int
+     */
+    protected $laststartposition = 0;
+    /**
+     *  Last starting text position data
+     * @var stdClass
+     */
+    protected $laststarttextposition = null;
     /**
      * Determines, whether error, when creating tables occured
      */
@@ -597,6 +651,27 @@ class block_formal_langs_lexical_automata {
         return $result;
     }
 
+    /**
+     * Returns a starting state index by name
+     * @param string $startingstate a string state
+     * @return int
+     */
+    public function get_starting_state_index($startingstate) {
+        $result = null;
+        if (count($this->startingstates)) {
+            $i = 0;
+            /**
+             *  block_formal_langs_lexical_automata_starting_state $state
+             */
+            foreach($this->startingstates as $state) {
+                if ($state->statename  == $startingstate) {
+                    $result = $i;
+                }
+                $i++;
+            }
+        }
+        return $result;
+    }
     protected function check_action_transitions() {
         if (count($this->startingstates) != 0) {
             /**
@@ -630,6 +705,9 @@ class block_formal_langs_lexical_automata {
                 foreach ($this->startingstates as $state) {
                     $state->build_tables($wrapper, $this);
                 }
+                $this->currentstartingstate = 'YYINITIAL';
+                $this->laststartposition  = 0;
+                $this->laststarttextposition = block_formal_langs_lexical_automata_state::position(0, 0);
             }
         }
     }
@@ -705,6 +783,23 @@ class block_formal_langs_lexical_automata {
     }
 
     /**
+     * Returns last starting position character
+     * @return int|string
+     */
+    public function get() {
+        return $this->wrapper->get($this->laststartposition);
+    }
+
+    /**
+     * Returns last starting position character and advances a position
+     * @return int|string
+     */
+    public function  getc() {
+        $c = $this->wrapper->get($this->laststartposition);
+        $this->laststartposition = $this->laststartposition + 1;
+        return $c;
+    }
+    /**
      * Performa actual lexical analysis
      */
     public function lex() {
@@ -712,7 +807,163 @@ class block_formal_langs_lexical_automata {
         if ($this->error) {
             return;
         }
-        // TODO: Implement
+        if ($this->currentstartingstate == '') {
+            $this->currentstartingstate = 'YYINITIAL';
+        }
+        // Create initial state stuff
+        $startingstate = $this->get_starting_state($this->currentstartingstate);
+        $inc = block_formal_langs_lexical_automata_starting_state::$INCLUSIVE;
+        $astates = array();
+
+        $state = new block_formal_langs_lexical_automata_state();
+        $state->startingstate = $startingstate;
+        $state->state = 0;
+        $state->startstringpos = $this->laststartposition;
+        $state->starttextpos = clone $this->laststarttextposition;
+        $state->movedfromzerowidthstates = array();
+        $state->endstringpos = $this->laststartposition;
+        $state->endtextpos = clone $this->laststarttextposition;
+
+        $astates[] = $state;
+
+        if ($startingstate->statetype == $inc) {
+            $sstate = $this->get_starting_state('');
+            if ($sstate != null) {
+                $cstate = clone $state;
+                $cstate->startingstate = $sstate;
+                $cstate->starttextpos = clone $this->laststarttextposition;
+                $cstate->endtextpos = clone $this->laststarttextposition;
+                $astates[] = $state;
+            }
+        }
+
+        $this->set_result(null);
+        // Create current maximum scanned position
+        $maximumpos = new stdClass();
+        $maximumpos->stringpos = $this->laststartposition;
+        $maximumpos->textpos = clone $this->laststarttextposition;
+        $maximumpos->state = $state;
+        $acceptedstates = array();
+        // Iterate loop for matching stuff data
+        while(count($astates)) {
+            /**
+             * @var block_formal_langs_lexical_automata_state $curstate
+             */
+            $curstate = array_shift($astates);
+            // Compute new maximum position
+            $maximumpos = self::maximumpos($maximumpos, $curstate);
+            // If state is acceptable, compute accepted states
+            if ($curstate->is_acceptable()) {
+                $acceptedstates = self::pick_maximum_acceptable_states($acceptedstates, $curstate);
+            }
+
+            $transitions = $curstate->get_available_transitions();
+            $matchchar = $this->wrapper->get($curstate->endstringpos);
+            for($i = 0; $i < count($transitions); $i++) {
+                /**
+                 * @var block_formal_langs_lexical_transition_rule $transition
+                 */
+                $transition = $transitions[$i];
+                // Is this is zerowidth assertions, we not advance
+                if ($transition->rule->match($matchchar, $curstate->endtextpos)) {
+                    $zwidth = $transition->rule->is_zero_width();
+                    $mchar = ($zwidth) ? '' : $matchchar;
+                    for($j = 0; $j < count($transition->newstates); $j++) {
+                        $newstate = $transition->newstates[$j];
+                        $newautostate = $state->clone_with_state($newstate,$mchar,$zwidth);
+
+                        if ($zwidth == false) {
+                            $newautostate->endstringpos += 1;
+                            $fka = $newautostate->advance_position($newautostate->endtextpos, $matchchar);
+                            $newautostate->endtextpos = $fka;
+                        }
+
+                        if ($newautostate != null) {
+                            $astates[] = $newautostate;
+                        }
+                    }
+                }
+            }
+        }
+        if (count($acceptedstates) == 0) {
+            $char = $this->wrapper->get($maximumpos->stringpos);
+            if ($char == block_formal_langs_lexical_matching_rule_type::$EOF_SYMBOL) {
+               $this->wrapper->accept(null, $maximumpos->state);
+            }  else {
+               $this->wrapper->tokenize_error($maximumpos->state);
+            }
+        }  else {
+            // Take all starting states from states and pick one with less index
+            $stateindexestonames = array();
+            for($i = 0; $i < $acceptedstates; $i++) {
+                $curstate = $acceptedstates[$i];
+                $index = $this->get_starting_state_index($curstate->startingstate->statename);
+                $stateindexestonames[$index] = $curstate->startingstate->statename;
+            }
+            $minstartingstate = $stateindexestonames[min(array_keys($stateindexestonames))];
+            // Now, when we picked a state with some least indexes,
+            $servedacceptedtates = array();
+            for($i = 0; $i < $acceptedstates; $i++) {
+                $curstate = $acceptedstates[$i];
+                if ($curstate->startingstate->statename == $minstartingstate) {
+                    $actionindex = $curstate->startingstate->statestoactions[$curstate->state];
+                    $servedacceptedtates[$actionindex] = $curstate;
+                }
+            }
+            /**
+             * @var block_formal_langs_lexical_automata_state $minactionstate
+             * @var block_formal_langs_lexical_action $action
+             */
+            // Apply rules
+            $minactionstate = $servedacceptedtates[min(array_keys($servedacceptedtates))];
+            $actionindex = $minactionstate->startingstate->statestoactions[$minactionstate->state];
+            $action = $minactionstate->startingstate->actions[$actionindex];
+            $action->accept($this, $minactionstate);
+            $this->wrapper->accept($action, $minactionstate);
+        }
+    }
+
+    /**
+     * Picks maximum acceptable states
+     * @param array $oldacceptables
+     * @param block_formal_langs_lexical_automata_state $state
+     * @return array
+     */
+    public static function pick_maximum_acceptable_states($oldacceptables, $state) {
+        $result = array();
+        if (count($oldacceptables)) {
+            /**
+             * @var block_formal_langs_lexical_automata_state $tstate
+             */
+            $tstate = $oldacceptables[0];
+            if ($tstate->length() == $state->length()) {
+                $result = $oldacceptables;
+                $result[] = $state;
+            } else {
+                if ($tstate->length() < $state->length()) {
+                    $result = array($state);
+                } else {
+                    $result = $oldacceptables;
+                }
+            }
+        }  else {
+            $result = array($state);
+        }
+        return $result;
+    }
+    /**
+     * Computes maximum position of state
+     * @param stdClass $maximumpos old maximum position
+     * @param block_formal_langs_lexical_automata_state $state
+     * @return stdClass
+     */
+    private static function maximumpos($maximumpos, $state) {
+        if ($maximumpos->stringpos > $state->endstringpos) {
+            $maximumpos->stringpos = $state->endstringpos;
+            $maximumpos->textpos = clone $state->endtextpos;
+            $maximumpos->state = $state;
+        }
+        return $maximumpos;
     }
 
 }
