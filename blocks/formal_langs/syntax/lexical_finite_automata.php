@@ -270,6 +270,22 @@ class block_formal_langs_lexical_automata_starting_state {
         }
         return $result;
     }
+
+    /**
+     * Finds NFA state in DFA state
+     * @param array $dstates
+     * @param int $state
+     * @return array DFA states, which contains NFA state
+     */
+    private static function find_nfa_state_in_dfa($dstates, $state) {
+        $result = array();
+        for($i = 0; $i < count($dstates); $i++) {
+            if (in_array($state, $dstates[$i][0])) {
+                $result[] = $i;
+            }
+        }
+        return $result;
+    }
     /**
      * Builds an exclude epsilon data
      */
@@ -286,7 +302,7 @@ class block_formal_langs_lexical_automata_starting_state {
             for($i = 0; $i < count($disjointtransitions); $i++) {
                 $transition = $disjointtransitions[$i];
                 $rule = $transition[0];
-                $nstates = $this->table->epsilon_closure($rule[1]);
+                $nstates = $this->table->epsilon_closure($transition[1]);
                 $stateindex = $this->find_state_in_dstates($dstates, $nstates);
                 if ($stateindex === null) {
                     $stateindex = count($dstates);
@@ -298,10 +314,48 @@ class block_formal_langs_lexical_automata_starting_state {
             $firstunmarked = self::find_first_unmarked_state($dstates);
         } while($firstunmarked !== null);
 
-        // TODO:
-        // 1. Implement mapping some acceptable states to an DFA states
-        // 2. Implement mapping some actions to DFA states
-        // 3. Write tests
+
+        // 1. Fill DFA states mapping to acceptable states
+        // 2. Fill acceptable states
+        $dfatonfacceptable = array();
+        $newacceptable = array();
+        for ($i = 0; $i < count($this->table->acceptablestates); $i++) {
+            $s = $this->table->acceptablestates[$i];
+            $dfafoundstates = self::find_nfa_state_in_dfa($dstates, $s);
+            for($j = 0; $j < count($dfafoundstates); $j++) {
+                $dfafoundstate = $dfafoundstates[$j];
+                if (array_key_exists($dfafoundstate, $dfatonfacceptable) == false) {
+                    $dfatonfacceptable[$dfafoundstate] = array();
+                }
+                $dfatonfacceptable[$dfafoundstate][] = $s;
+            }
+            $newacceptable = block_formal_langs_lexical_matching_rule::union($newacceptable, $dfafoundstates);
+        }
+        sort($newacceptable);
+        // Rebuild states to action table
+        $newstatestoaction = array();
+        for ($i = 0; $i < count($newacceptable); $i++) {
+            $newacceptablestate = $newacceptable[$i];
+            // Get list of acceptables, which state is linked to
+            $oldacceptablelist = $dfatonfacceptable[$newacceptablestate];
+            // Find mapped action (if few can be selected, chose one with lesser
+            // number)
+            $currentselectedaction = 0;
+            $foundmin = false;
+            for($j = 0; $j < count($oldacceptablelist); $j++) {
+                $possibleaction = $this->statestoactions[$oldacceptablelist[$j]];
+                if ($foundmin == false || $possibleaction < $currentselectedaction) {
+                    $foundmin = true;
+                    $currentselectedaction = $possibleaction;
+                }
+            }
+            $newstatestoaction[$newacceptablestate] = $currentselectedaction;
+        }
+        $newtable = new block_formal_langs_lexical_transition_table();
+        $newtable->transitions = $dtran;
+        $newtable->acceptablestates = $newacceptable;
+        $this->table = $newtable;
+        $this->statestoactions = $newstatestoaction;
     }
 }
 
