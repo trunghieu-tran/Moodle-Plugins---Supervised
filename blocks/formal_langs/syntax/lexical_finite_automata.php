@@ -478,7 +478,11 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
      * @var array of array(code, null)
      */
     protected $tableerrors;
-
+    /**
+     * Whether token errors were found
+     * @var array token errors
+     */
+    protected $tokenerrors;
     /**
      * Preprocesses a CP1251 string, or MAC, removing and replacing all to "\n"
      * @param string $str
@@ -506,6 +510,14 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
     public function table_errors() {
         return $this->tableerrors;
     }
+
+    /**
+     * Returns count of token errors
+     * @return array
+     */
+    public function token_errors() {
+        return $this->tokenerrors;
+    }
     /**
      * Returns array of tokens
      * @return array 
@@ -527,8 +539,7 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
      * @param block_formal_langs_lexical_automata_state $state
      */
     public function tokenize_error($state) {
-        echo 'Accepted';
-        echo $state->buffer();
+        $this->tokenerrors[] =  $state;
     }
 
     /**
@@ -541,6 +552,19 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
         if ($this->lexer->result() != null) {
             $this->tokens[] = $this->lexer->result();
         }
+    }
+
+    /**
+     * Computes next token from lexer
+     * @return mixed|null
+     */
+    public function next_token() {
+        $r = null;
+        if (count($this->tokenerrors) == 0) {
+            $this->lexer->lex();
+            $r = $this->lexer->result();
+        }
+        return $r;
     }
 
     /**
@@ -887,6 +911,8 @@ class block_formal_langs_lexical_automata {
         }
         if (count($acceptedstates) == 0) {
             $char = $this->wrapper->get($maximumpos->stringpos);
+            $this->laststartposition = $maximumpos->stringpos;
+            $this->laststarttextposition = $maximumpos->textpos;
             if ($char == block_formal_langs_lexical_matching_rule_type::$EOF_SYMBOL) {
                $this->wrapper->accept(null, $maximumpos->state);
             }  else {
@@ -920,6 +946,8 @@ class block_formal_langs_lexical_automata {
             $action = $minactionstate->startingstate->actions[$actionindex];
             $action->accept($this, $minactionstate);
             $this->wrapper->accept($action, $minactionstate);
+            $this->laststartposition = $minactionstate->endstringpos;
+            $this->laststarttextposition = $minactionstate->endtextpos;
         }
     }
 
