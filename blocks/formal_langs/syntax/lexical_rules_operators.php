@@ -1064,12 +1064,27 @@ class block_formal_langs_lexical_simple_action extends block_formal_langs_lexica
      * Defines a new starting state, which automata can enter
      */
     protected $startingstate;
+
+    /**
+     * Custom data, which can determine one action from another
+     * @var mixed
+     */
+    protected $customdata;
+
+    /**
+     * Sets a custom data
+     * @param $data
+     */
+    public function set_custom_data($data) {
+        $this->customdata = $data;
+    }
     /**
      * Creates a starting simple state
      * @param string $startingstate starting state which automata enters to
      */
     public function __construct($startingstate = 'YYINITIAL') {
         $this->startingstate = $startingstate;
+        $this->customdata = null;
     }
     /**
      * Returns new starting state for lexer
@@ -1085,7 +1100,10 @@ class block_formal_langs_lexical_simple_action extends block_formal_langs_lexica
      * @return mixed some info data
      */
     public function accept($lexer, $acceptstate) {
-        $lexer->set_result($acceptstate->buffer());
+        $a = new stdClass();
+        $a->text = $acceptstate->buffer();
+        $a->data = $this->customdata;
+        $lexer->set_result($a);
         $lexer->set_starting_state($this->new_lexer_starting_state());
     }
 }
