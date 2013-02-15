@@ -325,6 +325,37 @@ class block_formal_langs_syntax_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($s->table->acceptablestates == array(1,2));
         $this->assertTrue($s->statestoactions == array(1 => 0, 2 => 0));
     }
+
+    /**
+     * Simple tokenization test
+     */
+    public function test_tokenize() {
+        $q = block_formal_langs_lexical_matching_rule::simple_rule('a');
+        $c = new block_formal_langs_lexical_concat_operator(array($q, $q));
+        $top = new block_formal_langs_lexical_alternative_operator(array($q, $c));
+        $q2 = block_formal_langs_lexical_matching_rule::simple_rule('b');
+        $c2 = new block_formal_langs_lexical_concat_operator(array($q, $q2));
+
+        $action = new block_formal_langs_lexical_simple_action();
+
+        $s = new block_formal_langs_lexical_automata_starting_state();
+        $s->rules = array($top, $c2);
+        $s->actions = array($action, $action);
+
+        $w = new block_formal_langs_lexer_interaction_wrapper_impl('aaaba');
+        $automata = new block_formal_langs_lexical_automata(array($s), $w);
+        $texts = array();
+        do {
+           $result = $w->next_token();
+           if ($result != null) {
+                $texts[] = $result->text;
+            }
+        } while ($result != null);
+        $this->assertTrue(count($w->token_errors()) == 0);
+        $this->assertTrue($texts[0] == 'aa');
+        $this->assertTrue($texts[1] == 'ab');
+        $this->assertTrue($texts[2] == 'a');
+    }
 }
 
 class block_formal_langs_syntax_lexer_intersection_test extends PHPUnit_Framework_TestCase {
