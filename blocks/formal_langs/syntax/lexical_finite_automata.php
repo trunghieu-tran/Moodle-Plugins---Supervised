@@ -63,14 +63,15 @@ class block_formal_langs_lexical_automata_state {
      * @return array all availble transitions from this state
      */
     public function get_available_transitions() {
-        $this->startingstate->table->transitions_for_state($this->state);
+        return $this->startingstate->table->transitions_for_state($this->state);
     }
     /**
      * Tests, whether current state is acceptable
      * @return bool
      */
     public function is_acceptable() {
-        return in_array($this->state, $this->startingstate->table->acceptablestates);
+        $table = $this->startingstate->table;
+        return in_array($this->state, $table->acceptablestates);
     }
 
 
@@ -86,6 +87,8 @@ class block_formal_langs_lexical_automata_state {
             return null;
         }
         $result = new block_formal_langs_lexical_automata_state();
+        $result->startingstate = $this->startingstate;
+        $result->state = $newstate;
         $result->starttextpos = clone $this->starttextpos;
         $result->endtextpos = clone $this->endtextpos;
         $result->startstringpos  = $this->startstringpos;
@@ -894,7 +897,7 @@ class block_formal_langs_lexical_automata {
                     $mchar = ($zwidth) ? '' : $matchchar;
                     for($j = 0; $j < count($transition->newstates); $j++) {
                         $newstate = $transition->newstates[$j];
-                        $newautostate = $state->clone_with_state($newstate,$mchar,$zwidth);
+                        $newautostate = $curstate->clone_with_state($newstate,$mchar,$zwidth);
 
                         if ($zwidth == false) {
                             $newautostate->endstringpos += 1;
@@ -919,9 +922,10 @@ class block_formal_langs_lexical_automata {
                $this->wrapper->tokenize_error($maximumpos->state);
             }
         }  else {
+
             // Take all starting states from states and pick one with less index
             $stateindexestonames = array();
-            for($i = 0; $i < $acceptedstates; $i++) {
+            for($i = 0; $i < count($acceptedstates); $i++) {
                 $curstate = $acceptedstates[$i];
                 $index = $this->get_starting_state_index($curstate->startingstate->statename);
                 $stateindexestonames[$index] = $curstate->startingstate->statename;
@@ -929,13 +933,14 @@ class block_formal_langs_lexical_automata {
             $minstartingstate = $stateindexestonames[min(array_keys($stateindexestonames))];
             // Now, when we picked a state with some least indexes,
             $servedacceptedtates = array();
-            for($i = 0; $i < $acceptedstates; $i++) {
+            for($i = 0; $i < count($acceptedstates); $i++) {
                 $curstate = $acceptedstates[$i];
                 if ($curstate->startingstate->statename == $minstartingstate) {
                     $actionindex = $curstate->startingstate->statestoactions[$curstate->state];
                     $servedacceptedtates[$actionindex] = $curstate;
                 }
             }
+
             /**
              * @var block_formal_langs_lexical_automata_state $minactionstate
              * @var block_formal_langs_lexical_action $action
