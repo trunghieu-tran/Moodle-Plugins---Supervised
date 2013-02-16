@@ -2500,12 +2500,11 @@ class poasassignment_model {
      *
      * @static
      * @param string $subtype - The type of plugin (submission or feedback)
-     * @param part_of_admin_tree $admin - The handle to the admin menu
-     * @param admin_settingpage $settings - The handle to current node in the navigation tree
-     * @param stdClass $module - The handle to the current module
-     * @return None
+     * @param $admin - The handle to the admin menu
+     * @param $settings - The handle to current node in the navigation tree
+     * @param $module - The handle to the current module
      */
-    public static function add_admin_plugin_settings($subtype, part_of_admin_tree $admin, admin_settingpage $settings, stdClass $module) {
+    public static function add_admin_plugin_settings($subtype, $admin, $settings, $module) {
         global $CFG;
 
         $plugins = get_plugin_list_with_file($subtype, 'settings.php', false);
