@@ -29,23 +29,23 @@ require_once('model.php');
 
 // Add admin panel first-level element called "POAS assignment plugins"
 $ADMIN->add('modules', new admin_category('modpoasassignmentplugins',
-    new lang_string('poasassignmentplugins', 'poasassignment'), !$module->visible));
+    new lang_string('poasassignmentplugins', 'poasassignment'), !$module->is_enabled()));
 
 // Add admin panel item for graders
 $ADMIN->add('modpoasassignmentplugins', new admin_category('poasassignmentplugins',
-    new lang_string('subplugintype_poasassignment_plural', 'poasassignment'), !$module->visible));
+    new lang_string('subplugintype_poasassignment_plural', 'poasassignment'), !$module->is_enabled()));
 
 // Add admin panel item for answer plugins
 $ADMIN->add('modpoasassignmentplugins', new admin_category('poasassignmentanswertypesplugins',
-    new lang_string('subplugintype_poasassignmentanswertypes_plural', 'poasassignment'), !$module->visible));
+    new lang_string('subplugintype_poasassignmentanswertypes_plural', 'poasassignment'), !$module->is_enabled()));
 
 // Add admin panel item for taskgivers plugins
 $ADMIN->add('modpoasassignmentplugins', new admin_category('poasassignmenttaskgiversplugins',
-    new lang_string('subplugintype_poasassignmenttaskgivers_plural', 'poasassignment'), !$module->visible));
+    new lang_string('subplugintype_poasassignmenttaskgivers_plural', 'poasassignment'), !$module->is_enabled()));
 
 // Add admin panel item for additional plugins
 $ADMIN->add('modpoasassignmentplugins', new admin_category('poasassignmentadditionalplugins',
-    new lang_string('subplugintype_poasassignmentadditional_plural', 'poasassignment'), !$module->visible));
+    new lang_string('subplugintype_poasassignmentadditional_plural', 'poasassignment'), !$module->is_enabled()));
 
 poasassignment_model::add_admin_plugin_settings('poasassignment', $ADMIN, $settings, $module);
 poasassignment_model::add_admin_plugin_settings('poasassignmentanswertypes', $ADMIN, $settings, $module);
