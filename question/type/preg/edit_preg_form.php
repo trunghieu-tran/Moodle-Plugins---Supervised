@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+global $app;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
@@ -55,10 +56,11 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
             global $CFG;
+            global $app;
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
             
-            $tmp = & $mform->createElement('text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/question/type/preg/tmp_img/edit.gif'), array('size' => 80));
+            $tmp = & $mform->createElement('text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $app . '/theme/image.php/standard/core/1359744739/t/edit'), array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
             
             return $repeated;
