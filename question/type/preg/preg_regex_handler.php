@@ -37,6 +37,11 @@ require_once($CFG->dirroot . '/question/type/preg/preg_errors.php');
  * Options, generic to all handlers - mainly affects scanning and parsing.
  */
 class qtype_preg_handling_options {
+    const MODE_PCRE = 0;
+    const MODE_POSIX = 1;
+
+    /** @var boolean Regex compatibility mode. */
+    public $mode = self::MODE_PCRE;
     /** @var boolean Strict PCRE compatible regex syntax. */
     public $pcrestrict = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */

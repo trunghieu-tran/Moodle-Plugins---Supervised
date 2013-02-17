@@ -35,15 +35,15 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
  */
 class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
-    /** @var array Integer values used for subpattern capturing.
-     *
-     * A value of 2*k means the beginning of the k-subpattern, a value of 2*k+1 means the ending of the k-subpattern.
-     */
-    public $tags;
+    /** @var array qtype_preg_node_subpatt instances for starting subpatterns. */
+    public $subpatt_start;
+    /** @var array qtype_preg_node_subpatt instances for ending subpatterns. */
+    public $subpatt_end;
 
     public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
         parent::__construct($from, $pregleaf, $to, $consumechars);
-        $this->tags = array();
+        $this->subpatt_start = array();
+        $this->subpatt_end = array();
     }
 }
 
@@ -395,16 +395,16 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
         }
         $body = array_pop($stack);
 
-        // Every transition outgoing from the start state we tag with the value of (subpattern number * 2).
+        // Copy this subpattern node to the starting transitions.
         foreach ($body['start']->outgoing_transitions() as $transition) {
-            $transition->tags[] = $this->pregnode->number * 2;
+            $transition->subpatt_start[] = $this->pregnode;
         }
 
-        // Every transition to the end state we tag with the value of (subpattern number * 2 + 1).
+        // Copy this subpattern node to the ending transitions.
         foreach ($automaton->get_states() as $state) {
             foreach ($state->outgoing_transitions() as $transition) {
                 if ($transition->to === $body['end']) {
-                    $transition->tags[] = $this->pregnode->number * 2 + 1;
+                    $transition->subpatt_end[] = $this->pregnode;
                 }
             }
         }
