@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('FONT' , dirname(__FILE__) . '/Ledger-Regular.ttf');
+define('FONT' , dirname(__FILE__) . '/../../../lib/default.ttf');
 define('FONT_SIZE' , 10.0);
 
 /**
