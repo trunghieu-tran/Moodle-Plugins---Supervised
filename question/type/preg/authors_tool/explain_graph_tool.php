@@ -625,10 +625,16 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
                 $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
                 
             } else {
-                $json_array['graph_src'] = $CFG->wwwroot . '/question/type/preg/tmp_img/graph_err.png';
+                $dotscript = 'digraph {
+                            "Ooops! I can\'t build explain graph!" [color=white];
+                        }';
+                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
             }
         } else {
-            $json_array['graph_src'] = $CFG->wwwroot  . '/question/type/preg/tmp_img/graph_def.png'; //Add graph
+            $dotscript = 'digraph {
+                        "This place is for explain graph" [color=white];
+                    }';
+            $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
         }
     }
 
