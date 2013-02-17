@@ -242,6 +242,7 @@ $string['description_option_J'] = 'allow duplicate names:';
 $string['description_unsetoption_J'] = 'disallow duplicate names:';
 // TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
+$string['description_finite_quant_strict'] = '%1 is repeated %count times%greed';
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
 $string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 $string['description_finite_quant_01'] = '%1 may be missing%greed';
