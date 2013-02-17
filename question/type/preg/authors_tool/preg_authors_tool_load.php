@@ -22,27 +22,29 @@ require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool
  * 
  * @param array $json_array contains author tool content
  */
-function get_json_array() {
-    
-    $json_array = array();
+abstract class author_json {
+    public static function get_json_array() {
+        
+        global $CFG;
+        
+        $json_array = array();
+        
+        $regextext = optional_param('regex', '', PARAM_TEXT);
+        $id = optional_param('id', '', PARAM_INT);
 
-    $regextext = optional_param('regex', '', PARAM_TEXT);
-    $id = optional_param('id', '', PARAM_INT);
-    
-    /*$regextext = optional_param('regex', '', PARAM_TEXT);
-    $json_array['regex'] = $regextext;*/
-
-    $tree = new qtype_preg_author_tool_tree($regextext);
-    $graph = new qtype_preg_author_tool_explain_graph($regextext);
-    $description = new qtype_preg_author_tool_description($regextext);
-    
-    $tree->generate_json($json_array, $regextext, $id);
-    $graph->generate_json($json_array, $regextext, $id);
-    $description->generate_json($json_array, $regextext, $id);
-    
-    return $json_array;
-    
+        $tools = array(
+            "tree" => new qtype_preg_author_tool_tree($regextext),
+            "graph" => new qtype_preg_author_tool_explain_graph($regextext),
+            "description" => new qtype_preg_author_tool_description($regextext),
+        );
+        
+        foreach($tools as $tool){
+            $tool->generate_json($json_array, $regextext, $id);
+        }
+        
+        return $json_array;
+    }
 }
 
-$json_array = get_json_array();
+$json_array = author_json::get_json_array();
 echo json_encode($json_array);
