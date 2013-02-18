@@ -2524,4 +2524,31 @@ class poasassignment_model {
         }
 
     }
+
+    public function reset($course, $instanceid)
+    {
+        global $DB;
+        $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid' => $instanceid));
+        foreach ($assignees as $assignee) {
+            // Delete random task values for the assignee
+            $DB->delete_records('poasassignment_task_values', array('assigneeid' => $assignee->id));
+
+            // Get all attempts
+            $attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assignee->id), 'id');
+            foreach ($attempts as $attempt) {
+                $submissions = $DB->get_records('poasassignment_submissions', array('attemptid' => $attempt->id));
+                foreach ($submissions as $submission) {
+                    $this->delete_files($instanceid, 'submissionfiles', $submission->id);
+                }
+                // Delete all submissions for each attempt
+                $DB->delete_records('poasassignment_rating_values', array('attemptid' => $attempt->id));
+                // Delete all grades for each attempt
+
+                $DB->delete_records('poasassignment_submissions', array('attemptid' => $attempt->id));
+            }
+            // Delete all attempts
+            $DB->delete_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
+        }
+        $DB->delete_records('poasassignment_assignee', array('poasassignmentid' => $instanceid));
+    }
 }

@@ -391,3 +391,7 @@ $string['subplugintype_poasassignmentanswertypes_plural'] = 'Answer types';
 $string['subplugintype_poasassignmenttaskgivers_plural'] = 'Task givers';
 $string['subplugintype_poasassignmentadditional_plural'] = 'Additionl plugins';
 $string['poasassignmentplugins'] = 'POAS Assignment plugins';
+$string['reset_attempts'] = 'Reset all attempts';
+$string['reset_assignees'] = 'Reset all assignees';
+$string['attemptsdeleted'] = 'All attempts are deleted';
+$string['assigneesdeleted'] = 'All assignees are deleted';
