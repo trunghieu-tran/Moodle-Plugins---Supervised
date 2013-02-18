@@ -415,3 +415,35 @@ function poasassignment_extend_navigation(navigation_node $navigation, $course, 
         }
     }
 }
+
+/**
+ * Called by course/reset.php
+ *
+ * @param $mform moodle form
+ */
+function poasassignment_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'poasassignmentheader', get_string('modulenameplural', 'poasassignment'));
+
+    $mform->addElement('checkbox', 'reset_assignees', get_string('reset_assignees', 'poasassignment'));
+}
+
+/**
+ * Used for set default values to form's elements displayed by poasassignment_reset_course_form_definition.
+ *
+ * @param $course course
+ * @return array default values
+ */
+function poasassignment_reset_course_form_defaults($course) {
+    return array('reset_attempts' => 1, 'reset_assignees' => 1);
+}
+
+function poasassignment_reset_userdata($data) {
+    if (!empty($data->reset_assignees)) {
+        global $DB;
+        $instances = $DB->get_records('poasassignment', array('course' => $data->courseid));
+        foreach ($instances as $instance) {
+            poasassignment_model::get_instance()->reset($data->courseid, $instance->id);
+        }
+        notify(get_string('assigneesdeleted', 'poasassignment'), 'notifysuccess');
+    }
+}

@@ -53,6 +53,15 @@ class poasassignment_answer {
     
     public function save_submission($attemptid, $data) {
     }
+
+    /**
+     * Deleting submission
+     *
+     * @param $attemptid
+     * @param $data
+     */
+    public function delete_submission($attemptid) {
+    }
     
     function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
         global $DB;

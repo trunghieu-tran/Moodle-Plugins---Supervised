@@ -327,3 +327,7 @@ $string['subplugintype_poasassignmenttaskgivers_plural'] = 'Стратегии �
 $string['subplugintype_poasassignmentadditional_plural'] = 'Дополнительно';
 $string['poasassignmentplugins'] = 'Плагины POAS Assignment';
 $string['submissions_help'] = 'На этой странице вы можете оценивать работы студентов';
+$string['reset_attempts'] = 'Чистка попыток';
+$string['reset_assignees'] = 'Чистка студентов модуля';
+$string['attemptsdeleted'] = 'Все попытки удалены';
+$string['assigneesdeleted'] = 'Все студенты модуля удалены';

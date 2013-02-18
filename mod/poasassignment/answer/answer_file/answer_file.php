@@ -256,6 +256,16 @@ class answer_file extends poasassignment_answer {
         $poasmodel->save_files($data->answerfiles_filemanager,'submissionfiles',$submission->id);
         return $submission->id;
     }
+    public function delete_submission($attemptid, $cmid) {
+        global $DB;
+        $submissions = $DB->get_records('poasassignment_submissions', array('attemptid' => $attemptid));
+        foreach ($submissions as $submission) {
+            if ($submission->id)
+                poasassignment_model::get_instance()->delete_files($cmid, 'submissionfiles', $submission->id);
+            //$DB->delete_records('poasassignment_submissions', array('attemptid' => $attemptid));
+        }
+
+    }
     
     function show_assignee_answer($assigneeid,$poasassignmentid,$needbox=1) {
         global $DB,$OUTPUT;
