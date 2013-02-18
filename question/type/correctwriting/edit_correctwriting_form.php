@@ -222,17 +222,19 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             }
 
             foreach ($question->options->answers as $id => $answer) {
-                $string = $lang->create_from_db('question_answers',$id);
-                $string = '';
-                if (count($descriptions[$id]) != 0) {
-                   if (strlen(trim($descriptions[$id][0])) == 0) {
-                       $string = "\n";
-                   }
-                }
-                $string = $string . implode("\n", $descriptions[$id]);
-                $question->options->answers[$id]->lexemedescriptions = $string;
+                if ($answer->fraction > $question->hintgradeborder) {
+                    // $string = $lang->create_from_db('question_answers',$id);
+                    $string = '';
+                    if (count($descriptions[$id]) != 0) {
+                        if (strlen(trim($descriptions[$id][0])) == 0) {
+                            $string = "\n";
+                        }
+                    }
+                    $string = $string . implode("\n", $descriptions[$id]);
+                    $question->options->answers[$id]->lexemedescriptions = $string;
 
-                $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
+                    $question->lexemedescriptions[$key] = $answer->lexemedescriptions;
+                }
                 $key++;
             }
         }
