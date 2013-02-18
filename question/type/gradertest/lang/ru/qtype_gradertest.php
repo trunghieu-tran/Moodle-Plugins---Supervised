@@ -1,0 +1,21 @@
+<?php
+$string['gradertest'] = 'Тест автотестера';
+$string['pluginname'] = 'Тест автотестера';
+$string['pluginnameediting'] = 'Редактирование теста автотестера';
+$string['pluginnamesummary'] = 'Тест для проверки программ в модуле poasassignment';
+$string['pluginname_help'] = 'Тест для проверки программ в модуле poasassignment';
+$string['pluginnameadding'] = 'Добавление нового теста автотестера';
+$string['gradertestsummary'] = 'Хранит входные и выходные данные тестов';
+$string['editinggradertest'] = 'Редактирование теста автотестера';
+$string['addinggradertest'] = 'Добавление теста автотестера';
+$string['gradertest_help'] = 'Тест автотестера';
+$string['testtext'] = 'Текст теста';
+$string['testfiles'] = 'Файлы теста';
+$string['testin'] = 'Входные данные теста';
+$string['testout'] = 'Выходные данные теста';
+$string['testweight'] = 'Вес теста';
+$string['testname'] = 'Название теста';
+$string['pathtomsvc'] = 'Путь к VC';
+$string['configpathtomsvc'] = 'Будет использован компилятор';
+$string['tasktext'] = 'Текст задания';
+$string['tasktext_help'] = 'Программа, которая должна быть написана';

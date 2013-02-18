@@ -1,6 +1,10 @@
 <?php
 $string['gradertest'] = 'Test for grader';
 $string['pluginname'] = 'Test for grader';
+$string['pluginnameediting'] = 'Editing test for grader';
+$string['pluginnamesummary'] = 'Test for poasassignment grader subplugin';
+$string['pluginname_help'] = 'Test for poasassignment grader subplugin';
+$string['pluginnameadding'] = 'Adding new grader test';
 $string['gradertestsummary'] = 'Saves input and output data';
 $string['editinggradertest'] = 'Editing grader test';
 $string['addinggradertest'] = 'Adding grader test';
