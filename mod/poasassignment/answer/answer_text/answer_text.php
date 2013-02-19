@@ -114,9 +114,9 @@ class answer_text extends poasassignment_answer {
         $submission->value = $data->text_editor;
         return $DB->insert_record('poasassignment_submissions', $submission);
     }
-    public function delete_submission($attemptid) {
+    public function delete_submission($attemptid, $cmid) {
         global $DB;
-        //$DB->delete_records('poasassignment_submissions', array('attemptid' => $attemptid));
+        $DB->delete_records('poasassignment_submissions', array('attemptid' => $attemptid));
     }
     
     function get_answer_values() {

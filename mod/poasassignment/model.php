@@ -390,7 +390,20 @@ class poasassignment_model {
         global $DB;
         $fs = get_file_storage();
         $this->context = get_context_instance(CONTEXT_MODULE, $cmid);
-        return $fs->delete_area_files($this->context->id,$filearea,$itemid);
+        return $fs->delete_area_files($this->context->id, 'mod_poasassignment', $filearea, $itemid);
+    }
+
+    /**
+     * Delete user draft files
+     *
+     * @param $userid
+     * @param $itemid
+     */
+    function delete_user_draft_files($userid, $itemid)
+    {
+        $fs = get_file_storage();
+        $usercontext = context_user::instance($userid);
+        $fs->delete_area_files($usercontext->id, 'user', 'draft', $itemid);
     }
 
     function get_poasassignments_files_urls($cm) {
@@ -2484,7 +2497,7 @@ class poasassignment_model {
     public function get_user_by_assigneeid($assigneeid) {
         global $DB;
         $sql = '
-        SELECT firstname, lastname
+        SELECT userid, firstname, lastname
         FROM {user}
         JOIN {poasassignment_assignee} on {poasassignment_assignee}.userid={user}.id
         WHERE {poasassignment_assignee}.id = ?';
@@ -2529,23 +2542,42 @@ class poasassignment_model {
     {
         global $DB;
         $assignees = $DB->get_records('poasassignment_assignee', array('poasassignmentid' => $instanceid));
+        // Get answer plugins
+        $plugins = $this->get_plugins();
+        $pluginsarray = array();
+        foreach ($plugins as $plugin) {
+            require_once($plugin->path);
+            $pluginsarray[$plugin->id] = new $plugin->name();
+        }
+        $cm = get_coursemodule_from_instance('poasassignment', $instanceid);
         foreach ($assignees as $assignee) {
-            // Delete random task values for the assignee
-            $DB->delete_records('poasassignment_task_values', array('assigneeid' => $assignee->id));
 
             // Get all attempts
             $attempts = $DB->get_records('poasassignment_attempts', array('assigneeid' => $assignee->id), 'id');
             foreach ($attempts as $attempt) {
                 $submissions = $DB->get_records('poasassignment_submissions', array('attemptid' => $attempt->id));
                 foreach ($submissions as $submission) {
-                    $this->delete_files($instanceid, 'submissionfiles', $submission->id);
+                    if ($pluginsarray[$submission->answerid])
+                        $pluginsarray[$submission->answerid]->delete_submission($attempt->id, $cm->id);
                 }
                 // Delete all submissions for each attempt
                 $DB->delete_records('poasassignment_rating_values', array('attemptid' => $attempt->id));
                 // Delete all grades for each attempt
 
                 $DB->delete_records('poasassignment_submissions', array('attemptid' => $attempt->id));
+
+                // Delete comment files
+                $file = $DB->get_record('files', array('component' => 'mod_poasassignment', 'filearea' => 'commentfiles', 'itemid' => $attempt->id), 'id, contextid');
+                if ($file)
+                {
+                    $fs = get_file_storage();
+                    $fs->delete_area_files($file->contextid, 'mod_poasassignment', 'commentfiles', $attempt->id);
+                }
             }
+
+            // Delete random task values for the assignee
+            $DB->delete_records('poasassignment_task_values', array('assigneeid' => $assignee->id));
+
             // Delete all attempts
             $DB->delete_records('poasassignment_attempts', array('assigneeid' => $assignee->id));
         }
