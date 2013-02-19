@@ -259,10 +259,18 @@ class answer_file extends poasassignment_answer {
     public function delete_submission($attemptid, $cmid) {
         global $DB;
         $submissions = $DB->get_records('poasassignment_submissions', array('attemptid' => $attemptid));
+        if ($attempt = $DB->get_record('poasassignment_attempts', array('id' => $attemptid), 'id, assigneeid'))
+        {
+            $user = poasassignment_model::get_instance()->get_user_by_assigneeid($attempt->assigneeid);
+        }
+
         foreach ($submissions as $submission) {
             if ($submission->id)
+            {
                 poasassignment_model::get_instance()->delete_files($cmid, 'submissionfiles', $submission->id);
-            //$DB->delete_records('poasassignment_submissions', array('attemptid' => $attemptid));
+                poasassignment_model::get_instance()->delete_user_draft_files($user->userid, $submission->value);
+            }
+            $DB->delete_records('poasassignment_submissions', array('attemptid' => $attemptid));
         }
 
     }

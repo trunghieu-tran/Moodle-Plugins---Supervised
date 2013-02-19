@@ -58,9 +58,10 @@ class poasassignment_answer {
      * Deleting submission
      *
      * @param $attemptid
-     * @param $data
+     * @param $cmid
+     * @internal param $data
      */
-    public function delete_submission($attemptid) {
+    public function delete_submission($attemptid, $cmid) {
     }
     
     function bind_submission_to_attempt($assigneeid,$draft,$final=0) {
