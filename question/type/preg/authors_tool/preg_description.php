@@ -246,29 +246,23 @@ class qtype_preg_author_tool_description extends qtype_preg_author_tool {
      * @param array $json_array contains text of description
      */
     public function generate_json(&$json_array, $regextext, $id){
-        
-        global $CFG;
 
-        if(!empty($regextext)) {
-            if($id == -1){
+        if($id == -1){
                 
-                //Checking parser errors
-                $pars_error = false;
-                foreach($this->get_errors() as $error) {
-                    if (is_a($error, 'qtype_preg_parsing_error')) {
-                        $pars_error = true;
-                        break;
-                    }
-                }
-                
-                if($pars_error === false && $this->get_ast_root() !== NULL) {
-                    $json_array['description'] = $this->default_description();//Add tree                
-                } else {                
-                    $json_array['description'] = 'Ooops! I can\'t build description!';
+            //Checking parser errors
+            $pars_error = false;
+            foreach($this->get_errors() as $error) {
+                if (is_a($error, 'qtype_preg_parsing_error')) {
+                    $pars_error = true;
+                    break;
                 }
             }
-        } else {
-            $json_array['description'] = 'Ooops! I can\'t build description!';
+                
+            if($pars_error === false && $this->get_ast_root() !== NULL) {
+                $json_array['description'] = $this->default_description();//Add tree                
+            } else {                
+                $json_array['description'] = 'Ooops! I can\'t build description!';
+            }
         }
     }
 }

@@ -603,36 +603,26 @@ class qtype_preg_author_tool_explain_graph extends qtype_preg_author_tool {
      * @param array $json_array contains link on image of explain graph
      */
     public function generate_json(&$json_array, $regextext, $id) {
-        
-        global $CFG;
-        
-        if(!empty($regextext)) {
 
-            //Checking parser errors
-            $pars_error = false;
-            foreach($this->get_errors() as $error) {
-                if (is_a($error, 'qtype_preg_parsing_error') || is_a($error, 'qtype_preg_accepting_error')) {
-                    $pars_error = true;
-                    break;
-                }
+        //Checking parser errors
+        $pars_error = false;
+        foreach($this->get_errors() as $error) {
+            if (is_a($error, 'qtype_preg_parsing_error') || is_a($error, 'qtype_preg_accepting_error')) {
+                $pars_error = true;
+                break;
             }
+        }
 
-            if($pars_error === false && $this->get_ast_root() !== NULL && $this->get_dst_root() !== NULL) {
+        if($pars_error === false && $this->get_ast_root() !== NULL && $this->get_dst_root() !== NULL) {
                 
-                $graph = $this->create_graph($id);
-                $dot_instructions_graph = $graph->create_dot();
+            $graph = $this->create_graph($id);
+            $dot_instructions_graph = $graph->create_dot();
                 
-                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
+            $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dot_instructions_graph, 'png'));
                 
-            } else {
-                $dotscript = 'digraph {
-                            "Ooops! I can\'t build explain graph!" [color=white];
-                        }';
-                $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
-            }
         } else {
             $dotscript = 'digraph {
-                        "This place is for explain graph" [color=white];
+                        "Ooops! I can\'t build explain graph!" [color=white];
                     }';
             $json_array['graph_src'] = 'data:image/png;base64,' . base64_encode(qtype_preg_regex_handler::execute_dot($dotscript, 'png'));
         }
