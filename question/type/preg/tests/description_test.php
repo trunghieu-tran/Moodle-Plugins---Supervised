@@ -189,6 +189,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('g{0,1}','<span style="color:blue">g</span> may be missing'),
           array('g{0,}','<span style="color:blue">g</span> is repeated any number of times or missing'),
           array('g{1,}','<span style="color:blue">g</span> is repeated any number of times'),
+          array('g{3}','<span style="color:blue">g</span> is repeated 3 times'),  
           array('g{2,5}','<span style="color:blue">g</span> is repeated from 2 to 5 times'),
         );
     }
