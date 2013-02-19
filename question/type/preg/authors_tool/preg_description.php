@@ -919,24 +919,24 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
 
         $resultpattern ='';
         $greedpattern='';
-        $wrong_borders =$this->pregnode->leftborder >= $this->pregnode->rightborder;
+        $wrong_borders =$this->pregnode->leftborder > $this->pregnode->rightborder;
 
         if($this->pregnode->leftborder===0 ){
             if($this->pregnode->rightborder ===1){
                 $resultpattern = self::get_form_string('description_finite_quant_01',$form);
                 $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
-            }
-            else {
+            } else {
                 $resultpattern = self::get_form_string('description_finite_quant_0',$form);
                 $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
             }
             
-        }
-        else if ($this->pregnode->leftborder===1) {
+        } else if ($this->pregnode->leftborder===1) {
             $resultpattern = self::get_form_string('description_finite_quant_1',$form);
-            $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
-        }
-        else {
+            $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);        
+        } else if ($this->pregnode->leftborder==$this->pregnode->rightborder) {
+            $resultpattern = self::get_form_string('description_finite_quant_strict',$form);
+            $resultpattern = str_replace('%count',$this->pregnode->rightborder,$resultpattern);
+        } else {
             $resultpattern = self::get_form_string('description_finite_quant',$form);
             $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
             $resultpattern = str_replace('%leftborder',$this->pregnode->leftborder,$resultpattern);
