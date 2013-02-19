@@ -211,87 +211,87 @@ $string['regexmatchheader_help'] = 'Here you can input string for matching. In f
 // Strings for node description
 
 // TYPE_LEAF_META
-$string['description_empty'] = 'nothing';
+$string['description_empty'] = 'ничего';
 // TYPE_LEAF_ASSERT
-$string['description_circumflex'] = 'beginning of the string';
-$string['description_dollar'] = 'end of the string';
-$string['description_wordbreak'] = 'at a word boundary';
-$string['description_wordbreak_neg'] = 'not at a word boundary';
-$string['description_esc_a'] = 'at the start of the subject';
-$string['description_esc_z'] = 'at the end of the subject';
-$string['description_esc_g'] = 'at the first matching position in the subject';
+$string['description_circumflex'] = 'начало строки';
+$string['description_dollar'] = 'конец строки';
+$string['description_wordbreak'] = 'на границе слова';
+$string['description_wordbreak_neg'] = 'не на границе слова';
+$string['description_esc_a'] = 'в начале текста';
+$string['description_esc_z'] = 'в конце текста';
+$string['description_esc_g'] = 'в начале поиска';// ??!! -TODO
 // TYPE_LEAF_BACKREF
-$string['description_backref'] = 'back reference to subpattern #%number';
-$string['description_backref_name'] = 'back reference to subpattern "%name"';
+$string['description_backref'] = 'обратная ссылка на подмаску №%number';
+$string['description_backref_name'] = 'обратная ссылка на подмаску "%name"';
 // TYPE_LEAF_RECURSION
-$string['description_recursion_all'] = 'recursive match with whole regular expression';
-$string['description_recursion'] = 'recursive match with subpattern #%number';
-$string['description_recursion_name'] = 'recursive match with subpattern "%name"';
+$string['description_recursion_all'] = 'рекурсивное совпадение со всем регулярным выражением';
+$string['description_recursion'] = 'рекурсивное совпадение с подмаской  №%number';
+$string['description_recursion_name'] = 'рекурсивное совпадение с подмаской "%name"';
 // TYPE_LEAF_OPTIONS
-$string['description_option_i'] = 'caseless:';
-$string['description_unsetoption_i'] = 'case sensitive:';
-$string['description_option_s'] = 'dot metacharacter matches \n:';
-$string['description_unsetoption_s'] = 'dot metacharacter does not match \n:';
-$string['description_option_m'] = 'multiline matching:';
-$string['description_unsetoption_m'] = 'not multiline matching:';
-$string['description_option_x'] = 'white spaces in expression was ignored:';
-$string['description_unsetoption_x'] = 'white spaces in expression was not ignored:';
-$string['description_option_U'] = 'quantifiers ungreedy by default:';
-$string['description_unsetoption_U'] = 'quantifiers greedy by default:';
-$string['description_option_J'] = 'allow duplicate names:';
-$string['description_unsetoption_J'] = 'disallow duplicate names:';
+$string['description_option_i'] = 'регистронезависимо:';
+$string['description_unsetoption_i'] = 'регистрозависимо:';
+$string['description_option_s'] = 'точка захватывает \n:';
+$string['description_unsetoption_s'] = 'точка не захватывает \n:';
+$string['description_option_m'] = 'многострочный режим:';
+$string['description_unsetoption_m'] = 'не многострочный режим:';
+$string['description_option_x'] = 'пробелы в выражении были проигнорированы:';
+$string['description_unsetoption_x'] = 'пробелы в выражении не были проигнорированы:';
+$string['description_option_U'] = 'квантификаторы не жадные:';
+$string['description_unsetoption_U'] = 'квантификаторы жадные:';
+$string['description_option_J'] = 'повторение имен разрешено:';
+$string['description_unsetoption_J'] = 'повторение имен запрещено:';
 // TYPE_NODE_FINITE_QUANT
-$string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
-$string['description_finite_quant_strict'] = '%1 is repeated %count times%greed';
-$string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
-$string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
-$string['description_finite_quant_01'] = '%1 may be missing%greed';
-$string['description_finite_quant_borders_err'] = ' (incorrect quantifier borders)';
+$string['description_finite_quant'] = '%1 повторяется от %leftborder до %rightborder раз(а)%greed';
+$string['description_finite_quant_strict'] = '%1 повторяется %count раз(а)%greed';
+$string['description_finite_quant_0'] = '%1 повторяется не более %rightborder раз или отсутствует%greed';
+$string['description_finite_quant_1'] = '%1 повторяется не более %rightborder раз%greed';
+$string['description_finite_quant_01'] = '%1 может отсутствовать%greed';
+$string['description_finite_quant_borders_err'] = ' (некорректные границы у квантификатора)';
 // TYPE_NODE_INFINITE_QUANT
-$string['description_infinite_quant'] = '%1 is repeated at least %leftborder times%greed';
-$string['description_infinite_quant_0'] = '%1 is repeated any number of times or missing%greed';
-$string['description_infinite_quant_1'] = '%1 is repeated any number of times%greed';
+$string['description_infinite_quant'] = '%1 повторяется хотябы %leftborder раз(а)%greed';
+$string['description_infinite_quant_0'] = '%1 повторяется любое количество раз или отсутствует%greed';
+$string['description_infinite_quant_1'] = '%1 повторяется любое количество раз%greed';
 // %greed
-$string['description_quant_lazy'] = ' (lazy quantifier)';
+$string['description_quant_lazy'] = ' (ленивый квантификатор)';
 $string['description_quant_greed'] = '';
-$string['description_quant_possessive'] = ' (possessive quantifier)';
+$string['description_quant_possessive'] = ' (сверхжадный квантификатор)';
 // TYPE_NODE_CONCAT
-$string['description_concat'] = '%1 then %2';
-$string['description_concat_wcomma'] = '%1 then %2';
+$string['description_concat'] = '%1 затем %2';
+$string['description_concat_wcomma'] = '%1, затем %2';
 $string['description_concat_space'] = '%1 %2';
-$string['description_concat_and'] = '%1 and %2';
+$string['description_concat_and'] = '%1 и %2';
 $string['description_concat_short'] = '%1%2';
 // TYPE_NODE_ALT
-$string['description_alt'] = '%1 or %2';
-$string['description_alt_wcomma'] = '%1 or %2';
+$string['description_alt'] = '%1 или %2';
+$string['description_alt_wcomma'] = '%1, или %2';
 // TYPE_NODE_ASSERT
-$string['description_pla_node_assert'] = 'further text should match: [%1]';
-$string['description_nla_node_assert'] = 'further text should not match: [%1]';
-$string['description_plb_node_assert'] = 'preceding text should match: [%1]';
-$string['description_nlb_node_assert'] = 'preceding text should not match: [%1]';
-$string['description_pla_node_assert_cond'] = 'further text matches: [%1]';
-$string['description_nla_node_assert_cond'] = 'further text does not match: [%1]';
-$string['description_plb_node_assert_cond'] = 'preceding text matches: [%1]';
-$string['description_nlb_node_assert_cond'] = 'preceding text does not match: [%1]';
+$string['description_pla_node_assert'] = 'текст далее должен соответствовать: [%1]';
+$string['description_nla_node_assert'] = 'текст далее не должен соответствовать: [%1]';
+$string['description_plb_node_assert'] = 'предыдущий текст должен соответствовать: [%1]';
+$string['description_nlb_node_assert'] = 'предыдущий текст не должен соответствовать: [%1]';
+$string['description_pla_node_assert_cond'] = 'текст далее соответствует: [%1]';
+$string['description_nla_node_assert_cond'] = 'текст далее не соответсвует: [%1]';
+$string['description_plb_node_assert_cond'] = 'предшествующий текст соответсвует: [%1]';
+$string['description_nlb_node_assert_cond'] = 'предшествующий текст не соответствует: [%1]';
 // TYPE_NODE_SUBPATT
-$string['description_subpattern'] = 'subpattern #%number: [%1]';
-$string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
-$string['description_subpattern_name'] = 'subpattern "%name": [%1]';
-$string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
-$string['description_grouping'] = 'grouping: [%1]';
-$string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternative): [%1]';
+$string['description_subpattern'] = 'подмаска №%number: [%1]';
+$string['description_subpattern_once'] = 'однократная подмаска №%number: [%1]';
+$string['description_subpattern_name'] = 'подмаска "%name": [%1]';
+$string['description_subpattern_once_name'] = 'однократная подмаска "%name": [%1]';
+$string['description_grouping'] = 'группировка: [%1]';
+$string['description_grouping_duplicate'] = 'группировка (номера подмасок сбрасываются в каждой из альтернатив): [%1]';
 // TYPE_NODE_COND_SUBPATT (%1 - first option; %2 - second option; %cond - condition )
-$string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
-$string['description_node_cond_subpatt_else'] = ' else check: [%2]';
-$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
-$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt'] = 'if the pattern #%number has been successfully recursively matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
-$string['description_define_node_cond_subpatt'] = 'definition of %1';
+$string['description_node_cond_subpatt'] = 'если %cond, тогда проверить: [%1]%else';
+$string['description_node_cond_subpatt_else'] = ' иначе проверить: [%2]';
+$string['description_backref_node_cond_subpatt'] = 'если подмаска №%number была успешно сопоставлена, тогда проверить: [%1]%else';
+$string['description_backref_node_cond_subpatt_name'] = 'если подмаска "%name" была успешно сопоставлена, тогда проверить: [%1]%else';
+$string['description_recursive_node_cond_subpatt_all'] = 'если весь шаблон был рекурсивно сопоставлен тогда проверить: [%1]%else';
+$string['description_recursive_node_cond_subpatt'] = 'если подмаска №%number была успешно рекурсивно сопоставлена, тогда проверить: [%1]%else';
+$string['description_recursive_node_cond_subpatt_name'] = 'если подмаска "%name" была успешно рекурсивно сопоставлена, тогда проверить: [%1]%else';
+$string['description_define_node_cond_subpatt'] = 'описание %1';
 // TYPE_LEAF_CONTROL
-$string['description_accept_leaf_control'] = 'force successful subpattern match';
-$string['description_fail_leaf_control'] = 'force fail';
+$string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
+$string['description_fail_leaf_control'] = 'спровоцировать неудачу';
 $string['description_mark_name_leaf_control'] = 'set name to %name to be passed back';
 $string['description_control_backtrack'] = 'if the rest of the pattern does not match %what';
 $string['description_commit_leaf_control'] = 'overall failure, no advance of starting point';
@@ -313,12 +313,12 @@ $string['description_utf8_leaf_control'] = 'UTF-8 mode';
 $string['description_utf16_leaf_control'] = 'UTF-16 mode';
 $string['description_ucp_leaf_control'] = 'PCRE_UCP';
 // TYPE_LEAF_CHARSET
-$string['description_charset'] = 'one of the following characters: %characters;';
-$string['description_charset_negative'] = 'any symbol except the following: %characters;';
-$string['description_charset_one_neg'] = 'not %characters';
-$string['description_charset_range'] = 'any character form %start to %end';
+$string['description_charset'] = 'один из следующих символов: %characters;';
+$string['description_charset_negative'] = 'любой из символов кроме следующих: %characters;';
+$string['description_charset_one_neg'] = 'не %characters';
+$string['description_charset_range'] = 'любой символ от %start до %end';
 $string['description_char'] = '<span style="color:blue">%char</span>';
-$string['description_char_16value'] = 'character with code 0x%code';
+$string['description_char_16value'] = 'символ с кодом 0x%code';
 //$string['description_charset_one'] = '%characters';
 // non-printing characters
 $string['description_char0'] = 'null character(NUL)';
