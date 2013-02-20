@@ -8,7 +8,7 @@
  */
  
 $string['clanguagemulticharliteral'] = 'There are several characters in character literal at {$a->line}:{$a->col}';
-$string['clanguageunknownsymbol'] = 'There is unknown character "{$a->value}" at {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'There is unknown character "{$a->symbol}" at {$a->line}:{$a->position}';
 $string['clanguageunmatchedquote'] = 'There is unmatched quote at {$a->line}:{$a->col}';
 $string['clanguageunmatchedsquote'] = 'There is unmatched single quote at {$a->line}:{$a->col}';
 $string['lang_c_language'] = 'C programming language';
