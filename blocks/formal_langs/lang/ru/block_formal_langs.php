@@ -10,7 +10,7 @@
 $string['lexical_error_message'] = 'Не могу разобрать {$a->symbol} на позиции {$a->line}:{$a->position} ';
 $string['clanguageunmatchedquote'] = 'Не закрыта кавычка на позиции {$a->line}:{$a->col}';
 $string['clanguageunmatchedsquote'] = 'Не закрыта одинарная кавычка на позиции {$a->line}:{$a->col}';
-$string['clanguageunknownsymbol'] = 'Неизвестный символ "{$a->value}" на позиции {$a->line}:{$a->col}';
+$string['clanguageunknownsymbol'] = 'Неизвестный символ "{$a->symbol}" на позиции {$a->line}:{$a->position}';
 $string['clanguagemulticharliteral'] = 'Символьный литерал из нескольких символов на позиции {$a->line}:{$a->col}';
 $string['lang_c_language'] = 'Язык программирования C';
 $string['lang_c_language_help'] = 'Язык программирования C (только лексический разбор).';
