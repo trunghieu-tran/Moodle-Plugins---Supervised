@@ -1,0 +1,3 @@
+The poasassignment module allows teachers to develop single task or variations of task, collect work from students, review it and provide feedback including multi-criterion grades. Module can distribute multiple task’s variants between students in different ways, using one of distribution strategies.
+
+The module is based on old Assignment module, but it doesn’t use sources of old Assignment  - only idea. Poasassignment extends old Assignment by introducing variants (no more single task for dozens of students), criteria for grading and sub-plugin system. That means, that all submission types, all distribute strategies, are plugins, that can be modified separately from the core.

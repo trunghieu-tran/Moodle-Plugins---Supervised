@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/poasassignment/db" VERSION="20120210" COMMENT="XMLDB file for Moodle mod/poasassignment"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="poasassignment" COMMENT="Defines poasassignments" NEXT="poasassignment_answers">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course poasassignment activity belongs to" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="intro"/>
+        <FIELD NAME="intro" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the poasassignment activity" PREVIOUS="name" NEXT="introformat"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="intro" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="introformat" NEXT="availabledate"/>
+        <FIELD NAME="availabledate" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="choicedate"/>
+        <FIELD NAME="choicedate" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="availabledate" NEXT="deadline"/>
+        <FIELD NAME="deadline" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="choicedate" NEXT="flags"/>
+        <FIELD NAME="flags" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="deadline" NEXT="taskgiverid"/>
+        <FIELD NAME="taskgiverid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="flags" NEXT="uniqueness"/>
+        <FIELD NAME="uniqueness" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="taskgiverid" NEXT="penalty"/>
+        <FIELD NAME="penalty" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0.05" SEQUENCE="false" DECIMALS="2" PREVIOUS="uniqueness"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="taskgiverid"/>
+        <KEY NAME="taskgiverid" TYPE="foreign" FIELDS="taskgiverid" REFTABLE="poasassignment_taskgivers" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="poasassignment_answers" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment" NEXT="poasassignment_ans_stngs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="path"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_ans_stngs" COMMENT="Settings for answer plugins" PREVIOUS="poasassignment_answers" NEXT="poasassignment_fields">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="value"/>
+        <FIELD NAME="value" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" PREVIOUS="value" NEXT="answerid"/>
+        <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="name" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="answerid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="answerid"/>
+        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="poasassignment_answers" REFFIELDS="id" PREVIOUS="primary" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="answerid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_fields" COMMENT="Fileds for poasassignment individual tasks" PREVIOUS="poasassignment_ans_stngs" NEXT="poasassignment_tasks">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="ftype"/>
+        <FIELD NAME="ftype" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" PREVIOUS="ftype" NEXT="showintable"/>
+        <FIELD NAME="showintable" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="name" NEXT="valuemax"/>
+        <FIELD NAME="valuemax" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="showintable" NEXT="valuemin"/>
+        <FIELD NAME="valuemin" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" PREVIOUS="valuemax" NEXT="secretfield"/>
+        <FIELD NAME="secretfield" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="valuemin" NEXT="random"/>
+        <FIELD NAME="random" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="secretfield" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="random"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_tasks" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_fields" NEXT="poasassignment_task_values">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="deadline"/>
+        <FIELD NAME="deadline" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="description" NEXT="hidden"/>
+        <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="deadline"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_task_values" COMMENT="Values of poasassignment fields" PREVIOUS="poasassignment_tasks" NEXT="poasassignment_criterions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="taskid"/>
+        <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="fieldid"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid" NEXT="value"/>
+        <FIELD NAME="value" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="fieldid" NEXT="assigneeid"/>
+        <FIELD NAME="assigneeid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="value"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="taskid"/>
+        <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="poasassignment_tasks" REFFIELDS="id" PREVIOUS="primary" NEXT="fieldid"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="poasassignment_fileds" REFFIELDS="id" PREVIOUS="taskid" NEXT="assigneeid"/>
+        <KEY NAME="assigneeid" TYPE="foreign" FIELDS="assigneeid" REFTABLE="poasassignment_assignee" REFFIELDS="id" PREVIOUS="fieldid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_criterions" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_task_values" NEXT="poasassignment_assignee">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="weight"/>
+        <FIELD NAME="weight" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" DECIMALS="2" PREVIOUS="name" NEXT="graderid"/>
+        <FIELD NAME="graderid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="weight" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="graderid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="primary" NEXT="graderid"/>
+        <KEY NAME="graderid" TYPE="foreign" FIELDS="graderid" REFTABLE="poasassignment_graders" REFFIELDS="id" PREVIOUS="poasassignmentid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_assignee" COMMENT="Connects Moodle user with poasassignment task and attempts" PREVIOUS="poasassignment_criterions" NEXT="poasassignment_submissions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="timetaken"/>
+        <FIELD NAME="timetaken" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timetaken" NEXT="taskid"/>
+        <FIELD NAME="taskid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="poasassignmentid" NEXT="finalized"/>
+        <FIELD NAME="finalized" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="taskid" NEXT="cancelled"/>
+        <FIELD NAME="cancelled" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if task is cancelled or 0" PREVIOUS="finalized"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="taskid"/>
+        <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="poasassignment_tasks" REFFIELDS="id" PREVIOUS="primary" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="taskid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_submissions" COMMENT="Saves submission data" PREVIOUS="poasassignment_assignee" NEXT="poasassignment_rating_values">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="answerid"/>
+        <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="value"/>
+        <FIELD NAME="value" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="answerid" NEXT="attemptid"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="value"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="attemptid"/>
+        <KEY NAME="attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="poasassignment_attempts" REFFIELDS="id" PREVIOUS="primary" NEXT="answerid"/>
+        <KEY NAME="answerid" TYPE="foreign" FIELDS="answerid" REFTABLE="poasassignment_answers" REFFIELDS="id" PREVIOUS="attemptid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_rating_values" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_submissions" NEXT="poasassignment_variants">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="criterionid"/>
+        <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="value"/>
+        <FIELD NAME="value" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="criterionid" NEXT="attemptid"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="value"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="criterionid"/>
+        <KEY NAME="criterionid" TYPE="foreign" FIELDS="criterionid" REFTABLE="poasassignment_criterions" REFFIELDS="id" PREVIOUS="primary" NEXT="attemptid"/>
+        <KEY NAME="attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="poasassignment_attempts" REFFIELDS="id" PREVIOUS="criterionid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_variants" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_rating_values" NEXT="poasassignment_attempts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="fieldid"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="sortorder"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="fieldid" NEXT="value"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="sortorder"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fieldid"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="poasassignment_fileds" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_attempts" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_variants" NEXT="poasassignment_taskgivers">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assigneeid"/>
+        <FIELD NAME="assigneeid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="attemptnumber"/>
+        <FIELD NAME="attemptnumber" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="assigneeid" NEXT="rating"/>
+        <FIELD NAME="rating" TYPE="number" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" DECIMALS="2" PREVIOUS="attemptnumber" NEXT="attemptdate"/>
+        <FIELD NAME="attemptdate" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rating" NEXT="ratingdate"/>
+        <FIELD NAME="ratingdate" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="attemptdate" NEXT="disablepenalty"/>
+        <FIELD NAME="disablepenalty" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="ratingdate" NEXT="draft"/>
+        <FIELD NAME="draft" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="disablepenalty" NEXT="final"/>
+        <FIELD NAME="final" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="draft"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="assigneeid"/>
+        <KEY NAME="assigneeid" TYPE="foreign" FIELDS="assigneeid" REFTABLE="poasassignment_assignee" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_taskgivers" COMMENT="Default comment for the table, please edit me" PREVIOUS="poasassignment_attempts" NEXT="poasassignment_graders">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="path"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="path"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_graders" COMMENT="Table of installed graders" PREVIOUS="poasassignment_taskgivers" NEXT="poasassignment_used_graders">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="path"/>
+        <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="poasassignment_used_graders" COMMENT="Connects grader with poasassignment instances" PREVIOUS="poasassignment_graders">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="poasassignmentid"/>
+        <FIELD NAME="poasassignmentid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="graderid"/>
+        <FIELD NAME="graderid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="poasassignmentid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="poasassignmentid"/>
+        <KEY NAME="poasassignmentid" TYPE="foreign" FIELDS="poasassignmentid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="primary" NEXT="graderid"/>
+        <KEY NAME="graderid" TYPE="foreign" FIELDS="graderid" REFTABLE="poasassignment_graders" REFFIELDS="id" PREVIOUS="poasassignmentid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
