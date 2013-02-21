@@ -438,12 +438,10 @@ function poasassignment_reset_course_form_defaults($course) {
 }
 
 function poasassignment_reset_userdata($data) {
-    if (!empty($data->reset_assignees)) {
-        global $DB;
-        $instances = $DB->get_records('poasassignment', array('course' => $data->courseid));
-        foreach ($instances as $instance) {
-            poasassignment_model::get_instance()->reset($data->courseid, $instance->id);
-        }
-        notify(get_string('assigneesdeleted', 'poasassignment'), 'notifysuccess');
+    global $DB;
+    $instances = $DB->get_records('poasassignment', array('course' => $data->courseid));
+    foreach ($instances as $instance) {
+        poasassignment_model::get_instance()->reset($data->courseid, $instance->id);
     }
+    return array(array('component'=>'poasassignment', 'item' => get_string('assigneesdeleted', 'poasassignment'), 'error'=> false));
 }
