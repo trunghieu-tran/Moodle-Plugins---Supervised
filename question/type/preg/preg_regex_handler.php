@@ -128,6 +128,10 @@ class qtype_preg_regex_handler {
         $this->lexer = null;
         $this->parser = null;
 
+        if ($regex === '') {
+            $regex = null;
+        }
+
         if ($regex === null) {
             return;
         }
