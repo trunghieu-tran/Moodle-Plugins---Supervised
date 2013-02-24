@@ -435,8 +435,8 @@ class qtype_correctwriting_table
        // Create a labels for table
        $this->mistakes = $mistakes;
        $this->table = array();
-       $answerlabel = new qtype_correctwriting_lexeme_label('Answer: ');
-       $responselabel = new qtype_correctwriting_lexeme_label('Response: ');
+       $answerlabel = new qtype_correctwriting_lexeme_label(get_string('imageanswer', 'qtype_correctwriting'));
+       $responselabel = new qtype_correctwriting_lexeme_label(get_string('imageresponse', 'qtype_correctwriting'));
        $this->table[] = new qtype_correctwriting_table_cell($answerlabel, $responselabel);
 
        // Build table
