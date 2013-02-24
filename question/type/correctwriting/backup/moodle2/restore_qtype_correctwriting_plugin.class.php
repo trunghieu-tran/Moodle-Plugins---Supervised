@@ -98,8 +98,8 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
         // Simple initialization
         $this->langid = null;
         $this->langobject = null;
-        $this->oldquestion = null;
-        $this->newquestion = null;
+        $this->oldquestion   = $this->get_old_parentid('question');
+        $this->newquestion   = $this->get_new_parentid('question');
         $this->questioncreated = null;
         $this->answermapping = null;
         $this->tokencountmapping = null;
@@ -114,7 +114,6 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
         if ($oldparentid != $this->oldquestion) {
             $this->refill_class_fields();
         }
-
         if (is_array($this->answermapping) == false) {
             $this->answermapping = array();
         }
@@ -132,23 +131,24 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
         $olddata = $data;
         $this->process_poasquestion($data);
 
-        $this->oldquestion   = $this->get_old_parentid('question');
-        $this->newquestion   = $this->get_new_parentid('question');
+
         $this->questioncreated = $this->get_mappingid('question_created', $this->oldquestion) ? true : false;
         $this->langid = $olddata['langid'];
 
-        /* Uncomment on bug cases
+        /**  //Uncomment on bug cases
         echo '<pre>';
         echo "Before proccesssing correctwriting\n";
         print_r($this->answermapping);
         echo '</pre>';
         */
+
         $answersarr = $this->answermapping;
         $this->answermapping  = array();
         foreach($answersarr as $id => $answer) {
             $this->answermapping[$answer] = $this->get_mappingid('question_answer', $answer);
         }
-        /* Uncomment on bug cases
+
+        /** // Uncomment on bug cases
         echo '<pre>';
         echo "After proccesssing correctwriting\n";
         print_r($this->answermapping);
@@ -233,6 +233,12 @@ class restore_qtype_correctwriting_plugin extends restore_qtype_poasquestion_plu
          // Remove \r and \n from string, because they are stored like this in XML
          $description = str_replace(array("\r", "\n"), array('', ''), $description);
          $this->tokendescriptionmapping[$answer][intval($data['number'])] = $description;
+         /* // Uncomment on bugs
+         if (array_key_exists($answer, $this->tokencountmapping) == false) {
+             echo '<pre> Can\'t found some key ' . $answer .
+                  ' in tokencountmappin </pre>';
+         }
+         */
          if (count($this->tokendescriptionmapping[$answer]) == $this->tokencountmapping[$answer]) {
              $string = $this->langobject->create_from_db('question_answers', $this->answermapping[$answer]);
              ksort($this->tokendescriptionmapping[$answer]);
