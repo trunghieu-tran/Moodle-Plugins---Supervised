@@ -17,7 +17,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/adminlib.php');
-require_once('model.php');
+require_once($CFG->dirroot . '/mod/poasassignment/model.php');
 
 // Add admin panel first-level element called "POAS assignment plugins"
 $ADMIN->add('modules', new admin_category('modpoasassignmentplugins',
