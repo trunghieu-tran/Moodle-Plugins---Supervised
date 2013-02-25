@@ -61,14 +61,20 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
     /**
      * Resets the given subpattern to no match. In PCRE mode also resets all inner subpatterns.
      */
-    public function reset_subpattern($number, $nested, $mode = qtype_preg_handling_options::MODE_PCRE) {
+    public function reset_subpattern($number, $nested, $old, $new, $mode = qtype_preg_handling_options::MODE_PCRE) {
         $numbers = array($number);
-        if ($mode == qtype_preg_handling_options::MODE_PCRE) {
+        if ($mode == qtype_preg_handling_options::MODE_POSIX) {
             $numbers = array_merge($numbers, $nested);
         }
         foreach ($numbers as $num) {
-            $this->index_first_new[$num] = self::NO_MATCH_FOUND;
-            $this->length_new[$num] = self::NO_MATCH_FOUND;
+            if ($old) {
+                $this->index_first[$num] = self::NO_MATCH_FOUND;
+                $this->length[$num] = self::NO_MATCH_FOUND;
+            }
+            if ($new) {
+                $this->index_first_new[$num] = self::NO_MATCH_FOUND;
+                $this->length_new[$num] = self::NO_MATCH_FOUND;
+            }
         }
     }
 
@@ -125,15 +131,23 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         if ($options !== null && !$options->capturesubpatterns) {
             return;
         }
-        // Reset all found subpatterns to no match.
+
+        // Reset all NEW subpatterns to no match - they are being matched again.
         foreach ($transition->subpatt_start as $node) {
-            $this->reset_subpattern($node->number, $node->nested, $options->mode);
+            $this->reset_subpattern($node->number, $node->nested, false, true, $options->mode);
+        }
+        // Reset all OLD subpatterns to no match - they are matched and replaced by new ones.
+        foreach ($transition->subpatt_end as $node) {
+            if ($this->index_first_new[$node->number] != self::NO_MATCH_FOUND) {
+                $this->reset_subpattern($node->number, $node->nested, true, false, $options->mode);
+            }
         }
 
         // Set start indexes of subpatterns.
         foreach ($transition->subpatt_start as $node) {
             $this->index_first_new[$node->number] = $pos;
         }
+
         // Set length of subpatterns.
         foreach ($transition->subpatt_end as $node) {
             if ($this->index_first_new[$node->number] != self::NO_MATCH_FOUND) {
