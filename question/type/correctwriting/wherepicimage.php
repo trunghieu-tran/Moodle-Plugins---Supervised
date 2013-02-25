@@ -51,7 +51,7 @@ define('ARROW_ANGLE', 1);
 // A space between arrow langind point and labels (used for moving lexeme)
 define('ARROW_INSERT_PADDING', 2);
 // A padding between middle part of token and starting of arrow for moving lexeme
-define('ARROW_TOP_PADDING', 0);
+define('ARROW_TOP_PADDING', 1);
 // A padding for moving mistake height
 define('MOVING_LINE_HEIGHT', 10);
 // A space between words
@@ -60,7 +60,14 @@ define('WORD_SPACING', 4);
 define('FRAME_THICKNESS', 1);
 // Defines a padding for frame label
 define('FRAME_LABEL_PADDING' , 4);
-
+// A small padding to draw small parts of moved lexeme upper line on horizontal
+define('MOVED_LEXEME_TINYSPACE_X', 1);
+// A small padding to draw small parts of moved lexeme upper line on vertical
+define('MOVED_LEXEME_TINYSPACE_Y', 2);
+// Defines a moved lexeme top mark width
+define('MOVED_LEXEME_TOP_MARK_WIDTH', 4);
+// Defines a moved lexeme top mark height
+define('MOVED_LEXEME_TOP_MARK_HEIGHT', 5);
 /**
  * This style of require_once is used intentionally, due to non-availability of Moodle here
  */
@@ -320,11 +327,39 @@ class qtype_correctwriting_image {
         $topy = FRAME_LABEL_PADDING;
         $smally =  FRAME_LABEL_PADDING  + MOVING_LINE_HEIGHT;
         $endx = $sourcelabel->rect()->x + $sourcelabel->rect()->width;
+        $upperarrowbeginx = $sourcelabel->rect()->x;
+        $upperarrowendx = $endx;
+        // If we can draw a moustaches, draw it
+        if ($sourcelabel->rect()->width > MOVED_LEXEME_TOP_MARK_WIDTH) {
+            $upperarrowbeginx = $sourcex - MOVED_LEXEME_TOP_MARK_WIDTH / 2;
+            $upperarrowendx = $sourcex + MOVED_LEXEME_TOP_MARK_WIDTH / 2;
+            // A top line upon lexeme
+            $toplinestartx = $sourcelabel->rect()->x - MOVED_LEXEME_TINYSPACE_X;
+            $toplineendx =   $endx + MOVED_LEXEME_TINYSPACE_X;
 
-        imageline($im,  $sourcelabel->rect()->x, $sourcey, $endx, $sourcey, $palette['red'] );
-        imageline($im, $sourcex, $sourcey, $sourcex, $topy, $palette['red'] );
+            imageline($im,  $toplinestartx, $sourcey, $upperarrowbeginx, $sourcey, $palette['red'] );
+            imageline($im,  $upperarrowendx, $sourcey, $toplineendx, $sourcey, $palette['red'] );
+            $bottomy = $sourcey + MOVED_LEXEME_TINYSPACE_Y;
+            // A two small lines for "moustaches"
+            imageline($im, $toplinestartx, $sourcey, $toplinestartx, $bottomy, $palette['red'] );
+            imageline($im, $toplineendx, $sourcey, $toplineendx, $bottomy, $palette['red'] );
+        }
+        // Compute and draw some lines of upper arrow of moving
+        $upperarrowy = $sourcey - MOVED_LEXEME_TOP_MARK_HEIGHT;
+        if ($sourcey - $topy < MOVED_LEXEME_TOP_MARK_HEIGHT) {
+             $upperarrowy = $sourcey - ($sourcey - $topy) / 2;
+        }
+        // Draw an upper arrow part
+        imageline($im, $upperarrowbeginx, $sourcey, $sourcex, $upperarrowy, $palette['red'] );
+        imageline($im, $upperarrowendx, $sourcey, $sourcex, $upperarrowy, $palette['red'] );
+
+        // A line from center  to top
+        imageline($im, $sourcex, $upperarrowy, $sourcex, $topy, $palette['red'] );
+        // Line from center to insertion point
         imageline($im, $sourcex, $topy, $this->insertionx, $topy, $palette['red'] );
+        // Draw a line from top of insertionx to bottom
         imageline($im, $this->insertionx, $topy, $this->insertionx, $smally, $palette['red'] );
+        // Draw an arrow's circumflex part
         $leftarrowx = $this->insertionx - ARROW_LENGTH * cos(ARROW_ANGLE);
         $rightarrowx = $this->insertionx + ARROW_LENGTH * cos(ARROW_ANGLE);
         $arrowy = $smally - ARROW_LENGTH * sin(ARROW_ANGLE);
