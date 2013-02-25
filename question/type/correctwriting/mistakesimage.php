@@ -246,14 +246,14 @@ class qtype_correctwriting_table_cell
        // Compute max label size part
        $labelsize = $this->get_max_label_size();
        // Compute rectangles for painting answer and response
-       $answerrect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE,
+       $responserect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE,
                                    'width' => $labelsize[0] + ROW_HORIZONTAL_SPACE, 'height' => $labelsize[1]);
        $height = imagesy($im);
-       $responserect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE,
+       $answerrect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE,
                                      'width' => $labelsize[0], 'height' => $labelsize[1]);
        // Draw an answer and response
-       $this->answer->paint($im, $palette, $answerrect, true );
-       $this->response->paint($im, $palette, $responserect, false );
+       $this->answer->paint($im, $palette, $answerrect, false );
+       $this->response->paint($im, $palette, $responserect, true );
    }
 }
 
@@ -649,7 +649,7 @@ class qtype_correctwriting_arrow_builder {
            foreach($this->table->mistakes()->get_moves() as $entry) {
                $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
-               $this->draw_arrow($im, $palette['red'], $p1, $p2, false);
+               $this->draw_arrow($im, $palette['red'], $p2, $p1, false);
            }
        }
        // Draw LCS
@@ -658,7 +658,7 @@ class qtype_correctwriting_arrow_builder {
                $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
                $p2[0] = $p1[0];
-               $this->draw_arrow($im, $palette['black'], $p1, $p2, false);
+               $this->draw_arrow($im, $palette['black'], $p2, $p1, false);
            }
        }
    }
