@@ -138,10 +138,13 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         foreach ($transition->subpatt_end as $node) {
             if ($this->index_first_new[$node->number] != self::NO_MATCH_FOUND) {
                 $this->length_new[$node->number] = $pos - $this->index_first_new[$node->number] + $matchlen;
-                // Replace old results with new results.
-                $this->index_first[$node->number] = $this->index_first_new[$node->number];
-                $this->length[$node->number] = $this->length_new[$node->number];
             }
+        }
+
+        // Replace old results with new results.
+        for ($i = 1; $i <= $this->maxsubpatt; $i++) {
+            $this->index_first[$i] = $this->index_first_new[$i];
+            $this->length[$i] = $this->length_new[$i];
         }
     }
 
