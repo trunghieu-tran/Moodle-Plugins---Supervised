@@ -225,7 +225,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
                 if (is_a($error, 'qtype_preg_parsing_error')) {    // Error messages are displayed for parsing errors only.
-                    echo 'Regex incorrect: ' . $error->errormsg . '<br/>';
+                    echo 'Regex incorrect: ' . $error->errormsg . "\n";
                 }
             }
             return true;
@@ -311,11 +311,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $sum = $sum1 === $sum2;
                 if (!$full) {
                     $result = false;
-                    echo "extended match field 'full' has the value of " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)<br/>";
+                    echo "extended match field 'full' has the value of " . $boolstr[$obtained->extendedmatch->full] . " which is incorrect (extra-tested by $enginename)\n";
                 }
                 if (!$sum) {
                     $result = false;
-                    echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . ' and ' . $obtained->left . ', the new values are ' . $obtained->extendedmatch->length() . ' and ' . $obtained->extendedmatch->left . " (extra-tested by $enginename)<br/>";
+                    echo "extended match fields 'length' and 'left' didn't pass: the old values are " . $obtained->length() . ' and ' . $obtained->left . ', the new values are ' . $obtained->extendedmatch->length() . ' and ' . $obtained->extendedmatch->left . " (extra-tested by $enginename)\n";
                 }
             }
         }
