@@ -110,6 +110,13 @@ abstract class qtype_preg_nfa_node {
     public function __construct(&$node, &$matcher) {
         $this->pregnode = $node;
     }
+
+    public static function move_transitions($from, $to) {
+        foreach ($from->outgoing_transitions() as $transition) {
+            $to->add_transition($transition);   // "from" is set automatically.
+        }
+        $from->remove_all_transitions();
+    }
 }
 
 /**
@@ -185,7 +192,7 @@ class qtype_preg_nfa_node_concat extends qtype_preg_nfa_operator {
         $first = array_pop($stack);
 
         $automaton->update_state_references($second['start'], $first['end']);
-        $first['end']->merge_transition_set($second['start']);
+        self::move_transitions($second['start'], $first['end']);
         $automaton->remove_state($second['start']);
 
         // Update automaton/stack properties.
@@ -217,7 +224,7 @@ class qtype_preg_nfa_node_alt extends qtype_preg_nfa_operator {
         // Merge start and end states.
         $automaton->update_state_references($second['start'], $first['start']);
         $automaton->update_state_references($second['end'], $first['end']);
-        $first['start']->merge_transition_set($second['start']);
+        self::move_transitions($second['start'], $first['start']);
         $automaton->remove_state($second['start']);
         $automaton->remove_state($second['end']);
 
@@ -297,7 +304,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
                 $automaton->update_state_references($res['end'], $cur['start']);
-                $cur['start']->merge_transition_set($res['end']);
+                self::move_transitions($res['end'], $cur['start']);
                 $automaton->remove_state($res['end']);
                 $res['end'] = $cur['end'];
             }
@@ -378,7 +385,7 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
             } else {
                 // On subsequent iterations we concatenate current automaton to the result.
                 $automaton->update_state_references($res['end'], $cur['start']);
-                $cur['start']->merge_transition_set($res['end']);
+                self::move_transitions($res['end'], $cur['start']);
                 $automaton->remove_state($res['end']);
                 $res['end'] = $cur['end'];
             }
