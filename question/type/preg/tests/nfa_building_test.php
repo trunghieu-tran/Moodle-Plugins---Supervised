@@ -23,7 +23,7 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
         if (!$matcher->is_error_exists()) {
             $matcher->automaton->draw('png', $this->dir . $filename);
         } else {
-            $this->assertTrue(false, "nfa building failed <br/>");
+            $this->assertTrue(false, "nfa building failed\n");
         }
     }
 
@@ -91,8 +91,16 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
         $this->draw('(a){3,6}', 'test_build_subpatt_brace_finite.png');
     }
 
+    function test_build_subpatt_brace_finite_with_alt() {
+        $this->draw('(a|b){3,6}', 'test_build_subpatt_brace_finite_with_alt.png');
+    }
+
     function test_build_subpatt_brace_infinite() {
         $this->draw('(a){3,}', 'test_build_subpatt_brace_infinite.png');
+    }
+
+    function test_build_subpatt_brace_infinite_with_alt() {
+        $this->draw('(a|b){3,}', 'test_build_subpatt_brace_infinite_with_alt.png');
     }
 
     function test_build_subpatt_aster() {

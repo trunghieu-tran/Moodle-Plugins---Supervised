@@ -539,7 +539,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
             $stack = array();
-            $node->create_automaton($this, $result, $stack);
+            $transitioncounter = 0;
+            $node->create_automaton($this, $result, $stack, $transitioncounter);
             /*
             if (!$isassertion) {
                 // Add a dummy transitions to the beginning of the NFA.

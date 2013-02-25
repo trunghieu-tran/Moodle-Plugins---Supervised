@@ -39,6 +39,9 @@ class qtype_preg_fa_transition {
     public $pregleaf;
     /** @var object of qtype_preg_fa_state class - state which transition leads to. */
     public $to;
+
+    public $number;
+
     /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
     public $consumechars;
 
@@ -46,10 +49,11 @@ class qtype_preg_fa_transition {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $consumechars = true) {
+    public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
+        $this->number = $number;
         $this->consumechars = $consumechars;
     }
 }
@@ -477,7 +481,7 @@ abstract class qtype_preg_finite_automaton {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
                     $index2 = $curtransition->to->number;
-                    $lab = $curtransition->pregleaf->tohr() . ',';
+                    $lab = $curtransition->number . ':' . $curtransition->pregleaf->tohr() . ',';
 
                     // Information about subpatterns.
                     if (count($curtransition->subpatt_start) > 0) {
