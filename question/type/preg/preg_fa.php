@@ -110,12 +110,10 @@ class qtype_preg_fa_state {
     }
 
     /**
-     * Moves transitions from one state to another.
-     *
-     * @param with a reference to an object of qtype_preg_fa_state to take transitions from.
+     * Removes all transitions from this state.
      */
-    public function merge_transition_set(&$with) {
-        $this->outtransitions = array_merge($this->outtransitions, $with->outtransitions);
+    public function remove_all_transitions() {
+        $this->outtransitions = array();
     }
 
     /**
@@ -367,20 +365,8 @@ abstract class qtype_preg_finite_automaton {
     public function numerate_states() {
         $result = array();
         $idcounter = 0;
-        $curstates = array($this->startstate);
-        while (count($curstates) !== 0) {
-            $newstates = array();
-            while (count($curstates) !== 0) {
-                $curstate = array_pop($curstates);
-                if ($curstate->number === -1) {
-                    $curstate->number = $idcounter;
-                    $result[$idcounter++] = $curstate;
-                    foreach ($curstate->outgoing_transitions() as $transition) {
-                        $newstates[] = $transition->to;
-                    }
-                }
-            }
-            $curstates = $newstates;
+        foreach ($this->states as $state) {
+            $state->number = $idcounter++;
         }
         return $result;
     }

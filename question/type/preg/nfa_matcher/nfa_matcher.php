@@ -138,13 +138,10 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         foreach ($transition->subpatt_end as $node) {
             if ($this->index_first_new[$node->number] != self::NO_MATCH_FOUND) {
                 $this->length_new[$node->number] = $pos - $this->index_first_new[$node->number] + $matchlen;
+                // Replace old results with new results.
+                $this->index_first[$node->number] = $this->index_first_new[$node->number];
+                $this->length[$node->number] = $this->length_new[$node->number];
             }
-        }
-
-        // Replace old results with new results.
-        for ($i = 1; $i <= $this->maxsubpatt; $i++) {
-            $this->index_first[$i] = $this->index_first_new[$i];
-            $this->length[$i] = $this->length_new[$i];
         }
     }
 
@@ -462,14 +459,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             // We'll replace curstates with newstates by the end of this loop.
             while (count($curstates) != 0) {
                 // Get the current state and iterate over all transitions.
-                $curstate = array_pop($curstates);
-                $curstateobj = $states[$curstate];
-                foreach ($curstateobj->state->outgoing_transitions() as $transition) {
-                    $curpos = $startpos + $curstateobj->length[0];
+                $curstate = $states[array_pop($curstates)];
+                foreach ($curstate->state->outgoing_transitions() as $transition) {
+                    $curpos = $startpos + $curstate->length[0];
                     $length = 0;
-                    if ($transition->pregleaf->match($str, $curpos, $length, $curstateobj)) {
+                    if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
                         // Create a new state.
-                        $newstate = clone $curstateobj;
+                        $newstate = clone $curstate;
                         $newstate->full = false;
                         $newstate->state = $transition->to;
                         $newstate->last_transition = $transition;
@@ -490,7 +486,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         }
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
-                        $newres = clone $curstateobj;
+                        $newres = clone $curstate;
                         $fulllastmatch = true;
                         if ($length > 0) {
                             $newres->length[0] += $length;
