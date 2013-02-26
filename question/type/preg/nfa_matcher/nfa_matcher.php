@@ -163,12 +163,13 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->str->concatenate($char);
     }
 
-    public function dump() {
+    public function subpatterns_to_str() {
+        $result = '';
         foreach ($this->index_first as $key => $index) {
             $length = $this->length[$key];
-            echo $key . ': (' . $index . ', ' . $length . ') ';
+            $result .= $key . ': (' . $index . ', ' . $length . ') ';
         }
-        echo "\n";
+        return $result;
     }
 }
 
@@ -436,6 +437,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return - the longest character sequence matched.
      */
     public function match_from_pos($str, $startpos) {
+        $DEBUG = 0;
+
         $states = array();           // Objects of qtype_preg_nfa_processing_state.
         $curstates = array();        // States which the automaton is in.
         $partialmatches = array();   // Possible partial matches.
@@ -452,6 +455,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         foreach ($this->automaton->get_states() as $curstate) {
             $curnum = $curstate->number;
             $states[$curnum] = null;
+
+            // Create only initial state on the beginning.
             if ($curstate === $this->automaton->start_state()) {
                 $states[$curnum] = new qtype_preg_nfa_processing_state(false, $result->index_first, $result->length,
                                                                        $result->index_first, $result->length,
@@ -474,10 +479,20 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             while (count($curstates) != 0) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
+
+if ($DEBUG) {
+    echo "\nstarting from state " . $curstate->state->number . "\n";
+}
+
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
                     $curpos = $startpos + $curstate->length[0];
                     $length = 0;
                     if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
+
+if ($DEBUG) {
+    echo 'matched ' . $transition->pregleaf->tohr() . "\n";
+}
+
                         // Create a new state.
                         $newstate = clone $curstate;
                         $newstate->full = false;
@@ -534,9 +549,27 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $states[$curstate->state->number]->worse_than($curstate, false, false, $areequal)) {
                     // Currently stored state needs replacement.
                     $states[$curstate->state->number] = $curstate;
-                    $newstates[] = $curstate->state->number;
+                    if (!array_key_exists($curstate->state->number, $newstates)) {
+                        $newstates[] = $curstate->state->number;
+                    }
                 }
             }
+
+if ($DEBUG) {
+    echo "\ntotally matched, witout ambiguities:\n";
+    foreach ($newstates as $newstate) {
+        $tr = $states[$newstate]->last_transition;
+        echo $tr->from->number . '->' . $tr->pregleaf->tohr() . '->' . $tr->to->number . "\n";
+    }
+    echo "\nall reached states:\n";
+    foreach ($states as $state) {
+        if ($state != null) {
+            echo 'state ' . $state->state->number . ': ' . $state->subpatterns_to_str() . "\n";
+        }
+    }
+    echo "------------------------------------------\n";
+}
+
             $curstates = $newstates;
         }
         // Find the best result.
