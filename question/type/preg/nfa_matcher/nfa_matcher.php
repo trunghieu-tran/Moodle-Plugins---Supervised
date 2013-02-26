@@ -549,9 +549,7 @@ if ($DEBUG) {
                     $states[$curstate->state->number]->worse_than($curstate, false, false, $areequal)) {
                     // Currently stored state needs replacement.
                     $states[$curstate->state->number] = $curstate;
-                    if (!array_key_exists($curstate->state->number, $newstates)) {
-                        $newstates[] = $curstate->state->number;
-                    }
+                    $newstates[$curstate->state->number] = true;
                 }
             }
 
@@ -570,7 +568,7 @@ if ($DEBUG) {
     echo "------------------------------------------\n";
 }
 
-            $curstates = $newstates;
+            $curstates = array_keys($newstates);
         }
         // Find the best result.
         foreach ($states as $curresult) {
