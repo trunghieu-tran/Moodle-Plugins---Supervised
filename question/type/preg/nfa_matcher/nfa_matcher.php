@@ -453,6 +453,8 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $partialmatches = array();   // Possible partial matches.
         $fullmatchfound = false;
 
+        $areequal = false;
+
         $maxsubpatt = $this->get_max_subpattern();
         $subpattmap = $this->get_subpattern_map();
 
@@ -497,11 +499,6 @@ if ($DEBUG) {
                     $curpos = $startpos + $curstate->length[0];
                     $length = 0;
                     if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
-
-if ($DEBUG) {
-    echo 'matched ' . $transition->pregleaf->tohr() . "\n";
-}
-
                         // Create a new state.
                         $newstate = clone $curstate;
                         $newstate->full = false;
@@ -522,6 +519,11 @@ if ($DEBUG) {
                             }
                             $reached[] = $curclosure;
                         }
+
+if ($DEBUG) {
+    echo 'matched ' . $str[$curpos] . ' using ' . $transition->pregleaf->tohr() . ', gonna make state ' . $newstate->state->number . ': ' . $newstate->subpatterns_to_str() . "\n";
+}
+
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
                         $newres = clone $curstate;
@@ -553,7 +555,6 @@ if ($DEBUG) {
             // Replace curstates with newstates.
             $newstates = array();
             foreach ($reached as $curstate) {
-                $areequal = false;
                 if ($states[$curstate->state->number] === null ||
                     $states[$curstate->state->number]->worse_than($curstate, false, false, $areequal)) {
                     // Currently stored state needs replacement.
@@ -564,7 +565,7 @@ if ($DEBUG) {
             $newstates = array_keys($newstates);
 
 if ($DEBUG) {
-    echo "\ntotally matched, witout ambiguities:\n";
+    echo "\ntotally matched, without ambiguities:\n";
     foreach ($newstates as $newstate) {
         echo $states[$newstate]->last_transition_to_str() . "\n";
     }
@@ -581,7 +582,6 @@ if ($DEBUG) {
         }
         // Find the best result.
         foreach ($states as $curresult) {
-            $areequal = false;
             if ($curresult !== null && $result->worse_than($curresult, false, false, $areequal)) {
                 $result = $curresult;
                 $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() === true.
@@ -589,7 +589,6 @@ if ($DEBUG) {
         }
         if (!$fullmatchfound) {
             foreach ($partialmatches as $curresult) {
-                $areequal = false;
                 if ($curresult !== null && $result->worse_than($curresult, false, false, $areequal)) {
                     $result = $curresult;
                     $result->index_first[0] = $startpos;    // It's guaranteed that result->is_match() === true.
