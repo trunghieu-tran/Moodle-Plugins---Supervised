@@ -163,6 +163,15 @@ class qtype_preg_nfa_processing_state extends qtype_preg_matching_results implem
         $this->str->concatenate($char);
     }
 
+    public function last_transition_to_str() {
+        $tr = $this->last_transition;
+        if ($tr != null) {
+            return $tr->from->number . '->' . $tr->pregleaf->tohr() . '->' . $tr->to->number;
+        } else {
+            return '';
+        }
+    }
+
     public function subpatterns_to_str() {
         $result = '';
         foreach ($this->index_first as $key => $index) {
@@ -552,23 +561,23 @@ if ($DEBUG) {
                     $newstates[$curstate->state->number] = true;
                 }
             }
+            $newstates = array_keys($newstates);
 
 if ($DEBUG) {
     echo "\ntotally matched, witout ambiguities:\n";
     foreach ($newstates as $newstate) {
-        $tr = $states[$newstate]->last_transition;
-        echo $tr->from->number . '->' . $tr->pregleaf->tohr() . '->' . $tr->to->number . "\n";
+        echo $states[$newstate]->last_transition_to_str() . "\n";
     }
     echo "\nall reached states:\n";
     foreach ($states as $state) {
         if ($state != null) {
-            echo 'state ' . $state->state->number . ': ' . $state->subpatterns_to_str() . "\n";
+            echo 'state ' . $state->state->number . ': ' . $state->subpatterns_to_str() . 'last transition is ' . $state->last_transition_to_str() . "\n";
         }
     }
     echo "------------------------------------------\n";
 }
 
-            $curstates = array_keys($newstates);
+            $curstates = $newstates;
         }
         // Find the best result.
         foreach ($states as $curresult) {
