@@ -3,7 +3,7 @@ Correct writing question
 
 Authors:
 1. Idea, string analysis method, general architecture, hints implementation - Oleg Sychev
-2. Question type code, sequence analyzer - Dmitry Mamontov
+2. Question type code, sequence analyzer, picture generation - Dmitry Mamontov
 
 Thanks going to:
 * Maria Birukova - for help with icon
