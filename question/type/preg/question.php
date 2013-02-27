@@ -305,13 +305,13 @@ class qtype_preg_question extends question_graded_automatically
 
             $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
 
-            if ($matcher->is_error_exists() && !$hintpossible && $engine != 'php_preg_matcher') {
+            if ($matcher->errors_exist() && !$hintpossible && $engine != 'php_preg_matcher') {
                 //Custom engine can't handle regex and hints not needed, let's try preg_match instead.
                 $engine = 'php_preg_matcher';
                 require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
                 $engineclass = 'qtype_preg_'.$engine;
                 $newmatcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
-                if (!$newmatcher->is_error_exists()) {//We still prefer to show error messages from custom engine, since they are much more detailed.
+                if (!$newmatcher->errors_exist()) {//We still prefer to show error messages from custom engine, since they are much more detailed.
                     $matcher = $newmatcher;
                 }
             }

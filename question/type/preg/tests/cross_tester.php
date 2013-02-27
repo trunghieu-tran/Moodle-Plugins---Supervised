@@ -221,7 +221,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @return true if there are errors, false otherwise.
      */
     function check_for_errors($matcher) {
-        if ($matcher->is_error_exists()) {
+        if ($matcher->errors_exist()) {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
                 if (is_a($error, 'qtype_preg_parsing_error')) {    // Error messages are displayed for parsing errors only.

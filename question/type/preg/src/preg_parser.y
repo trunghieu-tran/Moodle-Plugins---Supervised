@@ -12,15 +12,12 @@
     private $errornodes;
     // Count of reduces made.
     private $reducecount;
-    // Node id counter.
-    private $idcounter;
     // Handling options
     public $handlingoptions;
 
     function __construct() {
         $this->errornodes = array();
         $this->reducecount = 0;
-        $this->idcounter = 0;
         $this->handlingoptions = new qtype_preg_handling_options();
     }
 
@@ -48,7 +45,6 @@
         $newnode = new qtype_preg_node_error($subtype, $addinfo);
         $newnode->set_user_info($indfirst, $indlast, $userinscription);
         $newnode->operands = $operands;
-        $newnode->id = $this->idcounter++;
         $this->errornodes[] = $newnode;
         return $newnode;
     }
@@ -94,7 +90,6 @@
             }
             $result->subtype = $parens->subtype;
             $result->operands[0] = $exprnode;
-            $result->id = $this->idcounter++;
             $result->userinscription = new qtype_preg_userinscription($parens->userinscription->data . '...)');
         }
         $result->set_user_info($parens->indfirst, $exprnode->indlast + 1, $result->userinscription);
@@ -105,12 +100,10 @@
         if ($assertnode === null) {
             $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $assertnode->set_user_info($paren->indlast, $paren->indlast, new qtype_preg_userinscription());
-            $assertnode->id = $this->idcounter++;
         }
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $exprnode->set_user_info($assertnode->indlast + 1, $assertnode->indlast + 1, new qtype_preg_userinscription());
-            $exprnode->id = $this->idcounter++;
         }
         if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
             $result = new qtype_preg_node_cond_subpatt($paren->subtype);
@@ -139,9 +132,7 @@
         $result->operands[2] = new qtype_preg_node_assert($subtype);
         $result->operands[2]->operands[0] = $assertnode;
         $result->operands[2]->userinscription = new qtype_preg_userinscription(qtype_poasquestion_string::substr($paren->userinscription->data, 2) . '...)');
-        $result->operands[2]->id = $this->idcounter++;
         $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...)...|...)'));
-        $result->id = $this->idcounter++;
         $this->reducecount++;
         return $result;
     }
@@ -150,7 +141,6 @@
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $exprnode->set_user_info($paren->indlast + 2, $paren->indlast + 2, new qtype_preg_userinscription());
-            $exprnode->id = $this->idcounter++;
         }
         if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
             $result = new qtype_preg_node_cond_subpatt($paren->subtype);
@@ -171,7 +161,6 @@
             $result->number = $paren->number;
         }
         $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...|...)'));
-        $result->id = $this->idcounter++;
         $this->reducecount++;
         return $result;
     }
@@ -212,7 +201,6 @@ expr(A) ::= expr(B) expr(C). [CONC] {
     A->set_user_info(B->indfirst, C->indlast, new qtype_preg_userinscription());
     A->operands[0] = B;
     A->operands[1] = C;
-    A->id = $this->idcounter++;
     $this->reducecount++;
 }
 
@@ -221,7 +209,6 @@ expr(A) ::= expr(B) ALT expr(C). {
     A->set_user_info(B->indfirst, C->indlast, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
     A->operands[1] = C;
-    A->id = $this->idcounter++;
     $this->reducecount++;
 }
 
@@ -229,7 +216,6 @@ expr(A) ::= expr(B) ALT. {
     A = new qtype_preg_node_finite_quant(0, 1, false, true, false);
     A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
-    A->id = $this->idcounter++;
     $this->reducecount++;
 }
 
@@ -237,7 +223,6 @@ expr(A) ::= ALT expr(B). {
     A = new qtype_preg_node_finite_quant(0, 1, false, true, false);
     A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
     A->operands[0] = B;
-    A->id = $this->idcounter++;
     $this->reducecount++;
 }
 
@@ -245,7 +230,6 @@ expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->set_user_info(B->indfirst, C->indlast, C->userinscription);
     A->operands[0] = B;
-    A->id = $this->idcounter++;
     $this->create_error_node_from_lexer(C);
     $this->reducecount++;
 }
@@ -253,7 +237,6 @@ expr(A) ::= expr(B) QUANT(C). {
 expr(A) ::= OPENBRACK(B) CLOSEBRACK. {
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info(B->indlast, B->indlast, new qtype_preg_userinscription());
-    $emptynode->id = $this->idcounter++;
     A = $this->create_parens_node(B, $emptynode);
     $this->create_error_node_from_lexer(B);
     $this->reducecount++;
@@ -303,7 +286,6 @@ expr(A) ::= CONDSUBPATT(D) CLOSEBRACK CLOSEBRACK. {
 
 expr(A) ::= PARSLEAF(B). {
     A = B;
-    A->id = $this->idcounter++;
     $this->create_error_node_from_lexer(B);
     $this->reducecount++;
 }

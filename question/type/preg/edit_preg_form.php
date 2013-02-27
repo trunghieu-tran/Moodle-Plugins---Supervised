@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php')
 MoodleQuickForm::registerElementType('text_button',
     $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
     'MoodleQuickForm_text_button');
-    
+
 /**
  * Preg editing form definition.
  */
@@ -49,7 +49,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *      field holding an array of answers
      * @return array of form fields.
      */
-     
+
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
@@ -57,10 +57,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             global $CFG;
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
-            
+
             $tmp = & $mform->createElement('text_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/pix/i/edit.gif'), array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
-            
+
             return $repeated;
     }
     /**
@@ -183,7 +183,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
                 $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
                 //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
                 $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation'], $hintused);
-                if($matcher->is_error_exists()) {//there are errors in the matching process
+                if($matcher->errors_exist()) {//there are errors in the matching process
                     $regexerrors = $matcher->get_errors();
                     $errors['answer['.$key.']'] = '';
                     $i=0;
