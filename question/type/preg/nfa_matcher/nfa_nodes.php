@@ -39,11 +39,45 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     public $subpatt_start;
     /** @var array qtype_preg_node_subpatt instances for ending subpatterns. */
     public $subpatt_end;
+    /** @var array a map (subpatt number => replication number), used for cases like (...){m,n}. */
+    public $subpatt_replications;
 
     public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
         parent::__construct($from, $pregleaf, $to, $number, $consumechars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
+        $this->subpatt_replications = array();
+    }
+
+    // Overriden for subpatterns information
+    public function get_label_for_dot() {
+        $index1 = $this->from->number;
+        $index2 = $this->to->number;
+        $lab = $this->number . ':' . $this->pregleaf->tohr() . ',';
+
+        // Information about subpatterns.
+        if (count($this->subpatt_start) > 0) {
+            $lab = $lab . 'starts';
+            foreach ($this->subpatt_start as $node) {
+                $repl = $this->subpatt_replications[$node->number];
+                $lab = $lab . "{$node->number}($repl),";
+            }
+        }
+        if (count($this->subpatt_end) > 0) {
+            $lab = $lab . 'ends';
+            foreach ($this->subpatt_end as $node) {
+                $repl = $this->subpatt_replications[$node->number];
+                $lab = $lab . "{$node->number}($repl),";
+            }
+        }
+        $lab = substr($lab, 0, strlen($lab) - 1);
+        $lab = '"' . str_replace('"', '\"', $lab) . '"';
+        // Dummy transitions are displayed dotted.
+        if ($this->consumechars) {
+            return "$index1->$index2" . "[label = $lab];";
+        } else {
+            return "$index1->$index2" . "[label = $lab, style = dotted];";
+        }
     }
 }
 
@@ -107,7 +141,7 @@ abstract class qtype_preg_nfa_node {
      */
     abstract public function create_automaton(&$matcher, &$automaton, &$stack, &$transitioncounter);
 
-    public function __construct(&$node, &$matcher) {
+    public function __construct($node, &$matcher) {
         $this->pregnode = $node;
     }
 
@@ -432,17 +466,25 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
  */
 class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
 
+    /* When creating automata for expressions like (...){m,n} we need to remember the replication number
+       since POSIX tells us to give priority to ones starting earlier. */
+    private $replications = 0;
+
     public function create_automaton(&$matcher, &$automaton, &$stack, &$transitioncounter) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack, $transitioncounter);
         if ($this->pregnode->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
             return;
         }
+
+        $repl = ++$this->replications;
+
         $body = array_pop($stack);
 
         // Copy this subpattern node to the starting transitions.
         foreach ($body['start']->outgoing_transitions() as $transition) {
             $transition->subpatt_start[] = $this->pregnode;
+            $transition->subpatt_replications[$this->pregnode->number] = $repl;
         }
 
         // Copy this subpattern node to the ending transitions.
@@ -450,6 +492,7 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
             foreach ($state->outgoing_transitions() as $transition) {
                 if ($transition->to === $body['end']) {
                     $transition->subpatt_end[] = $this->pregnode;
+                    $transition->subpatt_replications[$this->pregnode->number] = $repl;
                 }
             }
         }

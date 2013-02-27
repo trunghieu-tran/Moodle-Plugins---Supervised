@@ -56,6 +56,20 @@ class qtype_preg_fa_transition {
         $this->number = $number;
         $this->consumechars = $consumechars;
     }
+
+    public function get_label_for_dot() {
+        $index1 = $this->from->number;
+        $index2 = $this->to->number;
+        $lab = $this->number . ':' . $this->pregleaf->tohr();
+        $lab = '"' . str_replace('"', '\"', $lab) . '"';
+
+        // Dummy transitions are displayed dotted.
+        if ($this->consumechars) {
+            return "$index1->$index2" . "[label = $lab];";
+        } else {
+            return "$index1->$index2" . "[label = $lab, style = dotted];";
+        }
+    }
 }
 
 /**
@@ -466,30 +480,7 @@ abstract class qtype_preg_finite_automaton {
             } else {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
-                    $index2 = $curtransition->to->number;
-                    $lab = $curtransition->number . ':' . $curtransition->pregleaf->tohr() . ',';
-
-                    // Information about subpatterns.
-                    if (count($curtransition->subpatt_start) > 0) {
-                        $lab = $lab . 'starts';
-                        foreach ($curtransition->subpatt_start as $node) {
-                            $lab = $lab . "{$node->number},";
-                        }
-                    }
-                    if (count($curtransition->subpatt_end) > 0) {
-                        $lab = $lab . 'ends';
-                        foreach ($curtransition->subpatt_end as $node) {
-                            $lab = $lab . "{$node->number},";
-                        }
-                    }
-                    $lab = substr($lab, 0, strlen($lab) - 1);
-                    $lab = '"' . str_replace('"', '\"', $lab) . '"';
-                    // Dummy transitions are displayed dotted.
-                    if ($curtransition->consumechars) {
-                        $result .= "$index1->$index2" . "[label = $lab];\n";
-                    } else {
-                        $result .= "$index1->$index2" . "[label = $lab, style = dotted];\n";
-                    }
+                    $result .= $curtransition->get_label_for_dot() . "\n";
                 }
             }
         }
