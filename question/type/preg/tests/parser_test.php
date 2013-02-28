@@ -368,13 +368,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->rightborder === 1);
         $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->flags[0][0]->data == 'a');
-        $parser = $this->run_parser('|b', $errornodes);
-        $root = $parser->get_root();
-        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT);
-        $this->assertTrue($root->leftborder === 0);
-        $this->assertTrue($root->rightborder === 1);
-        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->flags[0][0]->data == 'b');
         $parser = $this->run_parser('a|b|', $errornodes);
         $root = $parser->get_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT);
@@ -382,14 +375,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data == 'a');
         $this->assertTrue($root->operands[0]->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[1]->flags[0][0]->data == 'b');
-        $parser = $this->run_parser('|a|b', $errornodes);
-        $root = $parser->get_root();
-        $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_ALT);
-        $this->assertTrue($root->operands[0]->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT);
-        $this->assertTrue($root->operands[0]->operands[0]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[0]->operands[0]->flags[0][0]->data == 'a');
-        $this->assertTrue($root->operands[1]->type == qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[1]->flags[0][0]->data == 'b');
     }
     function test_parser_subpatterns() {
         $parser = $this->run_parser('((?:(?(?=a)(?>b)|a)))', $errornodes);
