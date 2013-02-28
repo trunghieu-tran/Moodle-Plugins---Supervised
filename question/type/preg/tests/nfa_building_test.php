@@ -92,7 +92,7 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_build_subpatt_brace_finite_with_alt() {
-        $this->draw('(a|b){3,6}', 'test_build_subpatt_brace_finite_with_alt.png');
+        $this->draw('(a|b|){3,6}', 'test_build_subpatt_brace_finite_with_alt.png');
     }
 
     function test_build_subpatt_brace_infinite() {
@@ -100,7 +100,7 @@ class qtype_preg_nfa_building_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_build_subpatt_brace_infinite_with_alt() {
-        $this->draw('(a|b){3,}', 'test_build_subpatt_brace_infinite_with_alt.png');
+        $this->draw('(a|b|){3,}', 'test_build_subpatt_brace_infinite_with_alt.png');
     }
 
     function test_build_subpatt_aster() {
