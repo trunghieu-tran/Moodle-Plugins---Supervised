@@ -233,13 +233,6 @@ expr(A) ::= expr(B) ALT. {
     $this->reducecount++;
 }
 
-expr(A) ::= ALT expr(B). {
-    A = new qtype_preg_node_finite_quant(0, 1, false, true, false);
-    A->set_user_info(B->indfirst, B->indlast + 1, new qtype_preg_userinscription('|'));
-    A->operands[0] = B;
-    $this->reducecount++;
-}
-
 expr(A) ::= expr(B) QUANT(C). {
     A = C;
     A->set_user_info(B->indfirst, C->indlast, C->userinscription);
