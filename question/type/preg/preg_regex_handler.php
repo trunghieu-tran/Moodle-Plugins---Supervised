@@ -46,6 +46,8 @@ class qtype_preg_handling_options {
     public $pcrestrict = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
+    /** @var boolean Should parser expand repetitions {m,n} to concatenations. */
+    public $expandtree = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
 }
@@ -382,8 +384,9 @@ class qtype_preg_regex_handler {
         $this->lexer->matcher = $this;        // Set matcher field, to allow creating qtype_preg_leaf nodes that require interaction with matcher
         $this->lexer->mod_top_opt($this->modifiers, new qtype_poasquestion_string(''));
         $this->lexer->handlingoptions = $this->options;
-        $this->parser = new qtype_preg_yyParser;
-        $this->parser->handlingoptions = $this->options;
+
+        $this->parser = new qtype_preg_yyParser($this->options);
+
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
                 $this->parser->doParse($token->type, $token->value);

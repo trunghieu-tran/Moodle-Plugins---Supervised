@@ -155,6 +155,8 @@ abstract class qtype_preg_node {
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
+    /** Array of links to nested nodes, including nested of nested, etc. */
+    public $nested = array();
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
@@ -1340,13 +1342,10 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
 
     /** Subpattern number. */
     public $number = -1;
-    /** Array of numbers of nested subpatterns. */
-    public $nested = array();
 
-    public function __construct($number = -1, $nested = array()) {
+    public function __construct($number = -1) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
         $this->number = $number;
-        $this->nested = $nested;
     }
 
     //TODO - ui_nodename()
