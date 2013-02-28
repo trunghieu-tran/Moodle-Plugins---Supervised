@@ -41,7 +41,7 @@
      * @param addinfo additional info, supplied for this error
      * @return qtype_preg_node_error object
      */
-    protected function create_error_node($subtype, $indfirst = -1, $indlast = -1, $addinfo = null, $userinscription, $operands = array()) {
+    protected function create_error_node($subtype, $indfirst = -1, $indlast = -1, $addinfo = null, $userinscription = null, $operands = array()) {
         $newnode = new qtype_preg_node_error($subtype, $addinfo);
         $newnode->set_user_info($indfirst, $indlast, $userinscription);
         $newnode->operands = $operands;
@@ -177,6 +177,15 @@
         }
         return array_values(array_unique($result));
     }
+
+    protected function numerate_ast_nodes($node, &$currentnumber) {
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->numerate_ast_nodes($operand, $currentnumber);
+            }
+        }
+        $node->id = $currentnumber++;
+    }
 }
 %parse_failure {
     if (count($this->errornodes) === 0) {
@@ -193,7 +202,12 @@
 %nonassoc OPENBRACK CONDSUBPATT.
 
 start ::= lastexpr(B). {
+    // Set the root node.
     $this->root = B;
+
+    // Numerate all nodes.
+    $idcounter = 1;
+    $this->numerate_ast_nodes($this->root, $idcounter);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
