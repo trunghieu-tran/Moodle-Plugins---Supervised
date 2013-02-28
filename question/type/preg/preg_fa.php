@@ -470,21 +470,24 @@ abstract class qtype_preg_finite_automaton {
      * @param filename - name of the resulting image file.
      */
     public function draw($type, $filename) {
-        $result = "digraph {\nrankdir = LR;\n";
+        $result = 'digraph {rankdir = LR;';
         foreach ($this->states as $curstate) {
             $index1 = $curstate->number;
 
             if (count($curstate->outgoing_transitions()) == 0) {
                 // Draw a single state.
-                $result .= "$index1\n";
+                $result .= $index1 . ';';
             } else {
                 // Draw a state with transitions.
                 foreach ($curstate->outgoing_transitions() as $curtransition) {
-                    $result .= $curtransition->get_label_for_dot() . "\n";
+                    $result .= $curtransition->get_label_for_dot();
                 }
             }
         }
-        $result .= "};";
+        // Make start and end states more fancy.
+        $result .= $this->start_state()->number . '[shape=rarrow];';
+        $result .= $this->end_state()->number . '[shape=doublecircle];';
+        $result .= '};';
         qtype_preg_regex_handler::execute_dot($result, $type, $filename);
     }
 
