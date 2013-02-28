@@ -1,4 +1,19 @@
 <?php
+// This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// CorrectWriting question type is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// CorrectWriting is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Defines class of lexical analyzer for correct writing question.
  *
@@ -46,7 +61,7 @@ class qtype_correctwriting_lexical_analyzer {
      *
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      *
-     * @param object $question question object
+     * @param qtype_correctwriting_question $question question object
      * @param object $answer answer object for which lcs is created
      * @param string $responsestr student response as a string
      */
