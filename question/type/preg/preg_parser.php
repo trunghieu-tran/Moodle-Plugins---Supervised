@@ -379,12 +379,12 @@ class qtype_preg_yyParser
     }
 
     protected function numerate_ast_nodes($node, &$currentnumber) {
+        $node->id = $currentnumber++;
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
                 $this->numerate_ast_nodes($operand, $currentnumber);
             }
         }
-        $node->id = $currentnumber++;
     }
 #line 392 "../preg_parser.php"
 
