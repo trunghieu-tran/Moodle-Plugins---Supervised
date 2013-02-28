@@ -345,15 +345,6 @@ class qtype_preg_regex_handler {
         return false;    // Should be overloaded by child classes
     }
 
-    protected function numerate_ast_nodes($node, &$currentnumber) {
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->numerate_ast_nodes($operand, $currentnumber);
-            }
-        }
-        $node->id = $currentnumber++;
-    }
-
     protected function look_for_circumflex($node, $wasconcat = false) {
         if (is_a($node, 'qtype_preg_leaf')) {
             // Expression starts from ^
@@ -414,9 +405,7 @@ class qtype_preg_regex_handler {
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
         //if (count($this->errors) === 0) { //Fill trees even if there are errors, so author tools could show them.
-            $idcounter = 1;
             $this->ast_root = $this->parser->get_root();
-            $this->numerate_ast_nodes($this->ast_root, $idcounter);
             $this->look_for_anchors();
             $this->dst_root = clone $this->ast_root;
             $this->dst_root = $this->from_preg_node($this->dst_root);
