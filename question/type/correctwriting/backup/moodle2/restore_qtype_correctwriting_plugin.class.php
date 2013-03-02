@@ -19,7 +19,8 @@
  *
  * @package    qtype
  * @subpackage correctwriting
- * @copyright  2011 Sychev Oleg, Mamontov Dmitry
+ * @copyright  2011 Sychev Oleg
+ * @author Mamontov Dmitry
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/restore_poasquestion_preg_plugin.class.php');

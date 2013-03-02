@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
  * Defines patterns class for lexer.
  *
  * @package    qtype
  * @subpackage correctwriting
- * @copyright &copy; 2011 Sergey Pashaev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 
@@ -28,7 +28,6 @@
  *
  * Class for storing patterns.
  *
- * @copyright  &copy; 2011 Sergey Pashaev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 class qtype_correctwriting_lexer_pattern {

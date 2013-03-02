@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
  * Defines error classes for the correct writing question.
  *

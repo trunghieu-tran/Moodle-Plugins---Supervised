@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage correctwriting
- * @copyright  2011 Sychev Oleg, Mamontov Dmitry
+ * @copyright  2011 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 // Defines a width for drawing lines of moving, removing or adding

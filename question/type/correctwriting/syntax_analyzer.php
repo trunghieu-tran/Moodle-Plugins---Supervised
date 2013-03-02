@@ -27,7 +27,7 @@
  * doesn't support syntax analysis.
  *
  * @copyright &copy; 2011  Oleg Sychev
- * @author Oleg Sychev, Sergey Pashaev, Volgograd State Technical University
+ * @author Oleg Sychev, Dmitry Mamontov, Volgograd State Technical University
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
