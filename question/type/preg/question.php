@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Preg question type is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -17,44 +17,21 @@
 /**
  * Perl-compatible regular expression question definition class.
  *
- * @package    qtype
- * @subpackage preg
- * @copyright  2011 Sychev Oleg
+ * @package    qtype_preg
+ * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
+require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
-
-/**
- * question which could return some specific hints and want to use *withhint behaviours should implement this
- */
-interface question_with_specific_hints {
-
-    /**
-     * returns an array of available specific hint types depending on question settings
-     * the keys are hint type indentifiers, unique for the qtype
-     * the values are interface strings with the hint description (without "hint" word!)
-     */
-    public function available_specific_hint_types();
-
-    /** 
-     * returns whether response allows for the hint to be done
-     */
-    public function hint_available($hinttype, $response);
-
-    /** 
-     * returns specific hint value of given hint type for given response
-     */
-    public function specific_hint($hinttype, $response);
-
-    /** 
-     * returns penalty for using specific hint of given hint type (possibly for given response)
-     */
-    public function penalty_for_specific_hint($hinttype, $response);
-}
-
+require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 /**
  * Represents a preg question.
@@ -63,27 +40,35 @@ interface question_with_specific_hints {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable, question_with_specific_hints {
+        implements question_automatically_gradable, question_with_qtype_specific_hints {
 
     //Fields defining a question
     /** @var array of question_answer objects. */
     public $answers = array();
     /** @var boolean whether answers should be graded case-sensitively. */
     public $usecase;
-    /** @var correct answer in user-readable form. */
+    /** @var string correct answer in user-readable form. */
     public $correctanswer;
-    /** @var should the match be exact or any match within answer is ok. */
+    /** @var boolean should the match be exact or any match within answer is ok. */
     public $exactmatch;
-    /** @var availability of hints in behavours with multiple attempts. */
-    public $usehint;
-    /** @var penalty for a hint. */
-    public $hintpenalty;
-    /** @var only answers with fraction >= hintgradeborder would be used for hinting. */
+    /** @var boolean availability of hints in behaviours with multiple attempts. */
+    public $usecharhint;
+    /** @var number penalty for a hint. */
+    public $charhintpenalty;
+    /** @var number only answers with fraction >= hintgradeborder would be used for hinting. */
     public $hintgradeborder;
-    /** @var matching engine to use. */
+    /** @var string matching engine to use. */
     public $engine;
-    /** @var notation, used to write answers. */
+    /** @var string notation, used to write answers. */
     public $notation;
+    /** @var boolean availability of next lexem hints in behaviours with multiple attempts.*/
+    public $uselexemhint;
+    /** @var number penalty for a next lexem hint. */
+    public $lexemhintpenalty;
+    /** @var string id of the language, used to write answers (cf. blocks/formal_langs for more details). */
+    public $langid;
+    /** @var preferred name for a lexem by the teacher. */
+    public $lexemusername;
 
     //Other fields
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
@@ -95,6 +80,29 @@ class qtype_preg_question extends question_graded_automatically
 
     public function __construct() {
         parent::__construct();
+    }
+
+    public static function question_from_regex($regex, $usecase, $exactmatch, $engine, $notation) {
+
+        $question = new qtype_preg_question;
+        $question->usecase = $usecase;
+        $question->correctanswer = '';
+        $question->exactmatch = $exactmatch;
+        $querymatcher = $question->get_query_matcher($engine);
+        $question->usecharhint = $querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $question->charhintpenalty = 0;
+        $question->hintgradeborder = 1;
+        $question->engine = $engine;
+        $question->notation = $notation;
+
+        $answer = new stdClass();
+        $answer->id = 100;
+        $answer->answer = $regex;
+        $answer->fraction = 1;
+        $answer->feedback = '';
+
+        $question->answers = array(100=>$answer);
+        return $question;
     }
 
     public function get_expected_data() {
@@ -121,84 +129,99 @@ class qtype_preg_question extends question_graded_automatically
 
     /**
     * Calculates and fill $this->bestfitanswer if necessary.
-    * @param $response response to find best fit answer
-    * @return array 'answer' => answer object, that best fit student's response, 'match' => array of matching results @see{preg_matcher}
+    * @param $response Response to find best fit answer
+    * @param $gradeborder float Set this argument if you want to find answer with other border than defined in question, used to get correct answer (100% border)
+    * @return array 'answer' => answer object, best fitting student's response, 'match' => matching results object @see{qtype_preg_matching_results}
     */
-    public function get_best_fit_answer(array $response) {
-        //check cache for valid results
-        if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array()) {
+    public function get_best_fit_answer(array $response, $gradeborder = null) {
+        //Check cache for valid results
+        if($response['answer']==$this->responseforbestfit && $this->bestfitanswer !== array() && $gradeborder === null) {
             return $this->bestfitanswer;
         }
 
+        //Set $hintgradeborder
+        if ($gradeborder === null) {//No grade border set, use question one
+            $hintgradeborder = $this->hintgradeborder;
+        } else {//We would still need to remember whether gradeborder === null for cache purposes, so use another variable
+            $hintgradeborder = $gradeborder;
+        }
+
         $querymatcher = $this->get_query_matcher($this->engine);//this matcher will be used to query engine capabilities
-        $knowleftcharacters = $querymatcher->is_supporting(preg_matcher::CHARACTERS_LEFT);
-        $ispartialmatching = $querymatcher->is_supporting(preg_matcher::PARTIAL_MATCHING);
-        
+        $knowleftcharacters = $querymatcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT);
+        $ispartialmatching = $querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING);
+
         //Set an initial value for best fit. This is tricky, since when hinting we need first element within hint grade border.
         reset($this->answers);
         $bestfitanswer = current($this->answers);
         if ($ispartialmatching) {
             foreach ($this->answers as $answer) {
-                if ($answer->fraction >= $this->hintgradeborder) {
+                if ($answer->fraction >= $hintgradeborder) {
                     $bestfitanswer = $answer;
-                    $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
-                    $matcher->match($response['answer']);
-                    $matchresult = $matcher->get_match_results();
+                    $hintneeded = ($this->usecharhint || $this->uselexemhint);//We already know that $answer->fraction >= $hintgradeborder.
+                    $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
+                    $bestmatchresult = $matcher->match($response['answer']);
                     if ($knowleftcharacters) {
-                        $maxfitness = (-1)*$matcher->characters_left();
+                        $maxfitness = (-1)*$bestmatchresult->left;
                     } else {
-                        $maxfitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
+                        $maxfitness = $bestmatchresult->length();
                     }
-                    break;//anyone that fits border helps
+                    break;//Any one that fits border helps
                 }
             }
-        } else {
-            $matchresult = array('is_match' => false, 'full' => false);
+        } else {//Just use first answer and not bother with maxfitness. But we still should fill $bestmatchresults from matcher to correctly fill matching results arrays.
+            $matcher = $this->get_matcher($this->engine, $bestfitanswer->answer, $this->exactmatch, $this->usecase, $bestfitanswer->id, $this->notation);
+            $bestmatchresult = $matcher->match($response['answer']);
         }
+
         //fitness = (the number of correct letters in response) or  (-1)*(the number of letters left to complete response) so we always look for maximum fitness.
         $full = false;
         foreach ($this->answers as $answer) {
-            $matcher =& $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation);
-            $full = $matcher->match($response['answer']);
+            $hintneeded = ($this->usecharhint || $this->uselexemhint) && $answer->fraction >= $hintgradeborder;
+            $matcher = $this->get_matcher($this->engine, $answer->answer, $this->exactmatch, $this->usecase, $answer->id, $this->notation, $hintneeded);
+            $matchresults = $matcher->match($response['answer']);
 
             //Check full match.
-            if ($full) {//Don't need to look more if we find full match.
+            if ($matchresults->full) {//Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
-                $matchresult = $matcher->get_match_results();
-                $fitness = strlen($response['answer']);
+                $bestmatchresult = $matchresults;
+                $fitness = qtype_poasquestion_string::strlen($response['answer']);
                 break;
             }
 
             //When hinting we should use only answers within hint border except full matching case and there is some match at all.
             //If engine doesn't support hinting we shoudn't bother with fitness too.
-            if (!$ispartialmatching || !$matcher->match_found() || $answer->fraction < $this->hintgradeborder) {
+            if (!$ispartialmatching || !$matchresults->is_match() || $answer->fraction < $hintgradeborder) {
                 continue;
             }
 
             //Calculate fitness.
             if ($knowleftcharacters) {//Engine could tell us how many characters left to complete response, this is the best fitness possible.
-                $fitness = (-1)*$matcher->characters_left();//-1 cause the less we need to add the better
+                $fitness = (-1)*$matchresults->left;//-1 cause the less we need to add the better
             } else {//We should rely on the length of correct response part.
-                $fitness = $matcher->last_correct_character_index() - $matcher->first_correct_character_index() + 1;
+                $fitness = $matchresults->length[0];
             }
 
             if ($fitness > $maxfitness) {
                 $maxfitness = $fitness;
                 $bestfitanswer = $answer;
-                $matchresult = $matcher->get_match_results();
+                $bestmatchresult = $matchresults;
             }
         }
 
-        //Save best fitted answer for further uses.
-        $this->bestfitanswer['answer'] = $bestfitanswer;
-        $this->bestfitanswer['match'] = $matchresult;
-        $this->responseforbestfit = $response['answer'];
-        return $this->bestfitanswer;
+        $bestfit = array();
+        $bestfit['answer'] = $bestfitanswer;
+        $bestfit['match'] = $bestmatchresult;
+        //Save best fitted answer for further uses (default grade border only)
+        if ($gradeborder === null) {
+            $this->bestfitanswer = $bestfit;
+            $this->responseforbestfit = $response['answer'];
+        }
+        return $bestfit;
     }
 
     public function get_matching_answer(array $response) {
         $bestfit = $this->get_best_fit_answer($response);
-        if ($bestfit['match']['is_match'] && $bestfit['match']['full']) {
+        if ($bestfit['match']->full) {
             return $bestfit['answer'];
         }
         return array();
@@ -209,7 +232,7 @@ class qtype_preg_question extends question_graded_automatically
         $bestfitanswer = $this->get_best_fit_answer($response);
         $grade = 0;
         $state = question_state::$gradedwrong;
-        if ($bestfitanswer['match']['is_match'] && $bestfitanswer['match']['full']) {//TODO - implement partial grades for partially correct answers
+        if ($bestfitanswer['match']->is_match() && $bestfitanswer['match']->full) {//TODO - implement partial grades for partially correct answers
             $grade = $bestfitanswer['answer']->fraction;
             $state = question_state::graded_state_for_fraction($bestfitanswer['answer']->fraction);
         }
@@ -225,15 +248,16 @@ class qtype_preg_question extends question_graded_automatically
     @param $exact bool exact macthing mode
     @param $usecase bool case sensitive mode
     @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
-    @param $notation notation, in which regex is written
+    @param $notation string notation, in which regex is written
+    @param $hintpossible boolean whether hint possible for specified answer
     @return matcher object
     */
-    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native') {
+    public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native', $hintpossible = true) {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
         if ($answerid !== null && array_key_exists($answerid,$this->matchers_cache)) {//could use cache
-            $matcher =& $this->matchers_cache[$answerid];
+            $matcher = $this->matchers_cache[$answerid];
         } else {//create and store matcher object
 
             $modifiers = null;
@@ -242,10 +266,13 @@ class qtype_preg_question extends question_graded_automatically
             }
 
             //Convert to actually used notation if necessary
-            $queryengine = new $engine;
+            $engineclass = 'qtype_preg_'.$engine;
+            $queryengine = new $engineclass;
             $usednotation = $queryengine->used_notation();
+            //Initialise $notationobj so it won't disappear after condition and could be used later.
+            $notationobj = null;
             if ($notation !== null && $notation != $usednotation) {//Conversion is necessary
-                $notationclass = 'preg_notation_'.$notation;
+                $notationclass = 'qtype_preg_notation_'.$notation;
                 $notationobj = new $notationclass($regex, $modifiers);
                 $regex = $notationobj->convert_regex($usednotation);
                 $modifiers = $notationobj->convert_modifiers($usednotation);
@@ -254,14 +281,43 @@ class qtype_preg_question extends question_graded_automatically
             //Modify regex according with question properties
             $for_regexp=$regex;
             if ($exact) {
-                //Grouping is needed in case regexp contains top-level alternatives
-                //use non-capturing grouping to not mess-up with user subpattern capturing
+                //Grouping is needed in case regexp contains top-level alternatives.
+                //Use non-capturing grouping to not mess-up with user subpattern capturing.
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
-            $matcher = new $engine($for_regexp, $modifiers);
-            if ($answerid !== null) {
-                $this->matchers_cache[$answerid] =& $matcher;
+            //Create and fill options object
+            $matchingoptions = new qtype_preg_matching_options;
+            //We need extension to hint next character or to generate correct answer if none is supplied
+            $matchingoptions->extensionneeded = $this->usecharhint || $this->uselexemhint || trim($this->correctanswer) == '';
+            if($answerid !== null && $answerid > 0) {
+                $feedback = $this->answers[$answerid]->feedback;
+                if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
+                    $matchingoptions->capturesubpatterns = false;
+                }
+            }
+
+            //Convert options to desired notation.
+            if ($notation !== null && $notation != $usednotation) {
+                $notationobj->options = $matchingoptions;
+                $matchingoptions = $notationobj->convert_options($usednotation);
+            }
+
+            $matcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
+
+            if ($matcher->is_error_exists() && !$hintpossible && $engine != 'php_preg_matcher') {
+                //Custom engine can't handle regex and hints not needed, let's try preg_match instead.
+                $engine = 'php_preg_matcher';
+                require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
+                $engineclass = 'qtype_preg_'.$engine;
+                $newmatcher = new $engineclass($for_regexp, $modifiers, $matchingoptions);
+                if (!$newmatcher->is_error_exists()) {//We still prefer to show error messages from custom engine, since they are much more detailed.
+                    $matcher = $newmatcher;
+                }
+            }
+
+            if ($answerid !== null) {//Cache created matcher
+                $this->matchers_cache[$answerid] = $matcher;
             }
         }
         return $matcher;
@@ -273,13 +329,35 @@ class qtype_preg_question extends question_graded_automatically
      */
     public function get_query_matcher($engine) {
         global $CFG;
-        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'.php');
+        require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
 
-        return new $engine;
+        $engineclass = 'qtype_preg_'.$engine;
+        return new $engineclass;
     }
 
+    /**
+     * Enchancing base class function with ability to generate correct response closest to student's one when given
+     */
+    public function get_correct_response_ext($response) {
+        $correctanswer = $this->correctanswer;
+        if (trim($correctanswer) == '') {
+            //No correct answer set be the teacher, so try to generate correct response.
+            //TODO - should we default to generate even if teacher entered the correct answer?
+            $bestfit = $this->get_best_fit_answer($response, 1);
+            $matchresults = $bestfit['match'];
+            if (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full) {
+                //Engine generated a full match
+                $correctanswer = $matchresults->correct_before_hint().$matchresults->string_extension();
+            }
+        }
+        return array('answer' => $correctanswer);
+    }
+
+    /**
+     * Standard overloading of base function
+     */
     public function get_correct_response() {
-        return array('answer' => $this->correctanswer);
+        return $this->get_correct_response_ext(array('answer' => ''));
     }
 
     public function summarise_response(array $response) {
@@ -298,85 +376,57 @@ class qtype_preg_question extends question_graded_automatically
         return get_string('pleaseenterananswer', 'qtype_shortanswer');
     }
 
-    /*
-    * Returns colored string parts: array with indexes 'wronghead', 'correctpart', 'hintedcharacter', 'wrongtail'
-    */
-    public function response_correctness_parts($response) {
+    /**
+     * Returns formatted feedback text to show to the user, or null if no feedback should be shown
+     */
+    public function get_feedback_for_response($response, $qa) {
+
         $bestfit = $this->get_best_fit_answer($response);
-        $answer = $bestfit['answer'];
-        $matchresults = $bestfit['match'];
-        $currentanswer = $response['answer'];
-
-        if ($matchresults['is_match']) {
-            $firstindex = $matchresults['index_first'][0];
-            $lastindex = $matchresults['index_last'][0];
-
-            $wronghead = '';
-            if ($firstindex > 0) {//if there is wrong heading
-                $wronghead = substr($currentanswer, 0, $firstindex);
+        $feedback = '';
+        //If best fit answer is found and there is a full match
+        //We should not show feedback for partial matches while question still active since student still don't get his answer correct
+        //But if the question is finished there is no harm in showing feedback for partial matching
+        $state = $qa->get_state();
+        if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match() && $state->is_finished()) ) {
+            $answer = $bestfit['answer'];
+            if ($answer->feedback) {
+                $feedbacktext = $this->insert_subpatterns($answer->feedback, $response, $bestfit['match']);
+                $feedback = $this->format_text($feedbacktext, $answer->feedbackformat,
+                    $qa, 'question', 'answerfeedback', $answer->id);
             }
-            $correctpart = '';
-            if ($firstindex != -1) {//there were any match
-                $correctpart = substr($currentanswer, $firstindex, $lastindex - $firstindex + 1);
-            }
-            $hintedcharacter = '';
-            if (isset($matchresults['next'])) {//if hint possible
-                $hintedcharacter = $matchresults['next'];
-            }
-            $wrongtail = '';
-            if ($lastindex + 1 < strlen($currentanswer)) {//if there is wrong tail
-                $wrongtail =  substr($currentanswer, $lastindex + 1, strlen($currentanswer) - $lastindex - 1);
-            }
-            return array('wronghead' => $wronghead, 'correctpart' => $correctpart, 'hintedcharacter' => $hintedcharacter, 'wrongtail' => $wrongtail);
         }
 
-        //No match - all response is wrong, but we could hint the very first character still
-        $queryengine = $this->get_query_matcher($this->engine);
-        if ($queryengine->is_supporting(preg_matcher::PARTIAL_MATCHING)) {
-            $result = array('wronghead' => $currentanswer, 'correctpart' => '', 'hintedcharacter' => '', 'wrongtail' => '');
-            if (isset($matchresults['next'])) {//if hint possible
-                $result['hintedcharacter'] = $matchresults['next'];
-            }
-        } else {//If there is no partial matching hide colored string when no match to not mislead the student who start his answer correctly
-            $result = null;
-        }
-        return $result;
+        return $feedback;
+
     }
 
-    /*
+    /**
     * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
     @param subject string to insert subpatterns
     @param question question object to create matcher
-    @param state state of the question attempt to get response
+    @param matchresults matching results object from best fitting answer
     @return changed string
     */
-    public function insert_subpatterns($subject, $response) {
+    public function insert_subpatterns($subject, $response, $matchresults) {
 
-        //To be sure best fit answer is calculated
-        $this->get_best_fit_answer($response);
-
-        //Sanity check 
-        if (strpos($subject,'{$') === false || strpos($subject,'}') === false) {
-            //There are no placeholders for sure 
+        //Sanity check
+        if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
+            //There are no placeholders for sure
             return $subject;
         }
 
         $answer = $response['answer'];
-        $matchresults = $this->bestfitanswer['match'];
-        //TODO - fix bug 72 leading to not replaced placeholder when using php_preg_matcher and last subpatterns isn't captured
-        // c.f. failed test in simpletest/testquestion.php
 
-        if ($matchresults['is_match']) {
-            foreach ($matchresults['index_first'] as $i => $startindex) {
-                $search = '{$'.$i.'}';
-                $endindex = $matchresults['index_last'][$i];
-                $replace = substr($answer, $startindex, $endindex - $startindex + 1);
-                $subject = str_replace($search, $replace, $subject);
+        foreach ($matchresults->all_subpatterns() as $i) {
+            $search = '{$'.$i.'}';
+            $startindex = $matchresults->index_first($i);
+            $length = $matchresults->length($i);
+            if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
+            } else {
+                $replace = '';
             }
-        } else {
-            //No match, so no feedback should be shown.
-            //It is possible to have best fit answer with no match to hint first character from first answer for which hint is possible.
-            $subject = '';
+            $subject = str_replace($search, $replace, $subject);
         }
 
         return $subject;
@@ -384,7 +434,7 @@ class qtype_preg_question extends question_graded_automatically
 
     //////////Specific hints implementation part
 
-    //we need adaptive (TODO interactive) behavour to use hints
+    //We need adaptive (TODO interactive) behaviour to use hints
      public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         global $CFG;
 
@@ -400,48 +450,38 @@ class qtype_preg_question extends question_graded_automatically
 
         return parent::make_behaviour($qa, $preferredbehaviour);
      }
+
     /**
-    * returns an array of available specific hint types
+    * Returns an array of available specific hint types
     */
-    public function available_specific_hint_types() {
-        if ($this->usehint) {
-        return array('hintnextchar' => get_string('hintnextchar','qtype_preg')
-                    );
+    public function available_specific_hints($response = null) {
+        $hinttypes = array();
+        if (count($this->hints) > 0) {
+            $hinttypes[] = 'hintmoodle#';
         }
-
-        return array();
+        if ($this->usecharhint) {
+            $hinttypes[] = 'hintnextchar';
+        }
+        if ($this->uselexemhint) {
+            $hinttypes[] = 'hintnextlexem';
+        }
+        return $hinttypes;
     }
 
-    /** 
-     * returns whether response allows for the hint to be done
+    /**
+     * Hint object factory
+     *
+     * Returns a hint object for given type
      */
-    public function hint_available($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-            return true;// next character hint available anywhere - TODO check where answer is correct or no next character could be generated
+    public function hint_object($hintkey, $response = null) {
+        //Moodle-specific hints.
+        if (substr($hintkey, 0, 11) == 'hintmoodle#') {
+            return new qtype_poasquestion_hintmoodle($this, $hintkey);
         }
+
+        //Preg specific hints
+        $hintclass = 'qtype_preg_'.$hintkey;
+        return new $hintclass($this, $hintkey);
     }
 
-        /** 
-     * returns specific hint value of given hint type for given response
-     */
-    public function specific_hint($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-                $bestfitanswer = $this->get_best_fit_answer($response);
-                return $bestfitanswer['match']['next'];
-        }
-    }
-
-    /** 
-     * returns penalty for using specific hint of given hint type (possibly for given response)
-     * $response could be null if we need to show possible penalty in advance
-     */
-    public function penalty_for_specific_hint($hinttype, $response) {
-        switch($hinttype) {
-            case 'hintnextchar':
-                return $this->hintpenalty;
-        }
-        return 0;
-    }
 }

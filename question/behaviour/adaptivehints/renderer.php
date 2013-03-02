@@ -28,32 +28,82 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         }
         $output .= html_writer::empty_tag('br');
 
-        //hinting buttons  $qa->get_behaviour()
-         foreach ($question->available_specific_hint_types() as $hintkey => $hintdescription) {
-            $attributes = array(
-                'type' => 'submit',
-                'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
-                'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintdescription),
-                'class' => 'submit btn',
-            );
-            if ($options->readonly) {
-                $attributes['disabled'] = 'disabled';
+        //Render buttons that should be rendered by behaviour.
+         foreach ($question->available_specific_hints() as $hintkey) {
+
+            $behaviour = $qa->get_behaviour();
+            $hintkey = $behaviour->adjust_hintkey($hintkey);
+            $hintobj = $question->hint_object($hintkey);
+
+            if (!$hintobj->button_rendered_by_question()) {//Button(s) isn't rendered by the question, so behaviour must render it.
+
+                //Check whether button should be rendered at all.
+                $laststep = $qa->get_last_step();
+                if ($hintobj->hint_response_based()) {
+                    $showhintbtn = $laststep->has_behaviour_var('_resp_hintbtns');
+                } else {
+                    $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
+                }
+                //Hide hint button if such hint buttons should not shown at all or hint unavailable or hint already rendered.
+                if (!$showhintbtn || !$hintobj->hint_available() || ($laststep->has_behaviour_var('_render_'.$hintkey) && $hintobj->hint_type() !== qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT)) {
+                    //Should not pass $response to hint_available, since response could be changed in adaptive.
+                    continue;
+                }
+
+                $output .= $this->render_hint_button($qa, $options, $hintobj);
+                $output .= html_writer::empty_tag('br');
+
             }
-            $output .= html_writer::empty_tag('input', $attributes);
-            $penalty = $question->penalty_for_specific_hint($hintkey, null);
-            if ($penalty != 0) {
-                $output .= $this->button_cost('withpenalty', $penalty, $options);
-            }
-            $output .= html_writer::empty_tag('br');
-            
-            /*if (!$options->readonly) {
-            $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
-                    array($attributes['id'], $qa->get_slot()));
-            }*/
         }
 
         return $output;
+    }
+
+    /**
+     * Renders hint button. Could be used by behaviour or question renderer to avoid code duplication while rendering it.
+     * @param hintobj object an object of a child of qtype_specific_hint class
+     */
+    public function render_hint_button(question_attempt $qa, question_display_options $options, $hintobj) {
+        $question = $qa->get_question();
+        $hintkey = $hintobj->hint_key();
+
+        //Render button.
+        $attributes = array(
+            'type' => 'submit',
+            'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
+            'name' => $qa->get_behaviour_field_name($hintkey.'btn'),
+            'value' => get_string('hintbtn', 'qbehaviour_adaptivehints', $hintobj->hint_description()),
+            'class' => 'submit btn',
+        );
+        if ($options->readonly) {
+            $attributes['disabled'] = 'disabled';
+        }
+        $output = html_writer::empty_tag('input', $attributes);
+
+        //Cost message
+        if ($hintobj->penalty_response_based()) {//if penalty is response-based
+            //try to get last response
+            $response = $qa->get_last_qt_data();
+            if (empty($response)) {
+                $response = null;
+            }
+            $penalty = $hintobj->penalty_for_specific_hint($response);
+            if ($penalty != 0) {
+                $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Note that reported penalty is approximation since user could change response in adaptive.
+            }
+        } else {
+            $penalty = $hintobj->penalty_for_specific_hint(null);
+            if ($penalty != 0) {
+                $output .= $this->button_cost('withpenalty', $penalty, $options);
+            }
+        }
+
+        if (!$options->readonly) {
+            $this->page->requires->js_init_call('M.core_question_engine.init_submit_button',
+                array($attributes['id'], $qa->get_slot()));
+         }
+
+         return $output;
     }
 
     //Overload penalty_info to show actual penalty
