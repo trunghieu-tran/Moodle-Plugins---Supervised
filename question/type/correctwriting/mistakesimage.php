@@ -31,15 +31,20 @@ define('ROW_HORIZONTAL_SPACE', 7);
 define('TINY_SPACE', 2);
 // Defines a width for drawing lines of moving, removing or adding
 define('LINE_WIDTH', 2);
+// A line width for strikethrought
+define('STRIKETHROUGH_LINE_WIDTH', 1);
 // A length of arrow end part
 define('ARROW_LENGTH', 5);
 // An arrow angle in radians
 define('ARROW_ANGLE', 0.5);
 // Define a space for frame
-define('FRAME_SPACE', 2);
+define('FRAME_SPACE', 5);
 // A thickness of drawn frame
 define('FRAME_THICKNESS', 1);
-
+// Defines a padding for absent frame
+define('ABSENT_FRAME_PADDING', 2);
+// Additional length for big strkethrough  inner lines
+define('BIG_STRIKETHROUGH_ADDITIONAL_LENGTH', 2);
 /**
  * This style of require_once is used intentionally, due to non-availability of Moodle here
  */
@@ -106,6 +111,13 @@ class qtype_correctwriting_abstract_label
    public function paint(&$im, $palette, $currentrect, $bottom) {
        $this->set_connection_point($currentrect, $bottom);
    }
+   /**
+    * Stub for returnin text
+    * @return string
+    */
+   public function text() {
+        return '';
+   }
 }
 /** An empty label is used as a stub, when we are skipping parts in the table in cases,
     when we draw an absent lexemes or added lexemes.
@@ -145,6 +157,14 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
    public function make_fixed() {
        $this->fixed  = true;
    }
+
+   /**
+    * Returns text of lexeme label
+    * @return string
+    */
+   public function text() {
+       return $this->text;
+   }
    /** Paints a label at specific position, specified by rectangle. If it set as fixed, we paint it as red.
        Label is painted at center of specified rectangle on a horizontal, and on top on vertical
        @param resource $im image resource, where it should be painted
@@ -163,6 +183,20 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
        }
        // Compute a middle parameter at center
        $x = $currentrect->x + $currentrect->width/2 - $this->labelsize[0]/2;
+
+       // Debug drawing of lexeme rectangles
+       /*
+       $fx1 = $currentrect->x;
+       $fx2 = $currentrect->x + $currentrect->width;
+       $fy1 = $currentrect->y;
+       $fy2 = $currentrect->y + $currentrect->height;
+       $points = array( array($fx1, $fy1), array($fx2, $fy1),
+                        array($fx2, $fy2), array($fx1, $fy2), array($fx1, $fy1) );
+       for($i = 1; $i < count($points); $i++) {
+           imageline($im, $points[$i-1][0], $points[$i-1][1], $points[$i][0], $points[$i][1], $palette['red']);
+       }
+       */
+
        // Paint a string
        qtype_correctwriting_render_text($im, $x, $currentrect->y, $this->text, $color);
    }
@@ -174,11 +208,11 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
 class qtype_correctwriting_table_cell
 {
    /**
-     @var qtype_correctwriting_abstract_label answer label part
+    * @var qtype_correctwriting_abstract_label answer label part
     */
    private $answer;
    /**
-     @var qtype_correctwriting_abstract_label response label part
+    * @var qtype_correctwriting_abstract_label response label part
     */
    private $response;
    /** Creates a cell with specified answer and response
@@ -199,6 +233,15 @@ class qtype_correctwriting_table_cell
        // Returns maximum size of label
        return array(max($answersize[0],$responsesize[0]) ,
                     max($answersize[1],$responsesize[1]));
+   }
+
+   /**
+    * Returns true if response text length bigger then
+    * @param int $length
+    * @return bool result
+    */
+   public function is_response_length_bigger($length) {
+       return textlib::strlen($this->response->text()) > $length;
    }
    /** Returns a total size of cell
        @return array of coordinates as array(width, height)
@@ -247,7 +290,7 @@ class qtype_correctwriting_table_cell
        $labelsize = $this->get_max_label_size();
        // Compute rectangles for painting answer and response
        $responserect = (object)array('x' => $currentpos[0], 'y' => $currentpos[1] + FRAME_SPACE,
-                                   'width' => $labelsize[0] + ROW_HORIZONTAL_SPACE, 'height' => $labelsize[1]);
+                                   'width' => $labelsize[0], 'height' => $labelsize[1]);
        $height = imagesy($im);
        $answerrect = (object)array('x' => $currentpos[0], 'y' => $height - $labelsize[1] - FRAME_SPACE,
                                      'width' => $labelsize[0], 'height' => $labelsize[1]);
@@ -538,6 +581,18 @@ class qtype_correctwriting_table
        $cell = $this->table[$this->responsetable[$responseindex]];
        return $cell->get_response_rect();
    }
+    /** Returns a connection point for lexeme in student answer
+     * @param int $responseindex of lexeme in answer
+     * @param int $length supposed length of lexeme
+     * @return bool
+     */
+    public function is_response_text_bigger_than($responseindex,$length) {
+        /**
+         * @var qtype_correctwriting_table_cell $cell
+         */
+        $cell = $this->table[$this->responsetable[$responseindex]];
+        return $cell->is_response_length_bigger($length);
+    }
    /** Returns a connection for arrow for cell $cell
        @param qtype_correctwriting_table_cell $cell cell, which connection point is extracted
        @return stdClass( answer => coordinate of answer connection point as array(x,y), response => coordinate of response)
@@ -637,13 +692,19 @@ class qtype_correctwriting_arrow_builder {
                $this->draw_rectangle($im, $palette['red'], $rect);
            }
        }
+       imagesetthickness($im, STRIKETHROUGH_LINE_WIDTH);
        // Draw added lexemes arrows
        if (count($this->table->mistakes()->get_added_lexeme_indexes()) != 0 ) {
            foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
                $rect = $this->table->get_rect_by_response_index($index);
-               $this->draw_strikethrough($im, $palette['red'], $rect);
+               if ($this->table->is_response_text_bigger_than($index, 1)) {
+                   $this->draw_big_strikethrough($im, $palette['red'], $rect);
+               } else {
+                   $this->draw_strikethrough($im, $palette['red'], $rect);
+               }
            }
        }
+       imagesetthickness($im, LINE_WIDTH);
        // Draw moved lexemes arrows
        if (count($this->table->mistakes()->get_moves()) != 0) {
            foreach($this->table->mistakes()->get_moves() as $entry) {
@@ -670,9 +731,31 @@ class qtype_correctwriting_arrow_builder {
     */
    protected function draw_strikethrough(&$im, $color, $rect) {
        $p1x = $rect->x;
-       $py = $rect->y + $rect->height * 0.65;
+       $py = $rect->y + $rect->height * 0.50;
        $p2x = $rect->x + $rect->width;
        imageline($im, $p1x, $py, $p2x, $py, $color);
+   }
+
+    /**
+     * Draws a big strikethrough line (for lexemes, which contains more lexemes that 1 and is odd in response)
+     * @param resource $im image
+     * @param int      $color  color
+     * @param stdClass $rect   rectangle
+     */
+   protected function draw_big_strikethrough(&$im, $color, $rect) {
+       $centerx = $rect->x + $rect->width / 2;
+       $centery = $rect->y + $rect->height / 2;
+       $hheight = $rect->height / 2 + BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
+       $points = array(
+            array($centerx - $hheight, $centery - $hheight),
+            array($centerx - $hheight, $centery + $hheight),
+            array($centerx + $hheight, $centery + $hheight),
+            array($centerx + $hheight, $centery - $hheight),
+       );
+       for($i = 0; $i < count($points); $i++) {
+           imageline($im, $centerx, $centery, $points[$i][0], $points[$i][1], $color);
+       }
+
    }
    /**
     * Draws a rectangle with specified color
@@ -681,10 +764,10 @@ class qtype_correctwriting_arrow_builder {
     * @param stdClass $rect   rectangle
     */
    protected function draw_rectangle(&$im, $color, $rect) {
-       $points = array(  array(0, 0),
-                         array(0, $rect->height),
-                         array($rect->width, $rect->height),
-                         array($rect->width, 0)
+       $points = array(  array(-1 * ABSENT_FRAME_PADDING, -1 * ABSENT_FRAME_PADDING),
+                         array(-1 * ABSENT_FRAME_PADDING, $rect->height + ABSENT_FRAME_PADDING),
+                         array($rect->width + ABSENT_FRAME_PADDING, $rect->height + ABSENT_FRAME_PADDING),
+                         array($rect->width + ABSENT_FRAME_PADDING, -1 * ABSENT_FRAME_PADDING)
                       );
        $lines = array( array($points[0], $points[1]),
                        array($points[1], $points[2]),

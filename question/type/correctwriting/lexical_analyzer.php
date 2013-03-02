@@ -62,7 +62,7 @@ class qtype_correctwriting_lexical_analyzer {
      *
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      *
-     * @param object $question question object
+     * @param qtype_correctwriting_question $question question object
      * @param object $answer answer object for which lcs is created
      * @param string $responsestr student response as a string
      */
