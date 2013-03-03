@@ -176,17 +176,6 @@
         return $result;
     }
 
-    protected function calculate_nodes_nesting($node) {
-        $node->nested = array();
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->calculate_nodes_nesting($operand);
-                $node->nested = array_merge($node->nested, $operand->nested);
-                $node->nested[] = $operand;
-            }
-        }
-    }
-
     protected function remove_subpatterns($node) {
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
@@ -197,6 +186,26 @@
             $node->subtype = qtype_preg_node_subpatt::SUBTYPE_GROUPING;
             $node->number = -1;
         }
+    }
+
+    protected function make_operator_leftassoc($node, $type) {
+        if (!is_a($node, 'qtype_preg_operator')) {
+            return $node;
+        }
+
+        if ($node->type == $type && count($node->operands) == 2 && $node->operands[1]->type == $type) {
+            $right = $node->operands[1];
+            $node->operands[1] = $right->operands[0];
+            $right->operands[0] = $node;
+            $node = $right;
+        }
+
+        // Important: the transformation should go from the root to the leafs.
+        foreach ($node->operands as $key => $operand) {
+            $node->operands[$key] = $this->make_operator_leftassoc($operand, $type);
+        }
+
+        return $node;
     }
 
     // Returns a node which should replace the given one.
@@ -305,6 +314,8 @@ start ::= lastexpr(B). {
     // Set the root node.
     $this->root = B;
 
+    $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
+
     // Expand the tree if needed.
     if ($this->handlingoptions->expandtree) {
         $this->root = $this->expand_tree($this->root);
@@ -312,9 +323,6 @@ start ::= lastexpr(B). {
 
     // Numerate all nodes.
     $this->numerate_ast_nodes($this->root);
-
-    // Calculate nodes nesting.
-    $this->calculate_nodes_nesting($this->root);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {

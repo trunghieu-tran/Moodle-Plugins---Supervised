@@ -155,8 +155,6 @@ abstract class qtype_preg_node {
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
-    /** Array of links to nested nodes, including nested of nested, etc. */
-    public $nested = array();
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
