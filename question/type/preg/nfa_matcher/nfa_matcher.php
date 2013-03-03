@@ -168,7 +168,7 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
         // Reset all OLD subtrees to no match - they are matched and replaced by new ones.
         foreach ($transition->subtree_end as $node) {
             if ($this->index_new[$node->id] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $this->reset_subtree($node, true, false, $options->mode);
+                //$this->reset_subtree($node, true, false, $options->mode);
             }
         }
 
@@ -512,7 +512,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return - the longest character sequence matched.
      */
     public function match_from_pos($str, $startpos) {
-        $DEBUG = 1;
+        $DEBUG = 0;
 
 if ($DEBUG) {
     $styleprovider = new qtype_preg_dot_style_provider();
@@ -562,7 +562,7 @@ if ($DEBUG) {
 
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                        //continue;
+                        continue;
                     }
                     $curpos = $startpos + $curstate->length();
                     $length = 0;
@@ -623,17 +623,31 @@ if ($DEBUG) {
                     }
                 }
             }
+            // Resolve ambiguities between the reached states.
+            foreach ($reached as $key1 => $reached1) {
+                foreach ($reached as $key2 => $reached2) {
+                    if ($reached1 == null || $reached2 == null || $reached1->state !== $reached2->state) {
+                        continue;
+                    }
+                    if ($reached1->worse_than($reached2, false, false, $areequal)) {
+                        $reached[$key1] = null;
+                    } else if ($reached2->worse_than($reached1, false, false, $areequal)) {
+                        $reached[$key2] = null;
+                    }
+                }
+            }
+
             // Replace curstates with newstates.
             $newstates = array();
             foreach ($reached as $curstate) {
-                if ($states[$curstate->state->number] === null ||
-                    $states[$curstate->state->number]->worse_than($curstate, false, false, $areequal)) {
-                    // Currently stored state needs replacement.
+                if ($curstate == null) {
+                    continue;
+                }
+                // Currently stored state needs replacement if it's null, or if it's not the same as the new state.
+                // In fact, the second check prevents from situations like \b*
+                if ($states[$curstate->state->number] === null || !$states[$curstate->state->number]->equals($curstate)) {
                     $states[$curstate->state->number] = $curstate;
                     $newstates[$curstate->state->number] = true;
-                    //echo 'REPLACING state ' . $curstate->state->number . ': ' . $curstate->subpatterns_to_str() . "\n";
-                } else {
-                    //echo 'THROWN state ' . $curstate->state->number . ': ' . $curstate->subpatterns_to_str() . "\n";
                 }
             }
             $newstates = array_keys($newstates);
