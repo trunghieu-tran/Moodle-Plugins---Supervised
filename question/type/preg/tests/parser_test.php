@@ -317,10 +317,10 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
     function test_parser_asserts() {
         $parser = $this->run_parser('(?<=\w)(?<!_)a*(?=\w)(?!_)', $errornodes);
         $root = $parser->get_root();
-        $tb = $root->operands[0]->operands[0];
-        $fb = $root->operands[0]->operands[1];
-        $tf = $root->operands[1]->operands[1]->operands[0];
-        $ff = $root->operands[1]->operands[1]->operands[1];
+        $tb = $root->operands[0]->operands[0]->operands[0];
+        $fb = $root->operands[0]->operands[0]->operands[1];
+        $tf = $root->operands[1]->operands[0];
+        $ff = $root->operands[1]->operands[1];
         $this->assertTrue($tf->type == qtype_preg_node::TYPE_NODE_ASSERT);
         $this->assertTrue($tf->subtype == qtype_preg_node_assert::SUBTYPE_PLA);
         $this->assertTrue($tf->userinscription->data === '(?=...)');
