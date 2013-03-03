@@ -56,7 +56,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         $lab = $this->number . ':' . $this->pregleaf->tohr() . ',';
 
         // Information about subpatterns.
-        /*if (count($this->subtree_start) > 0) {
+        if (count($this->subtree_start) > 0) {
             $lab = $lab . 'starts';
             foreach ($this->subtree_start as $node) {
                 $lab = $lab . "{$node->id},";
@@ -67,7 +67,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
             foreach ($this->subtree_end as $node) {
                 $lab = $lab . "{$node->id},";
             }
-        }*/
+        }
         $lab = substr($lab, 0, strlen($lab) - 1);
         $lab = '"' . str_replace('"', '\"', $lab) . '"';
         // Dummy transitions are displayed dotted.
@@ -124,6 +124,14 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
     }
 
     public function complete_match() {
+    }
+
+    public function subptree_count() {
+        return $this->subtree_count;
+    }
+
+    public function subtree_from_subpatt_number($subpatt_number) {
+        return $this->subpatt_to_subtree_map[$subpatt_number];
     }
 
     public function on_subpatt_added($subpatt_number, $subtree_number) {
