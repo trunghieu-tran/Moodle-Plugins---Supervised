@@ -9,7 +9,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
 
     private $mincode;
-    private $this->maxcode;
+    private $maxcode;
 
     protected function setUp() {
         $this->mincode = qtype_preg_unicode::min_possible_code();
