@@ -12,6 +12,8 @@
     private $errornodes;
     // Handling options.
     private $handlingoptions;
+    // Counter of nodes id. After parsing, equals the number of nodes in the tree.
+    private $idcounter = 0;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -32,6 +34,10 @@
 
     public function get_error_nodes() {
         return $this->errornodes;
+    }
+
+    public function get_number_of_nodes() {
+        return $this->idcounter;
     }
 
     /**
@@ -221,7 +227,7 @@
                 $res = $tmp;
                 if ($i >= $node->leftborder) {
                     $qu = new qtype_preg_node_finite_quant(0, 1);
-                    $qu->set_user_info($node->indfirst, $node->indlast, $node->userinscription);
+                    $qu->set_user_info($node->indfirst, $node->indlast, new qtype_preg_userinscription('?'));
                     $qu->operands[0] = $tmp;
                     $res = $qu;
                 }
@@ -249,7 +255,7 @@
                 $res = $tmp;
                 if ($i == $node->leftborder - 1) {
                     $aster = new qtype_preg_node_infinite_quant(0);
-                    $aster->set_user_info($node->indfirst, $node->indlast, $node->userinscription);
+                    $aster->set_user_info($node->indfirst, $node->indlast, new qtype_preg_userinscription('*'));
                     $aster->operands[0] = $tmp;
                     $res = $aster;
                 }
@@ -272,11 +278,11 @@
         return $node;
     }
 
-    protected function numerate_ast_nodes($node, &$currentnumber) {
-        $node->id = $currentnumber++;
+    protected function numerate_ast_nodes($node) {
+        $node->id = ++$this->idcounter;
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->numerate_ast_nodes($operand, $currentnumber);
+                $this->numerate_ast_nodes($operand);
             }
         }
     }
@@ -305,8 +311,7 @@ start ::= lastexpr(B). {
     }
 
     // Numerate all nodes.
-    $idcounter = 1;
-    $this->numerate_ast_nodes($this->root, $idcounter);
+    $this->numerate_ast_nodes($this->root);
 
     // Calculate nodes nesting.
     $this->calculate_nodes_nesting($this->root);
