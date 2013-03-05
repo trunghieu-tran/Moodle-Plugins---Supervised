@@ -102,6 +102,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     protected $passcount;              // Number of passes.
     protected $failcount;              // Number of fails.
+    protected $skipcount;              // Number of skipped tests.
+    protected $exceptionscount;        // Number of exceptions during testing.
     protected $testdataobjects;        // Objects with test data.
     protected $extracheckobjects;      // Objects for extra checks.
     protected $doextrachecks;          // Is it needed to do extra checks.
@@ -160,6 +162,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     public function __construct() {
         $this->passcount = 0;
         $this->failcount = 0;
+        $this->skipcount = 0;
+        $this->exceptionscount = 0;
         $this->testdataobjects = array();
         $this->extracheckobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
@@ -500,11 +504,13 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     $matcher->set_options($matchoptions);
                 } catch (Exception $e) {
                     echo 'EXCEPTION CATCHED DURING BUILDING MATCHER, test name is ' . $methodname .  "\n" . $e->getMessage() . "\n";
+                    $this->exceptionscount++;
                     continue;
                 }
 
                 // Skip to the next regex if there's something wrong.
                 if ($this->check_for_errors($matcher)) {
+                    $this->skipcount++;
                     continue;
                 }
 
@@ -532,6 +538,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $obtained = $matcher->get_match_results();
                     } catch (Exception $e) {
                         echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $methodname .  "\n" . $e->getMessage() . "\n";
+                        $this->exceptionscount++;
                         continue;
                     }
 
@@ -544,7 +551,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 }
             }
         }
-        echo "\nNUMBER OF PASSED REGEX-STRING PAIRS: " . $this->passcount . "\n";
-        echo 'NUMBER OF FAILED REGEX-STRING PAIRS: ' . $this->failcount . "\n";
+        echo "\n=======================\n";
+        echo 'PASSED:     ' . $this->passcount . "\n";
+        echo 'FAILED:     ' . $this->failcount . "\n";
+        echo 'SKIPPED:    ' . $this->skipcount . "\n";
+        echo 'EXCEPTIONS: ' . $this->exceptionscount . "\n";
+        echo "=======================\n";
     }
 }
