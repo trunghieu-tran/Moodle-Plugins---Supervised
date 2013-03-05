@@ -42,6 +42,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     public $is_null;
 
+    public $is_looped;
+
     public $min_subpatt_node;
 
     public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
@@ -49,6 +51,7 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         $this->subpatt_start = array();
         $this->subpatt_end = array();
         $this->is_null = false;
+        $this->is_looped = false;
         $this->min_subpatt_node = null;
     }
 
@@ -349,10 +352,11 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
         // Now, clone all transitions from the start state to the end state.
         foreach ($body['start']->outgoing_transitions() as $transition) {
-            if (!$transition->is_null) {
+            if (!$transition->is_null && !$transition->is_looped) {
                 $newtransition = clone $transition;
                 $newtransition->number = ++$transitioncounter;
                 $body['end']->add_transition($newtransition);    // "from" will be set here.
+                $transition->is_looped = true;
             }
         }
 
@@ -388,10 +392,11 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             // The last block is repeated.
             if ($i === $leftborder - 1) {
                 foreach ($cur['start']->outgoing_transitions() as $transition) {
-                    if (!$transition->is_null) {
+                    if (!$transition->is_null && !$transition->is_looped) {
                         $newtransition = clone $transition;
                         $newtransition->number = ++$transitioncounter;
                         $cur['end']->add_transition($newtransition);    // "from" will be set here.
+                        $transition->is_looped = true;
                     }
                 }
             }
