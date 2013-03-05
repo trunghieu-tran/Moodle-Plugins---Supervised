@@ -101,7 +101,7 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
                 $this->begin_subpatt_iteration($operand, $startpos, $skipwholematch, $mode);
             }
         }
-        if (!($skipwholematch && $node->subpattern == 1)) {
+        if ($node->subpattern != -1 && !($skipwholematch && $node->subpattern == 1)) {
             $this->matches[$node->subpattern][] = array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
     }
@@ -115,6 +115,14 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
             if (/*$i == 1 ||*/ !array_key_exists($i, $this->matches)) {
                 continue;
             }
+            $last1 = $this->last_match($i);
+            $last2 = $other->last_match($i);
+            if ($last1[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $last2[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return 1;
+            } else if ($last2[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $last1[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return -1;
+            }
+
             // Iterate over all repetitions.
             $count1 = count($this->matches[$i]);
             $count2 = count($other->matches[$i]);
@@ -212,16 +220,20 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
         }
     }
 
-    public function subpatterns_to_str() {
+    public function subpatterns_to_str($allrepetitions = true) {
         $result = '';
         $min = min(array_keys($this->matches));
         $max = max(array_keys($this->matches));
         for ($i = $min; $i <= $max; $i++) {
-            if (!array_key_exists($i, $this->matches)) {
-                continue;
+            if ($allrepetitions) {
+                $matches = $this->matches[$i];
+                for ($j = 0; $j < count($matches); $j++) {
+                    $result .= "$i($j): ({$matches[$j][0]},{$matches[$j][1]}) ";
+                }
+            } else {
+                $match = $this->last_match($i);
+                $result .= $i . ': (' . $match[0] . ', ' . $match[1] . ') ';
             }
-            $match = $this->last_match($i);
-            $result .= $i . ': (' . $match[0] . ', ' . $match[1] . ') ';
         }
         return $result;
     }
