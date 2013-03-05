@@ -46,8 +46,6 @@ class qtype_preg_handling_options {
     public $pcrestrict = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
-    /** @var boolean Should parser expand repetitions {m,n} to concatenations. */
-    public $expandtree = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
 }

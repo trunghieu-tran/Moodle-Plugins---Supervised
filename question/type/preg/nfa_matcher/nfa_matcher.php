@@ -748,12 +748,6 @@ if ($DEBUG) {
     }
 
     public function __construct($regex = null, $modifiers = null, $options = null) {
-
-        if ($options === null) {
-            $options = new qtype_preg_matching_options();
-        }
-        $options->expandtree = true;
-
         parent::__construct($regex, $modifiers, $options);
 
         if (!isset($regex) || !empty($this->errors)) {
