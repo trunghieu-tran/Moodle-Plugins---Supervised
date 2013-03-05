@@ -78,7 +78,11 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
 
     public function index_first($subexpr = 0) {
         $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        return $this->last_match($subpatt)[0];
+        $lastmatch = $this->last_match($subpatt);
+        if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return $lastmatch[0];
+        }
+        return qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
     public function length($subexpr = 0) {
@@ -178,14 +182,11 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
         if ($options !== null && !$options->capturesubpatterns) {
             return;
         }
-        //echo "STATE " . $this->state->number . "; transition " . $transition->pregleaf->tohr() . "\n";
-        //echo "before: " . $this->subpatterns_to_str() . "\n";
 
         // Begin a new iteration of a subpattern. In fact, we can call the method for
         // the subpattern with minimal number; all "bigger" subpatterns will be reset recursively.
         if ($transition->min_subpatt_node != null) {
             $this->begin_subpatt_iteration($transition->min_subpatt_node, $startpos, true, $options->mode);
-            //echo "min: " . $transition->min_subpatt_node->subpattern . "\n";
         }
 
         // Set matches to (pos, -1) for the new iteration.
@@ -201,10 +202,8 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
             $index = $last_match[0];
             if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $this->set_last_match($node->subpattern, $index, $pos - $index + $matchlen);
-                //echo $node->subpattern . ': (' . $index . ', ' . ($pos - $index + $matchlen) . "); ";
             }
         }
-        //echo "after: " . $this->subpatterns_to_str() . "\n";
     }
 
     public function concat_chr($char) {
@@ -618,29 +617,29 @@ if ($DEBUG) {
 
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
-                        /*$newres = clone $curstate;
+                        $partialmatch = clone $curstate;
                         $fulllastmatch = true;
                         if ($length > 0) {
-                            $newres->length[0] += $length;
-                            $newres->last_transition = $transition;
-                            $newres->last_match_len = $length;
+                            $partialmatch->length[0] += $length;
+                            $partialmatch->last_transition = $transition;
+                            $partialmatch->last_match_len = $length;
                             $fulllastmatch = false;
                         }
-                        $newres->set_source_info($newres->str()->substring(0, $startpos + $newres->length[0]),
-                                                 $this->get_max_subpattern(), $this->get_subpattern_map());
+
+                        $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length());
 
                         $path = null;
                         // TODO: if ($this->options === null || $this->options->extensionneeded).
-                        $path = null;//$this->determine_characters_left($str, $startpos, $newres, $fulllastmatch);
+                        $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                         if ($path !== null) {
-                            $newres->left = $path->length[0] - $newres->length[0];
-                            $newres->extendedmatch = new qtype_preg_matching_results($path->full, $path->index,
+                            $partialmatch->left = $path->length[0] - $partialmatch->length[0];
+                            $partialmatch->extendedmatch = new qtype_preg_matching_results($path->full, $path->index,
                                                                                      $path->length, $path->left);
 
-                            $newres->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                            $partialmatch->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
                         }
                         // Finally, save the possible partial match.
-                        $partialmatches[] = $newres;*/
+                        $partialmatches[] = $partialmatch;
                     }
                 }
             }
