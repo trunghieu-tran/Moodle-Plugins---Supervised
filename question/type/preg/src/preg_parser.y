@@ -14,6 +14,8 @@
     private $handlingoptions;
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
     private $idcounter = 0;
+    // Counter of subpatterns.
+    private $subpatternscounter = 0;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -36,8 +38,8 @@
         return $this->errornodes;
     }
 
-    public function get_number_of_nodes() {
-        return $this->idcounter;
+    public function get_subpatterns_count() {
+        return $this->subpatternscounter;
     }
 
     /**
@@ -176,18 +178,6 @@
         return $result;
     }
 
-    protected function remove_subpatterns($node) {
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->remove_subpatterns($operand);
-            }
-        }
-        if ($node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
-            $node->subtype = qtype_preg_node_subpatt::SUBTYPE_GROUPING;
-            $node->number = -1;
-        }
-    }
-
     protected function make_operator_leftassoc($node, $type) {
         if (!is_a($node, 'qtype_preg_operator')) {
             return $node;
@@ -208,90 +198,14 @@
         return $node;
     }
 
-    // Returns a node which should replace the given one.
-    protected function expand_tree($node) {
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $key => $operand) {
-                $node->operands[$key] = $this->expand_tree($operand);
-            }
-        }
-
-        // Operators {0} {1} ? * and + can be skipped.
-        $isnull = ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->leftborder == 0 && $node->rightborder == 0);
-        $isone = ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->leftborder == 1 && $node->rightborder == 1);
-        $isqu = ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->leftborder == 0 && $node->rightborder == 1);
-        $isaster = ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 0);
-        $isplus = ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT && $node->leftborder == 1);
-
-        if ($isnull || $isone || $isqu || $isaster || $isplus) {
-            return $node;
-        }
-
-        // Convert {m,n}
-        if ($node->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
-            // Create clones.
-            $clones = array();
-            for ($i = 0; $i < $node->rightborder; $i++) {
-                $tmp = clone $node->operands[0];
-                $res = $tmp;
-                if ($i >= $node->leftborder) {
-                    $qu = new qtype_preg_node_finite_quant(0, 1);
-                    $qu->set_user_info($node->indfirst, $node->indlast, new qtype_preg_userinscription('?'));
-                    $qu->operands[0] = $tmp;
-                    $res = $qu;
-                }
-                // Remove subpatterns from all but last repetition.
-                if ($i != $node->rightborder - 1) {
-                    $this->remove_subpatterns($res);
-                }
-                $clones[] = $res;
-            }
-
-            // Concatenate created clones.
-            $concat = $this->create_concat_node($clones[0], $clones[1], $node->indfirst, $node->indlast, new qtype_preg_userinscription());
-            for ($i = 2; $i < count($clones); $i++) {
-                $concat = $this->create_concat_node($concat, $clones[$i], $node->indfirst, $node->indlast, new qtype_preg_userinscription());
-            }
-            return $concat;
-        }
-
-        // Convert {m,}
-        if ($node->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
-            // Create clones.
-            $clones = array();
-            for ($i = 0; $i < $node->leftborder; $i++) {
-                $tmp = clone $node->operands[0];
-                $res = $tmp;
-                if ($i == $node->leftborder - 1) {
-                    $aster = new qtype_preg_node_infinite_quant(0);
-                    $aster->set_user_info($node->indfirst, $node->indlast, new qtype_preg_userinscription('*'));
-                    $aster->operands[0] = $tmp;
-                    $res = $aster;
-                }
-                // Remove subpatterns from all but last repetition.
-                if ($i != $node->leftborder - 1) {
-                    $this->remove_subpatterns($res);
-                }
-                $clones[] = $res;
-            }
-
-            // Concatenate created clones.
-            $concat = $this->create_concat_node($clones[0], $clones[1], $node->indfirst, $node->indlast, new qtype_preg_userinscription());
-            for ($i = 2; $i < count($clones); $i++) {
-                $concat = $this->create_concat_node($concat, $clones[$i], $node->indfirst, $node->indlast, new qtype_preg_userinscription());
-            }
-            return $concat;
-        }
-
-        // Return the subtree unmodified.
-        return $node;
-    }
-
-    protected function numerate_ast_nodes($node) {
+    protected function assign_ids_and_subpatterns($node) {
         $node->id = ++$this->idcounter;
+        if ($node->is_subpattern() || $node === $this->root) {
+            $node->subpattern = ++$this->subpatternscounter;
+        }
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->numerate_ast_nodes($operand);
+                $this->assign_ids_and_subpatterns($operand);
             }
         }
     }
@@ -316,13 +230,8 @@ start ::= lastexpr(B). {
 
     $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
 
-    // Expand the tree if needed.
-    if ($this->handlingoptions->expandtree) {
-        $this->root = $this->expand_tree($this->root);
-    }
-
     // Numerate all nodes.
-    $this->numerate_ast_nodes($this->root);
+    $this->assign_ids_and_subpatterns($this->root);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {

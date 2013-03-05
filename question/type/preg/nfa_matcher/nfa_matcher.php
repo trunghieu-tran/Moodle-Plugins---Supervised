@@ -37,11 +37,7 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
     public $automaton;           // A reference to the automaton, we need some methods from it
     public $state;               // A reference to the state which automaton is in.
 
-    public $index;               // Indexes captured for each subpattern.
-    public $length;              // Lengths captured for each subpattern.
-
-    public $index_new;           // new
-    public $length_new;          // story
+    public $matches;             // 2-dimensional array; 1st dimension is subpattern number; 2nd is matches for subpattern repetitions. Each subpattern is initialized with (-1,-1) at start.
 
     public $full;                // Is this a full match?
     public $left;                // How many characters left for full match?
@@ -52,55 +48,61 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
     public $last_match_len;      // Length of the last match.
     public $captured_transitions;
 
+    public function last_match($subpatt) {
+        $matches = $this->matches[$subpatt];
+        return end($matches);
+    }
+
+    public function set_last_match($subpatt, $index, $length) {
+        $count = count($this->matches[$subpatt]);
+        $this->matches[$subpatt][$count - 1] = array($index, $length);
+    }
+
+    public function increase_whole_match_length($delta) {
+        $this->matches[1][0][1] += $delta; // The whole expression's id is 1; we need the only repetition; length is at index 1.
+    }
+
+    public function equals($to) {
+        if ($this->state !== $to->state) {
+            return false;
+        }
+        foreach ($this->matches as $key => $repetitions) {
+            if ($this->last_match($key) != $to->last_match($key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**********************************************************************/
+
     public function index_first($subexpr = 0) {
         $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        return $this->index[$subpatt];
+        return $this->last_match($subpatt)[0];
     }
 
     public function length($subexpr = 0) {
         $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        return $this->length[$subpatt];
+        return $this->last_match($subpatt)[1];
     }
 
     public function is_subpattern_captured($subexpr) {
-        $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        return $this->length[$subpatt] != qtype_preg_matching_results::NO_MATCH_FOUND;
+        return $this->length($subexpr) != qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
-    public function set_whole_match($index, $length) {
-        $this->index[1] = $index;
-        $this->length[1] = $length; // The whole expression's id is 1.
-    }
-
-    public function increase_whole_match_length($delta) {
-        $this->length[1] += $delta; // The whole expression's id is 1.
-    }
-
-    public function equals($to) {
-        return ($this->state === $to->state &&
-                $this->index == $to->index &&
-                $this->length == $to->length);
-    }
+    /**********************************************************************/
 
     /**
      * Resets the given subpattern to no match. In POSIX mode also resets all inner subpatterns.
      */
-    public function reset_subpatt($node, $old, $new, $mode = qtype_preg_handling_options::MODE_PCRE) {
-        if ($node->id == 1) {
-            return;
-        }
+    public function begin_subpatt_iteration($node, $startpos, $skipwholematch, $mode = qtype_preg_handling_options::MODE_PCRE) {
         if (/*$mode == qtype_preg_handling_options::MODE_POSIX &&*/ is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->reset_subpatt($operand, $old, $new, $mode);
+                $this->begin_subpatt_iteration($operand, $startpos, $skipwholematch, $mode);
             }
         }
-        if ($old) {
-            $this->index[$node->id] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $this->length[$node->id] = qtype_preg_matching_results::NO_MATCH_FOUND;
-        }
-        if ($new) {
-            $this->index_new[$node->id] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $this->length_new[$node->id] = qtype_preg_matching_results::NO_MATCH_FOUND;
+        if (!($skipwholematch && $node->subpattern == 1)) {
+            $this->matches[$node->subpattern][] = array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
     }
 
@@ -108,24 +110,32 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
      * Returns 1 if this beats other, -1 if other beats this, 0 otherwise.
      */
     public function leftmost_longest($other) {
+        // Iterate over all subpatterns.
         for ($i = 1; $i <= $this->automaton->subpatt_count(); $i++) {
-            if (/*$i == 0 ||*/ !array_key_exists($i, $this->index)) {
+            if (/*$i == 1 ||*/ !array_key_exists($i, $this->matches)) {
                 continue;
             }
-            $ind_this = $this->index[$i];
-            $ind_that = $other->index[$i];
-            $len_this = $this->length[$i];
-            $len_that = $other->length[$i];
-
-            if (($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this < $ind_that) ||
-                ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === $ind_that && $len_this > $len_that)) {
-                return 1;
-            }
-            if (($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that < $ind_this) ||
-                ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === $ind_this && $len_that > $len_this)) {
-                return -1;
+            // Iterate over all repetitions.
+            $count1 = count($this->matches[$i]);
+            $count2 = count($other->matches[$i]);
+            $mincount = min($count1, $count2);
+            for ($j = 0; $j < $mincount; $j++) {
+                $match1 = $this->matches[$i][$j];
+                $match2 = $other->matches[$i][$j];
+                $ind_this = $match1[0];
+                $ind_that = $match2[0];
+                $len_this = $match1[1];
+                $len_that = $match2[1];
+                if (($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                    ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this < $ind_that) ||
+                    ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === $ind_that && $len_this > $len_that)) {
+                    return 1;
+                }
+                if (($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                    ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that < $ind_this) ||
+                    ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === $ind_this && $len_that > $len_this)) {
+                    return -1;
+                }
             }
         }
         return 0;
@@ -156,36 +166,37 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
     /**
      * Writes subpatterns start\end information to this state.
      */
-    public function write_subpatt_info($transition, $pos, $matchlen, $options) {
+    public function write_subpatt_info($transition, $startpos, $pos, $matchlen, $options) {
         if ($options !== null && !$options->capturesubpatterns) {
             return;
         }
+        //echo "STATE " . $this->state->number . "; transition " . $transition->pregleaf->tohr() . "\n";
+        //echo "before: " . $this->subpatterns_to_str() . "\n";
 
-        // Reset all NEW subpatterns to no match - they are being matched again.
-        foreach ($transition->subpatt_start as $node) {
-            $this->reset_subpatt($node, false, true, $options->mode);
+        // Begin a new iteration of a subpattern. In fact, we can call the method for
+        // the subpattern with minimal number; all "bigger" subpatterns will be reset recursively.
+        if ($transition->min_subpatt_node != null) {
+            $this->begin_subpatt_iteration($transition->min_subpatt_node, $startpos, true, $options->mode);
+            //echo "min: " . $transition->min_subpatt_node->subpattern . "\n";
         }
-        // Reset all OLD subpatterns to no match - they are matched and replaced by new ones.
-        foreach ($transition->subpatt_end as $node) {
-            if ($this->index_new[$node->id] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                //$this->reset_subpatt($node, true, false, $options->mode);
+
+        // Set matches to (pos, -1) for the new iteration.
+        foreach ($transition->subpatt_start as $node) {
+            if ($node->subpattern != 1) {
+                $this->set_last_match($node->subpattern, $pos, qtype_preg_matching_results::NO_MATCH_FOUND);
             }
         }
 
-        // Set start indexes of subpatterns.
-        foreach ($transition->subpatt_start as $node) {
-            $this->index_new[$node->id] = $pos;
-        }
-
-        // Set length of subpatterns.
+        // Set matches to (pos, length) for the ending iterations.
         foreach ($transition->subpatt_end as $node) {
-            if ($this->index_new[$node->id] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $this->length_new[$node->id] = $pos - $this->index_new[$node->id] + $matchlen;
-                // Replace old results with new results.
-                $this->index[$node->id] = $this->index_new[$node->id];
-                $this->length[$node->id] = $this->length_new[$node->id];
+            $last_match = $this->last_match($node->subpattern);
+            $index = $last_match[0];
+            if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $this->set_last_match($node->subpattern, $index, $pos - $index + $matchlen);
+                //echo $node->subpattern . ': (' . $index . ', ' . ($pos - $index + $matchlen) . "); ";
             }
         }
+        //echo "after: " . $this->subpatterns_to_str() . "\n";
     }
 
     public function concat_chr($char) {
@@ -203,9 +214,14 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
 
     public function subpatterns_to_str() {
         $result = '';
-        foreach ($this->index as $key => $index) {
-            $length = $this->length[$key];
-            $result .= $key . ': (' . $index . ', ' . $length . ') ';
+        $min = min(array_keys($this->matches));
+        $max = max(array_keys($this->matches));
+        for ($i = $min; $i <= $max; $i++) {
+            if (!array_key_exists($i, $this->matches)) {
+                continue;
+            }
+            $match = $this->last_match($i);
+            $result .= $i . ': (' . $match[0] . ', ' . $match[1] . ') ';
         }
         return $result;
     }
@@ -273,17 +289,14 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     /**
      * Creates a processing state object for the given state filled with "nomatch" values.
      */
-    public function create_nomatch_state($state, $str) {
+    public function create_initial_state($state, $root, $str, $startpos) {
         $result = new qtype_preg_nfa_processing_state();
         $result->automaton = $this->automaton;
         $result->state = $state;
 
-        for ($i = 1; $i <= $this->parser->get_number_of_nodes(); $i++) {     // Include the whole expression with id = 1.
-            $result->index[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $result->length[$i] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            $result->index_new = $result->index;
-            $result->length_new = $result->length;
-        }
+        $result->matches = array();
+        $result->begin_subpatt_iteration($root, $startpos, false/*, $mode*/);  // TODO: mode
+        $result->set_last_match($root->subpattern, $startpos, 0);
 
         $result->full = false;
         $result->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
@@ -297,7 +310,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    public function create_nomatch_result() {
+    public function create_nomatch_result($str) {
         $result = new qtype_preg_matching_results();
         $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
         $result->invalidate_match();
@@ -337,7 +350,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->captured_transitions[$transition->number] = true;
 
                 $newstate->increase_whole_match_length($length);
-                $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
+                $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                 // Does this state with same subpatt indexes exist in the result?
                 $exists = false;
@@ -406,7 +419,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $newstate->last_transition = $lasttransition;
             $newstate->last_match_len = $laststate->length[$lasttransition->pregleaf->number];
             $newstate->captured_transitions[$lasttransition->number] = true;
-            //$newstate->write_subpatt_info($transition, $curpos, $length, $this->options);   // TODO: is it needed?
+            //$newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);   // TODO: is it needed?
 
             // Re-write the string with correct characters.
             $newchr = $lasttransition->pregleaf->next_character($newstate->str(), $startpos + $laststate->length[0],
@@ -457,7 +470,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate->length[0] += $length;
                         $newstate->last_transition = $transition;
                         $newstate->last_match_len = $length;
-                        $newstate->write_subpatt_info($transition, $startpos + $curstateobj->length[0], $length, $this->options);
+                        $newstate->write_subpatt_info($transition, $startpos, $startpos + $curstateobj->length[0], $length, $this->options);
                         $newstate->left = -1;   TODO: replace to this.
                         captured_transitions???
                         $newstate->extendedmatch = null;*/
@@ -467,7 +480,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                                                                         qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
                                                                         $transition->to, $transition, $length, $curstateobj->captured_transitions, $curstateobj);
                         $newstate->length[0] += $length;
-                        $newstate->write_subpatt_info($transition, $startpos + $curstateobj->length[0], $length, $this->options);
+                        $newstate->write_subpatt_info($transition, $startpos, $startpos + $curstateobj->length[0], $length, $this->options);
 
                         // Generate a next character.
                         if ($length > 0) {
@@ -532,8 +545,7 @@ if ($DEBUG) {
         // Create an array of processing states for all nfa states (the only initial state, in fact, other states are null).
         foreach ($this->automaton->get_states() as $curstate) {
             if ($curstate === $this->automaton->start_state()) {
-                $initial = $this->create_nomatch_state($curstate, $str);
-                $initial->set_whole_match($startpos, 0);
+                $initial = $this->create_initial_state($curstate, $this->ast_root, $str, $startpos);
                 $states[$curstate->number] = $initial;
             } else {
                 $states[$curstate->number] = null;
@@ -546,7 +558,6 @@ if ($DEBUG) {
             $states[$state->state->number] = $state;
             $curstates[] = $state->state->number;
         }
-
 
         // Do search.
         while (count($curstates) != 0) {
@@ -579,7 +590,7 @@ if ($DEBUG) {
                         $newstate->captured_transitions[$transition->number] = true;
 
                         $newstate->increase_whole_match_length($length);
-                        $newstate->write_subpatt_info($transition, $curpos, $length, $this->options);
+                        $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                         // Saving the current result.
                         $closure = $this->epsilon_closure($newstate, $str, $startpos);
@@ -682,7 +693,7 @@ if ($DEBUG) {
             }
         }
         if ($result === null) {
-            return $this->create_nomatch_result();
+            return $this->create_nomatch_result($str);
         } else {
             $index = array($startpos);
             $length = array($result->length());
@@ -702,7 +713,7 @@ if ($DEBUG) {
      * @return - object of qtype_preg_nondeterministic_fa in case of success, false otherwise.
      */
     public function build_nfa($node, $isassertion = false) {
-        $result = new qtype_preg_nondeterministic_fa($this->parser->get_number_of_nodes(), $this->get_subpattern_map());
+        $result = new qtype_preg_nondeterministic_fa($this->parser->get_subpatterns_count(), $this->get_subpattern_map());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
@@ -752,7 +763,7 @@ if ($DEBUG) {
         $nfa = self::build_nfa($this->dst_root);
         if ($nfa !== false) {
             $this->automaton = $nfa;
-            $this->automaton->on_subexpr_added(0, $this->ast_root->id); // Inform the automaton that 0-subexpr is represented by root.
+            $this->automaton->on_subexpr_added(0, $this->ast_root->subpattern); // Inform the automaton that 0-subexpr is represented by root.
         } else {
             $this->automaton = null;
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
