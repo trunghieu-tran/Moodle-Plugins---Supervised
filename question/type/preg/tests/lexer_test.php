@@ -13,7 +13,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 
 class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
 

@@ -155,6 +155,8 @@ abstract class qtype_preg_node {
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
+    /* Subpattern number. Different nodes can have the same subpattern number in case of {m,n} usage. */
+    public $subpattern = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
