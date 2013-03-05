@@ -338,7 +338,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      */
     public function epsilon_closure($startstate, $str, $startpos) {
         $curstates = array($startstate);
-        $result = array($startstate);
+        $result = array($startstate->state->number => $startstate);
 
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
@@ -364,19 +364,17 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->increase_whole_match_length($length);
                 $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
-                // Does this state with same subpatt indexes exist in the result?
-                $exists = false;
-                foreach ($result as $res) {
-                    if ($res->equals($newstate)) {
-                        $exists = true;
-                        break;
+                // Resolve ambiguities if any.
+                if (array_key_exists($newstate->state->number, $result)) {
+                    $existing = $result[$newstate->state->number];
+                    $areequal = false;
+                    if ($existing->worse_than($newstate, false, false, $areequal)) {
+                        $result[$newstate->state->number] = $newstate;
+                        $curstates[] = $newstate;
                     }
-                }
-
-                // If not, add it.
-                if (!$exists) {
+                } else {
+                    $result[$newstate->state->number] = $newstate;
                     $curstates[] = $newstate;
-                    $result[] = $newstate;
                 }
             }
         }
