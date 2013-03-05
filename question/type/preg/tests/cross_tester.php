@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Data-driven cross-tester of matchers. Test functions should be implemented in child classes.
+ * Data-driven cross-tester of matchers. Interit this class and
+ * implement the engine_name() function for testing a concrete matcher.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -9,55 +10,51 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/****************************************************************************************************************************************************************************************
-*                                                                                                                                                                                       *
-*     The cross-tester searches (not recursively!) for files named "cross_tests_<suffix>.php". A class with test data should be named the same as the corresponding file.               *
-*     For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".                                                                           *
-*                                                                                                                                                                                       *
-*     Those classes represent test data as a set of test functions. Those functions should:                                                                                             *
-*     -be named "data_for_test_..."                                                                                                                                                     *
-*     -return an array of input and output data as in the following example:                                                                                                            *
-*                                                                                                                                                                                       *
-*        array(                                                                                                                                                                         *
-*              'regex'=>'^[-.\w]+[a-z]{2,6}$',                          // The regular expression to test.                                                                              *
-*              'modifiers'=>'i',                                        // Modifiers. Not necessary element, default value is null.                                                     *
-*              'tests'=>array($test1, ..., $testn),                     // Array containing tests in the format described below.                                                        *
-*              'tags'=>array($tag1, ..., $tagn),                        // Tags for the regex, see the cross-tester class constants. Not necessary element, default value is array().   *
-*              'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE)    // Notation of the regex. Not necessary element, default value is 'native'.                                     *
-*              );                                                                                                                                                                       *
-*                                                                                                                                                                                       *
-*     An array of expected results ($testi) should look like:                                                                                                                           *
-*                                                                                                                                                                                       *
-*        array(                                                                                                                                                                         *
-*              'str'=>'sample string',             // A string to match.                                                                                                                *
-*              'is_match'=>true,                   // Is there a match.                                                                                                                 *
-*              'full'=>true,                       // Is it full.                                                                                                                       *
-*              'index_first'=>array(0=>0),         // Start indexes of all subpatterns should be matched, keys are subpattern numbers. Not necessary to define unmatched subpatterns.   *
-*              'length'=>array(0=>2),              // Lengths of all subpatterns should be matched. Not necessary to define unmatched subpatterns.                                      *
-*              'left'=>0,                          // Number of characters left to complete match. Not necessary if 'full' is true.                                                     *
-*              'next'=>'',                         // A regular expression of possible next characters in case of not full match. Not necessary if 'full' is true.                      *
-*              'tags'=>array());                   // Tags for the string, see the cross-tester class constants. Not necessary element, default value is array().                       *
-*                                                                                                                                                                                       *
-*     Here's an example test function:                                                                                                                                                  *
-*                                                                                                                                                                                       *
-*     function data_for_test_example() {                                                                                                                                                *
-*        $test1 = array( 'str'=>'match me',                                                                                                                                             *
-*                        'is_match'=>true,                                                                                                                                              *
-*                        'full'=>false,                                                                                                                                                 *
-*                        'index_first'=>array(0=>0,1=>6),                                                                                                                               *
-*                        'length'=>array(0=>8,1=>2),                                                                                                                                    *
-*                        'left'=>1,                                                                                                                                                     *
-*                        'next'=>'!',                                                                                                                                                   *
-*                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PREG));                                                                                                        *
-*                                                                                                                                                                                       *
-*        return array('regex'=>'.* (Me)!',                                                                                                                                              *
-*                     'modifiers'=>'i',                                                                                                                                                 *
-*                     'tests'=>array($test1),                                                                                                                                           *
-*                     'tags'=>array(),                                                                                                                                                  *
-*                     'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE);                                                                                                            *
-*     }                                                                                                                                                                                 *
-*                                                                                                                                                                                       *
-****************************************************************************************************************************************************************************************/
+/*******************************************************************************************************************************************
+*
+*  The cross-tester searches for files named "cross_tests_<suffix>.php". The search isn't recursive, so put your tests
+*  in the "tests" folder. A class with test data should be named the same as the corresponding file is named.
+*  For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".
+*
+*  Those classes represent test data as a set of test functions. A test function should:
+*    -be named "data_for_test_..."
+*    -return an array of input and output data as in the following example:
+*
+*    array(
+*          'regex'=>'.*(.*)',                                     // The regular expression to test the matcher on.
+*          'tests'=>array($test1, ... , $testn),                  // Array containing tests in the format described below.
+*          'modifiers'=>'i',                                      // (Optional) modifiers, default value is null.
+*          'tags'=>array($tag1, ..., $tagn),                      // (Optional) tags for the regex, default value is array().
+*          'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE)  // (Optional) regex notation, default value is 'native'.
+*          );
+*
+*  An array of expected results ($testi) should look like:
+*
+*    array(
+*          'str'=>'aaa',                    // A string to match.
+*          'is_match'=>true,                // Is there a match?
+*          'full'=>true,                    // Is the match full?
+*          'index_first'=>array(0=>0,1=>3), // Start indexes of subexpressions; not necessary to define unmatched subexpressions.
+*          'length'=>array(0=>3,1=>0),      // Lengths of subexpressions; not necessary to define unmatched subexpressions.
+*          'left'=>0,                       // (Defined for partial matches) number of characters left to complete the partial match.
+*          'next'=>'',                      // (Defined for partial matches) a regex matching possible next character.
+*          'tags'=>array());                // (Optional) tags for the string, default value is array().
+*
+*  Here's an example test function:
+*
+*  function data_for_test_att_nullsubexpr_2() {
+*          $test1 = array('str'=>'aaaaaa',
+*                         'is_match'=>true,
+*                         'full'=>true,
+*                         'index_first'=>array(0=>0,1=>0),
+*                         'length'=>array(0=>6,1=>6));
+*
+*          return array('regex'=>'(a*)*',
+*                       'tests'=>array($test1),
+*                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+*  }
+*
+*******************************************************************************************************************************************/
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -510,7 +507,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                 // Skip to the next regex if there's something wrong.
                 if ($this->check_for_errors($matcher)) {
-                    $this->skipcount++;
+                    $this->skipcount += count($data['tests']);
                     continue;
                 }
 
