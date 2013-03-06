@@ -168,7 +168,8 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
         return 0;
     }
 
-    public function worse_than($other, $orequal = false, $longestmatch = false, &$areequal = null) {
+    public function worse_than($other) {
+        // Full match.
         if ($this->full && !$other->full) {
             return false;
         } else if (!$this->full && $other->full) {
@@ -183,10 +184,7 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
             return false;
         }
 
-        if ($areequal !== null) {
-            $areequal = true;
-        }
-
+        // Equal matches.
         return false;
     }
 
@@ -381,8 +379,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 // Resolve ambiguities if any.
                 if (array_key_exists($newstate->state->number, $result)) {
                     $existing = $result[$newstate->state->number];
-                    $areequal = false;
-                    if ($existing->worse_than($newstate, false, false, $areequal)) {
+                    if ($existing->worse_than($newstate)) {
                         $result[$newstate->state->number] = $newstate;
                         $curstates[] = $newstate;
                     }
@@ -562,7 +559,6 @@ if ($DEBUG) {
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $partialmatches = array();   // Possible partial matches.
         $fullmatchfound = false;
-        $areequal = false;
 
         $result = null;
 
@@ -664,9 +660,9 @@ if ($DEBUG) {
                     if ($reached1 == null || $reached2 == null || $reached1->state !== $reached2->state) {
                         continue;
                     }
-                    if ($reached1->worse_than($reached2, false, false, $areequal)) {
+                    if ($reached1->worse_than($reached2)) {
                         $reached[$key1] = null;
-                    } else if ($reached2->worse_than($reached1, false, false, $areequal)) {
+                    } else if ($reached2->worse_than($reached1)) {
                         $reached[$key2] = null;
                     }
                 }
@@ -705,13 +701,13 @@ if ($DEBUG) {
         }
         // Find the best result.
         foreach ($states as $curresult) {
-            if ($curresult !== null && ($result === null || $result->worse_than($curresult, false, false, $areequal))) {
+            if ($curresult !== null && ($result === null || $result->worse_than($curresult))) {
                 $result = $curresult;
             }
         }
         if (!$fullmatchfound) {
             foreach ($partialmatches as $curresult) {
-                if ($curresult !== null && ($result === null || $result->worse_than($curresult, false, false, $areequal))) {
+                if ($curresult !== null && ($result === null || $result->worse_than($curresult))) {
                     $result = $curresult;
                 }
             }
