@@ -119,33 +119,42 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
             if (/*$i == 1 ||*/ !array_key_exists($i, $this->matches)) {
                 continue;
             }
-            $last1 = $this->last_match($i);
-            $last2 = $other->last_match($i);
-            if ($last1[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $last2[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+
+            $this_match = $this->matches[$i];
+            $other_match = $other->matches[$i];
+
+            // Any match found beats nomatch.
+            $this_last = $this->last_match($i);
+            $other_last = $other->last_match($i);
+            if ($this_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $other_last[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
                 return 1;
-            } else if ($last2[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $last1[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+            } else if ($other_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $this_last[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return -1;
+            }
+
+            // Less number of iterations means that there were a longer match without epsilons.
+            $this_count = count($this_match);
+            $other_count = count($other_match);
+            if ($this_count < $other_count) {
+                return 1;
+            } else if ($other_count < $this_count) {
                 return -1;
             }
 
             // Iterate over all repetitions.
-            $count1 = count($this->matches[$i]);
-            $count2 = count($other->matches[$i]);
-            $mincount = min($count1, $count2);
-            for ($j = 0; $j < $mincount; $j++) {
-                $match1 = $this->matches[$i][$j];
-                $match2 = $other->matches[$i][$j];
-                $ind_this = $match1[0];
-                $ind_that = $match2[0];
-                $len_this = $match1[1];
-                $len_that = $match2[1];
-                if (($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                    ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this < $ind_that) ||
-                    ($ind_this !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === $ind_that && $len_this > $len_that)) {
+            for ($j = 0; $j < $this_count; $j++) {
+                $this_index = $this_match[$j][0];
+                $this_length = $this_match[$j][1];
+                $other_index = $other_match[$j][0];
+                $other_length = $other_match[$j][1];
+                if (($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                    ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index < $other_index) ||
+                    ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === $other_index && $this_length > $other_length)) {
                     return 1;
                 }
-                if (($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_this === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                    ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that < $ind_this) ||
-                    ($ind_that !== qtype_preg_matching_results::NO_MATCH_FOUND && $ind_that === $ind_this && $len_that > $len_this)) {
+                if (($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                    ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index < $this_index) ||
+                    ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === $this_index && $other_length > $this_length)) {
                     return -1;
                 }
             }
