@@ -135,7 +135,10 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
     }
 
     public function subpatt_from_subexpr_number($subexpr_number) {
-        return $this->subexpr_to_subpatt_map[$subexpr_number];
+        if (array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
+            return $this->subexpr_to_subpatt_map[$subexpr_number];
+        }
+        return -1;
     }
 
     public function on_subexpr_added($subexpr_number, $subpatt_number) {
