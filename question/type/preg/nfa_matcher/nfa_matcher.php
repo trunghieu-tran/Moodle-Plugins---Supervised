@@ -535,18 +535,89 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Returns the longest match using a string as input. Matching is proceeded from a given start position.
-     * @param qtype_poasquestion_string str - the original input string.
-     * @param int startpos - index of the start position to match.
-     * @return - the longest character sequence matched.
+     * This method should be used if there are backreferences in the regex.
+     * Returns array of all possible matches.
      */
-    public function match_from_pos($str, $startpos) {
+    protected function match_brute_force($str, $startpos) {
+        $fullmatches = array();       // Possible full matches.
+        $partialmatches = array();    // Possible partial matches.
+        $fullmatchfound = false;      // If a full match found, no need to store partial matches.
+
+        $curstates = array($this->create_initial_state($curstate, $this->ast_root, $str, $startpos));    // States which the automaton is in at the current wave front.
+
+        // Do search.
+        while (count($curstates) != 0) {
+            // Get the current state and iterate over all transitions.
+            $curstate = $states[array_pop($curstates)];
+            foreach ($curstate->state->outgoing_transitions() as $transition) {
+                $curpos = $startpos + $curstate->length();
+                $length = 0;
+                if ($transition->pregleaf->match($str, $curpos, $length, $curstate)) {
+
+                    // Create a new state.
+                    $newstate = clone $curstate;
+                    $newstate->state = $transition->to;
+
+                    $newstate->full = ($newstate->state === $this->automaton->end_state());
+
+                    $newstate->last_transition = $transition;
+                    $newstate->last_match_len = $length;
+
+                    $newstate->increase_whole_match_length($length);
+                    $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
+
+                    // Saving the current match.
+                    if (true) {    // TODO check for eps-loops.
+                        $curstates[] = $newstate;
+                        if ($newstate->full) {
+                            $fullmatches[] = $newstate;
+                        }
+                    }
+                } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
+                    // If a backreference matched partially - set corresponding fields.
+                    $partialmatch = clone $curstate;
+                    $fulllastmatch = true;
+                    if ($length > 0) {
+                        $partialmatch->length[0] += $length;
+                        $partialmatch->last_transition = $transition;
+                        $partialmatch->last_match_len = $length;
+                        $fulllastmatch = false;
+                    }
+
+                    $partialmatch->str = $partialmatch->str->substring(0, $startpos + $partialmatch->length());
+
+                    $path = null;
+                    // TODO: if ($this->options === null || $this->options->extensionneeded).
+                    $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
+                    if ($path !== null) {
+                        $partialmatch->left = $path->length[0] - $partialmatch->length[0];
+                        $partialmatch->extendedmatch = new qtype_preg_matching_results($path->full, $path->index,
+                                                                                     $path->length, $path->left);
+
+                        $partialmatch->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
+                    }
+                    // Finally, save the possible partial match.
+                    $partialmatches[] = $partialmatch;
+                }
+            }
+        }
+
+        $result = $fullmatches;
+        if (!$fullmatchfound) {
+            $result = array_merge($result, $partialmatches);
+        }
+        return $result;
+    }
+
+    /**
+     * This method should be used if there are no backreferences in the regex.
+     * Returns array of all possible matches.
+     */
+    public function match_fast($str, $startpos) {
         $states = array();           // Objects of qtype_preg_nfa_processing_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $partialmatches = array();   // Possible partial matches.
         $fullmatchfound = false;
-
-        $result = null;
 
         // Create an array of processing states for all nfa states (the only initial state, in fact, other states are null).
         foreach ($this->automaton->get_states() as $curstate) {
@@ -658,31 +729,50 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             }
             $curstates = array_keys($newstates);
         }
-        // Find the best result.
-        foreach ($states as $curresult) {
-            if ($curresult !== null && ($result === null || $result->worse_than($curresult))) {
-                $result = $curresult;
+
+        // Return array of all possible matches.
+        $result = array();
+        foreach ($states as $match) {
+            if ($match !== null) {
+                $result[] = $match;
             }
         }
         if (!$fullmatchfound) {
-            foreach ($partialmatches as $curresult) {
-                if ($curresult !== null && ($result === null || $result->worse_than($curresult))) {
-                    $result = $curresult;
-                }
+            foreach ($partialmatches as $match) {
+                $result[] = $match;
+            }
+        }
+        return $result;
+    }
+
+    public function match_from_pos($str, $startpos) {
+        $backrefs = count($this->get_backrefs()) > 0;
+        $possiblematches = array();
+        $result = null;
+
+        // Find all possible matches. Using the fast match method if there are no backreferences.
+        if ($backrefs) {
+            $possiblematches = $this->match_brute_force($str, $startpos);
+        } else {
+            $possiblematches = $this->match_fast($str, $startpos);
+        }
+
+        // Choose the best one.
+        foreach ($possiblematches as $match) {
+            if ($result === null || $result->worse_than($match)) {
+                $result = $match;
             }
         }
         if ($result === null) {
             return $this->create_nomatch_result($str);
-        } else {
-            $index = array($startpos);
-            $length = array($result->length());
-            for ($i = 1; $i <= $this->get_max_subpattern(); $i++) {
-                $index[$i] = $result->index_first($i);
-                $length[$i] = $result->length($i);
-            }
-
-            return new qtype_preg_matching_results($result->full, $index, $length, $result->left, null/*$result->extendedmatch*/);
         }
+        $index = array($startpos);
+        $length = array($result->length());
+        for ($i = 1; $i <= $this->get_max_subpattern(); $i++) {
+            $index[$i] = $result->index_first($i);
+            $length[$i] = $result->length($i);
+        }
+        return new qtype_preg_matching_results($result->full, $index, $length, $result->left, null/*$result->extendedmatch*/);
     }
 
     /**
