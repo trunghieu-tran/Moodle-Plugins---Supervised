@@ -73,7 +73,7 @@ function process_file($filename) {
     }
 
     fwrite($out, "<?php\n\n");
-    fwrite($out, "defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);\n\n");
+    //fwrite($out, "defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);\n\n");
     fwrite($out, "class qtype_preg_cross_tests_from_att_$INPUT_SET {\n");
 
     $counter = 0;
@@ -130,10 +130,6 @@ function process_file($filename) {
             continue;   // Skip errors?
         }
 
-        if ($indexes == '') {
-            continue;   // TODO REMOVE IT
-        }
-
         // Get subexpression pairs.
         $subexpressions = array();
         if ($indexes != '') {
@@ -141,6 +137,8 @@ function process_file($filename) {
         }
 
         // Form strings to be written to the file.
+        $is_match = 'true';
+        $full = 'true';
         $index2write = '';
         $length2write = '';
         foreach ($subexpressions as $key => $subexpression) {
@@ -158,7 +156,16 @@ function process_file($filename) {
         do_correction($regex, $string, $index2write, $length2write);
 
         // Define tags.
-        $tags = 'qtype_preg_cross_tester::TAG_FROM_AT_AND_T';
+        $tags = 'qtype_preg_cross_tester::TAG_FROM_ATT';
+        if ($indexes == '') {
+            $is_match = 'false';
+            $full = 'false';
+            $tags .= ', qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL';   // AT&T tests don't check partial matches.
+        }
+
+        if ($INPUT_SET == 'categorize') {
+            $tags .= ', qtype_preg_cross_tester::TAG_CATEGORIZE';
+        }
         if ($INPUT_SET == 'leftassoc') {
             $tags .= ', qtype_preg_cross_tester::TAG_ASSOC_LEFT';
         }
@@ -171,8 +178,8 @@ function process_file($filename) {
         fwrite($out, "\n");
         fwrite($out,      "    " . $FUNCTION_PREFIX . $counter++ . "() {\n");
         fwrite($out, '        $test1' . " = array('str'=>\"" . $string . "\",\n");
-        fwrite($out,      "                       'is_match'=>true,\n");
-        fwrite($out,      "                       'full'=>true,\n");
+        fwrite($out,      "                       'is_match'=>$is_match,\n");
+        fwrite($out,      "                       'full'=>$full,\n");
         fwrite($out,      "                       'index_first'=>" . $index2write . ",\n");
         fwrite($out,      "                       'length'=>" . $length2write . ");\n\n");
         fwrite($out,      "        return array('regex'=>\"" . $regex . "\",\n");

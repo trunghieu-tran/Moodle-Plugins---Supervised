@@ -1,7 +1,5 @@
 <?php
 
-defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-
 class qtype_preg_cross_tests_from_att_nullsubexpr {
 
     function data_for_test_att_nullsubexpr_0() {
@@ -13,7 +11,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_1() {
@@ -25,7 +23,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_2() {
@@ -37,7 +35,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_3() {
@@ -49,7 +47,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_4() {
@@ -61,7 +59,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_5() {
@@ -73,7 +71,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_6() {
@@ -85,7 +83,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_7() {
@@ -97,7 +95,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_8() {
@@ -109,7 +107,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_9() {
@@ -121,7 +119,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_10() {
@@ -133,7 +131,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_11() {
@@ -145,7 +143,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_12() {
@@ -157,22 +155,34 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_13() {
-        $test1 = array('str'=>"aaaaaa",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>0),
-                       'length'=>array(0=>6,1=>6));
+        $test1 = array('str'=>"x",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_nullsubexpr_14() {
+        $test1 = array('str'=>"aaaaaa",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0),
+                       'length'=>array(0=>6,1=>6));
+
+        return array('regex'=>"(a+)+",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_nullsubexpr_15() {
         $test1 = array('str'=>"aaaaaax",
                        'is_match'=>true,
                        'full'=>true,
@@ -181,22 +191,22 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a+)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_nullsubexpr_15() {
-        $test1 = array('str'=>"a",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>0),
-                       'length'=>array(0=>1,1=>1));
-
-        return array('regex'=>"([a]*)*",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_16() {
+        $test1 = array('str'=>"a",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0),
+                       'length'=>array(0=>1,1=>1));
+
+        return array('regex'=>"([a]*)*",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_nullsubexpr_17() {
         $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
@@ -205,10 +215,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_17() {
+    function data_for_test_att_nullsubexpr_18() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -217,10 +227,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_18() {
+    function data_for_test_att_nullsubexpr_19() {
         $test1 = array('str'=>"aaaaaax",
                        'is_match'=>true,
                        'full'=>true,
@@ -229,10 +239,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_19() {
+    function data_for_test_att_nullsubexpr_20() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -241,10 +251,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_20() {
+    function data_for_test_att_nullsubexpr_21() {
         $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
@@ -253,10 +263,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_21() {
+    function data_for_test_att_nullsubexpr_22() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -265,10 +275,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_22() {
+    function data_for_test_att_nullsubexpr_23() {
         $test1 = array('str'=>"aaaaaax",
                        'is_match'=>true,
                        'full'=>true,
@@ -277,10 +287,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([a]*)+",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_23() {
+    function data_for_test_att_nullsubexpr_24() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -289,10 +299,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_24() {
+    function data_for_test_att_nullsubexpr_25() {
         $test1 = array('str'=>"b",
                        'is_match'=>true,
                        'full'=>true,
@@ -301,10 +311,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_25() {
+    function data_for_test_att_nullsubexpr_26() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -313,10 +323,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_26() {
+    function data_for_test_att_nullsubexpr_27() {
         $test1 = array('str'=>"aaaaaab",
                        'is_match'=>true,
                        'full'=>true,
@@ -325,10 +335,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^b]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_27() {
+    function data_for_test_att_nullsubexpr_28() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -337,10 +347,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_28() {
+    function data_for_test_att_nullsubexpr_29() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -349,10 +359,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_29() {
+    function data_for_test_att_nullsubexpr_30() {
         $test1 = array('str'=>"ababab",
                        'is_match'=>true,
                        'full'=>true,
@@ -361,10 +371,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_30() {
+    function data_for_test_att_nullsubexpr_31() {
         $test1 = array('str'=>"bababa",
                        'is_match'=>true,
                        'full'=>true,
@@ -373,10 +383,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_31() {
+    function data_for_test_att_nullsubexpr_32() {
         $test1 = array('str'=>"b",
                        'is_match'=>true,
                        'full'=>true,
@@ -385,10 +395,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_32() {
+    function data_for_test_att_nullsubexpr_33() {
         $test1 = array('str'=>"bbbbbb",
                        'is_match'=>true,
                        'full'=>true,
@@ -397,10 +407,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_33() {
+    function data_for_test_att_nullsubexpr_34() {
         $test1 = array('str'=>"aaaabcde",
                        'is_match'=>true,
                        'full'=>true,
@@ -409,10 +419,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_34() {
+    function data_for_test_att_nullsubexpr_35() {
         $test1 = array('str'=>"b",
                        'is_match'=>true,
                        'full'=>true,
@@ -421,10 +431,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_35() {
+    function data_for_test_att_nullsubexpr_36() {
         $test1 = array('str'=>"bbbbbb",
                        'is_match'=>true,
                        'full'=>true,
@@ -433,10 +443,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_36() {
+    function data_for_test_att_nullsubexpr_37() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -445,10 +455,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^a]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_37() {
+    function data_for_test_att_nullsubexpr_38() {
         $test1 = array('str'=>"ccccxx",
                        'is_match'=>true,
                        'full'=>true,
@@ -457,10 +467,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_38() {
+    function data_for_test_att_nullsubexpr_39() {
         $test1 = array('str'=>"ababab",
                        'is_match'=>true,
                        'full'=>true,
@@ -469,10 +479,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"([^ab]*)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_39() {
+    function data_for_test_att_nullsubexpr_40() {
         $test1 = array('str'=>"zabcde",
                        'is_match'=>true,
                        'full'=>true,
@@ -481,10 +491,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"((z)+|a)*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_40() {
+    function data_for_test_att_nullsubexpr_41() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -493,10 +503,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"a+?",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_41() {
+    function data_for_test_att_nullsubexpr_42() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -505,10 +515,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_42() {
+    function data_for_test_att_nullsubexpr_43() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -517,19 +527,7 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*?)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_nullsubexpr_43() {
-        $test1 = array('str'=>"aaa",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>0));
-
-        return array('regex'=>"(a)*?",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_44() {
@@ -539,12 +537,24 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>0));
 
-        return array('regex'=>"(a*?)*?",
+        return array('regex'=>"(a)*?",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_45() {
+        $test1 = array('str'=>"aaa",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>0));
+
+        return array('regex'=>"(a*?)*?",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_nullsubexpr_46() {
         $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
@@ -553,10 +563,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_46() {
+    function data_for_test_att_nullsubexpr_47() {
         $test1 = array('str'=>"ax",
                        'is_match'=>true,
                        'full'=>true,
@@ -565,10 +575,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_47() {
+    function data_for_test_att_nullsubexpr_48() {
         $test1 = array('str'=>"axa",
                        'is_match'=>true,
                        'full'=>true,
@@ -577,10 +587,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_48() {
+    function data_for_test_att_nullsubexpr_49() {
         $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
@@ -589,10 +599,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_49() {
+    function data_for_test_att_nullsubexpr_50() {
         $test1 = array('str'=>"ax",
                        'is_match'=>true,
                        'full'=>true,
@@ -601,10 +611,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_50() {
+    function data_for_test_att_nullsubexpr_51() {
         $test1 = array('str'=>"axa",
                        'is_match'=>true,
                        'full'=>true,
@@ -613,10 +623,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_51() {
+    function data_for_test_att_nullsubexpr_52() {
         $test1 = array('str'=>"axax",
                        'is_match'=>true,
                        'full'=>true,
@@ -625,10 +635,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_52() {
+    function data_for_test_att_nullsubexpr_53() {
         $test1 = array('str'=>"axxa",
                        'is_match'=>true,
                        'full'=>true,
@@ -637,34 +647,34 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)(\\1)(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_nullsubexpr_53() {
-        $test1 = array('str'=>"x",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>0,2=>0),
-                       'length'=>array(0=>1,1=>0,2=>1));
-
-        return array('regex'=>"(a*)*(x)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_54() {
-        $test1 = array('str'=>"ax",
+        $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
-                       'index_first'=>array(0=>0,1=>0,2=>1),
-                       'length'=>array(0=>2,1=>1,2=>1));
+                       'index_first'=>array(0=>0,1=>0,2=>0),
+                       'length'=>array(0=>1,1=>0,2=>1));
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_55() {
+        $test1 = array('str'=>"ax",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0,2=>1),
+                       'length'=>array(0=>2,1=>1,2=>1));
+
+        return array('regex'=>"(a*)*(x)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_nullsubexpr_56() {
         $test1 = array('str'=>"axa",
                        'is_match'=>true,
                        'full'=>true,
@@ -673,22 +683,22 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)*(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_nullsubexpr_56() {
-        $test1 = array('str'=>"x",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>0,2=>0),
-                       'length'=>array(0=>1,1=>0,2=>1));
-
-        return array('regex'=>"(a*)+(x)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_nullsubexpr_57() {
+        $test1 = array('str'=>"x",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>0,2=>0),
+                       'length'=>array(0=>1,1=>0,2=>1));
+
+        return array('regex'=>"(a*)+(x)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_nullsubexpr_58() {
         $test1 = array('str'=>"ax",
                        'is_match'=>true,
                        'full'=>true,
@@ -697,10 +707,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_58() {
+    function data_for_test_att_nullsubexpr_59() {
         $test1 = array('str'=>"axa",
                        'is_match'=>true,
                        'full'=>true,
@@ -709,10 +719,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*)+(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_59() {
+    function data_for_test_att_nullsubexpr_60() {
         $test1 = array('str'=>"x",
                        'is_match'=>true,
                        'full'=>true,
@@ -721,10 +731,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_60() {
+    function data_for_test_att_nullsubexpr_61() {
         $test1 = array('str'=>"ax",
                        'is_match'=>true,
                        'full'=>true,
@@ -733,10 +743,10 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_nullsubexpr_61() {
+    function data_for_test_att_nullsubexpr_62() {
         $test1 = array('str'=>"axa",
                        'is_match'=>true,
                        'full'=>true,
@@ -745,6 +755,6 @@ class qtype_preg_cross_tests_from_att_nullsubexpr {
 
         return array('regex'=>"(a*){2}(x)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 }
