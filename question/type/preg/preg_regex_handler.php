@@ -190,6 +190,17 @@ class qtype_preg_regex_handler {
     }
 
     /**
+     * Returns max subpattern number.
+     */
+    public function get_max_subpattern() {
+        if ($this->lexer !== null) {
+            return $this->lexer->get_max_subpattern();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
      * Returns subpatterns map.
      */
     public function get_subpattern_map() {
@@ -201,13 +212,13 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns max subpattern number.
+     * Returns all backreference nodes in the regex.
      */
-    public function get_max_subpattern() {
+    public function get_backrefs() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_max_subpattern();
+            return $this->lexer->get_backrefs();
         } else {
-            return 0;
+            return array();
         }
     }
 
