@@ -1,10 +1,80 @@
 <?php
 
-defined('NOMATCH') || define('NOMATCH', qtype_preg_matching_results::NO_MATCH_FOUND);
-
 class qtype_preg_cross_tests_from_att_repetition {
 
     function data_for_test_att_repetition_0() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_1() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_2() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_3() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){1}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_4() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){2}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_5() {
+        $test1 = array('str'=>"",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){3}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_6() {
         $test1 = array('str'=>"",
                        'is_match'=>true,
                        'full'=>true,
@@ -13,10 +83,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_1() {
+    function data_for_test_att_repetition_7() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -25,10 +95,34 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_2() {
+    function data_for_test_att_repetition_8() {
+        $test1 = array('str'=>"a",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_9() {
+        $test1 = array('str'=>"a",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_10() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -37,10 +131,34 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_3() {
+    function data_for_test_att_repetition_11() {
+        $test1 = array('str'=>"a",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){2}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_12() {
+        $test1 = array('str'=>"a",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){3}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_13() {
         $test1 = array('str'=>"a",
                        'is_match'=>true,
                        'full'=>true,
@@ -49,10 +167,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_4() {
+    function data_for_test_att_repetition_14() {
         $test1 = array('str'=>"aa",
                        'is_match'=>true,
                        'full'=>true,
@@ -61,10 +179,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_5() {
+    function data_for_test_att_repetition_15() {
         $test1 = array('str'=>"aa",
                        'is_match'=>true,
                        'full'=>true,
@@ -73,10 +191,22 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_6() {
+    function data_for_test_att_repetition_16() {
+        $test1 = array('str'=>"aa",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_17() {
         $test1 = array('str'=>"aa",
                        'is_match'=>true,
                        'full'=>true,
@@ -85,10 +215,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_7() {
+    function data_for_test_att_repetition_18() {
         $test1 = array('str'=>"aa",
                        'is_match'=>true,
                        'full'=>true,
@@ -97,10 +227,22 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_8() {
+    function data_for_test_att_repetition_19() {
+        $test1 = array('str'=>"aa",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"((..)|(.)){3}",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_20() {
         $test1 = array('str'=>"aa",
                        'is_match'=>true,
                        'full'=>true,
@@ -109,10 +251,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_9() {
+    function data_for_test_att_repetition_21() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -121,10 +263,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_10() {
+    function data_for_test_att_repetition_22() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -133,10 +275,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_11() {
+    function data_for_test_att_repetition_23() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -145,10 +287,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_12() {
+    function data_for_test_att_repetition_24() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -157,10 +299,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_13() {
+    function data_for_test_att_repetition_25() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -169,10 +311,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_14() {
+    function data_for_test_att_repetition_26() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -181,10 +323,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_15() {
+    function data_for_test_att_repetition_27() {
         $test1 = array('str'=>"aaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -193,10 +335,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_16() {
+    function data_for_test_att_repetition_28() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -205,10 +347,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_17() {
+    function data_for_test_att_repetition_29() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -217,10 +359,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_18() {
+    function data_for_test_att_repetition_30() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -229,10 +371,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_19() {
+    function data_for_test_att_repetition_31() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -241,10 +383,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_20() {
+    function data_for_test_att_repetition_32() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -253,10 +395,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_21() {
+    function data_for_test_att_repetition_33() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -265,10 +407,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_22() {
+    function data_for_test_att_repetition_34() {
         $test1 = array('str'=>"aaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -277,10 +419,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_23() {
+    function data_for_test_att_repetition_35() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -289,10 +431,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_24() {
+    function data_for_test_att_repetition_36() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -301,10 +443,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_25() {
+    function data_for_test_att_repetition_37() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -313,10 +455,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_26() {
+    function data_for_test_att_repetition_38() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -325,10 +467,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_27() {
+    function data_for_test_att_repetition_39() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -337,10 +479,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_28() {
+    function data_for_test_att_repetition_40() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -349,10 +491,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_29() {
+    function data_for_test_att_repetition_41() {
         $test1 = array('str'=>"aaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -361,10 +503,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_30() {
+    function data_for_test_att_repetition_42() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -373,10 +515,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_31() {
+    function data_for_test_att_repetition_43() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -385,10 +527,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_32() {
+    function data_for_test_att_repetition_44() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -397,10 +539,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))((..)|(.))((..)|(.))",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_33() {
+    function data_for_test_att_repetition_45() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -409,10 +551,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){1}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_34() {
+    function data_for_test_att_repetition_46() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -421,10 +563,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){2}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_35() {
+    function data_for_test_att_repetition_47() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -433,10 +575,10 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.)){3}",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
-    function data_for_test_att_repetition_36() {
+    function data_for_test_att_repetition_48() {
         $test1 = array('str'=>"aaaaaa",
                        'is_match'=>true,
                        'full'=>true,
@@ -445,151 +587,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"((..)|(.))*",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_37() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){0,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_38() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){1,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_39() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){2,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_40() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){3,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_41() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){4,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_42() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){5,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_43() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){6,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_44() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){7,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_45() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>8),
-                       'length'=>array(0=>9,1=>0));
-
-        return array('regex'=>"X(.?){8,}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_46() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){0,8}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_47() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){1,8}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_48() {
-        $test1 = array('str'=>"X1234567Y",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>7),
-                       'length'=>array(0=>9,1=>1));
-
-        return array('regex'=>"X(.?){2,8}Y",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_49() {
@@ -599,9 +597,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>7),
                        'length'=>array(0=>9,1=>1));
 
-        return array('regex'=>"X(.?){3,8}Y",
+        return array('regex'=>"X(.?){0,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_50() {
@@ -611,9 +609,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>7),
                        'length'=>array(0=>9,1=>1));
 
-        return array('regex'=>"X(.?){4,8}Y",
+        return array('regex'=>"X(.?){1,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_51() {
@@ -623,9 +621,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>7),
                        'length'=>array(0=>9,1=>1));
 
-        return array('regex'=>"X(.?){5,8}Y",
+        return array('regex'=>"X(.?){2,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_52() {
@@ -635,9 +633,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>7),
                        'length'=>array(0=>9,1=>1));
 
-        return array('regex'=>"X(.?){6,8}Y",
+        return array('regex'=>"X(.?){3,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_53() {
@@ -647,12 +645,156 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>7),
                        'length'=>array(0=>9,1=>1));
 
-        return array('regex'=>"X(.?){7,8}Y",
+        return array('regex'=>"X(.?){4,}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_54() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){5,}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_55() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){6,}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_56() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){7,}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_57() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>8),
+                       'length'=>array(0=>9,1=>0));
+
+        return array('regex'=>"X(.?){8,}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_58() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){0,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_59() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){1,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_60() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){2,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_61() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){3,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_62() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){4,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_63() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){5,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_64() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){6,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_65() {
+        $test1 = array('str'=>"X1234567Y",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>7),
+                       'length'=>array(0=>9,1=>1));
+
+        return array('regex'=>"X(.?){7,8}Y",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_66() {
         $test1 = array('str'=>"X1234567Y",
                        'is_match'=>true,
                        'full'=>true,
@@ -661,151 +803,7 @@ class qtype_preg_cross_tests_from_att_repetition {
 
         return array('regex'=>"X(.?){8,8}Y",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_55() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){0,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_56() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){1,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_57() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){2,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_58() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){3,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_59() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){0,10}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_60() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){1,10}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_61() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){2,10}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_62() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd){3,10}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_63() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd)*(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_64() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(a|ab|c|bcd)+(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_65() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(ab|a|c|bcd){0,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
-    }
-
-    function data_for_test_att_repetition_66() {
-        $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
-
-        return array('regex'=>"(ab|a|c|bcd){1,}(d*)",
-                     'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_67() {
@@ -815,9 +813,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd){2,}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){0,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_68() {
@@ -827,9 +825,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd){3,}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){1,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_69() {
@@ -839,9 +837,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd){0,10}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){2,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_70() {
@@ -851,21 +849,21 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd){1,10}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){3,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_71() {
         $test1 = array('str'=>"ababcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>0,1=>3,2=>6),
-                       'length'=>array(0=>6,1=>3,2=>0));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
-        return array('regex'=>"(ab|a|c|bcd){2,10}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){4,}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
 
     function data_for_test_att_repetition_72() {
@@ -875,9 +873,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd){3,10}(d*)",
+        return array('regex'=>"(a|ab|c|bcd){0,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_73() {
@@ -887,9 +885,9 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
-        return array('regex'=>"(ab|a|c|bcd)*(d*)",
+        return array('regex'=>"(a|ab|c|bcd){1,10}(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 
     function data_for_test_att_repetition_74() {
@@ -899,8 +897,200 @@ class qtype_preg_cross_tests_from_att_repetition {
                        'index_first'=>array(0=>0,1=>3,2=>6),
                        'length'=>array(0=>6,1=>3,2=>0));
 
+        return array('regex'=>"(a|ab|c|bcd){2,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_75() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(a|ab|c|bcd){3,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_76() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"(a|ab|c|bcd){4,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_77() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(a|ab|c|bcd)*(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_78() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(a|ab|c|bcd)+(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_79() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){0,}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_80() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){1,}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_81() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){2,}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_82() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){3,}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_83() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"(ab|a|c|bcd){4,}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_84() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){0,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_85() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){1,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_86() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){2,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_87() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd){3,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_88() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
+
+        return array('regex'=>"(ab|a|c|bcd){4,10}(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
+    }
+
+    function data_for_test_att_repetition_89() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
+        return array('regex'=>"(ab|a|c|bcd)*(d*)",
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+    }
+
+    function data_for_test_att_repetition_90() {
+        $test1 = array('str'=>"ababcd",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0,1=>3,2=>6),
+                       'length'=>array(0=>6,1=>3,2=>0));
+
         return array('regex'=>"(ab|a|c|bcd)+(d*)",
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_AT_AND_T));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
     }
 }
