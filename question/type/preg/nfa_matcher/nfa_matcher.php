@@ -46,7 +46,6 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
     public $str;                 // String being captured or generated.
     public $last_transition;     // The last transition matched.
     public $last_match_len;      // Length of the last match.
-    public $captured_transitions;
 
     public function last_match($subpatt) {
         $matches = $this->matches[$subpatt];
@@ -329,7 +328,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->str = clone $str;
         $result->last_transition = null;
         $result->last_match_len = 0;
-        $result->captured_transitions = array();
 
         return $result;
     }
@@ -371,7 +369,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
                 $newstate->last_transition = $transition;
                 $newstate->last_match_len = $length;
-                $newstate->captured_transitions[$transition->number] = true;
 
                 $newstate->increase_whole_match_length($length);
                 $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
@@ -439,7 +436,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $newstate->length[0] += $remlength;
             $newstate->last_transition = $lasttransition;
             $newstate->last_match_len = $laststate->length[$lasttransition->pregleaf->number];
-            $newstate->captured_transitions[$lasttransition->number] = true;
             //$newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);   // TODO: is it needed?
 
             // Re-write the string with correct characters.
@@ -493,13 +489,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $newstate->last_match_len = $length;
                         $newstate->write_subpatt_info($transition, $startpos, $startpos + $curstateobj->length[0], $length, $this->options);
                         $newstate->left = -1;   TODO: replace to this.
-                        captured_transitions???
                         $newstate->extendedmatch = null;*/
 
                         $newstate = new qtype_preg_nfa_processing_state(false, $curstateobj->index, $curstateobj->length,
                                                                         $curstateobj->index_new, $curstateobj->length_new,
                                                                         qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null,
-                                                                        $transition->to, $transition, $length, $curstateobj->captured_transitions, $curstateobj);
+                                                                        $transition->to, $transition, $length, $curstateobj);
                         $newstate->length[0] += $length;
                         $newstate->write_subpatt_info($transition, $startpos, $startpos + $curstateobj->length[0], $length, $this->options);
 
@@ -546,15 +541,6 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * @return - the longest character sequence matched.
      */
     public function match_from_pos($str, $startpos) {
-        $DEBUG = 0;
-
-if ($DEBUG) {
-    $styleprovider = new qtype_preg_dot_style_provider();
-    $dotscript = $this->ast_root->dot_script($styleprovider);
-    $this->automaton->draw('png', '/home/user/automaton.png');
-    self::execute_dot($dotscript, 'png', '/home/user/ast.png');
-}
-
         $states = array();           // Objects of qtype_preg_nfa_processing_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $partialmatches = array();   // Possible partial matches.
@@ -586,11 +572,6 @@ if ($DEBUG) {
             while (count($curstates) != 0) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
-
-if ($DEBUG) {
-    echo "\nstarting from state " . $curstate->state->number . "\n";
-}
-
                 foreach ($curstate->state->outgoing_transitions() as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
@@ -607,7 +588,6 @@ if ($DEBUG) {
 
                         $newstate->last_transition = $transition;
                         $newstate->last_match_len = $length;
-                        $newstate->captured_transitions[$transition->number] = true;
 
                         $newstate->increase_whole_match_length($length);
                         $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
@@ -621,11 +601,6 @@ if ($DEBUG) {
                             }
                             $reached[] = $curclosure;
                         }
-
-if ($DEBUG) {
-    echo 'matched ' . $str[$curpos] . ' using ' . $transition->pregleaf->tohr() . ', gonna make state ' . $newstate->state->number . ': ' . $newstate->subpatterns_to_str() . "\n";
-}
-
                     } else if (!$fullmatchfound) {    // Transition not matched, save the partial match.
                         // If a backreference matched partially - set corresponding fields.
                         $partialmatch = clone $curstate;
@@ -681,23 +656,7 @@ if ($DEBUG) {
                     $newstates[$curstate->state->number] = true;
                 }
             }
-            $newstates = array_keys($newstates);
-
-if ($DEBUG) {
-    echo "\ntotally matched, without ambiguities:\n";
-    foreach ($newstates as $newstate) {
-        echo $states[$newstate]->last_transition_to_str() . "\n";
-    }
-    echo "\nall reached states:\n";
-    foreach ($states as $state) {
-        if ($state != null) {
-            echo 'state ' . $state->state->number . ': ' . $state->subpatterns_to_str() . 'last transition is ' . $state->last_transition_to_str() . "\n";
-        }
-    }
-    echo "------------------------------------------\n";
-}
-
-            $curstates = $newstates;
+            $curstates = array_keys($newstates);
         }
         // Find the best result.
         foreach ($states as $curresult) {
