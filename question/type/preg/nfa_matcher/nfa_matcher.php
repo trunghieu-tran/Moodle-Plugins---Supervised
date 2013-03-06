@@ -78,6 +78,9 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
 
     public function index_first($subexpr = 0) {
         $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
+        if ($subpatt == -1) {
+            return qtype_preg_matching_results::NO_MATCH_FOUND;
+        }
         $lastmatch = $this->last_match($subpatt);
         if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
             return $lastmatch[0];
@@ -87,6 +90,9 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
 
     public function length($subexpr = 0) {
         $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
+        if ($subpatt == -1) {
+            return qtype_preg_matching_results::NO_MATCH_FOUND;
+        }
         return $this->last_match($subpatt)[1];
     }
 
