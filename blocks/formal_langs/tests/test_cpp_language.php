@@ -297,9 +297,9 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
     }
     // Tests c++ keywords declarations
     public function test_cpp_keywords() {
-        $tests = array('signals|slots|public|private|protected|auto|lambda|class|try|catch'
-                      . '|friend|asm|template|typename|const_cast|dynamic_cast|reinterpret_cast'
-                      . '|static_cast');
+        $tests = 'signals|slots|public|private|protected|auto|lambda|class|try|catch'
+               . '|friend|asm|template|typename|const_cast|dynamic_cast|reinterpret_cast'
+               . '|static_cast|foreach';
         $o = 'block_formal_langs_c_token_keyword';
         $tests = explode('|', $tests);
         $this->utils->test_object($tests, $o);
