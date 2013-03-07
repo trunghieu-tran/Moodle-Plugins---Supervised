@@ -12,7 +12,7 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'block_formal_langs';
 $plugin->version  = 2013030700;
 $plugin->requires = 2011121310;
-$plugin->release = 'Formal languages 2.2';
+$plugin->release = 'Formal languages 2.2.1';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
