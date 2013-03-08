@@ -40,12 +40,15 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     /** @var array qtype_preg_node instances for ending subpatterns. */
     public $subpatt_end;
 
+    public $is_loop;
+
     public $min_subpatt_node;
 
     public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
         parent::__construct($from, $pregleaf, $to, $number, $consumechars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
+        $this->is_loop = false;
         $this->min_subpatt_node = null;
     }
 
@@ -85,13 +88,14 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
 
     protected $subpatt_count;
-
+    protected $subexpr_count;
     protected $subexpr_map;
     protected $subexpr_to_subpatt_map;
 
     public function __construct($subpatt_count, $subexpr_map) {
         parent::__construct();
         $this->subpatt_count = $subpatt_count;
+        $this->subexpr_count = 0;
         $this->subexpr_map = $subexpr_map;
         $this->subexpr_to_subpatt_map = array();
     }
@@ -131,6 +135,10 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
         return $this->subpatt_count;
     }
 
+    public function subexpr_count() {
+        return $this->subexpr_count;
+    }
+
     public function subpatt_from_subexpr_number($subexpr_number) {
         if (array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
             return $this->subexpr_to_subpatt_map[$subexpr_number];
@@ -139,6 +147,7 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
     }
 
     public function on_subexpr_added($subexpr_number, $subpatt_number) {
+        $this->subexpr_count++;
         $this->subexpr_to_subpatt_map[$subexpr_number] = $subpatt_number;
     }
 }
@@ -350,6 +359,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
         // Now, clone all transitions from the start state to the end state.
         foreach ($body['start']->outgoing_transitions() as $transition) {
             $newtransition = clone $transition;
+            $newtransition->is_loop = true;
             $newtransition->number = ++$transitioncounter;
             $body['end']->add_transition($newtransition);    // "from" will be set here.
         }
@@ -386,6 +396,7 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             if ($i === $leftborder - 1) {
                 foreach ($cur['start']->outgoing_transitions() as $transition) {
                     $newtransition = clone $transition;
+                    $newtransition->is_loop = true;
                     $newtransition->number = ++$transitioncounter;
                     $cur['end']->add_transition($newtransition);    // "from" will be set here.
                 }
