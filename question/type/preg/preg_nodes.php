@@ -101,7 +101,7 @@ interface qtype_preg_matcher_state {
     /**
      * Returns whether the given subpattern is captured.
      */
-    public function is_subpattern_captured($subpattern);
+    public function is_subexpr_captured($subpattern);
 }
 
 /**
@@ -1023,7 +1023,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function consumes($matcherstateobj = null) {
-        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         }
         return $matcherstateobj->length($this->number);
@@ -1035,7 +1035,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         $start = $matcherstateobj->index_first($this->number);
         $end = $start + $subpattlen - 1;
 
-        if (!$matcherstateobj->is_subpattern_captured($this->number) || ($subpattlen > 0 && $pos >= $str->length())) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number) || ($subpattlen > 0 && $pos >= $str->length())) {
             return false;
         } else if ($subpattlen === 0) {
             return true;
@@ -1064,7 +1064,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function next_character($str, $pos, $length = 0, $matcherstateobj = null) {
         // TODO: check for assertions in case of $length == 0
-        if (!$matcherstateobj->is_subpattern_captured($this->number)) {
+        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return new qtype_poasquestion_string('');
         }
         $start = $matcherstateobj->index_first($this->number);

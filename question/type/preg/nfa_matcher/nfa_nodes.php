@@ -31,21 +31,24 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
 
 /**
- * Represents a transition between two states.
+ * Represents a transition between two nfa states.
  */
 class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
-    /** @var array qtype_preg_node instances for starting subpatterns. */
+    // Array of nodes representing subpatterns starting at this transition.
     public $subpatt_start;
-    /** @var array qtype_preg_node instances for ending subpatterns. */
+
+    // Array of nodes representing subpatterns ending at this transition.
     public $subpatt_end;
 
+    // Is this transition a "go-back" transition?
     public $is_loop;
 
+    // A subpattern node with minimal number.
     public $min_subpatt_node;
 
-    public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
-        parent::__construct($from, $pregleaf, $to, $number, $consumechars);
+    public function __construct(&$from, &$pregleaf, &$to, $number, $consumeschars = true) {
+        parent::__construct($from, $pregleaf, $to, $number, $consumeschars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
         $this->is_loop = false;
@@ -54,11 +57,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 
     // Overriden for subpatterns information
     public function get_label_for_dot() {
-        $index1 = $this->from->number;
-        $index2 = $this->to->number;
         $lab = $this->number . ':' . $this->pregleaf->tohr() . ',';
 
-        // Information about subpatterns.
         if (count($this->subpatt_start) > 0) {
             $lab = $lab . 'starts';
             foreach ($this->subpatt_start as $node) {
@@ -71,13 +71,14 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
                 $lab = $lab . "{$node->subpattern},";
             }
         }
+
         $lab = substr($lab, 0, strlen($lab) - 1);
         $lab = '"' . str_replace('"', '\"', $lab) . '"';
-        // Dummy transitions are displayed dotted.
-        if ($this->consumechars) {
-            return "$index1->$index2" . "[label = $lab];";
+
+        if ($this->consumeschars) {
+            return $this->from->number . '->' . $this->to->number . "[label = $lab];";
         } else {
-            return "$index1->$index2" . "[label = $lab, style = dotted];";
+            return $this->from->number . '->' . $this->to->number . "[label = $lab, style = dotted];";  // Dummy transitions are displayed dotted.
         }
     }
 }
@@ -85,18 +86,27 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
 /**
  * Represents a nondeterministic finite automaton.
  */
-class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
+class qtype_preg_nfa extends qtype_preg_finite_automaton {
 
-    protected $subpatt_count;
-    protected $subexpr_count;
-    protected $subexpr_map;
+    // Number of subpatterns in the regular expression.
+    protected $max_subpatt;
+
+    // Number of subexpressions in the regular expression.
+    protected $max_subexpr;
+
+    // Map where keys are subexpression names, and values are their numbers.
+    protected $subexpr_name_to_number_map;
+
+    // Map where keys are subexpression numbers, and values are corresponding
+    // subpattern numbers. This map is built during nfa building. The relation
+    // is 1:m since subexpression numbers can be duplicated.
     protected $subexpr_to_subpatt_map;
 
-    public function __construct($subpatt_count, $subexpr_map) {
+    public function __construct($max_subpatt, $max_subexpr, $subexpr_name_to_number_map) {
         parent::__construct();
-        $this->subpatt_count = $subpatt_count;
-        $this->subexpr_count = 0;
-        $this->subexpr_map = $subexpr_map;
+        $this->max_subpatt = $max_subpatt;
+        $this->max_subexpr = $max_subexpr;
+        $this->subexpr_name_to_number_map = $subexpr_name_to_number_map;
         $this->subexpr_to_subpatt_map = array();
     }
 
@@ -131,24 +141,26 @@ class qtype_preg_nondeterministic_fa extends qtype_preg_finite_automaton {
     public function complete_match() {
     }
 
-    public function subpatt_count() {
-        return $this->subpatt_count;
+    public function max_subpatt() {
+        return $this->max_subpatt;
     }
 
-    public function subexpr_count() {
-        return $this->subexpr_count;
+    public function max_subexpr() {
+        return $this->max_subexpr;
     }
 
     public function subpatt_from_subexpr_number($subexpr_number) {
         if (array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
             return $this->subexpr_to_subpatt_map[$subexpr_number];
         }
-        return -1;
+        return array();
     }
 
     public function on_subexpr_added($subexpr_number, $subpatt_number) {
-        $this->subexpr_count++;
-        $this->subexpr_to_subpatt_map[$subexpr_number] = $subpatt_number;
+        if (!array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
+            $this->subexpr_to_subpatt_map[$subexpr_number] = array();
+        }
+        $this->subexpr_to_subpatt_map[$subexpr_number][] = $subpatt_number;
     }
 }
 

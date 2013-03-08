@@ -43,18 +43,18 @@ class qtype_preg_fa_transition {
     public $number;
 
     /** @var boolean  true if a transition consume characters, false if not. A nonassertion automaton could have such transitions only at start and at end of the automaton. */
-    public $consumechars;
+    public $consumeschars;
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;    // When clonning a transition we also want a clone of its pregleaf.
     }
 
-    public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
+    public function __construct(&$from, &$pregleaf, &$to, $number, $consumeschars = true) {
         $this->from = $from;
         $this->pregleaf = clone $pregleaf;
         $this->to = $to;
         $this->number = $number;
-        $this->consumechars = $consumechars;
+        $this->consumeschars = $consumeschars;
     }
 
     public function get_label_for_dot() {
@@ -64,7 +64,7 @@ class qtype_preg_fa_transition {
         $lab = '"' . str_replace('"', '\"', $lab) . '"';
 
         // Dummy transitions are displayed dotted.
-        if ($this->consumechars) {
+        if ($this->consumeschars) {
             return "$index1->$index2" . "[label = $lab];";
         } else {
             return "$index1->$index2" . "[label = $lab, style = dotted];";

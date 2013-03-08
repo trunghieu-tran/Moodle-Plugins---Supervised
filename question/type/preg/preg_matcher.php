@@ -120,18 +120,6 @@ class qtype_preg_matching_results {
         return $subpattern;
     }
 
-    /**
-     * Returns true if subpattern is captured
-     * @param subpattern subpattern number
-     */
-    public function is_subpattern_captured($subpattern) {
-        $subpattern = $this->subpattern_number($subpattern);
-        if (!isset($this->length[$subpattern])) {
-            throw new qtype_preg_exception('Error: Asked for unexisting subpattern '.$subpattern);
-        }
-        return ($this->length[$subpattern] != qtype_preg_matching_results::NO_MATCH_FOUND);
-    }
-
     public function index_first($subpattern = 0) {
         $subpattern = $this->subpattern_number($subpattern);
         return $this->index_first[$subpattern];
