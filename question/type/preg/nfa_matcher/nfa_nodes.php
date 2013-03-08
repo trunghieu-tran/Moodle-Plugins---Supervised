@@ -40,15 +40,12 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     /** @var array qtype_preg_node instances for ending subpatterns. */
     public $subpatt_end;
 
-    public $is_null;
-
     public $min_subpatt_node;
 
     public function __construct(&$from, &$pregleaf, &$to, $number, $consumechars = true) {
         parent::__construct($from, $pregleaf, $to, $number, $consumechars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
-        $this->is_null = false;
         $this->min_subpatt_node = null;
     }
 
@@ -352,18 +349,15 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
 
         // Now, clone all transitions from the start state to the end state.
         foreach ($body['start']->outgoing_transitions() as $transition) {
-            if (!$transition->is_null) {
-                $newtransition = clone $transition;
-                $newtransition->number = ++$transitioncounter;
-                $body['end']->add_transition($newtransition);    // "from" will be set here.
-            }
+            $newtransition = clone $transition;
+            $newtransition->number = ++$transitioncounter;
+            $body['end']->add_transition($newtransition);    // "from" will be set here.
         }
 
         // The body automaton can be skipped by an eps-transition.
         self::add_ending_eps_transition_if_needed($automaton, $body, $transitioncounter);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end'], ++$transitioncounter);
-        $transition->is_null = true;
         $body['start']->add_transition($transition);
 
         // Update automaton/stack properties.
@@ -391,11 +385,9 @@ class qtype_preg_nfa_node_infinite_quant extends qtype_preg_nfa_operator {
             // The last block is repeated.
             if ($i === $leftborder - 1) {
                 foreach ($cur['start']->outgoing_transitions() as $transition) {
-                    if (!$transition->is_null) {
-                        $newtransition = clone $transition;
-                        $newtransition->number = ++$transitioncounter;
-                        $cur['end']->add_transition($newtransition);    // "from" will be set here.
-                    }
+                    $newtransition = clone $transition;
+                    $newtransition->number = ++$transitioncounter;
+                    $cur['end']->add_transition($newtransition);    // "from" will be set here.
                 }
             }
             if ($res === null) {
@@ -449,7 +441,6 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         qtype_preg_nfa_operator::add_ending_eps_transition_if_needed($automaton, $body, $transitioncounter);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_nfa_transition($body['start'], $epsleaf, $body['end'], ++$transitioncounter);
-        $transition->is_null = true;
         $body['start']->add_transition($transition);
 
         // Update automaton/stack properties.
@@ -497,7 +488,6 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
         foreach ($borderstates as $state) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_nfa_transition($state, $epsleaf, $res['end'], ++$transitioncounter);
-            $transition->is_null = true;
             $state->add_transition($transition);
         }
 
@@ -518,7 +508,6 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
             // Add eps-transition.
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_nfa_transition($start, $epsleaf, $end, ++$transitioncounter);
-            $transition->is_null = true;
             $start->add_transition($transition);
 
             // Update automaton/stack properties.

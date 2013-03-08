@@ -116,6 +116,25 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
     }
 
     /**
+     * Checks if this state contains null iterations, for example \b*. Such states should be skipped during matching.
+     */
+    public function has_null_iterations() {
+        foreach ($this->matches as $subpatt => $repetitions) {
+            $count = count($repetitions);
+            if ($count < 2) {
+                continue;
+            }
+
+            $pre_last = $repetitions[$count - 2];
+            $last = $repetitions[$count - 1];
+            if ($last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $pre_last == $last) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns 1 if this beats other, -1 if other beats this, 0 otherwise.
      */
     public function leftmost_longest($other) {
@@ -270,7 +289,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case 'leaf_charset':
             case 'leaf_meta':
             case 'leaf_assert':
-            //case 'leaf_backref':
+            case 'leaf_backref':
                 return 'qtype_preg_nfa_leaf';
                 break;
         }
@@ -301,7 +320,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
-            //case qtype_preg_node::TYPE_LEAF_BACKREF:
+            case qtype_preg_node::TYPE_LEAF_BACKREF:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -543,12 +562,19 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $partialmatches = array();    // Possible partial matches.
         $fullmatchfound = false;      // If a full match found, no need to store partial matches.
 
-        $curstates = array($this->create_initial_state($curstate, $this->ast_root, $str, $startpos));    // States which the automaton is in at the current wave front.
+if (1 == 0) {
+    $styleprovider = new qtype_preg_dot_style_provider();
+    $dotscript = $this->ast_root->dot_script($styleprovider);
+    $this->automaton->draw('png', '/home/user/automaton.png');
+    self::execute_dot($dotscript, 'png', '/home/user/ast.png');
+}
+
+        $curstates = array($this->create_initial_state($this->automaton->start_state(), $this->ast_root, $str, $startpos));    // States which the automaton is in at the current wave front.
 
         // Do search.
         while (count($curstates) != 0) {
             // Get the current state and iterate over all transitions.
-            $curstate = $states[array_pop($curstates)];
+            $curstate = array_pop($curstates);
             foreach ($curstate->state->outgoing_transitions() as $transition) {
                 $curpos = $startpos + $curstate->length();
                 $length = 0;
@@ -567,7 +593,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                     // Saving the current match.
-                    if (true) {    // TODO check for eps-loops.
+                    if (!$newstate->has_null_iterations()) {
                         $curstates[] = $newstate;
                         if ($newstate->full) {
                             $fullmatches[] = $newstate;
@@ -578,7 +604,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $partialmatch = clone $curstate;
                     $fulllastmatch = true;
                     if ($length > 0) {
-                        $partialmatch->length[0] += $length;
+                        $partialmatch->increase_whole_match_length($length);
                         $partialmatch->last_transition = $transition;
                         $partialmatch->last_match_len = $length;
                         $fulllastmatch = false;
@@ -590,9 +616,9 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     // TODO: if ($this->options === null || $this->options->extensionneeded).
                     $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                     if ($path !== null) {
-                        $partialmatch->left = $path->length[0] - $partialmatch->length[0];
+                        $partialmatch->left = $path->length[0] - $partialmatch->length[0];  // TODO length[0] should be replaced
                         $partialmatch->extendedmatch = new qtype_preg_matching_results($path->full, $path->index,
-                                                                                     $path->length, $path->left);
+                                                                                       $path->length, $path->left);
 
                         $partialmatch->extendedmatch->set_source_info($path->str(), $this->get_max_subpattern(), $this->get_subpattern_map());
                     }
@@ -677,7 +703,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         $partialmatch = clone $curstate;
                         $fulllastmatch = true;
                         if ($length > 0) {
-                            $partialmatch->length[0] += $length;
+                            $partialmatch->increase_whole_match_length($length);
                             $partialmatch->last_transition = $transition;
                             $partialmatch->last_match_len = $length;
                             $fulllastmatch = false;
@@ -689,7 +715,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                         // TODO: if ($this->options === null || $this->options->extensionneeded).
                         $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                         if ($path !== null) {
-                            $partialmatch->left = $path->length[0] - $partialmatch->length[0];
+                            $partialmatch->left = $path->length[0] - $partialmatch->length[0];  // TODO length[0] should be replaced
                             $partialmatch->extendedmatch = new qtype_preg_matching_results($path->full, $path->index,
                                                                                      $path->length, $path->left);
 
