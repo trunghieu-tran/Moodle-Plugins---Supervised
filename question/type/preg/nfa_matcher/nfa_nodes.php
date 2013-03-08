@@ -97,8 +97,9 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Map where keys are subexpression names, and values are their numbers.
     protected $subexpr_name_to_number_map;
 
-    // Map where keys are subexpression numbers, and values are corresponding subpattern numbers.
-    // This map is built during nfa building.
+    // Map where keys are subexpression numbers, and values are corresponding
+    // subpattern numbers. This map is built during nfa building. The relation
+    // is 1:m since subexpression numbers can be duplicated.
     protected $subexpr_to_subpatt_map;
 
     public function __construct($max_subpatt, $max_subexpr, $subexpr_name_to_number_map) {
@@ -152,12 +153,14 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         if (array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
             return $this->subexpr_to_subpatt_map[$subexpr_number];
         }
-        return -1;
+        return array();
     }
 
     public function on_subexpr_added($subexpr_number, $subpatt_number) {
-        $this->max_subexpr++;
-        $this->subexpr_to_subpatt_map[$subexpr_number] = $subpatt_number;
+        if (!array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
+            $this->subexpr_to_subpatt_map[$subexpr_number] = array();
+        }
+        $this->subexpr_to_subpatt_map[$subexpr_number][] = $subpatt_number;
     }
 }
 
