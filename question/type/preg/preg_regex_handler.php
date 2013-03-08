@@ -192,9 +192,9 @@ class qtype_preg_regex_handler {
     /**
      * Returns max subpattern number.
      */
-    public function get_max_subpattern() {
+    public function get_max_subexpr() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_max_subpattern();
+            return $this->lexer->get_max_subexpr();
         } else {
             return 0;
         }
@@ -203,9 +203,9 @@ class qtype_preg_regex_handler {
     /**
      * Returns subpatterns map.
      */
-    public function get_subpattern_map() {
+    public function get_subexpr_map() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_subpattern_map();
+            return $this->lexer->get_subexpr_map();
         } else {
             return array();
         }

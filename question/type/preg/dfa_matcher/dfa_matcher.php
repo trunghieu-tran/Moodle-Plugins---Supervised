@@ -193,7 +193,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $result = $this->compare($str, 0, $offset, false);
         if ($result===false) {
             $errres = new qtype_preg_matching_results(false, array(0), array(0), qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null);
-            $errres->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
+            $errres->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
             return $errres;
         }
         $extstr = substr($str, 0, $result->offset + $result->index+1);
@@ -229,10 +229,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         } else {
             $ext=$result;
             $extmatch = new qtype_preg_matching_results($ext->full, array($ext->offset), array($ext->index+1), $ext->left-1, null);
-            $extmatch->set_source_info($extstr, $this->get_max_subpattern(), $this->get_subpattern_map());
+            $extmatch->set_source_info($extstr, $this->get_max_subexpr(), $this->get_subexpr_map());
         }
         $res = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->left, $extmatch);
-        $res->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+        $res->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
         return $res;
     }
 
