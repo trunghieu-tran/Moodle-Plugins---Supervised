@@ -149,7 +149,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             foreach ($this->finiteautomates[$index][$currentstateindex]->passages as $num => $passage) {
                 $newstate = new finite_automate_state;
                 $statecount++;
-                $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);        
+                $fpU = $this->followposU($num, $this->map[0], $this->finiteautomates[$index][$currentstateindex]->passages, $index);
                 foreach ($fpU as $follow) {
                     if ($follow < qtype_preg_dfa_node_assert::ASSERT_MIN_NUM) {
                         //if number less then dfa_preg_node_assert::ASSERT_MIN_NUM constant than this is character class, to passages it.
@@ -170,7 +170,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                         end($this->finiteautomates[$index]);
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = key($this->finiteautomates[$index]);
                     } else {
-                        //else do passage point to state, which has in fa already                        
+                        //else do passage point to state, which has in fa already
                         $this->finiteautomates[$index][$currentstateindex]->passages[$num] = $this->state($newstate->passages, $index);
                     }
                 }
@@ -193,7 +193,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         $result = $this->compare($str, 0, $offset, false);
         if ($result===false) {
             $errres = new qtype_preg_matching_results(false, array(0), array(0), qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT, null);
-            $errres->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
+            $errres->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
             return $errres;
         }
         $extstr = substr($str, 0, $result->offset + $result->index+1);
@@ -229,10 +229,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         } else {
             $ext=$result;
             $extmatch = new qtype_preg_matching_results($ext->full, array($ext->offset), array($ext->index+1), $ext->left-1, null);
-            $extmatch->set_source_info($extstr, $this->get_max_subpattern(), $this->get_subpattern_map());
+            $extmatch->set_source_info($extstr, $this->get_max_subexpr(), $this->get_subexpr_map());
         }
         $res = new qtype_preg_matching_results($result->full, array($result->offset), array($result->index+1), $result->left, $extmatch);
-        $res->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+        $res->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
         return $res;
     }
 
@@ -249,7 +249,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
     *   3)next  - next character (mixed, int(0) for end of string, else string with character which can be next)
  *   If matching is impossible, return bool(false)
     */
-    function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0        
+    function compare($string, $assertnumber, $offset = 0, $endanchor = true) {//if main regex then assertnumber is 0
         $index = 0;//char index in string, comparing begin of first char in string
         $length = 0;//count of character matched with current leaf
         $end = false;//current state is end state, not yet
@@ -478,7 +478,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
                     }
                 }
                 if (!isset($front[$i]->nextstep)) {
-					     throw new Exception("wave error on regex: $this->regex\n");      
+					     throw new Exception("wave error on regex: $this->regex\n");
                 }
                 $front[$i]->currentstep = $front[$i]->nextstep;
                 $front[$i]->nextstep = array();
@@ -580,7 +580,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if ($this->connection[$index][$number]->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {//if this leaf is character class
             foreach ($this->connection[$index] as $num => $cc) {
                 if ($cc->pregnode->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                    
+
                     //$this->connection[$index][$number]->pregnode->push_negative();
                     if (array_key_exists($num, $passages) && $this->connection[$index][$number]->pregnode->is_include($cc->pregnode)) {
                         array_push($equnum, $num);
@@ -643,10 +643,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         return $result;
     }
     /**
-    *get regex and build finite automates
-    @param regex - regular expirience for which will be build finite automate
-    @param modifiers - modifiers of regular expression
-    */
+     *get regex and build finite automates
+     * @param regex - regular expirience for which will be build finite automate
+     * @param modifiers - modifiers of regular expression
+     */
     public function __construct($regex = null, $modifiers = null, $options = null) {
         global $CFG;
         $this->picnum=0;
@@ -664,10 +664,10 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         if (!isset($regex)) {//not build tree and dfa, if regex not given
             return;
         }
-        parent::__construct($regex, $modifiers, $options);     
+        parent::__construct($regex, $modifiers, $options);
         $this->roots[0] = $this->dst_root;//place dst root in engine specific place
         //building finite automates
-        if ($this->is_error_exists()) {
+        if ($this->errors_exist()) {
             return;
         }
         $this->append_end(0);
@@ -1311,7 +1311,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
         }
 		return false;
 	}
-	
+
     /**
     * Function converts operand{} quantificator to operand and operand? combination
     * @param node node with {}

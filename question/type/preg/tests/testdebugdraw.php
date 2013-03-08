@@ -20,7 +20,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     }
 
     protected function run_parser($regex) {
-        $parser = new qtype_preg_yyParser;
+        $parser = new qtype_preg_yyParser();
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);

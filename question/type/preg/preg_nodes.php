@@ -155,10 +155,26 @@ abstract class qtype_preg_node {
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
+    /* Subpattern number. Different nodes can have the same subpattern number in case of {m,n} usage. */
+    public $subpattern = -1;
 
     public function __construct() {
         $this->type = self::TYPE_ABSTRACT;
     }
+
+    /**
+     * Is this node a subpattern? According to Fowler, a subpattern
+     * is a leaf, or a subexpression, or a quantifier.
+     */
+    abstract public function is_subpattern();
+
+    /**
+     * Returns the dot script corresponding to this node.
+     * @param styleprovider an object prividing styles for different node types.
+     * @param isroot if true, adds the "digraph {\n" to the start and "}" to the end.
+     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
+     */
+    abstract public function dot_script($styleprovider, $isroot = true);
 
     /**
      * Sets indexes and userinscription for the node.
@@ -176,15 +192,6 @@ abstract class qtype_preg_node {
     public function name() {
         return $this->type;
     }
-
-    /**
-     * Returns the dot script corresponding to this node.
-     * @param styleprovider an object prividing styles for different node types.
-     * @param isroot if true, adds the "digraph {\n" to the start and "}" to the end.
-     * @return mixed the dot script if this is the root, array(dot script, node styles) otherwise.
-     */
-    abstract public function dot_script($styleprovider, $isroot = true);
-
 
     /**
      * May be overloaded by childs to change name using data from $this->pregnode.
@@ -211,6 +218,10 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         foreach ($this->mergedassertions as $i => $mergedassertion) {
             $this->mergedassertions[$i] = clone $mergedassertion;
         }
+    }
+
+    public function is_subpattern() {
+        return true;    // Any leaf is a subpattern.
     }
 
     public function dot_script($styleprovider, $isroot = true) {
@@ -1251,6 +1262,11 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         $this->greed = $greed;
         $this->possessive = $possessive;
     }
+
+    public function is_subpattern() {
+        return true;    // Finite quantifier is a subpattern.
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1275,6 +1291,11 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         $this->greed = $greed;
         $this->possessive = $possessive;
     }
+
+    public function is_subpattern() {
+        return true;    // Infinite quantifier is a subpattern.
+    }
+
     //TODO - ui_nodename()
 }
 
@@ -1286,6 +1307,10 @@ class qtype_preg_node_concat extends qtype_preg_operator {
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_CONCAT;
     }
+
+    public function is_subpattern() {
+        return false;    // Concatenation is not a subpattern.
+    }
 }
 
 /**
@@ -1295,6 +1320,10 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function __construct() {
         $this->type = qtype_preg_node::TYPE_NODE_ALT;
+    }
+
+    public function is_subpattern() {
+        return false;    // Alternation is not a subpattern.
     }
 }
 
@@ -1321,11 +1350,15 @@ class qtype_preg_node_assert extends qtype_preg_operator {
         return 'node assert';
     }
 
+    public function is_subpattern() {
+        return true;    // Lookaround assertion is a subpattern.
+    }
+
     //TODO - ui_nodename()
 }
 
 /**
- * Defines subpatterns, unary operator.
+ * Defines subpatterns, unary operator. TODO: according to Fowler, should be ranamed to qtype_preg_node_subexpr
  */
 class qtype_preg_node_subpatt extends qtype_preg_operator {
 
@@ -1340,13 +1373,14 @@ class qtype_preg_node_subpatt extends qtype_preg_operator {
 
     /** Subpattern number. */
     public $number = -1;
-    /** Array of numbers of nested subpatterns. */
-    public $nested = array();
 
-    public function __construct($number = -1, $nested = array()) {
+    public function __construct($number = -1) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBPATT;
         $this->number = $number;
-        $this->nested = $nested;
+    }
+
+    public function is_subpattern() {
+        return true;    // Subexpression is a subpattern.
     }
 
     //TODO - ui_nodename()
@@ -1384,6 +1418,10 @@ class qtype_preg_node_cond_subpatt extends qtype_preg_operator {
         $this->subtype = $subtype;
         $this->number = $number;
         $this->condbranch = $condbranch;
+    }
+
+    public function is_subpattern() {
+        return true;    // Conditional subexpression is a subpattern.
     }
 
     //TODO - ui_nodename()
@@ -1480,6 +1518,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $this->type = qtype_preg_node::TYPE_NODE_ERROR;
         $this->subtype = $subtype;
         $this->addinfo = $addinfo;
+    }
+
+    public function is_subpattern() {
+        return false;    // Of course it's not.
     }
 
     public function dot_script($styleprovider, $isroot = true) {
