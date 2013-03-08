@@ -95,24 +95,29 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
     /**********************************************************************/
 
+    public function find_dup_subexpr_match($subexpr) {
+        $subpatts = $this->automaton->subpatt_from_subexpr_number($subexpr);
+        if (count($subpatts) == 0) {
+            // Can get here when {0} occurs in the regex.
+            return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
+        }
+        foreach ($subpatts as $subpatt) {
+            $lastmatch = $this->last_match($subpatt);
+            if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                return $lastmatch;
+            }
+        }
+        return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
     public function index_first($subexpr = 0) {
-        $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        if ($subpatt == -1) {
-            return qtype_preg_matching_results::NO_MATCH_FOUND;
-        }
-        $lastmatch = $this->last_match($subpatt);
-        if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-            return $lastmatch[0];
-        }
-        return qtype_preg_matching_results::NO_MATCH_FOUND;
+        $lastmatch = $this->find_dup_subexpr_match($subexpr);
+        return $lastmatch[0];
     }
 
     public function length($subexpr = 0) {
-        $subpatt = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        if ($subpatt == -1) {
-            return qtype_preg_matching_results::NO_MATCH_FOUND;
-        }
-        return $this->last_match($subpatt)[1];
+        $lastmatch = $this->find_dup_subexpr_match($subexpr);
+        return $lastmatch[1];
     }
 
     public function is_subexpr_captured($subexpr) {
