@@ -3952,7 +3952,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>3),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>'^a	b\n      c',
+        return array('regex'=>'^a	b\n  c',
                      'modifiers'=>'x',
                      'tests'=>array($test1));
     }
@@ -5081,7 +5081,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>4),
+                        'length'=>array(0=>6),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'abc[\10]de',
@@ -6987,14 +6987,14 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>7,1=>5),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test2 = array( 'str'=>"\"the \"quick\" brown fox\"",
+        $test2 = array( 'str'=>'"the \\"quick\\" brown fox"',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>14),
                         'length'=>array(0=>25,1=>10),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>'"([^\\"]+|\\.)*"',
+        return array('regex'=>'"([^\\\\"]+|\\\\.)*"',
                      'tests'=>array($test1, $test2));
     }
 
@@ -16950,7 +16950,7 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3),
+                        'index_first'=>array(0=>0,1=>3,2=>4),
                         'length'=>array(0=>4,1=>1,2=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -20768,7 +20768,7 @@ with the handling of backtracking verbs. */
                      'modifiers'=>'xK',
                      'tests'=>array($test1));
     }
-*//* COMMIT at the start of a pattern should act like an anchor. Again, 
+*//* COMMIT at the start of a pattern should act like an anchor. Again,
 however, we need the complication for Perl. */
 /*  function data_for_test_() {
         $test1 = array( 'str'=>'ABCDEFG',
@@ -22408,8 +22408,8 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 *//* A check on what happens after hitting a mark and them bumping along to
-something that does not even start. Perl reports tags after the failures here, 
-though it does not when the individual letters are made into something 
+something that does not even start. Perl reports tags after the failures here,
+though it does not when the individual letters are made into something
 more complicated. */
 /*  function data_for_test_() {
         $test1 = array( 'str'=>'AABC',
