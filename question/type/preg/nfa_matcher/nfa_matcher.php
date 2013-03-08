@@ -365,7 +365,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     public function create_nomatch_result($str) {
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
         $result->invalidate_match();
         return $result;
     }
@@ -634,7 +634,7 @@ if (1 == 0) {
                     $path = null;//$this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                     if ($path !== null) {
                         $partialmatch->left = $path->length() - $partialmatch->length();
-                        $partialmatch->extendedmatch = $path->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+                        $partialmatch->extendedmatch = $path->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
                     }
                     // Finally, save the possible partial match.
                     $partialmatches[] = $partialmatch;
@@ -644,11 +644,11 @@ if (1 == 0) {
 
         $result = array();
         foreach ($fullmatches as $match) {
-            $result[] = $match->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+            $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
         }
         if (!$fullmatchfound) {
             foreach ($partialmatches as $match) {
-                $result[] = $match->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+                $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
         }
         return $result;
@@ -735,7 +735,7 @@ if (1 == 0) {
                         $path = $this->determine_characters_left($str, $startpos, $partialmatch, $fulllastmatch);
                         if ($path !== null) {
                             $partialmatch->left = $path->length() - $partialmatch->length();
-                            $partialmatch->extendedmatch = $path->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+                            $partialmatch->extendedmatch = $path->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
                         }
                         // Finally, save the possible partial match.
                         $partialmatches[] = $partialmatch;
@@ -776,12 +776,12 @@ if (1 == 0) {
         $result = array();
         foreach ($states as $match) {
             if ($match !== null) {
-                $result[] = $match->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+                $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
         }
         if (!$fullmatchfound) {
             foreach ($partialmatches as $match) {
-                $result[] = $match->to_matching_results($this->get_max_subpattern(), $this->get_subpattern_map());
+                $result[] = $match->to_matching_results($this->get_max_subexpr(), $this->get_subexpr_map());
             }
         }
         return $result;
@@ -818,7 +818,7 @@ if (1 == 0) {
      * @return - object of qtype_preg_nondeterministic_fa in case of success, false otherwise.
      */
     public function build_nfa($node, $isassertion = false) {
-        $result = new qtype_preg_nondeterministic_fa($this->parser->get_subpatterns_count(), $this->get_subpattern_map());
+        $result = new qtype_preg_nondeterministic_fa($this->parser->get_max_subpatt(), $this->get_subexpr_map());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {

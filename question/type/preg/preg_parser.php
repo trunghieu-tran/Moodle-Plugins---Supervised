@@ -119,9 +119,9 @@ class qtype_preg_yyParser
     // Handling options.
     private $handlingoptions;
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
-    private $idcounter = 0;
+    private $id_counter = 0;
     // Counter of subpatterns.
-    private $subpatternscounter = 0;
+    private $subpatt_counter = 0;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -144,8 +144,8 @@ class qtype_preg_yyParser
         return $this->errornodes;
     }
 
-    public function get_subpatterns_count() {
-        return $this->subpatternscounter;
+    public function get_max_subpatt() {
+        return $this->subpatt_counter;
     }
 
     /**
@@ -304,14 +304,14 @@ class qtype_preg_yyParser
         return $node;
     }
 
-    protected function assign_ids_and_subpatterns($node) {
-        $node->id = ++$this->idcounter;
+    protected function assign_ids_and_subpatts($node) {
+        $node->id = ++$this->id_counter;
         if ($node->is_subpattern() || $node === $this->root) {
-            $node->subpattern = ++$this->subpatternscounter;
+            $node->subpattern = ++$this->subpatt_counter;
         }
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->assign_ids_and_subpatterns($operand);
+                $this->assign_ids_and_subpatts($operand);
             }
         }
     }
@@ -999,7 +999,7 @@ static public $yy_action = array(
     $this->root = $this->make_operator_leftassoc($this->root, qtype_preg_node::TYPE_NODE_CONCAT);
 
     // Numerate all nodes.
-    $this->assign_ids_and_subpatterns($this->root);
+    $this->assign_ids_and_subpatts($this->root);
     }
 #line 1009 "../preg_parser.php"
 #line 234 "../preg_parser.y"
