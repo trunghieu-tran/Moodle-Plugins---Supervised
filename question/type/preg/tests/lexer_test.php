@@ -13,7 +13,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 
 class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
 
@@ -452,7 +452,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_BACKREF);
         $this->assertTrue($token->value->number == 'rty');
-        $map = $lexer->get_subpattern_map();
+        $map = $lexer->get_subexpr_map();
         $this->assertTrue(count($map) === 2);
         $this->assertTrue(array_key_exists('qwe', $map) && $map['qwe'] === 1);
         $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);

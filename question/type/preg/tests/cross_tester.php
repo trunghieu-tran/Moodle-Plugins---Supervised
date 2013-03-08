@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Data-driven cross-tester of matchers. Test functions should be implemented in child classes.
+ * Data-driven cross-tester of matchers. Interit this class and
+ * implement the engine_name() function for testing a concrete matcher.
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
@@ -9,55 +10,51 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/****************************************************************************************************************************************************************************************
-*                                                                                                                                                                                       *
-*     The cross-tester searches (not recursively!) for files named "cross_tests_<suffix>.php". A class with test data should be named the same as the corresponding file.               *
-*     For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".                                                                           *
-*                                                                                                                                                                                       *
-*     Those classes represent test data as a set of test functions. Those functions should:                                                                                             *
-*     -be named "data_for_test_..."                                                                                                                                                     *
-*     -return an array of input and output data as in the following example:                                                                                                            *
-*                                                                                                                                                                                       *
-*        array(                                                                                                                                                                         *
-*              'regex'=>'^[-.\w]+[a-z]{2,6}$',                          // The regular expression to test.                                                                              *
-*              'modifiers'=>'i',                                        // Modifiers. Not necessary element, default value is null.                                                     *
-*              'tests'=>array($test1, ..., $testn),                     // Array containing tests in the format described below.                                                        *
-*              'tags'=>array($tag1, ..., $tagn),                        // Tags for the regex, see the cross-tester class constants. Not necessary element, default value is array().   *
-*              'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE)    // Notation of the regex. Not necessary element, default value is 'native'.                                     *
-*              );                                                                                                                                                                       *
-*                                                                                                                                                                                       *
-*     An array of expected results ($testi) should look like:                                                                                                                           *
-*                                                                                                                                                                                       *
-*        array(                                                                                                                                                                         *
-*              'str'=>'sample string',             // A string to match.                                                                                                                *
-*              'is_match'=>true,                   // Is there a match.                                                                                                                 *
-*              'full'=>true,                       // Is it full.                                                                                                                       *
-*              'index_first'=>array(0=>0),         // Start indexes of all subpatterns should be matched, keys are subpattern numbers. Not necessary to define unmatched subpatterns.   *
-*              'length'=>array(0=>2),              // Lengths of all subpatterns should be matched. Not necessary to define unmatched subpatterns.                                      *
-*              'left'=>0,                          // Number of characters left to complete match. Not necessary if 'full' is true.                                                     *
-*              'next'=>'',                         // A regular expression of possible next characters in case of not full match. Not necessary if 'full' is true.                      *
-*              'tags'=>array());                   // Tags for the string, see the cross-tester class constants. Not necessary element, default value is array().                       *
-*                                                                                                                                                                                       *
-*     Here's an example test function:                                                                                                                                                  *
-*                                                                                                                                                                                       *
-*     function data_for_test_example() {                                                                                                                                                *
-*        $test1 = array( 'str'=>'match me',                                                                                                                                             *
-*                        'is_match'=>true,                                                                                                                                              *
-*                        'full'=>false,                                                                                                                                                 *
-*                        'index_first'=>array(0=>0,1=>6),                                                                                                                               *
-*                        'length'=>array(0=>8,1=>2),                                                                                                                                    *
-*                        'left'=>1,                                                                                                                                                     *
-*                        'next'=>'!',                                                                                                                                                   *
-*                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PREG));                                                                                                        *
-*                                                                                                                                                                                       *
-*        return array('regex'=>'.* (Me)!',                                                                                                                                              *
-*                     'modifiers'=>'i',                                                                                                                                                 *
-*                     'tests'=>array($test1),                                                                                                                                           *
-*                     'tags'=>array(),                                                                                                                                                  *
-*                     'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE);                                                                                                            *
-*     }                                                                                                                                                                                 *
-*                                                                                                                                                                                       *
-****************************************************************************************************************************************************************************************/
+/*******************************************************************************************************************************************
+*
+*  The cross-tester searches for files named "cross_tests_<suffix>.php". The search isn't recursive, so put your tests
+*  in the "tests" folder. A class with test data should be named the same as the corresponding file is named.
+*  For example, a file named "cross_tests_example.php" should contain a class named "cross_tests_example".
+*
+*  Those classes represent test data as a set of test functions. A test function should:
+*    -be named "data_for_test_..."
+*    -return an array of input and output data as in the following example:
+*
+*    array(
+*          'regex'=>'.*(.*)',                                     // The regular expression to test the matcher on.
+*          'tests'=>array($test1, ... , $testn),                  // Array containing tests in the format described below.
+*          'modifiers'=>'i',                                      // (Optional) modifiers, default value is null.
+*          'tags'=>array($tag1, ..., $tagn),                      // (Optional) tags for the regex, default value is array().
+*          'notation'=>qtype_preg_cross_tester::NOTATION_NATIVE)  // (Optional) regex notation, default value is 'native'.
+*          );
+*
+*  An array of expected results ($testi) should look like:
+*
+*    array(
+*          'str'=>'aaa',                    // A string to match.
+*          'is_match'=>true,                // Is there a match?
+*          'full'=>true,                    // Is the match full?
+*          'index_first'=>array(0=>0,1=>3), // Start indexes of subexpressions; not necessary to define unmatched subexpressions.
+*          'length'=>array(0=>3,1=>0),      // Lengths of subexpressions; not necessary to define unmatched subexpressions.
+*          'left'=>0,                       // (Defined for partial matches) number of characters left to complete the partial match.
+*          'next'=>'',                      // (Defined for partial matches) a regex matching possible next character.
+*          'tags'=>array());                // (Optional) tags for the string, default value is array().
+*
+*  Here's an example test function:
+*
+*  function data_for_test_att_nullsubexpr_2() {
+*          $test1 = array('str'=>'aaaaaa',
+*                         'is_match'=>true,
+*                         'full'=>true,
+*                         'index_first'=>array(0=>0,1=>0),
+*                         'length'=>array(0=>6,1=>6));
+*
+*          return array('regex'=>'(a*)*',
+*                       'tests'=>array($test1),
+*                       'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT));
+*  }
+*
+*******************************************************************************************************************************************/
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -83,15 +80,18 @@ abstract class qtype_preg_cross_tests_extra_checker {
 abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     // Different sources of test data.
-    const TAG_FROM_NFA                = 0;
-    const TAG_FROM_DFA                = 1;
-    const TAG_FROM_BACKTRACKING       = 2;
-    const TAG_FROM_PCRE               = 3;
-    const TAG_FROM_AT_AND_T           = 4;
-    const TAG_CATEGORIZE              = 5;
-    const TAG_ASSOC_LEFT              = 6;
-    const TAG_ASSOC_RIGHT             = 7;
-    const TAG_DEBUG_MODE              = 8;
+    const TAG_FROM_NFA           = 1;
+    const TAG_FROM_DFA           = 2;
+    const TAG_FROM_BACKTRACKING  = 4;
+    const TAG_FROM_PCRE          = 8;
+    const TAG_FROM_ATT           = 16;
+
+    const TAG_CATEGORIZE         = 32;   // The test determines the matcher's associativity.
+    const TAG_ASSOC_LEFT         = 64;   // The test should be used for left-associative matchers.
+    const TAG_ASSOC_RIGHT        = 128;  // The test should be used for right-associative matchers.
+
+    const TAG_DONT_CHECK_PARTIAL = 256;  // Indicates that if there's no full match, the cross-tester skips partial match checking.
+    const TAG_DEBUG_MODE         = 512;  // Informs matchers that it's debug mode.
 
     // Different notations.
     const NOTATION_NATIVE             = 'native';
@@ -102,6 +102,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     protected $passcount;              // Number of passes.
     protected $failcount;              // Number of fails.
+    protected $skipcount;              // Number of skipped tests.
+    protected $exceptionscount;        // Number of exceptions during testing.
     protected $testdataobjects;        // Objects with test data.
     protected $extracheckobjects;      // Objects for extra checks.
     protected $doextrachecks;          // Is it needed to do extra checks.
@@ -143,11 +145,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         $matcher->match($test1['str']);
         $obtained1 = $matcher->get_match_results();
-        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', false);
+        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], null, $matcher, $test1, $obtained1, 'categorize', 'associativity', false, false);
 
         $matcher->match($test2['str']);
         $obtained2 = $matcher->get_match_results();
-        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', false);
+        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], null, $matcher, $test2, $obtained2, 'categorize', 'associativity', false, false);
 
         if ($left && !$right) {
             return self::TAG_ASSOC_LEFT;
@@ -160,6 +162,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     public function __construct() {
         $this->passcount = 0;
         $this->failcount = 0;
+        $this->skipcount = 0;
+        $this->exceptionscount = 0;
         $this->testdataobjects = array();
         $this->extracheckobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
@@ -221,7 +225,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * @return true if there are errors, false otherwise.
      */
     function check_for_errors($matcher) {
-        if ($matcher->is_error_exists()) {
+        if ($matcher->errors_exist()) {
             $errors = $matcher->get_error_objects();
             foreach ($errors as $error) {
                 if (is_a($error, 'qtype_preg_parsing_error')) {    // Error messages are displayed for parsing errors only.
@@ -325,18 +329,24 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $dumpfails = true) {
-        // Checking match existance.
+    function compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, $dumpfails) {
+        // Do some initialization.
         $fullpassed = ($expected['full'] === $obtained->full);
-        if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
+        $ismatchpassed = true;
+        $indexfirstpassed = true;
+        $lengthpassed = true;
+        $nextpassed = true;
+        $leftpassed = true;
+
+        // Check match existance.
+        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
             $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
-        } else {
+        } else if (!$skippartialcheck) {
             $ismatchpassed = $fullpassed;
         }
 
-        // Checking indexes.
-        if ($matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
-            $indexfirstpassed = true;
+        // Check indexes and lengths.
+        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
             foreach ($obtained->index_first as $key => $index) {
                 $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $expected['index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                           (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->index_first[$key]));
@@ -344,8 +354,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     break;
                 }
             }
-
-            $lengthpassed = true;
             foreach ($obtained->length as $key => $index) {
                 $lengthpassed = $lengthpassed && ((!array_key_exists($key, $expected['length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                   (array_key_exists($key, $expected['length']) && $expected['length'][$key] === $obtained->length[$key]));
@@ -353,17 +361,16 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     break;
                 }
             }
-        } else {
+        } else if (!$skippartialcheck) {
             $indexfirstpassed = (!array_key_exists(0, $expected['index_first']) && $obtained->index_first[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                 (array_key_exists(0, $expected['index_first']) && $expected['index_first'][0] === $obtained->index_first[0]);
             $lengthpassed = (!array_key_exists(0, $expected['length']) && $obtained->length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                             (array_key_exists(0, $expected['length']) && $expected['length'][0] === $obtained->length[0]);
         }
 
-        // Checking next possible character.
-        $nextpassed = true;
+        // Check the next possible character.
         $obtainednext = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
-        if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
+        if (!$skippartialcheck && !$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
             if ($obtained->extendedmatch !== null) {
                 $obtainednext = $obtained->string_extension();
             }
@@ -373,17 +380,15 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                            ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
         }
 
-        // Checking number of characters left.
-        $leftpassed = true;
-        if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
+        // Check the number of characters left.
+        if (!$skippartialcheck && !$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
             $leftpassed = in_array($obtained->left, $expected['left']);
         }
-        if ($this->doextrachecks && $obtained->extendedmatch !== null) {
+        if (!$skippartialcheck && $this->doextrachecks && $obtained->extendedmatch !== null) {
             $this->do_extra_check($regex, $notation, $modifiers, $obtained);
         }
 
         $enginename = $matcher->name();
-        $boolstr = array(false => 'FALSE', true => 'TRUE');
 
         // Dump fails.
         if ($dumpfails) {
@@ -441,22 +446,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Check that Abstract Syntax Tree conaints only childs of qtype_preg_node class.
-     *
-     * Sometimes there could be matcher's concrete nodes there, which may lead to errors.
-     */
-     protected function check_ast($node, $enginename, $regex) {
-        if (!is_a($node, 'qtype_preg_node')) {
-            echo "ABSTRACT SYNTAX TREE CONTAINS NON-AST NODES FOR MATCHER $enginename AND REGEX $regex";
-        }
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach($node->operands as $operand) {
-                $this->check_ast($operand, $enginename, $regex);
-            }
-        }
-     }
-
-    /**
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
@@ -500,16 +489,15 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     $matcher->set_options($matchoptions);
                 } catch (Exception $e) {
                     echo 'EXCEPTION CATCHED DURING BUILDING MATCHER, test name is ' . $methodname .  "\n" . $e->getMessage() . "\n";
+                    $this->exceptionscount++;
                     continue;
                 }
 
                 // Skip to the next regex if there's something wrong.
                 if ($this->check_for_errors($matcher)) {
+                    $this->skipcount += count($data['tests']);
                     continue;
                 }
-
-                //Check that AST contains only preg_nodes.
-                $this->check_ast($matcher->get_ast_root(), $matcher->name(), $regex);
 
                 // Iterate over all tests.
                 foreach ($data['tests'] as $expected) {
@@ -532,11 +520,13 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         $obtained = $matcher->get_match_results();
                     } catch (Exception $e) {
                         echo "EXCEPTION CATCHED DURING MATCHING, test name is " . $methodname .  "\n" . $e->getMessage() . "\n";
+                        $this->exceptionscount++;
                         continue;
                     }
 
                     // Results obtained, check them.
-                    if ($this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, true)) {
+                    $skippartialcheck = in_array(self::TAG_DONT_CHECK_PARTIAL, $tags);
+                    if ($this->compare_results($regex, $notation, $str, $modifiers, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
                         $this->passcount++;
                     } else {
                         $this->failcount++;
@@ -544,7 +534,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 }
             }
         }
-        echo "\nNUMBER OF PASSED REGEX-STRING PAIRS: " . $this->passcount . "\n";
-        echo 'NUMBER OF FAILED REGEX-STRING PAIRS: ' . $this->failcount . "\n";
+        echo "\n=======================\n";
+        echo 'PASSED:     ' . $this->passcount . "\n";
+        echo 'FAILED:     ' . $this->failcount . "\n";
+        echo 'SKIPPED:    ' . $this->skipcount . "\n";
+        echo 'EXCEPTIONS: ' . $this->exceptionscount . "\n";
+        echo "=======================\n";
     }
 }

@@ -463,7 +463,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
 
 
         //Invalidate match called later to allow parser to count subpatterns
-        $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subpattern(), $this->get_subpattern_map());
+        $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_map());
         $this->matchresults->invalidate_match();
     }
 
@@ -487,7 +487,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             //Reset match data and perform matching.
             $this->matchresults = $this->match_inner($str);
             //Save source data for the match
-            $this->matchresults->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+            $this->matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
 
             //Set all string as incorrect if there were no matching
             if (!$this->matchresults->is_match()) {
@@ -523,7 +523,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subpattern(), $this->get_subpattern_map());
+        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
         $result->invalidate_match();
 
         if ($this->anchor->start) {
