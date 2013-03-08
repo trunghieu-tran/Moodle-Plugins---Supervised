@@ -31,36 +31,56 @@ require_once($CFG->dirroot . '/question/type/preg/nfa_matcher/nfa_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_dotstyleprovider.php');
 
 /**
- * Represents a state of an automaton when running.
+ * Represents an execution state of an nfa.
  */
-class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
-    public $automaton;           // A reference to the automaton, we need some methods from it
-    public $state;               // A reference to the state which automaton is in.
+class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
 
-    public $matches;             // 2-dimensional array; 1st dimension is subpattern number; 2nd is matches for subpattern repetitions. Each subpattern is initialized with (-1,-1) at start.
+    // The nfa being executed.
+    public $automaton;
 
-    public $full;                // Is this a full match?
-    public $left;                // How many characters left for full match?
-    public $extendedmatch;       // Match extension in case of partial match.
+    // The corresponding nfa state.
+    public $state;
 
-    public $str;                 // String being captured or generated.
-    public $last_transition;     // The last transition matched.
-    public $last_match_len;      // Length of the last match.
+    // 2-dimensional array of matches; 1st is subpattern number; 2nd is repetitions of the subpattern.
+    // Each subpattern is initialized with (-1,-1) at start.
+    public $matches;
 
+    // Is this a full match?
+    public $full;
+
+    // How many characters left for full match?
+    public $left;
+
+    // Match extension in case of partial match. An object of this same class.
+    public $extendedmatch;
+
+    // String being captured and/or generated.
+    public $str;
+
+    // The last transition matched.
+    public $last_transition;
+
+    // Length of the last match.
+    public $last_match_len;
+
+    // Returns the last match for the given subpattern number.
     public function last_match($subpatt) {
         $matches = $this->matches[$subpatt];
         return end($matches);
     }
 
+    // Sets the last match for the given subpattern number.
     public function set_last_match($subpatt, $index, $length) {
         $count = count($this->matches[$subpatt]);
         $this->matches[$subpatt][$count - 1] = array($index, $length);
     }
 
-    public function increase_whole_match_length($delta) {
-        $this->matches[1][0][1] += $delta; // The whole expression's number is 1; we need the only repetition; length is at index 1.
+    // Increases the whole match (0-subexpression and 1-subpattern) length with the given value.
+    public function increase_match_length($delta) {
+        $this->matches[1][0][1] += $delta; // Subexpression 1; we need the only 1st repetition; length is at index 1.
     }
 
+    // Checks if this state equals another
     public function equals($to) {
         if ($this->state !== $to->state) {
             return false;
@@ -95,19 +115,19 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
         return $this->last_match($subpatt)[1];
     }
 
-    public function is_subpattern_captured($subexpr) {
+    public function is_subexpr_captured($subexpr) {
         return $this->length($subexpr) != qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
-    public function to_matching_results($max_subpattern, $subpattern_map) {
+    public function to_matching_results($max_subpattern, $subexpr_map) {
         $index = array();
         $length = array();
-        for ($i = 0; $i <= $this->automaton->subexpr_count(); $i++) {
+        for ($i = 0; $i <= $this->automaton->max_subexpr(); $i++) {
             $index[$i] = $this->index_first($i);
             $length[$i] = $this->length($i);
         }
         $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
-        $result->set_source_info($this->str, $max_subpattern, $subpattern_map);
+        $result->set_source_info($this->str, $max_subpattern, $subexpr_map);
         return $result;
     }
 
@@ -151,7 +171,7 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
      */
     public function leftmost_longest($other) {
         // Iterate over all subpatterns.
-        for ($i = 1; $i <= $this->automaton->subpatt_count(); $i++) {
+        for ($i = 1; $i <= $this->automaton->max_subpatt(); $i++) {
             if (/*$i == 1 ||*/ !array_key_exists($i, $this->matches)) {
                 continue;
             }
@@ -248,37 +268,6 @@ class qtype_preg_nfa_processing_state implements qtype_preg_matcher_state {
             }
         }
     }
-
-    public function concat_chr($char) {
-        $this->str->concatenate($char);
-    }
-
-    public function last_transition_to_str() {
-        $tr = $this->last_transition;
-        if ($tr != null) {
-            return $tr->from->number . '->' . $tr->pregleaf->tohr() . '->' . $tr->to->number;
-        } else {
-            return '';
-        }
-    }
-
-    public function subpatterns_to_str($allrepetitions = true) {
-        $result = '';
-        $min = min(array_keys($this->matches));
-        $max = max(array_keys($this->matches));
-        for ($i = $min; $i <= $max; $i++) {
-            if ($allrepetitions) {
-                $matches = $this->matches[$i];
-                for ($j = 0; $j < count($matches); $j++) {
-                    $result .= "$i($j): ({$matches[$j][0]},{$matches[$j][1]}) ";
-                }
-            } else {
-                $match = $this->last_match($i);
-                $result .= $i . ': (' . $match[0] . ', ' . $match[1] . ') ';
-            }
-        }
-        return $result;
-    }
 }
 
 class qtype_preg_nfa_matcher extends qtype_preg_matcher {
@@ -344,7 +333,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Creates a processing state object for the given state filled with "nomatch" values.
      */
     public function create_initial_state($state, $root, $str, $startpos) {
-        $result = new qtype_preg_nfa_processing_state();
+        $result = new qtype_preg_nfa_exec_state();
         $result->automaton = $this->automaton;
         $result->state = $state;
 
@@ -372,7 +361,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns an array of states which can be reached without consuming characters.
-     * @param qtype_preg_nfa_processing_state startstate state to go from.
+     * @param qtype_preg_nfa_exec_state startstate state to go from.
      * @param qtype_poasquestion_string str string being matched.
      * @param int startpos start position of matching.
      * @return an array of states (including the start state) which can be reached without consuming characters.
@@ -402,7 +391,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                 $newstate->last_transition = $transition;
                 $newstate->last_match_len = $length;
 
-                $newstate->increase_whole_match_length($length);
+                $newstate->increase_match_length($length);
                 $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                 // Resolve ambiguities if any.
@@ -425,12 +414,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
      * Returns the minimal path to complete a partial match.
      * @param qtype_poasquestion_string str string being matched.
      * @param int startpos - start position of matching.
-     * @param qtype_preg_nfa_processing_state laststate - the last state matched.
+     * @param qtype_preg_nfa_exec_state laststate - the last state matched.
      * @param bool fulllastmatch - was the last transition captured fully, not partially?
-     * @return object of qtype_preg_nfa_processing_state.
+     * @return object of qtype_preg_nfa_exec_state.
      */
     public function determine_characters_left($str, $startpos, $laststate, $fulllastmatch) {
-        $states = array();       // Objects of qtype_preg_nfa_processing_state.
+        $states = array();       // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();    // States which the automaton is in.
         $endstate = $this->automaton->end_state();
 
@@ -482,12 +471,12 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             $resumestate->last_transition = $laststate->last_transition;
             $resumestate->last_match_len = $backref_length;
 
-            $resumestate->increase_whole_match_length($backref_length - $laststate->last_match_len);
+            $resumestate->increase_match_length($backref_length - $laststate->last_match_len);
             $resumestate->write_subpatt_info($laststate->last_transition, $startpos, $prevpos, $backref_length, $this->options);
 
             // Re-write the string with correct characters.
             $newchr = $laststate->last_transition->pregleaf->next_character($resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
-            $resumestate->concat_chr($newchr);
+            $resumestate->str->concatenate($newchr);
         }
 
         $closure = $this->epsilon_closure($resumestate, $str, $startpos);
@@ -538,13 +527,13 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
                     $newstate->last_transition = $transition;
                     $newstate->last_match_len = $length;
 
-                    $newstate->increase_whole_match_length($length);
+                    $newstate->increase_match_length($length);
                     $newstate->write_subpatt_info($transition, $startpos, $startpos + $curstate->length(), $length, $this->options);
 
                     // Generate a next character.
                     if ($length > 0) {
                         $newchr = $transition->pregleaf->next_character($newstate->str, $startpos + $newstate->length(), 0, $curstate);
-                        $newstate->concat_chr($newchr);
+                        $newstate->str->concatenate($newchr);
                     }
 
                     // Saving the current result.
@@ -606,7 +595,7 @@ if (1 == 0) {
                     $newstate->last_transition = $transition;
                     $newstate->last_match_len = $length;
 
-                    $newstate->increase_whole_match_length($length);
+                    $newstate->increase_match_length($length);
                     $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                     // Saving the current match.
@@ -621,7 +610,7 @@ if (1 == 0) {
                     $partialmatch = clone $curstate;
                     $fulllastmatch = true;
                     if ($length > 0) {
-                        $partialmatch->increase_whole_match_length($length);
+                        $partialmatch->increase_match_length($length);
                         $partialmatch->last_transition = $transition;
                         $partialmatch->last_match_len = $length;
                         $fulllastmatch = false;
@@ -659,7 +648,7 @@ if (1 == 0) {
      * Returns array of all possible matches.
      */
     public function match_fast($str, $startpos) {
-        $states = array();           // Objects of qtype_preg_nfa_processing_state.
+        $states = array();           // Objects of qtype_preg_nfa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $partialmatches = array();   // Possible partial matches.
         $fullmatchfound = false;
@@ -706,7 +695,7 @@ if (1 == 0) {
                         $newstate->last_transition = $transition;
                         $newstate->last_match_len = $length;
 
-                        $newstate->increase_whole_match_length($length);
+                        $newstate->increase_match_length($length);
                         $newstate->write_subpatt_info($transition, $startpos, $curpos, $length, $this->options);
 
                         // Saving the current result.
@@ -722,7 +711,7 @@ if (1 == 0) {
                         $partialmatch = clone $curstate;
                         $fulllastmatch = true;
                         if ($length > 0) {
-                            $partialmatch->increase_whole_match_length($length);
+                            $partialmatch->increase_match_length($length);
                             $partialmatch->last_transition = $transition;
                             $partialmatch->last_match_len = $length;
                             $fulllastmatch = false;
@@ -815,10 +804,10 @@ if (1 == 0) {
      * Constructs an NFA corresponding to the given node.
      * @param $node - object of nfa_preg_node child class.
      * @param $isassertion - will the result be a lookaround-assertion automaton.
-     * @return - object of qtype_preg_nondeterministic_fa in case of success, false otherwise.
+     * @return - object of qtype_preg_nfa in case of success, false otherwise.
      */
     public function build_nfa($node, $isassertion = false) {
-        $result = new qtype_preg_nondeterministic_fa($this->parser->get_max_subpatt(), $this->get_subexpr_map());
+        $result = new qtype_preg_nfa($this->parser->get_max_subpatt(), $this->get_max_subexpr(), $this->get_subexpr_map());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         try {
