@@ -1,6 +1,6 @@
 <?php
-$string['gradertest'] = 'Тест автотестера';
-$string['pluginname'] = 'Тест автотестера';
+$string['gradertest'] = 'Тест удаленного автотестера';
+$string['pluginname'] = 'Тест удаленного автотестера';
 $string['pluginnameediting'] = 'Редактирование теста автотестера';
 $string['pluginnamesummary'] = 'Тест для проверки программ в модуле poasassignment';
 $string['pluginname_help'] = 'Тест для проверки программ в модуле poasassignment';
@@ -16,6 +16,6 @@ $string['testout'] = 'Выходные данные теста';
 $string['testweight'] = 'Вес теста';
 $string['testname'] = 'Название теста';
 $string['pathtomsvc'] = 'Путь к VC';
-$string['configpathtomsvc'] = 'Будет использован компилятор';
+$string['configpathtomsvc'] = 'Будет использован компилятор по пути';
 $string['tasktext'] = 'Текст задания';
 $string['tasktext_help'] = 'Программа, которая должна быть написана';
