@@ -6987,14 +6987,14 @@ class qtype_preg_cross_tests_from_pcre {
                         'length'=>array(0=>7,1=>5),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test2 = array( 'str'=>"\"the \"quick\" brown fox\"",
+        $test2 = array( 'str'=>'"the \\"quick\\" brown fox"',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0,1=>14),
                         'length'=>array(0=>25,1=>10),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        return array('regex'=>'"([^\\"]+|\\.)*"',
+        return array('regex'=>'"([^\\\\"]+|\\\\.)*"',
                      'tests'=>array($test1, $test2));
     }
 
@@ -16950,7 +16950,7 @@ class qtype_preg_cross_tests_from_pcre {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>3,2=>3),
+                        'index_first'=>array(0=>0,1=>3,2=>4),
                         'length'=>array(0=>4,1=>1,2=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
