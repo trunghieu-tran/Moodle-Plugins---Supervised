@@ -17033,8 +17033,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test2 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>59),
-                        'length'=>array(0=>61,1=>1),
+                        'index_first'=>array(0=>0,1=>60),
+                        'length'=>array(0=>61,1=>0),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(a|)*\d',
