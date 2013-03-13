@@ -1,7 +1,7 @@
 <?php
 
 $plugin->component = 'qtype_gradertest';
-$plugin->version  = 2013030801;
+$plugin->version  = 2013031301;
 $plugin->requires = 2010090501;
 
 $plugin->maturity  = MATURITY_RC;
