@@ -73,11 +73,28 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Returns the last match for the given subpattern number.
     public function last_match($subpatt) {
         $matches = $this->matches[$subpatt];
+        $count = count($matches);
+
+        // It's a tricky part. There can be situations like "(a|b\1)*" and string "ababbabbba".
+        // Hence it's not enough to remember only the last match, but we also need to know the penult match.
+        $result = $matches[$count - 1];
+        if ($result[0] != qtype_preg_matching_results::NO_MATCH_FOUND && $result[1] == qtype_preg_matching_results::NO_MATCH_FOUND && $count > 1) {
+            $result = $matches[$count - 2];
+        }
+        if ($result[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return $result;
+        }
+        return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    // Returns the current match for the given subpattern number.
+    public function current_match($subpatt) {
+        $matches = $this->matches[$subpatt];
         return end($matches);
     }
 
-    // Sets the last match for the given subpattern number.
-    public function set_last_match($subpatt, $index, $length) {
+    // Sets the current match for the given subpattern number.
+    public function set_current_match($subpatt, $index, $length) {
         $count = count($this->matches[$subpatt]);
         $this->matches[$subpatt][$count - 1] = array($index, $length);
     }
@@ -93,7 +110,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
         foreach ($this->matches as $key => $repetitions) {
-            if ($this->last_match($key) != $to->last_match($key)) {
+            if ($this->current_match($key) != $to->current_match($key)) {
                 return false;
             }
         }
@@ -132,9 +149,22 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function to_matching_results($max_subpattern, $subexpr_map) {
         $index = array();
         $length = array();
-        for ($i = 0; $i <= $this->automaton->max_subexpr(); $i++) {
-            $index[$i] = $this->index_first($i);
-            $length[$i] = $this->length($i);
+        for ($subexpr = 0; $subexpr <= $this->automaton->max_subexpr(); $subexpr++) {
+            if (!array_key_exists($subexpr, $this->subexpr_to_subpatt)) {
+                // Can get here when {0} occurs in the regex.
+                $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            } else {
+                $subpatt = $this->subexpr_to_subpatt[$subexpr];
+                $match = $this->current_match($subpatt);
+                if ($match[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+                    $index[$subexpr] = $match[0];
+                    $length[$subexpr] = $match[1];
+                } else {
+                    $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                    $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                }
+            }
         }
         $result = new qtype_preg_matching_results($this->full, $index, $length, $this->left, $this->extendedmatch);
         $result->set_source_info($this->str, $max_subpattern, $subexpr_map);
@@ -190,8 +220,8 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             $other_match = $other->matches[$i];
 
             // Any match found beats nomatch.
-            $this_last = $this->last_match($i);
-            $other_last = $other->last_match($i);
+            $this_last = $this->current_match($i);
+            $other_last = $other->current_match($i);
             if ($this_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $other_last[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
                 return 1;
             } else if ($other_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $this_last[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -265,16 +295,16 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
         // Set matches to (pos, -1) for the new iteration.
         foreach ($transition->subpatt_start as $node) {
             if ($node->subpattern != 1) {
-                $this->set_last_match($node->subpattern, $pos, qtype_preg_matching_results::NO_MATCH_FOUND);
+                $this->set_current_match($node->subpattern, $pos, qtype_preg_matching_results::NO_MATCH_FOUND);
             }
         }
 
         // Set matches to (pos, length) for the ending iterations.
         foreach ($transition->subpatt_end as $node) {
-            $last_match = $this->last_match($node->subpattern);
-            $index = $last_match[0];
+            $current_match = $this->current_match($node->subpattern);
+            $index = $current_match[0];
             if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $this->set_last_match($node->subpattern, $index, $pos - $index + $matchlen);
+                $this->set_current_match($node->subpattern, $index, $pos - $index + $matchlen);
             }
         }
 
@@ -355,7 +385,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->matches = array();
         $result->subexpr_to_subpatt = array(0 => $root->subpattern);
         $result->begin_subpatt_iteration($root, $startpos, false/*, $mode*/);  // TODO: mode
-        $result->set_last_match($root->subpattern, $startpos, 0);
+        $result->set_current_match($root->subpattern, $startpos, 0);
 
         $result->full = false;
         $result->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
