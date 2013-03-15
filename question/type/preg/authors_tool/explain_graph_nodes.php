@@ -7,9 +7,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
+
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
  
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/explain_graph_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/explain_graph_misc.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
@@ -78,21 +81,34 @@ class qtype_preg_author_tool_leaf extends qtype_preg_author_tool_node
                     return array(get_string('explain_unknow_meta', 'qtype_preg'));
 
             case qtype_preg_node::TYPE_LEAF_ASSERT:
-                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
-                    return get_string('description_circumflex', 'qtype_preg');
-                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z  || $this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
-                    return get_string('description_dollar', 'qtype_preg');
+                if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX)
+                    return array(get_string('description_circumflex', 'qtype_preg'));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR)
+                    return array(get_string('description_dollar', 'qtype_preg'));
                 else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_B)
-                    return ($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg'));
+                    return array(($this->pregnode->negative ? get_string('description_wordbreak_neg', 'qtype_preg') : get_string('description_wordbreak', 'qtype_preg')));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A)
+                    return array(get_string('description_esc_a', 'qtype_preg'));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G)
+                    return array(get_string('description_esc_g', 'qtype_preg'));
+                else if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_Z)
+                    return array(get_string('description_esc_z', 'qtype_preg'));
                 else
-                    return get_string('explain_unknow_assert', 'qtype_preg');
+                    return array(get_string('explain_unknow_assert', 'qtype_preg'));
 
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-                return array(get_string('explain_backref', 'qtype_preg') . $this->pregnode->number);
+                if (is_integer($this->pregnode->number))
+                    return array(str_replace('%number', $this->pregnode->number, get_string('description_backref', 'qtype_preg')));
+                else
+                    return array(str_replace('%name', $this->pregnode->number, get_string('description_backref_name', 'qtype_preg')));
 
             case qtype_preg_node::TYPE_LEAF_RECURSION:
-                return array(get_string('explain_recursion', 'qtype_preg') . ($this->pregnode->number ? ' in #' . $this->pregnode->number : ''));
-
+                if ($this->pregnode->number == 0)
+                    return array(get_string('description_recursion_all', 'qtype_preg'));
+                else if (is_integer($this->pregnode->number))
+                    return array(str_replace('%number', $this->pregnode->number, get_string('description_recursion', 'qtype_preg')));
+                else
+                    return array(str_replace('%name', $this->pregnode->number, get_string('description_recursion_name', 'qtype_preg')));
             default:
                 return array(get_string('explain_unknow_node', 'qtype_preg'));
         }
@@ -368,12 +384,12 @@ class qtype_preg_author_tool_operator extends qtype_preg_author_tool_node {
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $left);
             qtype_preg_author_tool_explain_graph::assume_subgraph($graph, $right);
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $graph, $this->pregnode->id - 0.1);
+            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $right->entries[count($right->entries) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $graph->nodes[count($graph->nodes) - 1], $left->entries[count($left->entries) - 1]);
             $graph->entries[] = end($graph->nodes);
 
-            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node('', 'point', 'black', $graph, $this->pregnode->id - 0.2);
+            $graph->nodes[] = new qtype_preg_author_tool_explain_graph_node(array(''), 'point', 'black', $graph, -1);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $right->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->links[] = new qtype_preg_author_tool_explain_graph_link('', $left->exits[count($left->exits) - 1], $graph->nodes[count($graph->nodes) - 1]);
             $graph->exits[] = end($graph->nodes);

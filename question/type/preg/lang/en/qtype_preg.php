@@ -224,9 +224,9 @@ $string['description_esc_g'] = 'at the first matching position in the subject';
 $string['description_backref'] = 'back reference to subpattern #%number';
 $string['description_backref_name'] = 'back reference to subpattern "%name"';
 // TYPE_LEAF_RECURSION
-$string['description_recursion_all'] = 'recursive match with whole regular expression                                 ';
+$string['description_recursion_all'] = 'recursive match with whole regular expression';
 $string['description_recursion'] = 'recursive match with subpattern #%number';
-$string['description_recursion_name'] = 'recursive match with subpattern  "%name"';
+$string['description_recursion_name'] = 'recursive match with subpattern "%name"';
 // TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'caseless:';
 $string['description_unsetoption_i'] = 'case sensitive:';
@@ -242,6 +242,7 @@ $string['description_option_J'] = 'allow duplicate names:';
 $string['description_unsetoption_J'] = 'disallow duplicate names:';
 // TYPE_NODE_FINITE_QUANT
 $string['description_finite_quant'] = '%1 is repeated from %leftborder to %rightborder times%greed';
+$string['description_finite_quant_strict'] = '%1 is repeated %count times%greed';
 $string['description_finite_quant_0'] = '%1 is repeated no more %rightborder times or missing%greed';
 $string['description_finite_quant_1'] = '%1 is repeated no more %rightborder times%greed';
 $string['description_finite_quant_01'] = '%1 may be missing%greed';
@@ -285,7 +286,7 @@ $string['description_node_cond_subpatt_else'] = ' else check: [%2]';
 $string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
 $string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
 $string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt'] = 'if the pattern#%number has been successfully recursively matched then check: [%1]%else';
+$string['description_recursive_node_cond_subpatt'] = 'if the pattern #%number has been successfully recursively matched then check: [%1]%else';
 $string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
 $string['description_define_node_cond_subpatt'] = 'definition of %1';
 // TYPE_LEAF_CONTROL
@@ -539,18 +540,19 @@ $string['explain_any_char'] = 'Any character from';
 $string['explain_any_char_except'] = 'Any character except';
 
 // Strings for tooltipe
-$string['tooltipe_charset'] = 'character class';
-$string['tooltipe_charset_error'] = 'Incorrect range: left border is greater then the right one';
-$string['tooltipe_emptiness'] = 'emptiness';
-$string['tooltipe_assertion'] = 'assertion';
-$string['tooltipe_backreference'] = 'backreference';
-$string['tooltipe_recursion'] = 'recursion';
-$string['tooltipe_control_sequence'] = 'control sequence';
-$string['tooltipe_option'] = 'option';
-$string['tooltipe_finite_quantifier'] = 'finite quantifier';
-$string['tooltipe_infinite_quantifier'] = 'infinite quantifier';
-$string['tooltipe_concatenation'] = 'concatenation';
-$string['tooltipe_alternative'] = 'alternative';
-$string['tooltipe_assertion'] = 'assertion';
-$string['tooltipe_subpattern'] = 'subpattern';
-$string['tooltipe_conditional_subpattern'] = 'conditional subpattern';
+$string['authors_tool_tooltip_charset'] = 'character class';
+$string['authors_tool_tooltip_negative_charset'] = 'negative character class';
+$string['authors_tool_tooltip_charset_error'] = 'Incorrect range: left border is greater then the right one';
+$string['authors_tool_tooltip_emptiness'] = 'emptiness';
+$string['authors_tool_tooltip_assertion'] = 'assertion';
+$string['authors_tool_tooltip_backreference'] = 'backreference';
+$string['authors_tool_tooltip_recursion'] = 'recursion';
+$string['authors_tool_tooltip_control_sequence'] = 'control sequence';
+$string['authors_tool_tooltip_option'] = 'option';
+$string['authors_tool_tooltip_finite_quantifier'] = 'finite quantifier';
+$string['authors_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
+$string['authors_tool_tooltip_concatenation'] = 'concatenation';
+$string['authors_tool_tooltip_alternative'] = 'alternative';
+$string['authors_tool_tooltip_assertion'] = 'assertion';
+$string['authors_tool_tooltip_subpattern'] = 'subpattern';
+$string['authors_tool_tooltip_conditional_subpattern'] = 'conditional subpattern';

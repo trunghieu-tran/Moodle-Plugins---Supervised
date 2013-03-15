@@ -9,10 +9,12 @@
  * @package questions
  */
 
+require_once(dirname(__FILE__) . '/../../../../config.php');
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_authors_tool.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
@@ -130,7 +132,7 @@ class qtype_preg_description_options extends qtype_preg_handling_options {
 /**
  * Handler, generating information for regular expression
  */
-class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
+class qtype_preg_author_tool_description extends qtype_preg_author_tool {
     
     /** @var qtype_preg_description_options options for description and state of description */
     public $options;
@@ -237,7 +239,38 @@ class qtype_preg_author_tool_description extends qtype_preg_regex_handler {
     protected function is_preg_node_acceptable($pregnode) {
         return true;
     }
-    
+
+    /**
+     * Generate description
+     * 
+     * @param array $json_array contains text of description
+     */
+    public function generate_json(&$json_array, $regextext, $id){
+        
+        global $CFG;
+
+        if(!empty($regextext)) {
+            if($id == -1){
+                
+                //Checking parser errors
+                $pars_error = false;
+                foreach($this->get_errors() as $error) {
+                    if (is_a($error, 'qtype_preg_parsing_error')) {
+                        $pars_error = true;
+                        break;
+                    }
+                }
+                
+                if($pars_error === false && $this->get_ast_root() !== NULL) {
+                    $json_array['description'] = $this->default_description();//Add tree                
+                } else {                
+                    $json_array['description'] = 'Ooops! I can\'t build description!';
+                }
+            }
+        } else {
+            $json_array['description'] = 'Ooops! I can\'t build description!';
+        }
+    }
 }
 
 
@@ -886,24 +919,24 @@ class qtype_preg_description_node_finite_quant extends qtype_preg_description_op
 
         $resultpattern ='';
         $greedpattern='';
-        $wrong_borders =$this->pregnode->leftborder >= $this->pregnode->rightborder;
+        $wrong_borders =$this->pregnode->leftborder > $this->pregnode->rightborder;
 
         if($this->pregnode->leftborder===0 ){
             if($this->pregnode->rightborder ===1){
                 $resultpattern = self::get_form_string('description_finite_quant_01',$form);
                 $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
-            }
-            else {
+            } else {
                 $resultpattern = self::get_form_string('description_finite_quant_0',$form);
                 $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
             }
             
-        }
-        else if ($this->pregnode->leftborder===1) {
+        } else if ($this->pregnode->leftborder===1) {
             $resultpattern = self::get_form_string('description_finite_quant_1',$form);
-            $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
-        }
-        else {
+            $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);        
+        } else if ($this->pregnode->leftborder==$this->pregnode->rightborder) {
+            $resultpattern = self::get_form_string('description_finite_quant_strict',$form);
+            $resultpattern = str_replace('%count',$this->pregnode->rightborder,$resultpattern);
+        } else {
             $resultpattern = self::get_form_string('description_finite_quant',$form);
             $resultpattern = str_replace('%rightborder',$this->pregnode->rightborder,$resultpattern);
             $resultpattern = str_replace('%leftborder',$this->pregnode->leftborder,$resultpattern);
