@@ -619,22 +619,31 @@ class qtype_preg_charset_flag {
     const CIRCUMFLEX             = 'circumflex';
     const DOLLAR                 = 'dollar';
 
-    // Flag types.
-    const DIGIT                  = 'digit';      // \d AND [:digit:]
-    const XDIGIT                 = 'xdigit';     // [:xdigit:]
-    const SPACE                  = 'space';      // \s AND [:space:]
-    const WORD                   = 'word';       // \w AND [:word:]
-    const ALNUM                  = 'alnum';      // [:alnum:]
-    const ALPHA                  = 'alpha';      // [:alpha:]
-    const ASCII                  = 'ascii';      // [:ascii:]
-    const CNTRL                  = 'cntrl';      // [:ctrl:]
-    const GRAPH                  = 'graph';      // [:graph:]
-    const LOWER                  = 'lower';      // [:lower:]
-    const UPPER                  = 'upper';      // [:upper:]
-    const PRIN                   = 'print';      // [:print:] PRIN, because PRINT is php keyword
-    const PUNCT                  = 'punct';      // [:punct:]
-    const HSPACE                 = 'hspace';     // \h
-    const VSPACE                 = 'vspace';     // \v
+    const META_DOT               = 'dot';
+
+    // Escape sequences.
+    const SLASH_D                = 'slashd';
+    const SLASH_H                = 'slashh';
+    const SLASH_S                = 'slashs';
+    const SLASH_V                = 'slashv';
+    const SLASH_W                = 'slashw';
+
+    // POSIX classes.
+    const POSIX_ALNUM            = 'alnum';      // [:alnum:]
+    const POSIX_ALPHA            = 'alpha';      // [:alpha:]
+    const POSIX_ASCII            = 'ascii';      // [:ascii:]
+    const POSIX_BLANK            = 'blank';      // [:blank:]
+    const POSIX_CNTRL            = 'cntrl';      // [:ctrl:]
+    const POSIX_DIGIT            = 'digit';      // [:digit:]
+    const POSIX_GRAPH            = 'graph';      // [:graph:]
+    const POSIX_LOWER            = 'lower';      // [:lower:]
+    const POSIX_PRINT            = 'print';      // [:print:]
+    const POSIX_PUNCT            = 'punct';      // [:punct:]
+    const POSIX_SPACE            = 'space';      // [:space:]
+    const POSIX_UPPER            = 'upper';      // [:upper:]
+    const POSIX_WORD             = 'word';       // [:word:]
+    const POSIX_XDIGIT           = 'xdigit';     // [:xdigit:]
+
     const UPROPCC                = 'Cc';         // Control
     const UPROPCF                = 'Cf';         // Format
     const UPROPCN                = 'Cn';         // Unassigned

@@ -9,6 +9,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Returns a utf8 character by the given code.
+function code2utf8($num) {
+    if ($num < 128) {
+        return chr($num);
+    }
+    if ($num < 2048) {
+        return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+    }
+    if ($num < 65536) {
+        return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+    }
+    if ($num < 2097152) {
+        return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+    }
+    return '';
+}
+
 // Replaces escape sequences with real characters.
 function replace_esc_sequences($string) {
     $result = str_replace('\\n', "\n", $string);
@@ -16,7 +33,7 @@ function replace_esc_sequences($string) {
     while (preg_match('/[\\\\][x]..?/', $result, $match) > 0) {
         $hex = substr($match[0], 2);
         $code = hexdec($hex);
-        $ch = chr($code);
+        $ch = code2utf8($code);
         $result = str_replace($match[0], $ch, $result);
     }
     return $result;
