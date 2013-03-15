@@ -41,6 +41,12 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
     // Array of nodes representing subpatterns ending at this transition.
     public $subpatt_end;
 
+    // Array of nodes representing subexpressions starting at this transition.
+    public $subexpr_start;
+
+    // Array of nodes representing subexpressions ending at this transition.
+    public $subexpr_end;
+
     // Is this transition a "go-back" transition?
     public $is_loop;
 
@@ -51,6 +57,8 @@ class qtype_preg_nfa_transition extends qtype_preg_fa_transition {
         parent::__construct($from, $pregleaf, $to, $number, $consumeschars);
         $this->subpatt_start = array();
         $this->subpatt_end = array();
+        $this->subexpr_start = array();
+        $this->subexpr_end = array();
         $this->is_loop = false;
         $this->min_subpatt_node = null;
     }
@@ -97,17 +105,11 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
     // Map where keys are subexpression names, and values are their numbers.
     protected $subexpr_name_to_number_map;
 
-    // Map where keys are subexpression numbers, and values are corresponding
-    // subpattern numbers. This map is built during nfa building. The relation
-    // is 1:m since subexpression numbers can be duplicated.
-    protected $subexpr_to_subpatt_map;
-
     public function __construct($max_subpatt, $max_subexpr, $subexpr_name_to_number_map) {
         parent::__construct();
         $this->max_subpatt = $max_subpatt;
         $this->max_subexpr = $max_subexpr;
         $this->subexpr_name_to_number_map = $subexpr_name_to_number_map;
-        $this->subexpr_to_subpatt_map = array();
     }
 
     protected function set_limits() {
@@ -149,18 +151,24 @@ class qtype_preg_nfa extends qtype_preg_finite_automaton {
         return $this->max_subexpr;
     }
 
-    public function subpatt_from_subexpr_number($subexpr_number) {
-        if (array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
-            return $this->subexpr_to_subpatt_map[$subexpr_number];
-        }
-        return array();
-    }
 
-    public function on_subexpr_added($subexpr_number, $subpatt_number) {
-        if (!array_key_exists($subexpr_number, $this->subexpr_to_subpatt_map)) {
-            $this->subexpr_to_subpatt_map[$subexpr_number] = array();
+    public function on_subexpr_added($pregnode) {
+        $subpatt_number = $pregnode->subpattern;
+        $subexpr_number = $pregnode->number;
+
+        // Copy the node to the starting transitions.
+        foreach ($this->startstate->outgoing_transitions() as $transition) {
+            $transition->subexpr_start[$subexpr_number] = $pregnode;
         }
-        $this->subexpr_to_subpatt_map[$subexpr_number][] = $subpatt_number;
+
+        // Copy the node to the ending transitions.
+        foreach ($this->states as $state) {
+            foreach ($state->outgoing_transitions() as $transition) {
+                if ($transition->to === $this->endstate) {
+                    $transition->subexpr_end[$subexpr_number] = $pregnode;
+                }
+            }
+        }
     }
 }
 
@@ -557,6 +565,6 @@ class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
             return;
         }
 
-        $automaton->on_subexpr_added($this->pregnode->number, $this->pregnode->subpattern);
+        $automaton->on_subexpr_added($this->pregnode);
     }
 }

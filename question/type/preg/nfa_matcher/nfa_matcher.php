@@ -45,6 +45,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     // Each subpattern is initialized with (-1,-1) at start.
     public $matches;
 
+    // Array used mostly for disambiguation when there are duplicate subpexpressions numbers.
+    public $subexpr_to_subpatt;
+
     // Is this a full match?
     public $full;
 
@@ -100,16 +103,14 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     /**********************************************************************/
 
     public function find_dup_subexpr_match($subexpr) {
-        $subpatts = $this->automaton->subpatt_from_subexpr_number($subexpr);
-        if (count($subpatts) == 0) {
+        if (!array_key_exists($subexpr, $this->subexpr_to_subpatt)) {
             // Can get here when {0} occurs in the regex.
             return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
         }
-        foreach ($subpatts as $subpatt) {
-            $lastmatch = $this->last_match($subpatt);
-            if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                return $lastmatch;
-            }
+        $subpatt = $this->subexpr_to_subpatt[$subexpr];
+        $lastmatch = $this->last_match($subpatt);
+        if ($lastmatch[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return $lastmatch;
         }
         return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
     }
@@ -276,6 +277,11 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this->set_last_match($node->subpattern, $index, $pos - $index + $matchlen);
             }
         }
+
+        // Some stuff for subexpressions.
+        foreach ($transition->subexpr_start as $node) {
+            $this->subexpr_to_subpatt[$node->number] = $node->subpattern;
+        }
     }
 }
 
@@ -347,6 +353,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
         $result->state = $state;
 
         $result->matches = array();
+        $result->subexpr_to_subpatt = array(0 => $root->subpattern);
         $result->begin_subpatt_iteration($root, $startpos, false/*, $mode*/);  // TODO: mode
         $result->set_last_match($root->subpattern, $startpos, 0);
 
@@ -860,7 +867,9 @@ if (1 == 0) {
         $nfa = self::build_nfa($this->dst_root);
         if ($nfa !== false) {
             $this->automaton = $nfa;
-            $this->automaton->on_subexpr_added(0, $this->ast_root->subpattern); // Inform the automaton that 0-subexpr is represented by root.
+            // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
+            // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.
+            // $this->automaton->on_subexpr_added($this->ast_root);
         } else {
             $this->automaton = null;
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
