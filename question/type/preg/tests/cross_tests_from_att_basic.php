@@ -872,7 +872,7 @@ a",
     }
 
     function data_for_test_att_basic_72() {
-        $test1 = array('str'=>"ÿ",
+        $test1 = array('str'=>"Ã¿",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
