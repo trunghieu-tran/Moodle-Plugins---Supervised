@@ -1,7 +1,7 @@
 <?php
-// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+// This file is part of Moodle - http://moodle.org/
 //
-// Preg question type is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -26,14 +26,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+global $app;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
 
-MoodleQuickForm::registerElementType('text_button',
+MoodleQuickForm::registerElementType('text_and_button',
     $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
-    'MoodleQuickForm_text_button');
-
+    'MoodleQuickForm_text_and_button');
+    
 /**
  * Preg editing form definition.
  */
@@ -49,18 +50,19 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *      field holding an array of answers
      * @return array of form fields.
      */
-
+     
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
             global $CFG;
+            global $app;
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
-
-            $tmp = & $mform->createElement('text_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/pix/i/edit.gif'), array('size' => 80));
+            
+            $tmp = & $mform->createElement('text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $app . '/theme/image.php/standard/core/1359744739/t/edit'), array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
-
+            
             return $repeated;
     }
     /**
@@ -107,7 +109,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setType('lexemhintpenalty', PARAM_NUMBER);
         $mform->addHelpButton('lexemhintpenalty','lexemhintpenalty','qtype_preg');
         $langs = block_formal_langs::available_langs();//TODO - add context
-        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $langs);
+        $mform->addElement('select','langid',get_string('langselect','qtype_preg'),$langs);
         $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
         $mform->addHelpButton('langid','langselect','qtype_preg');
         $mform->addElement('text', 'lexemusername', get_string('lexemusername','qtype_preg'), array('size' => 54));

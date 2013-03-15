@@ -15,25 +15,25 @@ class qtype_preg_author_tool_explain_graph_node {
 
     public $shape   = 'ellipse';  // shape of node on image
     public $color   = 'black';    // color of node on image
-    public $owner   = null;       // owner of node
+    public $owner   = NULL;       // owner of node
     public $label   = '';         // data of node on image
-    public $id      = -1;          // id of node
+    public $id      = -1;         // id of node
     public $fill    = '';         // filling of node on image
-    public $invert  = false;
+    public $invert  = FALSE;      // flag of inversion of node
     
     /**
      * Returns count of links in which node is. Searching executes in owner of node.
-     * @param type - boolean parameter; true - node is source, false - nodeis destination.
+     * @param type - boolean parameter; true - node is destination, false - node is source.
      */
     public function links_count($type) {
     
-        $cx = 0;
+        $cx = 0; // links counter
         foreach ($this->owner->links as $link) {
             if ($type) {
-                if ($link->destination == $this)
+                if ($link->destination === $this)
                     ++$cx;
             } else {
-                if ($link->source == $this)
+                if ($link->source === $this)
                     ++$cx;
             }
         }
@@ -42,7 +42,7 @@ class qtype_preg_author_tool_explain_graph_node {
     }
     
     /**
-     * Returns array of links in which node is in any instance.
+     * Returns array of links in which node is as any instance.
      */
     public function links() {
     
@@ -103,17 +103,14 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         $this->id      = $id;
     }
     
-    //private static $counter = 0; // counter for generating id for nodes in graph
-    
     /**
-     * Creates text file with dot instructions.
+     * Creates text with dot instructions.
      */
     public function create_dot() {
+        $this->regenerate_id();
         $instr = 'digraph { rankdir = LR;';
 
         foreach ($this->nodes as $iter) {
-            //$iter->id = ++qtype_preg_author_tool_explain_graph_subgraph::$counter;
-
             if ($iter->shape == 'record') {
                 $instr .= '"nd' .$iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
             } else {
@@ -139,6 +136,7 @@ class qtype_preg_author_tool_explain_graph_subgraph {
     /**
      * Creates html of character class for dot instructions
      * @param lbl - label of node in graph
+     * @param invert - is charclass invert
      */
     private static function compute_html($lbl, $invert) {
         $elements = array();
@@ -195,8 +193,9 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         foreach ($gr->nodes as $iter) {
             if ($iter->shape == 'record')
                 $instr .= '"nd' . $iter->id . '" [shape=record, color=black, label=' . qtype_preg_author_tool_explain_graph_subgraph::compute_html($iter->label, $iter->invert) . $iter->fill . '];';
-            else
-                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', $iter->label[0]) . '"' . $iter->fill .'];';
+            else {
+                $instr .= '"nd' . $iter->id . '" [shape=' . $iter->shape . ', color=' . $iter->color . ', label="' . str_replace(chr(10), '', str_replace('"', '\\"', $iter->label[0])) . '"' . $iter->fill .'];';
+            }
         }
 
         foreach ($gr->subgraphs as $iter) 
@@ -209,6 +208,40 @@ class qtype_preg_author_tool_explain_graph_subgraph {
         }
 
         $instr .= '}';
+    }
+
+    private function find_max_id() {
+        $maxid = -1;
+        foreach ($this->nodes as $node) {
+            if ($node->id > $maxid) {
+                $maxid = $node->id;
+            }
+        }
+
+        foreach ($this->subgraphs as $subgraph) {
+            $tmpid = $subgraph->find_max_id();
+            if ($tmpid > $maxid) {
+                $maxid = $tmpid;
+            }
+        }
+
+        return $maxid;
+    }
+
+    private function regenerate_id($maxid = -1) {
+        $maxid = $maxid == -1 ? $this->find_max_id() : $maxid;
+
+        foreach ($this->nodes as $node) {
+            if ($node->id == -1) {
+                $node->id = ++$maxid;
+            }
+        }
+
+        foreach ($this->subgraphs as $subgraph) {
+            $maxid = $subgraph->regenerate_id($maxid);
+        }
+
+        return $maxid;
     }
 
 }

@@ -14,7 +14,7 @@ global $CFG;
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/form/text.php');
 
-class MoodleQuickForm_text_button extends MoodleQuickForm_text{
+class MoodleQuickForm_text_and_button extends MoodleQuickForm_text{
     
     /** @var string html for help button, if empty then no help */
     var $_helpbutton = '';
@@ -37,7 +37,7 @@ class MoodleQuickForm_text_button extends MoodleQuickForm_text{
      * @param array $elementLinks (optional) link on button image and link on new page
      * @param array $attributes (optional) Either a typical HTML attribute string or an associative array
      */
-    function MoodleQuickForm_text_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
+    function MoodleQuickForm_text_and_button($elementName=null, $elementButtonName=null, $elementLabel=null, $elementLinks=null, $attributes=null) {
         $this->idbutton .= $elementButtonName;
         $this->linkonpage .= $elementLinks['link_on_page'];
         $this->linkonbuttonimage .= $elementLinks['link_on_button_image'];
