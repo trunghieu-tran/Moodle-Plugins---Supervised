@@ -9,7 +9,7 @@
  */
 
 $string['addmoreanswerblanks'] = 'Adding a regular expression options';
-$string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the choosen engine doesn\'t support subpatterns capturing you should use only {$0}.</p>';
+$string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the choosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subexpression match etc. If the choosen engine doesn\'t support subexpressions capturing you should use only {$0}.</p>';
 $string['answerno'] = 'Answer {$a}';
 $string['charhintpenalty'] = 'Penalty for the next character hint';
 $string['charhintpenalty_help'] = 'Penalty for getting the one-character hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints). These penalties are mutually exclusive.';
@@ -52,7 +52,7 @@ $string['notation_native'] = 'Regular expression';
 $string['notation_mdlshortanswer'] = 'Moodle shortanswer';
 $string['notation_pcrestrict'] = 'PCRE Strict';
 $string['noregex'] = 'No regex supplied for matching';
-$string['nosubpatterncapturing'] = '{$a} engine doesn\'t support subpattern capturing, please remove placeholders (except {$0}) from the feedback or choose another engine';
+$string['nosubexprcapturing'] = '{$a} engine doesn\'t support subexpression capturing, please remove placeholders (except {$0}) from the feedback or choose another engine';
 $string['pluginname'] = 'Regular expression';
 $string['pluginname_help'] = '<p>Regular expressions are a form of writing patterns to match different strings. You can use it to verify answers in two ways: an expression to match with full (usually correct) answer, or an expression to match a part of the answer (which can be used, for example, to catch common errors and give appropriate comments).</p><p>This question uses the PHP perl-compatible regular expression syntax as the default notation. There are many tutorials about creating and using regular expression, here is one <a href="http://www.phpfreaks.com/content/print/126">example</a>. You can find detailed syntax of expression here: <a href="http://www.nusphere.com/kb/phpmanual/reference.pcre.pattern.syntax.htm">php manual</a>. Note that you should neither enclose regular expression in delimiters nor specify any modifiers - Moodle will do it for you.</p><p>You can also use this question as the advanced form of shortanswer with hinting, even if you don\'t know a bit about regular expressions! Just select <b>Moodle shortanswer</b> as notation for your questions.</p>';
 $string['php_preg_matcher'] = 'PHP preg extension';
@@ -62,7 +62,7 @@ $string['pluginnameediting'] = 'Editing a regular expression question';
 $string['pluginnamesummary'] = 'Enter a string response from student that can be matched against several regular expressions. Shows to the student the correct part of his response. Using behaviours with multiple tries can give a hint by telling a next correct character.<br/>You can use it without knowing regular expression to get hinting by using the \'Moodle shortanswer\' notation.';
 $string['questioneditingheading'] = 'Question editing settings';
 $string['regex_handler'] = 'Regex handler';
-$string['subpattern'] = 'Subpattern';
+$string['subexpression'] = 'Subexpression';
 $string['tobecontinued'] = '...';
 $string['toolargequant'] = 'Too large finite quantificator';
 $string['toomanyerrors'] = '.......{$a} more errors';
@@ -90,8 +90,8 @@ $string['node_infinite_quant']         = 'infinite quantifier';
 $string['node_concat']                 = 'concatenation';
 $string['node_alt']                    = 'alternative';
 $string['node_assert']                 = 'lookaround assertion';
-$string['node_subpatt']                = 'subpattern';
-$string['node_cond_subpatt']           = 'conditional subpattern';
+$string['node_subexpr']                = 'subexpression';
+$string['node_cond_subexpr']           = 'conditional subexpression';
 $string['node_error']                  = 'syntax error';
 // Subtypes.
 $string['empty_leaf_meta']             = 'emptiness';
@@ -124,17 +124,17 @@ $string['pla_node_assert']             = 'positive lookahead assert';
 $string['nla_node_assert']             = 'negative lookahead assert';
 $string['plb_node_assert']             = 'positive lookbehind assert';
 $string['nlb_node_assert']             = 'negative lookbehind assert';
-$string['subpatt_node_subpatt']        = 'subpattern';
-$string['onceonly_node_subpatt']       = 'once-only subpattern';
-$string['subpatt_node_cond_subpatt']   = '"subpattern"-conditional subpattern';
-$string['recursion_node_cond_subpatt'] = 'recursive conditional subpattern';
-$string['define_node_cond_subpatt']    = '"define"-conditional subpattern';
-$string['pla_node_cond_subpatt']       = 'positive lookahead conditional subpattern';
-$string['nla_node_cond_subpatt']       = 'negative lookahead conditional subpattern';
-$string['plb_node_cond_subpatt']       = 'positive lookbehind conditional subpattern';
-$string['nlb_node_cond_subpatt']       = 'negative lookbehind conditional subpattern';
+$string['subexpr_node_subexpr']        = 'subexpression';
+$string['onceonly_node_subexpr']       = 'once-only subexpression';
+$string['subexpr_node_cond_subexpr']   = '"subexpression"-conditional subexpression';
+$string['recursion_node_cond_subexpr'] = 'recursive conditional subexpression';
+$string['define_node_cond_subexpr']    = '"define"-conditional subexpression';
+$string['pla_node_cond_subexpr']       = 'positive lookahead conditional subexpression';
+$string['nla_node_cond_subexpr']       = 'negative lookahead conditional subexpression';
+$string['plb_node_cond_subexpr']       = 'positive lookbehind conditional subexpression';
+$string['nlb_node_cond_subexpr']       = 'negative lookbehind conditional subexpression';
 $string['unknown_error_node_error']                                = 'unknown error';
-$string['consubpatt_too_much_alter_node_error']                    = 'too much top-level alternatives in a conditional subpattern';
+$string['condsubexpr_too_much_alter_node_error']                    = 'too much top-level alternatives in a conditional subexpression';
 $string['wrong_close_paren_node_error']                            = 'closing paren without opening';
 $string['wrong_open_paren_node_error']                             = 'opening paren without closing';
 $string['empty_parens_node_error']                                 = 'empty parens';
@@ -148,7 +148,7 @@ $string['incorrect_range_node_error']                              = 'incorrect 
 
 /******* Error messages *******/
 $string['error_PCREincorrectregex']             = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
-$string['error_threealtincondsubpatt']          = 'Regex syntax error: three or more top-level alternatives in the conditional subpattern in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
+$string['error_threealtincondsubexpr']          = 'Regex syntax error: three or more top-level alternatives in the conditional subexpression in position from {$a->indfirst} to {$a->indlast}. Use parentheses if you want to include alternatives in yes-expr on no-expr.';
 $string['error_unopenedparen']                  = 'Regex syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->indfirst}.';
 $string['error_unclosedparen']                  = 'Regex syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->indfirst}.';
 $string['error_quantifieratstart']              = 'Regex syntax error: quantifier in position from {$a->indfirst} to {$a->indlast} doesn\'t have an operand - nothing to repeat.';
@@ -163,25 +163,25 @@ $string['error_slashatendofpattern']            = 'Regex syntax error: \\ at end
 $string['error_catendofpattern']                = 'Regex syntax error: \c at end of pattern.';
 $string['error_invalidescapesequence']          = 'Invalid escape sequence: {$a->addinfo}.';
 $string['error_posixclassoutsidecharset']       = 'POSIX classes are not allowed outside character sets.';
-$string['error_unexistingsubpatt']              = 'The subpattern "{$a->addinfo}" does not exist.';
+$string['error_unexistingsubexpr']              = 'The subexpression "{$a->addinfo}" does not exist.';
 $string['error_unknownmodifier']                = 'Unknown, wrong or unsupported modifier(s): {$a->addinfo}.';
 $string['error_missingcommentending']           = 'Missing closing parenthesis for the comment in position from {$a->indfirst} to {$a->indlast}.';
-$string['error_missingcondsubpattending']       = 'Unclosed conditional subpattern name.';
+$string['error_missingcondsubexprending']       = 'Unclosed conditional subexpression name.';
 $string['error_missingcalloutending']           = 'Unclosed callout.';
-$string['error_missingsubpattending']           = 'Unclosed subpattern name.';
+$string['error_missingsubexprending']           = 'Unclosed subexpression name.';
 $string['error_missingbackrefending']           = 'Missing backreference ending: {$a->addinfo}.';
 $string['error_missingbackrefbeginning']        = 'Missing backreference beginning: {$a->addinfo}.';
 $string['error_missingcontrolending']           = 'Missing closing parenthesis after control sequence (*...';
-$string['error_wrongcondsubpattnumber']         = 'Wrong subpattern number: digits expected.';
-$string['error_condsubpattassertexpected']      = 'Assertion or condition expected.';
+$string['error_wrongcondsubexprnumber']         = 'Wrong subexpression number: digits expected.';
+$string['error_condsubexprassertexpected']      = 'Assertion or condition expected.';
 $string['error_charcodetoobig']                 = 'The character code {$a->addinfo} is too big.';
 $string['error_charcodedisallowed']             = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
-$string['error_condsubpattzerocondition']       = 'Invalid condition (?(0).';
+$string['error_condsubexprzerocondition']       = 'Invalid condition (?(0).';
 $string['error_calloutbignumber']               = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
-$string['error_duplicatesubpattnames']          = 'Two named subpatterns have the same name.';
+$string['error_duplicatesubexprnames']          = 'Two named subexpressions have the same name.';
 $string['error_backreftozero']                  = 'Backreference to the whole expression is not allowed.';
-$string['error_differentsubpattnames']          = 'Different subpattern names for subpatterns of the same number.';
-$string['error_subpattnameexpected']            = 'Subpattern name expected.';
+$string['error_differentsubexprnames']          = 'Different subexpression names for subexpressions of the same number.';
+$string['error_subexprnameexpected']            = 'subexpression name expected.';
 $string['error_cxshouldbeascii']                = '\c should be followed by an ascii character.';
 $string['error_lnuunsupported']                 = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
 $string['error_unrecognizedlba']                = 'Unrecognized character after (?<.';
@@ -221,12 +221,12 @@ $string['description_esc_a'] = 'at the start of the subject';
 $string['description_esc_z'] = 'at the end of the subject';
 $string['description_esc_g'] = 'at the first matching position in the subject';
 // TYPE_LEAF_BACKREF
-$string['description_backref'] = 'back reference to subpattern #%number';
-$string['description_backref_name'] = 'back reference to subpattern "%name"';
+$string['description_backref'] = 'back reference to subexpression #%number';
+$string['description_backref_name'] = 'back reference to subexpression "%name"';
 // TYPE_LEAF_RECURSION
 $string['description_recursion_all'] = 'recursive match with whole regular expression';
-$string['description_recursion'] = 'recursive match with subpattern #%number';
-$string['description_recursion_name'] = 'recursive match with subpattern "%name"';
+$string['description_recursion'] = 'recursive match with subexpression #%number';
+$string['description_recursion_name'] = 'recursive match with subexpression "%name"';
 // TYPE_LEAF_OPTIONS
 $string['description_option_i'] = 'caseless:';
 $string['description_unsetoption_i'] = 'case sensitive:';
@@ -273,24 +273,24 @@ $string['description_pla_node_assert_cond'] = 'further text matches: [%1]';
 $string['description_nla_node_assert_cond'] = 'further text does not match: [%1]';
 $string['description_plb_node_assert_cond'] = 'preceding text matches: [%1]';
 $string['description_nlb_node_assert_cond'] = 'preceding text does not match: [%1]';
-// TYPE_NODE_SUBPATT
-$string['description_subpattern'] = 'subpattern #%number: [%1]';
-$string['description_subpattern_once'] = 'once checked subpattern #%number: [%1]';
-$string['description_subpattern_name'] = 'subpattern "%name": [%1]';
-$string['description_subpattern_once_name'] = 'once checked subpattern "%name": [%1]';
+// TYPE_NODE_SUBEXPR
+$string['description_subexpression'] = 'subexpression #%number: [%1]';
+$string['description_subexpression_once'] = 'once checked subexpression #%number: [%1]';
+$string['description_subexpression_name'] = 'subexpression "%name": [%1]';
+$string['description_subexpression_once_name'] = 'once checked subexpression "%name": [%1]';
 $string['description_grouping'] = 'grouping: [%1]';
 $string['description_grouping_duplicate'] = 'grouping (reset group numbers for capturing groups in each alternative): [%1]';
-// TYPE_NODE_COND_SUBPATT (%1 - first option; %2 - second option; %cond - condition )
-$string['description_node_cond_subpatt'] = 'if %cond then check: [%1]%else';
-$string['description_node_cond_subpatt_else'] = ' else check: [%2]';
-$string['description_backref_node_cond_subpatt'] = 'if the subpattern #%number has been successfully matched then check: [%1]%else';
-$string['description_backref_node_cond_subpatt_name'] = 'if the subpattern "%name" has been successfully matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt_all'] = 'if the whole pattern has been successfully recursively matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt'] = 'if the pattern #%number has been successfully recursively matched then check: [%1]%else';
-$string['description_recursive_node_cond_subpatt_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
-$string['description_define_node_cond_subpatt'] = 'definition of %1';
+// TYPE_NODE_COND_SUBEXPR (%1 - first option; %2 - second option; %cond - condition )
+$string['description_node_cond_subexpr'] = 'if %cond then check: [%1]%else';
+$string['description_node_cond_subexpr_else'] = ' else check: [%2]';
+$string['description_backref_node_cond_subexpr'] = 'if the subexpression #%number has been successfully matched then check: [%1]%else';
+$string['description_backref_node_cond_subexpr_name'] = 'if the subexpression "%name" has been successfully matched then check: [%1]%else';
+$string['description_recursive_node_cond_subexpr_all'] = 'if the whole pattern has been successfully recursively matched then check: [%1]%else';
+$string['description_recursive_node_cond_subexpr'] = 'if the pattern #%number has been successfully recursively matched then check: [%1]%else';
+$string['description_recursive_node_cond_subexpr_name'] = 'if the pattern "%name" has been successfully recursively matched then check: [%1]%else';
+$string['description_define_node_cond_subexpr'] = 'definition of %1';
 // TYPE_LEAF_CONTROL
-$string['description_accept_leaf_control'] = 'force successful subpattern match';
+$string['description_accept_leaf_control'] = 'force successful subexpression match';
 $string['description_fail_leaf_control'] = 'force fail';
 $string['description_mark_name_leaf_control'] = 'set name to %name to be passed back';
 $string['description_control_backtrack'] = 'if the rest of the pattern does not match %what';
@@ -528,8 +528,8 @@ $string['description_empty_g'] = 'nothing(form g)';
 
 $string['author_tool_explain_graph'] = 'explain graph';
 
-$string['explain_subpattern'] = 'subpattern #';
-$string['explain_backref'] = 'the result of subpattern #';
+$string['explain_subexpression'] = 'subexpression #';
+$string['explain_backref'] = 'the result of subexpression #';
 $string['explain_recursion'] = 'recursion';
 $string['explain_unknow_node'] = 'unknow node';
 $string['explain_unknow_meta'] = 'unknow meta';
@@ -554,5 +554,5 @@ $string['authors_tool_tooltip_infinite_quantifier'] = 'infinite quantifier';
 $string['authors_tool_tooltip_concatenation'] = 'concatenation';
 $string['authors_tool_tooltip_alternative'] = 'alternative';
 $string['authors_tool_tooltip_assertion'] = 'assertion';
-$string['authors_tool_tooltip_subpattern'] = 'subpattern';
-$string['authors_tool_tooltip_conditional_subpattern'] = 'conditional subpattern';
+$string['authors_tool_tooltip_subexpression'] = 'subexpression';
+$string['authors_tool_tooltip_conditional_subexpression'] = 'conditional subexpression';

@@ -242,16 +242,16 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /**
-    * Create or get suitable matcher object for given engine, regex and options.
-    @param engine string engine name
-    @param regex string regular expression to match
-    @param $exact bool exact macthing mode
-    @param $usecase bool case sensitive mode
-    @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
-    @param $notation string notation, in which regex is written
-    @param $hintpossible boolean whether hint possible for specified answer
-    @return matcher object
-    */
+     * Create or get suitable matcher object for given engine, regex and options.
+     * @param engine string engine name
+     * @param regex string regular expression to match
+     * @param $exact bool exact macthing mode
+     * @param $usecase bool case sensitive mode
+     * @param $answerid integer answer id for this regex, null for cases where id is unknown - no cache
+     * @param $notation string notation, in which regex is written
+     * @param $hintpossible boolean whether hint possible for specified answer
+     * @return matcher object
+     */
     public function &get_matcher($engine, $regex, $exact = false, $usecase = true, $answerid = null, $notation = 'native', $hintpossible = true) {
         global $CFG;
         require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
@@ -282,7 +282,7 @@ class qtype_preg_question extends question_graded_automatically
             $for_regexp=$regex;
             if ($exact) {
                 //Grouping is needed in case regexp contains top-level alternatives.
-                //Use non-capturing grouping to not mess-up with user subpattern capturing.
+                //Use non-capturing grouping to not mess-up with user subexpression capturing.
                 $for_regexp = '^(?:'.$for_regexp.')$';
             }
 
@@ -292,8 +292,8 @@ class qtype_preg_question extends question_graded_automatically
             $matchingoptions->extensionneeded = $this->usecharhint || $this->uselexemhint || trim($this->correctanswer) == '';
             if($answerid !== null && $answerid > 0) {
                 $feedback = $this->answers[$answerid]->feedback;
-                if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subpatterns in feedback
-                    $matchingoptions->capturesubpatterns = false;
+                if (strpos($feedback,'{$') === false || strpos($feedback,'}') === false) {//No placeholders for subexpressions in feedback
+                    $matchingoptions->capturesubexpressions = false;
                 }
             }
 
@@ -390,7 +390,7 @@ class qtype_preg_question extends question_graded_automatically
         if (isset($bestfit['answer']) && ($bestfit['match']->full  || $bestfit['match']->is_match() && $state->is_finished()) ) {
             $answer = $bestfit['answer'];
             if ($answer->feedback) {
-                $feedbacktext = $this->insert_subpatterns($answer->feedback, $response, $bestfit['match']);
+                $feedbacktext = $this->insert_subexpressions($answer->feedback, $response, $bestfit['match']);
                 $feedback = $this->format_text($feedbacktext, $answer->feedbackformat,
                     $qa, 'question', 'answerfeedback', $answer->id);
             }
@@ -401,13 +401,13 @@ class qtype_preg_question extends question_graded_automatically
     }
 
     /**
-    * Insert subpatterns in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subpattern ets
-    @param subject string to insert subpatterns
-    @param question question object to create matcher
-    @param matchresults matching results object from best fitting answer
-    @return changed string
-    */
-    public function insert_subpatterns($subject, $response, $matchresults) {
+     * Insert subexpressions in the subject string instead of {$x} placeholders, where {$0} is the whole match, {$1}  - first subexpression etc
+     * @param subject string to insert subexpressions
+     * @param question question object to create matcher
+     * @param matchresults matching results object from best fitting answer
+     * @return changed string
+     */
+    public function insert_subexpressions($subject, $response, $matchresults) {
 
         //Sanity check
         if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
@@ -417,7 +417,7 @@ class qtype_preg_question extends question_graded_automatically
 
         $answer = $response['answer'];
 
-        foreach ($matchresults->all_subpatterns() as $i) {
+        foreach ($matchresults->all_subexpressions() as $i) {
             $search = '{$'.$i.'}';
             $startindex = $matchresults->index_first($i);
             $length = $matchresults->length($i);

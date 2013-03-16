@@ -57,8 +57,8 @@ class qtype_preg_dot_style_provider {
                 } else {
                     $bracketflag = true;
                 }
-            
-                $label .= qtype_preg_dot_style_provider::get_spec_symbol($tmp, $tmptooltip, 7);                
+
+                $label .= qtype_preg_dot_style_provider::get_spec_symbol($tmp, $tmptooltip, 7);
                 //$flag = !$flag;
                 //$color = $colors[$flag];
                 //var_dump($colors[$flag]);
@@ -75,16 +75,16 @@ class qtype_preg_dot_style_provider {
             $tooltip = $tmptooltip;
         }
         $id = $pregnode->id;
-        
+
         // Now the label is ready, just return the appropriate style for node type and subtype.
         switch ($pregnode->type) {
             case qtype_preg_node::TYPE_ABSTRACT: {
                 return "[label = \"abstract node\", style = dotted, color = \"blue\"]";  // это пример, замени его потом на пустую строку.
             }
             case qtype_preg_node::TYPE_LEAF_CHARSET: {
-                
+
                     $tooltip = substr($tooltip, 0, strlen($tooltip)-5);
-                    
+
                     if (strrpos($label, ',') === (strlen($label)-1) && strlen($label) > 0) {
                         $label = qtype_poasquestion_string::substr($label, 0, -1);
                     }
@@ -112,7 +112,7 @@ class qtype_preg_dot_style_provider {
                 return "[label = \"assertion $label\", tooltip = " . get_string('authors_tool_tooltip_assertion', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_BACKREF: {
-                return "[label = \"backreference to subpattern #$pregnode->number\", tooltip = " . get_string('authors_tool_tooltip_backreference', 'qtype_preg') . ", shape = rectangle, id = $id]";
+                return "[label = \"backreference to subexpression #$pregnode->number\", tooltip = " . get_string('authors_tool_tooltip_backreference', 'qtype_preg') . ", shape = rectangle, id = $id]";
             }
             case qtype_preg_node::TYPE_LEAF_RECURSION: {
                 return "[label = \"recursion ' . $pregnode->number . '\", tooltip = " . get_string('authors_tool_tooltip_recursion', 'qtype_preg') . ", shape = rectangle, id = $id]";
@@ -141,11 +141,11 @@ class qtype_preg_dot_style_provider {
             case qtype_preg_node::TYPE_NODE_ASSERT: {
                 return "[label = \"assertion $label\", tooltip = " . get_string('authors_tool_tooltip_assertion', 'qtype_preg') . ", id = $id]";
             }
-            case qtype_preg_node::TYPE_NODE_SUBPATT: {
-                return "[label = \"$label\", tooltip = " . get_string('authors_tool_tooltip_subpattern', 'qtype_preg') . ", id = $id]";
+            case qtype_preg_node::TYPE_NODE_SUBEXPR: {
+                return "[label = \"$label\", tooltip = " . get_string('authors_tool_tooltip_subexpression', 'qtype_preg') . ", id = $id]";
             }
-            case qtype_preg_node::TYPE_NODE_COND_SUBPATT: {
-                return "[label = \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_conditional_subpattern', 'qtype_preg') . "\", id = $id]";
+            case qtype_preg_node::TYPE_NODE_COND_SUBEXPR: {
+                return "[label = \"$label\", tooltip = \"" . get_string('authors_tool_tooltip_conditional_subexpression', 'qtype_preg') . "\", id = $id]";
             }
             case qtype_preg_node::TYPE_NODE_ERROR: {
                 return "[label = \"ERROR\", tooltip = \"" . $pregnode->error_string() . "\", color = red, id = $id]";
@@ -316,7 +316,7 @@ class qtype_preg_dot_style_provider {
                 }
             }
             $tooltip = $result . '&#10;';
-            
+
             for ($i = 1; $i < 33; $i++) {
                 if (qtype_poasquestion_string::strpos($result, chr($i)) !== false) {
                     $tooltip .= get_string('description_char' . dechex($i), 'qtype_preg') . '&#10;';
@@ -341,7 +341,7 @@ class qtype_preg_dot_style_provider {
         }
         return $result;
     }
-    
+
     protected static function get_spec_symbol_with_color($userinscription, &$tooltip, $length = 30, $color = 'blue') {
         if ($userinscription->type === qtype_preg_userinscription::TYPE_CHARSET_FLAG) {
             $tooltip = $userinscription->data . '&#10;';
@@ -371,7 +371,7 @@ class qtype_preg_dot_style_provider {
                                   );
             $flag = true;
             $colors = array(true=>'blue', false=>'green');
-            
+
             $result = $userinscription->data;
             foreach ($service as $key => $value) {
                 if (qtype_poasquestion_string::strpos($result, $key) !== false) {

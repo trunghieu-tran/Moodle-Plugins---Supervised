@@ -181,10 +181,10 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data == '[');
         $token = $lexer->nextToken();// \23
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);    // No subpatterns before this token.
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);    // No subexpressions before this token.
         $token = $lexer->nextToken();// \9
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_BACKREF);    // Backref to the 9th subpattern.
+        $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_BACKREF);    // Backref to the 9th subexpression.
         $this->assertTrue($token->value->number == 9);
         $token = $lexer->nextToken();// \023
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -240,7 +240,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($token->value->negative);
         $this->assertTrue($token->value->flags[0][0]->data == '%');
         for ($i = 0; $i < 12; $i++) {
-            $lexer->nextToken();// skip 12 subpatterns
+            $lexer->nextToken();// skip 12 subexpressions
         }
         $token = $lexer->nextToken();// \g15
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -371,7 +371,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         for ($i = 0; $i < 11; $i++) {
             $token = $lexer->nextToken();
             $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-            $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+            $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         }
         $token = $lexer->nextToken();// \11
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -405,14 +405,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token[1]->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token[1]->value->flags[0][0]->data == '8');
     }
-    function test_lexer_named_subpatterns_and_backreferences() {
+    function test_lexer_named_subexpressions_and_backreferences() {
         $lexer = $this->create_lexer("(?|(?<qwe>)|(?'qwe'))(?P<rty>)\k<qwe>\k'qwe'\g{qwe}\k{rty}(?P=rty)");
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -420,7 +420,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -428,7 +428,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -591,98 +591,98 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
     }
-    function test_lexer_subpatterns() {
+    function test_lexer_subexpressions() {
         $lexer = $this->create_lexer('((?:(?>(?(?=(?(?!(?(?<=(?(?<!');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA);
+        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA);
+        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB);
+        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB);
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB);
+        $this->assertTrue($token->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB);
         $lexer = $this->create_lexer('((?(123)(?(+1)(?(-1)(?(<name_1>)(?(\'name_2\')(?(name_3)(?(R)(?(R4)(?(R&name_4)(?(DEFINE)');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token[0]->value->number === 123);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token[0]->value->number === 2);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token[0]->value->number === 1);
         for ($i = 0; $i < 3; $i++) {
             $token = $lexer->nextToken();
-            $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
-            $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+            $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
+            $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
             $this->assertTrue($token[0]->value->number == 'name_' . ($i + 1));
         }
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION);
         $this->assertTrue($token[0]->value->number === 0);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION);
         $this->assertTrue($token[0]->value->number === 4);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION);
         $this->assertTrue($token[0]->value->number === 'name_4');
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_DEFINE);
+        $this->assertTrue($token[0]->type == qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE);
 
     }
-    function test_lexer_subpatterns_nested() {
+    function test_lexer_subexpressions_nested() {
         $lexer = $this->create_lexer('((?:(?>()(');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
     }
-    function test_lexer_duplicate_subpattern_numbers_from_pcre() {
+    function test_lexer_duplicate_subexpression_numbers_from_pcre() {
         $lexer = $this->create_lexer('(a)(?|x(y)z|(p(q)r)|(t)u(v))(z)');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // a
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -692,14 +692,14 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();    // x
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($token->value->flags[0][0]->data == 'x');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // y
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -715,7 +715,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // p
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -723,7 +723,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data == 'p');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();    // q
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -741,7 +741,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // y
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -755,7 +755,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data == 'u');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();    // v
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -767,7 +767,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
         $token = $lexer->nextToken();    // z
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -776,20 +776,20 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
     }
-    function test_lexer_duplicate_subpattern_numbers_nested() {
+    function test_lexer_duplicate_subexpression_numbers_nested() {
         $lexer = $this->create_lexer('()(?|()|()(?|()|(()))|())()');
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -797,16 +797,16 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -814,11 +814,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 4);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -830,7 +830,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -838,7 +838,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
         $token = $lexer->nextToken();    // (
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 5);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -983,7 +983,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->flags[0][0]->data == 'ه');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -1306,11 +1306,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->value->indlast === 59);
         $lexer = $this->create_lexer('(?(0)(?C255(?Pn(?<name1(?\'name2(?P<name3\g0(?<>(?\'\'(?P<>\g{}\k<>\k\'\'\k{}(?P=)\cй');
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token[1]->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token[1]->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_CONSUBPATT_ZERO_CONDITION);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION);
         $this->assertTrue($token[1]->value->indfirst === 0);
         $this->assertTrue($token[1]->value->indlast === 4);
         $token = $lexer->nextToken();
@@ -1328,19 +1328,19 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $this->assertTrue($token->value->indfirst === 15);
         $this->assertTrue($token->value->indlast === 22);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $this->assertTrue($token->value->indfirst === 23);
         $this->assertTrue($token->value->indlast === 30);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $this->assertTrue($token->value->indfirst === 31);
         $this->assertTrue($token->value->indlast === 39);
         $token = $lexer->nextToken();
@@ -1352,49 +1352,49 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 43);
         $this->assertTrue($token->value->indlast === 46);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 47);
         $this->assertTrue($token->value->indlast === 50);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 51);
         $this->assertTrue($token->value->indlast === 55);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 56);
         $this->assertTrue($token->value->indlast === 59);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 60);
         $this->assertTrue($token->value->indlast === 63);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 64);
         $this->assertTrue($token->value->indlast === 67);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 68);
         $this->assertTrue($token->value->indlast === 71);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
         $this->assertTrue($token->value->type == qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $this->assertTrue($token->value->indfirst === 72);
         $this->assertTrue($token->value->indlast === 76);
         $token = $lexer->nextToken();
@@ -1406,52 +1406,52 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('(*MARK:)(*:)(?(R&)(?(<>)(?(\'\')(?()');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_RECURSION);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
-        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBPATT_NAME_EXPECTED);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
+        $this->assertTrue($token[0]->value->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED);
         $token = $lexer->nextToken();
-        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBPATT);
+        $this->assertTrue($token[0]->type === qtype_preg_yyParser::CONDSUBEXPR);
         $this->assertTrue($token[0]->value->subtype == null);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_CONDSUBPATT_ASSERT_EXPECTED);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED);
         $lexer = $this->create_lexer('(?(R&(?(<(?(\'(?((?(Rd)');
         $token = $lexer->nextToken();   // (?(R&
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING);
         $token = $lexer->nextToken();   // (?(<
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING);
         $token = $lexer->nextToken();   // (?('
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING);
         $token = $lexer->nextToken();   // (?(
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_CONDSUBEXPR_ENDING);
         $token = $lexer->nextToken();   // (?(Rd)
         $this->assertTrue($token[1]->type === qtype_preg_yyParser::PARSLEAF);
-        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBPATT_NUMBER);
+        $this->assertTrue($token[1]->value->subtype == qtype_preg_node_error::SUBTYPE_WRONG_CONDSUBEXPR_NUMBER);
         $lexer = $this->create_lexer('(?<namebody(?\'namebody(?P<namebody');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBPATT_ENDING);
+        $this->assertTrue($token->value->subtype == qtype_preg_node_error::SUBTYPE_MISSING_SUBEXPR_ENDING);
         $lexer = $this->create_lexer('\gA}\kA}\kA\'\kA>(?PA)');
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_yyParser::PARSLEAF);
@@ -1514,10 +1514,10 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer("(?|(?<qwe>)|(?'qwe'(?'rty'(?'abc')))|(?'uio')");      // (?P<rty>)\k<qwe>\k'qwe'\g{qwe}\k{rty}(?P=rty)
         $token = $lexer->nextToken();    // (?|
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
         $token = $lexer->nextToken();    // (?<qwe>
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -1525,15 +1525,15 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (?'qwe'
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // (?'rty'
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 2);
         $token = $lexer->nextToken();    // (?'abc'
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 3);
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type == qtype_preg_yyParser::CLOSEBRACK);
@@ -1545,18 +1545,18 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type == qtype_preg_yyParser::ALT);
         $token = $lexer->nextToken();    // (?'uio')
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBPATT_NAMES);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DIFFERENT_SUBEXPR_NAMES);
         $lexer = $this->create_lexer('(?P<name>(?<name>(?\'name\'(?<(');
         $token = $lexer->nextToken();    // (?P<name>
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($token->value->number === 1);
         $token = $lexer->nextToken();    // (?<name>
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES);
         $token = $lexer->nextToken();    // (?'name'
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
-        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBPATT_NAMES);
+        $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES);
         $token = $lexer->nextToken();    // (?<(
         $this->assertTrue($token->type == qtype_preg_yyParser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_error::SUBTYPE_UNRECOGNIZED_LBA);

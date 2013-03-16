@@ -86,7 +86,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description('(a)\1',null,null);
         //var_dump($handler);
         $result = $handler->description('%s','%s');
-        $expected = 'subpattern #1: [<span style="color:blue">a</span>] then back reference to subpattern #1';
+        $expected = 'subexpression #1: [<span style="color:blue">a</span>] then back reference to subexpression #1';
         $this->assertEquals($expected, $result);
     }
 
@@ -188,7 +188,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('g{0,1}','<span style="color:blue">g</span> may be missing','рус - TODO'),
           array('g{0,}','<span style="color:blue">g</span> is repeated any number of times or missing','рус - TODO'),
           array('g{1,}','<span style="color:blue">g</span> is repeated any number of times','рус - TODO'),
-          array('g{3}','<span style="color:blue">g</span> is repeated 3 times','рус - TODO'),  
+          array('g{3}','<span style="color:blue">g</span> is repeated 3 times','рус - TODO'),
           array('g{2,5}','<span style="color:blue">g</span> is repeated from 2 to 5 times','рус - TODO'),
         );
     }
@@ -205,14 +205,14 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $result = $handler->description('%s','%s');
         $this->assertEquals($expected_en, $result);
     }
-    
+
     public function option_provider()
     {
         return array(
           array('(?i)b','caseless: <span style="color:blue">b</span>','рус - TODO'),
           array('(?i:b)','grouping: [caseless: <span style="color:blue">b</span>]','рус - TODO'),
-          array('(a(?i)b)c','subpattern #1: [<span style="color:blue">a</span> then caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
-          //array('(?i)a(?u)b(?-i)c(?-u)d','subpattern #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
+          array('(a(?i)b)c','subexpression #1: [<span style="color:blue">a</span> then caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
+          //array('(?i)a(?u)b(?-i)c(?-u)d','subexpression #1: [<span style="color:blue">a</span>caseless: <span style="color:blue">b</span>] then case sensitive: <span style="color:blue">c</span>','рус - TODO'),
         );
     }
 
@@ -223,8 +223,8 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_author_tool_description('([a|b]|)\W+',null,null);
         //var_dump($handler);
         $result = $handler->default_description();
-        //$expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
-        $expected = '<span class="description_node_6"><span class="description_node_3">subpattern #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
+        //$expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
+        $expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
         $this->assertEquals($expected, $result);
     }
 
@@ -249,11 +249,11 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
           array('(?(?<=a)b|c)','if preceding text matches: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]','рус - TODO'),
           array('(?(?<!a)b|c)','if preceding text does not match: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>] else check: [<span style="color:blue">c</span>]','рус - TODO'),
           array('(?(?=a)b)','if further text matches: [<span style="color:blue">a</span>] then check: [<span style="color:blue">b</span>]','рус - TODO'),
-          array('(?(1)a)','if the subpattern #1 has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
-          array('(?(name)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
-          array('(?(<name>)a)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
-          array('(?(<name>)a|b)','if the subpattern "name" has been successfully matched then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]','рус - TODO'),
-          array('(?(DEFINE)(?<name>a))','definition of subpattern #1: [<span style="color:blue">a</span>]','рус - TODO'),
+          array('(?(1)a)','if the subexpression #1 has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
+          array('(?(name)a)','if the subexpression "name" has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
+          array('(?(<name>)a)','if the subexpression "name" has been successfully matched then check: [<span style="color:blue">a</span>]','рус - TODO'),
+          array('(?(<name>)a|b)','if the subexpression "name" has been successfully matched then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]','рус - TODO'),
+          array('(?(DEFINE)(?<name>a))','definition of subexpression #1: [<span style="color:blue">a</span>]','рус - TODO'),
         );
     }
 
@@ -273,17 +273,17 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
     public function postprocessing_provider()
     {
         return array(
-          array('([abc])','subpattern #1: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]','рус - TODO'),
+          array('([abc])','subexpression #1: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]','рус - TODO'),
           array('[^\S]','white space','рус - TODO'),
         );
     }
-    
+
     //------------------------------------------------------------------
 
     /**
-     * @dataProvider subpattern_provider
+     * @dataProvider subexpression_provider
      */
-    public function test_subpattern($regex,$expected_en,$expected_ru)
+    public function test_subexpression($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_author_tool_description($regex,null,null);
         //var_dump($handler);
@@ -291,7 +291,7 @@ class qtype_preg_description_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected_en, $result);
     }
 
-    public function subpattern_provider()
+    public function subexpression_provider()
     {
         return array(
           array('(?:[abc])','grouping: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]','рус - TODO'),

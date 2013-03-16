@@ -6,26 +6,26 @@ State 0:
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           lastexpr ::= * expr
           expr ::= * expr CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  16
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                          start accept
                       lastexpr shift  19
                           expr shift  5
@@ -41,21 +41,21 @@ State 1:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT expr CLOSEBRACK expr * CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR expr CLOSEBRACK expr * CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-     (17) expr ::= CONDSUBPATT expr CLOSEBRACK expr *
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+     (17) expr ::= CONDSUBEXPR expr CLOSEBRACK expr *
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  21
@@ -63,7 +63,7 @@ State 1:
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 17
 
@@ -78,23 +78,23 @@ State 2:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT expr * CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBPATT expr * CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= CONDSUBPATT expr * CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-     (18) expr ::= CONDSUBPATT expr *
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+     (18) expr ::= CONDSUBEXPR expr *
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  8
@@ -102,7 +102,7 @@ State 2:
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 18
 
@@ -118,10 +118,10 @@ State 3:
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
           expr ::= OPENBRACK expr * CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
@@ -129,9 +129,9 @@ State 3:
           expr ::= * OPENBRACK expr
      (15) expr ::= OPENBRACK expr *
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  23
@@ -139,7 +139,7 @@ State 3:
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 15
 
@@ -154,20 +154,20 @@ State 4:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT CLOSEBRACK expr * CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR CLOSEBRACK expr * CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  13
@@ -175,7 +175,7 @@ State 4:
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
 
 State 5:
@@ -189,10 +189,10 @@ State 5:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
      (12) lastexpr ::= expr *
           expr ::= * expr CLOSEBRACK
@@ -200,9 +200,9 @@ State 5:
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  17
@@ -210,7 +210,7 @@ State 5:
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 12
 
@@ -221,32 +221,32 @@ State 6:
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT * expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBPATT * expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT * CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBPATT * CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR * expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR * expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR * CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR * CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= CONDSUBPATT * expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= CONDSUBPATT * expr
-          expr ::= * CONDSUBPATT
-     (19) expr ::= CONDSUBPATT *
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= CONDSUBEXPR * expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= CONDSUBEXPR * expr
+          expr ::= * CONDSUBEXPR
+     (19) expr ::= CONDSUBEXPR *
           expr ::= * QUANT
 
                     CLOSEBRACK shift  7
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  2
                      {default} reduce 19
 
@@ -257,28 +257,28 @@ State 7:
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT CLOSEBRACK * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBPATT CLOSEBRACK * CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR CLOSEBRACK * expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR CLOSEBRACK * CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= * CLOSEBRACK
      (14) expr ::= CLOSEBRACK *
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  14
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  4
                      {default} reduce 14
 
@@ -289,12 +289,12 @@ State 8:
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBPATT expr CLOSEBRACK * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBPATT expr CLOSEBRACK * CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR expr CLOSEBRACK * expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR expr CLOSEBRACK * CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
      (13) expr ::= expr CLOSEBRACK *
@@ -302,17 +302,17 @@ State 8:
      (14) expr ::= CLOSEBRACK *
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= CONDSUBPATT expr CLOSEBRACK * expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= CONDSUBEXPR expr CLOSEBRACK * expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  18
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  1
                      {default} reduce 13
 
@@ -325,10 +325,10 @@ State 9:
           expr ::= OPENBRACK * CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
           expr ::= OPENBRACK * expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= * CLOSEBRACK
@@ -336,16 +336,16 @@ State 9:
           expr ::= OPENBRACK * expr
           expr ::= * OPENBRACK
      (16) expr ::= OPENBRACK *
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  15
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  3
                      {default} reduce 16
 
@@ -358,24 +358,24 @@ State 10:
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                       PARSLEAF shift  22
                          QUANT shift  24
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  11
                      {default} reduce 3
 
@@ -391,25 +391,25 @@ State 11:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                       PARSLEAF shift  22
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 2
 
@@ -425,36 +425,36 @@ State 12:
           expr ::= expr * QUANT
           expr ::= * OPENBRACK CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBPATT CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= * PARSLEAF
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
           expr ::= * CLOSEBRACK
           expr ::= * OPENBRACK expr
           expr ::= * OPENBRACK
-          expr ::= * CONDSUBPATT expr CLOSEBRACK expr
-          expr ::= * CONDSUBPATT expr
-          expr ::= * CONDSUBPATT
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                          QUANT shift  20
                      OPENBRACK shift  9
-                   CONDSUBPATT shift  6
+                   CONDSUBEXPR shift  6
                           expr shift  12
                      {default} reduce 1
 
 State 13:
-      (9) expr ::= CONDSUBPATT CLOSEBRACK expr CLOSEBRACK *
+      (9) expr ::= CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK *
      (13) expr ::= expr CLOSEBRACK *
      (14) expr ::= CLOSEBRACK *
 
                      {default} reduce 9
 
 State 14:
-     (10) expr ::= CONDSUBPATT CLOSEBRACK CLOSEBRACK *
+     (10) expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK *
      (14) expr ::= CLOSEBRACK *
 
                      {default} reduce 10
@@ -477,7 +477,7 @@ State 17:
                      {default} reduce 13
 
 State 18:
-      (8) expr ::= CONDSUBPATT expr CLOSEBRACK CLOSEBRACK *
+      (8) expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK *
      (14) expr ::= CLOSEBRACK *
 
                      {default} reduce 8
@@ -494,7 +494,7 @@ State 20:
                      {default} reduce 4
 
 State 21:
-      (7) expr ::= CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK *
+      (7) expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK *
      (13) expr ::= expr CLOSEBRACK *
      (14) expr ::= CLOSEBRACK *
 

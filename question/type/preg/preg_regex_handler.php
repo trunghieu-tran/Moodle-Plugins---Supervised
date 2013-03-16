@@ -116,7 +116,7 @@ class qtype_preg_regex_handler {
         //do parsing
         if ($this->is_parsing_needed()) {
             $this->build_tree($regex);
-            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subpatterns
+            $this->accept_regex();//Sometimes engine that use accept_regex still need parsing to count subexpressions
         } else {
             $this->ast_root = null;
             //In case with no parsing we should stick to accepting whole regex, not nodes
@@ -190,7 +190,7 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns max subpattern number.
+     * Returns max subexpression number.
      */
     public function get_max_subexpr() {
         if ($this->lexer !== null) {
@@ -201,7 +201,7 @@ class qtype_preg_regex_handler {
     }
 
     /**
-     * Returns subpatterns map.
+     * Returns subexpressions map.
      */
     public function get_subexpr_map() {
         if ($this->lexer !== null) {
@@ -365,8 +365,8 @@ class qtype_preg_regex_handler {
             $operand = $node->operands[0];
             return ($node->leftborder === 0 && isset($operand->type) && $operand->type == qtype_preg_node::TYPE_LEAF_CHARSET &&
                     count($operand->flags) > 0 && $operand->flags[0][0]->data === qtype_preg_charset_flag::META_DOT);
-        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBPATT) {
-            // Check the first operand for concatenation and subpatterns.
+        } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_SUBEXPR) {
+            // Check the first operand for concatenation and subexpressions.
             return $this->look_for_circumflex($node->operands[0], $wasconcat || isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_CONCAT);
         } else if (isset($node->type) && $node->type == qtype_preg_node::TYPE_NODE_ALT) {
             // Every branch of alternative is anchored.

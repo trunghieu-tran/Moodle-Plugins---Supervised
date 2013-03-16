@@ -554,14 +554,14 @@ class qtype_preg_nfa_node_finite_quant extends qtype_preg_nfa_operator {
 }
 
 /**
- * Class for subpatterns.
+ * Class for subexpressions.
  */
-class qtype_preg_nfa_node_subpatt extends qtype_preg_nfa_operator {
+class qtype_preg_nfa_node_subexpr extends qtype_preg_nfa_operator {
 
     public function create_automaton_inner(&$matcher, &$automaton, &$stack, &$transitioncounter) {
         // Operand creates its automaton.
         $this->operands[0]->create_automaton($matcher, $automaton, $stack, $transitioncounter);
-        if ($this->pregnode->subtype == qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
+        if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
             return;
         }
 

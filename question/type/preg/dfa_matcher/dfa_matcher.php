@@ -1219,8 +1219,8 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
             case 'node_infinite_quant':
                 $pregnode = $this->convert_infinite_quant($pregnode);
                 break;
-            //TODO write dfa_preg_node_subpatt to process situations like subpattern inside subpattern
-            case 'node_subpatt':
+            //TODO write dfa_preg_node_subexpr to process situations like subexpression inside of subexpression
+            case 'node_subexpr':
                 $pregnode = $pregnode->operands[0];
                 return $this->from_preg_node($pregnode);
                 break;
@@ -1259,7 +1259,7 @@ class qtype_preg_dfa_matcher extends qtype_preg_matcher {
 				}
                 break;
 			case 'node_assert':
-			case 'node_subpatt':
+			case 'node_subexpr':
             case 'node_infinite_quant':
                 $res=self::delete_zero_quant($node->operands[0]);
                 if ($res===true) {
