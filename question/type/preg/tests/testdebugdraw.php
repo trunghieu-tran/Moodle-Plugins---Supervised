@@ -59,7 +59,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
     function test_dot_style_provider() {
         $parser = $this->run_parser('(a|)');
         $root1 = $parser->get_root();
-        $etalon_dot_instructions1 = 'digraph {rankdir = LR;3[label = "( ... )", tooltip = subpattern, id = 3];2[label = "|", tooltip = alternative, id = 2];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];1[label = "emptiness", tooltip = emptiness, shape = rectangle, id = 1];3->2->0;2->1;}';
+        $etalon_dot_instructions1 = 'digraph {rankdir = LR;3[label = "( ... )", tooltip = subexpression, id = 3];2[label = "|", tooltip = alternative, id = 2];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];1[label = "emptiness", tooltip = emptiness, shape = rectangle, id = 1];3->2->0;2->1;}';
 
         //ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         $parser = $this->run_parser('^\\\\a\\b\\A\\Z\\G$');
@@ -124,7 +124,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('\\A[^c-z;-](ef)+');
         $root17 = $parser->get_root();
-        $etalon_dot_instructions17 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];0[label = "assertion \A", tooltip = assertion, shape = rectangle, id = 0];7[label = "concat", tooltip = concatenation, id = 7];1[label = "[^;-c-z]", tooltip = "character class", shape = rectangle, id = 1];6[label = "+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subpattern, id = 5];4[label = "concat", tooltip = concatenation, id = 4];2[label = "e", tooltip = "character class", shape = rectangle, id = 2];3[label = "f", tooltip = "character class", shape = rectangle, id = 3];8->0;8->7->1;7->6->5->4->2;4->3;}';
+        $etalon_dot_instructions17 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];0[label = "assertion \A", tooltip = assertion, shape = rectangle, id = 0];7[label = "concat", tooltip = concatenation, id = 7];1[label = "[^;-c-z]", tooltip = "character class", shape = rectangle, id = 1];6[label = "+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subexpression, id = 5];4[label = "concat", tooltip = concatenation, id = 4];2[label = "e", tooltip = "character class", shape = rectangle, id = 2];3[label = "f", tooltip = "character class", shape = rectangle, id = 3];8->0;8->7->1;7->6->5->4->2;4->3;}';
 
         $parser = $this->run_parser('abc{3,7}');
         $root18 = $parser->get_root();
@@ -168,11 +168,11 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('ab(xa)*+a');
         $root28 = $parser->get_root();
-        $etalon_dot_instructions28 = 'digraph {rankdir = LR;10[label = "concat", tooltip = concatenation, id = 10];8[label = "concat", tooltip = concatenation, id = 8];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];7[label = "concat", tooltip = concatenation, id = 7];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];6[label = "*+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subpattern, id = 5];4[label = "concat", tooltip = concatenation, id = 4];2[label = "x", tooltip = "character class", shape = rectangle, id = 2];3[label = "a", tooltip = "character class", shape = rectangle, id = 3];9[label = "a", tooltip = "character class", shape = rectangle, id = 9];10->8->0;8->7->1;7->6->5->4->2;4->3;10->9;}';
+        $etalon_dot_instructions28 = 'digraph {rankdir = LR;10[label = "concat", tooltip = concatenation, id = 10];8[label = "concat", tooltip = concatenation, id = 8];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];7[label = "concat", tooltip = concatenation, id = 7];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];6[label = "*+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subexpression, id = 5];4[label = "concat", tooltip = concatenation, id = 4];2[label = "x", tooltip = "character class", shape = rectangle, id = 2];3[label = "a", tooltip = "character class", shape = rectangle, id = 3];9[label = "a", tooltip = "character class", shape = rectangle, id = 9];10->8->0;8->7->1;7->6->5->4->2;4->3;10->9;}';
 
         $parser = $this->run_parser('a(bc|b|x)cc');
         $root29 = $parser->get_root();
-        $etalon_dot_instructions29 = 'digraph {rankdir = LR;13[label = "concat", tooltip = concatenation, id = 13];11[label = "concat", tooltip = concatenation, id = 11];9[label = "concat", tooltip = concatenation, id = 9];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];8[label = "( ... )", tooltip = subpattern, id = 8];7[label = "|", tooltip = alternative, id = 7];5[label = "|", tooltip = alternative, id = 5];3[label = "concat", tooltip = concatenation, id = 3];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];2[label = "c", tooltip = "character class", shape = rectangle, id = 2];4[label = "b", tooltip = "character class", shape = rectangle, id = 4];6[label = "x", tooltip = "character class", shape = rectangle, id = 6];10[label = "c", tooltip = "character class", shape = rectangle, id = 10];12[label = "c", tooltip = "character class", shape = rectangle, id = 12];13->11->9->0;9->8->7->5->3->1;3->2;5->4;7->6;11->10;13->12;}';
+        $etalon_dot_instructions29 = 'digraph {rankdir = LR;13[label = "concat", tooltip = concatenation, id = 13];11[label = "concat", tooltip = concatenation, id = 11];9[label = "concat", tooltip = concatenation, id = 9];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];8[label = "( ... )", tooltip = subexpression, id = 8];7[label = "|", tooltip = alternative, id = 7];5[label = "|", tooltip = alternative, id = 5];3[label = "concat", tooltip = concatenation, id = 3];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];2[label = "c", tooltip = "character class", shape = rectangle, id = 2];4[label = "b", tooltip = "character class", shape = rectangle, id = 4];6[label = "x", tooltip = "character class", shape = rectangle, id = 6];10[label = "c", tooltip = "character class", shape = rectangle, id = 10];12[label = "c", tooltip = "character class", shape = rectangle, id = 12];13->11->9->0;9->8->7->5->3->1;3->2;5->4;7->6;11->10;13->12;}';
 
         $parser = $this->run_parser('a(?:bc|b|x)cc');
         $root30 = $parser->get_root();
@@ -180,11 +180,11 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('a(?>bc|b|x)cc');
         $root31 = $parser->get_root();
-        $etalon_dot_instructions31 = 'digraph {rankdir = LR;13[label = "concat", tooltip = concatenation, id = 13];11[label = "concat", tooltip = concatenation, id = 11];9[label = "concat", tooltip = concatenation, id = 9];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];8[label = "(?> ... )", tooltip = subpattern, id = 8];7[label = "|", tooltip = alternative, id = 7];5[label = "|", tooltip = alternative, id = 5];3[label = "concat", tooltip = concatenation, id = 3];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];2[label = "c", tooltip = "character class", shape = rectangle, id = 2];4[label = "b", tooltip = "character class", shape = rectangle, id = 4];6[label = "x", tooltip = "character class", shape = rectangle, id = 6];10[label = "c", tooltip = "character class", shape = rectangle, id = 10];12[label = "c", tooltip = "character class", shape = rectangle, id = 12];13->11->9->0;9->8->7->5->3->1;3->2;5->4;7->6;11->10;13->12;}';
+        $etalon_dot_instructions31 = 'digraph {rankdir = LR;13[label = "concat", tooltip = concatenation, id = 13];11[label = "concat", tooltip = concatenation, id = 11];9[label = "concat", tooltip = concatenation, id = 9];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];8[label = "(?> ... )", tooltip = subexpression, id = 8];7[label = "|", tooltip = alternative, id = 7];5[label = "|", tooltip = alternative, id = 5];3[label = "concat", tooltip = concatenation, id = 3];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];2[label = "c", tooltip = "character class", shape = rectangle, id = 2];4[label = "b", tooltip = "character class", shape = rectangle, id = 4];6[label = "x", tooltip = "character class", shape = rectangle, id = 6];10[label = "c", tooltip = "character class", shape = rectangle, id = 10];12[label = "c", tooltip = "character class", shape = rectangle, id = 12];13->11->9->0;9->8->7->5->3->1;3->2;5->4;7->6;11->10;13->12;}';
 
         $parser = $this->run_parser('a(?>x*)xa');
         $root32 = $parser->get_root();
-        $etalon_dot_instructions32 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];4[label = "concat", tooltip = concatenation, id = 4];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];3[label = "(?> ... )", tooltip = subpattern, id = 3];2[label = "*", tooltip = "infinite quantifier", id = 2];1[label = "x", tooltip = "character class", shape = rectangle, id = 1];5[label = "x", tooltip = "character class", shape = rectangle, id = 5];7[label = "a", tooltip = "character class", shape = rectangle, id = 7];8->6->4->0;4->3->2->1;6->5;8->7;}';
+        $etalon_dot_instructions32 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];4[label = "concat", tooltip = concatenation, id = 4];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];3[label = "(?> ... )", tooltip = subexpression, id = 3];2[label = "*", tooltip = "infinite quantifier", id = 2];1[label = "x", tooltip = "character class", shape = rectangle, id = 1];5[label = "x", tooltip = "character class", shape = rectangle, id = 5];7[label = "a", tooltip = "character class", shape = rectangle, id = 7];8->6->4->0;4->3->2->1;6->5;8->7;}';
 
         $parser = $this->run_parser('(?-i)(?i:tv)set');
         $root33 = $parser->get_root();
@@ -208,11 +208,11 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('(?(?<=a)m|d)');
         $root38 = $parser->get_root();
-        $etalon_dot_instructions38 = 'digraph {rankdir = LR;5[label = "(?(?<= ... ) ... | .... )", tooltip = "conditional subpattern", id = 5];1[label = "m", tooltip = "character class", shape = rectangle, id = 1];2[label = "d", tooltip = "character class", shape = rectangle, id = 2];4[label = "assertion (?<= ... )", tooltip = assertion, id = 4];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];5->1;5->2;5->4->0;}';
+        $etalon_dot_instructions38 = 'digraph {rankdir = LR;5[label = "(?(?<= ... ) ... | .... )", tooltip = "conditional subexpression", id = 5];1[label = "m", tooltip = "character class", shape = rectangle, id = 1];2[label = "d", tooltip = "character class", shape = rectangle, id = 2];4[label = "assertion (?<= ... )", tooltip = assertion, id = 4];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];5->1;5->2;5->4->0;}';
 
         $parser = $this->run_parser('(a)?(?(?1)m|d)');
         $root39 = $parser->get_root();
-        $etalon_dot_instructions39 = 'digraph {rankdir = LR;13[label = "ERROR ", tooltip = error, id = 13];12[label = "|", tooltip = alternative, id = 12];10[label = "concat", tooltip = concatenation, id = 10];8[label = "concat", tooltip = concatenation, id = 8];2[label = "?", tooltip = "finite quantifier", id = 2];1[label = "( ... )", tooltip = subpattern, id = 1];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];6[label = "assertion (?( ... )", tooltip = assertion, id = 6];5[label = "concat", tooltip = concatenation, id = 5];3[label = "ERROR ", tooltip = error, id = 3];4[label = "1", tooltip = "character class", shape = rectangle, id = 4];9[label = "m", tooltip = "character class", shape = rectangle, id = 9];11[label = "d", tooltip = "character class", shape = rectangle, id = 11];13->12->10->8->2->1->0;8->6->5->5->4;10->9;12->11;}';
+        $etalon_dot_instructions39 = 'digraph {rankdir = LR;13[label = "ERROR ", tooltip = error, id = 13];12[label = "|", tooltip = alternative, id = 12];10[label = "concat", tooltip = concatenation, id = 10];8[label = "concat", tooltip = concatenation, id = 8];2[label = "?", tooltip = "finite quantifier", id = 2];1[label = "( ... )", tooltip = subexpression, id = 1];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];6[label = "assertion (?( ... )", tooltip = assertion, id = 6];5[label = "concat", tooltip = concatenation, id = 5];3[label = "ERROR ", tooltip = error, id = 3];4[label = "1", tooltip = "character class", shape = rectangle, id = 4];9[label = "m", tooltip = "character class", shape = rectangle, id = 9];11[label = "d", tooltip = "character class", shape = rectangle, id = 11];13->12->10->8->2->1->0;8->6->5->5->4;10->9;12->11;}';
 
         $parser = $this->run_parser('a\.?');
         $root40 = $parser->get_root();
@@ -232,7 +232,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('(a+a+)+a');
         $root44 = $parser->get_root();
-        $etalon_dot_instructions44 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];6[label = "+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subpattern, id = 5];4[label = "concat", tooltip = concatenation, id = 4];1[label = "+", tooltip = "infinite quantifier", id = 1];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];3[label = "+", tooltip = "infinite quantifier", id = 3];2[label = "a", tooltip = "character class", shape = rectangle, id = 2];7[label = "a", tooltip = "character class", shape = rectangle, id = 7];8->6->5->4->1->0;4->3->2;8->7;}';
+        $etalon_dot_instructions44 = 'digraph {rankdir = LR;8[label = "concat", tooltip = concatenation, id = 8];6[label = "+", tooltip = "infinite quantifier", id = 6];5[label = "( ... )", tooltip = subexpression, id = 5];4[label = "concat", tooltip = concatenation, id = 4];1[label = "+", tooltip = "infinite quantifier", id = 1];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];3[label = "+", tooltip = "infinite quantifier", id = 3];2[label = "a", tooltip = "character class", shape = rectangle, id = 2];7[label = "a", tooltip = "character class", shape = rectangle, id = 7];8->6->5->4->1->0;4->3->2;8->7;}';
 
         $parser = $this->run_parser(':::1:::0:|:::1:1:0:');
         $root45 = $parser->get_root();
@@ -276,7 +276,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('[[:blank:]](a|b)');
         $root55 = $parser->get_root();
-        $etalon_dot_instructions55 = 'digraph {rankdir = LR;5[label = "concat", tooltip = concatenation, id = 5];0[label = "[[:blank:]]", tooltip = "character class", shape = rectangle, id = 0];4[label = "( ... )", tooltip = subpattern, id = 4];3[label = "|", tooltip = alternative, id = 3];1[label = "a", tooltip = "character class", shape = rectangle, id = 1];2[label = "b", tooltip = "character class", shape = rectangle, id = 2];5->0;5->4->3->1;3->2;}';
+        $etalon_dot_instructions55 = 'digraph {rankdir = LR;5[label = "concat", tooltip = concatenation, id = 5];0[label = "[[:blank:]]", tooltip = "character class", shape = rectangle, id = 0];4[label = "( ... )", tooltip = subexpression, id = 4];3[label = "|", tooltip = alternative, id = 3];1[label = "a", tooltip = "character class", shape = rectangle, id = 1];2[label = "b", tooltip = "character class", shape = rectangle, id = 2];5->0;5->4->3->1;3->2;}';
 
         $parser = $this->run_parser('[[:space:]]{3,}');
         $root56 = $parser->get_root();
@@ -296,7 +296,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('(ab|cd*$|){3,100}');
         $root60 = $parser->get_root();
-        $etalon_dot_instructions60 = 'digraph {rankdir = LR;13[label = "{3,100}", tooltip = "finite quantifier", id = 13];12[label = "( ... )", tooltip = subpattern, id = 12];11[label = "|", tooltip = alternative, id = 11];9[label = "|", tooltip = alternative, id = 9];2[label = "concat", tooltip = concatenation, id = 2];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];3[label = "c", tooltip = "character class", shape = rectangle, id = 3];5[label = "*", tooltip = "infinite quantifier", id = 5];4[label = "d", tooltip = "character class", shape = rectangle, id = 4];7[label = "assertion $", tooltip = assertion, shape = rectangle, id = 7];10[label = "emptiness", tooltip = emptiness, shape = rectangle, id = 10];13->12->11->9->2->0;2->1;9->8->6->3;6->5->4;8->7;11->10;}';
+        $etalon_dot_instructions60 = 'digraph {rankdir = LR;13[label = "{3,100}", tooltip = "finite quantifier", id = 13];12[label = "( ... )", tooltip = subexpression, id = 12];11[label = "|", tooltip = alternative, id = 11];9[label = "|", tooltip = alternative, id = 9];2[label = "concat", tooltip = concatenation, id = 2];0[label = "a", tooltip = "character class", shape = rectangle, id = 0];1[label = "b", tooltip = "character class", shape = rectangle, id = 1];8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];3[label = "c", tooltip = "character class", shape = rectangle, id = 3];5[label = "*", tooltip = "infinite quantifier", id = 5];4[label = "d", tooltip = "character class", shape = rectangle, id = 4];7[label = "assertion $", tooltip = assertion, shape = rectangle, id = 7];10[label = "emptiness", tooltip = emptiness, shape = rectangle, id = 10];13->12->11->9->2->0;2->1;9->8->6->3;6->5->4;8->7;11->10;}';
 
         $parser = $this->run_parser('[[-]]');
         $root61 = $parser->get_root();
@@ -308,7 +308,7 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
 
         $parser = $this->run_parser('[[=aleph=]](NULL)?');
         $root63 = $parser->get_root();
-        $etalon_dot_instructions63 = 'digraph {rankdir = LR;11[label = "concat", tooltip = concatenation, id = 11];0[label = "[[=aleph=]]", tooltip = "character class", shape = rectangle, id = 0];10[label = "?", tooltip = "finite quantifier", id = 10];9[label = "( ... )", tooltip = subpattern, id = 9];8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];4[label = "concat", tooltip = concatenation, id = 4];2[label = "N", tooltip = "character class", shape = rectangle, id = 2];3[label = "U", tooltip = "character class", shape = rectangle, id = 3];5[label = "L", tooltip = "character class", shape = rectangle, id = 5];7[label = "L", tooltip = "character class", shape = rectangle, id = 7];11->0;11->10->9->8->6->4->2;4->3;6->5;8->7;}';
+        $etalon_dot_instructions63 = 'digraph {rankdir = LR;11[label = "concat", tooltip = concatenation, id = 11];0[label = "[[=aleph=]]", tooltip = "character class", shape = rectangle, id = 0];10[label = "?", tooltip = "finite quantifier", id = 10];9[label = "( ... )", tooltip = subexpression, id = 9];8[label = "concat", tooltip = concatenation, id = 8];6[label = "concat", tooltip = concatenation, id = 6];4[label = "concat", tooltip = concatenation, id = 4];2[label = "N", tooltip = "character class", shape = rectangle, id = 2];3[label = "U", tooltip = "character class", shape = rectangle, id = 3];5[label = "L", tooltip = "character class", shape = rectangle, id = 5];7[label = "L", tooltip = "character class", shape = rectangle, id = 7];11->0;11->10->9->8->6->4->2;4->3;6->5;8->7;}';
 
         $parser = $this->run_parser('BE$33[\w!-]');
         $root64 = $parser->get_root();
@@ -403,8 +403,8 @@ class qtype_preg_draw_test extends PHPUnit_Framework_TestCase {
         $this->matcher->input_fa('0->a->1;0->b->0;1->a->1;1->b->2;2->b->3;2->a->1;3->a->1;3->b->0;');
         $this->matcher->draw('complex.dot', 'complex.jpg');
     }
-    function test_subpattern() {//(a)(bc)
+    function test_subexpression() {//(a)(bc)
         $this->matcher->input_fa('0->#s1e1#a->1;1->#s2#b->2;2->#e2#c->3;');
-        $this->matcher->draw('subpattern.dot', 'subpattern.jpg');
+        $this->matcher->draw('subexpression.dot', 'subexpression.jpg');
     }*/
 }

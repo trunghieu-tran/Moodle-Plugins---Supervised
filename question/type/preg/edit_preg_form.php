@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php')
 MoodleQuickForm::registerElementType('text_and_button',
     $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
     'MoodleQuickForm_text_and_button');
-    
+
 /**
  * Preg editing form definition.
  */
@@ -50,7 +50,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *      field holding an array of answers
      * @return array of form fields.
      */
-     
+
     function get_per_answer_fields($mform, $label, $gradeoptions,
             &$repeatedoptions, &$answersoption) {
             $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
@@ -59,10 +59,10 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
             global $app;
             /*$mform->registerNoSubmitButton('regextest');
             $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
-            
+
             $tmp = & $mform->createElement('text_and_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $app . '/theme/image.php/standard/core/1359744739/t/edit'), array('size' => 80));
             array_splice($repeated, 1, 1, array( '0' => $tmp));
-            
+
             return $repeated;
     }
     /**
@@ -221,15 +221,15 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         $querymatcher = $questionobj->get_query_matcher($data['engine']);
-        //If engine doesn't support subpattern capturing, than no placeholders should be in feedback
-        if (!$querymatcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
+        //If engine doesn't support subexpression capturing, than no placeholders should be in feedback
+        if (!$querymatcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING)) {
             $feedbacks = $data['feedback'];
             foreach ($feedbacks as $key => $feedback) {
                 if (is_array($feedback)) {//On some servers feedback is HTMLEditor, on another it is simple text area
                     $feedback = $feedback['text'];
                 }
                 if (!empty($feedback) && preg_match('/\{\$([1-9][0-9]*|\w+)\}/', $feedback) == 1) {
-                    $errors['feedback['.$key.']'] = get_string('nosubpatterncapturing','qtype_preg',$querymatcher->name());
+                    $errors['feedback['.$key.']'] = get_string('nosubexprcapturing','qtype_preg',$querymatcher->name());
                 }
             }
         }

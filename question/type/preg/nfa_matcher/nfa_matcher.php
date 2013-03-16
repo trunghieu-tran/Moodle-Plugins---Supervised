@@ -282,7 +282,7 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
      * Writes subpatterns start\end information to this state.
      */
     public function write_subpatt_info($transition, $startpos, $pos, $matchlen, $options) {
-        if ($options !== null && !$options->capturesubpatterns) {
+        if ($options !== null && !$options->capturesubexpressions) {
             return;
         }
 
@@ -329,7 +329,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case 'node_infinite_quant':
             case 'node_concat':
             case 'node_alt':
-            case 'node_subpatt':
+            case 'node_subexpr':
                 return 'qtype_preg_nfa_' . $pregname;
                 break;
             case 'leaf_charset':
@@ -353,7 +353,7 @@ class qtype_preg_nfa_matcher extends qtype_preg_matcher {
             case qtype_preg_matcher::PARTIAL_MATCHING:
             case qtype_preg_matcher::CORRECT_ENDING:
             case qtype_preg_matcher::CHARACTERS_LEFT:
-            case qtype_preg_matcher::SUBPATTERN_CAPTURING:
+            case qtype_preg_matcher::SUBEXPRESSION_CAPTURING:
             case qtype_preg_matcher::CORRECT_ENDING_ALWAYS_FULL:
                 return true;
             default:

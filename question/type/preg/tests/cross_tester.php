@@ -330,7 +330,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         }
 
         // Check indexes and lengths.
-        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
+        if (!$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING)) {
             foreach ($obtained->index_first as $key => $index) {
                 $indexfirstpassed = $indexfirstpassed && ((!array_key_exists($key, $expected['index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                           (array_key_exists($key, $expected['index_first']) && $expected['index_first'][$key] === $obtained->index_first[$key]));
@@ -444,7 +444,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      * The main function - runs all matchers on test-data sets.
      */
     function test() {
-        $options = new qtype_preg_matching_options();  // Forced subpattern catupring.
+        $options = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $enginename = $this->engine_name();
         $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
 

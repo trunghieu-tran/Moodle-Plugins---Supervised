@@ -495,7 +495,7 @@ abstract class qtype_preg_finite_automaton {
     /**
      * Reads fa from a special code and modifies current object.
      * code format: i->abc->j;k->charset->l; e.t.c.
-     * maximum count of subpatterns when reading fa is 9 in current implementation.
+     * maximum count of subexpressions when reading fa is 9 in current implementation.
      * @param facode string with the code of the finite automaton.
      */
     public function input_fa($facode) {
@@ -561,11 +561,11 @@ abstract class qtype_preg_finite_automaton {
      */
     static protected function read_transition($facode, $start) {
         $i = $start;
-        $subpattstarts = array();
-        $subpattends = array();
+        $subexprstarts = array();
+        $subexprends = array();
         $charset = '';
         $error = false;
-        // Input subpatterns.
+        // Input subexpressions.
         if ($facode[$start] == '#') {
             $i = $start + 1;
             do {
@@ -574,9 +574,9 @@ abstract class qtype_preg_finite_automaton {
                     echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
                     // TODO: correct error message.
                 } else if ($facode[$i] == 's') {
-                    $subpattstarts[] = (int)$facode[$i + 1];
+                    $subexprstarts[] = (int)$facode[$i + 1];
                 } else if ($facode[$i] == 'e') {
-                    $subpattends[] = (int)$facode[$i + 1];
+                    $subexprends[] = (int)$facode[$i + 1];
                 } else {
                     $error = true;
                     echo "<BR><BR><BR>Incorrect fa code!<BR><BR><BR>";
@@ -605,10 +605,10 @@ abstract class qtype_preg_finite_automaton {
         $trash =  new qtype_preg_fa_state();
         $transition = new qtype_preg_nfa_transition($trash, $leaf, $trash);
         $transition->tags = array();
-        foreach ($subpattstarts as $val) {
+        foreach ($subexprstarts as $val) {
             $transition->tags[] = $val * 2;
         }
-        foreach ($subpattends as $val) {
+        foreach ($subexprends as $val) {
             $transition->tags[] = $val * 2 + 1;
         }
         return $transition;

@@ -981,7 +981,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    // Tests for cases with ambiguity - subpatterns, quantifiers and backreferences.
+    // Tests for cases with ambiguity - subexpressions, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
@@ -1000,7 +1000,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_nested() {
+    function data_for_test_subexpr_nested() {
         $test1 = array( 'str'=>'abcbcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -1010,7 +1010,7 @@ class qtype_preg_cross_tests_from_preg {
         $test2 = array( 'str'=>'ad',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0,1=>1),    // The quantifier is outside subpatterns 2 and 3 so they are not matched!
+                        'index_first'=>array(0=>0,1=>1),    // The quantifier is outside subexpressions 2 and 3 so they are not matched!
                         'length'=>array(0=>2,1=>0));
 
         return array('regex'=>'^a((b(c)(?:\b|\B))*)d$',
@@ -1018,7 +1018,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_with_quant_nested() {
+    function data_for_test_subexpr_with_quant_nested() {
         $test1 = array( 'str'=>'12',
                         'is_match'=>true,
                         'full'=>false,
@@ -1040,7 +1040,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_concatenated() {
+    function data_for_test_subexpr_concatenated() {
         $test1 = array( 'str'=>'_abcdef',
                         'is_match'=>true,
                         'full'=>true,
@@ -1058,7 +1058,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_alternated() {
+    function data_for_test_subexpr_alternated() {
         $test1 = array( 'str'=>'abcdefgh',
                         'is_match'=>true,
                         'full'=>true,
@@ -1070,7 +1070,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_quantifier_inside() {
+    function data_for_test_subexpr_quantifier_inside() {
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -1082,7 +1082,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_quantifier_outside() {
+    function data_for_test_subexpr_quantifier_outside() {
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -1094,7 +1094,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_tricky() {
+    function data_for_test_subexpr_tricky() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -1112,7 +1112,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_nested_and_concatenated() {
+    function data_for_test_subexpr_nested_and_concatenated() {
         $test1 = array( 'str'=>'zw',
                         'is_match'=>true,
                         'full'=>true,
@@ -1132,7 +1132,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_duplicate_simple() {
+    function data_for_test_subexpr_duplicate_simple() {
         $test1 = array( 'str'=>'cat-cats',
                         'is_match'=>true,
                         'full'=>true,
@@ -1150,7 +1150,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_duplicate() {
+    function data_for_test_subexpr_duplicate() {
         $test1 = array( 'str'=>'abee',
                         'is_match'=>true,
                         'full'=>true,
@@ -1168,7 +1168,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_subpatt_named() {
+    function data_for_test_subexpr_named() {
         $test1 = array( 'str'=>'abcabcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -2529,7 +2529,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
     }
 
-    function data_for_test_node_cond_subpatt() {
+    function data_for_test_node_cond_subexpr() {
         $test1 = array( 'str'=>'11-aaa-11',
                         'is_match'=>true,
                         'full'=>true,
@@ -2584,7 +2584,7 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_backref_to_uncaptured_subpatt() {
+    function data_for_test_backref_to_uncaptured_subexpr() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,

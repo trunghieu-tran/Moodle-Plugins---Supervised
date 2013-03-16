@@ -185,7 +185,7 @@ class qtype_preg_yyParser
     }
 
     /**
-      * Creates and return correct parenthesis node (subpattern, groping or assertion).
+      * Creates and return correct parenthesis node (subexpression, groping or assertion).
       *
       * Used to avoid code duplication between empty and non-empty parenthesis.
       * @param parens parenthesis token from lexer
@@ -193,13 +193,13 @@ class qtype_preg_yyParser
       */
     protected function create_parens_node($parens, $exprnode) {
         $result = null;
-        if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
+        if ($parens->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING && !$this->handlingoptions->preserveallnodes) {
             $result = $exprnode;
         } else {
-            if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_GROUPING) {
-                $result = new qtype_preg_node_subpatt(-1);
-            } else if ($parens->subtype === qtype_preg_node_subpatt::SUBTYPE_SUBPATT || $parens->subtype === qtype_preg_node_subpatt::SUBTYPE_ONCEONLY) {
-                $result = new qtype_preg_node_subpatt($parens->number);
+            if ($parens->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING) {
+                $result = new qtype_preg_node_subexpr(-1);
+            } else if ($parens->subtype === qtype_preg_node_subexpr::SUBTYPE_SUBEXPR || $parens->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
+                $result = new qtype_preg_node_subexpr($parens->number);
             } else {
                 $result = new qtype_preg_node_assert();
             }
@@ -211,7 +211,7 @@ class qtype_preg_yyParser
         return $result;
     }
 
-    protected function create_cond_subpatt_assertion_node($paren, $assertnode, $exprnode) {
+    protected function create_cond_subexpr_assertion_node($paren, $assertnode, $exprnode) {
         if ($assertnode === null) {
             $assertnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $assertnode->set_user_info($paren->indlast, $paren->indlast, new qtype_preg_userinscription());
@@ -221,24 +221,24 @@ class qtype_preg_yyParser
             $exprnode->set_user_info($assertnode->indlast + 1, $assertnode->indlast + 1, new qtype_preg_userinscription());
         }
         if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
-            $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+            $result = new qtype_preg_node_cond_subexpr($paren->subtype);
             $result->operands[0] = $exprnode;
         } else {
-            // Error: only one or two top-level alternative allowed in a conditional subpattern.
+            // Error: only one or two top-level alternative allowed in a conditional subexpression.
             if ($exprnode->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || $exprnode->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
-                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode, $assertnode));
+                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode, $assertnode));
                 return $result;
             } else {
-                $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+                $result = new qtype_preg_node_cond_subexpr($paren->subtype);
                 $result->operands[0] = $exprnode->operands[0];
                 $result->operands[1] = $exprnode->operands[1];
             }
         }
-        if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA) {
+        if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
-        } else if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB) {
+        } else if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLB;
-        } else if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA) {
+        } else if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_NLA;
         } else {
             $subtype = qtype_preg_node_assert::SUBTYPE_NLB;
@@ -250,26 +250,26 @@ class qtype_preg_yyParser
         return $result;
     }
 
-    protected function create_cond_subpatt_other_node($paren, $exprnode) {
+    protected function create_cond_subexpr_other_node($paren, $exprnode) {
         if ($exprnode === null) {
             $exprnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $exprnode->set_user_info($paren->indlast + 2, $paren->indlast + 2, new qtype_preg_userinscription());
         }
         if ($exprnode->type != qtype_preg_node::TYPE_NODE_ALT) {
-            $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+            $result = new qtype_preg_node_cond_subexpr($paren->subtype);
             $result->operands[0] = $exprnode;
         } else {
-             // Error: only one or two top-level alternative allowed in a conditional subpattern.
+             // Error: only one or two top-level alternative allowed in a conditional subexpression.
             if ($exprnode->operands[0]->type == qtype_preg_node::TYPE_NODE_ALT || $exprnode->operands[1]->type == qtype_preg_node::TYPE_NODE_ALT) {
-                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBPATT_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode));
+                $result = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, $paren->indfirst, $exprnode->indlast + 1, null, null, array($exprnode));
                 return $result;
             } else {
-                $result = new qtype_preg_node_cond_subpatt($paren->subtype);
+                $result = new qtype_preg_node_cond_subexpr($paren->subtype);
                 $result->operands[0] = $exprnode->operands[0];
                 $result->operands[1] = $exprnode->operands[1];
             }
         }
-        if ($paren->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_SUBPATT) {
+        if ($paren->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
             $result->number = $paren->number;
         }
         $result->set_user_info($paren->indfirst, $exprnode->indlast + 1, new qtype_preg_userinscription($paren->userinscription->data . '...|...)'));
@@ -336,7 +336,7 @@ class qtype_preg_yyParser
     const PARSLEAF                       =  7;
     const QUANT                          =  8;
     const OPENBRACK                      =  9;
-    const CONDSUBPATT                    = 10;
+    const CONDSUBEXPR                    = 10;
     const YY_NO_ACTION = 48;
     const YY_ACCEPT_ACTION = 47;
     const YY_ERROR_ACTION = 46;
@@ -567,7 +567,7 @@ static public $yy_action = array(
     static public $yyTokenName = array(
   '$',             'ERROR_PREC_VERY_SHORT',  'ERROR_PREC_SHORT',  'ERROR_PREC',  
   'CLOSEBRACK',    'ALT',           'CONC',          'PARSLEAF',    
-  'QUANT',         'OPENBRACK',     'CONDSUBPATT',   'error',       
+  'QUANT',         'OPENBRACK',     'CONDSUBEXPR',   'error',       
   'start',         'lastexpr',      'expr',        
     );
 
@@ -583,19 +583,19 @@ static public $yy_action = array(
  /*   4 */ "expr ::= expr QUANT",
  /*   5 */ "expr ::= OPENBRACK CLOSEBRACK",
  /*   6 */ "expr ::= OPENBRACK expr CLOSEBRACK",
- /*   7 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr CLOSEBRACK",
- /*   8 */ "expr ::= CONDSUBPATT expr CLOSEBRACK CLOSEBRACK",
- /*   9 */ "expr ::= CONDSUBPATT CLOSEBRACK expr CLOSEBRACK",
- /*  10 */ "expr ::= CONDSUBPATT CLOSEBRACK CLOSEBRACK",
+ /*   7 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK",
+ /*   8 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK",
+ /*   9 */ "expr ::= CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK",
+ /*  10 */ "expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK",
  /*  11 */ "expr ::= PARSLEAF",
  /*  12 */ "lastexpr ::= expr",
  /*  13 */ "expr ::= expr CLOSEBRACK",
  /*  14 */ "expr ::= CLOSEBRACK",
  /*  15 */ "expr ::= OPENBRACK expr",
  /*  16 */ "expr ::= OPENBRACK",
- /*  17 */ "expr ::= CONDSUBPATT expr CLOSEBRACK expr",
- /*  18 */ "expr ::= CONDSUBPATT expr",
- /*  19 */ "expr ::= CONDSUBPATT",
+ /*  17 */ "expr ::= CONDSUBEXPR expr CLOSEBRACK expr",
+ /*  18 */ "expr ::= CONDSUBEXPR expr",
+ /*  19 */ "expr ::= CONDSUBEXPR",
  /*  20 */ "expr ::= QUANT",
     );
 
@@ -1046,41 +1046,41 @@ static public $yy_action = array(
 #line 1051 "../preg_parser.php"
 #line 270 "../preg_parser.y"
     function yy_r7(){
-    if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
-        $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
-        $this->_retvalue = $this->create_cond_subpatt_assertion_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
+    if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+        $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+        $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
     } else {
-        $this->_retvalue = $this->create_cond_subpatt_other_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -1]->minor);
+        $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
     }
 #line 1061 "../preg_parser.php"
 #line 279 "../preg_parser.y"
     function yy_r8(){
-    if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
-        $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
-        $this->_retvalue = $this->create_cond_subpatt_assertion_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, null);
+    if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+        $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+        $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, null);
     } else {
-        $this->_retvalue = $this->create_cond_subpatt_other_node($this->yystack[$this->yyidx + -3]->minor, null);
+        $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, null);
     }
     }
 #line 1071 "../preg_parser.php"
 #line 288 "../preg_parser.y"
     function yy_r9(){
-    if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
-        $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
-        $this->_retvalue = $this->create_cond_subpatt_assertion_node($this->yystack[$this->yyidx + -3]->minor, null, $this->yystack[$this->yyidx + -1]->minor);
+    if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+        $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+        $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -3]->minor, null, $this->yystack[$this->yyidx + -1]->minor);
     } else {
-        $this->_retvalue = $this->create_cond_subpatt_other_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
+        $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
     }
 #line 1081 "../preg_parser.php"
 #line 297 "../preg_parser.y"
     function yy_r10(){
-    if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLA || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLA ||
-        $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_PLB || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subpatt::SUBTYPE_NLB) {
-        $this->_retvalue = $this->create_cond_subpatt_assertion_node($this->yystack[$this->yyidx + -2]->minor, null, null);
+    if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
+        $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+        $this->_retvalue = $this->create_cond_subexpr_assertion_node($this->yystack[$this->yyidx + -2]->minor, null, null);
     } else {
-        $this->_retvalue = $this->create_cond_subpatt_other_node($this->yystack[$this->yyidx + -2]->minor, null);
+        $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -2]->minor, null);
     }
     }
 #line 1091 "../preg_parser.php"

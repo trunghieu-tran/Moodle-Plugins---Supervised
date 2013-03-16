@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
     public function __construct($regex = null, $modifiers = null, $options = null) {
-        //This matcher sometimes use common lexer/parser to count subpatterns, since preg_match don't always return them all.
+        //This matcher sometimes use common lexer/parser to count subexpressions, since preg_match don't always return them all.
         //We need to be sure it uses PCRE strict parsing mode and don't generate any additional error messages.
         if (is_object($options)) {
             $options->pcrestrict = true;
@@ -43,7 +43,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
 
     public function is_supporting($capability) {
         switch ($capability) {
-        case qtype_preg_matcher::SUBPATTERN_CAPTURING :
+        case qtype_preg_matcher::SUBEXPRESSION_CAPTURING :
             return true;
             break;
         }
@@ -66,12 +66,12 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
      * @return bool if parsing needed
      */
     protected function is_parsing_needed() {
-        //We need parsing if option is set for capture subpatterns.
-        return $this->options->capturesubpatterns;
+        //We need parsing if option is set for capture subexpressions.
+        return $this->options->capturesubexpressions;
     }
 
     protected function is_preg_node_acceptable($pregnode) {
-        return true;    // We actually need tree only for subpatterns, so accept anything.
+        return true;    // We actually need tree only for subexpressions, so accept anything.
     }
 
     /**
@@ -120,7 +120,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
         $matches = array();
         //No need to find all matches since preg_match don't return partial matches, any full match is sufficient
         $full = preg_match($for_regexp, $str, $matches, PREG_OFFSET_CAPTURE);
-        //$matches[0] - match with the whole regexp, $matches[1] - first subpattern etc
+        //$matches[0] - match with the whole regexp, $matches[1] - first subexpression etc
         //$matches[$i] format is array(0=> match, 1 => offset of this match)
         if ($full) {
             $matchresults->full = true;//No partial matching from preg_match

@@ -369,7 +369,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15, $test16, $test17, $test18, $test19, $test20, $test21, $test22, $test23, $test24, $test25, $test26, $test27, $test28, $test29, $test30, $test31, $test32, $test33, $test34, $test35, $test36));
     }
 
-    function data_for_test_subpattern_in_quantifier() {
+    function data_for_test_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abczz',
                         'is_match'=>true,
                         'full'=>true,
@@ -424,7 +424,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-/*  function data_for_test_subpattern_and_alternative_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_and_alternative_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'bc',
                         'is_match'=>true,
                         'full'=>true,
@@ -512,7 +512,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 */
-    function data_for_test_subpattern_and_alternative_and_greedy_quantifiers() {
+    function data_for_test_subexpression_and_alternative_and_greedy_quantifiers() {
         $test1 = array( 'str'=>'bc',
                         'is_match'=>true,
                         'full'=>true,
@@ -600,7 +600,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11));
     }
 
-/*  function data_for_test_subpattern_and_alternative_and_greedy_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'bbc',
                         'is_match'=>true,
                         'full'=>true,
@@ -612,7 +612,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_and_alternative_and_greedy_and_lazy_quantifiers_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'babc',
                         'is_match'=>true,
                         'full'=>true,
@@ -665,7 +665,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_subpattern_and_alternative_and_greedy_and_lazy_quantifiers_3() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_3() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'babc',
                         'is_match'=>true,
                         'full'=>true,
@@ -1318,7 +1318,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-    function data_for_test_character_class_and_quantifiers_and_subpatterns() {
+    function data_for_test_character_class_and_quantifiers_and_subexpressions() {
         $test1 = array( 'str'=>'abc!pqr=apquxz.ixr.zzz.ac.uk',
                         'is_match'=>true,
                         'full'=>true,
@@ -1396,7 +1396,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_with_modifier_i() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_with_modifier_i() {
         $test1 = array( 'str'=>'0abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -1503,7 +1503,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13));
     }
 
-    function data_for_test_quantifiers_and_subpatterns() {
+    function data_for_test_quantifiers_and_subexpressions() {
         $test1 = array( 'str'=>'.1.2.3',
                         'is_match'=>true,
                         'full'=>true,
@@ -1558,7 +1558,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_space_and_not_space_characters_in_quantifiers_and_subpatterns() {
+    function data_for_test_space_and_not_space_characters_in_quantifiers_and_subexpressions() {
         $test1 = array( 'str'=>'1 IN SOA non-sp1 non-sp2(',
                         'is_match'=>true,
                         'full'=>true,
@@ -1595,7 +1595,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_character_classes_in_quantifiers_and_subpattern() {
+    function data_for_test_character_classes_in_quantifiers_and_subexpression() {
         $test1 = array( 'str'=>'a.',
                         'is_match'=>true,
                         'full'=>true,
@@ -1660,7 +1660,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
-    function data_for_test_character_classes_in_quantifiers_and_subpatterns() {
+    function data_for_test_character_classes_in_quantifiers_and_subexpressions() {
         $test1 = array( 'str'=>'*.a',
                         'is_match'=>true,
                         'full'=>true,
@@ -1738,7 +1738,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
-    function data_for_test_positive_lookahead_assertion_and_subpatterns() {
+    function data_for_test_positive_lookahead_assertion_and_subexpressions() {
         $test1 = array( 'str'=>'abde',
                         'is_match'=>true,
                         'full'=>true,
@@ -1750,7 +1750,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_lookahead_assertion_and_subpatterns() {
+    function data_for_test_negative_lookahead_assertion_and_subexpressions() {
         $test1 = array( 'str'=>'abdf',
                         'is_match'=>true,
                         'full'=>true,
@@ -1762,7 +1762,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_positive_lookahead_assertion_and_subpatterns_2() {
+    function data_for_test_positive_lookahead_assertion_and_subexpressions_2() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -1801,7 +1801,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_any_character_and_space_character_in_quantifiers_and_subpattern() {
+    function data_for_test_any_character_and_space_character_in_quantifiers_and_subexpression() {
         $test1 = array( 'str'=>'"1234"',
                         'is_match'=>true,
                         'full'=>true,
@@ -1992,7 +1992,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-    function data_for_test_many_subpatterns() {
+    function data_for_test_many_subexpressions() {
         $test1 = array( 'str'=>'abcdefhijklm',
                         'is_match'=>true,
                         'full'=>true,
@@ -2004,7 +2004,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_subpatterns_and_unnumbered_subpatterns() {
+    function data_for_test_many_subexpressions_and_unnumbered_subexpressions() {
         $test1 = array( 'str'=>'abcdefhijklm',
                         'is_match'=>true,
                         'full'=>true,
@@ -2433,7 +2433,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_alternatives_and_subpatterns_and_back_reference() {
+    function data_for_test_alternatives_and_subexpressions_and_back_reference() {
         $test1 = array( 'str'=>'cataract cataract23',
                         'is_match'=>true,
                         'full'=>true,
@@ -2552,7 +2552,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_lookahead_assertion_and_unnumbered_subpattern_and_quantifiers() {
+    function data_for_test_negative_lookahead_assertion_and_unnumbered_subexpression_and_quantifiers() {
         $test1 = array( 'str'=>'foobar crowbar etc',
                         'is_match'=>true,
                         'full'=>true,
@@ -2585,7 +2585,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_positive_and_negative_lookahead_assertions_and_quantifier_in_subpattern() {
+    function data_for_test_positive_and_negative_lookahead_assertions_and_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'abc456',
                         'is_match'=>true,
                         'full'=>true,
@@ -2759,7 +2759,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_character_class_in_greedy_quantifier_and_greedy_quantifier_in_alternative_in_subpattern() {
+    function data_for_test_character_class_in_greedy_quantifier_and_greedy_quantifier_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2771,7 +2771,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_character_class_in_lazy_quantifier_and_greedy_quantifier_in_alternative_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_character_class_in_lazy_quantifier_and_greedy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2783,7 +2783,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_character_class_in_lazy_quantifier_and_lazy_quantifier_in_alternative_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_character_class_in_lazy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -2795,7 +2795,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_character_class_in_greedy_quantifier_and_lazy_quantifier_in_alternative_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_character_class_in_greedy_quantifier_and_lazy_quantifier_in_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aabbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -3849,7 +3849,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference() {
         $test1 = array( 'str'=>'cowcowbell',
                         'is_match'=>true,
                         'full'=>true,
@@ -3957,7 +3957,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference_in_quantifier() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference_in_quantifier() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -4001,7 +4001,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference_in_quantifier_2() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference_in_quantifier_2() {
         $test1 = array( 'str'=>'aab',
                         'is_match'=>true,
                         'full'=>true,
@@ -4045,7 +4045,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference_in_quantifier_3() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference_in_quantifier_3() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -4089,7 +4089,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference_in_quantifier_4() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference_in_quantifier_4() {
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -4144,7 +4144,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_alternative_without_second_operand_in_subpattern_and_back_reference_in_quantifier_5() {
+    function data_for_test_alternative_without_second_operand_in_subexpression_and_back_reference_in_quantifier_5() {
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -4259,7 +4259,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_negative_character_classes_in_quantifiers_in_subpatterns() {
+    function data_for_test_negative_character_classes_in_quantifiers_in_subexpressions() {
         $test1 = array( 'str'=>'track1.title:TBlah blah blah',
                         'is_match'=>true,
                         'full'=>true,
@@ -4271,7 +4271,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_character_classes_in_quantifiers_in_subpatterns_modifier_i() {
+    function data_for_test_negative_character_classes_in_quantifiers_in_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'track1.title:TBlah blah blah',
                         'is_match'=>true,
                         'full'=>true,
@@ -4284,7 +4284,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_character_classes_in_quantifiers_in_subpatterns_modifier_i_2() {
+    function data_for_test_negative_character_classes_in_quantifiers_in_subexpressions_modifier_i_2() {
         $test1 = array( 'str'=>'track1.title:TBlah blah blah',
                         'is_match'=>true,
                         'full'=>true,
@@ -4540,7 +4540,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_unnumbered_subpatterns_in_alternative() {
+    function data_for_test_unnumbered_subexpressions_in_alternative() {
         $test1 = array( 'str'=>'b::c',
                         'is_match'=>true,
                         'full'=>true,
@@ -4876,7 +4876,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_subpattern_and_oct_code_of_character() {
+    function data_for_test_subexpression_and_oct_code_of_character() {
         $test1 = array( 'str'=>"abc\x53",
                         'is_match'=>true,
                         'full'=>true,
@@ -4888,7 +4888,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 /* на следующих 2 тестовых функциях выбрасывается исключение: Uninitialized string offset: 1
-    function data_for_test_subpattern_and_oct_code_of_character_2() {
+    function data_for_test_subexpression_and_oct_code_of_character_2() {
         $test1 = array( 'str'=>"abc\x93",
                         'is_match'=>true,
                         'full'=>true,
@@ -4900,7 +4900,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_and_oct_code_of_character_3() {
+    function data_for_test_subexpression_and_oct_code_of_character_3() {
         $test1 = array( 'str'=>"abc\xd3",
                         'is_match'=>true,
                         'full'=>true,
@@ -4912,7 +4912,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpattern_and_oct_code_of_character_4() {
+    function data_for_test_subexpression_and_oct_code_of_character_4() {
         $test1 = array( 'str'=>"abc\x40",
                         'is_match'=>true,
                         'full'=>true,
@@ -4931,7 +4931,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpattern_and_oct_code_of_character_5() {
+    function data_for_test_subexpression_and_oct_code_of_character_5() {
         $test1 = array( 'str'=>"abc\x400",
                         'is_match'=>true,
                         'full'=>true,
@@ -5016,7 +5016,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_many_subpatterns_and_back_reference_and_oct_code_of_character() {
+    function data_for_test_many_subexpressions_and_back_reference_and_oct_code_of_character() {
         $test1 = array( 'str'=>'abcdefghijkllS',
                         'is_match'=>true,
                         'full'=>true,
@@ -5028,7 +5028,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_subpatterns_and_back_reference_and_oct_code_of_character_2() {
+    function data_for_test_many_subexpressions_and_back_reference_and_oct_code_of_character_2() {
         $test1 = array( 'str'=>"abcdefghijk\12S",
                         'is_match'=>true,
                         'full'=>true,
@@ -5634,7 +5634,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subpatterns() {
+    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5646,7 +5646,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subpatterns_2() {
+    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions_2() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5658,7 +5658,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subpatterns() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5670,7 +5670,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subpatterns_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5682,7 +5682,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subpatterns_before_end_of_line() {
+    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5694,7 +5694,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subpatterns_before_end_of_line() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_character_in_lazy_quantifier_and_digit_in_greedy_quantifier_in_subexpressions_before_end_of_line() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5706,7 +5706,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subpatterns_and_word_boundary_before_end_of_line() {
+    function data_for_test_any_character_and_digit_in_greedy_quantifiers_in_subexpressions_and_word_boundary_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5718,7 +5718,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_any_character_and_digit_in_greedy_quantifiers_and_not_digit_in_subpatterns_before_end_of_line() {
+    function data_for_test_any_character_and_digit_in_greedy_quantifiers_and_not_digit_in_subexpressions_before_end_of_line() {
         $test1 = array( 'str'=>'I have 2 numbers: 53147',
                         'is_match'=>true,
                         'full'=>true,
@@ -5945,7 +5945,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_character_class_in_quantifier_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'word cat dog elephant mussel cow horse canary baboon snake shark otherword',
                         'is_match'=>true,
                         'full'=>true,
@@ -5966,7 +5966,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_quantifier_in_unnumbered_subpattern_in_quantifier_2() {
+    function data_for_test_character_class_in_quantifier_in_unnumbered_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'word cat dog elephant mussel cow horse canary baboon snake shark the quick brown fox and the lazy dog and several other words getting close to thirty by now I hope',
                         'is_match'=>true,
                         'full'=>false,
@@ -5980,7 +5980,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_null_quantifier() {
+    function data_for_test_subexpression_in_null_quantifier() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6006,7 +6006,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_quantifier_2() {
+    function data_for_test_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6032,7 +6032,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_quantifier_3() {
+    function data_for_test_subexpression_in_quantifier_3() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6058,7 +6058,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_quantifier_4() {
+    function data_for_test_subexpression_in_quantifier_4() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6091,7 +6091,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_subpattern_in_quantifier_5() {
+    function data_for_test_subexpression_in_quantifier_5() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6131,7 +6131,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_subpattern_in_quantifier_6() {
+    function data_for_test_subexpression_in_quantifier_6() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>false,
                         'full'=>false,
@@ -6159,7 +6159,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_quantifier_7() {
+    function data_for_test_subexpression_in_quantifier_7() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>false,
                         'full'=>false,
@@ -6187,7 +6187,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_quantifier_8() {
+    function data_for_test_subexpression_in_quantifier_8() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>false,
                         'full'=>false,
@@ -6222,7 +6222,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_subpattern_in_quantifier_9() {
+    function data_for_test_subexpression_in_quantifier_9() {
         $test1 = array( 'str'=>'bcd',
                         'is_match'=>false,
                         'full'=>false,
@@ -6595,7 +6595,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternative_modifier_s_in_unnumbered_subpattern() { //модификатор s не поддерживается
+/*  function data_for_test_any_character_in_quantifier_or_begin_of_line_in_alternative_modifier_s_in_unnumbered_subexpression() { //модификатор s не поддерживается
         $test1 = array( 'str'=>"abcde\n1234Xyz",
                         'is_match'=>true,
                         'full'=>true,
@@ -6775,7 +6775,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_quantifier_10() {
+    function data_for_test_subexpression_in_quantifier_10() {
         $test1 = array( 'str'=>'abcabcabcabc ',
                         'is_match'=>true,
                         'full'=>true,
@@ -6877,7 +6877,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_subpattern_in_null_quantifier_2() {
+    function data_for_test_subexpression_in_null_quantifier_2() {
         $test1 = array( 'str'=>'abd',
                         'is_match'=>true,
                         'full'=>true,
@@ -6907,7 +6907,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_quantifier_in_subpattern() {
+    function data_for_test_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -6979,7 +6979,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_negative_character_class_in_quantifier_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_negative_character_class_in_quantifier_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'the "quick" brown fox',
                         'is_match'=>true,
                         'full'=>true,
@@ -7100,7 +7100,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 *//* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_subpattern_and_alternative_and_lazy_quantifiers_2() {
+    function data_for_test_subexpression_and_alternative_and_lazy_quantifiers_2() {
         $test1 = array( 'str'=>'bac',
                         'is_match'=>true,
                         'full'=>true,
@@ -7140,7 +7140,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 /* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_subpattern_and_alternative_and_greedy_and_lazy_quantifiers_2() {
+    function data_for_test_subexpression_and_alternative_and_greedy_and_lazy_quantifiers_2() {
         $test1 = array( 'str'=>'bac',
                         'is_match'=>true,
                         'full'=>true,
@@ -7214,7 +7214,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 /* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_alternative_in_subpattern_in_lazy_quantifier() {
+    function data_for_test_alternative_in_subexpression_in_lazy_quantifier() {
         $test1 = array( 'str'=>'CD',
                         'is_match'=>true,
                         'full'=>true,
@@ -7226,7 +7226,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_in_greedy_quantifier() {
+    function data_for_test_alternative_in_subexpression_in_greedy_quantifier() {
         $test1 = array( 'str'=>'CD',
                         'is_match'=>true,
                         'full'=>true,
@@ -7238,7 +7238,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_in_lazy_quantifier_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_lazy_quantifier_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ABABAB',
                         'is_match'=>true,
                         'full'=>true,
@@ -7250,7 +7250,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpattern_in_greedy_quantifier_and_back_reference() {
+    function data_for_test_subexpression_in_greedy_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'ABABAB',
                         'is_match'=>true,
                         'full'=>true,
@@ -7370,7 +7370,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_subpattern_in_positive_lookbehind_assertion() {
+    function data_for_test_subexpression_in_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'fooabar',
                         'is_match'=>true,
                         'full'=>true,
@@ -7488,7 +7488,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_digits_in_subpattern_in_atomic_group() { //однократные подмаски не поддерживаются
+/*  function data_for_test_digits_in_subexpression_in_atomic_group() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'1.230003938',
                         'is_match'=>true,
                         'full'=>true,
@@ -7525,7 +7525,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
- /*  function data_for_test_escape_sequences_in_quantifiers_in_atomic_groups_in_alternative_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+ /*  function data_for_test_escape_sequences_in_quantifiers_in_atomic_groups_in_alternative_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'now is the time for all good men to come to the aid of the party',
                         'is_match'=>true,
                         'full'=>true,
@@ -7555,7 +7555,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_digits_in_quantifier_and_word_character_in_subpatterns() {
+    function data_for_test_digits_in_quantifier_and_word_character_in_subexpressions() {
         $test1 = array( 'str'=>'12345a',
                         'is_match'=>true,
                         'full'=>true,
@@ -7574,7 +7574,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_digits_in_quantifier_in_atomic_group_and_word_character_in_subpatterns() { //однократные подмаски не поддерживаются
+/*  function data_for_test_digits_in_quantifier_in_atomic_group_and_word_character_in_subexpressions() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'12345a',
                         'is_match'=>true,
                         'full'=>true,
@@ -7616,7 +7616,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_in_atomic_group_in_subpattern() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_atomic_group_in_subexpression() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -7628,7 +7628,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_in_atomic_group_in_subpattern_2() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_atomic_group_in_subexpression_2() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -7664,7 +7664,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_character_class_in_quantifier_in_atomic_group_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_character_class_in_quantifier_in_atomic_group_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'((abc(ade)ufh()()x',
                         'is_match'=>true,
                         'full'=>true,
@@ -7676,7 +7676,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_character_class_in_quantifier_in_atomic_group_in_subpattern_in_quantifier_2() { //однократные подмаски не поддерживаются
+/*  function data_for_test_character_class_in_quantifier_in_atomic_group_in_subexpression_in_quantifier_2() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'(abc)',
                         'is_match'=>true,
                         'full'=>true,
@@ -7760,7 +7760,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_modifier_x_in_subpattern() { //модификатор x не поддерживается
+/*  function data_for_test_modifier_x_in_subexpression() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'a bcd e',
                         'is_match'=>true,
                         'full'=>true,
@@ -7838,7 +7838,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_modifier_i_in_subpattern() {
+    function data_for_test_modifier_i_in_subexpression() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -7920,7 +7920,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
-    function data_for_test_modifier_i_in_subpattern_2() {
+    function data_for_test_modifier_i_in_subexpression_2() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -7975,7 +7975,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_modifier_i_in_subpattern_in_quantifier() {
+    function data_for_test_modifier_i_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aBc',
                         'is_match'=>true,
                         'full'=>true,
@@ -8347,7 +8347,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-/*  function data_for_test_unnumbered_and_conditional_subpatterns() { //условные подмаски не поддерживаются
+/*  function data_for_test_unnumbered_and_conditional_subexpressions() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aA',
                         'is_match'=>true,
                         'full'=>true,
@@ -8393,7 +8393,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_conditional_subpattern_in_quantifier() { //условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_in_quantifier() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aa',
                         'is_match'=>true,
                         'full'=>true,
@@ -8437,7 +8437,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_positive_lookahead_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abc:',
                         'is_match'=>true,
                         'full'=>true,
@@ -8483,7 +8483,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_negative_lookahead_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_negative_lookahead_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abc:',
                         'is_match'=>true,
                         'full'=>true,
@@ -8529,7 +8529,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_positive_lookbehind_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_positive_lookbehind_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -8580,7 +8580,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_negative_lookbehind_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_negative_lookbehind_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -8631,7 +8631,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_conditional_subpattern_modifier_x() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -8665,7 +8665,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_conditional_subpattern_modifier_x_2() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_modifier_x_2() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -8699,7 +8699,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_subpatterns_and_back_reference_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpressions_and_back_reference_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'12',
                         'is_match'=>true,
                         'full'=>true,
@@ -8743,7 +8743,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-    function data_for_test_modifier_i_in_subpattern_and_back_reference() {
+    function data_for_test_modifier_i_in_subexpression_and_back_reference() {
         $test1 = array( 'str'=>'blah blah',
                         'is_match'=>true,
                         'full'=>true,
@@ -8812,7 +8812,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
-    function data_for_test_back_reference_and_modifier_i_in_subpattern() {
+    function data_for_test_back_reference_and_modifier_i_in_subexpression() {
         $test1 = array( 'str'=>'blah blah',
                         'is_match'=>true,
                         'full'=>true,
@@ -8892,7 +8892,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -8925,7 +8925,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-/*  function data_for_test_character_class_in_quantifier_in_subpattern_in_quantifier() { //дальше идут какие-то странные, пустые тесты, хотя, вроде бы, не должны быть такими
+/*  function data_for_test_character_class_in_quantifier_in_subexpression_in_quantifier() { //дальше идут какие-то странные, пустые тесты, хотя, вроде бы, не должны быть такими
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -8944,7 +8944,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -8984,7 +8984,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_negative_character_class_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_negative_character_class_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -9010,7 +9010,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_negative_character_class_in_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_negative_character_class_in_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'cccc',
                         'is_match'=>true,
                         'full'=>true,
@@ -9029,7 +9029,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_lazy_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_character_class_in_lazy_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -9048,7 +9048,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_lazy_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_character_class_in_lazy_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -9081,7 +9081,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_negative_character_class_in_lazy_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_negative_character_class_in_lazy_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -9107,7 +9107,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_negative_character_class_in_lazy_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_negative_character_class_in_lazy_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'c',
                         'is_match'=>true,
                         'full'=>true,
@@ -9152,7 +9152,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_greedy_quantifier_in_atomic_group_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_greedy_quantifier_in_atomic_group_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -9171,7 +9171,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_lazy_quantifier_in_atomic_group_in_subpattern_in_quantifier() { //ленивые квантификаторы не поддерживаются
+/*  function data_for_test_lazy_quantifier_in_atomic_group_in_subexpression_in_quantifier() { //ленивые квантификаторы не поддерживаются
         $test1 = array( 'str'=>'aaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -9190,7 +9190,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_digits_in_conditional_subpattern_modifier_x() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_digits_in_conditional_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'12-sep-98',
                         'is_match'=>true,
                         'full'=>true,
@@ -9228,7 +9228,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-    function data_for_test_subpattern_in_positive_lookahead_assertion_and_back_reference() {
+    function data_for_test_subexpression_in_positive_lookahead_assertion_and_back_reference() {
         $test1 = array( 'str'=>'foobarfoo',
                         'is_match'=>true,
                         'full'=>true,
@@ -9274,7 +9274,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_alternative_in_subpattern_modifier_i() {
+    function data_for_test_alternative_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'saturday',
                         'is_match'=>true,
                         'full'=>true,
@@ -9328,7 +9328,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
-    function data_for_test_alternative_in_subpattern_modifier_i_2() {
+    function data_for_test_alternative_in_subexpression_modifier_i_2() {
         $test1 = array( 'str'=>'abcx',
                         'is_match'=>true,
                         'full'=>true,
@@ -9406,7 +9406,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
-    function data_for_test_character_class_in_alternative_in_subpattern_modifier_i() {
+    function data_for_test_character_class_in_alternative_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -9478,7 +9478,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9));
     }
 
-/*  function data_for_test_alternatives_in_subpattern_modifier_i_and_m_not_i_and_i() { //модификатор m не поддерживается
+/*  function data_for_test_alternatives_in_subexpression_modifier_i_and_m_not_i_and_i() { //модификатор m не поддерживается
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -9645,7 +9645,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 /*The cases of aaaa and aaaaaa are missed out below because Perl does things differently. We know that odd, and maybe incorrect, things happen with recursive references in Perl, as far as 5.11.3 - see some stuff in test #2.*/
-    function data_for_test_back_reference_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_back_reference_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>false,
@@ -9770,7 +9770,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14));
     }
 
-    function data_for_test_back_references_in_quantifiers_in_subpatterns() {
+    function data_for_test_back_references_in_quantifiers_in_subexpressions() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>false,
@@ -10952,7 +10952,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_empty_subpattern() {
+    function data_for_test_empty_subexpression() {
         $test1 = array( 'str'=>'def',
                         'is_match'=>true,
                         'full'=>true,
@@ -11009,7 +11009,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_nested_subpatterns() {
+    function data_for_test_nested_subexpressions() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11021,7 +11021,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns() {
+    function data_for_test_subexpressions() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11069,7 +11069,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11081,7 +11081,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_2() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11093,7 +11093,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_3() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_3() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11105,7 +11105,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_4() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_4() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11117,7 +11117,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_5() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_5() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11129,7 +11129,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_6() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_6() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -11188,7 +11188,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_subpattern_in_quantifier() {
+    function data_for_test_character_class_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abbbcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11200,7 +11200,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_subpattern_in_quantifier_2() {
+    function data_for_test_character_class_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11224,7 +11224,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_alternatives_in_subpattern() {
+    function data_for_test_many_alternatives_in_subexpression() {
         $test1 = array( 'str'=>'ef',
                         'is_match'=>true,
                         'full'=>true,
@@ -11267,7 +11267,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_alternative_in_subpattern() {
+    function data_for_test_alternative_in_subexpression() {
         $test1 = array( 'str'=>'abcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -11291,7 +11291,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_without_second_branch_in_subpattern() {
+    function data_for_test_alternative_without_second_branch_in_subexpression() {
         $test1 = array( 'str'=>'abcdef',
                         'is_match'=>true,
                         'full'=>true,
@@ -11303,7 +11303,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_and_quantifier() {
+    function data_for_test_alternative_in_subexpression_and_quantifier() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11315,7 +11315,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern() {
+    function data_for_test_quantifier_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11327,7 +11327,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11339,7 +11339,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11351,7 +11351,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern_2() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression_2() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11363,7 +11363,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern_3() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression_3() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11419,7 +11419,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_alternative_in_subpattern_and_quantifier_2() {
+    function data_for_test_alternative_in_subexpression_and_quantifier_2() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11431,7 +11431,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_subpatterns_2() {
+    function data_for_test_many_subexpressions_2() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11455,7 +11455,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_and_character_class_in_alternative_in_subpattern_in_alternative() {
+    function data_for_test_quantifier_and_character_class_in_alternative_in_subexpression_in_alternative() {
         $test1 = array( 'str'=>'abh',
                         'is_match'=>true,
                         'full'=>true,
@@ -11467,7 +11467,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifiers_and_end_of_line_and_subpattern_in_alternatives_in_subpattern() {
+    function data_for_test_quantifiers_and_end_of_line_and_subexpression_in_alternatives_in_subexpression() {
         $test1 = array( 'str'=>'effgz',
                         'is_match'=>true,
                         'full'=>true,
@@ -11520,7 +11520,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_many_nested_subpatterns() {
+    function data_for_test_many_nested_subexpressions() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -11532,7 +11532,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_nested_subpatterns_and_back_reference() {
+    function data_for_test_many_nested_subexpressions_and_back_reference() {
         $test1 = array( 'str'=>'aa',
                         'is_match'=>true,
                         'full'=>true,
@@ -11544,7 +11544,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_nested_subpatterns_2() {
+    function data_for_test_many_nested_subexpressions_2() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -11600,7 +11600,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_any_characters_in_quantifiers_in_subpatterns() {
+    function data_for_test_any_characters_in_quantifiers_in_subexpressions() {
         $test1 = array( 'str'=>'abcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -11612,7 +11612,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_any_characters_in_quantifiers_in_subpatterns_2() {
+    function data_for_test_any_characters_in_quantifiers_in_subexpressions_2() {
         $test1 = array( 'str'=>'(a, b)',
                         'is_match'=>true,
                         'full'=>true,
@@ -11636,7 +11636,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern() {
+    function data_for_test_subexpression() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -11681,7 +11681,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_back_reference() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_back_reference() {
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11693,7 +11693,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_and_back_reference_in_alternative() {
+    function data_for_test_subexpression_and_back_reference_in_alternative() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -11728,7 +11728,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
-    function data_for_test_character_class_in_subpattern_and_lazy_quantifier_and_back_reference_in_subpattern_in_quantifier() {
+    function data_for_test_character_class_in_subexpression_and_lazy_quantifier_and_back_reference_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ababbbcbc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11740,7 +11740,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_subpattern_and_lazy_quantifier_and_back_reference_in_subpattern_in_quantifier_2() {
+    function data_for_test_character_class_in_subexpression_and_lazy_quantifier_and_back_reference_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'ababbbcbc',
                         'is_match'=>true,
                         'full'=>true,
@@ -11752,7 +11752,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_back_reference_in_alternative_in_subpattern_and_back_reference_and_subpattern_in_subpattern_in_quantifier() {
+    function data_for_test_back_reference_in_alternative_in_subexpression_and_back_reference_and_subexpression_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaxabaxbaaxbbax',
                         'is_match'=>true,
                         'full'=>true,
@@ -11764,7 +11764,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_back_reference_in_alternative_in_subpattern_and_back_reference_and_subpattern_in_subpattern_in_quantifier_2() {
+    function data_for_test_back_reference_in_alternative_in_subexpression_and_back_reference_and_subexpression_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'bbaababbabaaaaabbaaaabba',
                         'is_match'=>true,
                         'full'=>true,
@@ -12451,7 +12451,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_empty_subpattern_modifier_i() {
+    function data_for_test_empty_subexpression_modifier_i() {
         $test1 = array( 'str'=>'DEF',
                         'is_match'=>true,
                         'full'=>true,
@@ -12545,7 +12545,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_nested_subpatterns_modifier_i() {
+    function data_for_test_nested_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12558,7 +12558,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_modifier_i() {
+    function data_for_test_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12636,7 +12636,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12649,7 +12649,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i_2() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12662,7 +12662,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i_3() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i_3() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12675,7 +12675,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i_4() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i_4() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12688,7 +12688,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i_5() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i_5() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12701,7 +12701,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_in_quantifier_modifier_i_6() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_in_quantifier_modifier_i_6() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12714,7 +12714,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_quantifier_in_alternative_in_subpattern_in_lazy_quantifier_modifier_i() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_quantifier_in_alternative_in_subexpression_in_lazy_quantifier_modifier_i() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -12740,7 +12740,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_subpattern_in_quantifier_modifier_i() {
+    function data_for_test_character_class_in_subexpression_in_quantifier_modifier_i() {
         $test1 = array( 'str'=>'ABBBCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12753,7 +12753,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_subpattern_in_quantifier_modifier_i_2() {
+    function data_for_test_character_class_in_subexpression_in_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12779,7 +12779,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_subpattern_modifier_i() {
+    function data_for_test_alternatives_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'EF',
                         'is_match'=>true,
                         'full'=>true,
@@ -12825,7 +12825,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_alternative_in_subpattern_modifier_i_3() {
+    function data_for_test_alternative_in_subexpression_modifier_i_3() {
         $test1 = array( 'str'=>'ABCDE',
                         'is_match'=>true,
                         'full'=>true,
@@ -12851,7 +12851,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_after_begin_of_line_modifier_i() {
+    function data_for_test_alternative_in_subexpression_after_begin_of_line_modifier_i() {
         $test1 = array( 'str'=>'ABCDE',
                         'is_match'=>true,
                         'full'=>false,
@@ -12866,7 +12866,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_without_second_branch_in_subpattern_modifier_i() {
+    function data_for_test_alternative_without_second_branch_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ABCDEF',
                         'is_match'=>true,
                         'full'=>true,
@@ -12879,7 +12879,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_and_quantifier_modifier_i() {
+    function data_for_test_alternative_in_subexpression_and_quantifier_modifier_i() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12892,7 +12892,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_alternative_in_subpattern_modifier_i() {
+    function data_for_test_quantifier_in_alternative_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12905,7 +12905,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_character_class_in_subpattern_and_quantifier_modifier_i() {
+    function data_for_test_quantifier_in_character_class_in_subexpression_and_quantifier_modifier_i() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12918,7 +12918,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern_modifier_i() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12931,7 +12931,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern_modifier_i_2() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression_modifier_i_2() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12944,7 +12944,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_quantifier_in_subpattern_modifier_i_3() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_quantifier_in_subexpression_modifier_i_3() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -12970,7 +12970,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_and_quantifier_modifier_i_2() {
+    function data_for_test_alternative_in_subexpression_and_quantifier_modifier_i_2() {
         $test1 = array( 'str'=>'ABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -12983,7 +12983,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_modifier_i_2() {
+    function data_for_test_subexpressions_modifier_i_2() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -13009,7 +13009,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_and_character_class_in_alternative_in_subpattern_and_alternative_modifier_i() {
+    function data_for_test_quantifier_and_character_class_in_alternative_in_subexpression_and_alternative_modifier_i() {
         $test1 = array( 'str'=>'ABH',
                         'is_match'=>true,
                         'full'=>true,
@@ -13022,7 +13022,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifiers_and_end_of_line_and_subpattern_in_alternatives_in_subpattern_modifier_i() {
+    function data_for_test_quantifiers_and_end_of_line_and_subexpression_in_alternatives_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'EFFGZ',
                         'is_match'=>true,
                         'full'=>true,
@@ -13085,7 +13085,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
-    function data_for_test_many_nested_subpatterns_modifier_i() {
+    function data_for_test_many_nested_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'A',
                         'is_match'=>true,
                         'full'=>true,
@@ -13098,7 +13098,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_nested_subpatterns_and_back_reference_modifier_i() {
+    function data_for_test_many_nested_subexpressions_and_back_reference_modifier_i() {
         $test1 = array( 'str'=>'AA',
                         'is_match'=>true,
                         'full'=>true,
@@ -13111,7 +13111,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_nested_subpatterns_modifier_i_2() {
+    function data_for_test_many_nested_subexpressions_modifier_i_2() {
         $test1 = array( 'str'=>'A',
                         'is_match'=>true,
                         'full'=>true,
@@ -13124,7 +13124,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_many_unnumbered_subpatterns_modifier_i() {
+    function data_for_test_subexpression_in_many_unnumbered_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'A',
                         'is_match'=>true,
                         'full'=>true,
@@ -13137,7 +13137,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_subpattern_in_many_unnumbered_subpatterns_modifier_i() {
+    function data_for_test_alternatives_in_subexpression_in_many_unnumbered_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'C',
                         'is_match'=>true,
                         'full'=>true,
@@ -13235,7 +13235,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_modifier_i() {
+    function data_for_test_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ABCD',
                         'is_match'=>true,
                         'full'=>true,
@@ -13261,7 +13261,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_in_quantifier_in_subpattern_and_back_reference_modifier_i() {
+    function data_for_test_character_class_in_quantifier_in_subexpression_and_back_reference_modifier_i() {
         $test1 = array( 'str'=>'ABCABC',
                         'is_match'=>true,
                         'full'=>true,
@@ -13310,7 +13310,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_and_any_character_in_subpattern() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
                         'full'=>true,
@@ -13322,7 +13322,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
                         'full'=>true,
@@ -13334,7 +13334,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subpattern_in_lazy_quantifier_and_any_character_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
                         'full'=>true,
@@ -13353,7 +13353,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_2() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_2() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13365,7 +13365,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_3() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_3() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13377,7 +13377,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_4() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_4() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13389,7 +13389,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subpattern_in_lazy_quantifier_and_any_character_in_subpattern_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_2() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13401,7 +13401,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpatterns_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_subexpressions_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -13413,7 +13413,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_5() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_5() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13425,7 +13425,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 /* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_lazy_quantifier_and_any_character_in_subpattern_3() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_3() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13437,7 +13437,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_6() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_6() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13449,7 +13449,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subpattern_in_lazy_quantifier_and_any_character_in_subpattern_4() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_4() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13461,7 +13461,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_alternatives_in_unnumbered_subpattern_in_greedy_quantifier_and_any_character_in_subpattern_7() {
+    function data_for_test_alternatives_in_unnumbered_subexpression_in_greedy_quantifier_and_any_character_in_subexpression_7() {
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13473,7 +13473,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_alternatives_in_unnumbered_subpattern_in_lazy_quantifier_and_any_character_in_subpattern_5() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_alternatives_in_unnumbered_subexpression_in_lazy_quantifier_and_any_character_in_subexpression_5() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'acdbcdbe',
                         'is_match'=>true,
                         'full'=>true,
@@ -13485,7 +13485,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 *//* следующая функция не закомментирована, несмотря на неподдерживаемый ленивый квантификатор, т.к. на жадных такой же результат (а ленивые распознаются, но матчатся как жадные) */
-    function data_for_test_alternative_in_subpattern_in_lazy_quantifier_in_alternatives_in_subpattern_in_lazy_quantifier_and_any_character_in_subpattern() {
+    function data_for_test_alternative_in_subexpression_in_lazy_quantifier_in_alternatives_in_subexpression_in_lazy_quantifier_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'ace',
                         'is_match'=>true,
                         'full'=>true,
@@ -13497,7 +13497,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_any_character_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_any_character_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'AB',
                         'is_match'=>true,
                         'full'=>true,
@@ -13509,7 +13509,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_character_class_in_subpattern_in_alternative() {
+    function data_for_test_negative_character_class_in_subexpression_in_alternative() {
         $test1 = array( 'str'=>'.',
                         'is_match'=>true,
                         'full'=>true,
@@ -13533,7 +13533,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_back_reference_in_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_back_reference_in_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'aaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -13581,7 +13581,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_back_reference_in_conditional_subpattern_in_quantifier() { //условные подмаски не поддерживаются
+/*  function data_for_test_back_reference_in_conditional_subexpression_in_quantifier() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -13620,7 +13620,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-    function data_for_test_subpatterns_in_alternative_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_subexpressions_in_alternative_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -13690,7 +13690,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_any_characters_in_unnumbered_subpattern_in_greedy_quantifier() {
+    function data_for_test_any_characters_in_unnumbered_subexpression_in_greedy_quantifier() {
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -13702,7 +13702,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_characters_in_unnumbered_subpattern_in_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_characters_in_unnumbered_subexpression_in_lazy_quantifier() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -13714,7 +13714,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_any_character_in_subpattern_in_positive_lookahead_assertion_in_alternative_in_unnumbered_subpattern_in_quantifier_and_back_reference() {
+    function data_for_test_any_character_in_subexpression_in_positive_lookahead_assertion_in_alternative_in_unnumbered_subexpression_in_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -13726,7 +13726,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_empty_subpattern_in_quantifier() {
+    function data_for_test_empty_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -13738,7 +13738,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aax',
                         'is_match'=>true,
                         'full'=>true,
@@ -13750,7 +13750,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_alternative_in_subexpression_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aax',
                         'is_match'=>true,
                         'full'=>true,
@@ -13762,7 +13762,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_in_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_alternative_in_subexpression_in_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'aax',
                         'is_match'=>true,
                         'full'=>true,
@@ -13774,7 +13774,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_in_quantifier_2() {
+    function data_for_test_alternative_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'cab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13786,7 +13786,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_quantifier_11() {
+    function data_for_test_subexpression_in_quantifier_11() {
         $test1 = array( 'str'=>'cab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13798,7 +13798,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_i() {
+    function data_for_test_unnumbered_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13844,7 +13844,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_subpattern_modifier_i_2() {
+    function data_for_test_subexpression_modifier_i_2() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13863,7 +13863,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_i_2() {
+    function data_for_test_unnumbered_subexpression_modifier_i_2() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13909,7 +13909,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_unnumbered_subpattern_in_subpattern_modifier_i() {
+    function data_for_test_unnumbered_subexpression_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13928,7 +13928,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_not_i_modifier_i() {
+    function data_for_test_unnumbered_subexpression_modifier_not_i_modifier_i() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13975,7 +13975,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_subpattern_modifier_not_i_modifier_i() {
+    function data_for_test_subexpression_modifier_not_i_modifier_i() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -13995,7 +13995,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_not_i_modifier_i_2() {
+    function data_for_test_unnumbered_subexpression_modifier_not_i_modifier_i_2() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14042,7 +14042,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_not_i_in_subpattern_modifier_i() {
+    function data_for_test_unnumbered_subexpression_modifier_not_i_in_subexpression_modifier_i() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14062,7 +14062,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_unnumbered_subpattern_modifier_not_i_in_subpattern_modifier_i_2() {
+    function data_for_test_unnumbered_subexpression_modifier_not_i_in_subexpression_modifier_i_2() {
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>true,
                         'full'=>false,
@@ -14095,7 +14095,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_any_character_in_unnumbered_subpattern_modifier_s_not_i_in_subpattern_modifier_i() { //модификатор s не поддерживается
+/*  function data_for_test_any_character_in_unnumbered_subexpression_modifier_s_not_i_in_subexpression_modifier_i() { //модификатор s не поддерживается
         $test1 = array( 'str'=>"a\nB",
                         'is_match'=>true,
                         'full'=>true,
@@ -14108,7 +14108,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_many_unnumbered_subpatterns_and_empty_unnumbered_subpatterns() {
+    function data_for_test_many_unnumbered_subexpressions_and_empty_unnumbered_subexpressions() {
         $test1 = array( 'str'=>'cabbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -14120,7 +14120,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_many_unnumbered_subpatterns_and_empty_unnumbered_subpatterns_2() {
+    function data_for_test_many_unnumbered_subexpressions_and_empty_unnumbered_subexpressions_2() {
         $test1 = array( 'str'=>'caaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
                         'is_match'=>true,
                         'full'=>true,
@@ -14132,7 +14132,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_and_digit_and_back_reference_modifier_i() {
+    function data_for_test_subexpression_and_digit_and_back_reference_modifier_i() {
         $test1 = array( 'str'=>'Ab4ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14164,7 +14164,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_quantifier_and_nested_unnumbered_subpatterns_in_quantifiers() {
+    function data_for_test_subexpression_in_quantifier_and_nested_unnumbered_subexpressions_in_quantifiers() {
         $test1 = array( 'str'=>'x~~',
                         'is_match'=>true,
                         'full'=>true,
@@ -14245,7 +14245,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_alternative_in_subpattern_in_negative_lookbehind_assertion_and_character_class() {
+    function data_for_test_alternative_in_subexpression_in_negative_lookbehind_assertion_and_character_class() {
         $test1 = array( 'str'=>'dbaacb',
                         'is_match'=>true,
                         'full'=>true,
@@ -14269,7 +14269,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifiers_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_quantifiers_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'',
                         'is_match'=>true,
                         'full'=>true,
@@ -14338,7 +14338,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
-/*  function data_for_test_any_characters_in_nested_subpatterns_modifier_s_and_subpattern_modifier_m() { //модификаторы s и m не поддерживаются
+/*  function data_for_test_any_characters_in_nested_subexpressions_modifier_s_and_subexpression_modifier_m() { //модификаторы s и m не поддерживаются
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14350,7 +14350,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_modifier_m() { //модификатор m не поддерживается
+/*  function data_for_test_subexpression_modifier_m() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14374,7 +14374,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_modifier_m_2() { //модификатор m не поддерживается
+/*  function data_for_test_subexpression_modifier_m_2() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"a\nb\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14386,7 +14386,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_modifier_m_3() { //модификатор m не поддерживается
+/*  function data_for_test_subexpression_modifier_m_3() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"a\nb\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14398,7 +14398,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_modifier_m_4() { //модификатор m не поддерживается
+/*  function data_for_test_subexpression_modifier_m_4() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"a\nb\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14410,7 +14410,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_characters_in_subpattern_modifier_s_and_negative_lookahead_assertion() { //модификатор s не поддерживается
+/*  function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion() { //модификатор s не поддерживается
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14422,7 +14422,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_characters_in_subpattern_modifier_s_and_negative_lookahead_assertion_2() { //модификатор s не поддерживается
+/*  function data_for_test_any_characters_in_subexpression_modifier_s_and_negative_lookahead_assertion_2() { //модификатор s не поддерживается
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14434,7 +14434,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_begin_of_line_after_empty_subpattern() {
+    function data_for_test_begin_of_line_after_empty_subexpression() {
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -14457,7 +14457,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_subpattern_modifier_m_5() { //модификатор m не поддерживается
+/*  function data_for_test_subexpression_modifier_m_5() { //модификатор m не поддерживается
         $test1 = array( 'str'=>"a\nb\nc\n",
                         'is_match'=>true,
                         'full'=>true,
@@ -14469,7 +14469,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_quantifier_and_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_quantifier_and_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -14492,7 +14492,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_subpattern_in_quantifier_and_conditional_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_quantifier_and_conditional_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14504,7 +14504,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_empty_subpattern_in_quantifier_and_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_empty_subexpression_in_quantifier_and_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14516,7 +14516,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_empty_subpattern_in_quantifier_and_conditional_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_empty_subexpression_in_quantifier_and_conditional_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14528,7 +14528,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_round_brackets_in_subpatterns_in_quantifier_and_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_round_brackets_in_subexpressions_in_quantifier_and_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'(blah)',
                         'is_match'=>true,
                         'full'=>true,
@@ -14583,7 +14583,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_round_brackets_in_subpatterns_in_quantifier_and_conditional_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_round_brackets_in_subexpressions_in_quantifier_and_conditional_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'(blah)',
                         'is_match'=>true,
                         'full'=>true,
@@ -14629,7 +14629,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_negative_lookahead_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_negative_lookahead_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14641,7 +14641,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_positive_lookahead_assertion_in_conditional_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_in_conditional_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -14664,7 +14664,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_positive_lookahead_assertion_in_conditional_subpattern_3() { //условные подмаски не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_in_conditional_subexpression_3() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14676,7 +14676,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_lazy_quantifier_in_subpattern_in_positive_lookahead_assertion_and_back_reference_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14688,7 +14688,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_word_character_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_word_character_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'one:',
                         'is_match'=>true,
                         'full'=>true,
@@ -14700,7 +14700,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_positive_lookbehind_assertion_after_end_of_line() {
+    function data_for_test_subexpression_in_positive_lookbehind_assertion_after_end_of_line() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -14712,7 +14712,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_lazy_quantifier_in_subpattern_in_positive_lookahead_assertion_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_lazy_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -14733,7 +14733,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_negative_character_class_in_quantifier_and_quantifier_in_subpattern() {
+    function data_for_test_negative_character_class_in_quantifier_and_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'aexycd',
                         'is_match'=>true,
                         'full'=>true,
@@ -14745,7 +14745,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_subpattern_and_quantifier() {
+    function data_for_test_quantifier_in_subexpression_and_quantifier() {
         $test1 = array( 'str'=>'caab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14757,7 +14757,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_word_character_in_character_class_in_quantifier_in_subpattern_in_quantifier_and_word_character_in_quantifier_in_subpattern() {
+    function data_for_test_word_character_in_character_class_in_quantifier_in_subexpression_in_quantifier_and_word_character_in_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -14804,7 +14804,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subpattern() {
+    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'a:[b]:',
                         'is_match'=>true,
                         'full'=>true,
@@ -14816,7 +14816,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subpattern_2() {
+    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subexpression_2() {
         $test1 = array( 'str'=>'a=[b]=',
                         'is_match'=>true,
                         'full'=>true,
@@ -14828,7 +14828,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subpattern_3() {
+    function data_for_test_square_opening_bracket_in_character_class_in_quantifier_in_subexpression_3() {
         $test1 = array( 'str'=>'a.[b].',
                         'is_match'=>true,
                         'full'=>true,
@@ -14840,7 +14840,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_quantifier_in_atomic_group_in_subpattern_3() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_atomic_group_in_subexpression_3() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14852,7 +14852,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_in_subpattern_in_atomic_group() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_subexpression_in_atomic_group() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -14864,7 +14864,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_negative_character_classes_in_quantifiers_in_atomic_group_in_alternative_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_negative_character_classes_in_quantifiers_in_atomic_group_in_alternative_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'((abc(ade)ufh()()x',
                         'is_match'=>true,
                         'full'=>true,
@@ -14948,7 +14948,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_empty_subpattern_in_conditional_subpattern_and_character_classes_in_quantifiers_in_atomic_groups_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_empty_subexpression_in_conditional_subexpression_and_character_classes_in_quantifiers_in_atomic_groups_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -15142,7 +15142,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10, $test11, $test12, $test13, $test14, $test15, $test16, $test17, $test18, $test19, $test20, $test21, $test22, $test23));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_alternative_in_subpattern_in_positive_lookbehind_assertion() { //однократные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_alternative_in_subexpression_in_positive_lookbehind_assertion() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -15179,7 +15179,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_negative_lookahead_assertion_and_character_class_in_quantifier_in_unnumbered_subpattern_in_quantifier_in_atomic_group() { //однократные подмаски не поддерживаются
+/*  function data_for_test_negative_lookahead_assertion_and_character_class_in_quantifier_in_unnumbered_subexpression_in_quantifier_in_atomic_group() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'word cat dog elephant mussel cow horse canary baboon snake shark otherword',
                         'is_match'=>true,
                         'full'=>true,
@@ -15443,7 +15443,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_subpattern_in_quantifier_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_subexpression_in_quantifier_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ZABCDEFG',
                         'is_match'=>true,
                         'full'=>true,
@@ -15455,7 +15455,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_empty_subpattern_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_empty_subexpression_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ZABCDEFG',
                         'is_match'=>true,
                         'full'=>true,
@@ -15467,7 +15467,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_empty_subpattern_in_subpattern_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_empty_subexpression_in_subexpression_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'ZABCDEFG',
                         'is_match'=>true,
                         'full'=>true,
@@ -15479,7 +15479,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_atomic_group_in_quantifier_in_alternative_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_atomic_group_in_quantifier_in_alternative_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ZABCDEFG',
                         'is_match'=>true,
                         'full'=>true,
@@ -15491,7 +15491,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_empty_atomic_group_in_quantifier_in_alternative_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_empty_atomic_group_in_quantifier_in_alternative_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ZABCDEFG',
                         'is_match'=>true,
                         'full'=>true,
@@ -15843,7 +15843,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_unnumbered_subpattern_modiier_x() { //модификатор x не поддерживается
+/*  function data_for_test_unnumbered_subexpression_modiier_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'XabcdY',
                         'is_match'=>true,
                         'full'=>true,
@@ -15873,7 +15873,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_alternative_in_subpattern_modiier_x() { //модификатор x не поддерживается
+/*  function data_for_test_alternative_in_subexpression_modiier_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'XabcY',
                         'is_match'=>true,
                         'full'=>true,
@@ -15922,7 +15922,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_modiier_i_and_not_i_in_alternative_in_subpattern() {
+    function data_for_test_modiier_i_and_not_i_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'abCE',
                         'is_match'=>true,
                         'full'=>true,
@@ -15986,7 +15986,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7));
     }
 
-    function data_for_test_any_character_in_quantifier_in_subpattern_and_digit_in_quantifier_and_back_reference() {
+    function data_for_test_any_character_in_quantifier_in_subexpression_and_digit_in_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'abc123abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -16005,7 +16005,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_any_character_in_quantifier_in_subpattern_and_digit_in_quantifier_and_back_reference_modifier_s() {
+    function data_for_test_any_character_in_quantifier_in_subexpression_and_digit_in_quantifier_and_back_reference_modifier_s() {
         $test1 = array( 'str'=>'abc123abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -16025,7 +16025,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_any_character_in_quantifier_in_nested_subpatterns_and_digit_in_quantifier_and_back_reference() {
+    function data_for_test_any_character_in_quantifier_in_nested_subexpressions_and_digit_in_quantifier_and_back_reference() {
         $test1 = array( 'str'=>'abc123abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -16260,7 +16260,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
@@ -16274,7 +16274,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_character_class_and_alternatives_and_unnumbered_subpatterns_modifier_i() {
+    function data_for_test_character_class_and_alternatives_and_unnumbered_subexpressions_modifier_i() {
         $test1 = array( 'str'=>'REGular',
                         'is_match'=>true,
                         'full'=>true,
@@ -16394,7 +16394,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_negative_character_class_in_negative_lookbehind_assertion_and_subpattern() {
+    function data_for_test_negative_character_class_in_negative_lookbehind_assertion_and_subexpression() {
         $test1 = array( 'str'=>'foobarX',
                         'is_match'=>true,
                         'full'=>true,
@@ -16484,7 +16484,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_modifier_x_space_characters_in_quantifiers_in_unnumbered_subpattern_modifier_not_x() { //модификатор x не поддерживается
+/*  function data_for_test_modifier_x_space_characters_in_quantifiers_in_unnumbered_subexpression_modifier_not_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'A # B',
                         'is_match'=>true,
                         'full'=>true,
@@ -16514,7 +16514,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_modifiers_x_not_is_and_space_characters_in_quantifiers_in_unnumbered_subpattern_modifiers_not_ixs() { //модификаторы i, x и s не поддерживаются
+/*  function data_for_test_modifiers_x_not_is_and_space_characters_in_quantifiers_in_unnumbered_subexpression_modifiers_not_ixs() { //модификаторы i, x и s не поддерживаются
         $test1 = array( 'str'=>'A #include',
                         'is_match'=>true,
                         'full'=>true,
@@ -16715,7 +16715,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_word_and_any_characters_in_quantifiers_and_backslash_and_end_of_string_character_and_any_character_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_word_and_any_characters_in_quantifiers_and_backslash_and_end_of_string_character_and_any_character_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>"abc=xyz\\\npqr",
                         'is_match'=>true,
                         'full'=>true,
@@ -16727,7 +16727,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_word_character_in_quantifier_in_subpattern_in_positive_lookahead_assertion_and_back_reference() {
+    function data_for_test_word_character_in_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference() {
         $test1 = array( 'str'=>'abcd:',
                         'is_match'=>true,
                         'full'=>true,
@@ -16739,7 +16739,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_word_character_in_quantifier_in_subpattern_in_positive_lookahead_assertion_and_back_reference_2() {
+    function data_for_test_word_character_in_quantifier_in_subexpression_in_positive_lookahead_assertion_and_back_reference_2() {
         $test1 = array( 'str'=>'abcd:',
                         'is_match'=>true,
                         'full'=>true,
@@ -16946,7 +16946,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_empty_subpattern_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_empty_subexpression_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -16958,7 +16958,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_nested_unnumbered_subpatterns_in_quantifier_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_nested_unnumbered_subexpressions_in_quantifier_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -16970,7 +16970,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_empty_subpattern_in_quantifier_in_subpattern_in_quantifier_2() {
+    function data_for_test_empty_subexpression_in_quantifier_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -16982,7 +16982,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_nested_unnumbered_subpatterns_in_quantifier_in_unnumbered_subpattern_in_quantifier_2() {
+    function data_for_test_nested_unnumbered_subexpressions_in_quantifier_in_unnumbered_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -16994,7 +16994,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_in_quantifier_and_alternative_without_second_branch_in_subpattern_in_conditional_subpattern_in_quantifier() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_quantifier_and_alternative_without_second_branch_in_subexpression_in_conditional_subexpression_in_quantifier() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abbD',
                         'is_match'=>true,
                         'full'=>true,
@@ -17020,7 +17020,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_alternative_without_second_branch_in_subpattern_in_quantifier_and_digit() {
+    function data_for_test_alternative_without_second_branch_in_subexpression_in_quantifier_and_digit() {
         $test1 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
@@ -17062,7 +17062,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_alternative_without_second_branch_in_unnumbered_subpattern_in_quantifier_and_digit() {
+    function data_for_test_alternative_without_second_branch_in_unnumbered_subexpression_in_quantifier_and_digit() {
         $test1 = array( 'str'=>'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                         'is_match'=>true,
                         'full'=>false,
@@ -17146,7 +17146,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_any_character_in_subpattern_in_quantifier_and_any_character_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_any_character_in_subexpression_in_quantifier_and_any_character_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -17158,7 +17158,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_conditional_subpattern_in_alternative_in_subpattern_in_quantifier_in_subpattern_modifier_x() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_in_alternative_in_subexpression_in_quantifier_in_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -17171,7 +17171,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_conditional_subpattern_in_subpattern_in_quantifier_in_subpattern_modifier_x() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_in_subexpression_in_quantifier_in_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -17184,7 +17184,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_conditional_subpattern_in_quantifier_in_subpattern_modifier_x() { //модификатор x и условные подмаски не поддерживаются
+/*  function data_for_test_conditional_subexpression_in_quantifier_in_subexpression_modifier_x() { //модификатор x и условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -17270,7 +17270,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'adc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17289,7 +17289,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'adc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17310,7 +17310,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subpattern_in_quantifier() { //условные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subexpression_in_quantifier() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'adc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17329,7 +17329,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subpattern_in_quantifier_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_in_conditional_subexpression_in_quantifier_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'adc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17348,7 +17348,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_positive_lookahead_assertion_and_any_character_in_quantifier_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_and_any_character_in_quantifier_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17360,7 +17360,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_and_any_character_in_quantifier_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_positive_lookahead_assertion_and_any_character_in_quantifier_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17372,7 +17372,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_character_class_in_positive_lookahead_assertion_and_negative_character_class_in_conditional_subpattern_in_alternative_in_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_character_class_in_positive_lookahead_assertion_and_negative_character_class_in_conditional_subexpression_in_alternative_in_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'%ab%',
                         'is_match'=>true,
                         'full'=>true,
@@ -17714,7 +17714,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_alternative_without_second_branch_in_subpattern_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_alternative_without_second_branch_in_subexpression_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'Z',
                         'is_match'=>true,
                         'full'=>true,
@@ -17726,7 +17726,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpatterns_in_alternative() {
+    function data_for_test_subexpressions_in_alternative() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17738,7 +17738,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17750,7 +17750,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpattern_in_positive_lookahead_assertion_and_subpattern_in_alternative() {
+    function data_for_test_subexpression_in_positive_lookahead_assertion_and_subexpression_in_alternative() {
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17762,7 +17762,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative_in_subpattern() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative_in_subexpression() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17774,7 +17774,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative_in_subpattern_in_possessive_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative_in_subexpression_in_possessive_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17786,7 +17786,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative_in_unnumbered_subpattern_in_possessive_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative_in_unnumbered_subexpression_in_possessive_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17798,7 +17798,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative_in_positive_lookahead_assertion_and_any_characters_in_subpattern() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative_in_positive_lookahead_assertion_and_any_characters_in_subexpression() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17810,7 +17810,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_atomic_group_and_subpattern_in_alternative_in_atomic_group() { //однократные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_atomic_group_and_subexpression_in_alternative_in_atomic_group() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
@@ -17822,7 +17822,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_in_subpattern_in_atomic_group_in_quantifier_and_subpattern_in_subpattern() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_subexpression_in_atomic_group_in_quantifier_and_subexpression_in_subexpression() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaabaaabaabab',
                         'is_match'=>true,
                         'full'=>true,
@@ -17862,7 +17862,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_quantifier_in_alternative_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_quantifier_in_alternative_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17874,7 +17874,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_in_positive_lookahead_assertion_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_positive_lookahead_assertion_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -17886,7 +17886,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_positive_lookahead_assertion_in_conditional_subpattern_and_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_subexpression_in_positive_lookahead_assertion_in_conditional_subexpression_and_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -17898,7 +17898,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_alternative_in_unnumbered_subpattern_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_alternative_in_unnumbered_subexpression_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaabc',
                         'is_match'=>true,
                         'full'=>false,
@@ -17926,7 +17926,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_alternative_in_unnumbered_subpattern_in_quantifier() {
+    function data_for_test_alternative_in_unnumbered_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aaaabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -17973,7 +17973,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-    function data_for_test_subpattern_in_positive_lookahead_assertion_in_quantifier_and_any_character() {
+    function data_for_test_subexpression_in_positive_lookahead_assertion_in_quantifier_and_any_character() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -17992,7 +17992,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_subpattern_in_positive_lookahead_assertion_in_lazy_quantifier_and_any_character() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_positive_lookahead_assertion_in_lazy_quantifier_and_any_character() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -18011,7 +18011,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-    function data_for_test_subroutine_reference_in_positive_lookahead_assertion_in_quantifier_and_character_class_and_character_class_in_subpattern() {
+    function data_for_test_subroutine_reference_in_positive_lookahead_assertion_in_quantifier_and_character_class_and_character_class_in_subexpression() {
         $test1 = array( 'str'=>'abd',
                         'is_match'=>true,
                         'full'=>true,
@@ -18042,7 +18042,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_positive_lookbehind_assertion_in_quantifier() {
+    function data_for_test_subexpression_in_positive_lookbehind_assertion_in_quantifier() {
         $test1 = array( 'str'=>'abcxyz',
                         'is_match'=>true,
                         'full'=>true,
@@ -18326,7 +18326,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_positive_lookahead_assertion_in_conditional_subpattern_in_possessive_quantifier() { //условные подмаски и захватывающие квантификаторы не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_in_conditional_subexpression_in_possessive_quantifier() { //условные подмаски и захватывающие квантификаторы не поддерживаются
         $test1 = array( 'str'=>'XcccddYX',
                         'is_match'=>true,
                         'full'=>true,
@@ -18338,7 +18338,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_positive_lookahead_assertion_in_conditional_subpattern_in_possessive_quantifier_2() { //условные подмаски и захватывающие квантификаторы не поддерживаются
+/*  function data_for_test_positive_lookahead_assertion_in_conditional_subexpression_in_possessive_quantifier_2() { //условные подмаски и захватывающие квантификаторы не поддерживаются
         $test1 = array( 'str'=>'XcccddYX',
                         'is_match'=>true,
                         'full'=>true,
@@ -18350,7 +18350,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_in_subpattern_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_quantifier_in_subexpression_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaaaa',
                         'is_match'=>true,
                         'full'=>true,
@@ -18389,7 +18389,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_quantifier_in_subpattern_in_possessive_quantifier_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_quantifier_in_subexpression_in_possessive_quantifier_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -18412,7 +18412,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_quantifier_in_subpattern_in_possessive_quantifier_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_quantifier_in_subexpression_in_possessive_quantifier_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -18667,7 +18667,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_subpattern_and_reset_start() { //\K не поддерживается
+/*  function data_for_test_subexpression_and_reset_start() { //\K не поддерживается
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -18679,7 +18679,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_and_reset_start_in_alternative_in_subpattern() { //\K не поддерживается
+/*  function data_for_test_subexpression_and_reset_start_in_alternative_in_subexpression() { //\K не поддерживается
         $test1 = array( 'str'=>'foobar',
                         'is_match'=>true,
                         'full'=>true,
@@ -18698,7 +18698,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_reset_start_in_subpattern() { //\K не поддерживается
+/*  function data_for_test_reset_start_in_subexpression() { //\K не поддерживается
         $test1 = array( 'str'=>'foobarbaz',
                         'is_match'=>true,
                         'full'=>true,
@@ -18722,7 +18722,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_alternative_in_named_subpattern_and_named_back_reference() { //\g не поддерживается
+/*  function data_for_test_alternative_in_named_subexpression_and_named_back_reference() { //\g не поддерживается
         $test1 = array( 'str'=>'tom-tom',
                         'is_match'=>true,
                         'full'=>true,
@@ -18741,7 +18741,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_relative_back_reference_in_alternative_in_nested_subpatterns() { //\g не поддерживается
+/*  function data_for_test_relative_back_reference_in_alternative_in_nested_subexpressions() { //\g не поддерживается
         $test1 = array( 'str'=>'bacxxx',
                         'is_match'=>false,
                         'full'=>false,
@@ -18755,7 +18755,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_and_back_reference() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_and_back_reference() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -18801,7 +18801,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -18838,7 +18838,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_and_subroutine_reference_2() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_and_subroutine_reference_2() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'XYabcdY',
                         'is_match'=>true,
                         'full'=>true,
@@ -18850,7 +18850,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpatterns_in_not_duplicate_subpattern_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_subexpressions_in_not_duplicate_subexpression_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'XYabcdY',
                         'is_match'=>true,
                         'full'=>true,
@@ -18862,7 +18862,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_in_not_duplicate_subpattern_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_in_not_duplicate_subexpression_and_subroutine_reference() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'XYabcdY',
                         'is_match'=>true,
                         'full'=>true,
@@ -18874,7 +18874,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_word_character_in_quantifier_in_named_subpattern_and_named_back_reference_in_quantifier() { //\k не поддерживается
+/*  function data_for_test_word_character_in_quantifier_in_named_subexpression_and_named_back_reference_in_quantifier() { //\k не поддерживается
         $test1 = array( 'str'=>'a:aaxyz',
                         'is_match'=>true,
                         'full'=>true,
@@ -18920,7 +18920,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_word_character_in_quantifier_in_named_subpattern_and_named_back_reference_in_quantifier_2() { //\g не поддерживается
+/*  function data_for_test_word_character_in_quantifier_in_named_subexpression_and_named_back_reference_in_quantifier_2() { //\g не поддерживается
         $test1 = array( 'str'=>'a:aaxyz',
                         'is_match'=>true,
                         'full'=>true,
@@ -18966,7 +18966,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_named_and_conditional_subpatterns_modifier_x() { //модификатор x не поддерживается
+/*  function data_for_test_named_and_conditional_subexpressions_modifier_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'abd',
                         'is_match'=>true,
                         'full'=>true,
@@ -18986,7 +18986,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_any_character_in_subpattern_and_relative_reference() { //\g не поддерживается
+/*  function data_for_test_any_character_in_subexpression_and_relative_reference() { //\g не поддерживается
         $test1 = array( 'str'=>'aXaXZ',
                         'is_match'=>true,
                         'full'=>true,
@@ -18998,7 +18998,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_subpattern_and_relative_reference_2() { //\g не поддерживается
+/*  function data_for_test_any_character_in_subexpression_and_relative_reference_2() { //\g не поддерживается
         $test1 = array( 'str'=>'aXaXZ',
                         'is_match'=>true,
                         'full'=>true,
@@ -19142,7 +19142,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-/*  function data_for_test_word_and_space_characters_in_possessive_quantifiers_in_alternative_in_subpattern_in_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_word_and_space_characters_in_possessive_quantifiers_in_alternative_in_subexpression_in_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'now is the time for all good men to come to the aid of the party',
                         'is_match'=>true,
                         'full'=>true,
@@ -19214,7 +19214,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_possessive_quantifier_in_subpattern() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_possessive_quantifier_in_subexpression() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -19226,7 +19226,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_possessive_quantifier_in_subpattern_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_possessive_quantifier_in_subexpression_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -19238,7 +19238,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_square_brackets_in_negative_character_class_in_quantifier_in_alternative_in_subpattern_in_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_square_brackets_in_negative_character_class_in_quantifier_in_alternative_in_subexpression_in_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'((abc(ade)ufh()()x',
                         'is_match'=>true,
                         'full'=>true,
@@ -19250,7 +19250,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_square_brackets_in_negative_character_class_in_quantifier_in_alternative_in_subpattern_in_quantifier_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_square_brackets_in_negative_character_class_in_quantifier_in_alternative_in_subexpression_in_quantifier_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'(abc)',
                         'is_match'=>true,
                         'full'=>true,
@@ -19287,7 +19287,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subpattern_in_quantifier() {
+    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
@@ -19331,7 +19331,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subpattern_in_quantifier_2() {
+    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subexpression_in_quantifier_2() {
         $test1 = array( 'str'=>'>abc>123<xyz<',
                         'is_match'=>true,
                         'full'=>true,
@@ -19357,7 +19357,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_any_characters_in_subpatterns_and_relative_references_and_back_references_in_subpatterns_in_alternative_in_unnumbered_subpattern_modifier_i() {
+    function data_for_test_any_characters_in_subexpressions_and_relative_references_and_back_references_in_subexpressions_in_alternative_in_unnumbered_subexpression_modifier_i() {
         $test1 = array( 'str'=>'1221',
                         'is_match'=>true,
                         'full'=>true,
@@ -19409,7 +19409,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_digit_in_quantifier_and_character_class_in_subpattern_and_relative_references_in_alternatives_in_subpattern() {
+    function data_for_test_digit_in_quantifier_and_character_class_in_subexpression_and_relative_references_in_alternatives_in_subexpression() {
         $test1 = array( 'str'=>'12',
                         'is_match'=>true,
                         'full'=>true,
@@ -19453,7 +19453,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-    function data_for_test_relative_reference_in_quantifier_in_alternative_in_nested_subpatterns() {
+    function data_for_test_relative_reference_in_quantifier_in_alternative_in_nested_subexpressions() {
         $test1 = array( 'str'=>'xyz',
                         'is_match'=>true,
                         'full'=>true,
@@ -19499,7 +19499,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
-/*  function data_for_test_digit_and_character_class_in_possessive_quantifiers_in_alternative_in_conditional_subpattern_and_relative_reference_in_alternative_in_unnumbered_subpattern_in_quantifier_in_nested_subpatterns_modifier_x() { //модификатор x и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_digit_and_character_class_in_possessive_quantifiers_in_alternative_in_conditional_subexpression_and_relative_reference_in_alternative_in_unnumbered_subexpression_in_quantifier_in_nested_subexpressions_modifier_x() { //модификатор x и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'<>',
                         'is_match'=>true,
                         'full'=>true,
@@ -19809,7 +19809,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 */
-    function data_for_test_not_word_characters_in_possessive_quantifiers_and_back_and_relative_references_in_subpatterns_in_alternatives_in_unnumbered_subpattern_modifier_i() {
+    function data_for_test_not_word_characters_in_possessive_quantifiers_and_back_and_relative_references_in_subexpressions_in_alternatives_in_unnumbered_subexpression_modifier_i() {
         $test1 = array( 'str'=>'1221',
                         'is_match'=>true,
                         'full'=>true,
@@ -19861,7 +19861,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
-    function data_for_test_any_character_in_subpattern_and_back_and_relative_references_and_any_character_in_alternative_in_subpattern() {
+    function data_for_test_any_character_in_subexpression_and_back_and_relative_references_and_any_character_in_alternative_in_subexpression() {
         $test1 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
@@ -19926,7 +19926,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8));
     }
 
-    function data_for_test_subpattern_and_relative_reference_in_positive_lookbehind_assertion() {
+    function data_for_test_subexpression_and_relative_reference_in_positive_lookbehind_assertion() {
         $test1 = array( 'str'=>'baz',
                         'is_match'=>true,
                         'full'=>true,
@@ -19956,7 +19956,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-    function data_for_test_relative_reference_in_positive_lookbehind_assertion_and_subpattern() {
+    function data_for_test_relative_reference_in_positive_lookbehind_assertion_and_subexpression() {
         $test1 = array( 'str'=>'zbaaz',
                         'is_match'=>true,
                         'full'=>true,
@@ -19986,7 +19986,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_named_subpattern_and_named_back_reference_in_positive_lookbehind_assertion() { //(?&) не поддерживается
+/*  function data_for_test_named_subexpression_and_named_back_reference_in_positive_lookbehind_assertion() { //(?&) не поддерживается
         $test1 = array( 'str'=>'baz',
                         'is_match'=>true,
                         'full'=>true,
@@ -19998,7 +19998,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_and_back_reference_2() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_and_back_reference_2() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -20044,7 +20044,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 */
-/*  function data_for_test_not_duplicate_subpattern_and_relative_reference() { //не дублирующиеся подмаски не поддерживаются
+/*  function data_for_test_not_duplicate_subexpression_and_relative_reference() { //не дублирующиеся подмаски не поддерживаются
         $test1 = array( 'str'=>'abcabc',
                         'is_match'=>true,
                         'full'=>true,
@@ -20311,7 +20311,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_named_relative_reference_in_alternative_in_subpattern_in_quantifier_in_named_subpattern_modifier_x() { //модификатор x и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_square_brackets_in_negative_character_class_in_possessive_quantifier_and_named_relative_reference_in_alternative_in_subexpression_in_quantifier_in_named_subexpression_modifier_x() { //модификатор x и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'(ab(cd)ef)',
                         'is_match'=>true,
                         'full'=>true,
@@ -20437,7 +20437,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_reset_start_in_atomic_group_in_subpattern() { //однократные подмаски не поддерживаются
+/*  function data_for_test_reset_start_in_atomic_group_in_subexpression() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -20449,7 +20449,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_reset_start_in_subpattern_2() { //\K не поддерживается
+/*  function data_for_test_reset_start_in_subexpression_2() { //\K не поддерживается
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
@@ -20497,7 +20497,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subpattern_in_quantifier_3() {
+    function data_for_test_square_brackets_in_negative_character_class_and_relative_reference_in_quantifier_in_alternative_in_subexpression_in_quantifier_3() {
         $test1 = array( 'str'=>'a(b)c',
                         'is_match'=>true,
                         'full'=>true,
@@ -20516,7 +20516,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2));
     }
 
-/*  function data_for_test_named_subpattern_and_relative_references_in_alternative_in_named_subpattern() { //(?P>) не поддерживается
+/*  function data_for_test_named_subexpression_and_relative_references_in_alternative_in_named_subexpression() { //(?P>) не поддерживается
         $test1 = array( 'str'=>'0',
                         'is_match'=>true,
                         'full'=>true,
@@ -20542,7 +20542,7 @@ class qtype_preg_cross_tests_from_pcre {
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_named_subpattern_and_relative_references_in_alternative_in_named_subpattern_2() { //(?P>) не поддерживается
+/*  function data_for_test_named_subexpression_and_relative_references_in_alternative_in_named_subexpression_2() { //(?P>) не поддерживается
         $test1 = array( 'str'=>'0',
                         'is_match'=>true,
                         'full'=>true,
@@ -20913,7 +20913,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_named_back_reference_in_alternative_without_second_branch_in_named_subpattern_in_quantifier() {
+    function data_for_test_named_back_reference_in_alternative_without_second_branch_in_named_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'xxx',
                         'is_match'=>true,
                         'full'=>true,
@@ -20925,7 +20925,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 
-    function data_for_test_negative_character_class_in_subpattern_in_unnumbered_subpattern_modifier_i_and_relative_reference() {
+    function data_for_test_negative_character_class_in_subexpression_in_unnumbered_subexpression_modifier_i_and_relative_reference() {
         $test1 = array( 'str'=>'aa',
                         'is_match'=>true,
                         'full'=>true,
@@ -21036,7 +21036,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_word_character_in_subpattern() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_word_character_in_subexpression() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21073,7 +21073,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_unnumbered_subpattern_in_possessive_quantifier_and_word_character_in_subpattern() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_unnumbered_subexpression_in_possessive_quantifier_and_word_character_in_subexpression() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21110,7 +21110,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21149,7 +21149,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_unnumbered_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_unnumbered_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21188,7 +21188,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21207,7 +21207,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_unnumbered_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_unnumbered_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_3() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21226,7 +21226,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_4() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_4() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21265,7 +21265,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-/*  function data_for_test_unnumbered_subpattern_in_possessive_quantifier_and_word_character_in_subpattern_4() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_unnumbered_subexpression_in_possessive_quantifier_and_word_character_in_subexpression_4() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaaX',
                         'is_match'=>true,
                         'full'=>true,
@@ -21304,7 +21304,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 */
-    function data_for_test_alternative_in_subpattern_in_quantifier_and_relative_reference() {
+    function data_for_test_alternative_in_subexpression_in_quantifier_and_relative_reference() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -21330,7 +21330,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3));
     }
 
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_relative_reference() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_relative_reference() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
@@ -21362,7 +21362,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-/*  function data_for_test_subpattern_in_possessive_quantifier_and_relative_reference_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_possessive_quantifier_and_relative_reference_2() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
@@ -21394,7 +21394,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_relative_reference_and_subpattern_in_unnumbered_subpattern_in_null_quantifier() {
+    function data_for_test_relative_reference_and_subexpression_in_unnumbered_subexpression_in_null_quantifier() {
         $test1 = array( 'str'=>'b',
                         'is_match'=>true,
                         'full'=>true,
@@ -21406,7 +21406,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_square_brackets_in_negative_character_class_in_quantifier_in_atomic_group_and_relative_reference_in_alternative_in_unnumbered_subpattern_in_quantifier_in_nested_subpatterns_modifier_x() { //модификатор x не поддерживается
+/*  function data_for_test_square_brackets_in_negative_character_class_in_quantifier_in_atomic_group_and_relative_reference_in_alternative_in_unnumbered_subexpression_in_quantifier_in_nested_subexpressions_modifier_x() { //модификатор x не поддерживается
         $test1 = array( 'str'=>'foo(bar(baz)+baz(bop))',
                         'is_match'=>true,
                         'full'=>true,
@@ -21444,7 +21444,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21468,7 +21468,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21492,7 +21492,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subpattern_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_unnumbered_subexpression_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21516,7 +21516,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subpattern_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternative_in_subexpression_in_possessive_quantifier() { //ленивые и захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21540,7 +21540,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternatives_in_unnumbered_subpattern() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_begin_of_string_and_any_character_in_lazy_quantifier_and_alternatives_in_unnumbered_subexpression() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'ba',
                         'is_match'=>true,
                         'full'=>true,
@@ -21552,7 +21552,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_subpattern_in_unnumbered_subpattern_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_in_unnumbered_subexpression_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'beetle',
                         'is_match'=>true,
                         'full'=>true,
@@ -21576,7 +21576,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpattern_and_relative_reference_in_quantifier() {
+    function data_for_test_subexpression_and_relative_reference_in_quantifier() {
         $test1 = array( 'str'=>'aaaab',
                         'is_match'=>true,
                         'full'=>true,
@@ -21588,7 +21588,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_subpattern_and_relative_reference_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_subexpression_and_relative_reference_in_possessive_quantifier() { //захватывающие квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aaaab',
                         'is_match'=>true,
                         'full'=>false,
@@ -21664,7 +21664,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_quantifier_and_recursion_in_alternative_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_quantifier_and_recursion_in_alternative_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaabcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -21676,7 +21676,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_and_recursion_in_subpattern_in_alternative_in_conditional_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_quantifier_and_recursion_in_subexpression_in_alternative_in_conditional_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaabcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -21688,7 +21688,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_and_relative_reference_in_alternative_in_conditional_subpattern_in_subpattern() { //условные подмаски не поддерживаются
+/*  function data_for_test_quantifier_and_relative_reference_in_alternative_in_conditional_subexpression_in_subexpression() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaabcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -21700,7 +21700,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_quantifier_and_relative_reference_in_alternative_in_conditional_subpattern_in_subpattern_2() { //условные подмаски не поддерживаются
+/*  function data_for_test_quantifier_and_relative_reference_in_alternative_in_conditional_subexpression_in_subexpression_2() { //условные подмаски не поддерживаются
         $test1 = array( 'str'=>'aaaabcde',
                         'is_match'=>true,
                         'full'=>true,
@@ -22244,7 +22244,7 @@ however, we need the complication for Perl. */
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_subpattern_and_relative_reference_in_quantifier_and_any_character_in_subpattern() {
+    function data_for_test_subexpression_and_relative_reference_in_quantifier_and_any_character_in_subexpression() {
         $test1 = array( 'str'=>'abcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -22930,7 +22930,7 @@ name were given. */
                      'tests'=>array($test1, $test2, $test3));
     }
 */
-    function data_for_test_subpattern_in_quantifier_and_back_reference_in_quantifier_in_subpattern() {
+    function data_for_test_subexpression_in_quantifier_and_back_reference_in_quantifier_in_subexpression() {
         $test1 = array( 'str'=>'hello world test',
                         'is_match'=>true,
                         'full'=>true,
@@ -22942,7 +22942,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 
-    function data_for_test_subpattern_in_quantifier_and_back_reference_in_quantifier_in_subpattern_2() {
+    function data_for_test_subexpression_in_quantifier_and_back_reference_in_quantifier_in_subexpression_2() {
         $test1 = array( 'str'=>'hello world test',
                         'is_match'=>false,
                         'full'=>false,
@@ -22980,7 +22980,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-    function data_for_test_quantifier_in_unnumbered_subpattern_in_quantifier_in_subpattern_in_quantifier() {
+    function data_for_test_quantifier_in_unnumbered_subexpression_in_quantifier_in_subexpression_in_quantifier() {
         $test1 = array( 'str'=>'aac',
                         'is_match'=>true,
                         'full'=>true,
@@ -22992,7 +22992,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 
-/*  function data_for_test_quantifier_in_atomic_group_in_quantifier_in_subpattern_in_quantifier() { //однократные подмаски не поддерживаются
+/*  function data_for_test_quantifier_in_atomic_group_in_quantifier_in_subexpression_in_quantifier() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'aac',
                         'is_match'=>true,
                         'full'=>true,
@@ -23016,7 +23016,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_unnumbered_subpattern_and_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_character_in_lazy_quantifier_in_unnumbered_subexpression_and_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'aba',
                         'is_match'=>true,
                         'full'=>true,
@@ -23120,7 +23120,7 @@ name were given. */
                      'tests'=>array($test1));
     }
 */
-/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_subpatterns_in_alternative_in_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
+/*  function data_for_test_any_character_in_lazy_quantifier_in_atomic_group_and_subexpressions_in_alternative_in_positive_lookbehind_assertion() { //ленивые квантификаторы не поддерживаются, на жадных будет другой результат
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,
                         'full'=>true,
@@ -23139,7 +23139,7 @@ name were given. */
                      'tests'=>array($test1, $test2));
     }
 */
-/*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_subpatterns_in_alternative_in_positive_lookbehind_assertion() { //однократные подмаски не поддерживаются
+/*  function data_for_test_any_character_in_quantifier_in_atomic_group_and_subexpressions_in_alternative_in_positive_lookbehind_assertion() { //однократные подмаски не поддерживаются
         $test1 = array( 'str'=>'alphabetabcd',
                         'is_match'=>true,
                         'full'=>true,
