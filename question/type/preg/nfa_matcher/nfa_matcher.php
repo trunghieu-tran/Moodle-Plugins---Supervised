@@ -236,16 +236,6 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
     public function leftmost_longest($other) {
         // Iterate over all subpatterns.
         for ($i = 1; $i <= $this->automaton->max_subpatt(); $i++) {
-            $this_match = self::empty_subpatt_match();
-            $other_match = self::empty_subpatt_match();
-
-            if (array_key_exists($i, $this->matches)) {
-                $this_match = $this->matches[$i];
-            }
-            if (array_key_exists($i, $other->matches)) {
-                $other_match = $other->matches[$i];
-            }
-
             // Any match found beats nomatch.
             $this_last = $this->current_match($i);
             $other_last = $other->current_match($i);
@@ -254,6 +244,9 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
             } else if ($other_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $this_last[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
                 return -1;
             }
+
+            $this_match = array_key_exists($i, $this->matches) ? $this->matches[$i] : self::empty_subpatt_match();
+            $other_match = array_key_exists($i, $other->matches) ? $other->matches[$i] : self::empty_subpatt_match();
 
             // Less number of iterations means that there were a longer match without epsilons.
             $this_count = count($this_match);
