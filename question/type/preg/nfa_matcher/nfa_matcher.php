@@ -190,8 +190,19 @@ class qtype_preg_nfa_exec_state implements qtype_preg_matcher_state {
                 $this->begin_subpatt_iteration($operand, $startpos, $skipwholematch, $mode);
             }
         }
-        if ($node->subpattern != -1 && !($skipwholematch && $node->subpattern == 1)) {
+        if ($node->subpattern == -1) {
+            return;
+        }
+
+        if (!array_key_exists($node->subpattern, $this->matches)) {
+            // Very first iteration.
             $this->matches[$node->subpattern][] = self::empty_subpatt_match();
+        } else {
+            // There were some iterations. Start a new iteration only if the last wasn't NOMATCH.
+            $cur = $this->current_match($node->subpattern);
+            if (!($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND) && !($skipwholematch && $node->subpattern == 1)) {
+                $this->matches[$node->subpattern][] = self::empty_subpatt_match();
+            }
         }
     }
 
